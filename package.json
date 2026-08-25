@@ -1,0 +1,23 @@
+{
+  "name": "tablero-casa-oga",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "datos": "python3 pipeline/build.py",
+    "validar": "python3 pipeline/validate.py",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "todo": "npm run datos && npm run validar && npm run build"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.0",
+    "vite": "^8.2.2",
+    "vite-plugin-singlefile": "^2.3.3"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  }
+}
