@@ -250,3 +250,82 @@ export function Embudo({ etapas, w, h, formato }) {
   }))
   return <BarrasH datos={datos} w={w} h={h} formato={formato} anchoEtiqueta={116} notaAncho={110} />
 }
+
+/** Trama diagonal para distinguir tramos sin depender del color. En una impresion en
+ *  blanco y negro dos rellenos grises son el mismo relleno; una trama no. */
+export function Tramas() {
+  return (
+    <defs>
+      <pattern id="trama" width="6" height="6" patternUnits="userSpaceOnUse"
+               patternTransform="rotate(45)">
+        <rect width="6" height="6" fill="var(--gris)" />
+        <line x1="0" y1="0" x2="0" y2="6" stroke="#fff" strokeWidth="2.5" />
+      </pattern>
+    </defs>
+  )
+}
+
+/**
+ * Barra segmentada desde cero, con rotulo y valor SOBRE cada tramo y trama en el que no
+ * lleva enfasis. Los tramos ya no se distinguen solo por color.
+ */
+export function BarraTramos({ tramos, w, h, formato, banda }) {
+  const total = tramos.reduce((s, t) => s + t.valor, 0) || 1
+  const alto = Math.max(28, Math.min(52, h * 0.34))
+  const y = 22
+  let x = 0
+  return (
+    <svg width={w} height={h} role="img" style={{ display: 'block' }}>
+      <Tramas />
+      {tramos.map((t, i) => {
+        const ancho = (t.valor / total) * w
+        const el = (
+          <g key={t.etiqueta}>
+            <rect x={x} y={y} width={Math.max(0, ancho - (i < tramos.length - 1 ? 2 : 0))}
+                  height={alto} fill={t.enfasis ? ACC : 'url(#trama)'} />
+            <text x={x + 8} y={y - 7} fontSize="11.5" fontWeight={t.enfasis ? 700 : 500}
+                  fill={t.enfasis ? INK : MUT2}>{t.etiqueta}</text>
+            {ancho > 76 && (
+              <text x={x + 8} y={y + alto / 2} fontSize="13" fontWeight={700}
+                    fill={t.enfasis ? '#fff' : INK} dominantBaseline="central" className="tabular">
+                {formato(t.valor)}
+              </text>
+            )}
+            {t.nota && (
+              <text x={x + 8} y={y + alto + 15} fontSize="10.5" fill={MUT}>{t.nota}</text>
+            )}
+          </g>
+        )
+        x += ancho
+        return el
+      })}
+      {banda && (
+        <g>
+          <line x1={(banda[0] / total) * w} x2={(banda[0] / total) * w} y1={y - 4} y2={y + alto + 4}
+                stroke={INK} strokeWidth="1.5" strokeDasharray="3 2" />
+          <line x1={(banda[1] / total) * w} x2={(banda[1] / total) * w} y1={y - 4} y2={y + alto + 4}
+                stroke={INK} strokeWidth="1.5" strokeDasharray="3 2" />
+          <text x={(banda[1] / total) * w + 6} y={y + alto + 15} fontSize="10.5" fill={MUT2}
+                fontWeight={600}>{banda[2]}</text>
+        </g>
+      )}
+    </svg>
+  )
+}
+
+/** Serie de exposicion por corte, bajo el selector: mover el corte es ver la trayectoria.
+ *  Es el "como vengo" que pide el apunte de la clase 4. */
+export function SerieCortes({ valores, activo, w, h }) {
+  const max = Math.max(...valores) || 1
+  const paso = w / Math.max(1, valores.length - 1)
+  const pts = valores.map((v, i) => [i * paso, h - 3 - (v / max) * (h - 8)])
+  return (
+    <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
+      <polyline points={pts.map((p) => p.join(',')).join(' ')} fill="none"
+                stroke={GRIS} strokeWidth="1.5" />
+      <polyline points={pts.slice(0, activo + 1).map((p) => p.join(',')).join(' ')} fill="none"
+                stroke={ACC} strokeWidth="2" />
+      <circle cx={pts[activo][0]} cy={pts[activo][1]} r="3.2" fill={ACC} />
+    </svg>
+  )
+}

@@ -200,15 +200,16 @@ body {
 .pie {
   flex-shrink: 0;
   border-top: 1px solid var(--bd);
-  padding: 8px var(--pad-x) 10px;
+  padding: 7px var(--pad-x) 9px;
   font-size: 10.5px;
-  line-height: 1.45;
+  line-height: 1.4;
   color: var(--mut);
-  display: flex;
-  gap: 6px 20px;
-  flex-wrap: wrap;
   background: var(--fondo);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
+.pie-l { display: flex; gap: 5px 14px; flex-wrap: wrap; align-items: baseline; }
 .pie b { color: var(--mut2); font-weight: 600; }
 .pie .sep { color: var(--gris2); }
 
@@ -288,4 +289,50 @@ body {
 .kpi-base {
   font-size: 10.5px; color: var(--mut); margin-top: auto; padding-top: 7px;
   border-top: 1px dotted var(--bd);
+}
+
+/* ---------- semaforo: forma + etiqueta, nunca solo color ---------- */
+.sem {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 600 11px/1 var(--fuente); color: var(--mut2);
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.sem i { width: 10px; height: 10px; border: 1.5px solid currentColor; flex-shrink: 0; }
+.sem-lleno i { background: currentColor; }
+.sem-medio i { background: linear-gradient(to top, currentColor 50%, transparent 50%); }
+.sem-vacio i { background: none; border-style: dashed; }
+.sem-vacio { color: var(--acc); }
+
+/* ---------- tabla de la lista ---------- */
+.lista-tabla { width: 100%; border-collapse: collapse; font-size: clamp(11px, .95vw, 13px); }
+.lista-tabla th {
+  text-align: left; font: 600 10px/1 var(--fuente); color: var(--mut);
+  text-transform: uppercase; letter-spacing: .06em;
+  padding: 0 10px 6px 0; border-bottom: 1px solid var(--bd); white-space: nowrap;
+}
+.lista-tabla th.num, .lista-tabla td.num { text-align: right; }
+.lista-tabla td {
+  padding: 4px 10px 4px 0; border-bottom: 1px dotted var(--bd);
+  color: var(--mut2); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.lista-tabla td.destacado { color: var(--ink); font-weight: 600; }
+.lista-tabla .no { color: var(--acc); font-weight: 600; }
+
+/* ---------- serie bajo el selector de corte ---------- */
+.corte-caja { display: flex; flex-direction: column; gap: 2px; }
+.corte-serie { line-height: 0; }
+
+/* ---------- aviso de control inerte ---------- */
+.ctrl .apagado { opacity: .42; pointer-events: none; }
+.ctrl .aviso {
+  font: 500 10.5px/1.3 var(--fuente); color: var(--mut);
+  max-width: 21ch;
+}
+
+/* ---------- modo impresion: las 14 pantallas en flujo ---------- */
+.impresion-flujo { display: flex; flex-direction: column; }
+.impresion-flujo .hoja { height: 168mm; display: flex; flex-direction: column; }
+.impresion-flujo .hoja .pant { flex: 1; min-height: 0; }
+@media screen {
+  .impresion-flujo { overflow: auto; }
 }

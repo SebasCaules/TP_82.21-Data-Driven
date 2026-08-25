@@ -1,0 +1,68 @@
+# Deploy a GitHub Pages desde Actions, no desde la carpeta /docs: docs/ tiene el
+# documento LaTeX de formulas y configurar Pages ahi lo publicaria por error.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'pandas==2.3.3' 'numpy==2.1.0'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+
+      # El payload NO se versiona: se regenera desde los CSV en cada deploy. Si una
+      # ancla no da, el build corta aca y no se publica nada.
+      - name: Pipeline y anclas
+        run: python3 pipeline/build.py
+
+      # src/datos.js se versiona para que un clone limpio compile sin Python. El riesgo
+      # es que quede viejo: aca se comprueba que lo commiteado es exactamente lo que el
+      # pipeline genera hoy.
+      - name: Sin deriva del payload versionado
+        run: git diff --exit-code -- src/datos.js
+
+      - name: Arnes de validacion
+        run: python3 pipeline/validate.py
+
+      - name: Paridad Python/JS
+        run: |
+          python3 pipeline/golden.py
+          node test/paridad.mjs
+
+      - run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
