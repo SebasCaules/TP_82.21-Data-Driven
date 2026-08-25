@@ -1,0 +1,192 @@
+# Transcripcion de la Parte D entregada (DOCX, v1.0, no se toca — decision D8)
+# Fuente: entregas/entregable-1/25-08/
+
+
+
+Nombre del Proyecto
+Casa Óga — Retail de Hogar y Decoración
+Entregable 1 · Parte D — Clase 4: Diseño de Dashboard
+Integrante(s)
+ | [Nombre(s) y legajos]
+ | Rol Asignado en esta fase
+ | 
+
+ | Sebastian Caules - 64331
+ | Programador y Organización
+ | 
+
+ | Tomas Ferreccio - 64934
+ | Investigación de material
+ | 
+
+ | Matías Sola - 64322
+ | Tratamiento de datos
+ | 
+
+ | Francisco Cattaneo - 64900
+ | Investigación de fórmulas matemáticas
+ | 
+
+ | Juan Manuel Rilo - 64037
+ | Consolidación de datos y fórmulas
+ | 
+Fecha de entrega
+ | 01/09/2026
+ | 
+ | 
+Versión
+ | v1.0
+ | 
+ | 
+
+Sección 1 Objetivo y preguntas de negocio del dashboard
+ | 
+
+1.1  Objetivo del dashboard
+Dar al directorio de Casa Óga un número mensual de seguimiento del riesgo de pérdida de clientes (cuánta facturación anual está expuesta y sobre qué parte de la base) para decidir si el proyecto de retención sigue recibiendo presupuesto. La misma base alimenta una vista semanal para Marketing, que decide a quiénes contactar dentro de la capacidad real de 500 a 800 contactos personalizados por mes.
+
+1.2  Preguntas de negocio a responder
+¿Cuánta facturación anual está hoy en riesgo y qué parte de la base la explica?
+¿El riesgo se concentra en los clientes que más facturan o en los de menor valor?
+¿La recompra a 90 días se mueve hacia la meta de 10-11% o sigue en la línea base de 8-9%?
+¿Qué región y qué categoría concentran la pérdida esperada del mes?
+¿A cuántos clientes en riesgo alcanza a contactar Marketing y cuáles quedan sin cubrir?
+¿La lista priorizada rinde más que el criterio actual, que convierte 1,39% de compra a 7 días?
+
+Sección 2  Indicadores (KPIs) del dashboard
+ | 
+
+2.1  Definición de indicadores 
+
+Indicador
+ | Fórmula / Cálculo
+ | Meta y umbrales (semáforo)
+ | Frecuencia y dueño
+ | Fuente de datos
+ | 
+Tasa de recompra a 90 días
+ | Clientes con una compra nueva dentro de los 90 días / clientes activos al inicio de la ventana
+ | Meta 10-11% al primer año. Verde ≥10% “En meta” / Amarillo 9-10% “Por debajo” / Rojo <9% “Fuera de meta”. Cada estado con etiqueta, no solo color
+ | Mensual · María G. (sponsor), ejecución Sofía R.
+ | Transacciones_clientes.csv
+ | 
+Ingreso anual en riesgo (exposición)
+ | Suma del gasto anualizado de los clientes en riesgo (facturación histórica / años de historia)
+ | Referencia ARS 94,9 M al 31/12/2025. Sin meta: se sigue la variación mes a mes. Es exposición, no recupero
+ | Mensual · Carlos F. (Dirección Financiera)
+ | Transacciones_clientes.csv
+ | 
+Clientes en riesgo
+ | Recency > máx(90 días; 1,5 × gap mediano propio), sobre clientes con 3 compras o más
+ | Referencia 2.452 (41,0% de 5.978). Verde <38% / Amarillo 38-42% / Rojo >42%, con etiqueta de texto
+ | Mensual · María G.
+ | Transacciones_clientes.csv
+ | 
+Riesgo en el quintil de mayor valor (Q5)
+ | Clientes en riesgo dentro de Q5 de facturación / total de Q5
+ | Referencia 51,8% (619 clientes, ARS 113,6 M). Verde <45% / Amarillo 45-52% / Rojo >52%
+ | Mensual · María G.
+ | Transacciones_clientes.csv
+ | 
+Cobertura de contacto
+ | Clientes en riesgo contactados en el mes / capacidad comprometida (500 a 800)
+ | Meta ≥90% de la capacidad usada. Rojo si queda sin contactar algún cliente del decil superior de pérdida esperada
+ | Semanal · Sofía R.
+ | Campanias_marketing.csv
+ | 
+Compra a 7 días sobre contactados
+ | Compras dentro de los 7 días del envío / envíos de la lista
+ | Baseline 1,39% (criterio actual “Inactivos 90d”). Meta: superarlo de forma sostenida en tres meses
+ | Semanal · Sofía R.
+ | Campanias_marketing.csv
+ | 
+
+Sección 3  Usuarios y audiencia del dashboard
+ | 
+
+3.1  Mapa de usuarios
+Usuario / Rol
+ | Pregunta clave que necesita responder
+ | Nivel de uso esperado
+ | 
+Directorio: María G. (sponsor) y Carlos F. (Finanzas)
+ | ¿Cuánta facturación protegemos y vale seguir invirtiendo?
+ | Medio · mensual
+ | 
+Sofía R., Gcia. de Marketing y Fidelización
+ | ¿A quiénes contacto esta semana y con qué acción?
+ | Alto · semanal
+ | 
+Equipo de campañas de Marketing
+ | ¿Qué rindió la lista de la semana pasada contra el criterio anterior?
+ | Alto · semanal
+ | 
+Lucía O., Gcia. de Operaciones
+ | ¿Qué tiendas concentran clientes en riesgo?
+ | Bajo · vista secundaria por tienda
+ | 
+Equipo del proyecto (82.21)
+ | ¿Qué cifras se sostienen y cuáles hay que recalcular antes de mostrarlas?
+ | Alto · en cada iteración
+ | 
+
+Sección 4  Diseño / boceto del dashboard (wireframe)
+ | 
+
+4.1  Estructura del boceto
+[FILTROS]
+Mes de corte (la V1 queda fija al 31/12/2025), región, categoría principal del cliente y segmento RFM. Canal y tienda no entran en la vista ejecutiva: van en la operativa.
+[KPIs PRINCIPALES]
+Arriba a la izquierda, el número grande: ARS 94,9 M/año en riesgo (exposición). Al lado y en menor jerarquía, tres tarjetas: recompra a 90 días 8,5% contra meta 10-11%; 2.452 clientes en riesgo (41,0% de 5.978); riesgo del quintil de mayor valor 51,8% (619 clientes, ARS 113,6 M).
+[VISUALIZACIONES]
+1. Línea, recompra trimestral 2022-2025 con la meta marcada. Título: “La recompra cae cuatro trimestres seguidos desde el pico de 19,0%”. Responde si el indicador mejora o empeora.
+2. Barras horizontales, pérdida esperada en pesos por segmento RFM, ordenadas de mayor a menor y con la tasa de riesgo etiquetada al lado. Título: “El riesgo no está donde está la plata: Campeones concentra el 29,1% de la facturación con la tasa más baja”.
+3. Barras horizontales, porcentaje en riesgo por quintil de valor, base en cero. Título: “El riesgo crece con el valor: Q5 (51,8%) casi cuadruplica a Q1 (13,3%)”.
+4. Barras horizontales por región y por categoría, todo en gris salvo el máximo. Sirve para descartar una lectura geográfica: 4,7 puntos entre extremos por región.
+5. Comparación contra el criterio actual: compra a 7 días del segmento “Inactivos 90d” (1,39%) contra la lista priorizada. Va etiquetado “Modelo predictivo (en desarrollo)” hasta que exista score.
+Reglas aplicadas: barras siempre desde cero, tiempo en línea, un solo color de énfasis y el resto en gris, título que dice el hallazgo. Sin torta, sin 3D, sin eje Y secundario. Cada estado del semáforo lleva etiqueta de texto además del color, según pidió el negocio.
+[NIVEL DE DETALLE]
+Tabla de detalle solo en la vista de Marketing: código de cliente (sin nombre ni mail), pérdida esperada, recency, gap propio, última categoría y acción sugerida. Ordenable y exportable. Drill-down desde cualquier barra al listado filtrado. La vista de directorio se resuelve en una pantalla, sin scroll.
+[NOTAS FIJAS AL PIE]
+Fecha de corte de los datos: 31/12/2025. Churn es un proxy operativo: sin compra por más de 90 días o más de 1,5 veces el ritmo propio del cliente. Los ARS 94,9 M son exposición, no recupero. Los bloques van rotulados “Diagnóstico (datos históricos)” y “Modelo predictivo (en desarrollo)”.
+[BOCETO]
+Mockup navegable en demos/dashboard-directorio-churn.html (HTML + SVG, corre local, sin datos personales). Se adjunta PDF de las vistas como respaldo de presentación.
+ | 
+
+Sección 5  Fuentes de datos y granularidad
+ | 
+
+5.1  Datos que alimentan el dashboard
+Fuentes principales
+ | Transacciones_clientes.csv (50.250 filas, 2022-2025), Clientes.csv (6.050), Campanias_marketing.csv (23.729 envíos), Fidelizacion.csv (4.043), Tiendas.csv (28) y Calendario.csv. No hay costos ni margen: el riesgo se expresa en facturación, no en contribución.
+ | 
+Granularidad
+ | Transacción individual (fecha, tienda, canal, cliente, categoría, monto). Se agrega a cliente-mes para la lista de contacto y a mes para la vista ejecutiva.
+ | 
+Frecuencia de actualización
+ | Mensual para el directorio, semanal para Marketing. Los datasets entregados son estáticos y cortan al 31/12/2025: la V1 se arma sobre ese corte y lo declara a la vista.
+ | 
+Calidad conocida
+ | 250 ids de transacción duplicados (el negocio confirmó que se eliminan), 613 montos negativos sin semántica declarada, canal con 4 etiquetas para 2 valores, 8,7% de edades nulas con valores imposibles, 30,1% de envíos a clientes sin consentimiento de marketing. Detalle en el Entregable 2.
+ | 
+
+Sección 6  Herramienta y alcance de la V1
+ | 
+
+6.1  Alcance de la primera versión
+Herramienta elegida
+ | HTML + SVG local, servido con python -m http.server. Looker Studio y Tableau Public quedan afuera porque exigen subir los datos, y Clientes.csv trae mail, edad, género y provincia (Ley 25.326, art. 12). Power BI Desktop no corre en las máquinas del equipo.
+ | 
+Alcance V1 (qué se muestra)
+ | Cuatro vistas sobre el corte al 31/12/2025: riesgo por recency y por quintil de valor, segmentos RFM con su pérdida esperada, simulador de valor esperado e inventario de calidad de los seis datasets. Todo diagnóstico, sin score.
+ | 
+Fuera de alcance V1
+ | Score del modelo, alertas automáticas, refresco automático de datos, integración con el CRM, drill-down por tienda y medición de efecto incremental (necesita grupo de control).
+ | 
+Plan de evolución (V2)
+ | Score en la lista, corte por pérdida esperada contra la capacidad de 500 a 800 contactos por mes, grupo de control estratificado por quintil de valor y refresco mensual desde el sistema de origen.
+ | 
+Responsable
+ | Sebastian Caules (64331), con Matías Sola (64322) en el tratamiento de datos.
+ | 
+

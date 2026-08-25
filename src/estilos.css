@@ -1,0 +1,291 @@
+/* Tokens tomados de la ficha F07 del BAN (congelada, decision D11). El resto del
+   tablero hereda de ahi para que "mismo color, mismo significado" (Knaflic regla 19)
+   valga en las doce pantallas. */
+
+:root {
+  --sup: #fff;
+  --fondo: #eceef1;
+  --rule: #16181d;
+  --bd: #dcdfe4;
+  --lbl: #3a3f4a;
+  --ink: #1a1a1a;
+  --mut: #8a919c;
+  --mut2: #4a4a4a;
+  --trk: #eceef1;
+  --acc: #b8433a;          /* unico color de enfasis del tablero (regla 18) */
+  --gris: #b6bcc6;         /* las series que NO son el enfasis */
+  --gris2: #d5d9e0;
+  --meta: #6a7180;
+
+  --fuente: "Segoe UI", Tahoma, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  --pad-x: clamp(20px, 2.6vw, 44px);
+  --pie-h: 46px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;               /* D1: nada scrollea, en ninguna resolucion */
+}
+
+body {
+  background: var(--fondo);
+  color: var(--ink);
+  font: 15px/1.5 var(--fuente);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ---------- armazon: encabezado fijo, cuerpo flexible, pie fijo ---------- */
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--fondo);
+}
+
+.cuerpo {
+  flex: 1;
+  min-height: 0;                  /* sin esto el hijo desborda en vez de encogerse */
+  display: flex;
+  flex-direction: column;
+  padding: clamp(10px, 1.6vh, 22px) var(--pad-x) 0;
+}
+
+/* ---------- encabezado ---------- */
+
+.enc {
+  background: var(--rule);
+  color: #fff;
+  padding: 10px var(--pad-x);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+.enc .marca {
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.enc .marca span { color: var(--mut); font-weight: 400; }
+
+.bloques { display: flex; gap: 0; border: 1px solid #3a404b; border-radius: 5px; overflow: hidden; }
+.bloques button {
+  font: 600 12px/1 var(--fuente);
+  background: #22252c;
+  color: #c9ced8;
+  border: 0;
+  padding: 8px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.bloques button + button { border-left: 1px solid #3a404b; }
+.bloques button[aria-pressed="true"] { background: #fff; color: var(--rule); }
+.bloques button:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+
+/* ---------- controles: corte y filtros ---------- */
+
+.ctrl { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+
+.ctrl label { font-size: 11px; color: var(--mut); text-transform: uppercase; letter-spacing: 0.06em; }
+
+.ctrl select {
+  font: 500 12.5px/1 var(--fuente);
+  background: #22252c;
+  color: #e6e8ec;
+  border: 1px solid #3a404b;
+  border-radius: 4px;
+  padding: 7px 9px;
+}
+.ctrl select:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+
+.chip {
+  font: 500 11.5px/1 var(--fuente);
+  background: #2c313a;
+  color: #e6e8ec;
+  border: 1px solid #3a404b;
+  border-radius: 3px;
+  padding: 6px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.chip b { font-weight: 600; }
+.chip button {
+  background: none; border: 0; color: var(--mut); cursor: pointer;
+  font: 600 13px/1 var(--fuente); padding: 0 1px;
+}
+.chip button:hover { color: #fff; }
+.chip button:focus-visible { outline: 1px solid #fff; }
+
+/* ---------- riel de pantallas ---------- */
+
+.riel { display: flex; gap: 5px; align-items: center; }
+.riel button {
+  width: 26px; height: 22px;
+  font: 600 11px/1 var(--fuente);
+  background: #22252c; color: #8a919c;
+  border: 1px solid #3a404b; border-radius: 3px;
+  cursor: pointer;
+}
+/* La pantalla activa no se distingue solo por color: cambia el borde y se rellena.
+   Requisito del negocio (relevamiento) y restriccion 5 del runbook. */
+.riel button[aria-current="true"] {
+  background: #fff; color: var(--rule); border-color: #fff; font-weight: 700;
+}
+.riel button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+
+/* ---------- pantalla ---------- */
+
+.pant { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: clamp(6px, 1.1vh, 14px); }
+
+.rotulo {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: 600 10.5px/1 var(--fuente);
+  text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--mut2);
+  align-self: flex-start;
+}
+.rotulo::before {
+  content: ""; width: 9px; height: 9px; border: 1.5px solid var(--mut2);
+}
+.rotulo.predictivo::before { background: none; border-style: dashed; }
+.rotulo.diagnostico::before { background: var(--mut2); }
+
+.titulo {
+  font: 600 clamp(19px, 2.05vw, 30px)/1.22 var(--fuente);
+  letter-spacing: -0.015em;
+  margin: 0;
+  max-width: 46ch;
+}
+.bajada {
+  font-size: clamp(12.5px, 1.05vw, 14.5px);
+  color: var(--mut2);
+  margin: 0;
+  max-width: 82ch;
+}
+
+.lienzo {
+  flex: 1;
+  min-height: 150px;              /* piso: sin esto una columna corta colapsa el SVG */
+  display: flex;
+  gap: clamp(14px, 2vw, 34px);
+  align-items: stretch;
+}
+.lienzo > * { min-width: 0; }
+
+.tarjeta {
+  background: var(--sup);
+  border: 1px solid var(--bd);
+  border-top: 3px solid var(--rule);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- pie fijo ---------- */
+
+.pie {
+  flex-shrink: 0;
+  border-top: 1px solid var(--bd);
+  padding: 8px var(--pad-x) 10px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--mut);
+  display: flex;
+  gap: 6px 20px;
+  flex-wrap: wrap;
+  background: var(--fondo);
+}
+.pie b { color: var(--mut2); font-weight: 600; }
+.pie .sep { color: var(--gris2); }
+
+/* ---------- impresion: A4 apaisada, una pantalla por hoja ---------- */
+
+@page { size: A4 landscape; margin: 10mm; }
+
+@media print {
+  html, body, #root { height: auto; overflow: visible; background: #fff; }
+  .app { height: auto; display: block; }
+  .enc, .riel { display: none !important; }
+  .impresion { display: block !important; }
+  .hoja {
+    break-after: page;
+    height: 178mm;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 6mm;
+  }
+  .hoja:last-child { break-after: auto; }
+  .titulo { font-size: 20px; }
+  .pie { border-top: 1px solid var(--bd); color: #555; }
+}
+
+.impresion { display: none; }
+
+/* ---------- detector de desborde (?fit) ---------- */
+
+.fit-mal { outline: 3px solid #b8433a !important; outline-offset: -3px; }
+
+/* ---------- BAN (ficha F07, congelada) ---------- */
+
+.ban {
+  --val: 38px;
+  background: var(--sup);
+  border: 1px solid var(--bd);
+  border-top: 3px solid var(--rule);
+  padding: 14px 16px;
+  font-family: var(--fuente);
+  display: flex;
+  flex-direction: column;
+}
+.ban-lbl {
+  font-size: 12px; font-weight: 600; color: var(--lbl);
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.ban-val {
+  font-size: var(--val); color: var(--ink); font-weight: 600;
+  letter-spacing: -1px; margin: 6px 0 0; line-height: 1.05;
+}
+.ban-sub { font-size: 12px; color: var(--mut); margin-top: 3px; }
+.ban-track { position: relative; height: 24px; background: var(--trk); margin-top: 10px; }
+.ban-track i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--acc); }
+.ban-mk { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
+.ban-sc {
+  position: absolute; top: calc(100% + 5px);
+  font-size: 10.5px; color: var(--mut); white-space: nowrap;
+}
+.ban-scrow { height: 16px; }
+.ban table { width: 100%; border-collapse: collapse; margin-top: 11px; font-size: 11.5px; }
+.ban td { padding: 3px 0; color: var(--mut2); border-bottom: 1px dotted var(--bd); }
+.ban td:last-child { text-align: right; font-weight: 600; color: var(--ink); }
+.ban-note { font-size: 10.5px; color: var(--mut); margin-top: 9px; line-height: 1.5; }
+
+/* ---------- tarjetas de KPI ---------- */
+.kpi-lbl {
+  font-size: 11px; font-weight: 600; color: var(--lbl);
+  text-transform: uppercase; letter-spacing: .05em;
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.kpi-lbl b { color: var(--acc); font-variant-numeric: tabular-nums; }
+.kpi-val {
+  font-size: clamp(22px, 2.3vw, 32px); font-weight: 600; color: var(--ink);
+  letter-spacing: -.5px; line-height: 1.1; margin-top: 5px;
+}
+.kpi-sub { font-size: 11.5px; color: var(--mut2); margin-top: 3px; }
+.kpi-base {
+  font-size: 10.5px; color: var(--mut); margin-top: auto; padding-top: 7px;
+  border-top: 1px dotted var(--bd);
+}

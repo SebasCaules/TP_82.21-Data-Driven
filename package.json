@@ -6,10 +6,12 @@
   "scripts": {
     "datos": "python3 pipeline/build.py",
     "validar": "python3 pipeline/validate.py",
+    "golden": "python3 pipeline/golden.py",
+    "paridad": "node test/paridad.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "todo": "npm run datos && npm run validar && npm run build"
+    "todo": "npm run datos && npm run validar && npm run golden && npm run paridad && npm run build"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.0",
