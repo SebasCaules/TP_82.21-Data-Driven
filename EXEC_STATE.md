@@ -7,8 +7,8 @@ Método: workforce (olas verificadas). Arranque 2026-08-25. Entrega **mar 01/09/
 
 | # | Compuerta | Estado | Notas |
 |---|---|---|---|
-| 1 | Alcance | **ESPERANDO VISTO BUENO** | inventario F0 completo, 5 anclas en verde, 13 contradicciones, 4 preguntas abiertas |
-| 2 | Contrato de datos | TODO | |
+| 1 | Alcance | **APROBADA** | 4 recomendaciones aceptadas: 25 cortes, pesos nominales, lista top-N, backlog fuera |
+| 2 | Contrato de datos | **ESPERANDO VISTO BUENO** | 44/44 anclas, 201.819/201.819 chequeos, payload 1.089 KB, ola 1 cerrada |
 | 3 | Diseño por pantalla | TODO | |
 | 4 | Esqueleto navegable | TODO | |
 | 5 | Verificación | TODO | |
@@ -23,7 +23,28 @@ Método: workforce (olas verificadas). Arranque 2026-08-25. Entrega **mar 01/09/
 | F0.3 verificación de cifras derivadas | DONE | 94,9 M · 262,8 M · 550,2 M · 204,6 M · 80,1 M @30/09 · Q5/Q1 3,89× |
 | F0.4 scaffold `app/` + copia de datasets (D5, D10) | DONE | `app/data/raw/` 6 CSV, md5 idéntico, `raw/` intacto |
 | F0.5 inventario y contradicciones | DONE | `app/docs/fase-0-inventario.md` |
-| F0.6 git init + remote (D6) | TODO | tras compuerta 1 |
+| F0.6 git init + remote (D6) | DONE | `app/` es la raíz del repo, remote a TP_82.21-Data-Driven (vacío, confirmado) |
+
+## Ola 1 — pipeline (compuerta 2)
+
+| Módulo | Dueño | Build | Verificación | Resultado |
+|---|---|---|---|---|
+| `loader.py` | W1 (sonnet) | OK | VERDE (sonnet high) | 10/10 conteos exactos al primer intento |
+| `features.py` | W2 (sonnet high) | OK + bloqueo | VERDE (opus high) | el bloqueo de las 664 celdas era correcto: el contrato estaba mal |
+| `series.py` | W3 (sonnet high) | OK + bloqueo | **ROJO** (opus high): 2 altas, 2 medias, 2 bajas | fix aplicado; las dos altas necesitaban `build.py`, integradas por N0 |
+| `pack.py` | W4 (sonnet) | OK | VERDE (sonnet high) | clobbereaba `exposicion_por_corte`; punto de integración, resuelto por N0 |
+| `build.py`, `validate.py` | N0 | OK | — | 44/44 anclas · 201.819/201.819 chequeos |
+
+Findings de `series.py` y cómo se cerraron:
+
+| Severidad | Finding | Cierre |
+|---|---|---|
+| alta | `estacionalidad` daba 16,6 M en diciembre contra el ancla de 29,0 M | base equivocada: el ancla es sobre venta total. `build.py` pasa `tx_total` |
+| alta | `base_activa_anual.ventas` daba 68,6 M en 2022 contra 123,8 M | mismo origen. Se emiten las dos series con el % identificado al lado |
+| media | `recompra_trimestral` usaba `MAX(fecha)` del run | parámetro `hasta`, cableado al corte de referencia |
+| media | el embudo mezclaba bases: global sobre 23.529 y segmentos sobre 23.729 | se emiten las dos desagregaciones; cada una reconcilia con su total |
+| baja | clic de "Inactivos 90d" 9,5 % contra 9,6 % del wiki | diferencia de base; las dos viajan y el pie declara cuál es cuál |
+| baja | la serie traía 2025Q4 con `tasa=null` | el gráfico filtra nulos; queda declarado en el diseño |
 
 ## Decisiones N0
 
@@ -32,6 +53,11 @@ Método: workforce (olas verificadas). Arranque 2026-08-25. Entrega **mar 01/09/
 | N0-1 | El apunte `raw/clases/clase-04/Clase 4.md` entra al contrato de diseño con rango superior a la guía | `CLAUDE.md`: lo dicho en clase pisa al programa y a la guía. Apareció después de escribirse `consignas.md` del 25/08 | 2026-08-25 |
 | N0-2 | La limpieza reporta el conteo en las cuatro etapas (crudo → dedupe → identificado → monto>0) | resuelve la contradicción 613/608 sin pisar ninguna de las dos fuentes | 2026-08-25 |
 | N0-3 | `EXEC_STATE.md` y la documentación de ejecución viven en `app/`, versionados | el repo es público y académico; el build se documenta solo | 2026-08-25 |
+| N0-4 | RFM: R/F/M son `qcut` del `rank(method="first")`; `Nuevos` usa el conteo literal de compras, no el quintil F | reproduce 5 de 7 segmentos exactos y los dos que la guía cita (Campeones 1.014 / 159,9 M y "En riesgo" 1.018 / 95,7 %). Las otras variantes de desempate se alejan mucho más | 2026-08-25 |
+| N0-5 | Arquitectura: tabla de contingencia por (corte × región × categoría × RFM × quintil); el navegador solo filtra y suma | medidas las tres opciones: precálculo total 5,8 MB, cálculo en navegador 0,37 MB con riesgo de paridad, contingencia 1.089 KB sin ese riesgo | 2026-08-25 |
+| N0-6 | Las cifras anuales de ventas y la estacionalidad van sobre la base **sin** filtrar cliente (49.392 filas) | es la única que reproduce 123,8/295,8/349,7/225,0 M y diciembre 29,0 / febrero 16,5. Dos workers lo devolvieron como bloqueo en vez de forzarlo y tenían razón | 2026-08-25 |
+| N0-7 | El denominador anualizado se deja completo y se declara `clientes_historia_corta` por corte | preserva el ancla 94,9/204,6 = 46,4 %; corregirlo la rompería. Decisión del usuario en compuerta 2 | 2026-08-25 |
+| N0-8 | La contingencia tiene **664** celdas ocupadas, no 696 | 696 salió de un sondeo mío con la regla vieja de `Nuevos`. El worker lo devolvió como bloqueo; el contrato estaba mal y se corrigió | 2026-08-25 |
 
 ## Ownership de archivos
 

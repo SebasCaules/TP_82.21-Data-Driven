@@ -89,7 +89,7 @@ física y no se pueden geolocalizar; esconderlos rompería la suma.
 ### 4.2 Tabla de contingencia — el corazón
 
 Por cada corte, una fila por celda **ocupada** de `region × categoria × rfm × quintil`
-(696 ocupadas de 1.470 posibles al último corte). Por celda, seis enteros:
+(664 ocupadas de 1.470 posibles al último corte). Por celda, seis enteros:
 
 | Campo | Tipo | Qué es |
 |---|---|---|

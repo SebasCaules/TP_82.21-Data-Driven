@@ -105,12 +105,12 @@ def main():
         "contingencias": contingencias,
         "listas": listas,
         "series": {
-            "recompra_trimestral": series.recompra_trimestral(tx),
+            "recompra_trimestral": series.recompra_trimestral(tx, hasta=pd.Timestamp(CORTE_REF)),
             "base_activa_anual": series.base_activa_anual(tx),
             "ventas_anuales": _ventas_anuales(DATA_DIR),
             "embudo_campanias": series.embudo_campanias(camp, pd.Timestamp(CORTE_REF)),
             "consentimiento": series.consentimiento(camp, clientes),
-            "estacionalidad": series.estacionalidad(tx),
+            "estacionalidad": series.estacionalidad(tx, tx_total=_tx_total(DATA_DIR)),
             "exposicion_por_corte": exposicion_por_corte,
         },
         "stage_counts": counts,
@@ -136,6 +136,22 @@ def main():
     return 0
 
 
+def _tx_total(data_dir):
+    """Base sin filtrar cliente: dedupe + monto > 0 (49.392 filas).
+
+    Es la base de "ventas de la empresa": la venta anonima es venta igual, y es la que
+    reproduce las cifras anuales y la estacionalidad del wiki. La base por cliente
+    identificado (27.276) mide otra cosa y no las reproduce — lo devolvieron como
+    bloqueo los workers de series y tenian razon.
+    """
+    import pandas as pd
+
+    raw = pd.read_csv(Path(data_dir) / "Transacciones_clientes.csv").drop_duplicates()
+    raw = raw[raw["monto_neto"] > 0].copy()
+    raw["fecha"] = pd.to_datetime(raw["fecha"])
+    return raw
+
+
 def _ventas_anuales(data_dir):
     """Ventas por anio sobre la base SIN filtrar cliente (dedupe + monto > 0, 49.392 filas).
 
@@ -146,9 +162,7 @@ def _ventas_anuales(data_dir):
     """
     import pandas as pd
 
-    raw = pd.read_csv(Path(data_dir) / "Transacciones_clientes.csv").drop_duplicates()
-    raw = raw[raw["monto_neto"] > 0].copy()
-    raw["fecha"] = pd.to_datetime(raw["fecha"])
+    raw = _tx_total(data_dir)
     anio = raw["fecha"].dt.year
     total = raw.groupby(anio)["monto_neto"].sum()
     ident = raw[raw["id_cliente"].notna()].groupby(anio)["monto_neto"].sum()
@@ -206,6 +220,59 @@ def _anclas(counts, facts, tx):
     ] + [
         chk(f"ventas {v['anio']} (M)", _millones(v["ventas"]), esperado)
         for v, esperado in zip(_ventas_anuales(DATA_DIR), [123.8, 295.8, 349.7, 225.0])
+    ] + _anclas_estacionalidad(tx) + _anclas_campanias()
+
+
+def _anclas_campanias():
+    """El embudo y el consentimiento. La tabla por segmento del wiki esta declarada
+    sobre los 23.729 del dataset; el embudo global, sobre los 23.529 limpios. Se
+    chequean las dos bases contra su propia fuente."""
+    import pandas as pd
+    import series
+
+    camp = loader.load_campanias(DATA_DIR)
+    clientes = loader.load_clientes(DATA_DIR)
+    e = series.embudo_campanias(camp, pd.Timestamp(CORTE_REF))
+    c = series.consentimiento(camp, clientes)
+    seg = {x["segmento"]: x for x in e["por_segmento_completa"]}
+
+    def chk(nombre, real, esperado):
+        return {"nombre": nombre, "real": real, "esperado": esperado, "ok": real == esperado}
+
+    return [
+        chk("envios base completa", e["base_completa_envios"], 23729),
+        chk("envios base limpia", e["base_limpia_envios"], 23529),
+        chk("embudo abre (%)", round(100 * e["global"]["abre"], 1), 35.1),
+        chk("embudo clic (%)", round(100 * e["global"]["clic"], 1), 8.8),
+        chk("embudo compra 7d (%)", round(100 * e["global"]["compra_7dias"], 1), 1.2),
+        chk("marca a superar Inactivos 90d (%)",
+            round(100 * seg["Inactivos 90d"]["compra_7dias"], 2), 1.39),
+        chk("compra a 7 dias sin clic previo", e["compra_sin_click_previo"], 0),
+        chk("envios sin consentimiento", c["envios_a_no_acepta"], 7078),
+        chk("envios sin consentimiento (%)", round(100 * c["pct_envios_a_no_acepta"], 1), 30.1),
+        chk("alcance de los que no consintieron (%)", round(100 * c["pct_alcance"], 1), 98.3),
+        chk("envios huerfanos", c["envios_huerfanos"], 46),
+    ] + [
+        chk(f"envios segmento {s}", seg[s]["envios"], n)
+        for s, n in (("Silver", 6164), ("Gold", 5117), ("Bronze", 4703),
+                     ("Inactivos 90d", 4399), ("Todos", 3346))
+    ]
+
+
+def _anclas_estacionalidad(tx):
+    """Diciembre y febrero, los dos extremos que declara el wiki. Van sobre la venta
+    total (con anonima incluida): es lo que mide 'cuando vende la empresa'."""
+    import series
+
+    por_mes = {e["mes"]: e for e in series.estacionalidad(tx, tx_total=_tx_total(DATA_DIR))}
+    return [
+        {
+            "nombre": f"estacionalidad mes {mes} (M)",
+            "real": _millones(por_mes[mes]["promedio"]),
+            "esperado": esperado,
+            "ok": _millones(por_mes[mes]["promedio"]) == esperado,
+        }
+        for mes, esperado in ((12, 29.0), (2, 16.5))
     ]
 
 
