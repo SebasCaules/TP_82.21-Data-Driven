@@ -871,19 +871,24 @@ export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion
  * de la banda de capacidad (de 500 a 800) se dibuja con relleno intermedio, asi que el rango
  * declarado se ve en vez de anunciarse.
  */
-export function Unidades({ total, cubiertoLo, cubiertoHi, porCuadro, w, h }) {
+export function Unidades({ total, cubiertoLo, cubiertoHi, porCuadro, w, h, unidad }) {
   if (!(total > 0) || w < 40 || h < 30) return null
   const n = Math.ceil(total / porCuadro)
   const g = 4
+  // La clave de lectura se escribe SOBRE el primer cuadro, no en una leyenda aparte: la
+  // unidad es lo primero que hay que saber para contar, y en un renglon suelto abajo a la
+  // derecha se leia despues de haber mirado toda la cuadricula.
+  const padTop = unidad ? 26 : 0
+  const hg = Math.max(20, h - padTop)
   // Columnas por proporcion de la caja, no "las que entren": tomar el cuadro mas grande
   // posible daba una sola fila larguisima, que se cuenta peor que una cuadricula.
-  const cols = Math.max(1, Math.min(n, Math.round(Math.sqrt((n * w) / Math.max(1, h)))))
+  const cols = Math.max(1, Math.min(n, Math.round(Math.sqrt((n * w) / Math.max(1, hg)))))
   const filas = Math.ceil(n / cols)
-  const s = Math.max(4, Math.min((w - (cols - 1) * g) / cols, (h - (filas - 1) * g) / filas))
+  const s = Math.max(4, Math.min((w - (cols - 1) * g) / cols, (hg - (filas - 1) * g) / filas))
   const ancho = cols * (s + g) - g
   const alto = filas * (s + g) - g
   const x0 = Math.max(0, (w - ancho) / 2)
-  const y0 = Math.max(0, (h - alto) / 2)
+  const y0 = padTop + Math.max(0, (hg - alto) / 2)
   const nLo = Math.round(cubiertoLo / porCuadro)
   const nHi = Math.round(cubiertoHi / porCuadro)
 
@@ -902,6 +907,26 @@ export function Unidades({ total, cubiertoLo, cubiertoHi, porCuadro, w, h }) {
                 stroke={dentro || rango ? 'none' : 'var(--bd2)'} strokeWidth="1" />
         )
       })}
+
+      {/* La clave, con una llave que abarca los dos PRIMEROS cuadros, arriba de ellos. El
+          resto se infiere: si estos dos son 50 cada uno, los demas tambien. Debajo de la
+          cuadricula entera la llave quedaba pegada a la ultima fila y se leia como si
+          hablara de esa. */}
+      {unidad && (() => {
+        const x1 = x0
+        const x2 = x0 + Math.min(2, cols) * (s + g) - g
+        const yb = y0 - 7
+        return (
+          <g>
+            <path d={`M${x1} ${yb + 4} L${x1} ${yb} L${x2} ${yb} L${x2} ${yb + 4}`}
+                  fill="none" stroke={EJE} strokeWidth="1" />
+            <text x={x2 + 9} y={yb + 1} fontSize="11.5" fill={MUT2} dominantBaseline="central">
+              <tspan fontWeight={700}>{unidad.cantidad}</tspan>
+              <tspan fill={MUT}>{` ${unidad.texto}`}</tspan>
+            </text>
+          </g>
+        )
+      })()}
     </svg>
   )
 }

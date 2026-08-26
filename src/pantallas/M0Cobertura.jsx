@@ -53,16 +53,19 @@ export default function M0({ info }) {
         </div>
 
         <div className="cob-grilla">
+          {/* La unidad ya no vive acá: se escribe sobre los dos primeros cuadros de la
+              cuadrícula, que es donde hace falta para empezar a contar. Acá quedan los tres
+              estados, en cuerpo legible. */}
           <div className="cob-leyenda">
-            <span><i className="ll" />contactados con la capacidad mínima ({entero(capLo)})</span>
-            <span><i className="lr" />hasta el máximo declarado ({entero(capHi)})</span>
-            <span><i className="lt" />sin contactar</span>
-            <span className="cob-uni">1 cuadro = {POR_CUADRO} clientes</span>
+            <span><i className="ll" />Contactados con la capacidad mínima<b>{entero(capLo)}</b></span>
+            <span><i className="lr" />Hasta el máximo declarado<b>{entero(capHi)}</b></span>
+            <span><i className="lt" />Sin contactar<b>{entero(sinCubrir)}</b></span>
           </div>
           <Lienzo>
             {({ w, h }) => (
               <Unidades total={enRiesgo} cubiertoLo={capLo} cubiertoHi={capHi}
-                        porCuadro={POR_CUADRO} w={w} h={h} />
+                        porCuadro={POR_CUADRO} w={w} h={h}
+                        unidad={{ cantidad: `cada cuadro = ${POR_CUADRO}`, texto: 'clientes' }} />
             )}
           </Lienzo>
         </div>
