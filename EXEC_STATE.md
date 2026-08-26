@@ -181,6 +181,8 @@ confirmaron los cuatro. Los tres hallazgos que valían la corrida:
 | N0-21 | El **valor** de un token vive en `estilos.css`; su **uso dentro del SVG** vive en `graficos.jsx`. Ningún worker cruza esa frontera | dos hallazgos de contraste (A11Y-02, A11Y-11) se arreglan a los dos lados; sin la frontera, dos workers se pisan el mismo archivo | 2026-08-26 |
 | N0-22 | `src/Ban.jsx` se borra. Las clases `.ban-*` de `estilos.css` se conservan | el componente no lo monta ninguna pantalla desde que D0 desarmó la ficha F07 en zonas, pero D0 sigue usando `.ban-track`, `.ban-sc` y `.ban-scrow`. Muere el componente, no los estilos | 2026-08-26 |
 | N0-23 | El semáforo de "Clientes en riesgo" se monta en `D0Consolidada.jsx`, no en el pipeline | `umbral_en_riesgo` ya viaja en el payload desde `build.py`: lo que falta es consumirlo. El hallazgo se archivó contra el pipeline pero el arreglo es de pantalla | 2026-08-26 |
+| N0-24 | Las tildes de las categorías se corrigen en la **capa de display del navegador** (`agregacion.js`), no en el pipeline | `validate.py` mapea los valores crudos del CSV a través de `dims.categoria`: renombrarlas ahí rompe los 201.900 chequeos. El empaquetado usa índices, nunca la etiqueta, así que corregirlas al leerlas es seguro y alcanza a las cuatro pantallas que las muestran | 2026-08-26 |
+| N0-25 | El gris de las series sin énfasis prioriza separarse **del fondo**, no del azul de énfasis | son objetivos incompatibles y está probado: papel `#eceae5` contra acento `#22456f` da 8,13:1, y para que el gris quede a 3:1 de los dos haría falta un producto de 9. El viejo `#8891a3` daba 3,08 contra el énfasis y 2,64 contra el papel; el nuevo `#767f91` da 3,35 contra el papel y 2,43 contra el énfasis. 1.4.11 pide la marca contra su fondo, y el énfasis además ya lo cargan la etiqueta en negrita y el valor en tinta | 2026-08-26 |
 
 ## Ownership de archivos
 
@@ -211,7 +213,7 @@ Plan: `docs/plan-fixes-auditoria.md`. Rama: `fix/auditoria-diseno` desde `9dcb97
 | Paso | Estado | Commit | Notas |
 |---|---|---|---|
 | F0 · reconciliación | DONE | | 27 hallazgos re-adjudicados contra HEAD: 21 `sigue`, 6 `mutado`, 0 muertos |
-| Ola 1 · sustrato (`estilos.css`, `graficos.jsx`, `Semaforo.jsx`) | TODO | | 27 hallazgos |
+| Ola 1 · sustrato (`estilos.css`, `graficos.jsx`, `Semaforo.jsx`) | DONE | | 21 cerrados, los 3 VERDE al primer intento. DVZ-09 queda para M2a; DVZ-05 baja a D0 y D4 |
 | Ola 2 · controles (`App.jsx`, `Filtros.jsx`, `LineaTiempo.jsx`, `fit.js`, `Ban.jsx`) | TODO | | 11 hallazgos |
 | Ola 3 · las 14 pantallas | TODO | | 31 hallazgos en 13 archivos |
 | Ola 4 · documentos | TODO | | 3 hallazgos |

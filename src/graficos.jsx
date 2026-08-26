@@ -97,45 +97,14 @@ export function escalaNice(max, objetivo = 5) {
   const bruto = max / objetivo
   const mag = 10 ** Math.floor(Math.log10(bruto))
   const norm = bruto / mag
-  const paso = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10) * mag
+  // El paso mas cercano a bruto, no el primero que lo supera: redondear siempre para arriba
+  // dejaba a D2 (norm 1,035) con tres marcas en vez de cinco, y a D6 (norm 2,77) con una
+  // distancia entre marcas mas grande que todo el rango de sus datos.
+  const paso = (norm <= 1.5 ? 1 : norm <= 2.25 ? 2 : norm <= 3.5 ? 2.5 : norm <= 7.5 ? 5 : 10) * mag
   const tope = Math.ceil(max / paso - 1e-9) * paso
   const ticks = []
   for (let v = 0; v <= tope + paso * 1e-9; v += paso) ticks.push(Number(v.toFixed(10)))
   return { max: tope, ticks }
-}
-
-/**
- * Escala de numeros redondos que NO arranca en cero.
- *
- * Cuando los datos viven entre 6 % y 19 %, forzar el cero deja el 30 % de abajo del grafico
- * vacio y aplasta las variaciones que son justo el tema. Truncar el eje es legitimo en una
- * serie de tiempo (la regla 4, "toda barra arranca en cero", habla de barras: el largo de una
- * barra ES la cifra, la altura de un punto no). Lo que no es legitimo es truncar sin decirlo,
- * asi que quien use esto tiene que dibujar la marca de corte.
- */
-export function escalaNiceRango(min, max, objetivo = 4) {
-  const span = max - min
-  if (!(span > 0)) return { min: 0, max: max || 1, ticks: [0, max || 1], cortada: false }
-  const bruto = span / objetivo
-  const mag = 10 ** Math.floor(Math.log10(bruto))
-  const norm = bruto / mag
-  const paso = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10) * mag
-  const piso = Math.floor(min / paso + 1e-9) * paso
-  const techo = Math.ceil(max / paso - 1e-9) * paso
-  const ticks = []
-  for (let v = piso; v <= techo + paso * 1e-9; v += paso) ticks.push(Number(v.toFixed(10)))
-  return { min: piso, max: techo, ticks, cortada: piso > 0 }
-}
-
-/** Marca de corte del eje: el eje se parte en dos trazos y queda un hueco. Es la senal
- *  convencional de "esta escala no arranca en cero" y va acompanada de su rotulo. */
-function CorteDeEje({ x, y }) {
-  return (
-    <g aria-hidden="true">
-      <path d={`M${x - 5} ${y + 3} l10 -4 M${x - 5} ${y + 8} l10 -4`}
-            stroke={EJE} strokeWidth="1.4" fill="none" strokeLinecap="round" />
-    </g>
-  )
 }
 
 /**
@@ -175,7 +144,7 @@ function EjeXValor({ x0, ancho, y, ticks, max, formato, titulo }) {
       {/* El titulo va en la PUNTA del eje y debajo de los rotulos de las marcas: pegado al
           origen se confundia con la primera marca. */}
       {titulo && (
-        <text x={x0 + ancho} y={y + 38} fontSize="11" fill={MUT2} textAnchor="end"
+        <text fontFamily="var(--mono)" x={x0 + ancho} y={y + 38} fontSize="11" fill={MUT2} textAnchor="end"
               letterSpacing=".09em" fontWeight={600}
               style={{ textTransform: 'uppercase' }}>{titulo}</text>
       )}
@@ -215,7 +184,8 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
 
   return (
     <svg width={w} height={h} role={onBarra ? 'group' : 'img'}
-         aria-label={tituloEje || 'Gráfico de barras'} style={{ display: 'block' }}>
+         aria-label={(tituloEje || 'Gráfico de barras') + ': ' + datos.map((d) => d.etiqueta + ' ' + formato(d.valor)).join(', ')}
+         style={{ display: 'block' }}>
       {datos.map((d, i) => {
         const y = padTop + i * paso + (paso - alto) / 2
         const largo = Math.max(1, (d.valor / max) * ancho)
@@ -316,19 +286,16 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
   const iw = Math.max(20, w - padL - padR)
   const ih = Math.max(20, h - padT - padB)
 
-  // Escala: si forzar el cero deja mas de un tercio del alto vacio, el eje arranca en un
-  // numero redondo por debajo del minimo y se DECLARA cortado. Con la recompra entre 6,3 % y
-  // 19,0 %, el cero se comia el 33 % del grafico y aplastaba justo la caida que es el tema.
+  // El eje de la recompra arranca siempre en cero. Esto truncaba el eje cuando el piso de la
+  // serie quedaba a mas de un cuarto del rango por encima de cero, pero las zonas que
+  // acompanan a esta primitiva (D0 y D4) arrancan en 'Fuera de meta: 0', asi que el piso
+  // siempre es cero y el truncado nunca se activaba: se saca la rama en vez de sostener un
+  // camino que el build no corre.
   const topes = [...vals, ...(banda || []), ...(banda2 || []),
                  ...(zonas ? zonas.flatMap((z) => [z.desde, z.hasta]).filter((v) => Number.isFinite(v)) : [])]
   const crudo = Math.max(...topes)
-  const piso = Math.min(...topes)
-  // Umbral: si el cero se come mas de una cuarta parte del alto, no vale la pena pagarlo.
-  // Con la recompra (6,3 % a 19,0 %) el cero desperdiciaba un tercio del grafico.
-  const conviene = piso > 0.25 * crudo
-  const esc = conviene ? escalaNiceRango(piso, crudo, 4) : { ...escalaNice(crudo, 4), min: 0, cortada: false }
-  const { max, ticks, cortada } = esc
-  const min = esc.min
+  const { max, ticks } = escalaNice(crudo, 4)
+  const min = 0
   const X = (i) => padL + (i / Math.max(1, serie.length - 1)) * iw
   const Y = (v) => padT + ih - ((v - min) / (max - min)) * ih
   const yBase = Y(min)
@@ -361,18 +328,9 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
       {/* Titulo del eje Y en su PUNTA, arriba del todo y a la izquierda: no compite con
           ninguna marca porque queda por encima del primer tick. */}
       {tituloY && (
-        <text x={4} y={11} fontSize="11" fill={MUT2} letterSpacing=".09em" fontWeight={600}
+        <text fontFamily="var(--mono)" x={4} y={11} fontSize="11" fill={MUT2} letterSpacing=".09em" fontWeight={600}
               style={{ textTransform: 'uppercase' }}>{tituloY}</text>
       )}
-      {/* El aviso de escala truncada va en el renglón del título del eje, que es donde se
-          lee qué significa la escala. Abajo, junto a la marca de corte, se encimaba con los
-          rótulos de trimestre. */}
-      {cortada && (
-        <text x={xFin} y={11} fontSize="10" fill={MUT2} textAnchor="end" fontWeight={600}>
-          eje cortado: arranca en {formato(min)}, no en cero
-        </text>
-      )}
-
       {/* Las bandas primero, todo lo demas va encima.
 
           Las dos NO se distinguen por tono. Compuestas sobre blanco daban #e2e7ec y #e5e7ea:
@@ -412,7 +370,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
 
       {banda2 && (
         <rect x={padL} y={Y(banda2[1])} width={iw} height={Math.max(1, Y(banda2[0]) - Y(banda2[1]))}
-              fill="url(#trama)" stroke="var(--bd2)" strokeWidth="1" />
+              fill="url(#trama)" stroke={GRIS} strokeWidth="1" />
       )}
       {banda && (
         <g>
@@ -435,10 +393,6 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
         </g>
       ))}
       <line x1={padL} x2={xFin} y1={yBase} y2={yBase} stroke={EJE} strokeWidth="1" />
-      {/* El eje no arranca en cero: se parte con la marca convencional y se dice con
-          todas las letras. Una escala truncada sin declarar es la falla que el rulebook
-          persigue; declarada, es una decision de encuadre. */}
-      {cortada && <CorteDeEje x={padL} y={yBase - 7} />}
 
       {/* Rotulo de cada banda en el margen, no encima de la curva. La identidad la lleva la
           muestra de color al lado, no el color del texto: un rotulo pintado con el color de
@@ -472,7 +426,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
       {banda2 && (
         <g>
           <rect x={xFin + 7} y={(Y(banda2[0]) + Y(banda2[1])) / 2 - 4} width={9} height={9}
-                fill="url(#trama)" stroke="var(--bd2)" strokeWidth="1" />
+                fill="url(#trama)" stroke={GRIS} strokeWidth="1" />
           <text x={xFin + 20} y={(Y(banda2[0]) + Y(banda2[1])) / 2} fontSize="10" fill={MUT}
                 dominantBaseline="central">{rotulos[1]}</text>
         </g>
@@ -545,7 +499,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
                   <rect x={bx + 10} y={by + 21} width={7} height={7} fill="none"
                         stroke={tono} strokeWidth="1.2" strokeDasharray="2 1.6" />
                 )}
-                <text x={bx + 22} y={by + 25} fontSize="9" fontWeight={600} fill={tono}
+                <text fontFamily="var(--mono)" x={bx + 22} y={by + 25} fontSize="9" fontWeight={600} fill={tono}
                       letterSpacing=".07em" dominantBaseline="central">{est}</text>
               </g>
             )}
@@ -568,7 +522,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
       })}
       {/* Titulo del eje X en su punta derecha, por debajo de los rotulos de trimestre. */}
       {tituloEje && (
-        <text x={xFin} y={yBase + 42} fontSize="11" fill={MUT2} textAnchor="end"
+        <text fontFamily="var(--mono)" x={xFin} y={yBase + 42} fontSize="11" fill={MUT2} textAnchor="end"
               letterSpacing=".09em" fontWeight={600}
               style={{ textTransform: 'uppercase' }}>{tituloEje}</text>
       )}
@@ -579,7 +533,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
       <rect x={padL} y={padT} width={iw} height={Math.max(1, yBase - padT)} fill="transparent"
             tabIndex={0} role="img"
             aria-label={`${tituloEje || 'Serie'}: ${serie.filter((q) => q.valor != null).map((q) => `${q.etiqueta} ${formato(q.valor)}`).join(', ')}`}
-            style={{ cursor: 'crosshair', outline: 'none' }}
+            style={{ cursor: 'crosshair' }}
             onPointerMove={(e) => mover(e)}
             onPointerLeave={() => setFoco(null)}
             /* Respaldo de mouse: hay stacks de entrada que no emiten eventos de puntero.
@@ -626,7 +580,8 @@ export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132,
   const yBase = padTop + disponible
 
   return (
-    <svg width={w} height={h} role="img" aria-label={tituloEje || 'Puntos con intervalo'}
+    <svg width={w} height={h} role="img"
+         aria-label={(tituloEje || 'Puntos con intervalo') + ': ' + datos.map((d) => d.etiqueta + ' ' + formato(d.valor) + ' [' + formato(d.ic[0]) + '-' + formato(d.ic[1]) + ']').join(', ')}
          style={{ display: 'block' }}>
       {referencia && (
         <g>
@@ -634,6 +589,14 @@ export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132,
                 height={disponible} fill="var(--mut)" opacity=".13" />
           <line x1={X(referencia.valor)} x2={X(referencia.valor)} y1={padTop} y2={yBase}
                 stroke={MUT2} strokeWidth="1.25" strokeDasharray="3 2" />
+          {/* Sin este rotulo la banda se leia como parte de la afirmacion del titulo: es el
+              IC de la referencia global, no el solapamiento entre segmentos que el titulo
+              describe. */}
+          {referencia.rotulo && (
+            <text x={X(referencia.ic[1]) + 6} y={padTop + 10} fontSize="10.5" fill={MUT}>
+              {referencia.rotulo}
+            </text>
+          )}
         </g>
       )}
       {datos.map((d, i) => {
@@ -722,7 +685,8 @@ export function BarraTramos({ tramos, w, h, formato, banda, alturaBarra }) {
   const y = Math.max(ROT, (h - alto - NOTA + ROT) / 2)
   let x = 0
   return (
-    <svg width={w} height={Math.max(h, y + alto + NOTA + 6)} role="img" aria-label="Barra segmentada"
+    <svg width={w} height={Math.max(h, y + alto + NOTA + 6)} role="img"
+         aria-label={'Barra segmentada: ' + tramos.map((t) => t.etiqueta + ' ' + formato(t.valor)).join(', ')}
          style={{ display: 'block' }}>
       <Tramas />
       {tramos.map((t, i) => {
@@ -731,7 +695,7 @@ export function BarraTramos({ tramos, w, h, formato, banda, alturaBarra }) {
           <g key={t.etiqueta}>
             <rect x={x} y={y} width={Math.max(0, ancho - (i < tramos.length - 1 ? 2 : 0))}
                   height={alto} fill={t.excepcion ? EXC : t.enfasis ? ACC : 'url(#trama)'}
-                  stroke={t.enfasis ? 'none' : 'var(--bd2)'} strokeWidth="1" />
+                  stroke={t.enfasis ? 'none' : GRIS} strokeWidth="1" />
             <text x={x + 1} y={y - 7} fontSize="11.5" fontWeight={t.enfasis || t.excepcion ? 700 : 500}
                   fill={t.excepcion ? EXC : t.enfasis ? INK : MUT2}>{t.etiqueta}</text>
             {ancho > 74 && (
@@ -778,7 +742,9 @@ export function Chispa({ serie, w, h, banda, tonoBanda = 'var(--acc)', rotulo, r
   const lo = Math.min(...topes)
   const pad = (hi - lo) * 0.12 || 1
   const max = hi + pad
-  const min = Math.max(0, lo - pad)
+  // Ancla en cero: sin eje ni marca de corte que declare un truncado, dejar la base en
+  // lo - pad empinaba la pendiente contra la misma caida vista con eje desde cero (D4).
+  const min = 0
   const R = 3.5
   // El rotulo del ultimo valor se lleva su ancho del area de dibujo, y el punto se mete R
   // hacia adentro: dibujado en x = w quedaba cortado a la mitad por el borde del SVG.
@@ -846,7 +812,7 @@ export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion
   return (
     <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
       <Tramas />
-      <rect x={0} y={y} width={w} height={alto} fill="url(#trama)" stroke="var(--bd2)" strokeWidth="1" />
+      <rect x={0} y={y} width={w} height={alto} fill="url(#trama)" stroke={GRIS} strokeWidth="1" />
       <rect x={0} y={y} width={ancho} height={alto} fill={tono} />
       {rotulo && (
         <text x={dentro ? 10 : ancho + 8} y={y + alto / 2} fontSize="15" fontWeight={700}
@@ -924,7 +890,7 @@ export function CurvaConcentracion({ acum, total, nRiesgo, capLo, capHi, w, h,
       )}
 
       {tituloY && (
-        <text x={4} y={11} fontSize="11" fill={MUT2} letterSpacing=".09em" fontWeight={600}
+        <text fontFamily="var(--mono)" x={4} y={11} fontSize="11" fill={MUT2} letterSpacing=".09em" fontWeight={600}
               style={{ textTransform: 'uppercase' }}>{tituloY}</text>
       )}
       <line x1={padL} x2={padL} y1={padT} y2={yBase} stroke={EJE} strokeWidth="1" />
@@ -954,7 +920,7 @@ export function CurvaConcentracion({ acum, total, nRiesgo, capLo, capHi, w, h,
 
       <text x={padL} y={yBase + 15} fontSize="10.5" fill={MUT} textAnchor="middle">0</text>
       {tituloX && (
-        <text x={padL + iw} y={yBase + 34} fontSize="11" fill={MUT2} textAnchor="end"
+        <text fontFamily="var(--mono)" x={padL + iw} y={yBase + 34} fontSize="11" fill={MUT2} textAnchor="end"
               letterSpacing=".09em" fontWeight={600} style={{ textTransform: 'uppercase' }}>
           {tituloX}
         </text>
@@ -985,7 +951,7 @@ export function CurvaConcentracion({ acum, total, nRiesgo, capLo, capHi, w, h,
       <rect x={padL} y={padT} width={iw} height={ih} fill="transparent"
             tabIndex={0} role="slider" aria-label="Cantidad de clientes a contactar"
             aria-valuemin={1} aria-valuemax={n} aria-valuenow={kSel}
-            style={{ cursor: 'pointer', outline: 'none' }}
+            style={{ cursor: 'pointer' }}
             onPointerMove={(e) => onHover(desdeX(e.clientX, e.currentTarget.getBoundingClientRect()))}
             onMouseMove={(e) => onHover(desdeX(e.clientX, e.currentTarget.getBoundingClientRect()))}
             onPointerLeave={() => onHover(null)}

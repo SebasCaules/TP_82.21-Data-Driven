@@ -29,24 +29,26 @@
   --trk: #dfe1e0;          /* riel */
 
   --acc: #22456f;          /* azul-700: único color de énfasis (regla 18) */
-  --sel: #2f6ba6;          /* azul-500: selección y foco */
+  --sel: #2f6ba6;          /* azul-500: selección */
   --azul3: #7ea6c9;        /* azul-300: series secundarias, solo como relleno */
   --azul1: #d7e2ec;        /* azul-100: fondo de fila activa */
   --terra: #b8433a;        /* SOLO excepción: sin consentimiento, no contactable */
 
   /* Semáforo: paleta de ESTADO, reservada. No se reusa nunca para una serie, y las series
-     no la usan. Los tres pasan los seis chequeos contra el papel (separación protan 10,3,
-     visión normal 20,6, contraste >= 3:1); aun así cada estado lleva forma y rótulo, porque
-     el ámbar y el verde se acercan en gris y esto se imprime. */
+     no la usan. Los tres pasan >= 4,5:1 de texto sobre blanco (no solo el 3:1 de objeto
+     gráfico que exige 1.4.11); aun así cada estado lleva forma y rótulo, porque el ámbar
+     y el verde se acercan en gris y esto se imprime. */
   --sem-meta: #0f7a52;
-  --sem-cerca: #b8821f;
+  --sem-cerca: #8a6110;
   --sem-fuera: #8f3128;
 
-  --gris: #8891a3;         /* las series que NO son el énfasis. Derivado entre azul-300 y
-                              --mut: 3,17:1 sobre blanco y 3,08:1 contra el azul de énfasis,
-                              que es lo que hace que barra destacada y barra gris se separen. */
+  --gris: #767f91;         /* las series que NO son el énfasis. Bajado para separarse del
+                              papel: 3,35:1 sobre #eceae5 y 4,03:1 sobre blanco (antes
+                              #8891a3 daba 2,64:1 sobre papel, bajo el 3:1 de 1.4.11). */
   --gris2: #b9c0cc;
-  --eje: #97a0af;          /* ejes y marcas: presentes, nunca protagonistas */
+  --eje: #79839a;          /* ejes y marcas: presentes, nunca protagonistas. 3,16:1 sobre
+                              papel y 3,80:1 sobre blanco (antes #97a0af daba 2,19:1 sobre
+                              papel, bajo el 3:1 de 1.4.11). */
   --tram-b: #d3d8e0;       /* trama: base clara para que el rótulo encima se lea */
   --tram-l: #f4f6f8;
 
@@ -118,7 +120,7 @@ body {
 .lat-grupo {
   display: flex; align-items: baseline; gap: 6px;
   padding: 12px 8px 5px; margin-top: 2px;
-  border-top: 1px dashed rgba(0, 0, 0, .22);
+  border-top: 1px dashed rgba(22, 35, 58, .26);
 }
 .lat-lista > li:first-child .lat-grupo { border-top: 0; margin-top: 0; padding-top: 2px; }
 .lat-grupo span {
@@ -139,7 +141,7 @@ body {
   font: 400 12px/1.25 var(--fuente);
   text-align: left; cursor: pointer;
 }
-.lat-item:hover { background: rgba(0, 0, 0, .045); color: var(--ink); }
+.lat-item:hover { background: rgba(22, 35, 58, .05); color: var(--ink); }
 .lat-item:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 /* La vista activa no se distingue solo por color: se invierte y engrosa. */
 .lat-item.on { background: var(--ink); color: #fff; font-weight: 500; }
@@ -189,7 +191,7 @@ body {
   flex: 1; min-width: 60px; height: 100%;
   position: relative;
   cursor: ew-resize;
-  border-bottom: 1px solid rgba(0, 0, 0, .28);
+  border-bottom: 1px solid rgba(22, 35, 58, .33);
   touch-action: none;
   /* Sin esto, arrastrar el cursor selecciona el texto de alrededor. */
   user-select: none; -webkit-user-select: none;
@@ -240,7 +242,7 @@ body {
   position: relative;
   display: inline-flex; align-items: center; gap: 5px;
   height: 28px; padding: 0 8px;
-  border: 1px solid rgba(0, 0, 0, .2);
+  border: 1px solid rgba(22, 35, 58, .24);
   border-radius: 4px;
   background: var(--sup);
   box-shadow: 0 1px 0 rgba(0, 0, 0, .05);
@@ -251,14 +253,21 @@ body {
 .chip-f-caja { position: relative; display: inline-flex; }
 .chip-f-btn { font: inherit; }
 .chip-f-btn:disabled { cursor: default; }
-.chip-f:hover {
+.chip-f:hover:not(:disabled) {
   border-color: var(--ink); color: var(--ink);
   box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
   transform: translateY(-1px);
 }
-.chip-f:focus-visible { outline: 2px solid var(--sel); outline-offset: 2px; }
+/* El rect transparente que captura el clic sobre la curva de M0 es focalizable y es el unico
+   control del tablero que vive dentro de un SVG: sin esto no muestra donde esta el foco. */
+.lienzo svg rect[role="slider"]:focus-visible {
+  outline: 2px solid var(--sel);
+  outline-offset: -2px;
+}
+
+.chip-f:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .chip-f .caret { opacity: .5; margin-left: -1px; }
-.chip-f:hover .caret { opacity: .9; }
+.chip-f:hover:not(:disabled) .caret { opacity: .9; }
 
 /* Ancho FIJO, no max-width: el chip cambia de texto al poner el filtro ("Región" pasa a
    "Solo online") y con ancho automático eso le corría el riel del mes de corte de al lado.
@@ -279,7 +288,7 @@ body {
   background: var(--ink); border-color: var(--ink); color: #fff;
   box-shadow: 0 1px 0 rgba(0, 0, 0, .18);
 }
-.chip-f.on:hover { background: #000; }
+.chip-f.on:hover:not(:disabled) { background: #0b1526; }
 .chip-f-fin {
   display: grid; place-items: center;
   width: 15px; height: 15px; flex-shrink: 0; margin-right: -3px;
@@ -301,7 +310,7 @@ body {
   min-width: 100%; max-height: 46vh; overflow-y: auto;
   background: var(--sup);
   border: 1px solid var(--bd);
-  border-radius: 5px;
+  border-radius: 4px;
   box-shadow: 0 6px 18px rgba(22, 35, 58, .16);
 }
 .chip-op {
@@ -505,7 +514,10 @@ body {
   white-space: nowrap;
 }
 .ban-sub { font-size: 12px; color: var(--mut); margin-top: 3px; }
-.ban-track { position: relative; height: 24px; background: var(--trk); margin-top: 10px; }
+.ban-track {
+  position: relative; height: 24px; background: var(--trk); margin-top: 10px;
+  border: 1px solid var(--gris);   /* contorno >= 3:1: el riel solo no alcanza (A11Y-11) */
+}
 .ban-track i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--acc); }
 .ban-mk { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
 .ban-sc {
@@ -601,7 +613,7 @@ body {
   font: 600 clamp(30px, 3.4vw, 50px)/1 var(--fuente);
   color: var(--ink); letter-spacing: -.03em; white-space: nowrap;
 }
-.z2-nota { font: 400 10.5px/1.3 var(--mono); color: var(--terra); }
+.z2-nota { font: 400 10.5px/1.3 var(--mono); color: var(--mut2); }
 /* Rótulo en versalita gris, valor en tinta: los tres datos se leen de un vistazo en vez de
    perderse en un renglón corrido. */
 .z2-base {
@@ -753,7 +765,7 @@ body {
 }
 .cob-k-ctl button:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); }
 .cob-k-ctl button:disabled { opacity: .35; cursor: default; }
-.cob-k-ctl button:focus-visible { outline: 2px solid var(--sel); outline-offset: 1px; }
+.cob-k-ctl button:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
 
 /* Saltos a los dos cortes de capacidad declarados. */
 .cob-salto {
@@ -796,10 +808,10 @@ body {
 
 .art-cab { display: flex; align-items: baseline; gap: 9px; }
 /* El numeral en el mono del sistema, que es la voz que el tablero ya usa para sus rótulos.
-   Va en azul-300 para anclar la columna sin competir con la cifra. */
+   Va en azul-500 y no en azul-300: a 2,57:1 el 300 no llegaba ni al umbral de texto grande. */
 .art-n {
   font: 500 clamp(26px, 3vw, 44px)/.85 var(--mono);
-  color: var(--azul3); letter-spacing: -.05em;
+  color: var(--sel); letter-spacing: -.05em;
 }
 .art-rot {
   font: 600 10px/1.3 var(--mono); color: var(--lbl);
@@ -914,6 +926,7 @@ body {
   padding: 6px 9px; cursor: pointer; margin-left: auto;
 }
 .chip-claro:hover { border-color: var(--mut); color: var(--ink); }
+.chip-claro:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 /* ---------- barra angosta: los rótulos ceden antes que el riel ---------- */
 /* Por debajo de 1300 px los dos rótulos ("Filtros" y "Mes de corte") se comen el ancho que
@@ -964,6 +977,9 @@ body {
   .app { height: auto; display: block; }
   .lat, .barra, .filtros { display: none !important; }
   .principal { display: block; }
+  /* Red: la guarda de fuera de rango (más abajo) va acotada a "screen", pero si algún
+     selector futuro vuelve a ocultar .principal con !important, esto lo pisa (LAY-01). */
+  .app > .principal { display: block !important; }
   .cuerpo { padding: 0; }
   .titulo { font-size: 20px; height: auto; -webkit-line-clamp: none; display: block; }
   .bajada { height: auto; -webkit-line-clamp: none; display: block; }
@@ -986,15 +1002,28 @@ body {
 
 .chico { display: none; }
 
-@media (max-width: 1000px), (max-height: 560px) {
-  .app { display: block; }
-  .app > .lat, .app > .principal { display: none !important; }
+/* Decisión N0-20: la guarda deja de reemplazar el tablero entero y pasa a banner fijo
+   arriba, con el tablero montado debajo y SOLO su cuerpo scrolleable (única excepción a
+   "nada scrollea, en ninguna resolución"). Antes ocultaba .principal completo: a 200% de
+   zoom (WCAG 1.4.4) el viewport en px CSS cae en este mismo rango y no quedaba nada en
+   pantalla (A11Y-09). El umbral de ancho se corre a 1151px para alinear con el piso
+   declarado de 1152 (antes 1000px dejaba una banda de 1001-1151 dibujándose apretada y
+   sin avisar, LAY-03); el alto queda en 560 porque no hay desborde verificado entre 561
+   y 639. Acotada a "screen": sin esto la regla también corría al imprimir, y el área de
+   página en Letter (bajo 1000px de ancho) sacaba hojas en blanco (LAY-01). */
+@media screen and (max-width: 1151px), screen and (max-height: 560px) {
+  .app { display: flex; flex-direction: column; }
+  .app > .lat { display: none !important; }
+  .app > .principal { flex: 1; min-height: 0; }
+  .cuerpo { overflow-y: auto; }
   .chico {
-    display: flex; flex-direction: column; justify-content: center;
-    height: 100%; padding: 28px; gap: 10px; background: var(--papel);
+    flex: 0 0 auto;
+    display: flex; flex-direction: column;
+    padding: 10px var(--pad-x); gap: 4px;
+    background: var(--papel); border-bottom: 1px solid var(--bd);
   }
-  .chico h1 { font: 600 19px/1.3 var(--fuente); margin: 0; max-width: 30ch; }
-  .chico p { font-size: 13.5px; color: var(--mut2); margin: 0; max-width: 44ch; line-height: 1.5; }
+  .chico h1 { font: 600 14px/1.3 var(--fuente); margin: 0; max-width: 60ch; }
+  .chico p { font-size: 11.5px; color: var(--mut2); margin: 0; max-width: 80ch; line-height: 1.4; }
   .chico b { color: var(--ink); }
 }
 

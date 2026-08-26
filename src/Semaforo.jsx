@@ -10,6 +10,13 @@ const ESTADOS = {
   meta: { texto: 'En meta', forma: 'lleno' },
   cerca: { texto: 'Por debajo', forma: 'medio' },
   fuera: { texto: 'Fuera de meta', forma: 'vacio' },
+  // Rótulos propios para estadoInverso: comparten forma/color con meta/cerca/fuera (mismo
+  // umbral, mismo semáforo) pero no su texto. 'Por debajo' tiene sentido para la recompra
+  // (más es mejor), no para un KPI donde menos es mejor: ahí la banda del medio no está
+  // "por debajo" de nada, está en zona de alerta arriba del umbral verde.
+  'inv-meta': { texto: 'Dentro del umbral', forma: 'lleno' },
+  'inv-cerca': { texto: 'En zona de alerta', forma: 'medio' },
+  'inv-fuera': { texto: 'Sobre el umbral', forma: 'vacio' },
 }
 
 export function estadoRecompra(valor, [lo]) {
@@ -20,11 +27,12 @@ export function estadoRecompra(valor, [lo]) {
 
 /** Para los KPIs donde MENOS es mejor: clientes en riesgo (verde <38 %, amarillo 38-42 %,
  *  rojo >42 %) y riesgo en Q5 (verde <45 %, amarillo 45-52 %, rojo >52 %). Los umbrales
- *  salen de la Parte D §2.1 entregada, no se inventan aca. */
+ *  salen de la Parte D §2.1 entregada, no se inventan aca. Devuelve claves 'inv-*' propias
+ *  (no 'meta'/'cerca'/'fuera') porque el rótulo de la banda del medio es otro: ver ESTADOS. */
 export function estadoInverso(valor, [lo, hi]) {
-  if (valor < lo) return 'meta'
-  if (valor <= hi) return 'cerca'
-  return 'fuera'
+  if (valor < lo) return 'inv-meta'
+  if (valor <= hi) return 'inv-cerca'
+  return 'inv-fuera'
 }
 
 /**
