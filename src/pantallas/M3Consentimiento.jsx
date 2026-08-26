@@ -35,17 +35,14 @@ export default function M3() {
         Tres de cada diez envíos van a clientes que no dieron consentimiento
       </h1>
 
-      <p className="bajada">
-        <b>{entero(c.envios_a_no_acepta)}</b> de {entero(c.envios_base)} envíos
-        ({pct(pctSinConsentimiento)}) van a clientes sin consentimiento.
-      </p>
+      {/* Una sola bajada, no tres: el titulo ya da el dato de sin-consentimiento (y el
+          grafico lo repite con nota por barra), asi que acá van solo los dos datos que no
+          estan en ningun otro lado. Tres <p className="bajada"> con su alto fijo de dos
+          lineas cada uno era el grueso del hueco blanco de esta pantalla. */}
       <p className="bajada">
         Esa lista alcanza al <b>{pct(pctAlcance)}</b> de los {entero(c.clientes_no_acepta_total)}{' '}
-        clientes que no consintieron.
-      </p>
-      <p className="bajada">
-        {entero(c.envios_huerfanos)} envíos van a ids de cliente ausentes del maestro: quedan
-        fuera de esta cuenta.
+        clientes que no consintieron. {entero(c.envios_huerfanos)} envíos van a ids ausentes
+        del maestro y quedan fuera de esta cuenta.
       </p>
 
       <div className="lienzo">
@@ -55,7 +52,7 @@ export default function M3() {
               datos={datos} w={w} h={h}
               formato={entero}
               tituloEje="Envíos de la campaña, por consentimiento del cliente"
-              anchoEtiqueta={168} notaAncho={118}
+              anchoEtiqueta={168}
             />
           )}
         </Lienzo>

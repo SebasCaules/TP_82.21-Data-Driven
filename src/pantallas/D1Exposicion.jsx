@@ -40,7 +40,11 @@ export default function D1({ info }) {
           </div>
           <Lienzo>
             {({ w, h }) => (
-              <BarraTramos tramos={tramosAnual} w={w} h={h} formato={pesos} />
+              // Sin alturaBarra el tramo queda con un tope de 58 px y la mitad de la
+              // tarjeta abajo en blanco: se pide el alto disponible menos el margen fijo
+              // que la primitiva reserva arriba (rótulo, 20 px) y abajo (nota, 34 px).
+              <BarraTramos tramos={tramosAnual} w={w} h={h} formato={pesos}
+                           alturaBarra={Math.max(30, h - 54)} />
             )}
           </Lienzo>
         </div>
@@ -51,7 +55,8 @@ export default function D1({ info }) {
           </div>
           <Lienzo>
             {({ w, h }) => (
-              <BarraTramos tramos={tramosHist} w={w} h={h} formato={pesos} />
+              <BarraTramos tramos={tramosHist} w={w} h={h} formato={pesos}
+                           alturaBarra={Math.max(30, h - 54)} />
             )}
           </Lienzo>
         </div>

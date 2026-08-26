@@ -81,6 +81,18 @@ export function chequear() {
     }
   }
 
+  // 3b. titulo o bajada que no entra en las lineas reservadas. La cabecera tiene alto FIJO
+  //     para que el lienzo no cambie de tamano al mover un filtro; el precio es que un texto
+  //     largo se corta en silencio. Esto lo hace ruidoso.
+  for (const el of document.querySelectorAll('.titulo, .bajada')) {
+    if (el.scrollHeight > el.clientHeight + 2) {
+      problemas.push({
+        tipo: 'texto-cortado-por-el-clamp',
+        detalle: `${clase(el)} necesita ${el.scrollHeight} px y tiene ${el.clientHeight}: "${el.textContent.slice(0, 60)}"`,
+      })
+    }
+  }
+
   // 4. un grafico aplastado es ilegible aunque no desborde.
   //    Solo los SVG de grafico: los iconos van DENTRO de un <svg> y miden 13 px a proposito,
   //    asi que un chequeo ingenuo los reportaba a los siete como aplastados.

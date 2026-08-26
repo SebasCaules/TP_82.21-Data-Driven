@@ -3,44 +3,56 @@
 // en cuatro tramos de 200, uno por semana de contacto. Cuántas filas entran en pantalla se
 // mide, no se fija: el piso es 3 y el techo lo da el alto real de la caja a 1152x640, para
 // no scrollear nunca (usa el mismo useMedida que Lienzo, porque la tabla necesita saber su
-// propio alto disponible). Sin columna de score real: se rotula "Modelo predictivo · en
-// desarrollo", mismo criterio que los KPIs no computables (C-10). Si el filtro activo no
-// deja ningún cliente del top global, se declara en vez de mostrar una tabla vacía.
+// propio alto disponible). Sin columna de score real: no hay "Acción sugerida" por fila
+// (veinte celdas idénticas no son datos), el modelo predictivo en desarrollo se declara
+// una sola vez en la bajada. Si el filtro activo no deja ningún cliente del top global, se
+// declara en vez de mostrar una tabla vacía.
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { lista, entero, pesos, millones, SIN_FILTRO } from '../agregacion.js'
+import { lista, entero, pesos, millones, hayFiltro, SIN_FILTRO } from '../agregacion.js'
+import { DIMENSIONES, etiquetaValor } from '../Filtros.jsx'
 import { useMedida } from '../graficos.jsx'
 
 const pesosFinos = (x) => `ARS ${entero(x)}`
 
 const TAMANO_TRAMO = 200
 
-const COLUMNAS = [
+// Ocho columnas no se leen como lista priorizada: quedan las que justifican por qué ESE
+// cliente entra a la tabla (exposición) y por qué está en riesgo (recency, gap), más
+// consentimiento porque sin él no se puede llamar. Región y categoría solo aportan cuando
+// son el recorte activo (si no, las 200 filas dicen lo mismo); se agregan condicionadas
+// al filtro en vez de ir siempre.
+const COLUMNAS_FIJAS = [
   { campo: 'anualizado', etiqueta: 'Exposición anual', num: true },
   { campo: 'recency', etiqueta: 'Recency', num: true },
   { campo: 'gap', etiqueta: 'Gap propio', num: true },
-  { campo: 'categoria', etiqueta: 'Categoría', num: false },
-  { campo: 'consiente', etiqueta: 'Consentimiento', num: false },
 ]
+const COLUMNA_CONSENTIMIENTO = { campo: 'consiente', etiqueta: 'Consentimiento', num: false }
 
-/** Descarga las filas completas en CSV. La Parte D §4.1 promete la lista "exportable", y
- *  la tabla en pantalla muestra solo las que entran sin scroll: sin esto, las otras no
- *  existen en ningun lado. Blob local, sin red. */
-function descargar(filas, corte) {
-  const cab = ['cliente', 'exposicion_anual_ars', 'recency_dias', 'gap_mediano_dias',
-               'quintil', 'segmento_rfm', 'region', 'categoria', 'consiente_marketing']
-  const cuerpo = filas.map((f) => [f.id, f.anualizado, f.recency, f.gap, f.quintil,
-    f.rfm, f.region, f.categoria, f.consiente ? 'si' : 'no'].join(','))
-  const csv = [cab.join(','), ...cuerpo].join('\n')
-  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `lista-contacto-${corte}.csv`
-  a.click()
-  URL.revokeObjectURL(url)
+function celda(f, campo) {
+  switch (campo) {
+    case 'anualizado': return pesosFinos(f.anualizado)
+    case 'recency': return `${entero(f.recency)} d`
+    case 'gap': return `${entero(f.gap)} d`
+    case 'region': return f.region
+    case 'categoria': return f.categoria
+    case 'consiente': return f.consiente ? 'Sí' : 'No'
+    default: return null
+  }
 }
 
-export default function M1({ info, filtro, iCorte }) {
+/** Mismas clases que usaba la tabla fija original: num alinea, destacado resalta el dato
+ *  que ordena la lista (exposición), y el "No" de consentimiento se marca aparte porque es
+ *  la excepción que decide si se puede llamar, no el criterio de orden. */
+function claseCelda(c, f) {
+  const clases = []
+  if (c.num) clases.push('num')
+  if (c.campo === 'anualizado') clases.push('destacado')
+  if (c.campo === 'consiente' && !f.consiente) clases.push('no')
+  return clases.join(' ') || undefined
+}
+
+export default function M1({ info, filtro, setFiltro, iCorte }) {
   const [tramo, setTramo] = useState(0)
   const [orden, setOrden] = useState({ campo: 'anualizado', dir: 'desc' })
   // Cuantas filas entran se mide, no se fija: 12 desbordaban a 1152x640 y sobraba lugar
@@ -52,6 +64,13 @@ export default function M1({ info, filtro, iCorte }) {
 
   // Un tramo nuevo de corte o de filtro reordena la base: se vuelve al primero.
   useEffect(() => { setTramo(0) }, [iCorte, filtro])
+
+  const COLUMNAS = useMemo(() => [
+    ...COLUMNAS_FIJAS,
+    ...(filtro.region !== null ? [{ campo: 'region', etiqueta: 'Región', num: false }] : []),
+    ...(filtro.categoria !== null ? [{ campo: 'categoria', etiqueta: 'Categoría', num: false }] : []),
+    COLUMNA_CONSENTIMIENTO,
+  ], [filtro.region, filtro.categoria])
 
   const filas = lista(iCorte, filtro)
   const sinRepresentantes = filas.length === 0
@@ -102,9 +121,9 @@ export default function M1({ info, filtro, iCorte }) {
   }
 
   function exportarCSV() {
-    const encabezados = ['cliente', 'exposicion_anual', 'recency_dias', 'gap_propio_dias', 'categoria', 'consentimiento']
+    const encabezados = ['cliente', 'exposicion_anual', 'recency_dias', 'gap_propio_dias', 'region', 'categoria', 'consentimiento']
     const cuerpo = filas.map((f) => [
-      f.id, Math.round(f.anualizado), f.recency, f.gap, f.categoria, f.consiente ? 'si' : 'no',
+      f.id, Math.round(f.anualizado), f.recency, f.gap, f.region, f.categoria, f.consiente ? 'si' : 'no',
     ].join(';'))
     const csv = [encabezados.join(';'), ...cuerpo].join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -148,6 +167,12 @@ export default function M1({ info, filtro, iCorte }) {
     )
   }
 
+  const filtroActivo = hayFiltro(filtro)
+  const etiquetasFiltro = DIMENSIONES
+    .filter(({ id }) => filtro[id] !== null)
+    .map(({ id, etq }) => `${etq}: ${etiquetaValor(id, filtro[id])}`)
+    .join(' · ')
+
   return (
     <section className="pant">
       <h1 className="titulo" style={{ fontWeight: 500, fontSize: 'clamp(14px, 1.25vw, 18px)' }}>
@@ -155,12 +180,17 @@ export default function M1({ info, filtro, iCorte }) {
         {millones(info.exposicion)}, y solo {entero(conConsentimiento)} se pueden contactar
       </h1>
       <p className="bajada">
-        La tabla se ordena por exposición anual descendente y cada cabecera reordena. En
-        pantalla van las primeras del tramo activo; el botón exporta los {entero(filas.length)} completos.
+        Ordenada por exposición anual descendente; cada cabecera reordena. La acción sugerida
+        (modelo predictivo, en desarrollo) es igual para toda la lista. El botón exporta los{' '}
+        {entero(filas.length)} completos.
       </p>
 
-      <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(8px,1.3vh,16px)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+      <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(6px,1vh,12px)' }}>
+        {/* flex:'0 0 auto' explícito: .lienzo > * en estilos.css da flex:1 1 0 a todo hijo
+            directo (pensado para las tarjetas en fila de las otras pantallas). En esta
+            columna eso repartía el alto en partes iguales entre tabs, nota y tabla; solo
+            la tabla (cajaRef, más abajo) tiene que crecer. */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap', flex: '0 0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
             <span className="kpi-lbl">Tramo semanal</span>
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -201,6 +231,25 @@ export default function M1({ info, filtro, iCorte }) {
             Exportar CSV · {entero(filas.length)} completos
           </button>
         </div>
+        <div className="kpi-sub" style={{ marginTop: -4, flex: '0 0 auto' }}>
+          La capacidad de contacto se reparte en 4 semanas: cada tramo es el lote de esa semana.
+        </div>
+
+        {/* Solo se ve cuando se llegó acá por drill-down (App.jsx → verEnLista): un click en
+            otra vista trae a esta pantalla con un filtro puesto y sin este aviso no se
+            entiende por qué la lista cambió. setFiltro(SIN_FILTRO) lo saca sin salir de la
+            pantalla; no toca App.jsx ni el resto de los filtros de la barra. */}
+        {filtroActivo && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
+            fontSize: '11.5px', color: 'var(--mut2)', flex: '0 0 auto',
+          }}>
+            <span>Este recorte sale de {etiquetasFiltro}.</span>
+            <button type="button" className="chip-claro" onClick={() => setFiltro(SIN_FILTRO)}>
+              Quitar filtro
+            </button>
+          </div>
+        )}
 
         {/* La tabla va en position:absolute por el mismo motivo que los SVG: en flujo,
             su alto empuja al contenedor flex y el contenedor mide lo que mide la tabla,
@@ -210,6 +259,7 @@ export default function M1({ info, filtro, iCorte }) {
                style={{ position: 'absolute', left: 0, right: 0, top: 0 }}>
           <thead>
             <tr>
+              <th className="num">N.º</th>
               <th>Cliente</th>
               {COLUMNAS.map((c) => (
                 <th
@@ -227,19 +277,18 @@ export default function M1({ info, filtro, iCorte }) {
                   {c.etiqueta}{orden.campo === c.campo ? (orden.dir === 'asc' ? ' ▲' : ' ▼') : ''}
                 </th>
               ))}
-              <th>Acción sugerida</th>
             </tr>
           </thead>
           <tbody>
-            {visibles.map((f) => (
+            {visibles.map((f, i) => (
               <tr key={f.id}>
+                <td className="num">{inicio + i + 1}</td>
                 <td>{f.id}</td>
-                <td className="num destacado">{pesosFinos(f.anualizado)}</td>
-                <td className="num">{entero(f.recency)} d</td>
-                <td className="num">{entero(f.gap)} d</td>
-                <td>{f.categoria}</td>
-                <td className={f.consiente ? '' : 'no'}>{f.consiente ? 'Sí' : 'No'}</td>
-                <td style={{ fontStyle: 'italic' }}>Modelo predictivo · en desarrollo</td>
+                {COLUMNAS.map((c) => (
+                  <td key={c.campo} className={claseCelda(c, f)}>
+                    {celda(f, c.campo)}
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>

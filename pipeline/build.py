@@ -314,6 +314,27 @@ def _anclas_campanias():
         chk(f"envios segmento {s}", seg[s]["envios"], n)
         for s, n in (("Silver", 6164), ("Gold", 5117), ("Bronze", 4703),
                      ("Inactivos 90d", 4399), ("Todos", 3346))
+    ] + [
+        chk(f"compras 7d segmento {s}", seg[s]["compras"], n)
+        for s, n in (("Silver", 82), ("Gold", 53), ("Bronze", 45),
+                     ("Inactivos 90d", 61), ("Todos", 45))
+    ] + [
+        # Los bordes del IC de Wilson, contra el calculo hecho aparte (ver el comentario
+        # de series._wilson). Sin esto el intervalo seria una cifra sin chequeo, que es
+        # justo lo que el proyecto no admite.
+        chk(f"IC95 compra 7d {s} (pp)",
+            [round(100 * x, 2) for x in seg[s]["compra_7dias_ic"]], borde)
+        for s, borde in (("Bronze", [0.72, 1.28]), ("Gold", [0.79, 1.35]),
+                         ("Inactivos 90d", [1.08, 1.78]), ("Silver", [1.07, 1.65]),
+                         ("Todos", [1.01, 1.79]))
+    ] + [
+        # El hallazgo que la pantalla M2b afirma, anclado como booleano: el mejor segmento
+        # y el peor tienen intervalos que se tocan, asi que la diferencia observada no
+        # separa a uno de otro. Si algun dia dejaran de solaparse, el ancla se cae y el
+        # titulo de esa pantalla deja de ser cierto.
+        chk("IC de Inactivos 90d y Bronze se solapan",
+            seg["Inactivos 90d"]["compra_7dias_ic"][0] <= seg["Bronze"]["compra_7dias_ic"][1],
+            True),
     ]
 
 

@@ -2,13 +2,11 @@
 // mayor a menor exposicion (regla 11), con la tasa de riesgo como nota junto a cada barra
 // (regla 14) y un solo color de enfasis (regla 18): la categoria que el titulo defiende.
 // Marcar los dos extremos con el mismo acento le daba dos significados opuestos al color
-// dentro del mismo grafico, que es lo que prohibe la regla 19. La bajada
-// calcula la amplitud en pp y el n de las categorias de menor exposicion en cada render:
-// nada viene hardcodeado.
+// dentro del mismo grafico, que es lo que prohibe la regla 19. La bajada calcula la
+// amplitud en pp en cada render: nada viene hardcodeado.
 
 import { Lienzo, BarrasH } from '../graficos.jsx'
-import { ICONO_CATEGORIA } from '../Iconos.jsx'
-import { dims, pct, pesos, porDimension } from '../agregacion.js'
+import { dims, millones, pct, pesos, porDimension } from '../agregacion.js'
 
 export default function D5b({ iCorte, filtro, verEnLista }) {
   const cat = porDimension(iCorte, 'categoria', filtro)
@@ -26,7 +24,6 @@ export default function D5b({ iCorte, filtro, verEnLista }) {
   const amplitud = alta && baja ? (alta.tasa - baja.tasa).toFixed(1).replace('.', ',') : null
 
   const porExposicion = [...filas].sort((a, b) => b.valor - a.valor)
-  const dosMenores = porExposicion.slice(-2)
 
   const datos = porExposicion.map((f) => ({
     etiqueta: f.etiqueta,
@@ -35,7 +32,6 @@ export default function D5b({ iCorte, filtro, verEnLista }) {
     // Solo la de mayor tasa: es la que el titulo nombra como "la que mueve la aguja".
     // La del extremo bajo se identifica por su etiqueta y su nota, no por el color.
     enfasis: !!alta && f.etiqueta === alta.etiqueta,
-    Icono: ICONO_CATEGORIA[f.etiqueta],
     _i: f._i,
   }))
 
@@ -49,27 +45,20 @@ export default function D5b({ iCorte, filtro, verEnLista }) {
       <p className="bajada">
         {alta && baja && (
           <>{alta.etiqueta} {pct(alta.tasa)} contra {baja.etiqueta} {pct(baja.tasa)}, {amplitud} puntos
-          de diferencia. </>
-        )}
-        {dosMenores.length === 2 && (
-          <>Las dos categorías con menos exposición tienen pocos clientes:
-          {' '}{dosMenores[0].etiqueta} {dosMenores[0].n} y {dosMenores[1].etiqueta} {dosMenores[1].n}.</>
+          de diferencia.</>
         )}
       </p>
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => {
-            const anchoEtiqueta = 140  // +22 por el icono de categoria
-            const notaAncho = 64
-            const padTop = 20
-            const padBot = 4
+            const anchoEtiqueta = 118  // cubre "Cocina y mesa" / "Organizacion", la más larga de las 7
             return (
               <div style={{ position: 'relative', width: w, height: h }}>
                 <BarrasH
                   datos={datos} w={w} h={h}
-                  formato={(v) => pesos(v)}
+                  formato={(v) => pesos(v)} formatoEje={(v) => millones(v, 0)}
                   tituloEje="Exposición anual, por categoría (ARS)"
-                  anchoEtiqueta={anchoEtiqueta} notaAncho={notaAncho}
+                  anchoEtiqueta={anchoEtiqueta}
                   onBarra={verEnLista ? (i, d) => verEnLista('categoria', d._i) : undefined}
                 />
               </div>

@@ -4,7 +4,7 @@
 // tasa no infle el rango visible de las 5 regiones reales y desmienta el título.
 
 import { Lienzo, BarrasH } from '../graficos.jsx'
-import { entero, pesos, pct, porDimension, dims } from '../agregacion.js'
+import { entero, millones, pesos, pct, porDimension, dims } from '../agregacion.js'
 
 export default function D5a({ iCorte, filtro, verEnLista }) {
   const r = porDimension(iCorte, 'region', filtro)
@@ -38,12 +38,7 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
   const online = r[onlineIdx]
   const onlineTasaTxt = online.n ? `${pct((100 * online.nr) / online.n)} en riesgo` : 'sin clientes en riesgo calculable'
 
-  // Overlay de clic sobre cada fila: replica el layout interno de BarrasH (mismos
-  // padTop/padBot/paso que graficos.jsx) para no tocar ese archivo.
   const anchoEtiqueta = 92
-  const notaAncho = 112
-  const padTop = 20
-  const padBot = 4
 
   return (
     <section className="pant">
@@ -67,9 +62,9 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
               <div style={{ position: 'relative', width: w, height: h }}>
                 <BarrasH
                   datos={datos} w={w} h={h}
-                  formato={pesos}
+                  formato={pesos} formatoEje={(v) => millones(v, 0)}
                   tituloEje="Exposición anual, por región (ARS)"
-                  anchoEtiqueta={anchoEtiqueta} notaAncho={notaAncho}
+                  anchoEtiqueta={anchoEtiqueta}
                   onBarra={verEnLista ? (i, d) => verEnLista('region', d.idxOriginal) : undefined}
                 />
               </div>

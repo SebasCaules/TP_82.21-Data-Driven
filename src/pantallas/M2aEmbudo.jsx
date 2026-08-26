@@ -3,9 +3,13 @@
 // porcentaje de nota al lado de cada barra. La bajada declara las dos bases y que la compra
 // a 7 días nunca ocurre sin clic previo: el salto al abrir es mecánico, no un efecto causal.
 // Serie global: no depende del corte ni de los filtros.
+// formatoEje en miles ("24 mil" en vez de "23.529"): la escala del eje solo necesita marcar
+// la magnitud, y el numero exacto ya esta en la nota de cada barra.
 
 import { Lienzo, Embudo } from '../graficos.jsx'
 import { entero, pct, series } from '../agregacion.js'
+
+const formatoEje = (v) => (v >= 1000 ? `${Math.round(v / 1000)} mil` : entero(v))
 
 export default function M2a() {
   const emb = series.embudo_campanias
@@ -26,14 +30,13 @@ export default function M2a() {
       </h1>
       <p className="bajada">
         {entero(emb.base_completa_envios)} envíos en la base completa, {entero(emb.base_limpia_envios)} en
-        la limpia. Compra a 7 días nunca ocurre sin clic previo ({entero(emb.compra_sin_click_previo)}{' '}
-        excepciones): el salto al abrir es mecánico, no causal.
+        la limpia. Compra a 7 días nunca ocurre sin clic: el salto al abrir es mecánico, no causal.
       </p>
 
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => (
-            <Embudo etapas={etapas} w={w} h={h} formato={entero} />
+            <Embudo etapas={etapas} w={w} h={h} formato={entero} formatoEje={formatoEje} />
           )}
         </Lienzo>
       </div>

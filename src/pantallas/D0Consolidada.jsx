@@ -7,13 +7,9 @@
 import Ban from '../Ban.jsx'
 import Semaforo, { estadoInverso, estadoRecompra } from '../Semaforo.jsx'
 import { Lienzo, Linea } from '../graficos.jsx'
-import { entero, mesCorte, meta, millones, pct, series } from '../agregacion.js'
+import { entero, meta, millones, pct, series } from '../agregacion.js'
 
-// Orden documentado en docs/diseno-pantallas.md (bloque Directorio, post-split E-1):
-// D0 D1 D2 D3 D4 D5a D5b D6 D7 → D7 es la novena pantalla, indice 8.
-const INDICE_D7 = 8
-
-export default function D0({ info, irA }) {
+export default function D0({ info }) {
   const pctRiesgo = info.clientes ? (100 * info.enRiesgo) / info.clientes : 0
   const sens90 = info.sensibilidad ? info.sensibilidad.find((x) => x.umbral === 90) : null
   const recompra = series.recompra_trimestral
@@ -33,11 +29,11 @@ export default function D0({ info, irA }) {
   return (
     <section className="pant">
       <h1 className="titulo" style={{ fontWeight: 500, fontSize: 'clamp(14px, 1.25vw, 18px)' }}>
-        Casi la mitad del ingreso anual de la base está en clientes hoy en riesgo por falta de compra reciente
+        Casi la mitad del ingreso anual está en clientes en riesgo por falta de compra reciente
       </h1>
 
       <p className="bajada">
-        La base venía creciendo hasta 2024 y las campañas se deciden por criterio comercial.
+        La base crecía hasta 2024 y las campañas se deciden por criterio comercial.
         En {ultimoAnio.anio} la base activa cayó {pct(caidaBase)} y la recompra a 90 días bajó a{' '}
         {pct(ultima ? ultima.valor : 0)}.
       </p>
@@ -54,7 +50,8 @@ export default function D0({ info, irA }) {
               valor={pct(pctRiesgo)}
               apoyo={`${entero(info.enRiesgo)} de ${entero(info.clientes)} con compra válida`}
               baseline={`${entero(info.elegibles)} elegibles (3 compras o más)`}
-              estado={<Semaforo estado={estadoInverso(pctRiesgo, meta.umbral_en_riesgo)} />}
+              estado={<Semaforo estado={estadoInverso(pctRiesgo, meta.umbral_en_riesgo)}
+                                de="clientes en riesgo" />}
             />
             <Kpi
               etiqueta="Facturación histórica en riesgo"
@@ -68,42 +65,42 @@ export default function D0({ info, irA }) {
               apoyo={info.sensibilidad
                 ? info.sensibilidad.map((x) => `${x.umbral} d ${millones(x.exposicion)}`).join(' · ')
                 : '—'}
-              baseline={`casi insensible al umbral · base completa del corte, sin filtros`}
+              baseline="base completa del corte, sin filtros"
             />
           </div>
 
-          <button
-            type="button"
-            onClick={() => irA(INDICE_D7)}
-            style={{
-              background: 'none', border: 0, padding: 0, margin: 0, font: 'inherit',
-              color: 'inherit', textAlign: 'left', cursor: 'pointer',
-            }}
-          >
-            <span className="kpi-sub" style={{ textDecoration: 'underline' }}>
-              Tres decisiones, ninguna cuesta presupuesto nuevo → ver el pedido en D7
-            </span>
-          </button>
-
           <div className="tarjeta" style={{ flex: 1, minHeight: 0 }}>
             <div className="kpi-lbl">
-              Recompra 90 días · María G. · cadencia mensual
-              <Semaforo estado={estado} sufijo={pct(ultima ? ultima.valor : 0)} />
+              Recompra · María G. · mensual
+              {/* Semaforo grande y pegado al numero (el 8,5 % va DENTRO de la pastilla,
+                  via sufijo): es lo que el directorio busca primero al mirar esta tarjeta,
+                  no un renglon chico que se lee como leyenda del grafico. */}
+              <Semaforo estado={estado} tamano="grande" sufijo={pct(ultima ? ultima.valor : 0)}
+                        de="recompra a 90 días" />
             </div>
-            {/* La serie es global: no responde al corte ni a los filtros. Sin esta linea,
-                con Region=Cuyo el BAN se recalcula y este 8,5 % sigue siendo el de todo el
-                pais, y se lee como si fuera el de Cuyo. */}
+            {/* Unica salvedad de la tarjeta, dicha una sola vez: la serie es global y no
+                responde al corte ni a los filtros del resto de la pantalla. El rango de
+                trimestres ya lo dice el propio eje X del grafico, no hace falta repetirlo
+                en texto. */}
             <div className="kpi-base" style={{ marginTop: 0, borderTop: 0, paddingTop: 2 }}>
-              serie global {recompra[0]?.etiqueta.replace("'", '20')}–
-              {ultima?.etiqueta.replace("'", '20')} · no responde al corte ni a los filtros
+              no responde al corte ni a los filtros
             </div>
+            {/* Serie de tiempo trimestral contra una banda de meta: va en linea (regla 7).
+                Se sostiene: es la unica primitiva que muestra tendencia y quiebre en el
+                tiempo sin inventar una escala de barras para 15 puntos.
+                Sin banda2 (linea base) aca a proposito: en esta version el 8,5 % final
+                cae adentro de esa banda, y la plaqueta del ultimo punto (offset fijo de
+                14 px en la primitiva) queda pisando la banda sin importar el alto de la
+                tarjeta. D4 hace la comparacion completa contra la linea base con toda la
+                pantalla disponible; aca alcanza con la meta, que es lo que el semaforo ya
+                califica. */}
             <Lienzo>
               {({ w, h }) => (
                 <Linea
                   serie={recompra} w={w} h={h}
                   formato={(v) => `${v.toFixed(1).replace('.', ',')}%`}
-                  banda={[metaLo, metaHi]} banda2={meta.base_recompra}
-                  tituloEje="% que vuelve a comprar en 90 días"
+                  banda={[metaLo, metaHi]}
+                  tituloEje="% que recompra en 90 días"
                 />
               )}
             </Lienzo>

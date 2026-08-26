@@ -42,8 +42,13 @@ export default function D4Recompra() {
         <div className="tarjeta" style={{ flex: 1, minHeight: 0 }}>
           <div className="kpi-lbl">
             Estado contra la meta
-            <Semaforo estado={estado} />
+            {/* El estado ES el mensaje de esta pantalla (Parte D §2.1): pastilla grande,
+                no un renglon chico que compite con el grafico. */}
+            <Semaforo estado={estado} tamano="grande" de="recompra a 90 días" />
           </div>
+          {/* Serie de tiempo trimestral contra una banda de meta: va en linea (regla 7).
+              Se sostiene: es la unica primitiva que muestra tendencia y quiebre en el
+              tiempo sin inventar una escala de barras para 15 puntos. */}
           <Lienzo>
             {({ w, h }) => (
               <Linea
@@ -51,7 +56,7 @@ export default function D4Recompra() {
                 formato={(v) => pct(v)}
                 banda={meta.meta_recompra}
                 banda2={meta.base_recompra}
-                tituloEje="% que vuelve a comprar en 90 días"
+                tituloEje="% que recompra en 90 días"
               />
             )}
           </Lienzo>

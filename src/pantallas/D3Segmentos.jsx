@@ -37,13 +37,16 @@ export default function D3({ iCorte, filtro, info, verEnLista }) {
 
   const pctFacturacion = tot.f ? (100 * campeones.f) / tot.f : 0
   const pctEnRiesgo = enRiesgo.n ? (100 * enRiesgo.nr) / enRiesgo.n : 0
+  // Contraste que da título al gráfico: cuánto de lo facturado (no visible en este
+  // gráfico, que es solo exposición) contra cuánta exposición aporta el mismo segmento.
+  // El monto de exposición de Campeones ya se lee directo en su barra: no se repite.
+  const pctExposicionCampeones = tot.ar ? (100 * campeones.ar) / tot.ar : 0
 
   return (
     <section className="pant">
       <h1 className="titulo">
-        El riesgo no está donde está la plata: Campeones concentra ARS {millones(campeones.f)} de
-        los ARS {millones(tot.f)} históricos ({pct(pctFacturacion)}) y aporta ARS{' '}
-        {millones(campeones.ar)} de los ARS {millones(tot.ar)} de exposición
+        El riesgo no está donde está la plata: Campeones concentra {pct(pctFacturacion)} de lo
+        facturado y {pct(pctExposicionCampeones)} de la exposición
       </h1>
       <p className="bajada">
         El segmento En riesgo ({pct(pctEnRiesgo)}) es circular por construcción: la R de RFM
@@ -54,16 +57,13 @@ export default function D3({ iCorte, filtro, info, verEnLista }) {
         <Lienzo>
           {({ w, h }) => {
             const anchoEtiqueta = 106
-            const notaAncho = 100
-            const padTop = 20
-            const padBot = 4
             return (
               <div style={{ position: 'relative', width: w, height: h }}>
                 <BarrasH
                   datos={datos} w={w} h={h}
-                  formato={pesos}
+                  formato={pesos} formatoEje={(v) => millones(v, 0)}
                   tituloEje="Exposición anual (ARS)"
-                  anchoEtiqueta={anchoEtiqueta} notaAncho={notaAncho}
+                  anchoEtiqueta={anchoEtiqueta}
                   onBarra={verEnLista ? (i, d) => verEnLista('rfm', d._i) : undefined}
                 />
                 {/* Cabecera de la columna de notas: la tasa es un eje distinto (fracción,

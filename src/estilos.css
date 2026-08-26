@@ -4,19 +4,43 @@
    Google Fonts, y el mono del sistema tiene el mismo carácter que IBM Plex Mono. */
 
 :root {
-  --papel: #eceae5;        /* fondo de la aplicación */
-  --lat: #f4f2ee;          /* barra lateral */
-  --sup: #fff;             /* tarjetas */
-  --ink: #1a1a1a;
-  --lbl: #3a3f4a;
-  --mut: #6f6b64;          /* texto secundario */
-  --mut2: #4a463f;
-  --bd: rgba(0, 0, 0, .14);
-  --bd2: rgba(0, 0, 0, .07);
-  --trk: #e2dfd9;
-  --acc: #b8433a;          /* único color de énfasis (regla 18) */
-  --gris: #8d8a83;         /* las series que NO son el énfasis, 3,2:1 sobre blanco */
-  --gris2: #c9c5bd;
+  /* Paleta azul del mockup de direcciones, variante 2a ("rampa de azules"), que es la que
+     el propio mockup recomienda para toda la interfaz. Se conserva el papel cálido y se
+     enfría toda la tinta: el contraste papel cálido / tinta fría es de donde sale el
+     carácter, sin cambiar de mundo.
+
+     El cambio semántico importante: el terracota deja de ser "acá mirá" y pasa a ser
+     "excepción". Antes el mismo rojo marcaba la barra destacada de cada gráfico y el estado
+     fuera de meta, así que el color decía dos cosas a la vez. Ahora el énfasis es azul-700 y
+     el terracota queda para lo que de verdad es excepción: sin consentimiento, fuera de meta,
+     no contactable. */
+
+  --papel: #eceae5;        /* fondo de la aplicación, se mantiene cálido */
+  --lat: #f2f1ee;          /* barra lateral */
+  --sup: #ffffff;          /* tarjetas */
+  --ink: #16233a;          /* azul-900: texto y cifra grande */
+  --lbl: #3d4d66;          /* etiquetas */
+  --mut: #5f6779;          /* texto secundario. Un paso más oscuro que el #6b7385 del
+                              mockup: a 9 px sobre papel cálido, aquel daba 3,96:1 y este
+                              da 4,72:1, que es lo que pide un proyector. */
+  --mut2: #475061;
+  --bd: rgba(22, 35, 58, .16);
+  --bd2: rgba(22, 35, 58, .08);
+  --trk: #dfe1e0;          /* riel */
+
+  --acc: #22456f;          /* azul-700: único color de énfasis (regla 18) */
+  --sel: #2f6ba6;          /* azul-500: selección y foco */
+  --azul3: #7ea6c9;        /* azul-300: series secundarias, solo como relleno */
+  --azul1: #d7e2ec;        /* azul-100: fondo de fila activa */
+  --terra: #b8433a;        /* SOLO excepción: sin consentimiento, fuera de meta */
+
+  --gris: #8891a3;         /* las series que NO son el énfasis. Derivado entre azul-300 y
+                              --mut: 3,17:1 sobre blanco y 3,08:1 contra el azul de énfasis,
+                              que es lo que hace que barra destacada y barra gris se separen. */
+  --gris2: #b9c0cc;
+  --eje: #97a0af;          /* ejes y marcas: presentes, nunca protagonistas */
+  --tram-b: #d3d8e0;       /* trama: base clara para que el rótulo encima se lea */
+  --tram-l: #f4f6f8;
 
   --fuente: "Segoe UI", Tahoma, Helvetica, Arial, sans-serif;
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
@@ -115,13 +139,6 @@ body {
 .lat-n { font: 500 9.5px var(--mono); color: var(--mut); flex-shrink: 0; }
 .lat-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* Marca de audiencia: cuadro = directorio, círculo = marketing, los dos = ambas. */
-.aud { display: inline-flex; gap: 2px; flex-shrink: 0; opacity: .55; }
-.lat-item.on .aud { opacity: .9; }
-.aud i { width: 6px; height: 6px; border: 1.2px solid currentColor; }
-.aud-marketing i { border-radius: 50%; }
-.aud-ambas i.dos { border-radius: 50%; }
-
 .lat-pie {
   padding: 10px 16px 0;
   border-top: 1px solid var(--bd);
@@ -133,30 +150,37 @@ body {
 
 .barra {
   display: flex;
-  align-items: flex-end;
+  align-items: center;                /* filtros y mes de corte sobre el mismo eje */
   gap: clamp(16px, 3vw, 44px);
-  padding: 9px var(--pad-x) 10px;
+  padding: 10px var(--pad-x);
   border-bottom: 1px solid var(--bd);
   background: var(--papel);
 }
-.barra-corte { flex: 0 0 auto; width: clamp(230px, 26%, 340px); }
+/* El corte se estira hasta casi tocar los filtros: los filtros toman el ancho que
+   necesitan y el sobrante es todo del riel, que es el control que gana con ser largo
+   (25 cortes en 250 px son 10 px por mes; en 600 px son 24). */
+.barra-corte { flex: 1 1 auto; min-width: 240px; }
 .barra-corte.apagada { opacity: .4; pointer-events: none; }
 
 /* ---------- mes de corte ---------- */
 
-.tl { display: flex; flex-direction: column; gap: 4px; user-select: none; }
-.tl-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+/* Un solo renglón de 28 px, la misma caja que un chip de filtro. */
+.tl { display: flex; align-items: center; gap: 10px; height: 28px; user-select: none; }
 .tl-lbl {
+  flex-shrink: 0;
   font: 500 9px/1.2 var(--mono);
   letter-spacing: .13em; text-transform: uppercase; color: var(--mut);
 }
-.tl-val { font: 600 14px/1.15 var(--fuente); letter-spacing: -.01em; }
+.tl-val {
+  flex-shrink: 0; min-width: 60px; text-align: right;
+  font: 600 13.5px/1.15 var(--fuente); letter-spacing: -.01em;
+}
 
 .tl-pista {
-  height: 20px;
+  flex: 1; min-width: 60px; height: 100%;
   position: relative;
   cursor: ew-resize;
-  border-bottom: 1px solid rgba(0, 0, 0, .3);
+  border-bottom: 1px solid rgba(0, 0, 0, .28);
   touch-action: none;
   /* Sin esto, arrastrar el cursor selecciona el texto de alrededor. */
   user-select: none; -webkit-user-select: none;
@@ -168,24 +192,18 @@ body {
   display: flex; justify-content: space-between; align-items: flex-end;
 }
 /* El corte activo no se distingue por color: es el único tick que llega arriba y engrosa. */
-.tl-tick { width: 1px; height: 5px; background: rgba(0, 0, 0, .25); }
-.tl-tick.anio { height: 9px; background: rgba(0, 0, 0, .42); }
-.tl-tick.on { background: var(--ink); height: 18px; width: 2px; }
-
-.tl-pie {
-  display: flex; justify-content: space-between;
-  font: 400 9px/1.2 var(--mono); color: var(--mut);
-  letter-spacing: .04em;
-}
+.tl-tick { width: 1px; height: 7px; background: rgba(22, 35, 58, .32); }
+.tl-tick.anio { height: 12px; background: rgba(22, 35, 58, .5); }
+.tl-tick.on { background: var(--acc); height: 22px; width: 2px; }
 
 /* ---------- filtros ---------- */
 
 .filtros {
-  flex: 1; min-width: 0;
-  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-  padding-bottom: 2px;
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 6px;
 }
 .filtros.inertes .chip-f { opacity: .35; }
+.chip-f-caja .chip-f { width: 100%; }
 .filtros-lbl {
   display: inline-flex; align-items: center; gap: 5px;
   font: 500 9px/1.2 var(--mono);
@@ -195,10 +213,14 @@ body {
 .filtros-lbl b {
   display: inline-grid; place-items: center;
   min-width: 15px; height: 15px; padding: 0 3px;
-  background: var(--acc); color: #fff;
+  background: var(--sel); color: #fff;
   border-radius: 8px; font: 600 9.5px/1 var(--mono);
 }
 .filtros-nota { font: italic 400 10.5px var(--fuente); color: var(--mut); }
+.filtros-cola {
+  flex: 0 0 auto; width: 128px;
+  display: flex; align-items: center;
+}
 
 /* Afordancia: fondo propio, sombra de una línea, icono y caret. Un borde fino sobre el
    fondo no se lee como algo que se puede tocar. */
@@ -214,24 +236,28 @@ body {
   cursor: pointer;
   transition: border-color .12s, box-shadow .12s, transform .12s;
 }
-.chip-f select {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  opacity: 0; cursor: pointer; font: inherit;
-}
+.chip-f-caja { position: relative; display: inline-flex; }
+.chip-f-btn { font: inherit; }
+.chip-f-btn:disabled { cursor: default; }
 .chip-f:hover {
   border-color: var(--ink); color: var(--ink);
   box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
   transform: translateY(-1px);
 }
-.chip-f:has(select:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+.chip-f:focus-visible { outline: 2px solid var(--sel); outline-offset: 2px; }
 .chip-f .caret { opacity: .5; margin-left: -1px; }
 .chip-f:hover .caret { opacity: .9; }
 
+/* Ancho FIJO, no max-width: el chip cambia de texto al poner el filtro ("Región" pasa a
+   "Solo online") y con ancho automático eso le corría el riel del mes de corte de al lado.
+   11,5ch es el ajuste justo: el valor más largo del catálogo ("Cocina y mesa") mide 79 px
+   y 11,5ch son 80,5 px con esta tipografía. */
 .chip-f-txt {
   font: 600 11px/1 var(--fuente);
   letter-spacing: .01em; white-space: nowrap;
-  max-width: 13ch; overflow: hidden; text-overflow: ellipsis;
+  width: 11.5ch; overflow: hidden; text-overflow: ellipsis;
 }
+.chip-f.reset .chip-f-txt { width: auto; }
 
 /* Con filtro puesto: se invierte, y la ✕ reemplaza al caret. El estado no depende del
    color — cambian el fondo, el peso y el control de la derecha. */
@@ -240,16 +266,49 @@ body {
   box-shadow: 0 1px 0 rgba(0, 0, 0, .18);
 }
 .chip-f.on:hover { background: #000; }
-.chip-f-x {
-  position: relative; z-index: 1;
+.chip-f-fin {
   display: grid; place-items: center;
-  width: 15px; height: 15px; margin-right: -3px;
-  border: 0; border-radius: 3px; background: rgba(255, 255, 255, .16);
+  width: 15px; height: 15px; flex-shrink: 0; margin-right: -3px;
+}
+.chip-f-x {
+  display: grid; place-items: center;
+  width: 15px; height: 15px;
+  border-radius: 3px; background: rgba(255, 255, 255, .18);
   color: inherit;
   font: 400 12px/1 var(--fuente); cursor: pointer;
 }
 .chip-f-x:hover { background: rgba(255, 255, 255, .3); }
-.chip-f-x:focus-visible { outline: 1px solid currentColor; }
+
+
+/* Menú del filtro: una fila por valor, cada una con su icono. */
+.chip-menu {
+  position: absolute; top: calc(100% + 5px); left: 0; z-index: 40;
+  margin: 0; padding: 4px; list-style: none;
+  min-width: 100%; max-height: 46vh; overflow-y: auto;
+  background: var(--sup);
+  border: 1px solid var(--bd);
+  border-radius: 5px;
+  box-shadow: 0 6px 18px rgba(22, 35, 58, .16);
+}
+.chip-op {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px 6px 7px; border-radius: 3px;
+  font: 500 11.5px/1.2 var(--fuente); color: var(--mut2);
+  white-space: nowrap; cursor: pointer;
+}
+.chip-op-i {
+  display: inline-grid; place-items: center;
+  width: 15px; height: 15px; flex-shrink: 0; color: var(--mut);
+}
+.chip-op.foco { background: var(--azul1); color: var(--ink); }
+.chip-op.foco .chip-op-i { color: var(--acc); }
+/* El elegido no se marca solo con fondo: lleva barra a la izquierda y negrita. */
+.chip-op.sel { font-weight: 700; color: var(--ink); box-shadow: inset 2px 0 0 var(--acc); }
+
+/* Filtro puesto sobre la dimensión que ESTA vista desagrega: sigue puesto, pero acá no
+   recorta. Se declara en el chip porque es donde el usuario mira cuando le importa. */
+.chip-f.exento { background: var(--mut2); border-style: dashed; }
+.chip-f.exento .chip-f-txt { text-decoration: underline dotted rgba(255, 255, 255, .6); }
 
 .chip-f.reset {
   background: transparent; border-style: dashed; box-shadow: none;
@@ -263,7 +322,9 @@ body {
 .cuerpo {
   flex: 1; min-height: 0;
   display: flex; flex-direction: column;
-  padding: clamp(10px, 1.5vh, 20px) var(--pad-x) 0;
+  /* El respiro de abajo lo daba el pie. Sacado el pie, hay que ponerlo explícito o el
+     gráfico de la última fila termina pegado al borde de la ventana. */
+  padding: clamp(10px, 1.5vh, 20px) var(--pad-x) clamp(12px, 1.8vh, 24px);
 }
 
 .pant { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: clamp(6px, 1vh, 13px); }
@@ -278,21 +339,41 @@ body {
 .rotulo.predictivo::before { background: none; border-style: dashed; }
 .rotulo.diagnostico::before { background: var(--mut2); }
 
+/* Título y bajada ocupan SIEMPRE el mismo alto, tenga el texto una línea o dos. Es lo que
+   hace que el gráfico de abajo mida igual con cualquier filtro puesto: si la cabecera crece
+   al cambiar de "Muebles y Baño" a "Iluminación y Organización", el lienzo se achica y las
+   tarjetas cambian de tamaño solas. El tope de dos líneas es dur o a propósito: obliga a que
+   el título entre, y el detector de desborde marca el que no entra. */
 .titulo {
   font: 600 clamp(19px, 2.05vw, 30px)/1.22 var(--fuente);
   letter-spacing: -.015em; margin: 0; max-width: 46ch;
+  height: 2.44em;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 .bajada {
-  font-size: clamp(12.5px, 1.02vw, 14.5px);
+  font-size: clamp(12.5px, 1.02vw, 14.5px); line-height: 1.45;
   color: var(--mut2); margin: 0; max-width: 82ch;
+  height: 2.9em;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden;
 }
+/* Pantallas que declaran su cabecera de una sola línea (el cierre, la lista). */
+.pant.cab-1 .titulo { height: 1.22em; -webkit-line-clamp: 1; }
+.pant.cab-1 .bajada { height: 1.45em; -webkit-line-clamp: 1; }
 
 .lienzo {
   flex: 1;
   min-height: 150px;              /* piso: sin esto una columna corta colapsa el SVG */
   display: flex; gap: clamp(12px, 1.8vw, 30px); align-items: stretch;
 }
-.lienzo > * { min-width: 0; }
+/* flex-basis 0 y no auto: con auto, el ancho de cada tarjeta lo decide su contenido y una
+   cifra más larga la ensancha. Con 0, el reparto lo decide la caja y el filtro no lo mueve. */
+.lienzo > * { min-width: 0; flex: 1 1 0; }
+.lienzo > .fijo { flex: 0 0 auto; }
+/* Nada de align-items:center sobre .lienzo: el hijo mide con position:absolute, así que
+   centrarlo lo colapsa a alto cero. El centrado vertical de una barra suelta lo hace la
+   primitiva dentro del SVG, que sí conoce su alto. */
 
 .tarjeta {
   background: var(--sup);
@@ -308,38 +389,51 @@ body {
   display: flex; justify-content: space-between; gap: 8px; align-items: center;
 }
 .kpi-lbl b { color: var(--acc); font-variant-numeric: tabular-nums; }
+/* La pastilla de estado no se comprime: es lo que el directorio busca primero. El que cede
+   es el rótulo de la tarjeta, que puede partirse en dos renglones. */
+.kpi-lbl > .sem { flex-shrink: 0; }
+.kpi-lbl { min-width: 0; }
 .kpi-val {
   font: 600 clamp(21px, 2.2vw, 31px)/1.08 var(--fuente); color: var(--ink);
   letter-spacing: -.02em; margin-top: 5px;
 }
-.kpi-sub { font-size: 11.5px; color: var(--mut2); margin-top: 3px; }
+/* Alto reservado, como en el título: el texto de estas dos líneas se acorta al poner un
+   filtro ("2.452 de 5.978 con compra válida" pasa a caber en un renglón) y con alto
+   automático la tarjeta entera se achicaba, corriendo el gráfico de abajo. */
+.kpi-sub {
+  font-size: 11.5px; line-height: 1.2; color: var(--mut2); margin-top: 3px;
+  min-height: 2.4em;
+}
 .kpi-base {
   font: 400 10.5px/1.4 var(--mono); color: var(--mut);
   margin-top: auto; padding-top: 7px; border-top: 1px dotted var(--bd);
+  min-height: calc(2.8em + 8px);
 }
 
-/* ---------- pie ---------- */
+/* ---------- pie: SOLO en la hoja impresa ---------- */
 
-.pie {
+.pie-impreso {
   flex-shrink: 0;
   border-top: 1px solid var(--bd);
-  padding: 7px var(--pad-x) 9px;
-  font-size: 11px; line-height: 1.4;
-  color: var(--mut2); background: var(--papel);
-  display: flex; flex-direction: column; gap: 3px;
+  padding: 6px 0 0;
+  font-size: 9.5px; line-height: 1.35;
+  color: var(--mut2);
+  display: none;
+  flex-direction: column; gap: 2px;
 }
-.pie-l { display: flex; gap: 5px 14px; flex-wrap: wrap; align-items: baseline; }
-.pie b { color: var(--ink); font-weight: 600; }
-.pie .sep { color: var(--gris2); }
-.pie-ojo {
-  border: 1px solid var(--acc); border-radius: 3px;
-  padding: 0 5px; color: var(--acc); font-weight: 600;
-}
+@media print { .pie-impreso { display: flex; } }
+.pie-l { display: flex; gap: 3px 12px; flex-wrap: wrap; align-items: baseline; }
+.pie-impreso b { color: var(--ink); font-weight: 600; }
+.pie-impreso .sep { color: var(--gris2); }
 
 /* ---------- BAN (ficha F07, congelada) ---------- */
 
 .ban {
   --val: 38px;
+  /* Ocupa TODO el ancho de su contenedor. Sin esto medía lo que medía su cifra, y al poner
+     un filtro "ARS 94,9 M" pasaba a "ARS 15,5 M" y la tarjeta se angostaba sola: era la
+     última pieza que seguía cambiando de tamaño con el filtro. */
+  flex: 1; min-width: 0;
   background: var(--sup);
   border: 1px solid var(--bd);
   border-top: 3px solid var(--ink);
@@ -371,17 +465,44 @@ body {
 .ban-note { font: 400 10.5px/1.5 var(--fuente); color: var(--mut); margin-top: 9px; }
 
 /* ---------- semáforo: forma + etiqueta, nunca solo color ---------- */
+/* Pastilla con borde, no renglón suelto: en la versión anterior se leía como leyenda del
+   gráfico y había que buscarlo. */
 
+/* El tono del estado va en una variable para poder usarlo a la vez como color de texto y
+   como fondo del rótulo. Con currentColor no se puede: dentro del rótulo ya vale blanco. */
 .sem {
-  display: inline-flex; align-items: center; gap: 6px;
-  font: 600 10.5px/1 var(--mono); color: var(--mut2);
+  --tono: var(--mut2);
+  display: inline-flex; align-items: stretch;
+  border: 1.5px solid var(--tono); border-radius: 4px;
+  background: var(--sup); overflow: hidden;
+  font: 600 10.5px/1 var(--mono); color: var(--tono);
   text-transform: uppercase; letter-spacing: .06em;
+  white-space: nowrap;
 }
-.sem i { width: 10px; height: 10px; border: 1.5px solid currentColor; flex-shrink: 0; }
+.sem-cab {
+  display: flex; align-items: center;
+  padding: 0 8px;
+  background: var(--tono); color: var(--sup);
+  font-size: .88em; letter-spacing: .12em;
+}
+.sem > i { align-self: center; margin: 0 0 0 9px; }
+.sem-chico > i { margin-left: 8px; }
+.sem-txt { display: flex; align-items: center; padding: 5px 9px 5px 7px; }
+.sem-contra {
+  display: flex; align-items: center;
+  padding: 0 9px; border-left: 1px dotted currentColor;
+  font-weight: 400; opacity: .82; text-transform: none; letter-spacing: 0;
+}
+.sem-grande { font-size: 12.5px; }
+.sem-grande .sem-txt { padding: 8px 12px 8px 8px; }
+.sem-grande > i { margin-left: 12px; }
+.sem i { width: 11px; height: 11px; border: 1.5px solid currentColor; flex-shrink: 0; }
+.sem-grande i { width: 14px; height: 14px; }
 .sem-lleno i { background: currentColor; }
 .sem-medio i { background: linear-gradient(to top, currentColor 50%, transparent 50%); }
 .sem-vacio i { background: none; border-style: dashed; }
-.sem-vacio { color: var(--acc); }
+.sem-vacio { --tono: var(--terra); }
+.sem-txt b { font-weight: 700; }
 
 /* ---------- tabla de la lista ---------- */
 
@@ -397,7 +518,8 @@ body {
   color: var(--mut2); font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 .lista-tabla td.destacado { color: var(--ink); font-weight: 600; }
-.lista-tabla .no { color: var(--acc); font-weight: 600; }
+.lista-tabla tr.activa td { background: var(--azul1); }
+.lista-tabla .no { color: var(--terra); font-weight: 600; }
 
 .chip-claro {
   font: 600 10.5px/1 var(--mono); color: var(--mut2);
@@ -415,10 +537,14 @@ body {
   .lat-marca { padding-bottom: 10px; }
   .lat-item { padding: 5px 8px; font-size: 11.5px; }
   .lat-grupo { padding: 8px 8px 4px; }
+  /* A 178 px el detalle del grupo parte el rótulo en dos renglones y ensucia la lista. */
+  .lat-grupo i { display: none; }
   .lat-pie { font-size: 9px; gap: 2px; padding-top: 8px; }
   .barra { padding: 7px var(--pad-x) 8px; }
   .tl-pista { height: 17px; }
   .chip-f { height: 26px; }
+  .tl { height: 26px; }
+  .tl-tick.on { height: 20px; }
   .cuerpo { padding-top: 8px; }
   .titulo { font-size: clamp(17px, 1.75vw, 23px); }
   .tarjeta { padding: 9px 12px; }
@@ -427,7 +553,6 @@ body {
   .ban { padding: 10px 13px; }
   .ban-track { height: 20px; }
   .ban table { margin-top: 8px; }
-  .pie { font-size: 10.5px; padding: 5px var(--pad-x) 7px; line-height: 1.35; }
 }
 
 /* ---------- impresión: A4 apaisada, una vista por hoja ---------- */
@@ -443,7 +568,8 @@ body {
   .lat, .barra, .filtros { display: none !important; }
   .principal { display: block; }
   .cuerpo { padding: 0; }
-  .titulo { font-size: 20px; }
+  .titulo { font-size: 20px; height: auto; -webkit-line-clamp: none; display: block; }
+  .bajada { height: auto; -webkit-line-clamp: none; display: block; }
   .chico { display: none !important; }
 }
 
@@ -477,4 +603,4 @@ body {
 
 /* ---------- detector de desborde (?fit) ---------- */
 
-.fit-mal { outline: 3px solid var(--acc) !important; outline-offset: -3px; }
+.fit-mal { outline: 3px solid var(--terra) !important; outline-offset: -3px; }

@@ -6,6 +6,8 @@ hacen I/O. Ningun redondeo intermedio; se redondea solo al formatear en la vista
 
 from __future__ import annotations
 
+import math
+
 import pandas as pd
 
 
@@ -129,6 +131,21 @@ def base_activa_anual(tx: pd.DataFrame) -> list[dict]:
     return resultado
 
 
+def _wilson(exitos: int, n: int, z: float = 1.959963984540054) -> list[float] | None:
+    """Intervalo de Wilson al 95 % para una proporcion. Se usa el de Wilson y no el
+    normal (Wald) porque con p cercano a 0,01 y n de pocos miles el de Wald se sale
+    del [0,1] y subestima el ancho. No es una cifra nueva: es la precision de la tasa
+    que ya se reporta, y es lo que permite afirmar 'ningun segmento discrimina' en vez
+    de suponerlo mirando barras casi iguales."""
+    if n <= 0:
+        return None
+    p = exitos / n
+    d = 1 + z * z / n
+    centro = (p + z * z / (2 * n)) / d
+    radio = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return [max(0.0, centro - radio), min(1.0, centro + radio)]
+
+
 def embudo_campanias(camp: pd.DataFrame, corte) -> dict:
     """Envios con fecha_envio <= corte. Dos bases declaradas: la completa del
     dataset y la 'limpia' sin duplicados de fila completa (23.729 y 23.529 al
@@ -150,11 +167,14 @@ def embudo_campanias(camp: pd.DataFrame, corte) -> dict:
         n = len(df)
         if n == 0:
             return {"envios": 0, "abre": None, "clic": None, "compra_7dias": None}
+        compras = int(df["compra_7dias"].sum())
         return {
             "envios": int(n),
             "abre": float(df["abierto"].mean()),
             "clic": float(df["click"].mean()),
             "compra_7dias": float(df["compra_7dias"].mean()),
+            "compras": compras,
+            "compra_7dias_ic": _wilson(compras, int(n)),
         }
 
     global_limpio = tasas(limpia)

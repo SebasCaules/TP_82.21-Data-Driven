@@ -8,11 +8,6 @@ import Semaforo, { estadoInverso } from '../Semaforo.jsx'
 import { entero, meta, pct, porDimension } from '../agregacion.js'
 
 const ANCHO_ETIQUETA = 54
-// 180, no 140: con la barra de énfasis (Q5, siempre la más larga) el valor arranca en
-// w-185 y la nota en w-115, quedan ~22 px de aire. Con 140 los dos textos anclados a la
-// derecha se pisaban 18 px sobre esa barra (comité: colisión "51,8 %6").
-const NOTA_ANCHO = 180
-// Espeja graficos.jsx línea 59 (padTop = tituloEje ? 20 : 6): D2 siempre pasa tituloEje,
 
 export default function D2({ iCorte, filtro, info, verEnLista }) {
   const q = porDimension(iCorte, 'quintil', filtro)
@@ -48,17 +43,17 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
   if (sinBaseQ1) {
     bajada = 'Con este filtro Q1 no tiene clientes con historia suficiente: el gradiente entre elegibles se lee sobre los quintiles con base.'
   } else if (sube) {
-    bajada = `El salto Q1→Q2 es de composición: el ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras y por definición no puede estar en riesgo. Entre elegibles el gradiente real va de ${pct(gradQ1)} a ${pct(gradQ5)}, o sea ${ratio}×.`
+    bajada = `El salto Q1→Q2 es de composición: ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras, no califica como riesgo. Entre elegibles el gradiente real va de ${pct(gradQ1)} a ${pct(gradQ5)}, ${ratio}×.`
   } else {
     // gradQ5 < gradQ1: no llamarlo "gradiente" ni prometer una subida que en este
     // estado no se da, para no chocar con el título de la pantalla.
-    bajada = `El salto Q1→Q2 es de composición: el ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras y por definición no puede estar en riesgo. Entre elegibles, Q1 y Q5 van de ${pct(gradQ1)} a ${pct(gradQ5)}.`
+    bajada = `El salto Q1→Q2 es de composición: ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras, no califica como riesgo. Entre elegibles, Q1 y Q5 van de ${pct(gradQ1)} a ${pct(gradQ5)}.`
   }
 
   return (
     <section className="pant">
       <h1 className="titulo">
-        El riesgo sube con el valor del cliente, pero menos de lo que sugiere el total
+        El riesgo sube con el valor, pero menos de lo que sugiere el total
       </h1>
       <p className="bajada">{bajada}</p>
 
@@ -72,9 +67,9 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
           {({ w, h }) => (
             <BarrasH
               datos={datos} w={w} h={h}
-              formato={(v) => pct(v)}
+              formato={(v) => pct(v)} formatoEje={(v) => pct(v, 0)}
               tituloEje="% en riesgo sobre el total del quintil"
-              anchoEtiqueta={ANCHO_ETIQUETA} notaAncho={NOTA_ANCHO}
+              anchoEtiqueta={ANCHO_ETIQUETA}
               referencia={{ valor: promedio, etiqueta: `general ${pct(promedio)}` }}
               onBarra={verEnLista ? (i) => verEnLista('quintil', i) : undefined}
             />

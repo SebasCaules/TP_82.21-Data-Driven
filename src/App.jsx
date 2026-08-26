@@ -1,19 +1,22 @@
 // Armazón del tablero.
 //
-// Estructura: barra lateral con las 14 vistas numeradas, timeline de cortes arriba y una
-// franja de filtros debajo. No hay conmutador de bloques: las 14 vistas son un solo
-// recorrido y la audiencia se declara con una marca por vista.
+// Estructura: barra lateral con las 14 vistas numeradas y UNA barra de controles arriba,
+// filtros a la izquierda y mes de corte a la derecha, todo en el mismo renglón.
+//
+// Sin pie de pantalla. Las dos líneas de advertencias corrían idénticas en las 14 vistas y
+// eran ruido: lo que no se puede inferir se dice en la bajada de la pantalla que lo necesita,
+// y las cuatro correcciones obligatorias de la cátedra viajan en la hoja impresa, que es el
+// entregable. En pantalla, el dato que las resume ("exposición, no recupero") va pegado al
+// número, no a 600 px de distancia.
 //
 // Lo que la verificación dejó fijo y no cambia al cambiar de piel: el corte y los filtros se
-// apagan con leyenda donde no aplican (Nielsen H1), el drill-down salta a la lista con el
-// filtro puesto (Parte D §4.1), imprimir da las 14 hojas, y el pie de dos líneas lleva las
-// cuatro correcciones obligatorias.
+// apagan donde no aplican (Nielsen H1), el drill-down salta a la lista con el filtro puesto
+// (Parte D §4.1) e imprimir da las 14 hojas.
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { SIN_FILTRO, corteInfo, cortes, hayFiltro, mesCorte, meta } from './agregacion.js'
+import { SIN_FILTRO, corteInfo, cortes, hayFiltro, meta, mesCorte } from './agregacion.js'
 import Filtros, { DIMENSIONES, etiquetaValor } from './Filtros.jsx'
 import LineaTiempo from './LineaTiempo.jsx'
-import { MarcaAudiencia } from './Iconos.jsx'
 import { GRUPOS, PANTALLAS } from './pantallas/index.jsx'
 
 const CORTE_INICIAL = cortes.length - 1
@@ -103,7 +106,7 @@ export default function App() {
       <div className="principal">
         <div className="barra">
           <Filtros filtro={filtro} setFiltro={setFiltro} activos={usaFiltros}
-                   reiniciar={reiniciar} modificado={modificado} />
+                   reiniciar={reiniciar} modificado={modificado} ejeExento={pantalla.eje} />
           <div className={`barra-corte${usaCorte ? '' : ' apagada'}`}>
             <LineaTiempo iCorte={iCorte} setICorte={setICorte} activo={usaCorte} />
           </div>
@@ -114,17 +117,12 @@ export default function App() {
             ? <Impresion ctx={ctx} info={info} filtro={filtro} />
             : <pantalla.Componente {...ctx} />}
         </main>
-
-        {!imprimiendo && (
-          <Pie info={info} filtro={filtro} pantalla={pantalla}
-               usaFiltros={usaFiltros} usaCorte={usaCorte} />
-        )}
       </div>
     </div>
   )
 }
 
-/** Las 14 vistas numeradas. Los grupos separan con una marca, no con un conmutador. */
+/** Las 14 vistas numeradas. Los grupos separan con un rótulo, no con un conmutador. */
 function Lateral({ indice, irA }) {
   return (
     <nav className="lat" aria-label="Vistas del tablero">
@@ -150,7 +148,6 @@ function Lateral({ indice, irA }) {
                       aria-current={i === indice ? 'page' : undefined}>
                 <span className="lat-n tabular">{String(i + 1).padStart(2, '0')}</span>
                 <span className="lat-txt">{p.corto}</span>
-                <MarcaAudiencia audiencia={p.audiencia} />
               </button>
             </li>
           )
@@ -171,36 +168,31 @@ function Impresion({ ctx, info, filtro }) {
       {PANTALLAS.map((p) => (
         <div className="hoja" key={p.id}>
           <p.Componente {...ctx} usaFiltros={p.depende === 'todo'} />
-          <Pie info={info} filtro={filtro} pantalla={p}
-               usaFiltros={p.depende === 'todo'} usaCorte={p.depende !== 'ninguno'} />
+          <PieImpreso info={info} filtro={filtro} pantalla={p}
+                      usaFiltros={p.depende === 'todo'} usaCorte={p.depende !== 'ninguno'} />
         </div>
       ))}
     </div>
   )
 }
 
-/** Pie de dos líneas con las cuatro correcciones obligatorias. */
-function Pie({ info, filtro, pantalla, usaFiltros, usaCorte }) {
+/**
+ * Pie SOLO de la hoja impresa. En pantalla estorbaba; en papel es obligatorio: la cátedra
+ * pidió las cuatro correcciones (proxy declarado, exposición ≠ recupero, pesos nominales,
+ * denominador del anualizado) y la hoja se lee sin el tablero al lado.
+ */
+function PieImpreso({ info, filtro, pantalla, usaFiltros, usaCorte }) {
   const activos = DIMENSIONES
     .filter(({ id }) => filtro[id] !== null)
     .map(({ id, etq }) => `${etq}: ${etiquetaValor(id, filtro[id])}`)
 
-  // El filtro de la dimension que la pantalla desagrega no se aplica a su propio eje: el
-  // grafico quedaria en una sola barra. Se declara, no se esconde.
-  const eje = pantalla.eje
-  const ejeFiltrado = usaFiltros && eje && filtro[eje] !== null
-  const etqEje = ejeFiltrado ? DIMENSIONES.find((d) => d.id === eje).etq : null
-
   return (
-    <footer className="pie">
+    <footer className="pie-impreso">
       <div className="pie-l">
         <span><b>Corte</b> {usaCorte ? mesCorte(info.corte) : 'serie completa 2022-2025'}</span>
         <span className="sep">|</span>
         <span><b>Filtros</b> {!usaFiltros ? 'no aplican en esta vista'
           : activos.length ? activos.join(' · ') : 'ninguno'}</span>
-        {ejeFiltrado && (
-          <span className="pie-ojo">el filtro de {etqEje.toLowerCase()} no recorta su propio eje: las barras siguen mostrando todas</span>
-        )}
         <span className="sep">|</span>
         <span><b>{pantalla.predictivo ? 'Modelo predictivo · en desarrollo' : 'Diagnóstico · datos históricos'}</b></span>
         {pantalla.pie && (<><span className="sep">|</span><span>{pantalla.pie}</span></>)}

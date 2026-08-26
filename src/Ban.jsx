@@ -54,12 +54,11 @@ export default function Ban({ info, grande = false }) {
 
       <div className="ban-note">
         {marca != null
-          ? `La marca vertical es el corte anterior: ARS ${millones(info.exposicionPrevia)} al ${fechaCorta(info.cortePrevio)}.`
-          : 'Primer corte de la serie: no hay corte anterior con el que comparar.'}
+          ? `Marca: corte anterior, ARS ${millones(info.exposicionPrevia)} (${fechaCorta(info.cortePrevio)}).`
+          : 'Primer corte: sin comparación anterior.'}
         {info.historiaCorta > 0 && (
-          <> {info.historiaCorta === 1 ? 'Un cliente aporta' : `${entero(info.historiaCorta)} clientes aportan`}
-            {' '}gasto anualizado con menos de un año de historia, que infla la base;
-            sin ellos la base es ARS {millones(info.baseAnualizada1a)}.</>
+          <> {info.historiaCorta === 1 ? '1 cliente' : `${entero(info.historiaCorta)} clientes`} con
+            menos de un año inflan la base; sin ellos, ARS {millones(info.baseAnualizada1a)}.</>
         )}
       </div>
     </div>

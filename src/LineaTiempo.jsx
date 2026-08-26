@@ -1,6 +1,9 @@
 // Control del mes de corte: una pista de ticks, uno por corte, con la marca del activo.
-// Sin curva: la trayectoria de la exposición vive en su propia vista, acá el control es un
-// control.
+//
+// Todo en UN renglon y a la misma altura que los chips de filtro. Antes era una pila de tres
+// filas (rotulo+valor / pista / extremos) y quedaba desalineada con los filtros de al lado.
+// Los extremos de la serie se leen en los ticks altos, uno por diciembre, y en el valor
+// activo: no hacen falta tres rotulos mas.
 //
 // Accesible por teclado: la pista es un slider (flechas, Inicio, Fin, PageUp/PageDown).
 // El estado no depende del color: el corte activo lleva marca alta y llena, y su mes
@@ -38,10 +41,7 @@ export default function LineaTiempo({ iCorte, setICorte, activo = true }) {
 
   return (
     <div className="tl">
-      <div className="tl-cab">
-        <span className="tl-lbl">Mes de corte</span>
-        <strong className="tl-val tabular">{mesCorte(cortes[iCorte])}</strong>
-      </div>
+      <span className="tl-lbl">Mes de corte</span>
 
       <div
         ref={ref}
@@ -54,6 +54,7 @@ export default function LineaTiempo({ iCorte, setICorte, activo = true }) {
         aria-valuenow={iCorte}
         aria-disabled={!activo}
         aria-valuetext={mesCorte(cortes[iCorte])}
+        title={`${mesCorte(cortes[0])} – ${mesCorte(cortes[n - 1])}, ${n} cortes`}
         onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); onPointer(e) }}
         onPointerMove={onPointer}
         onKeyDown={onKey}
@@ -67,11 +68,7 @@ export default function LineaTiempo({ iCorte, setICorte, activo = true }) {
         </div>
       </div>
 
-      <div className="tl-pie" aria-hidden="true">
-        <span>{mesCorte(cortes[0])}</span>
-        <span>{n} meses</span>
-        <span>{mesCorte(cortes[n - 1])}</span>
-      </div>
+      <strong className="tl-val tabular">{mesCorte(cortes[iCorte])}</strong>
     </div>
   )
 }

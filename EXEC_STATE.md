@@ -169,12 +169,21 @@ confirmaron los cuatro. Los tres hallazgos que valían la corrida:
 | N0-9 | En el desempate del comité gana la **regla citada del rulebook**, después la Parte D | es lo que fija el runbook §6. El ENV del comité había puesto la Parte D por encima de la guía; se corrige acá | 2026-08-25 |
 | N0-10 | 14 pantallas, no 12: D5 se parte en región y categoría, M2 en embudo y segmentos | dos gráficos en una pantalla violan `dec-D1` y no cierran a 1152×640 | 2026-08-25 |
 | N0-11 | Los ejes y columnas dicen **"exposición anual (ARS)"**, no "pérdida esperada" | no hay ninguna probabilidad aplicada; el término sugiere una esperanza estadística que no existe | 2026-08-25 |
+| N0-12 | El color de énfasis pasa a **azul-700 `#22456f`** y el terracota queda reservado para la excepción | el mismo rojo marcaba "mirá acá" y "esto está mal": dos significados en un canal. Paleta 2a del mockup de direcciones, que es la que el propio mockup recomienda | 2026-08-25 |
+| N0-13 | El pie de dos líneas sale de la pantalla y se imprime | corría idéntico en las 14 vistas y se volvía invisible; en papel es donde hace falta. Pedido del usuario | 2026-08-25 |
+| N0-14 | La cabecera (título + bajada) tiene **alto fijo** de 2 + 2 líneas con recorte duro | es la única forma de garantizar que el lienzo mida igual con cualquier filtro puesto, que es lo que el usuario pidió. El detector de desborde marca el título que no entra | 2026-08-25 |
+| N0-15 | `Linea` **trunca el eje Y** cuando el cero se come más de una cuarta parte del alto, y lo declara con marca de corte y rótulo | la regla 4 ("toda barra arranca en cero") habla de barras: el largo de una barra ES la cifra, la altura de un punto no. Truncar sin decirlo sí sería falsear; truncar declarándolo es encuadre. Pedido del usuario | 2026-08-25 |
+| N0-16 | El corte por segmento de campaña se presenta con **intervalo de Wilson al 95 %**, calculado en el pipeline y anclado | cinco barras entre 0,96 % y 1,39 % se ven iguales: la conclusión quedaba en el título. Con el intervalo, el solapamiento se ve. 11 anclas nuevas (86 en total) | 2026-08-25 |
+| N0-17 | Los filtros dejan el `<select>` nativo por un listbox propio | el pedido es un icono por VALOR (AMBA, Muebles, Campeones, Q4) y `<option>` no admite SVG. Se reimplementan teclado y ARIA a mano para no perder accesibilidad | 2026-08-25 |
 
 ## Ownership de archivos
 
 Se asigna antes de spawnear cada ola. Reservados al orquestador (N0) en todo momento:
-`app/EXEC_STATE.md`, `app/src/main.tsx`, `app/src/App.tsx`, `app/vite.config.ts`,
-`app/package.json`, `wiki/**`, `entregas/**`, `CLAUDE.md`.
+`app/EXEC_STATE.md`, `app/src/main.jsx`, `app/src/App.jsx`, `app/src/graficos.jsx`,
+`app/src/estilos.css`, `app/src/Filtros.jsx`, `app/src/LineaTiempo.jsx`, `app/src/Iconos.jsx`,
+`app/src/Semaforo.jsx`, `app/src/agregacion.js`, `app/src/fit.js`,
+`app/src/pantallas/index.jsx`, `app/vite.config.js`, `app/package.json`, `app/pipeline/**`,
+`app/test/**`, `wiki/**`, `entregas/**`, `CLAUDE.md`.
 
 ## Fixes sugeridos (S-nn)
 
