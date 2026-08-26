@@ -35,37 +35,38 @@ export default function M0({ info }) {
 
       <div className="lienzo cob">
         <div className="cob-kpi fijo">
+          {/* La muestra de color va acá, pegada a su cifra, y no en una leyenda aparte:
+              esta columna YA dice los tres números, así que repetirlos abajo del gráfico era
+              decir dos veces lo mismo y dejaba la leyenda apretada contra la cuadrícula. */}
           <div className="cob-dato">
             <span className="cob-etq">En riesgo este corte</span>
             <span className="cob-val tabular">{entero(enRiesgo)}</span>
             <span className="cob-ap">clientes elegibles sin compra reciente</span>
           </div>
           <div className="cob-dato">
-            <span className="cob-etq">Los alcanza la capacidad</span>
+            <span className="cob-etq"><i className="cob-m ll" />Los alcanza la capacidad</span>
             <span className="cob-val tabular acc">{entero(capLo)} a {entero(capHi)}</span>
-            <span className="cob-ap">{pct(pctLo)} a {pct(pctHi)} del total</span>
+            <span className="cob-ap">{pct(pctLo)} a {pct(pctHi)} del total. El tramo claro es
+              hasta el máximo declarado</span>
           </div>
           <div className="cob-dato">
-            <span className="cob-etq">Quedan sin contactar</span>
+            <span className="cob-etq"><i className="cob-m lt" />Quedan sin contactar</span>
             <span className="cob-val tabular">{entero(sinCubrir)}</span>
             <span className="cob-ap">el tramo de menor exposición</span>
           </div>
         </div>
 
         <div className="cob-grilla">
-          {/* La unidad ya no vive acá: se escribe sobre los dos primeros cuadros de la
-              cuadrícula, que es donde hace falta para empezar a contar. Acá quedan los tres
-              estados, en cuerpo legible. */}
-          <div className="cob-leyenda">
-            <span><i className="ll" />Contactados con la capacidad mínima<b>{entero(capLo)}</b></span>
-            <span><i className="lr" />Hasta el máximo declarado<b>{entero(capHi)}</b></span>
-            <span><i className="lt" />Sin contactar<b>{entero(sinCubrir)}</b></span>
-          </div>
+          {/* Una sola cosa arriba de la cuadrícula: cuánto vale un cuadro, con un cuadro de
+              verdad al lado y aire suficiente. Una llave sobre DOS cuadros decía "estos dos"
+              mientras el texto decía "cada uno", que es lo contrario. */}
+          <p className="cob-unidad">
+            <i className="cob-m ll" /> un cuadro <b>= {POR_CUADRO} clientes</b>
+          </p>
           <Lienzo>
             {({ w, h }) => (
               <Unidades total={enRiesgo} cubiertoLo={capLo} cubiertoHi={capHi}
-                        porCuadro={POR_CUADRO} w={w} h={h}
-                        unidad={{ cantidad: `cada cuadro = ${POR_CUADRO}`, texto: 'clientes' }} />
+                        porCuadro={POR_CUADRO} w={w} h={h} />
             )}
           </Lienzo>
         </div>
