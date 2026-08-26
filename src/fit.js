@@ -99,6 +99,9 @@ export function chequear() {
   for (const svg of document.querySelectorAll('.lienzo svg')) {
     if (svg.parentElement.closest('svg')) continue        // icono anidado
     if (svg.hasAttribute('data-icono')) continue
+    // Las miniaturas del cierre miden poco a proposito: son la prueba al pie de una cifra,
+    // no el grafico de la pantalla.
+    if (svg.hasAttribute('data-chispa')) continue
     const r = svg.getBoundingClientRect()
     if (r.height < 90) {
       problemas.push({ tipo: 'grafico-aplastado', detalle: `svg de ${Math.round(r.height)} px de alto` })

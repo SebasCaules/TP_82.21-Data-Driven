@@ -568,6 +568,73 @@ export function BarraTramos({ tramos, w, h, formato, banda, alturaBarra }) {
   )
 }
 
+/**
+ * Sparkline: la serie entera en pocos pixeles, con su banda y el ultimo punto marcado.
+ *
+ * No lleva eje a proposito, y no contradice la regla 21: no es un grafico de analisis sino
+ * la prueba al pie de una afirmacion que ya trae su cifra escrita al lado. El eje rotulado
+ * de esta misma serie vive en D4, que es la pantalla que la analiza.
+ */
+export function Chispa({ serie, w, h, banda }) {
+  const vals = serie.filter((v) => v != null)
+  if (!vals.length || w < 24 || h < 14) return null
+  const topes = [...vals, ...(banda || [])]
+  const hi = Math.max(...topes)
+  const lo = Math.min(...topes)
+  const pad = (hi - lo) * 0.12 || 1
+  const max = hi + pad
+  const min = Math.max(0, lo - pad)
+  const X = (i) => (i / Math.max(1, serie.length - 1)) * w
+  const Y = (v) => h - ((v - min) / (max - min)) * h
+  const pts = serie.map((v, i) => (v == null ? null : [X(i), Y(v)])).filter(Boolean)
+  const iUlt = pts.length - 1
+
+  return (
+    <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
+      {banda && (
+        <rect x={0} y={Y(banda[1])} width={w} height={Math.max(1, Y(banda[0]) - Y(banda[1]))}
+              fill="var(--acc)" opacity=".13" />
+      )}
+      <polyline points={pts.map((q) => q.join(',')).join(' ')} fill="none"
+                stroke={ACC} strokeWidth="1.75" strokeLinejoin="round" strokeLinecap="round" />
+      <circle cx={pts[iUlt][0]} cy={pts[iUlt][1]} r="2.75" fill={ACC} />
+    </svg>
+  )
+}
+
+/**
+ * Barra de proporcion en dos tramos, sin rotulos: la cifra ya esta escrita al lado. El
+ * tramo que no lleva enfasis va con trama, para que la particion se lea tambien impresa en
+ * blanco y negro.
+ */
+export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion = false }) {
+  if (w < 20) return null
+  // Recorte vacio: 0 sobre 0 no es una proporcion. Se dibuja el marco sin relleno y con la
+  // leyenda que corresponde, en vez de devolver null y dejar la caja en blanco.
+  if (!(total > 0)) {
+    return (
+      <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
+        <line x1={0} x2={w} y1={h / 2} y2={h / 2} stroke={EJE} strokeWidth="1"
+              strokeDasharray="3 3" />
+        <text x={w / 2} y={h / 2 - 7} fontSize="10" fill={MUT} textAnchor="middle">
+          sin clientes en este recorte
+        </text>
+      </svg>
+    )
+  }
+  const ancho = Math.max(1, Math.min(w, (parte / total) * w))
+  // Se centra en la caja que le den: adentro de un Lienzo alto quedaria pegada arriba.
+  const alto = Math.min(alturaBarra, h)
+  const y = Math.max(0, (h - alto) / 2)
+  return (
+    <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
+      <Tramas />
+      <rect x={0} y={y} width={w} height={alto} fill="url(#trama)" stroke="var(--bd2)" strokeWidth="1" />
+      <rect x={0} y={y} width={ancho} height={alto} fill={excepcion ? EXC : ACC} />
+    </svg>
+  )
+}
+
 /** Serie de exposicion por corte, bajo el selector: mover el corte es ver la trayectoria. */
 export function SerieCortes({ valores, activo, w, h }) {
   const max = Math.max(...valores) || 1

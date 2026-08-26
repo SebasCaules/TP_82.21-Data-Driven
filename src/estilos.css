@@ -548,6 +548,125 @@ body {
 .sem-vacio { --tono: var(--terra); }
 .sem-txt b { font-weight: 700; }
 
+/* ---------- D7: el acta ---------- */
+/* Una sola superficie con tres artículos a columna completa, no tres tarjetas. Las tarjetas
+   separadas atrapan aire en el padding de cada una y obligan a que el pedido sea una cuarta
+   caja; acá el filete hace de separador y el alto lo reparte el ritmo interno de la columna. */
+
+.acta-wrap { flex-direction: column; gap: clamp(10px, 1.6vh, 20px); }
+
+.acta {
+  flex: 1; min-height: 0;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  background: var(--sup);
+  border: 1px solid var(--bd);
+  border-top: 3px solid var(--ink);
+  padding: clamp(12px, 1.8vh, 22px) clamp(14px, 1.8vw, 28px);
+}
+
+.art {
+  display: flex; flex-direction: column;
+  min-width: 0;
+  padding: 0 clamp(14px, 1.8vw, 30px);
+  border-left: 1px solid var(--bd);
+}
+.art:first-child { border-left: 0; padding-left: 0; }
+.art:last-child { padding-right: 0; }
+
+.art-cab { display: flex; align-items: baseline; gap: 9px; }
+/* El numeral en el mono del sistema, que es la voz que el tablero ya usa para sus rótulos.
+   Va en azul-300 para anclar la columna sin competir con la cifra. */
+.art-n {
+  font: 500 clamp(26px, 3vw, 44px)/.85 var(--mono);
+  color: var(--azul3); letter-spacing: -.05em;
+}
+.art-rot {
+  font: 600 10px/1.3 var(--mono); color: var(--lbl);
+  text-transform: uppercase; letter-spacing: .1em;
+}
+
+.art-decision {
+  margin: clamp(10px, 1.6vh, 18px) 0 0;
+  font: 600 clamp(13px, 1.12vw, 16px)/1.35 var(--fuente);
+  color: var(--ink); letter-spacing: -.005em;
+}
+
+.art-cifra {
+  margin-top: clamp(12px, 2vh, 24px);
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+}
+.art-val {
+  font: 600 clamp(24px, 2.5vw, 38px)/1 var(--fuente);
+  color: var(--acc); letter-spacing: -.025em;
+}
+.art-val-pie { font: 400 10.5px/1.3 var(--mono); color: var(--mut); }
+.art-decision { min-height: 4.05em; }   /* tres renglones */
+.art-apoyo { min-height: 3em; }         /* dos renglones */
+
+.art-marca { margin-top: 10px; }
+.art-prueba {
+  flex: 1; min-height: 34px;
+  display: flex; flex-direction: column; justify-content: center; gap: 6px;
+  padding: clamp(10px, 1.6vh, 20px) 0 clamp(6px, 1vh, 12px);
+}
+.art-prueba > div { max-height: 190px; }
+.art-prueba-pie {
+  font: 400 9.5px/1.35 var(--mono); color: var(--mut);
+  min-height: 2.7em;   /* dos renglones reservados: al vaciarse movia el alto de la columna */
+}
+.art-apoyo {
+  margin: 8px 0 0;
+  font: 400 12px/1.5 var(--fuente); color: var(--mut2);
+}
+
+/* Anclado abajo: las tres columnas cierran parejas aunque la decisión tenga distinto largo. */
+.art-costo {
+  margin: auto 0 0;
+  padding-top: clamp(8px, 1.2vh, 14px);
+  border-top: 1px dotted var(--bd);
+  font: 400 10.5px/1.45 var(--mono); color: var(--mut);
+}
+.art-costo span {
+  display: block;
+  font-weight: 600; color: var(--mut2);
+  text-transform: uppercase; letter-spacing: .09em;
+  margin-bottom: 2px;
+}
+
+/* La banda del pedido: filete de acento arriba y nada de caja. Es el renglón de la
+   resolución, no una tarjeta más. */
+.pedido {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: clamp(16px, 2.4vw, 40px);
+  border-top: 2px solid var(--acc);
+  padding-top: clamp(10px, 1.6vh, 20px);
+}
+.pedido-lbl {
+  flex: 0 0 auto;
+  font: 600 10px/1.35 var(--mono); color: var(--acc);
+  text-transform: uppercase; letter-spacing: .11em;
+}
+.pedido-txt {
+  flex: 1; min-width: 0; margin: 0;
+  font: 600 clamp(15px, 1.55vw, 23px)/1.3 var(--fuente);
+  color: var(--ink); letter-spacing: -.012em;
+}
+.pedido-txt b { color: var(--acc); font-weight: 700; }
+.pedido-sello {
+  flex: 0 0 auto;
+  font: 600 11px/1 var(--mono); color: var(--mut);
+  text-transform: uppercase; letter-spacing: .1em;
+  border: 1.5px dashed var(--gris2); border-radius: 3px;
+  padding: 7px 11px;
+}
+
+@media (max-height: 730px) {
+  .acta { padding: 10px 14px; }
+  .art-n { font-size: clamp(22px, 2.4vw, 32px); }
+  .art-val { font-size: clamp(20px, 2vw, 28px); }
+  .pedido-sello { display: none; }
+}
+
 /* ---------- tabla de la lista ---------- */
 
 .lista-tabla { width: 100%; border-collapse: collapse; font-size: clamp(11px, .92vw, 12.5px); }
