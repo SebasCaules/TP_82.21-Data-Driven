@@ -358,9 +358,11 @@ body {
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
   overflow: hidden;
 }
-/* Pantallas que declaran su cabecera de una sola línea (el cierre, la lista). */
-.pant.cab-1 .titulo { height: 1.22em; -webkit-line-clamp: 1; }
-.pant.cab-1 .bajada { height: 1.45em; -webkit-line-clamp: 1; }
+/* Pantallas que declaran su cabecera de una sola línea (el cierre, la lista, la
+   consolidada). El tope de 46ch es para un título de dos renglones; en uno solo estorba y
+   corta la frase, así que acá el título usa el ancho completo. */
+.pant.cab-1 .titulo { height: 1.22em; -webkit-line-clamp: 1; max-width: 100%; }
+.pant.cab-1 .bajada { height: 1.45em; -webkit-line-clamp: 1; max-width: 100%; }
 
 .lienzo {
   flex: 1;
@@ -426,6 +428,44 @@ body {
 .pie-impreso b { color: var(--ink); font-weight: 600; }
 .pie-impreso .sep { color: var(--gris2); }
 
+/* ---------- D0: la columna de la cifra ---------- */
+/* Ancho fijo y BAN de alto fijo: el BAN es la pieza que el usuario ve reajustarse cuando
+   cambia el filtro, porque su nota y su tabla cambian de largo. Acá se le reserva el alto
+   y el sobrante se lo reparten los tres apoyos. */
+
+.col-cifra {
+  flex: 0 0 clamp(300px, 31%, 440px);
+  display: flex; flex-direction: column; gap: clamp(6px, 1vh, 12px);
+  min-height: 0;
+}
+.col-cifra > .ban { flex: 0 0 auto; }
+
+.apoyos {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  padding-top: 6px; padding-bottom: 6px;
+}
+.dato {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; justify-content: center; gap: 1px;
+  padding: 5px 0;
+}
+.dato + .dato { border-top: 1px dotted var(--bd); }
+.dato-cab {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font: 600 10px/1.2 var(--mono); color: var(--lbl);
+  text-transform: uppercase; letter-spacing: .07em;
+}
+.dato-cab > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dato-cab .sem { flex-shrink: 0; }
+.dato-val { font: 600 clamp(17px, 1.55vw, 23px)/1.1 var(--fuente); letter-spacing: -.02em; }
+/* Dos líneas reservadas, como en el título: el texto de apoyo se acorta al poner un filtro
+   y sin alto fijo la fila entera cambia de tamaño. */
+.dato-sub {
+  font: 400 10.5px/1.35 var(--mono); color: var(--mut);
+  min-height: 2.7em;
+}
+
 /* ---------- BAN (ficha F07, congelada) ---------- */
 
 .ban {
@@ -462,7 +502,10 @@ body {
 .ban table { width: 100%; border-collapse: collapse; margin-top: 11px; font-size: 11.5px; }
 .ban td { padding: 3px 0; color: var(--mut2); border-bottom: 1px dotted var(--bd); }
 .ban td:last-child { text-align: right; font-weight: 600; color: var(--ink); }
-.ban-note { font: 400 10.5px/1.5 var(--fuente); color: var(--mut); margin-top: 9px; }
+.ban-note {
+  font: 400 10.5px/1.5 var(--fuente); color: var(--mut); margin-top: 9px;
+  min-height: 4.5em;      /* tres renglones: la nota se acorta al filtrar */
+}
 
 /* ---------- semáforo: forma + etiqueta, nunca solo color ---------- */
 /* Pastilla con borde, no renglón suelto: en la versión anterior se leía como leyenda del

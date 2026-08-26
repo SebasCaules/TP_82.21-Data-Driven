@@ -175,6 +175,7 @@ confirmaron los cuatro. Los tres hallazgos que valían la corrida:
 | N0-15 | `Linea` **trunca el eje Y** cuando el cero se come más de una cuarta parte del alto, y lo declara con marca de corte y rótulo | la regla 4 ("toda barra arranca en cero") habla de barras: el largo de una barra ES la cifra, la altura de un punto no. Truncar sin decirlo sí sería falsear; truncar declarándolo es encuadre. Pedido del usuario | 2026-08-25 |
 | N0-16 | El corte por segmento de campaña se presenta con **intervalo de Wilson al 95 %**, calculado en el pipeline y anclado | cinco barras entre 0,96 % y 1,39 % se ven iguales: la conclusión quedaba en el título. Con el intervalo, el solapamiento se ve. 11 anclas nuevas (86 en total) | 2026-08-25 |
 | N0-17 | Los filtros dejan el `<select>` nativo por un listbox propio | el pedido es un icono por VALOR (AMBA, Muebles, Campeones, Q4) y `<option>` no admite SVG. Se reimplementan teclado y ARIA a mano para no perder accesibilidad | 2026-08-25 |
+| N0-18 | El favicon es la opción **4b** del mockup de direcciones ("la casa que se apaga"), inlineada como data URI en `index.html` | pedido del usuario. Va inline y no como archivo suelto porque el build es de un solo archivo y sin red: un `<link>` a un `.svg` habría dejado el único fetch del bundle. Usa la misma paleta que N0-12, con el terracota en la barra corta (la porción perdida). Fuente en `src/favicon-casa.svg` | 2026-08-25 |
 
 ## Ownership de archivos
 
