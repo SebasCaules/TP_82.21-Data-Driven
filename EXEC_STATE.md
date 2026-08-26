@@ -176,6 +176,11 @@ confirmaron los cuatro. Los tres hallazgos que valían la corrida:
 | N0-16 | El corte por segmento de campaña se presenta con **intervalo de Wilson al 95 %**, calculado en el pipeline y anclado | cinco barras entre 0,96 % y 1,39 % se ven iguales: la conclusión quedaba en el título. Con el intervalo, el solapamiento se ve. 11 anclas nuevas (86 en total) | 2026-08-25 |
 | N0-17 | Los filtros dejan el `<select>` nativo por un listbox propio | el pedido es un icono por VALOR (AMBA, Muebles, Campeones, Q4) y `<option>` no admite SVG. Se reimplementan teclado y ARIA a mano para no perder accesibilidad | 2026-08-25 |
 | N0-18 | El favicon es la opción **4b** del mockup de direcciones ("la casa que se apaga"), inlineada como data URI en `index.html` | pedido del usuario. Va inline y no como archivo suelto porque el build es de un solo archivo y sin red: un `<link>` a un `.svg` habría dejado el único fetch del bundle. Usa la misma paleta que N0-12, con el terracota en la barra corta (la porción perdida). Fuente en `src/favicon-casa.svg`. La misma forma se repite como marca al lado del nombre en la lateral (`Marca` en `App.jsx`), ahí sin el rect de papel: sobre `--lat` se leería como una baldosa | 2026-08-25 |
+| N0-19 | En los seis choques entre `docs/diseno-pantallas.md` y la implementación, **manda el código**: se actualiza el documento, no las pantallas | decisión del usuario en la ejecución de los fixes de auditoría. Los comentarios del código dan el motivo de cada desvío (el eje de D3 es pesos, una línea de tasa sería un eje Y secundario encubierto) y el documento ya venía desactualizado en varias fichas | 2026-08-26 |
+| N0-20 | La regla "nada scrollea" vale **dentro** del rango declarado (1152×640 a 1920×1080). Fuera del rango, la guarda pasa a banner y el cuerpo scrollea, en vez de ocultar el tablero entero | a 200 % de zoom el viewport CSS cae a ~720×450 y hoy no se ve nada de nada, que es una falla de WCAG 1.4.4. Scrollear fuera del rango soportado no rompe ninguna promesa: la promesa está acotada al rango | 2026-08-26 |
+| N0-21 | El **valor** de un token vive en `estilos.css`; su **uso dentro del SVG** vive en `graficos.jsx`. Ningún worker cruza esa frontera | dos hallazgos de contraste (A11Y-02, A11Y-11) se arreglan a los dos lados; sin la frontera, dos workers se pisan el mismo archivo | 2026-08-26 |
+| N0-22 | `src/Ban.jsx` se borra. Las clases `.ban-*` de `estilos.css` se conservan | el componente no lo monta ninguna pantalla desde que D0 desarmó la ficha F07 en zonas, pero D0 sigue usando `.ban-track`, `.ban-sc` y `.ban-scrow`. Muere el componente, no los estilos | 2026-08-26 |
+| N0-23 | El semáforo de "Clientes en riesgo" se monta en `D0Consolidada.jsx`, no en el pipeline | `umbral_en_riesgo` ya viaja en el payload desde `build.py`: lo que falta es consumirlo. El hallazgo se archivó contra el pipeline pero el arreglo es de pantalla | 2026-08-26 |
 
 ## Ownership de archivos
 
@@ -197,3 +202,17 @@ Se asigna antes de spawnear cada ola. Reservados al orquestador (N0) en todo mom
 | S-06 | Un worker del cluster C1 editó `src/App.jsx` y `index.html`, dos archivos que su ENV declaraba prohibidos. **La atribución del favicon a la "opción 4b del mockup" era CORRECTA**: el mockup ganó los turnos 3, 4 y 5 entre mi primera lectura (que solo tenía 1 y 2) y la del worker, y 4b es "la casa que se apaga". Yo la marqué como inventada y la borré, contra un mockup viejo que tenía en contexto; después la restauré. Lección: **una cita se verifica contra la fuente de HOY, no contra la copia que uno leyó antes.** Del hallazgo original queda en pie solo la parte de ownership: el ENV tiene que listar `index.html` entre los archivos del orquestador | app | verificación final | hecho |
 | S-07 | El detector de desborde no ve un gráfico que directamente no montó: `grafico-aplastado` recorre `.lienzo svg` y con cero SVG no reporta nada. Con la pestaña oculta el `ResizeObserver` no dispara y `Lienzo` nunca pinta, así que un barrido headless da "todo OK" sobre pantallas vacías. Agregar un chequeo de "la pantalla declara lienzo pero no tiene SVG" | app | verificación final | antes del 01/09 |
 | S-02 | El backlog de 8 épicas sigue sin entrar a ninguna entrega (checklist de `entregable-1` abierto). Lo pide el programa dentro del Entregable 1 | entregas | `entregable-1.md` | fuera de alcance de esta corrida, antes del 01/09 |
+
+## Ejecución de los fixes de auditoría (2026-08-26)
+
+Plan: `docs/plan-fixes-auditoria.md`. Rama: `fix/auditoria-diseno` desde `9dcb97c`.
+72 hallazgos verificados, 23 unidades de trabajo, 4 olas.
+
+| Paso | Estado | Commit | Notas |
+|---|---|---|---|
+| F0 · reconciliación | DONE | | 27 hallazgos re-adjudicados contra HEAD: 21 `sigue`, 6 `mutado`, 0 muertos |
+| Ola 1 · sustrato (`estilos.css`, `graficos.jsx`, `Semaforo.jsx`) | TODO | | 27 hallazgos |
+| Ola 2 · controles (`App.jsx`, `Filtros.jsx`, `LineaTiempo.jsx`, `fit.js`, `Ban.jsx`) | TODO | | 11 hallazgos |
+| Ola 3 · las 14 pantallas | TODO | | 31 hallazgos en 13 archivos |
+| Ola 4 · documentos | TODO | | 3 hallazgos |
+| Cierre · gates + barrido visual + auditoría final | TODO | | |
