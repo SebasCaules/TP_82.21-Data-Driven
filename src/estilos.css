@@ -373,7 +373,13 @@ body {
    el título entre, y el detector de desborde marca el que no entra. */
 .titulo {
   font: 600 clamp(19px, 2.05vw, 30px)/1.22 var(--fuente);
-  letter-spacing: -.015em; margin: 0; max-width: 46ch;
+  letter-spacing: -.015em; margin: 0;
+  /* El tope de medida existe para que un titulo largo no cruce la pantalla de lado a lado,
+     pero 46ch topeaba en 590 px una columna de 923 y partia en dos titulos que entraban
+     enteros en una linea, dejando huerfano el final ("[1,08-1,78 %]" en la vista 08). El
+     `min` deja mandar a la columna cuando ella es la restriccion, que es lo que pasa de
+     1440 para arriba, y al tope de medida cuando sobra ancho. */
+  max-width: min(100%, 68ch);
   height: 2.44em;
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
   overflow: hidden;
