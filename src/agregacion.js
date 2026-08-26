@@ -126,6 +126,21 @@ export function lista(iCorte, filtro = SIN_FILTRO, soloConsentimiento = false) {
   return filas
 }
 
+/**
+ * El tope de exposicion comun a D5a y D5b. Las dos pantallas prometen la misma escala para
+ * que el lector compare region contra categoria sin recalcular: sin esto cada una escala
+ * contra su propio maximo y los topes difieren en 17 de los 25 cortes. "Solo online" queda
+ * afuera porque D5a lo saca del panel y lo declara aparte.
+ */
+export function topeExposicionPar(iCorte, filtro = SIN_FILTRO) {
+  const iOnline = dims.region.indexOf('Solo online')
+  const reg = porDimension(iCorte, 'region', filtro)
+  const cat = porDimension(iCorte, 'categoria', filtro)
+  const maxReg = Math.max(0, ...reg.filter((_, i) => i !== iOnline).map((c) => c.ar))
+  const maxCat = Math.max(0, ...cat.map((c) => c.ar))
+  return Math.max(maxReg, maxCat)
+}
+
 /** Datos del corte: los campos que consume la ficha F07 del BAN. */
 export function corteInfo(iCorte, filtro = SIN_FILTRO) {
   const a = agregar(iCorte, filtro)

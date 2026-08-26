@@ -157,7 +157,7 @@ function EjeXValor({ x0, ancho, y, ticks, max, formato, titulo }) {
  * `datos`: [{etiqueta, valor, nota, enfasis}]. El orden se decide afuera (regla 11).
  */
 export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiqueta = 132,
-                          onBarra, referencia }) {
+                          onBarra, referencia, tope }) {
   if (!datos.length) return null
   const fmtEje = formatoEje || formato
   const padTop = 8
@@ -177,7 +177,9 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
   const anchoNota = Math.max(0, ...datos.map((d) => (d.nota ? anchoTexto(d.nota, fuente - 1.5, 400) + 14 : 0)))
   const ancho = Math.max(40, w - x0 - anchoNota - anchoValor - 6)
 
-  const crudo = Math.max(...datos.map((d) => d.valor), 0)
+  // `tope` fuerza la escala hacia arriba sin achicar nunca la propia: es lo que hace que D5a
+  // y D5b se puedan comparar de un vistazo, que es la promesa del par region/categoria.
+  const crudo = Math.max(...datos.map((d) => d.valor), 0, tope || 0)
   const { max, ticks } = escalaNice(crudo)
   const yBase = padTop + disponible
   const xDe = (v) => x0 + (v / max) * ancho

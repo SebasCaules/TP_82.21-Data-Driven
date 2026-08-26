@@ -214,7 +214,7 @@ body {
   display: flex; align-items: center; gap: 5px;
 }
 .filtros.inertes .chip-f { opacity: .35; }
-.chip-f-caja .chip-f { width: 100%; }
+.chip-f-caja .chip-f-btn { flex: 1 1 auto; }
 .filtros-lbl {
   flex: 0 0 auto;
   display: inline-flex; align-items: center; gap: 5px;
@@ -250,7 +250,7 @@ body {
   cursor: pointer;
   transition: border-color .12s, box-shadow .12s, transform .12s;
 }
-.chip-f-caja { position: relative; display: inline-flex; }
+.chip-f-caja { position: relative; display: inline-flex; align-items: center; gap: 3px; }
 .chip-f-btn { font: inherit; }
 .chip-f-btn:disabled { cursor: default; }
 .chip-f:hover:not(:disabled) {
@@ -294,11 +294,15 @@ body {
   width: 15px; height: 15px; flex-shrink: 0; margin-right: -3px;
 }
 .chip-f-x {
+  /* 24x24 es el minimo de objetivo tactil de 2.5.8. Dejo de vivir anidada dentro del boton
+     del combobox, asi que ya no hereda su fondo oscuro: se pinta sola. La ranura se reserva
+     con visibility, no desmontando, para no correrle el ancho al riel del mes de corte. */
+  flex: 0 0 auto;
   display: grid; place-items: center;
-  width: 15px; height: 15px;
-  border-radius: 3px; background: rgba(255, 255, 255, .18);
-  color: inherit;
-  font: 400 12px/1 var(--fuente); cursor: pointer;
+  width: 24px; height: 24px;
+  border: 1px solid rgba(0, 0, 0, .2); border-radius: 4px;
+  background: var(--sup); color: var(--mut2);
+  font: 400 14px/1 var(--fuente); cursor: pointer;
 }
 .chip-f-x:hover { background: rgba(255, 255, 255, .3); }
 

@@ -77,7 +77,7 @@ export const PANTALLAS = [
     id: 'D5b', eje: 'categoria', grupo: 'diagnostico', audiencia: 'ambas', depende: 'todo', Componente: D5b,
     corto: 'Categoría',
     pregunta: '¿Qué categoría concentra la exposición?',
-    pie: 'Categoría = donde el cliente concentra su gasto hasta el corte',
+    pie: 'Organización 199 y Baño 166 clientes: las tasas del extremo bajo se mueven con pocos casos',
   },
   {
     id: 'D6', grupo: 'diagnostico', audiencia: 'directorio', depende: 'ninguno', Componente: D6, predictivo: true,

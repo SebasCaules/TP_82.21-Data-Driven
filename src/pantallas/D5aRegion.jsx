@@ -10,7 +10,7 @@
 // tasa no infle el rango visible de las 5 regiones reales y desmienta el título.
 
 import { Lienzo, BarrasH } from '../graficos.jsx'
-import { entero, millones, pesos, pct, porDimension, dims } from '../agregacion.js'
+import { entero, millones, pesos, pct, porDimension, topeExposicionPar, dims } from '../agregacion.js'
 
 export default function D5a({ iCorte, filtro, verEnLista }) {
   const r = porDimension(iCorte, 'region', filtro)
@@ -25,6 +25,12 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
   const minT = hayTasas ? Math.min(...tasas) : null
   const maxT = hayTasas ? Math.max(...tasas) : null
   const amplitudTxt = hayTasas ? (maxT - minT).toFixed(1).replace('.', ',') : null
+
+  // Total del universo de las 5 regiones (excluye Solo online): mismo denominador que la
+  // nota de cada barra, para que el encabezado de la columna y las notas midan lo mismo y
+  // no se confunda con el porcentaje del titulo (que es participacion en pesos, otra cosa).
+  const totalesReg = reales.reduce((s, { c }) => ({ n: s.n + c.n, nr: s.nr + c.nr }), { n: 0, nr: 0 })
+  const tasaGeneral = totalesReg.n ? (100 * totalesReg.nr) / totalesReg.n : null
 
   const datos = reales
     .slice()
@@ -69,9 +75,22 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
                   datos={datos} w={w} h={h}
                   formato={pesos} formatoEje={(v) => millones(v, 0)}
                   tituloEje="Exposición anual, por región (ARS)"
+                  tope={topeExposicionPar(iCorte, filtro)}
                   anchoEtiqueta={anchoEtiqueta}
                   onBarra={verEnLista ? (i, d) => verEnLista('region', d.idxOriginal) : undefined}
                 />
+                {/* Encabezado de la columna de notas: sin esto "X % en riesgo" no declara su
+                    base y en el corte por defecto coincide en redondeo con el porcentaje del
+                    titulo, que mide otra cosa (participacion en pesos). Mismo patron que
+                    D3Segmentos. */}
+                {tasaGeneral != null && (
+                  <svg width={w} height={h} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                    <text x={w} y={11} fontSize="10" fill="var(--mut)" letterSpacing=".07em"
+                          textAnchor="end" style={{ textTransform: 'uppercase' }}>
+                      tasa de riesgo · general {pct(tasaGeneral)}
+                    </text>
+                  </svg>
+                )}
               </div>
             )
           }}

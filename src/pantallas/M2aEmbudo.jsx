@@ -16,18 +16,23 @@ export default function M2a() {
   const emb = series.embudo_campanias
   const g = emb.global
   const envios = g.envios
+  const compras = envios * g.compra_7dias
 
   const etapas = [
     { etiqueta: 'Envíos', valor: envios },
     { etiqueta: 'Abre', valor: envios * g.abre, pct: pct(g.abre * 100) },
     { etiqueta: 'Clic', valor: envios * g.clic, pct: pct(g.clic * 100) },
-    { etiqueta: 'Compra a 7 días', valor: envios * g.compra_7dias, pct: pct(g.compra_7dias * 100) },
+    { etiqueta: 'Compra a 7 días', valor: compras, pct: pct(g.compra_7dias * 100) },
   ]
 
   return (
     <section className="pant">
+      {/* COPY-05: "las campañas masivas no discriminan" era una afirmacion sobre diferencias
+          entre segmentos que este embudo, un solo agregado sin desagregar, no puede sostener.
+          Esa comparacion es tema de M2b (M2bSegmentos.jsx), que la dibuja con evidencia. Acá
+          el titulo se queda en lo que el embudo muestra: cuanto llega a compra. */}
       <h1 className="titulo">
-        El embudo termina en {pct(g.compra_7dias * 100)}: las campañas masivas no discriminan
+        De {entero(envios)} envíos, {entero(compras)} terminan en compra a 7 días
       </h1>
       <p className="bajada">
         {entero(emb.base_completa_envios)} envíos en la base completa, {entero(emb.base_limpia_envios)} en

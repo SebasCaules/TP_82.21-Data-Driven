@@ -39,11 +39,22 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
   const sube = gradQ5 >= gradQ1
   const ratio = gradQ1 ? (gradQ5 / gradQ1).toFixed(2).replace('.', ',') : null
 
+  // Piso de base para la comparación entre elegibles: con ne de un dígito la tasa cae en
+  // un puñado de valores posibles (1 de 2 da 50,0 %) y puesta al lado de una tasa de
+  // cientos de casos parece medir lo mismo sin serlo. Por debajo del piso, la bajada
+  // declara los conteos en vez de la tasa.
+  const BASE_MINIMA_GRADIENTE = 30
+  const baseFlaca = !sinBaseQ1 && (q[0].ne < BASE_MINIMA_GRADIENTE || q[4].ne < BASE_MINIMA_GRADIENTE)
+
   let bajada
   if (sinBaseQ1) {
     bajada = 'Con este filtro Q1 no tiene clientes con historia suficiente: el gradiente entre elegibles se lee sobre los quintiles con base.'
+  } else if (baseFlaca) {
+    bajada = `El salto Q1→Q2 es de composición: ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras, no califica como riesgo. La base de elegibles es chica en este recorte (Q1: ${entero(q[0].ne)}, Q5: ${entero(q[4].ne)}): la tasa entre elegibles no alcanza para comparar.`
   } else if (sube) {
-    bajada = `El salto Q1→Q2 es de composición: ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras, no califica como riesgo. Entre elegibles el gradiente real va de ${pct(gradQ1)} a ${pct(gradQ5)}, ${ratio}×.`
+    // ratio puede quedar en null con gradQ1 en 0 (hay elegibles pero ninguno en riesgo):
+    // ahí no hay "veces" que declarar, y el guard evita imprimir "null" en pantalla.
+    bajada = `El salto Q1→Q2 es de composición: ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras, no califica como riesgo. Entre elegibles el gradiente real va de ${pct(gradQ1)} a ${pct(gradQ5)}${ratio != null ? `, ${ratio}×` : ''}.`
   } else {
     // gradQ5 < gradQ1: no llamarlo "gradiente" ni prometer una subida que en este
     // estado no se da, para no chocar con el título de la pantalla.
@@ -60,19 +71,30 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span className="kpi-lbl" style={{ display: 'inline' }}>Riesgo en Q5</span>
         <b className="tabular" style={{ fontSize: 15 }}>{pct(datos[4].valor)}</b>
-        <Semaforo estado={estadoInverso(datos[4].valor, meta.umbral_q5)} />
+        <Semaforo estado={estadoInverso(datos[4].valor, meta.umbral_q5)} de="riesgo en Q5" />
       </div>
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => (
-            <BarrasH
-              datos={datos} w={w} h={h}
-              formato={(v) => pct(v)} formatoEje={(v) => pct(v, 0)}
-              tituloEje="% en riesgo sobre el total del quintil"
-              anchoEtiqueta={ANCHO_ETIQUETA}
-              referencia={{ valor: promedio, etiqueta: `general ${pct(promedio)}` }}
-              onBarra={verEnLista ? (i) => verEnLista('quintil', i) : undefined}
-            />
+            <div style={{ position: 'relative', width: w, height: h }}>
+              <BarrasH
+                datos={datos} w={w} h={h}
+                formato={(v) => pct(v)} formatoEje={(v) => pct(v, 0)}
+                tituloEje="% en riesgo sobre el total del quintil"
+                anchoEtiqueta={ANCHO_ETIQUETA}
+                referencia={{ valor: promedio, etiqueta: `general ${pct(promedio)}` }}
+                onBarra={verEnLista ? (i) => verEnLista('quintil', i) : undefined}
+              />
+              {/* Cabecera de la columna de notas, mismo recurso que D3: la nota es nr/ne
+                  (otro denominador que el de la barra, que es nr/n) y sin rótulo se lee
+                  como si fuera la fracción que dibuja la barra. */}
+              <svg width={w} height={h} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                <text x={w} y={11} fontSize="10" fill="var(--mut)" letterSpacing=".07em"
+                      textAnchor="end" style={{ textTransform: 'uppercase' }}>
+                  riesgo entre elegibles
+                </text>
+              </svg>
+            </div>
           )}
         </Lienzo>
       </div>

@@ -64,8 +64,13 @@ proyecto no puede leer. Se corrige el wiki, no el tablero (S-05).
 
 Detector propio (`src/fit.js`). No usa `scrollHeight`, que da cero con `overflow:hidden` y
 produce el falso negativo conocido: compara rectángulos con `getBoundingClientRect` y detecta
-superposición con el pie y con el encabezado, desborde lateral, texto recortado y gráfico
-aplastado por debajo de 90 px.
+superposición con el borde inferior del cuerpo y con la barra de controles, desborde lateral,
+texto recortado y gráfico aplastado por debajo de 90 px.
+
+> **Cuidado:** hasta el 26/08/2026 esos dos chequeos apuntaban a `.pie` y `.enc`, dos clases
+> que dejaron de existir cuando el pie salió de la pantalla (N0-13). Ningún selector matcheaba,
+> así que comparaban contra el borde de la ventana y contra cero, o sea que no comparaban nada.
+> Las corridas de la matriz anteriores a esa fecha valen por sus otros chequeos, no por estos dos.
 
 | Resolución | 14 pantallas | Con filtro | 3 cortes |
 |---|---|---|---|
@@ -74,6 +79,21 @@ aplastado por debajo de 90 px.
 | 1366 × 768 | limpio | limpio | limpio |
 | 1440 × 900 | limpio | limpio | limpio |
 | 1920 × 1080 | limpio | limpio | limpio |
+
+Los cinco puntos de arriba son una diagonal: el ancho mínimo solo se probaba con la ventana
+más baja, que es donde la media query por alto achica el título y la lateral. El peor caso de
+la cabecera de alto fijo es el otro: ancho mínimo con ventana alta, donde el título vuelve a
+su cuerpo grande y tiene menos lugar. Se agregó al barrido del 26/08/2026:
+
+| Resolución | 14 pantallas | Por qué está |
+|---|---|---|
+| 1152 × 640 | limpio | piso declarado |
+| 1440 × 900 | limpio | laptop típica |
+| 1100 × 700 | **desborde de la barra superior** | por debajo del piso, dentro del hueco que la guarda no cubría |
+
+El tercero es el que motivó alinear el umbral de la guarda con el piso declarado: entre 1001 y
+1116 px el tablero se dibujaba entero pero el mes de corte activo quedaba fuera de la ventana,
+y el detector daba limpio. Con el umbral corregido, ese rango ya cae del lado de la guarda.
 
 Dos fallas reales que el detector cazó y que la captura de pantalla no mostraba:
 
@@ -169,7 +189,7 @@ auditor de la capa (a) resume dónde estaba el problema real:
 | B-05 | La nota de historia corta del BAN salía de la serie global: con un filtro puesto mostraba el número nacional al lado de una cifra filtrada. Ahora viaja por celda de contingencia |
 | B-01 | En `BarrasH`, la etiqueta de valor de la barra más larga se metía dentro de la columna de notas. El ancho de la etiqueta no salía del presupuesto de la barra |
 | A-05 · B-06 | D5b marcaba con el mismo color de énfasis la categoría de **mayor** y la de **menor** tasa: dos significados opuestos en un mismo gráfico (regla 19) |
-| A-02 | De los cuatro KPIs computables que la Parte D declara con semáforo, solo uno lo tenía |
+| A-02 | De los cuatro KPIs computables que la Parte D declara con semáforo, solo uno lo tenía. Tras el fix del 26/08/2026 son **dos de cuatro**: recompra a 90 días y clientes en riesgo. Los otros dos siguen sin pastilla |
 | A-04 | El pie, donde viven las cuatro correcciones obligatorias, se pintaba a 2,6:1 de contraste |
 | A-06 | Las barras sin énfasis quedaban a 1,64:1 contra el fondo, por debajo del mínimo de 3:1 para un objeto gráfico |
 | A-08 | Al imprimir se colaba un decimoquinto pie, el de la pantalla activa |
@@ -183,7 +203,14 @@ auditor de la capa (a) resume dónde estaba el problema real:
 
 ### Lo que se declinó, con motivo
 
-El auditor propuso poner énfasis en AMBA en D5a. No se hizo: el título de esa pantalla dice
-que **la geografía no explica el riesgo**, así que resaltar una región contradiría el
-hallazgo. Un gráfico sin énfasis es la codificación correcta cuando el mensaje es que no hay
-diferencia; la regla 18 pide que no haya más de un énfasis, no que haya uno.
+El auditor propuso poner énfasis en AMBA en D5a y en su momento no se hizo, porque el título
+de entonces decía que la geografía no explica el riesgo y resaltar una región lo contradecía.
+
+> **Nota (26/08/2026).** Eso cambió y este párrafo quedó viejo. El título de D5a pasó a ser la
+> concentración, que es lo que las barras dibujan, y la planitud de la tasa bajó a la bajada,
+> que es su lugar: un título que habla de la tasa sobre un gráfico de pesos no lo sostiene el
+> dibujo. Con ese título, el énfasis en AMBA sí corresponde, y es el que tiene hoy. Lo que la
+> auditoría de diseño sí encontró en esa pantalla es otra cosa: el 43,2 % del título (parte de
+> la exposición) y el 43,2 % de la fila de AMBA (tasa de riesgo) coincidían al decimal en el
+> corte por defecto sin que nada dijera que medían cosas distintas. La columna ahora lleva
+> encabezado.

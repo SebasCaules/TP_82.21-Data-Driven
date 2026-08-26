@@ -38,8 +38,8 @@ export default function D4Recompra() {
         trimestres y quedó fuera de meta
       </h1>
       <p className="bajada">
-        Serie completa 2022Q1–2025Q3. La línea base histórica es {baseLo}-{baseHi} %, adentro
-        de la franja de fuera de meta.
+        Serie completa 2022Q1–2025Q3. La línea base histórica es {pct(baseLo)} – {pct(baseHi)}, en
+        el borde entre fuera de meta y por debajo.
       </p>
 
       <div className="lienzo">
@@ -58,7 +58,8 @@ export default function D4Recompra() {
                 serie={trimestral} w={w} h={h}
                 formato={(v) => pct(v)}
                 zonas={zonasRecompra(ultimo.valor)}
-                tituloEje="% que recompra en 90 días"
+                tituloY="% que recompra en 90 días"
+                tituloEje="Trimestre"
               />
             )}
           </Lienzo>

@@ -25,7 +25,7 @@ export default function M3() {
       etiqueta: 'Sin consentimiento',
       valor: c.envios_a_no_acepta,
       nota: `${pct(pctSinConsentimiento)} del total`,
-      enfasis: true,
+      excepcion: true,
     },
   ]
 
@@ -39,10 +39,14 @@ export default function M3() {
           grafico lo repite con nota por barra), asi que acá van solo los dos datos que no
           estan en ningun otro lado. Tres <p className="bajada"> con su alto fijo de dos
           lineas cada uno era el grueso del hueco blanco de esta pantalla. */}
+      {/* CIF-09: la bajada vieja decia "quedan fuera de esta cuenta" y se podia leer como
+          que los 46 huerfanos quedan afuera del grafico entero. No es asi: conConsentimiento
+          = envios_base - envios_a_no_acepta los deja adentro de la barra "Con consentimiento"
+          porque no hay maestro contra el cual clasificarlos. Se declara sin tocar los datos. */}
       <p className="bajada">
         Esa lista alcanza al <b>{pct(pctAlcance)}</b> de los {entero(c.clientes_no_acepta_total)}{' '}
         clientes que no consintieron. {entero(c.envios_huerfanos)} envíos van a ids ausentes
-        del maestro y quedan fuera de esta cuenta.
+        del maestro: no entran en esta cuenta, pero la barra sí los cuenta.
       </p>
 
       <div className="lienzo">

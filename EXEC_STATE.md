@@ -214,7 +214,14 @@ Plan: `docs/plan-fixes-auditoria.md`. Rama: `fix/auditoria-diseno` desde `9dcb97
 |---|---|---|---|
 | F0 · reconciliación | DONE | | 27 hallazgos re-adjudicados contra HEAD: 21 `sigue`, 6 `mutado`, 0 muertos |
 | Ola 1 · sustrato (`estilos.css`, `graficos.jsx`, `Semaforo.jsx`) | DONE | | 21 cerrados, los 3 VERDE al primer intento. DVZ-09 queda para M2a; DVZ-05 baja a D0 y D4 |
-| Ola 2 · controles (`App.jsx`, `Filtros.jsx`, `LineaTiempo.jsx`, `fit.js`, `Ban.jsx`) | TODO | | 11 hallazgos |
-| Ola 3 · las 14 pantallas | TODO | | 31 hallazgos en 13 archivos |
-| Ola 4 · documentos | TODO | | 3 hallazgos |
-| Cierre · gates + barrido visual + auditoría final | TODO | | |
+| Ola 2 · controles (`App.jsx`, `Filtros.jsx`, `LineaTiempo.jsx`, `fit.js`, `Ban.jsx`) | DONE | | 11 cerrados. `App.jsx` y `fit.js` los hizo N0; `Ban.jsx` se borró |
+| Ola 3 · las 14 pantallas | DONE | | 31 cerrados en 6 workers. 5 de 6 VERDE; el ROJO de `cortes` fue un falso positivo mío (le di al builder la instrucción de saltear NAR-05 y no al verificador) |
+| Ola 4 · documentos | DONE | | 7 cerrados: los 6 choques doc/código de N0-19 más la matriz de resoluciones |
+| Cierre · gates + barrido visual | DONE | | `npm run todo` verde (92 anclas, 201.917 y 606.270 chequeos). Las 14 vistas con `__fit()` limpio a 1152×640 y a 1440×900 |
+
+**71 de 72 hallazgos cerrados.** El barrido visual del cierre encontró dos cosas que la
+verificación por unidad no vio, las dos ya corregidas: la bajada nueva de D3 no entraba en las
+dos líneas del clamp, y mi propio arreglo de `fit.js` levantaba un falso positivo en las 14
+vistas porque comparaba la marca de la lateral contra la barra de otra columna.
+
+| S-08 | DVZ-09: la última barra del embudo de M2a mide unos 9 px sobre 827. No se arregla con un piso de ancho: agrandar una barra que vale 1,2 % es exactamente el lie factor que la regla 4 prohíbe. Queda mitigado por el título, que ahora dice la cifra en palabras ("De 23.529 envíos, 284 terminan en compra a 7 días"). Si el equipo lo quiere resuelto en el dibujo, la salida es desdoblar el embudo en dos paneles de escala propia | app | auditoría de diseño 26/08 | abierto, no bloquea |

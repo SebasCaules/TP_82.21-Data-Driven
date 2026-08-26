@@ -81,15 +81,30 @@ export default function M0({ info, iCorte, filtro }) {
       <h1 className="titulo">
         {hay
           ? `Contactar a ${entero(kBase)} de los ${entero(enRiesgo)} en riesgo cubre el ${pct(cubreBase)} de la exposición, no el ${pct(azarBase)}`
-          : 'Sin clientes en riesgo con este recorte'}
+          : enRiesgo === 0
+            ? 'Sin clientes en riesgo con este recorte'
+            : 'El filtro activo no aporta ningún cliente al ranking de exposición'}
       </h1>
       <p className="bajada">
         {hay
-          ? <>La lista se ordena por exposición, así que el orden rinde{' '}
-              {(cubreBase / (azarBase || 1)).toFixed(2).replace('.', ',')} veces más que el
-              alcance. Movete sobre la curva, hacé clic para fijar un corte, o escribí el
-              número exacto arriba.</>
-          : 'Ninguna combinación de filtros deja clientes en riesgo en este corte.'}
+          // CIF-04: con un filtro, kBase puede colapsar a cuantas filas del top 800 global
+          // sobreviven al filtro, muy por debajo de la capacidad declarada. Se declara en
+          // vez de dejar que el titulo lo presente como una decision. La bajada larga de
+          // abajo ya repite la ventaja que muestra el KPI "Ventaja sobre el azar", asi que
+          // en este caso se reemplaza entera (no se le agrega texto) para no desbordar el
+          // recorte de dos lineas de .bajada.
+          ? (kBase < capLo
+              ? <>La lista es el recorte del top 800 que sobrevive al filtro, no la
+                  capacidad: aporta {entero(n)} de los {entero(enRiesgo)} en riesgo.</>
+              : <>La lista se ordena por exposición, así que el orden rinde{' '}
+                  {(cubreBase / (azarBase || 1)).toFixed(2).replace('.', ',')} veces más que
+                  el alcance. Movete sobre la curva, hacé clic para fijar un corte, o
+                  escribí el número exacto arriba.</>)
+          : enRiesgo === 0
+            ? 'Ninguna combinación de filtros deja clientes en riesgo en este corte.'
+            : <>El ranking prioriza exposición individual sobre el top 800 global, no por
+                filtro. Hay {entero(enRiesgo)} en riesgo con este recorte, pero ninguno entra
+                a ese top 800.</>}
       </p>
 
       {/* Los tres KPIs son la lectura del punto elegido, no cifras fijas. El primero ademas

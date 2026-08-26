@@ -44,8 +44,8 @@ export default function M2b() {
         {pct(solapaDesde, 2)} y {pct(solapaHasta, 2)}
       </h1>
       <p className="bajada">
-        Punto y barra: intervalo de confianza al 95 % (Wilson). Punteada: tasa global. No
-        alcanza para priorizar por segmento sobre exposición.
+        Punto y barra: intervalo de Wilson al 95 %. Punteada: tasa global. La franja gris es
+        el tramo donde los intervalos del mejor y el peor segmento se pisan.
       </p>
 
       <div className="lienzo">

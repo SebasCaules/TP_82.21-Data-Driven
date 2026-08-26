@@ -8,7 +8,9 @@
 //
 // `ejeExento` es la dimension que la pantalla activa desagrega. Su filtro NO se aplica a su
 // propio eje (si no, el grafico colapsaria a una barra), y eso hay que declararlo: antes lo
-// decia una linea del pie, que ya no existe. Ahora lo dice el propio chip.
+// decia una linea del pie, que ya no existe. El chip lo dice por aria-label y estilo, pero
+// eso no alcanza para quien mira la pantalla sin pasar el mouse ni usar lector: por eso el
+// aviso se repite en texto siempre visible, al lado del contador de filtros.
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { dims } from './agregacion.js'
@@ -43,6 +45,8 @@ function Chip({ dim, valor, onElegir, activo, exento }) {
   const caja = useRef(null)
   const listaId = useId()
   const tecleo = useRef({ txt: '', t: 0 })
+  // Id de cada <li role="option">, para aria-activedescendant. -1 es la fila "Todas las...".
+  const idOpcion = (i) => `${listaId}-op${i}`
 
   const puesto = valor !== null
   const IconoActual = puesto ? (iconoDeValor(id, opciones[valor]) ?? Icono) : Icono
@@ -105,8 +109,9 @@ function Chip({ dim, valor, onElegir, activo, exento }) {
         className={`chip-f chip-f-btn${puesto ? ' on' : ''}${exento ? ' exento' : ''}`}
         role="combobox"
         aria-expanded={abierto}
-        aria-controls={listaId}
+        aria-controls={abierto ? listaId : undefined}
         aria-haspopup="listbox"
+        aria-activedescendant={abierto ? idOpcion(foco) : undefined}
         aria-label={`${aviso}${puesto ? `: ${texto}` : ''}`}
         disabled={!activo}
         title={exento ? aviso : undefined}
@@ -115,21 +120,27 @@ function Chip({ dim, valor, onElegir, activo, exento }) {
       >
         <IconoActual aria-hidden="true" />
         <span className="chip-f-txt" aria-hidden="true">{texto}</span>
-        {/* Ranura de ancho fijo: la ✕ y el caret no miden lo mismo, y alternarlos le movía
-            el ancho al chip y, detrás, al riel del mes de corte. */}
-        <span className="chip-f-fin">
-          {puesto && activo ? (
-            <span className="chip-f-x" role="button" tabIndex={-1}
-                  aria-label={`Quitar el filtro de ${etq}`}
-                  onClick={(e) => { e.stopPropagation(); onElegir(null) }}>×</span>
-          ) : <Caret />}
-        </span>
+        {/* El caret queda siempre montado: la ✕ de sacar el filtro ahora vive afuera,
+            como boton hermano (no puede haber un control interactivo anidado dentro
+            de otro control interactivo). */}
+        <span className="chip-f-fin"><Caret /></span>
       </button>
+
+      {/* Boton hermano, no anidado en el combobox: un <span role="button"> adentro de
+          un <button> es HTML invalido y el foco de teclado nunca llegaba ahi. Se
+          reserva con visibility en vez de montar/desmontar, por el mismo motivo que
+          el caret de arriba: no correrle el ancho al chip y, detras, al riel del mes
+          de corte cada vez que se pone o saca un filtro. */}
+      <button type="button" className="chip-f-x"
+              style={{ visibility: puesto && activo ? 'visible' : 'hidden' }}
+              disabled={!(puesto && activo)}
+              aria-label={`Quitar el filtro de ${etq}`}
+              onClick={() => onElegir(null)}>×</button>
 
       {abierto && (
         <ul className="chip-menu" id={listaId} role="listbox" aria-label={etq}
             onKeyDown={onKey}>
-          <li role="option" aria-selected={!puesto}
+          <li role="option" id={idOpcion(-1)} aria-selected={!puesto}
               className={`chip-op${!puesto ? ' sel' : ''}${foco === -1 ? ' foco' : ''}`}
               onPointerEnter={() => setFoco(-1)}
               onClick={() => elegir(null)}>
@@ -139,7 +150,7 @@ function Chip({ dim, valor, onElegir, activo, exento }) {
           {opciones.map((o, i) => {
             const IconoOp = iconoDeValor(id, o)
             return (
-              <li key={o} role="option" aria-selected={valor === i}
+              <li key={o} role="option" id={idOpcion(i)} aria-selected={valor === i}
                   className={`chip-op${valor === i ? ' sel' : ''}${foco === i ? ' foco' : ''}`}
                   onPointerEnter={() => setFoco(i)}
                   onClick={() => elegir(i)}>
@@ -156,6 +167,11 @@ function Chip({ dim, valor, onElegir, activo, exento }) {
 
 export default function Filtros({ filtro, setFiltro, activos, reiniciar, modificado, ejeExento }) {
   const puestos = DIMENSIONES.filter(({ id }) => filtro[id] !== null).length
+  // El chip exento ya lo declara por aria-label y por estilo (borde punteado), pero eso
+  // no se ve sin pasar el mouse ni sin lector de pantalla. Se repite en texto fijo, para
+  // que quien mira la pantalla vea que ese filtro esta puesto y no recorta esta vista.
+  const dimExenta = DIMENSIONES.find(({ id }) => id === ejeExento)
+  const filtroExento = activos && dimExenta && filtro[dimExenta.id] !== null
 
   return (
     <div className={`filtros${activos ? '' : ' inertes'}`}>
@@ -168,6 +184,18 @@ export default function Filtros({ filtro, setFiltro, activos, reiniciar, modific
            aria-hidden={!puestos}>{puestos || 0}</b>
       </span>
 
+      {/* Montado siempre que la vista tenga eje exento (nunca cambia en la vida del
+          componente: lo fija la pantalla, no el filtro), y oculto con visibility en vez
+          de desmontado. Mismo motivo que el contador de arriba y la ✕ de cada chip: si el
+          ancho lo decidiera el contenido, poner o sacar el filtro de ese eje le correría
+          el riel del mes de corte de al lado. */}
+      {dimExenta && activos && (
+        <span className="filtros-nota" aria-hidden={!filtroExento}
+              style={filtroExento ? undefined : { visibility: 'hidden' }}>
+          {dimExenta.etq} no recorta esta vista
+        </span>
+      )}
+
       {DIMENSIONES.map((d) => (
         <Chip key={d.id} dim={d} valor={filtro[d.id]} activo={activos}
               exento={activos && filtro[d.id] !== null && d.id === ejeExento}
@@ -176,16 +204,18 @@ export default function Filtros({ filtro, setFiltro, activos, reiniciar, modific
 
       {/* Ranura de ancho fijo al final. Adentro va "Limpiar" o el aviso de que los filtros
           no aplican, y a veces nada: si el ancho lo decidiera el contenido, cada cambio de
-          filtro le movería el riel del mes de corte, que está pegado a la derecha. */}
+          filtro le movería el riel del mes de corte, que está pegado a la derecha.
+          "Limpiar" gana aunque los filtros estén inertes: el corte sigue siendo global, y
+          si se movió (modificado) hace falta un camino de vuelta visible, no solo Esc. */}
       <span className="filtros-cola">
-        {!activos
-          ? <span className="filtros-nota">no aplican acá</span>
-          : modificado && (
+        {modificado
+          ? (
             <button type="button" className="chip-f reset" onClick={reiniciar}
                     title="Volver al estado inicial (Esc)">
               <span className="chip-f-txt">Limpiar</span>
             </button>
-          )}
+          )
+          : !activos && <span className="filtros-nota">no aplican acá</span>}
       </span>
     </div>
   )

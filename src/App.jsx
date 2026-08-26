@@ -195,7 +195,7 @@ function Lateral({ indice, irA }) {
       </ol>
 
       <div className="lat-pie">
-        <span>↑ ↓ cambia de vista</span>
+        <span>↑ ↓ cambia de vista · Esc limpia</span>
         <span>F pantalla completa · I imprime</span>
       </div>
     </nav>

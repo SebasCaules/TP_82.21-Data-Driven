@@ -24,7 +24,7 @@
 // La barra de progreso del F07 decia lo mismo que Z3 dice rotulado, y su tabla de tres filas
 // es Z3. La ficha no se rediseño: se desarmo en las zonas que 5a define.
 
-import { estadoRecompra } from '../Semaforo.jsx'
+import Semaforo, { estadoInverso } from '../Semaforo.jsx'
 import { Lienzo, Linea } from '../graficos.jsx'
 import { entero, fechaCorta, meta, pct, pesos, series } from '../agregacion.js'
 
@@ -61,9 +61,13 @@ export default function D0({ info }) {
     .filter((r) => r.tasa != null)
     .map((r) => ({ etiqueta: r.trimestre.replace('20', "\'"), valor: r.tasa * 100 }))
   const ultima = recompra[recompra.length - 1]
-  const estado = ultima ? estadoRecompra(ultima.valor, meta.meta_recompra) : 'fuera'
 
-  const sujeto = LECTURA.find(([tope]) => info.pct < tope)[1]
+  // Cero real (Segmento = Nuevos: ar=nr=0) no es "una porción chica", es nada. La tabla
+  // LECTURA arranca en pct>0 a proposito: por debajo cualquier etiqueta de porcion afirma
+  // una exposicion que no existe (COPY-08).
+  const sujeto = info.pct <= 0
+    ? 'Nada del gasto anual'
+    : LECTURA.find(([tope]) => info.pct < tope)[1]
   const pctHist = info.facturacion ? (100 * info.facturacionRiesgo) / info.facturacion : 0
   const pctClientes = info.clientes ? (100 * info.enRiesgo) / info.clientes : 0
   const marcaPrevia = info.exposicionPrevia != null && info.baseAnualizada
@@ -106,13 +110,19 @@ export default function D0({ info }) {
             </div>
             <div className="ban-scrow" />
 
-            {/* Los tres datos que encuadran la cifra, cada uno con su rótulo y su valor en
+            {/* Los datos que encuadran la cifra, cada uno con su rótulo y su valor en
                 tinta: como renglón corrido de 10 px en gris no los leía nadie, y son los que
-                dicen sobre qué base y a qué fecha vale el número de arriba. */}
+                dicen sobre qué base y a qué fecha vale el número de arriba. Los últimos dos
+                declaran cuánto del gasto anual anualizado viene de clientes con menos de un
+                año de historia (CIF-05): en cortes viejos ese denominador se infla dividiendo
+                por años desde la primera compra, y sin esta base la LECTURA de arriba elegía
+                su lectura sin decir contra qué monto vale. */}
             <div className="z2-base">
               <span><i>Base</i><b className="tabular">{entero(info.clientes)}</b>clientes</span>
               <span><i>Corte</i><b className="tabular">{fechaCorta(info.corte)}</b></span>
               <span><i>Moneda</i><b>pesos nominales</b></span>
+              <span><i>Con menos de 1 año</i><b className="tabular">{entero(info.historiaCorta)}</b>clientes</span>
+              <span><i>Base sin ellos</i><b className="tabular">{pesos(info.baseAnualizada1a)}</b>anualizados</span>
             </div>
           </div>
 
@@ -126,6 +136,22 @@ export default function D0({ info }) {
                     ap={`de ${pesos(info.facturacion)} acumulados`} />
             <Contra etq="Clientes en riesgo" val={`${entero(info.enRiesgo)} / ${entero(info.clientes)}`}
                     ap={`${pct(pctClientes)} de la base con compra válida`} />
+
+            {/* Estado de "Clientes en riesgo" contra el umbral (Parte D §2.1). La pastilla
+                completa mide ~153 px por su etiqueta ("En zona de alerta") y ninguno de los
+                tres tercios de arriba tiene ese ancho disponible ni compartiendo fila con la
+                cifra ni solo: a 1152 px el tercio mide ~137 px (estilos.css:653 ya deja
+                registrado que esa columna está al límite solo para el texto). Por eso va en
+                una fila propia que ocupa las tres columnas del mismo grid (gridColumn ocupa
+                lo que ya existe, no agrega CSS), en vez de meterse en un tercio que la
+                aplasta a 0 px de ancho como pasaba antes. */}
+            <div className="z3-estado" style={{
+              gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8,
+              marginTop: 8, paddingTop: 8, borderTop: '1px dotted var(--bd)',
+            }}>
+              <span className="kpi-lbl" style={{ display: 'inline' }}>Frente al umbral</span>
+              <Semaforo estado={estadoInverso(pctClientes, meta.umbral_en_riesgo)} de="clientes en riesgo" />
+            </div>
           </div>
         </div>
 
@@ -142,7 +168,8 @@ export default function D0({ info }) {
                 serie={recompra} w={w} h={h}
                 formato={(v) => `${v.toFixed(1).replace('.', ',')}%`}
                 zonas={zonasRecompra(ultima ? ultima.valor : null)}
-                tituloEje="% que recompra en 90 días"
+                tituloY="% que recompra en 90 días"
+                tituloEje="Trimestre"
               />
             )}
           </Lienzo>
@@ -154,7 +181,8 @@ export default function D0({ info }) {
   )
 }
 
-/** Una de las tres comparaciones de Z3. */
+/** Una de las tres comparaciones de Z3. El estado de "Clientes en riesgo" (OV-5) no se
+ *  arma acá: va en su propia fila debajo de las tres, ver el comentario junto a z3-estado. */
 function Contra({ etq, val, ap }) {
   return (
     <div className="z3-item">

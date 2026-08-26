@@ -39,18 +39,24 @@ export default function D3({ iCorte, filtro, info, verEnLista }) {
   const pctEnRiesgo = enRiesgo.n ? (100 * enRiesgo.nr) / enRiesgo.n : 0
   // Contraste que da título al gráfico: cuánto de lo facturado (no visible en este
   // gráfico, que es solo exposición) contra cuánta exposición aporta el mismo segmento.
-  // El monto de exposición de Campeones ya se lee directo en su barra: no se repite.
+  // El monto de exposición de Campeones ya se lee directo en su barra: no se repite. Las
+  // dos bases (tot.f, tot.ar) van en la bajada junto a cada porcentaje: sin ellas ninguno
+  // de los dos se puede chequear a mano.
   const pctExposicionCampeones = tot.ar ? (100 * campeones.ar) / tot.ar : 0
 
   return (
     <section className="pant">
+      {/* El título original generalizaba desde un solo segmento ("el riesgo no está donde
+          está la plata") y quedaba leído en contra del título de D2 ("el riesgo sube con
+          el valor"), que habla de quintiles, no de segmentos. Acotado a "entre segmentos"
+          y con Campeones nombrado como la excepción, no como la regla. */}
       <h1 className="titulo">
-        El riesgo no está donde está la plata: Campeones concentra {pct(pctFacturacion)} de lo
-        facturado y {pct(pctExposicionCampeones)} de la exposición
+        Entre segmentos, el riesgo no está donde está la plata: la excepción es Campeones
       </h1>
       <p className="bajada">
-        El segmento En riesgo ({pct(pctEnRiesgo)}) es circular por construcción: la R de RFM
-        es la misma recency que define el target.
+        Campeones: {pct(pctFacturacion)} de {pesos(tot.f)} facturados contra{' '}
+        {pct(pctExposicionCampeones)} de {pesos(tot.ar)} de exposición. El {pct(pctEnRiesgo)} del
+        segmento En riesgo es circular: la R de RFM es la misma recency que define el target.
       </p>
 
       <div className="lienzo">

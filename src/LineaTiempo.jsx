@@ -29,7 +29,12 @@ export default function LineaTiempo({ iCorte, setICorte, activo = true }) {
 
   // Actualizador funcional: si llegan varias teclas antes de un re-render, cada una parte
   // del valor real y no del que quedó capturado en el closure.
+  //
+  // Si el riel esta inactivo (activo=false) no hay que mover nada: antes las flechas
+  // cambiaban igual el corte global aunque la pantalla no lo usara para nada, y el
+  // teclado tabulaba directo a un control fantasma.
   const onKey = useCallback((e) => {
+    if (!activo) return
     const salto = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: 1, ArrowDown: -1,
                     PageUp: 3, PageDown: -3 }[e.key]
     if (salto !== undefined) {
@@ -37,7 +42,7 @@ export default function LineaTiempo({ iCorte, setICorte, activo = true }) {
       e.preventDefault()
     } else if (e.key === 'Home') { setICorte(0); e.preventDefault() }
     else if (e.key === 'End') { setICorte(n - 1); e.preventDefault() }
-  }, [n, setICorte])
+  }, [n, setICorte, activo])
 
   return (
     <div className="tl">
@@ -47,7 +52,7 @@ export default function LineaTiempo({ iCorte, setICorte, activo = true }) {
         ref={ref}
         className="tl-pista"
         role="slider"
-        tabIndex={0}
+        tabIndex={activo ? 0 : -1}
         aria-label="Mes de corte"
         aria-valuemin={0}
         aria-valuemax={n - 1}

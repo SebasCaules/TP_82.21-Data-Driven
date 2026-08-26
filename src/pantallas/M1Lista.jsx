@@ -17,6 +17,26 @@ const pesosFinos = (x) => `ARS ${entero(x)}`
 
 const TAMANO_TRAMO = 200
 
+// Nombre prosa de cada campo ordenable, para que la bajada declare el criterio activo en
+// vez de una frase fija que se desactualiza en cuanto se toca otra cabecera.
+const ETIQUETA_ORDEN = {
+  anualizado: 'exposición anual',
+  recency: 'recency',
+  gap: 'gap propio',
+  region: 'región',
+  categoria: 'categoría',
+  consiente: 'consentimiento',
+}
+
+// Para el nombre del CSV: sin tildes ni espacios, que un nombre de archivo no depende del
+// sistema operativo que lo reciba.
+function slug(s) {
+  return String(s)
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 // Ocho columnas no se leen como lista priorizada: quedan las que justifican por qué ESE
 // cliente entra a la tabla (exposición) y por qué está en riesgo (recency, gap), más
 // consentimiento porque sin él no se puede llamar. Región y categoría solo aportan cuando
@@ -52,7 +72,7 @@ function claseCelda(c, f) {
   return clases.join(' ') || undefined
 }
 
-export default function M1({ info, filtro, setFiltro, iCorte }) {
+export default function M1({ info, filtro, setFiltro, iCorte, volverAlOrigen, origenCorto }) {
   const [tramo, setTramo] = useState(0)
   const [orden, setOrden] = useState({ campo: 'anualizado', dir: 'desc' })
   // Cuantas filas entran se mide, no se fija: 12 desbordaban a 1152x640 y sobraba lugar
@@ -62,8 +82,11 @@ export default function M1({ info, filtro, setFiltro, iCorte }) {
   const tablaRef = useRef(null)
   const [medidas, setMedidas] = useState({ fila: 25, cabecera: 28 })
 
-  // Un tramo nuevo de corte o de filtro reordena la base: se vuelve al primero.
-  useEffect(() => { setTramo(0) }, [iCorte, filtro])
+  // Un tramo nuevo de corte, de filtro o de orden reordena la base: se vuelve al primero.
+  // Sin `orden` en las dependencias, tocar una cabecera reordenaba las 800 filas por debajo
+  // del tramo activo y "Semana 3" pasaba a ser otro lote de clientes sin que la pestaña lo
+  // avisara.
+  useEffect(() => { setTramo(0) }, [iCorte, filtro, orden])
 
   const COLUMNAS = useMemo(() => [
     ...COLUMNAS_FIJAS,
@@ -121,16 +144,26 @@ export default function M1({ info, filtro, setFiltro, iCorte }) {
   }
 
   function exportarCSV() {
-    const encabezados = ['cliente', 'exposicion_anual', 'recency_dias', 'gap_propio_dias', 'region', 'categoria', 'consentimiento']
+    // El nombre y las columnas llevan corte y filtro: dos exportaciones de recortes
+    // distintos (Región AMBA, después Categoría Muebles) ya no comparten nombre de archivo
+    // ni quedan indistinguibles una vez abiertas.
+    const dimsActivas = DIMENSIONES.filter(({ id }) => filtro[id] !== null)
+    const filtroTxt = dimsActivas.length
+      ? dimsActivas.map(({ id, etq }) => `${etq}: ${etiquetaValor(id, filtro[id])}`).join(' · ')
+      : 'ninguno'
+    const filtroSlug = dimsActivas.length
+      ? `-${dimsActivas.map(({ id }) => `${id}-${slug(etiquetaValor(id, filtro[id]))}`).join('-')}`
+      : ''
+    const encabezados = ['cliente', 'exposicion_anual', 'recency_dias', 'gap_propio_dias', 'region', 'categoria', 'consentimiento', 'corte', 'filtro']
     const cuerpo = filas.map((f) => [
-      f.id, Math.round(f.anualizado), f.recency, f.gap, f.region, f.categoria, f.consiente ? 'si' : 'no',
+      f.id, Math.round(f.anualizado), f.recency, f.gap, f.region, f.categoria, f.consiente ? 'si' : 'no', info.corte, filtroTxt,
     ].join(';'))
     const csv = [encabezados.join(';'), ...cuerpo].join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `marketing-lista-corte-${iCorte}.csv`
+    a.download = `marketing-lista-${info.corte}${filtroSlug}.csv`
     document.body.appendChild(a)
     a.click()
     a.remove()
@@ -168,8 +201,8 @@ export default function M1({ info, filtro, setFiltro, iCorte }) {
   }
 
   const filtroActivo = hayFiltro(filtro)
-  const etiquetasFiltro = DIMENSIONES
-    .filter(({ id }) => filtro[id] !== null)
+  const dimensionesActivas = DIMENSIONES.filter(({ id }) => filtro[id] !== null)
+  const etiquetasFiltro = dimensionesActivas
     .map(({ id, etq }) => `${etq}: ${etiquetaValor(id, filtro[id])}`)
     .join(' · ')
 
@@ -180,9 +213,10 @@ export default function M1({ info, filtro, setFiltro, iCorte }) {
         {millones(info.exposicion)}, y solo {entero(conConsentimiento)} se pueden contactar
       </h1>
       <p className="bajada">
-        Ordenada por exposición anual descendente; cada cabecera reordena. La acción sugerida
-        (modelo predictivo, en desarrollo) es igual para toda la lista. El botón exporta los{' '}
-        {entero(filas.length)} completos.
+        Ordenada por {ETIQUETA_ORDEN[orden.campo] ?? orden.campo}{' '}
+        {orden.dir === 'desc' ? 'descendente' : 'ascendente'}; cada cabecera reordena. La acción
+        sugerida (modelo predictivo, en desarrollo) es igual para toda la lista. El botón exporta
+        los {entero(filas.length)} completos.
       </p>
 
       <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(6px,1vh,12px)' }}>
@@ -194,40 +228,27 @@ export default function M1({ info, filtro, setFiltro, iCorte }) {
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
             <span className="kpi-lbl">Tramo semanal</span>
             <div style={{ display: 'flex', gap: '8px' }}>
+              {/* .chip-f + .on ya resuelve fondo, borde, hover y foco (Filtros.jsx la usa
+                  igual); el invertido de .on más el "(activa)" en el rótulo marcan el
+                  tramo activo sin depender del color solo. Sin .chip-f-txt (ancho fijo en
+                  ch, pensado para el valor del filtro) porque acá el rótulo cambia de
+                  largo con "(activa)"; el font solo se repone inline porque .chip-f no lo
+                  fija cuando no se usa ese hijo. */}
               {Array.from({ length: numTramos }, (_, i) => (
                 <button
                   key={i}
                   type="button"
                   aria-pressed={i === tramoActivo}
                   onClick={() => setTramo(i)}
-                  style={{
-                    fontFamily: 'inherit',
-                    fontSize: '11.5px',
-                    fontWeight: i === tramoActivo ? 700 : 400,
-                    textDecoration: i === tramoActivo ? 'underline' : 'none',
-                    padding: '2px 8px',
-                    cursor: 'pointer',
-                  }}
+                  className={`chip-f${i === tramoActivo ? ' on' : ''}`}
+                  style={{ font: '600 11px/1.45 var(--fuente)' }}
                 >
                   Semana {i + 1} {i === tramoActivo ? '(activa)' : ''}
                 </button>
               ))}
             </div>
           </div>
-          <button
-            type="button"
-            onClick={exportarCSV}
-            style={{
-              fontFamily: 'inherit',
-              fontSize: '11.5px',
-              fontWeight: 600,
-              padding: '2px 8px',
-              cursor: 'pointer',
-              background: 'none',
-              border: '1px solid var(--bd)',
-              color: 'inherit',
-            }}
-          >
+          <button type="button" onClick={exportarCSV} className="chip-claro">
             Exportar CSV · {entero(filas.length)} completos
           </button>
         </div>
@@ -235,19 +256,30 @@ export default function M1({ info, filtro, setFiltro, iCorte }) {
           La capacidad de contacto se reparte en 4 semanas: cada tramo es el lote de esa semana.
         </div>
 
-        {/* Solo se ve cuando se llegó acá por drill-down (App.jsx → verEnLista): un click en
-            otra vista trae a esta pantalla con un filtro puesto y sin este aviso no se
-            entiende por qué la lista cambió. setFiltro(SIN_FILTRO) lo saca sin salir de la
-            pantalla; no toca App.jsx ni el resto de los filtros de la barra. */}
-        {filtroActivo && (
+        {/* Se ve cuando hay un filtro activo o cuando se llegó acá por drill-down (App.jsx →
+            verEnLista): un click en otra vista trae a esta pantalla con un filtro puesto y
+            sin este aviso no se entiende por qué la lista cambió. setFiltro(SIN_FILTRO) limpia
+            las CUATRO dimensiones a la vez, no solo la que trajo el drill-down; por eso la
+            etiqueta dice cuántos filtros se van a sacar cuando hay más de uno, en vez de
+            hablar siempre de "filtro" en singular. Volver a {origenCorto} restaura filtro y
+            vista de antes del clic (volverAlOrigen es null si no se llegó por drill-down, así
+            que el botón no se monta). */}
+        {(filtroActivo || volverAlOrigen) && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
             fontSize: '11.5px', color: 'var(--mut2)', flex: '0 0 auto',
           }}>
-            <span>Este recorte sale de {etiquetasFiltro}.</span>
-            <button type="button" className="chip-claro" onClick={() => setFiltro(SIN_FILTRO)}>
-              Quitar filtro
-            </button>
+            {filtroActivo && <span>Este recorte sale de {etiquetasFiltro}.</span>}
+            {filtroActivo && (
+              <button type="button" className="chip-claro" onClick={() => setFiltro(SIN_FILTRO)}>
+                {dimensionesActivas.length > 1 ? `Quitar los ${dimensionesActivas.length} filtros` : 'Quitar filtro'}
+              </button>
+            )}
+            {volverAlOrigen && (
+              <button type="button" className="chip-claro" onClick={volverAlOrigen}>
+                Volver a {origenCorto}
+              </button>
+            )}
           </div>
         )}
 

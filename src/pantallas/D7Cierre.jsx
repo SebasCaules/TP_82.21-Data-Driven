@@ -139,7 +139,14 @@ function Articulo({ n, rotulo, decision, cifra, pieCifra, marca, apoyo, prueba, 
         <span className="art-val-pie">{pieCifra}</span>
       </div>
 
-      {marca && <div className="art-marca">{marca}</div>}
+      {/* .art-marca se monta siempre, no solo en la columna 01: si no, esa columna arranca
+          .art-apoyo y .art-prueba más abajo que 02 y 03 (VIS-12) porque solo ella suma el
+          alto de la pastilla del semáforo. Donde no hay marca real se reserva el mismo hueco
+          con visibility:hidden (no display:none, que no ocupa espacio): mismo componente,
+          mismo alto, invisible y afuera del árbol de accesibilidad. */}
+      <div className="art-marca" style={marca ? undefined : { visibility: 'hidden' }}>
+        {marca || <Semaforo estado="fuera" tamano="chico" />}
+      </div>
       <p className="art-apoyo">{apoyo}</p>
 
       {/* La prueba absorbe el alto que sobra (flex:1 en .art-prueba), así la columna no
