@@ -24,24 +24,32 @@ Dos bloques, una pantalla por gráfico, sin scroll (`dec-D1`, `dec-D2`).
 
 | Elemento | Comportamiento | Cita |
 |---|---|---|
-| Control de bloque | dos pestañas siempre visibles, la activa marcada por **forma y texto** además de color | guía, "Lo que el negocio pidió", fila "No depender solo del color" |
-| Salto de bloque | aterriza en la pantalla 0 del destino; cada bloque recuerda su última pantalla | Nielsen H1 |
-| Riel | clickeable, con la pantalla activa marcada por relleno y borde, no solo color | ídem |
-| Teclado | `→` `←` avanzan · dígitos dentro del bloque activo (1-8 / 1-4) · `0` vuelve a la consolidada · `b` cambia de bloque · `f` pantalla completa · `i` imprime · `Esc` limpia filtros. El handler **ignora el evento si el foco está en un control** | — |
+| Recorrido | **un solo riel de 14 vistas numeradas**, no dos bloques conmutables. La distinción de audiencia pasa a ser un rótulo de grupo (Diagnóstico · Operación · Decisión) que separa sin partir | implementación, `pantallas/index.jsx` |
+| Riel | clickeable, con la vista activa marcada por inversión y peso, no solo color | Nielsen H1 |
+| Teclado | `↑` `↓` `←` `→` avanzan y retroceden · `Inicio` y `Fin` van a los extremos · `f` pantalla completa · `i` imprime · `Esc` limpia corte y filtros. El handler ignora el evento si el foco está en un `select`, un `input` o el riel del corte, y **`f` e `i` solo actúan con el foco fuera de todo control** (WCAG 2.1.4) | — |
 | Selector de mes de corte | 25 cortes, dibujado como **serie de exposición por corte** con el activo marcado: mover el corte es ver la trayectoria | clase 4, "ver cómo vengo" |
 | Filtros | región, categoría, segmento RFM, quintil. En las pantallas de series globales se **apagan con leyenda** en vez de quedar activos e inertes | Nielsen H1 |
 | Drill-down | clic en una barra de D2, D3, D5a o D5b fija ese valor como filtro y salta a M1 | Parte D §4.1, "Drill-down desde cualquier barra al listado filtrado" |
 | Volver al inicio | control visible solo cuando el estado difiere del inicial | Nielsen H1 (reversibilidad) |
 | Foco | orden de tabulación declarado, anillo de 2 px en gris, no en el color de énfasis | — |
 
+> **Nota.** La versión 1 de este documento describía dos bloques conmutables con atajos por
+> dígito, `0` y `b`. La implementación los descartó: catorce vistas en un recorrido único con
+> tres rótulos de grupo separan igual y no obligan a recordar en qué bloque se está. La tabla
+> de arriba es lo que el tablero hace hoy.
+
 > **Nota.** El **quintil** es un cuarto filtro que la Parte D no declara (declara tres:
 > región, categoría, segmento RFM). Se agrega porque el contrato ya lo trae como dimensión
 > de la contingencia y porque D2 es su pantalla. Queda documentado como agregado, igual que
 > el corte móvil contra C-06.
 
-## Pie fijo — dos líneas en las 14 pantallas
+## Pie de dos líneas — solo en la hoja impresa
 
-Comprimido de 5 líneas a 2 sin sacar contenido: las 5 comían 107 px de 640.
+Estaba pensado como pie fijo de pantalla, comprimido de 5 líneas a 2 porque las 5 comían 107 px
+de 640. Terminó saliendo de la pantalla y quedando solo en papel (decisión N0-13): corría
+idéntico en las 14 vistas y a fuerza de repetirse se volvía invisible, mientras que en la hoja,
+que se lee sin el tablero al lado, es donde hace falta. Lo que la pantalla sí conserva es el
+dato que las resume, "exposición, no recupero", pegado al número en vez de a 600 px.
 
 1. Corte activo · filtros activos · rótulo del bloque (Diagnóstico / Modelo predictivo).
 2. Proxy de churn · "el monto en riesgo es exposición, no recupero" · pesos nominales sin
@@ -69,11 +77,15 @@ Cambios del comité:
 - El título ya no dice "ya dejaron de comprar": el proxy no habilita afirmar abandono consumado.
 - **El arriba-a-la-izquierda lo ocupa el BAN**, no el título. El título va como línea superior
   de menor peso. Resuelve el choque entre la regla 23 y Wexler que la v1 dejaba abierto.
-- **Sube el pedido concreto**: una línea con las tres decisiones y su costo cero, con salto a D7.
+- **El pedido concreto NO subió a D0.** El comité lo había aceptado, y la implementación lo dejó
+  entero en D7 (decisión N0-19): D0 ya lleva el BAN, sus tres encuadres y la serie de recompra,
+  y una cuarta zona con las tres decisiones repetía lo que la vista 14 dice con más contexto.
+  Lo que sostiene la regla 24 acá es que el título de D0 da la lectura y no la etiqueta.
   *Lead with the ending* (regla 24) no admite que el pedido aparezca en la pantalla 8 de 8.
-- Dos líneas de apertura S-C-P: situación (la base creció hasta 2024, las campañas se deciden
-  por criterio comercial) y complicación (en 2025 la base activa cayó 16,8 % y la recompra bajó
-  a 8,5 %). Minto.
+- **Sin bajada.** La apertura S-C-P de dos líneas tampoco quedó: D0 es la única de las 14 que
+  declara cabecera de una sola línea, porque el BAN tiene que arrancar arriba y las dos líneas
+  de situación y complicación le comían el alto a la serie. La caída de 2025 se cuenta en D4,
+  que es su pantalla.
 - La tarjeta del indicador declara **dueño y cadencia**: "Recompra 90 días · María G. · mensual",
   con el estado del semáforo. Es la pregunta 3 de las cuatro que el tablero tiene que resistir.
 - Una línea de rango: la exposición al umbral de 60 d es 95,1 M y a 120 d es 93,5 M. El valor
@@ -117,7 +129,7 @@ Lo que cambia es lo que se afirma.
 |---|---|
 | Pregunta | ¿Dónde conviene gastar el presupuesto de retención? |
 | Cifra | exposición anual por segmento RFM, con la tasa de riesgo etiquetada |
-| Gráfico | barras horizontales ordenadas por exposición, con la línea del 41,0 % general |
+| Gráfico | barras horizontales ordenadas por exposición, con la tasa de riesgo de cada segmento como nota al lado y el 41,0 % general en el encabezado de esa columna |
 | Título | El riesgo no está donde está la plata: Campeones concentra ARS 159,9 M de los 550,2 M históricos (29,1 %) y aporta ARS 15,5 M de los 94,9 M de exposición |
 | Reglas | 6, 11, 14, 18, 21 · capa (a), no mezclar bases |
 
@@ -148,7 +160,7 @@ cortan, no se interpolan. **Los filtros se apagan**: la serie es global.
 | Pregunta | ¿Qué región concentra la exposición? |
 | Cifra | exposición en ARS por región, con la tasa de riesgo etiquetada. Amplitud 2,8 pp entre las 5 regiones |
 | Gráfico | barras horizontales en **pesos**, no en porcentaje |
-| Título | La geografía no explica el riesgo: 2,8 puntos entre la región más alta y la más baja |
+| Título | AMBA concentra el 43,2 % de la exposición de las regiones (la planitud de la tasa, 2,8 puntos entre la más alta y la más baja, baja a la bajada) |
 | Reglas | 4, 6, 11, 14, 18 |
 
 Cambios: la barra codifica pesos porque la pregunta es de concentración de plata; y
@@ -206,8 +218,8 @@ ejecutar?" es previa a "¿a quiénes contacto?".
 | | |
 |---|---|
 | Pregunta | ¿A cuántos alcanza a contactar Marketing y cuáles quedan sin cubrir? |
-| Cifra | 2.452 en riesgo · capacidad 500 a 800 · cobertura 20,4 % a 32,6 % |
-| Gráfico | barra segmentada desde cero con la capacidad como **banda** (dos cortes), rótulo y trama en cada tramo |
+| Cifra | 2.452 en riesgo · capacidad 500 a 800 · contactar 500 cubre el 37,0 % de la exposición contra el 20,4 % que cubriría al azar |
+| Gráfico | **curva de concentración**: la lista ordenada por exposición contra el azar, con la banda de capacidad marcada. Tres KPIs de cabecera que son la lectura del punto elegido y se mueven con él |
 | Título | La capacidad cubre entre uno de cada cinco y uno de cada tres clientes en riesgo: el orden importa más que el alcance |
 | Reglas | 4, 8, 18 |
 
@@ -235,7 +247,7 @@ Se presenta como incumplimiento reconocido por el negocio con corrección en mar
 |---|---|
 | Pregunta | ¿A quiénes contacto esta semana? |
 | Cifra | top 800 por exposición = ARS 49,5 M de los 94,9 M (52,1 %). **568 de los 800 tienen consentimiento** |
-| Gráfico | tabla de las **12 primeras** en pantalla; las 800 por exportación e impresión |
+| Gráfico | tabla en pantalla con **las filas que entran medidas contra el alto real**, no un número fijo; las 800 por exportación e impresión |
 | Título | Los 800 de mayor exposición concentran ARS 49,5 M de los 94,9 M, y solo 568 se pueden contactar |
 | Reglas | Shneiderman (details-on-demand) · Parte D §4.1 |
 
