@@ -331,7 +331,11 @@ body {
 
 /* ---------- modo impresion: las 14 pantallas en flujo ---------- */
 .impresion-flujo { display: flex; flex-direction: column; }
-.impresion-flujo .hoja { height: 168mm; display: flex; flex-direction: column; }
+/* flex-shrink:0 es lo que hace que la hoja mida de verdad: sin eso el contenedor flex
+   reparte su alto entre las 14 y cada hoja termina en ~490 px, con los graficos aplastados. */
+.impresion-flujo .hoja {
+  height: 180mm; flex-shrink: 0; display: flex; flex-direction: column;
+}
 .impresion-flujo .hoja .pant { flex: 1; min-height: 0; }
 @media screen {
   .impresion-flujo { overflow: auto; }

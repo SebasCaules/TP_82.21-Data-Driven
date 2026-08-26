@@ -50,7 +50,7 @@ export function chequear() {
   // 2. superposicion con el pie o con el encabezado. Este es el chequeo que el
   //    scrollHeight no ve cuando hay overflow:hidden.
   for (const { el, sel, r } of rects(document)) {
-    if (el.closest('.pie') || el.closest('.enc') || el.closest('.impresion')) continue
+    if (el.closest('.pie') || el.closest('.enc') || el.closest('.impresion-flujo')) continue
     if (r.bottom > pieTop + 1) {
       problemas.push({
         tipo: 'pisa-el-pie',
