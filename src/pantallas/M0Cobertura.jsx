@@ -23,6 +23,11 @@ export default function M0({ info, iCorte, filtro }) {
   const [capLo, capHi] = meta.capacidad_contacto
   const [fijado, setFijado] = useState(null)
   const [hover, setHover] = useState(null)
+  // Texto crudo del campo mientras se escribe. Sin esto el input es un controlado atado al
+  // valor derivado: al borrarlo saltaba a 1 y los digitos siguientes se pegaban a ese 1, asi
+  // que escribir "640" daba "1640". Con `null` el campo muestra el valor vigente; con texto,
+  // muestra lo que el usuario esta tecleando.
+  const [texto, setTexto] = useState(null)
 
   const enRiesgo = info.enRiesgo
   const total = info.exposicion
@@ -47,7 +52,29 @@ export default function M0({ info, iCorte, filtro }) {
   const onFijar = useCallback((v) => {
     setFijado(Math.max(1, Math.min(acum.length || 1, Math.round(v))))
     setHover(null)
+    setTexto(null)
   }, [acum.length])
+
+  // Mientras se escribe manda el texto, asi el campo se puede vaciar sin que salte a 1 y
+  // los digitos no se pegan al valor viejo. Reglas:
+  //   - vacio, o "0", o a medio escribir: se deja escribir y el corte no se mueve;
+  //   - dentro de rango: el corte se mueve en vivo;
+  //   - pasado del tope: se corrige EN EL ACTO al tope y el texto se reescribe. Corregir
+  //     recien al salir del campo dejaba un "9999" en pantalla que no era el corte real.
+  const onTexto = useCallback((v) => {
+    const tope = acum.length || 1
+    const num = Number(v)
+    if (v.trim() === '' || !Number.isFinite(num)) { setTexto(v); return }
+    if (num > tope) {
+      setTexto(String(tope)); setFijado(tope); setHover(null); return
+    }
+    setTexto(v)
+    if (num >= 1) { setFijado(Math.round(num)); setHover(null) }
+  }, [acum.length])
+
+  // Al salir del campo vuelve a mostrar el corte vigente: si quedo vacio o en cero, se
+  // descarta lo tecleado y el corte sigue donde estaba.
+  const cerrarTexto = useCallback(() => setTexto(null), [])
 
   return (
     <section className="pant">
@@ -75,11 +102,17 @@ export default function M0({ info, iCorte, filtro }) {
           <span className="cob-k-ctl">
             <button type="button" onClick={() => onFijar(k - 10)} disabled={!hay || k <= 1}
                     aria-label="Diez contactos menos">−</button>
-            <input id="cob-n" type="number" className="cob-k-val tabular" value={hay ? k : ''}
+            <input id="cob-n" type="number" inputMode="numeric"
+                   className="cob-k-val tabular"
+                   value={texto ?? (hay ? String(k) : '')}
                    min={1} max={n} disabled={!hay}
-                   onChange={(ev) => {
-                     const v = Number(ev.target.value)
-                     if (Number.isFinite(v)) onFijar(v)
+                   onFocus={(ev) => { try { ev.target.select() } catch { /* number input */ } }}
+                   onChange={(ev) => onTexto(ev.target.value)}
+                   onBlur={cerrarTexto}
+                   onKeyDown={(ev) => {
+                     ev.stopPropagation()
+                     if (ev.key === 'Enter') ev.currentTarget.blur()
+                     else if (ev.key === 'Escape') { setTexto(null); ev.currentTarget.blur() }
                    }} />
             <button type="button" onClick={() => onFijar(k + 10)} disabled={!hay || k >= n}
                     aria-label="Diez contactos más">+</button>
