@@ -262,6 +262,16 @@ export function ReferenciaV({ x, h, etiqueta, y = 0 }) {
  */
 export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta',
                         rotuloBanda2 = 'línea base', tituloEje, tituloY }) {
+  // Un grafico SVG en pantalla ES interactivo: de los 15 trimestres solo dos llevan
+  // etiqueta directa (el pico y el ultimo), asi que sin esto los otros trece no se pueden
+  // leer. El teclado hace lo mismo que el mouse. En papel no existe, y por eso la etiqueta
+  // directa y el eje siguen cargando el dato: el tooltip suma, no habilita.
+  const [foco, setFoco] = useState(null)
+  const mover = (e) => {
+    const caja = e.currentTarget.getBoundingClientRect()
+    const t = (e.clientX - caja.left) / Math.max(1, caja.width)
+    setFoco(Math.max(0, Math.min(serie.length - 1, Math.round(t * (serie.length - 1)))))
+  }
   const padL = 50
   const padT = tituloY ? 26 : 14
   const padB = 46          // dos renglones: marcas del eje X y, debajo, su titulo
@@ -274,7 +284,8 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
     banda ? `${rotuloBanda} ${formato(banda[0])}–${formato(banda[1])}` : '',
     banda2 ? `${rotuloBanda2} ${formato(banda2[0])}–${formato(banda2[1])}` : '',
   ]
-  const padR = Math.min(w * 0.34, Math.max(30, ...rotulos.map((r) => anchoTexto(r, 10) + 12)))
+  // +25 por la muestra de color y su aire; sin eso el rotulo se sale del lienzo.
+  const padR = Math.min(w * 0.34, Math.max(30, ...rotulos.map((r) => anchoTexto(r, 10) + 25)))
   const iw = Math.max(20, w - padL - padR)
   const ih = Math.max(20, h - padT - padB)
 
@@ -325,19 +336,27 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
         </text>
       )}
 
-      {/* bandas primero: todo lo demas va encima */}
+      {/* Las bandas primero, todo lo demas va encima.
+
+          Las dos NO se distinguen por tono. Compuestas sobre blanco daban #e2e7ec y #e5e7ea:
+          ΔE 0,5 incluso con vision normal, o sea el mismo color, y esta pantalla existe para
+          decir que el valor cae por debajo de UNA de ellas. La meta se queda con el tinte del
+          acento (es la zona que se quiere alcanzar) y la linea base pasa a TRAMA: distinta
+          por textura antes que por color, que es lo unico que sobrevive a la impresion en
+          blanco y negro. */}
+      <Tramas />
       {banda2 && (
         <rect x={padL} y={Y(banda2[1])} width={iw} height={Math.max(1, Y(banda2[0]) - Y(banda2[1]))}
-              fill="var(--mut)" opacity=".16" />
+              fill="url(#trama)" stroke="var(--bd2)" strokeWidth="1" />
       )}
       {banda && (
         <g>
           <rect x={padL} y={Y(banda[1])} width={iw} height={Math.max(1, Y(banda[0]) - Y(banda[1]))}
-                fill="var(--acc)" opacity=".13" />
+                fill="var(--acc)" opacity=".16" />
           <line x1={padL} x2={xFin} y1={Y(banda[1])} y2={Y(banda[1])}
-                stroke={ACC} strokeWidth="1" strokeDasharray="4 3" opacity=".55" />
+                stroke={ACC} strokeWidth="1" opacity=".5" />
           <line x1={padL} x2={xFin} y1={Y(banda[0])} y2={Y(banda[0])}
-                stroke={ACC} strokeWidth="1" strokeDasharray="4 3" opacity=".55" />
+                stroke={ACC} strokeWidth="1" opacity=".5" />
         </g>
       )}
 
@@ -356,14 +375,24 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
           persigue; declarada, es una decision de encuadre. */}
       {cortada && <CorteDeEje x={padL} y={yBase - 7} />}
 
-      {/* rotulo de cada banda en el margen, no encima de la curva */}
+      {/* Rotulo de cada banda en el margen, no encima de la curva. La identidad la lleva la
+          muestra de color al lado, no el color del texto: un rotulo pintado con el color de
+          la serie confunde texto con dato. */}
       {banda && (
-        <text x={xFin + 7} y={(Y(banda[0]) + Y(banda[1])) / 2} fontSize="10" fill={ACC}
-              fontWeight={600} dominantBaseline="central">{rotulos[0]}</text>
+        <g>
+          <rect x={xFin + 7} y={(Y(banda[0]) + Y(banda[1])) / 2 - 4} width={9} height={9}
+                fill="var(--acc)" opacity=".16" stroke={ACC} strokeWidth="1" strokeOpacity=".5" />
+          <text x={xFin + 20} y={(Y(banda[0]) + Y(banda[1])) / 2} fontSize="10" fill={MUT2}
+                fontWeight={600} dominantBaseline="central">{rotulos[0]}</text>
+        </g>
       )}
       {banda2 && (
-        <text x={xFin + 7} y={(Y(banda2[0]) + Y(banda2[1])) / 2} fontSize="10" fill={MUT}
-              dominantBaseline="central">{rotulos[1]}</text>
+        <g>
+          <rect x={xFin + 7} y={(Y(banda2[0]) + Y(banda2[1])) / 2 - 4} width={9} height={9}
+                fill="url(#trama)" stroke="var(--bd2)" strokeWidth="1" />
+          <text x={xFin + 20} y={(Y(banda2[0]) + Y(banda2[1])) / 2} fontSize="10" fill={MUT}
+                dominantBaseline="central">{rotulos[1]}</text>
+        </g>
       )}
 
       {tramos.map((t, i) => (
@@ -382,7 +411,10 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
           las bandas: su plaqueta se ancla hacia adentro para no encimarse con ellos. */}
       {ultimo && (
         <g>
-          <circle cx={X(iUlt)} cy={Y(ultimo.valor)} r="4" fill={ACC} />
+          {/* Anillo de superficie: el ultimo punto cae encima de la banda y sin el se
+              empasta con ella. */}
+          <circle cx={X(iUlt)} cy={Y(ultimo.valor)} r="4" fill={ACC}
+                  stroke="var(--sup)" strokeWidth="2" />
           <Plaqueta x={X(iUlt) - (iUlt === serie.length - 1 ? 8 : 0)}
                     y={Y(ultimo.valor) - 15} texto={formato(ultimo.valor)}
                     fuente={12} peso={700} color={INK}
@@ -409,6 +441,50 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
               letterSpacing=".09em" fontWeight={600}
               style={{ textTransform: 'uppercase' }}>{tituloEje}</text>
       )}
+
+      {foco != null && serie[foco] && serie[foco].valor != null && (() => {
+        const x = X(foco)
+        const y = Y(serie[foco].valor)
+        const txt = `${serie[foco].etiqueta}  ${formato(serie[foco].valor)}`
+        const bw = anchoTexto(txt, 11) + 18
+        // La caja se da vuelta contra el borde derecho en vez de salirse del lienzo.
+        const bx = Math.min(x + 12, xFin - bw) < padL ? x + 12
+          : (x + 12 + bw > w - 4 ? x - 12 - bw : x + 12)
+        return (
+          <g pointerEvents="none">
+            <line x1={x} x2={x} y1={padT} y2={yBase} stroke={MUT2} strokeWidth="1" opacity=".45" />
+            <circle cx={x} cy={y} r="4.5" fill={ACC} stroke="var(--sup)" strokeWidth="2" />
+            <g transform={`translate(0 ${Math.max(padT + 12, Math.min(y - 14, yBase - 14))})`}>
+              <rect x={bx} y={-11} width={bw} height={22} rx="3"
+                    fill="var(--sup)" stroke="var(--bd)" strokeWidth="1" />
+              <text x={bx + 9} y={0} fontSize="11" fill={INK} dominantBaseline="central"
+                    className="tabular">{txt}</text>
+            </g>
+          </g>
+        )
+      })()}
+
+      {/* Zona de captura: cubre todo el area de dibujo, asi el objetivo es la columna del
+          trimestre y no el punto de 8 px. */}
+      <rect x={padL} y={padT} width={iw} height={Math.max(1, yBase - padT)} fill="transparent"
+            tabIndex={0} role="img"
+            aria-label={`${tituloEje || 'Serie'}: ${serie.filter((q) => q.valor != null).map((q) => `${q.etiqueta} ${formato(q.valor)}`).join(', ')}`}
+            style={{ cursor: 'crosshair', outline: 'none' }}
+            onPointerMove={(e) => mover(e)}
+            onPointerLeave={() => setFoco(null)}
+            /* Respaldo de mouse: hay stacks de entrada que no emiten eventos de puntero.
+               React descarta el setState repetido, asi que el doble handler no cuesta. */
+            onMouseMove={(e) => mover(e)}
+            onMouseLeave={() => setFoco(null)}
+            onFocus={() => setFoco((f) => (f == null ? serie.length - 1 : f))}
+            onBlur={() => setFoco(null)}
+            onKeyDown={(e) => {
+              const paso = { ArrowLeft: -1, ArrowRight: 1 }[e.key]
+              if (paso !== undefined) {
+                e.preventDefault(); e.stopPropagation()
+                setFoco((f) => Math.max(0, Math.min(serie.length - 1, (f ?? serie.length - 1) + paso)))
+              } else if (e.key === 'Escape') { e.stopPropagation(); setFoco(null) }
+            }} />
     </svg>
   )
 }
