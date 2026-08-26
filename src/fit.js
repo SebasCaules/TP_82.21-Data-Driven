@@ -105,6 +105,20 @@ export function chequear() {
     }
   }
 
+  // 5. una caja de grafico que quedo VACIA. Es distinto de "esta pantalla no tiene
+  //    grafico": la caja existe, se midio, y no pinto nada. Pasaba con la pestana oculta,
+  //    donde el ResizeObserver no dispara y Lienzo nunca llega a tener medida. Sin este
+  //    chequeo, un barrido automatico daba "todo OK" sobre pantallas en blanco.
+  for (const caja of document.querySelectorAll('.lienzo-caja')) {
+    const pintura = caja.querySelector('.lienzo-pintura')
+    if (pintura && pintura.children.length === 0) {
+      problemas.push({
+        tipo: 'lienzo-vacio',
+        detalle: `caja de ${Math.round(caja.getBoundingClientRect().width)}x${Math.round(caja.getBoundingClientRect().height)} sin nada dibujado`,
+      })
+    }
+  }
+
   return { ancho: vw, alto: vh, ok: problemas.length === 0, problemas }
 }
 

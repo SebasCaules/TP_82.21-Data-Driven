@@ -39,9 +39,12 @@ export function useMedida() {
 export function Lienzo({ children, className = '' }) {
   const [ref, caja] = useMedida()
   return (
-    <div ref={ref} className={className}
+    <div ref={ref} className={`lienzo-caja ${className}`}
          style={{ flex: 1, minHeight: 0, minWidth: 0, position: 'relative', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', inset: 0 }}>
+      {/* La clase existe para que el detector de desborde pueda distinguir "no monto el
+          grafico" de "no hay grafico en esta pantalla". Sin eso, una caja medida que quedo
+          vacia pasa como pantalla sin grafico y el chequeo da OK sobre nada. */}
+      <div className="lienzo-pintura" style={{ position: 'absolute', inset: 0 }}>
         {caja.w > 0 && caja.h > 0 ? children(caja) : null}
       </div>
     </div>
