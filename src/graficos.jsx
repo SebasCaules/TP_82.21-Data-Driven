@@ -54,7 +54,8 @@ const MUT2 = 'var(--mut2)'
  * Barras horizontales con base en cero.
  * `datos`: [{etiqueta, valor, nota, enfasis}]. El orden se decide afuera (regla 11).
  */
-export function BarrasH({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132, notaAncho = 96 }) {
+export function BarrasH({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132, notaAncho = 96,
+                          onBarra, referencia }) {
   if (!datos.length) return null
   const padTop = tituloEje ? 20 : 6
   const padBot = 4
@@ -66,6 +67,10 @@ export function BarrasH({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132, 
   const ancho = Math.max(40, w - x0 - notaAncho - 12)
   const max = Math.max(...datos.map((d) => d.valor), 0) || 1
   const fuente = Math.max(10.5, Math.min(13, paso * 0.42))
+  // La escala y el drill-down viven ACA, no en cada pantalla: cuatro pantallas replicaban
+  // esta misma aritmetica para ubicar su overlay de clic y su linea de referencia, y
+  // cualquier cambio de padding las desalineaba en silencio.
+  const xDe = (v) => x0 + (v / max) * ancho
 
   return (
     <svg width={w} height={h} role="img" style={{ display: 'block' }}>
@@ -96,6 +101,18 @@ export function BarrasH({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132, 
           </g>
         )
       })}
+      {referencia != null && referencia.valor > 0 && (
+        <ReferenciaV x={xDe(referencia.valor)} h={h - padBot} y={padTop - 14}
+                     etiqueta={referencia.etiqueta} />
+      )}
+      {onBarra && datos.map((d, i) => (
+        <rect key={'hit' + d.etiqueta} x={0} y={padTop + i * paso} width={w} height={paso}
+              fill="transparent" style={{ cursor: 'pointer' }}
+              onClick={() => onBarra(i, d)}
+              tabIndex={0} role="button"
+              aria-label={`Ver ${d.etiqueta} en la lista de contacto`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onBarra(i, d) } }} />
+      ))}
     </svg>
   )
 }

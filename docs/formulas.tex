@@ -1,0 +1,488 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{microtype}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\impl}[1]{\par\noindent{\small\raggedright\textit{Implementación:} \texttt{#1}\par}}
+\newcommand{\valor}[1]{\par\noindent{\small\raggedright\textit{Valor al corte 31/12/2025:} #1\par}}
+\newcommand{\supuesto}[1]{\par\smallskip\noindent\textbf{Supuesto.} #1\par}
+
+\title{}
+\date{}
+
+\begin{document}
+\shorthandoff{"}
+
+\begin{center}
+{\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
+Materia 82.21 --- Factibilidad de Proyectos Data Driven\\
+Entregable 1 --- Grupo 2\\[3mm]
+\begin{tabular}{ll}
+Sebastián Caules & 64331 \\
+Tomás Ferreccio & 64934 \\
+Matías Sola & 64322 \\
+Francisco Cattaneo & 64900 \\
+Juan Manuel Rilo & 64037 \\
+\end{tabular}\\[3mm]
+01/09/2026
+\end{center}
+
+\vspace{4mm}
+\noindent Este documento fija la notación y la trazabilidad de las fórmulas del tablero de riesgo de clientes de Casa Óga. Cada fórmula indica la línea de código que la implementa y el valor que produce sobre el corte de referencia, 31/12/2025. La decisión D4 del proyecto vuelve móvil el mes de corte: por eso cada fórmula lleva el parámetro $t$ explícito en la notación, nunca implícito. El pipeline recalcula todo desde cero en cada corte, usando solo transacciones con \texttt{fecha}~$\le t$ (\texttt{pipeline/features.py:69}). Los valores citados corresponden a la corrida de \texttt{pipeline/build.py}, que verificó 44 anclas del contrato de datos (\texttt{pipeline/CONTRACT.md} sección 5) antes de escribir el payload.
+
+\vspace{2mm}
+\tableofcontents
+
+\newpage
+\section{Tabla de símbolos}
+
+Un símbolo tiene un único significado en todo el documento. La tabla cubre las 25 fechas de corte, los campos por cliente y los agregados de la tabla de contingencia.
+
+\begin{longtable}{@{}l p{10.7cm}@{}}
+\toprule
+Símbolo & Significado \\
+\midrule
+\endhead
+$t$ & Corte: fin de mes usado como parámetro móvil. 25 valores, 2023-12-31 a 2025-12-31 (\texttt{pipeline/loader.py:20-22}). Corte de referencia de este documento: 2025-12-31. \\
+$i$ & Índice de un cliente individual (\texttt{id\_cliente}). \\
+$F_i(t)$ & Facturación acumulada del cliente $i$ con \texttt{fecha}~$\le t$: suma de \texttt{monto\_neto}. \\
+$n_i(t)$ & Cantidad de compras del cliente $i$ hasta $t$. \\
+$p_i(t)$ & Fecha de la primera compra de $i$ hasta $t$. \\
+$u_i(t)$ & Fecha de la última compra de $i$ hasta $t$. \\
+$\rho_i(t)$ & Recency: días entre $u_i(t)$ y $t$. \\
+$\gamma_i(t)$ & Gap mediano propio: mediana de los días entre compras consecutivas de $i$ hasta $t$. \\
+$E_i(t)$ & Indicador de elegibilidad, $1$ si $n_i(t)\ge 3$, si no $0$. \\
+$\theta_i(t)$ & Umbral de riesgo del cliente $i$, en días: $\max(90,\,1{,}5\,\gamma_i(t))$. \\
+$B_i(t)$ & Indicador de riesgo (proxy operativo de \emph{churn}), $1$ si $i$ está en riesgo, si no $0$. \\
+$A_i(t)$ & Años de historia del cliente $i$: $(t - p_i(t))/365{,}25$. \\
+$\hat F_i(t)$ & Facturación anualizada del cliente $i$. \\
+$Q_i(t)$ & Quintil de facturación de $i$, $1$ a $5$. \\
+$\mathrm{reg}_i(t)$ & Región donde $i$ concentra su gasto en tienda física, o \texttt{Solo online}. \\
+$\mathrm{cat}_i(t)$ & Categoría donde $i$ concentra su gasto. \\
+$\mathcal R_i(t), \mathcal F_i(t), \mathcal M_i(t)$ & Scores RFM de $i$: quintiles ($1$ a $5$) de recency, frecuencia (cantidad de compras) y monto (facturación). \\
+$S_i(t)$ & Segmento RFM asignado a $i$: una de siete etiquetas excluyentes. \\
+$r,c,s$ & Índices 0-based de región ($0$ a $5$), categoría ($0$ a $6$) y segmento RFM ($0$ a $6$) de un cliente, usados para construir $k$. \\
+$q$ & Quintil de facturación, $1$ a $5$, usado (como $q-1$) para construir $k$. \\
+$k$ & Clave empaquetada de una celda de la tabla de contingencia región$\times$categoría$\times$RFM$\times$quintil. \\
+$n_k(t)$ & Clientes de la celda $k$ en el corte $t$. \\
+$nr_k(t)$ & Clientes en riesgo de la celda $k$. \\
+$ne_k(t)$ & Clientes elegibles de la celda $k$. \\
+$f_k(t)$ & Facturación histórica total de la celda $k$. \\
+$fr_k(t)$ & Facturación histórica de los clientes en riesgo de la celda $k$. \\
+$a_k(t)$ & Facturación anualizada total de la celda $k$. \\
+$ar_k(t)$ & Facturación anualizada de los clientes en riesgo de la celda $k$ (exposición de la celda). \\
+$X(t)$ & Exposición agregada: suma de $\hat F_i(t)$ sobre los clientes en riesgo. \\
+\bottomrule
+\end{longtable}
+
+\section{Limpieza de transacciones}
+
+La limpieza se aplica en orden fijo sobre \texttt{Transacciones\_clientes.csv} y cada etapa reporta su propio conteo: los cuatro números viajan en el payload bajo \texttt{stage\_counts}, no son un registro de depuración.
+
+\begin{equation}
+\text{tx}_{\text{crudo}} \xrightarrow{\;\texttt{drop\_duplicates()}\;} \text{tx}_{\text{dedupe}} \xrightarrow{\;\texttt{id\_cliente}\ \text{no nulo}\;} \text{tx}_{\text{identificado}} \xrightarrow{\;\texttt{monto\_neto}>0\;} \text{tx}_{\text{limpio}}
+\label{eq:limpieza}
+\end{equation}
+
+\begin{center}
+\begin{tabular}{@{}llr@{}}
+\toprule
+Etapa & Regla & Conteo \\
+\midrule
+crudo & lectura tal cual & 50.250 \\
+dedupe & \texttt{drop\_duplicates()} de fila completa & 50.000 \\
+identificado & \texttt{id\_cliente} no nulo & 27.606 \\
+monto $>$ 0 & \texttt{monto\_neto} $>$ 0 & 27.276 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\impl{pipeline/loader.py:35 (dedupe), :36 (identificado), :37 (monto\_neto\,$>$\,0); los mismos filtros se repiten en \texttt{stage\_counts}, pipeline/loader.py:54-56.}
+\valor{50.250 $\to$ 50.000 $\to$ 27.606 $\to$ 27.276, los cuatro chequeados como anclas en \texttt{pipeline/build.py:213-219}.}
+
+Dos notas de calidad que el pipeline declara en vez de corregir en silencio: las 250 filas que saca el dedupe son exactamente las de \texttt{id\_transaccion} duplicado (\texttt{dup\_ids\_crudo}~=~250, \texttt{dup\_ids\_post}~=~0); y los montos $\le 0$ son 613 en crudo y 608 tras el dedupe, todos estrictamente negativos, ninguno en cero. El canal se normaliza de 4 etiquetas a 2 (\texttt{Tienda}/\texttt{tienda}~$\to$~\texttt{fisico}, \texttt{Online}/\texttt{E-commerce}~$\to$~\texttt{online}), \texttt{pipeline/loader.py:12-17,40}. No se deflacta por IPC: todo importe de este documento es en pesos nominales corrientes.
+
+\section{Métricas por cliente}
+
+\subsection{Facturación acumulada}
+
+\begin{equation}
+F_i(t) = \sum_{\substack{j:\ \text{cliente}(j)=i \\ \text{fecha}_j \le t}} \text{monto\_neto}_j
+\label{eq:facturacion}
+\end{equation}
+
+\impl{pipeline/features.py:71-72 (\texttt{agg.facturacion}, \texttt{groupby("id\_cliente").sum()}).}
+\valor{facturación de toda la base $=$ ARS 550,2 M; facturación de los clientes en riesgo $=$ ARS 262,8 M.}
+
+\subsection{Recency}
+
+\begin{equation}
+\rho_i(t) = t - u_i(t) \quad \text{(días)}
+\label{eq:recency}
+\end{equation}
+
+\impl{pipeline/features.py:78.}
+\valor{mediana 277 días sobre los 5.978 clientes con compra válida (rango 2 a 1.438 días). Ejemplo \texttt{CLI00002}: $\rho = 73$ días.}
+
+\subsection{Gap mediano propio}
+
+\begin{equation}
+\gamma_i(t) = \operatorname{mediana}\bigl(\{u_{i,m+1} - u_{i,m}\}_{m=1}^{\,n_i(t)-1}\bigr) \quad \text{(días entre compras consecutivas)}
+\label{eq:gap}
+\end{equation}
+
+\impl{pipeline/features.py:18-23 (\texttt{\_gap\_mediano\_por\_cliente}), :79 (asignación).}
+\valor{mediana de la base 163 días, sobre los 5.663 clientes con dos compras o más. Ejemplo \texttt{CLI00002}: $\gamma = 57$ días; \texttt{CLI00004}: $\gamma = 120{,}5$ días.}
+
+Los 315 clientes con una sola compra no tienen $\gamma_i(t)$ definido (diferencia sobre una serie de un solo punto). Verificado: esos 315 coinciden exactamente con los clientes de $n_i(t)=1$, y ninguno es elegible, así que el valor indefinido nunca llega a la regla de riesgo (sección \ref{sec:riesgo}).
+
+\subsection{Elegibilidad}
+
+\begin{equation}
+E_i(t) = \mathbf 1\bigl[n_i(t) \ge 3\bigr]
+\label{eq:elegible}
+\end{equation}
+
+\impl{pipeline/features.py:81.}
+\valor{4.940 elegibles de 5.978 clientes (82,6\%).}
+
+\subsection{Riesgo}
+\label{sec:riesgo}
+
+\begin{equation}
+\theta_i(t) = \max\bigl(90,\ 1{,}5\,\gamma_i(t)\bigr) \quad \text{(días)}
+\label{eq:umbral}
+\end{equation}
+
+\begin{equation}
+B_i(t) = E_i(t) \wedge \bigl[\rho_i(t) > \theta_i(t)\bigr]
+\label{eq:riesgo}
+\end{equation}
+
+\impl{pipeline/features.py:82-84.}
+\valor{2.452 clientes en riesgo de 5.978 (41,0\%).}
+
+Un cliente no elegible nunca puede estar en riesgo, aunque lleve años sin comprar: la ecuación~\eqref{eq:riesgo} exige $E_i(t)=1$ antes de evaluar el umbral. La sección~\ref{sec:proxy-churn} desarrolla la consecuencia aritmética de esta exigencia.
+
+Dos ejemplos concretos del umbral $\theta_i(t)$, verificados sobre el corte de referencia: \texttt{CLI00002} tiene 8 compras y $\gamma=57$, así que $\theta=\max(90,\,85{,}5)=90$ (domina el piso) y con $\rho=73<90$ no está en riesgo. \texttt{CLI00004} tiene 5 compras y $\gamma=120{,}5$, así que $\theta=\max(90,\,180{,}75)=180{,}75$ (domina $1{,}5\gamma$) y con $\rho=287>180{,}75$ sí está en riesgo. Entre los 4.940 elegibles, el piso de 90 días domina en 351 casos y $1{,}5\gamma$ domina en los 4.589 restantes.
+
+\subsection{Anualización del gasto}
+\label{sec:anualizacion}
+
+\begin{equation}
+A_i(t) = \frac{t - p_i(t)}{365{,}25} \quad \text{(años)}
+\label{eq:anios}
+\end{equation}
+
+\begin{equation}
+\hat F_i(t) = \begin{cases} F_i(t) & \text{si } A_i(t) = 0 \\[2pt] F_i(t) \,/\, A_i(t) & \text{si } A_i(t) > 0 \end{cases}
+\label{eq:anualizado}
+\end{equation}
+
+\impl{pipeline/features.py:86-87.}
+\valor{base anualizada total $=$ ARS 204,6 M; exposición (anualizado de los en riesgo) $=$ ARS 94,9 M.}
+
+\supuesto{$A_i(t)$ se mide desde la \emph{primera} compra hasta el corte, no hasta la última. Es el punto no obvio del caso: la alternativa intuitiva sería medir la ventana de compras observada, de $p_i(t)$ a $u_i(t)$. Esa alternativa castiga exactamente a los clientes que interesa medir bien: un cliente que compró seguido durante seis meses y después dejó de comprar tendría una ventana corta (0,5 años) sobre una facturación ya alta, y su gasto anualizado se dispararía por el solo hecho de estar inactivo. Usar $t$ (el corte, no $u_i(t)$) como fin de la ventana evita ese sesgo: el denominador sigue creciendo mes a mes aunque el cliente no vuelva a comprar, así que la inactividad no infla la proyección anual. La contrapartida es la opuesta: un cliente nuevo con muy poca historia (denominador chico) puede anualizar de más. Se mide en vez de corregir en silencio: 111 clientes (1,9\% de la base) tienen menos de un año de historia al corte de referencia, contra 2.661 (52,0\%) en el primer corte de la serie (2023-12-31), cuando casi toda la base era reciente. Ninguno de los 111 con historia corta del corte de referencia está en riesgo antes de los 0,605 años de antigüedad (el mínimo de $A_i(t)$ entre los $B_i(t)=1$), así que el sesgo de historia corta no contamina la exposición $X(t)$ de la sección~\ref{sec:exposicion}, sólo infla algunos términos de la base anualizada total que no están en riesgo.}
+
+El comentario original en \texttt{pipeline/build.py:74-75} declara para este mismo corte ``31 clientes y 2,8\% de la base'': ese número no reprodujo al correr el código (\texttt{pipeline/build.py:76-77}, \texttt{corta~=~anios~<~1.0}, sobre \texttt{facts} del corte 2025-12-31 da 111 clientes). El valor que viaja en el payload bajo \texttt{exposicion\_por\_corte[-1].clientes\_historia\_corta} es 111, y es el que se reporta acá; el comentario del código quedó desactualizado y no se fuerza para que coincida.
+
+\subsection{Quintil de facturación}
+
+\begin{equation}
+Q_i(t) = \operatorname{qcut}_5\bigl(F_i(t)\bigr) \in \{1,\ldots,5\}
+\label{eq:quintil}
+\end{equation}
+
+\impl{pipeline/features.py:89 (\texttt{pd.qcut(facturacion, 5, ...)}).}
+\valor{ver tabla~\ref{tab:quintiles} (sección~\ref{sec:proxy-churn}). Rangos de facturación: Q1 de ARS 500 a 42.953; Q5 de ARS 135.867 a 415.135.}
+
+\subsection{Región dominante}
+
+\begin{equation}
+\mathrm{reg}_i(t) = \begin{cases}
+\displaystyle\argmax_{r}\; \sum_{\substack{j:\ \text{región}(j)=r \\ \text{canal}(j)=\text{fisico},\ \text{fecha}_j \le t}} \text{monto\_neto}_j & \text{si $i$ tiene compra en tienda física} \\[4mm]
+\texttt{Solo online} & \text{si no}
+\end{cases}
+\label{eq:region}
+\end{equation}
+
+\impl{pipeline/features.py:26-32 (\texttt{\_region\_dominante}); asignación en la línea 91.}
+\valor{317 clientes \texttt{Solo online} al 31/12/2025 (5,3\% de la base). Ejemplo \texttt{CLI00002}: \texttt{Centro}.}
+
+\subsection{Categoría dominante}
+
+\begin{equation}
+\mathrm{cat}_i(t) = \argmax_{c}\; \sum_{\substack{j:\ \text{categoría}(j)=c \\ \text{fecha}_j \le t}} \text{monto\_neto}_j
+\label{eq:categoria}
+\end{equation}
+
+\impl{pipeline/features.py:35-38 (\texttt{\_categoria\_dominante}), :92 (asignación).}
+\valor{Muebles concentra la mayor cantidad de clientes (1.897, 44,4\% en riesgo); Baño la menor (166, 28,9\% en riesgo). Ejemplo \texttt{CLI00002}: \texttt{Muebles}.}
+
+\section{Segmentación RFM}
+
+\subsection{Scores R, F, M}
+
+\begin{equation}
+\mathcal R_i(t) = \operatorname{qcut}_5\Bigl(\operatorname{rank}^{\downarrow}_{\text{first}}\bigl(\rho_i(t)\bigr)\Bigr)
+\label{eq:rfm-r}
+\end{equation}
+\begin{equation}
+\mathcal F_i(t) = \operatorname{qcut}_5\Bigl(\operatorname{rank}^{\uparrow}_{\text{first}}\bigl(n_i(t)\bigr)\Bigr)
+\label{eq:rfm-f}
+\end{equation}
+\begin{equation}
+\mathcal M_i(t) = \operatorname{qcut}_5\Bigl(\operatorname{rank}^{\uparrow}_{\text{first}}\bigl(F_i(t)\bigr)\Bigr)
+\label{eq:rfm-m}
+\end{equation}
+
+donde $\operatorname{rank}^{\uparrow}_{\text{first}}$ ordena de menor a mayor y $\operatorname{rank}^{\downarrow}_{\text{first}}$ de mayor a menor, empates resueltos por orden de aparición (\texttt{method="first"}), y $\operatorname{qcut}_5$ reparte esos rangos en 5 bloques del mismo tamaño, etiquetados 1 a 5 en el orden del ranking. El score $\mathcal R_i(t)$ queda invertido respecto de $\rho_i(t)$: recency baja (compró hace poco) da score alto, como pide el contrato.
+
+\impl{pipeline/features.py:41-45 (\texttt{\_qcut\_rank\_5}), :94-96 (asignación de R, F, M).}
+\valor{sin valor único por ser cálculo por cliente. Cada score reparte 1.195 o 1.196 clientes por quintil, por construcción de \texttt{qcut}.}
+
+\subsection{Reglas de segmento}
+
+Siete reglas excluyentes, evaluadas en este orden; la primera que aplica gana y saca al cliente de la evaluación de las siguientes (\texttt{pipeline/features.py:48-65}, variable \texttt{aun\_sin\_asignar}):
+
+\begin{enumerate}
+\item \texttt{Campeones}: $\mathcal R_i(t)\ge 4 \,\wedge\, \mathcal F_i(t)\ge 4 \,\wedge\, \mathcal M_i(t)\ge 4$
+\item \texttt{En riesgo}: $\mathcal R_i(t)\le 2 \,\wedge\, \mathcal F_i(t)\ge 3$
+\item \texttt{Leales}: $\mathcal R_i(t)\ge 3 \,\wedge\, \mathcal F_i(t)\ge 4$
+\item \texttt{Hibernando}: $\mathcal R_i(t)\le 2 \,\wedge\, \mathcal F_i(t)\le 2$
+\item \texttt{Nuevos}: $\mathcal R_i(t)\ge 4 \,\wedge\, n_i(t) = 1$ (conteo literal de compras, no el score $\mathcal F$)
+\item \texttt{Potenciales}: $\mathcal R_i(t)\ge 4 \,\wedge\, \mathcal F_i(t)\le 2$
+\item \texttt{Perdidos}: el resto
+\end{enumerate}
+
+\impl{pipeline/features.py:48-65 (\texttt{\_segmento\_rfm}), :98 (asignación de $S_i(t)$).}
+\valor{ver tabla~\ref{tab:rfm-conteo}.}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lr@{}}
+\toprule
+Segmento $S_i(t)$ & Clientes \\
+\midrule
+Campeones & 1.014 \\
+En riesgo & 1.018 \\
+Leales & 820 \\
+Hibernando & 1.373 \\
+Nuevos & 34 \\
+Potenciales & 591 \\
+Perdidos & 1.128 \\
+\midrule
+Total & 5.978 \\
+\bottomrule
+\end{tabular}
+\caption{Segmentos RFM al corte de referencia. Coincide exacto con la nota de \texttt{pipeline/CONTRACT.md} sección 3 (verificado por corrida propia).}
+\label{tab:rfm-conteo}
+\end{table}
+
+Por construcción, la regla \texttt{Nuevos} exige $n_i(t)=1$, que nunca cumple $E_i(t)=1$ (la elegibilidad pide $n_i(t)\ge 3$): los 34 clientes \texttt{Nuevos} tienen 0 elegibles y 0 en riesgo, verificado sobre el corte de referencia.
+
+\section{Tabla de contingencia}
+
+\subsection{Clave empaquetada $k$}
+
+Con $|C|=7$ categorías, $|S|=7$ segmentos RFM y $|Q|=5$ quintiles, la celda de un cliente se codifica en base mixta:
+
+\begin{equation}
+k(i,t) = \bigl((r_i(t)\cdot 7 + c_i(t))\cdot 7 + s_i(t)\bigr)\cdot 5 + (q_i(t) - 1)
+\label{eq:k}
+\end{equation}
+
+donde $r_i(t), c_i(t), s_i(t)$ son los índices 0-based de $\mathrm{reg}_i(t)$, $\mathrm{cat}_i(t)$ y $S_i(t)$ en las listas fijas del contrato, y $q_i(t)=Q_i(t)$. Es una codificación posicional de base mixta (como convertir un número de varios dígitos, cada uno con su propia base): región no lleva módulo por ser el dígito más significativo, categoría y segmento usan base 7, quintil usa base 5. El espacio total es $6\times7\times7\times5=$ 1.470 combinaciones posibles, $k$ entre 0 y 1.469.
+
+\impl{pipeline/features.py:104-109 (\texttt{contingency}, línea 109 la fórmula de $k$).}
+\valor{ejemplo a mano, cliente \texttt{CLI00002}: región \texttt{Centro} ($r=1$), categoría \texttt{Muebles} ($c=4$), segmento \texttt{Campeones} ($s=0$), quintil $5$ ($q=5$). $k = ((1\cdot7+4)\cdot7+0)\cdot5+(5-1) = 389$, verificado contra la salida real de \texttt{contingency()}. La primera celda ocupada de la tabla ordenada por $k$ es $k=3$ (región \texttt{AMBA}, categoría \texttt{Baño}, segmento \texttt{Campeones}, quintil 4), con 2 clientes.}
+
+\subsection{Celdas agregadas}
+
+Por cada celda $k$ ocupada en el corte $t$, seis enteros:
+
+\begin{equation}
+n_k(t) = \!\!\sum_{i:\,k(i,t)=k}\!\! 1,\quad
+nr_k(t) = \!\!\sum_{i:\,k(i,t)=k}\!\! B_i(t),\quad
+ne_k(t) = \!\!\sum_{i:\,k(i,t)=k}\!\! E_i(t)
+\label{eq:celda-conteos}
+\end{equation}
+\begin{equation}
+f_k(t) = \!\!\sum_{i:\,k(i,t)=k}\!\! F_i(t),\qquad
+fr_k(t) = \!\!\sum_{i:\,k(i,t)=k}\!\! B_i(t)\cdot F_i(t)
+\label{eq:celda-montos-f}
+\end{equation}
+\begin{equation}
+a_k(t) = \!\!\sum_{i:\,k(i,t)=k}\!\! \hat F_i(t),\qquad
+ar_k(t) = \!\!\sum_{i:\,k(i,t)=k}\!\! B_i(t)\cdot \hat F_i(t)
+\label{eq:celda-montos-a}
+\end{equation}
+
+\impl{pipeline/features.py:111-125 (construcción de la tabla y \texttt{groupby("k").sum()}).}
+\valor{664 celdas ocupadas de 1.470 posibles (45,2\%) al corte de referencia. Reconciliación exacta: $\sum_k n_k(t) =$ 5.978, $\sum_k nr_k(t) =$ 2.452, $\sum_k ar_k(t) =$ 94.925.989 (ARS 94,9 M), igual a $X(t)$ de la sección~\ref{sec:exposicion}. Toda combinación de filtros del tablero es una suma de estas celdas: el navegador no recalcula riesgo, recency, quintiles ni RFM.}
+
+\section{Exposición agregada}
+\label{sec:exposicion}
+
+\begin{equation}
+X(t) = \sum_{i:\ B_i(t)=1} \hat F_i(t) \;=\; \sum_k ar_k(t)
+\label{eq:exposicion}
+\end{equation}
+
+\impl{pipeline/build.py:185. La igualdad con $\sum_k ar_k(t)$ es la que usa pipeline/pack.py:13-16 para derivar la serie \texttt{exposicion\_por\_corte}: suma \texttt{ar} de cada contingencia y no vuelve a tocar \texttt{facts}.}
+\valor{$X(31/12/2025) = $ ARS 94.925.989 ($\approx$ ARS 94,9 M).}
+
+\subsection{Descomposición por dimensión}
+
+\begin{equation}
+X(t) = \sum_{r} X_r(t) = \sum_{c} X_c(t) = \sum_{s} X_s(t) = \sum_{q} X_q(t)
+\label{eq:descomposicion}
+\end{equation}
+\begin{equation}
+X_d(t) = \!\!\sum_{i:\,B_i(t)=1,\ d_i(t)=d}\!\! \hat F_i(t)
+\label{eq:descomposicion-def}
+\end{equation}
+
+\impl{misma agregación de la ecuación~\eqref{eq:exposicion}, agrupada por dimensión en vez de sumada entera. No hay función separada en el pipeline: es un \texttt{groupby} sobre los clientes en riesgo de \texttt{facts}.}
+\valor{ver tabla~\ref{tab:descomposicion}. Las cuatro descomposiciones cierran contra ARS 94,9 M dentro del redondeo de un decimal.}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lr@{} @{\hspace{1.2cm}}lr@{} @{\hspace{1.2cm}}lr@{}}
+\toprule
+Región & ARS M & Categoría & ARS M & Quintil & ARS M \\
+\midrule
+AMBA & 40,5 & Muebles & 45,4 & Q1 & 2,2 \\
+Centro & 19,7 & Decoración & 18,9 & Q2 & 11,4 \\
+NOA & 16,1 & Iluminación & 13,0 & Q3 & 17,8 \\
+Cuyo & 15,0 & Textil hogar & 10,3 & Q4 & 24,8 \\
+Patagonia & 2,5 & Cocina y mesa & 5,0 & Q5 & 38,7 \\
+Solo online & 1,2 & Organización & 1,3 & & \\
+ & & Baño & 1,1 & & \\
+\bottomrule
+\end{tabular}
+\caption{Exposición $X(t)$ descompuesta por región, categoría y quintil (RFM en el texto: \texttt{En riesgo} 36,0 M, \texttt{Leales} 21,3 M, \texttt{Campeones} 15,5 M, \texttt{Hibernando} 12,3 M, \texttt{Perdidos} 8,7 M, \texttt{Potenciales} 1,1 M, \texttt{Nuevos} 0). El quintil 5 solo concentra el 40,8\% de la exposición total pese a no ser mayoría de clientes en riesgo: es el que más factura, no el que más gente en riesgo tiene.}
+\label{tab:descomposicion}
+\end{table}
+
+\section{Indicadores de la Parte D, sección 2.1}
+
+Los seis indicadores entregados en la Parte D (\texttt{docs/parte-d-entregada.txt}) se trazan acá contra su implementación. Cuatro ya quedaron definidos arriba; los otros dos (recompra y compra a 7 días) se definen en esta sección.
+
+\subsection{Tasa de recompra a 90 días}
+
+\begin{equation}
+\tau_q(t) = \frac{\bigl|\{i \in \text{clientes con última compra en el trimestre } q:\ \exists\, \text{compra en } (u_{i,q},\ u_{i,q}+90]\}\bigr|}{\bigl|\{i:\ \text{última compra de } i \text{ en el trimestre } q\}\bigr|}
+\label{eq:recompra}
+\end{equation}
+
+Un trimestre solo entra en el cálculo si su cierre más 90 días cae dentro del horizonte de datos disponible; si no, $\tau_q$ queda indefinido en vez de calcularse sobre una muestra sesgada de clientes con última compra temprana en el trimestre.
+
+\impl{pipeline/series.py:12-90 (\texttt{recompra\_trimestral}). Gate de observabilidad: líneas 44-59. Conteo de retorno: líneas 61-71.}
+\valor{2025Q3 (último trimestre observable con horizonte al 31/12/2025): $\tau = 8{,}5\%$ ($n=$ 1.330 clientes calculables), contra la meta de 10-11\% y la línea base histórica de 8-9\% (\texttt{pipeline/build.py} meta, \texttt{meta\_recompra}/\texttt{base\_recompra}). Pico de la serie: 2024Q2 con 19,0\%.}
+
+\subsection{Ingreso anual en riesgo (exposición)}
+
+Ya definido en la ecuación~\eqref{eq:exposicion}.
+
+\impl{pipeline/build.py:185.}
+\valor{ARS 94,9 M.}
+
+\subsection{Clientes en riesgo}
+
+Ya definido en la ecuación~\eqref{eq:riesgo}.
+
+\impl{pipeline/features.py:82-84.}
+\valor{2.452 de 5.978 (41,0\%).}
+
+\subsection{Riesgo en el quintil de mayor valor (Q5)}
+
+\begin{equation}
+\%\text{riesgo}_{Q5}(t) = \frac{\bigl|\{i:\ Q_i(t)=5,\ B_i(t)=1\}\bigr|}{\bigl|\{i:\ Q_i(t)=5\}\bigr|}\times 100
+\label{eq:q5}
+\end{equation}
+
+\impl{pipeline/build.py:187,210. Agrupa \texttt{facts} por \texttt{quintil} y promedia \texttt{en\_riesgo}.}
+\valor{51,8\% (619 de 1.196 clientes de Q5; facturación histórica de esos 619, ARS 113,6 M).}
+
+\subsection{Cobertura de contacto}
+
+\begin{equation}
+\text{cobertura}(t) = \frac{\min\bigl(800,\ |\{i:\ B_i(t)=1\}|\bigr)}{|\{i:\ B_i(t)=1\}|}\times 100
+\label{eq:cobertura}
+\end{equation}
+
+\impl{pipeline/features.py:128-129 (\texttt{top\_lista}, tope \texttt{n=800}, orden descendente por anualizado). Llamado con \texttt{n=800} en pipeline/build.py:64. Capacidad declarada \texttt{[500,800]} en el bloque \texttt{meta} de pipeline/build.py (\texttt{capacidad\_contacto}).}
+\valor{con 2.452 en riesgo y tope de 800: cobertura $= 800/\text{2.452} = 32{,}6\%$ contra el techo de la capacidad, o $500/\text{2.452}=20{,}4\%$ contra el piso. La lista prioriza por $\hat F_i(t)$ descendente, así que lo que queda sin cubrir es la cola de menor anualizado, no un recorte al azar.}
+
+\subsection{Compra a 7 días sobre contactados}
+
+\begin{equation}
+\text{compra7d}_g(t) = \frac{1}{|g|}\sum_{j \in g} \text{compra\_7dias}_j
+\label{eq:compra7d}
+\end{equation}
+
+para un grupo $g$ de envíos de \texttt{Campanias\_marketing.csv} con \texttt{fecha\_envio}$\le t$ (base limpia, sin duplicados de fila completa).
+
+\impl{pipeline/series.py:149-158 (\texttt{tasas}). Marca a superar: líneas 171-178, sobre el segmento \texttt{Inactivos 90d}.}
+\valor{global (23.529 envíos limpios al 31/12/2025): abre 35,1\%, clic 8,8\%, compra a 7 días 1,2\%. Marca a superar (segmento \texttt{Inactivos 90d}, criterio actual): 1,39\%.}
+
+\section{Supuesto: la exposición no es recupero}
+
+$X(t)$ (ecuación~\eqref{eq:exposicion}) es la facturación anual proyectada de clientes que hoy están en riesgo, calculada con su propio ritmo histórico de gasto. No mide cuánto recuperaría una campaña de retención: recuperar es una afirmación causal (\emph{si contactamos a estos clientes, vuelven a comprar tanto como antes}) y $X(t)$ no compara contactados contra un grupo de control. Afirmar que Casa Óga ``recupera ARS 94,9 M'' es una lectura que el dato no sostiene.
+
+Esta distinción ya está declarada en tres lugares del proyecto, y este documento la reafirma como cuarto: en \texttt{pipeline/CONTRACT.md} sección 3 (\texttt{perdida\_esperada} se define como ``exposición, no recupero''), en \texttt{docs/parte-d-entregada.txt} línea 75 (``Es exposición, no recupero'') y en la misma Parte D, sección 6.1, que deja fuera de alcance de la V1 ``la medición de efecto incremental (necesita grupo de control)''. La V2 del proyecto contempla un grupo de control estratificado por quintil de valor (Parte D, sección 6.1, ``Plan de evolución''), que es el diseño mínimo para poder hablar de recupero.
+
+Mientras no exista ese grupo de control, cualquier pantalla que muestre $X(t)$ debe rotularlo como \emph{exposición} y no como \emph{ahorro} o \emph{recupero potencial}, y la nota al pie del tablero (Parte D, sección 4.1, \texttt{[NOTAS FIJAS AL PIE]}) tiene que sostener esa distinción en cada corte, no solo en el primero.
+
+\section{Supuesto: el proxy de churn no es churn}
+\label{sec:proxy-churn}
+
+$B_i(t)$ (ecuación~\eqref{eq:riesgo}) es una regla de negocio sobre inactividad relativa al ritmo propio de cada cliente. No es una medición de intención de abandono ni la salida de un modelo predictivo con validación: es un umbral fijo, $\max(90,\,1{,}5\gamma_i(t))$, elegido por el equipo y sujeto a la misma discusión que cualquier otro parámetro de negocio.
+
+La regla tiene una consecuencia aritmética directa. La ecuación~\eqref{eq:riesgo} exige $E_i(t)=1$: un cliente con menos de 3 compras nunca puede estar en riesgo, sin importar cuánto tiempo pasó desde su última compra. Eso significa que la proporción de clientes elegibles no es pareja entre grupos, y donde no es pareja, comparar tasas de riesgo entre esos grupos mezcla dos efectos: cuánto realmente arriesga cada cliente, y qué fracción del grupo llegó siquiera a poder estar en riesgo.
+
+El caso más claro es el quintil de facturación. La tabla~\ref{tab:quintiles} muestra los cinco quintiles con su proporción de elegibles y dos versiones de la tasa de riesgo: sobre el total del quintil (como se reporta en el tablero) y sobre los elegibles del quintil (la que aísla el comportamiento real).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}crrrrr@{}}
+\toprule
+Quintil & Clientes & Elegibles & \% elegibles & \% riesgo / total & \% riesgo / elegibles \\
+\midrule
+Q1 & 1.196 & 389 & 32,5\% & 13,3\% & 40,9\% \\
+Q2 & 1.195 & 1.067 & 89,3\% & 42,5\% & 47,6\% \\
+Q3 & 1.196 & 1.123 & 93,9\% & 47,8\% & 50,9\% \\
+Q4 & 1.195 & 1.173 & 98,2\% & 49,7\% & 50,6\% \\
+Q5 & 1.196 & 1.188 & 99,3\% & 51,8\% & 52,1\% \\
+\bottomrule
+\end{tabular}
+\caption{Composición de elegibilidad y tasa de riesgo por quintil, corte 31/12/2025. Fuente: \texttt{pipeline/features.py:81-84,89}, agrupado por \texttt{quintil}.}
+\label{tab:quintiles}
+\end{table}
+
+\begin{equation}
+\text{gradiente}_{\text{total}} = \frac{\%\text{riesgo}_{Q5}/\text{total}}{\%\text{riesgo}_{Q1}/\text{total}} = \frac{51,8}{13,3} = 3{,}89
+\label{eq:gradiente-total}
+\end{equation}
+\begin{equation}
+\text{gradiente}_{\text{elegibles}} = \frac{\%\text{riesgo}_{Q5}/\text{elegibles}}{\%\text{riesgo}_{Q1}/\text{elegibles}} = \frac{52,1}{40,9} = 1{,}27
+\label{eq:gradiente-elegibles}
+\end{equation}
+
+\impl{cálculo propio sobre \texttt{pipeline/features.py:81-84,89}. Verificación independiente de las anclas publicadas: \texttt{pipeline/build.py:210-211} solo chequea 51,8\% y 13,3\% sobre el total, no el gradiente.}
+\valor{$3{,}89\times$ midiendo sobre toda la base, $1{,}27\times$ midiendo solo entre elegibles.}
+
+El gradiente que se muestra en el tablero (Q5 casi cuadruplica a Q1) es en su mayor parte composición: en Q1 solo 1 de cada 3 clientes llegó a las 3 compras que exige la elegibilidad, así que 2 de cada 3 no podían estar en riesgo pase lo que pase; en Q5 esa restricción casi no filtra a nadie (99,3\% elegibles). Entre los clientes que sí pudieron estar en riesgo en ambos quintiles, la diferencia de comportamiento es bastante más chica: $1{,}27\times$, no $3{,}89\times$. Cualquier lectura del tipo ``los clientes de más valor abandonan cuatro veces más'' sobreestima el efecto real en un factor de aproximadamente 3; la lectura defendible es que abandonan proporcionalmente más, una vez que se descuenta que en Q1 la mayoría ni siquiera acumuló historia suficiente para entrar en la medición.
+
+\end{document}

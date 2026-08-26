@@ -9,8 +9,8 @@ Método: workforce (olas verificadas). Arranque 2026-08-25. Entrega **mar 01/09/
 |---|---|---|---|
 | 1 | Alcance | **APROBADA** | 4 recomendaciones aceptadas: 25 cortes, pesos nominales, lista top-N, backlog fuera |
 | 2 | Contrato de datos | **APROBADA** | 44/44 anclas, 201.819/201.819 chequeos, payload 1.089 KB, ola 1 cerrada |
-| 3 | Diseño por pantalla | **ESPERANDO VISTO BUENO** | comité de 4 lentes: 72 hallazgos, 49 bloqueantes, 49 aceptados. 12 → 14 pantallas |
-| 4 | Esqueleto navegable | TODO | |
+| 3 | Diseño por pantalla | **APROBADA** | comité de 4 lentes: 72 hallazgos, 49 bloqueantes, 49 aceptados. 12 → 14 pantallas |
+| 4 | Esqueleto navegable | **ESPERANDO VISTO BUENO** | 14 pantallas con datos reales, cero desborde en 5 resoluciones × 3 cortes × 2 estados de filtro |
 | 5 | Verificación | TODO | |
 | 6 | Cierre | TODO | |
 
@@ -69,6 +69,48 @@ Detalle en `docs/comite-adjudicacion.md`. Los cuatro que cambian lo que se afirm
 3. El excedente de capacidad **no es un grupo de control**: es por construcción el tramo de
    menor exposición. Contradice el criterio de éxito 5 de la Parte C entregada.
 4. La lista ejecutable no son 800 clientes sino **568**: los otros 232 no tienen consentimiento.
+
+## Ola 3 — las 14 pantallas (compuerta 4)
+
+36 agentes, 0 errores. Un archivo por pantalla, ownership disjunto.
+
+| | |
+|---|---|
+| Verificación adversarial | 14 · **6 VERDE, 8 ROJO** |
+| Fixes aplicados | 8, todos re-verificados |
+| Integración por N0 | 6 correcciones que cruzaban archivos |
+
+Lo que encontraron los verificadores y no habría encontrado nadie mirando la pantalla:
+
+| Pantalla | Finding |
+|---|---|
+| M0 | asumía que hay más de 800 clientes en riesgo. Al corte 2023-12 hay 397 y la nota imprimía "cobertura 125,9 % a 201,5 %" |
+| D5a | calculaba la amplitud entre regiones incluyendo las que quedan en cero al filtrar, así que el título "2,8 puntos" era falso con cualquier filtro de categoría |
+| D3 | faltaba la línea del 41,0 % general que el comité había pedido, y el título mezclaba bases con el filtro de segmento activo |
+| D5b | no implementaba el drill-down que promete la Parte D §4.1 |
+| D6 | tenía "23.729" escrito a mano teniendo el dato en la API |
+| D4 | repetía en la bajada el mismo texto que ya pone el pie |
+| M1 | afirmaba que las 800 salen por impresión, y era falso |
+| D2 | el valor de la barra de Q5 y su nota de elegibles se pisaban 18 px |
+
+Correcciones de integración (N0):
+
+| # | Qué |
+|---|---|
+| I-1 | `BarrasH` expone `onBarra` y `referencia`. Cuatro pantallas replicaban su geometría interna para ubicar el overlay de clic y la línea de baseline: cualquier cambio de padding las desalineaba en silencio |
+| I-2 | M1 exporta las 800 en CSV. La Parte D promete la lista "exportable" y la tabla en pantalla muestra solo las que entran sin scroll |
+| I-3 | La tabla de M1 mide el alto de fila del DOM en vez de fijarlo: 12 filas desbordaban 144 px a 1152×640 y sobraba lugar a 1920×1080. Va en `position:absolute` por el mismo bucle de flexbox que ya había en los gráficos |
+| I-4 | La tarjeta de recompra de D0 declara que es serie global: con Región=Cuyo el BAN se recalculaba y ese 8,5 % seguía siendo el del país |
+| I-5 | Media query por **alto**: a 640 px el gráfico de D0 quedaba en 81 px. Se recorta cromo, no el gráfico |
+| I-6 | El título de M0 se calcula. Con corte móvil la cobertura va de 100 % en dic 2023 a 20,4 % en dic 2025 |
+
+## Documento de fórmulas (runbook §7)
+
+`docs/formulas.tex` → `formulas.pdf`, **11 páginas, 28 ecuaciones numeradas, 9 secciones**.
+Cada fórmula cita el archivo y la línea que la implementa y su valor al corte 31/12/2025.
+Encontró un error en un comentario de `build.py`: decía "31 clientes y 2,8 %" mezclando el
+conteo de los de menos de medio año con la participación de los de menos de un año. Son
+**111 clientes** y 2,8 %. Corregido.
 
 ## Decisiones N0
 

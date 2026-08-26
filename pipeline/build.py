@@ -70,9 +70,10 @@ def main():
         en_riesgo = facts["en_riesgo"]
         # Un cliente con poca historia infla su gasto anualizado: dividir la facturacion
         # por 0,2 anios da una tasa anual que no existe. A los en_riesgo no los alcanza
-        # (nunca bajan de 0,61 anios), pero si al denominador. Se mide y se declara en
-        # vez de corregirlo en silencio: al corte de referencia son 31 clientes y 2,8%
-        # de la base, en 2023-12 son 1.048 y la mayor parte del total.
+        # (nunca bajan de 0,61 anios), pero si al denominador. Se mide y se declara en vez
+        # de corregirlo en silencio: al corte de referencia son 111 clientes con menos de un
+        # anio de historia, que aportan el 2,8% de la base anualizada; en 2023-12 son 1.048
+        # y aportan la mayor parte del total.
         anios = (corte - facts["primera"]).dt.days / 365.25
         corta = anios < 1.0
         exposicion_por_corte.append({

@@ -9,6 +9,7 @@ import { entero, pct, series } from '../agregacion.js'
 export default function D6() {
   const filas = series.embudo_campanias.por_segmento_completa
   const marca = series.embudo_campanias.marca_a_superar.segmento
+  const marcaPct = series.embudo_campanias.marca_a_superar.compra_7dias
 
   const datos = filas
     .map((f) => ({
@@ -22,11 +23,11 @@ export default function D6() {
   return (
     <section className="pant">
       <h1 className="titulo">
-        Todavía no hay score que comparar: el objetivo es superar el 1,39 % del criterio actual
+        Todavía no hay score que comparar: el objetivo es superar el {pct(marcaPct * 100, 2)} del criterio actual
       </h1>
       <p className="bajada">
-        Compra a 7 días de la campaña completa (23.729 envíos), un segmento contra otro.
-        Inactivos 90d es hoy el mejor criterio disponible y la vara a superar.
+        Compra a 7 días de la campaña completa ({entero(series.embudo_campanias.base_completa_envios)} envíos), un segmento contra otro.
+        {marca} es hoy el mejor criterio disponible y la vara a superar.
       </p>
 
       <div className="lienzo">
@@ -36,7 +37,7 @@ export default function D6() {
               datos={datos} w={w} h={h}
               formato={(v) => pct(v, 2)}
               tituloEje="% de compra a 7 días del envío, por segmento"
-              anchoEtiqueta={112} notaAncho={150}
+              anchoEtiqueta={100} notaAncho={190}
             />
           )}
         </Lienzo>

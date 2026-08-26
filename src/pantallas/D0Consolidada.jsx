@@ -1,37 +1,55 @@
 // D0 — la pantalla consolidada. Es la respuesta a la tension entre D1 (una pantalla por
 // grafico) y Few, citado en el propio rulebook: "consolidated and arranged on a single
-// screen so the information can be monitored at a glance". Cuesta una pantalla y le da al
-// roleplay el vistazo unico que la definicion de dashboard exige, sin romper D1: el resto
-// del bloque sigue siendo un grafico por pantalla.
+// screen so the information can be monitored at a glance". El comite subio a esta pantalla
+// el pedido concreto y el dueno/cadencia del indicador (regla 24, lead with the ending), y
+// puso el BAN -no el titulo- en el arriba-a-la-izquierda (regla 23 vs. Wexler).
 
 import Ban from '../Ban.jsx'
+import Semaforo, { estadoRecompra } from '../Semaforo.jsx'
 import { Lienzo, Linea } from '../graficos.jsx'
 import { entero, mesCorte, meta, millones, pct, series } from '../agregacion.js'
 
-export default function D0({ info }) {
+// Orden documentado en docs/diseno-pantallas.md (bloque Directorio, post-split E-1):
+// D0 D1 D2 D3 D4 D5a D5b D6 D7 → D7 es la novena pantalla, indice 8.
+const INDICE_D7 = 8
+
+export default function D0({ info, irA }) {
   const recompra = series.recompra_trimestral
     .filter((r) => r.tasa != null)
     .map((r) => ({ etiqueta: r.trimestre.replace('20', "'"), valor: r.tasa * 100 }))
   const ultima = recompra[recompra.length - 1]
   const [metaLo, metaHi] = meta.meta_recompra
+  const estado = ultima ? estadoRecompra(ultima.valor, meta.meta_recompra) : 'fuera'
+
+  // Los dos ultimos puntos de la serie, no dos anios escritos a mano: si la serie se
+  // recorta o se extiende, la cifra sigue siendo la que corresponde.
+  const [anteultimo, ultimoAnio] = series.base_activa_anual.slice(-2)
+  const caidaBase = anteultimo && anteultimo.activos
+    ? (100 * (anteultimo.activos - ultimoAnio.activos)) / anteultimo.activos
+    : 0
 
   return (
     <section className="pant">
-      <span className="rotulo diagnostico">Diagnóstico · datos históricos</span>
-      <h1 className="titulo">
-        Casi la mitad del ingreso anual de la base depende de clientes que ya dejaron de comprar
+      <h1 className="titulo" style={{ fontWeight: 500, fontSize: 'clamp(14px, 1.25vw, 18px)' }}>
+        Casi la mitad del ingreso anual de la base está en clientes hoy en riesgo por falta de compra reciente
       </h1>
+
+      <p className="bajada">
+        La base venía creciendo hasta 2024 y las campañas se deciden por criterio comercial.
+        En {ultimoAnio.anio} la base activa cayó {pct(caidaBase)} y la recompra a 90 días bajó a{' '}
+        {pct(ultima ? ultima.valor : 0)}.
+      </p>
 
       <div className="lienzo">
         <div style={{ flex: '0 0 clamp(300px, 31%, 440px)', display: 'flex' }}>
           <Ban info={info} grande />
         </div>
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'clamp(8px,1.3vh,16px)', minWidth: 0 }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'clamp(6px,1vh,12px)', minWidth: 0 }}>
           <div style={{ display: 'flex', gap: 'clamp(8px,1.1vw,16px)' }}>
             <Kpi
               etiqueta="Clientes en riesgo"
-              valor={`${pct((100 * info.enRiesgo) / (info.clientes || 1))}`}
+              valor={pct((100 * info.enRiesgo) / (info.clientes || 1))}
               apoyo={`${entero(info.enRiesgo)} de ${entero(info.clientes)} con compra válida`}
               baseline={`${entero(info.elegibles)} elegibles (3 compras o más)`}
             />
@@ -41,12 +59,38 @@ export default function D0({ info }) {
               apoyo={`${pct((100 * info.facturacionRiesgo) / (info.facturacion || 1))} de ARS ${millones(info.facturacion)}`}
               baseline="histórico acumulado, no anual"
             />
+            <Kpi
+              etiqueta="Rango del umbral del proxy"
+              valor="ARS 94,9 M"
+              apoyo="60 d 95,1 M · 90 d 94,9 M · 120 d 93,5 M"
+              baseline={`casi insensible al umbral · corte de referencia ${mesCorte(meta.corte_ref)}`}
+            />
           </div>
+
+          <button
+            type="button"
+            onClick={() => irA(INDICE_D7)}
+            style={{
+              background: 'none', border: 0, padding: 0, margin: 0, font: 'inherit',
+              color: 'inherit', textAlign: 'left', cursor: 'pointer',
+            }}
+          >
+            <span className="kpi-sub" style={{ textDecoration: 'underline' }}>
+              Tres decisiones, ninguna cuesta presupuesto nuevo → ver el pedido en D7
+            </span>
+          </button>
 
           <div className="tarjeta" style={{ flex: 1, minHeight: 0 }}>
             <div className="kpi-lbl">
-              Recompra a 90 días contra la meta
-              <b> {ultima ? pct(ultima.valor) : '—'}</b>
+              Recompra 90 días · María G. · cadencia mensual
+              <Semaforo estado={estado} sufijo={pct(ultima ? ultima.valor : 0)} />
+            </div>
+            {/* La serie es global: no responde al corte ni a los filtros. Sin esta linea,
+                con Region=Cuyo el BAN se recalcula y este 8,5 % sigue siendo el de todo el
+                pais, y se lee como si fuera el de Cuyo. */}
+            <div className="kpi-base" style={{ marginTop: 0, borderTop: 0, paddingTop: 2 }}>
+              serie global {recompra[0]?.etiqueta.replace("'", '20')}–
+              {ultima?.etiqueta.replace("'", '20')} · no responde al corte ni a los filtros
             </div>
             <Lienzo>
               {({ w, h }) => (
@@ -61,12 +105,6 @@ export default function D0({ info }) {
           </div>
         </div>
       </div>
-
-      <p className="bajada">
-        El tablero <b>no</b> afirma que una campaña recupere esos ARS {millones(info.exposicion)}:
-        es la facturación anual que hoy depende de clientes inactivos. Medir recupero exige un
-        grupo de control, que todavía no existe.
-      </p>
     </section>
   )
 }

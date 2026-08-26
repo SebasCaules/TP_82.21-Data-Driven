@@ -3,15 +3,24 @@
 // es la lectura: el salto Q1→Q2 es de composición (Q1 está compuesto en su mayoría por
 // clientes sin historial suficiente para calificar como riesgo), no un efecto de valor.
 
-import { Lienzo, BarrasH, ReferenciaV } from '../graficos.jsx'
+import { Lienzo, BarrasH } from '../graficos.jsx'
 import { entero, pct, porDimension } from '../agregacion.js'
 
 const ANCHO_ETIQUETA = 54
-const NOTA_ANCHO = 140
+// 180, no 140: con la barra de énfasis (Q5, siempre la más larga) el valor arranca en
+// w-185 y la nota en w-115, quedan ~22 px de aire. Con 140 los dos textos anclados a la
+// derecha se pisaban 18 px sobre esa barra (comité: colisión "51,8 %6").
+const NOTA_ANCHO = 180
+// Espeja graficos.jsx línea 59 (padTop = tituloEje ? 20 : 6): D2 siempre pasa tituloEje,
 
 export default function D2({ iCorte, filtro, info, verEnLista }) {
   const q = porDimension(iCorte, 'quintil', filtro)
-  const promedio = info.clientes ? (100 * info.enRiesgo) / info.clientes : 0
+
+  // El baseline es el promedio del propio array de barras, no info: cuando el filtro
+  // ES quintil, porDimension no lo aplica al eje (las 5 barras no cambian), pero
+  // corteInfo sí filtra y el "general" terminaba mostrando la tasa de un solo quintil.
+  const totalGeneral = q.reduce((s, c) => ({ n: s.n + c.n, nr: s.nr + c.nr }), { n: 0, nr: 0 })
+  const promedio = totalGeneral.n ? (100 * totalGeneral.nr) / totalGeneral.n : 0
 
   const datos = q.map((c, i) => ({
     etiqueta: `Q${i + 1}`,
@@ -27,35 +36,42 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
   const pctElegiblesQ1 = q[0].n ? (100 * q[0].ne) / q[0].n : 0
   const sinHistoriaQ1 = 100 - pctElegiblesQ1
 
+  // Con algunos filtros Q1 se queda sin clientes o sin elegibles: ahí el 100 % y el 0,0 %
+  // del gradiente no son una medición, son el guard de división por cero. La bajada de
+  // composición no aplica: no hay nada que descomponer.
+  const sinBaseQ1 = q[0].n === 0 || q[0].ne === 0
+  const sube = gradQ5 >= gradQ1
+  const ratio = gradQ1 ? (gradQ5 / gradQ1).toFixed(2).replace('.', ',') : null
+
+  let bajada
+  if (sinBaseQ1) {
+    bajada = 'Con este filtro Q1 no tiene clientes con historia suficiente: el gradiente entre elegibles se lee sobre los quintiles con base.'
+  } else if (sube) {
+    bajada = `El salto Q1→Q2 es de composición: el ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras y por definición no puede estar en riesgo. Entre elegibles el gradiente real va de ${pct(gradQ1)} a ${pct(gradQ5)}, o sea ${ratio}×.`
+  } else {
+    // gradQ5 < gradQ1: no llamarlo "gradiente" ni prometer una subida que en este
+    // estado no se da, para no chocar con el título de la pantalla.
+    bajada = `El salto Q1→Q2 es de composición: el ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras y por definición no puede estar en riesgo. Entre elegibles, Q1 y Q5 van de ${pct(gradQ1)} a ${pct(gradQ5)}.`
+  }
+
   return (
     <section className="pant">
       <h1 className="titulo">
         El riesgo sube con el valor del cliente, pero menos de lo que sugiere el total
       </h1>
-      <p className="bajada">
-        El salto Q1→Q2 es de composición: el {pct(sinHistoriaQ1)} de Q1 tiene menos de 3
-        compras y por definición no puede estar en riesgo. Entre elegibles el gradiente real
-        va de {pct(gradQ1)} a {pct(gradQ5)}.
-      </p>
+      <p className="bajada">{bajada}</p>
 
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => (
-            <div style={{ position: 'relative', width: w, height: h }}>
-              <BarrasH
-                datos={datos} w={w} h={h}
-                formato={(v) => pct(v)}
-                tituloEje="% en riesgo sobre el total del quintil"
-                anchoEtiqueta={ANCHO_ETIQUETA} notaAncho={NOTA_ANCHO}
-              />
-              <svg width={w} height={h} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                <ReferenciaV
-                  x={xDeValor(promedio, datos, w)} h={h} y={16}
-                  etiqueta={`${pct(promedio)} general`}
-                />
-              </svg>
-              {verEnLista && <FilasClicables datos={datos} h={h} onClick={(i) => verEnLista('quintil', i)} />}
-            </div>
+            <BarrasH
+              datos={datos} w={w} h={h}
+              formato={(v) => pct(v)}
+              tituloEje="% en riesgo sobre el total del quintil"
+              anchoEtiqueta={ANCHO_ETIQUETA} notaAncho={NOTA_ANCHO}
+              referencia={{ valor: promedio, etiqueta: `general ${pct(promedio)}` }}
+              onBarra={verEnLista ? (i) => verEnLista('quintil', i) : undefined}
+            />
           )}
         </Lienzo>
       </div>
@@ -63,36 +79,4 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
   )
 }
 
-/** Misma formula de escala que BarrasH (x0 = anchoEtiqueta, ancho = w - x0 - notaAncho - 12,
- *  max = mayor valor de la serie) para ubicar la linea de referencia sobre la misma barra. */
-function xDeValor(valor, datos, w) {
-  const x0 = ANCHO_ETIQUETA
-  const ancho = Math.max(40, w - x0 - NOTA_ANCHO - 12)
-  const max = Math.max(...datos.map((d) => d.valor), 0) || 1
-  return x0 + (valor / max) * ancho
-}
 
-/** Overlay de botones invisibles, uno por fila, para el drill-down (Parte D §4.1).
- *  BarrasH no expone onClick por barra: replica su propia division de filas
- *  (padTop 20 con tituloEje, padBot 4, filas iguales) para alinear el target con la barra. */
-function FilasClicables({ datos, h, onClick }) {
-  const padTop = 20
-  const padBot = 4
-  const paso = (h - padTop - padBot) / datos.length
-  return (
-    <div style={{ position: 'absolute', inset: 0 }}>
-      {datos.map((d, i) => (
-        <button
-          key={d.etiqueta}
-          onClick={() => onClick(i)}
-          aria-label={`Ver en la lista los clientes de ${d.etiqueta}`}
-          style={{
-            position: 'absolute', left: 0, right: 0,
-            top: padTop + i * paso, height: paso,
-            background: 'transparent', border: 'none', cursor: 'pointer', padding: 0,
-          }}
-        />
-      ))}
-    </div>
-  )
-}

@@ -6,14 +6,19 @@
 import { Lienzo, BarrasH } from '../graficos.jsx'
 import { entero, pesos, pct, porDimension, dims } from '../agregacion.js'
 
-export default function D5a({ iCorte, filtro }) {
+export default function D5a({ iCorte, filtro, verEnLista }) {
   const r = porDimension(iCorte, 'region', filtro)
   const onlineIdx = dims.region.indexOf('Solo online')
 
   const reales = r.map((c, i) => ({ c, i })).filter(({ i }) => i !== onlineIdx)
-  const tasas = reales.map(({ c }) => (c.n ? (100 * c.nr) / c.n : 0))
-  const amplitud = Math.max(...tasas) - Math.min(...tasas)
-  const amplitudTxt = amplitud.toFixed(1).replace('.', ',')
+  // Amplitud solo sobre regiones con clientes: una región en n=0 no tiene tasa de
+  // riesgo (0 % sería falso, no hay base), y su nota ya se muestra como "—".
+  const conClientes = reales.filter(({ c }) => c.n > 0)
+  const tasas = conClientes.map(({ c }) => Math.round((1000 * c.nr) / c.n) / 10)
+  const hayTasas = tasas.length > 0
+  const minT = hayTasas ? Math.min(...tasas) : null
+  const maxT = hayTasas ? Math.max(...tasas) : null
+  const amplitudTxt = hayTasas ? (maxT - minT).toFixed(1).replace('.', ',') : null
 
   const datos = reales
     .slice()
@@ -23,36 +28,58 @@ export default function D5a({ iCorte, filtro }) {
       valor: c.ar,
       nota: c.n ? `${pct((100 * c.nr) / c.n)} en riesgo` : '—',
       enfasis: false,
+      idxOriginal: i,
     }))
 
+  const totalReal = datos.reduce((s, d) => s + d.valor, 0)
+  const top = datos[0]
+  const pesoTop = top && totalReal ? (100 * top.valor) / totalReal : null
+
   const online = r[onlineIdx]
-  const onlineTasa = online.n ? (100 * online.nr) / online.n : 0
+  const onlineTasaTxt = online.n ? `${pct((100 * online.nr) / online.n)} en riesgo` : 'sin clientes en riesgo calculable'
+
+  // Overlay de clic sobre cada fila: replica el layout interno de BarrasH (mismos
+  // padTop/padBot/paso que graficos.jsx) para no tocar ese archivo.
+  const anchoEtiqueta = 92
+  const notaAncho = 112
+  const padTop = 20
+  const padBot = 4
 
   return (
     <section className="pant">
       <h1 className="titulo">
-        La geografía no explica el riesgo: {amplitudTxt} puntos entre la región más alta y la más baja
+        {hayTasas
+          ? `La geografía no explica el riesgo: ${amplitudTxt} puntos entre la región más alta y la más baja`
+          : 'La geografía no explica el riesgo'}
       </h1>
       <p className="bajada">
-        Entre las 5 regiones la tasa de riesgo va de {pct(Math.min(...tasas))} a{' '}
-        {pct(Math.max(...tasas))}, una amplitud de {amplitudTxt} puntos porcentuales.
+        {hayTasas
+          ? <>Entre las regiones la tasa de riesgo va de {pct(minT)} a {pct(maxT)}.{' '}
+              {pesoTop != null && <>{top.etiqueta} concentra {pct(pesoTop)} de la exposición de las regiones.</>}
+            </>
+          : 'Ninguna región tiene clientes en la base filtrada.'}
       </p>
 
       <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(6px, 1vh, 14px)' }}>
         <Lienzo>
-          {({ w, h }) => (
-            <BarrasH
-              datos={datos} w={w} h={h}
-              formato={pesos}
-              tituloEje="Exposición anual, por región"
-              anchoEtiqueta={92} notaAncho={112}
-            />
-          )}
+          {({ w, h }) => {
+            return (
+              <div style={{ position: 'relative', width: w, height: h }}>
+                <BarrasH
+                  datos={datos} w={w} h={h}
+                  formato={pesos}
+                  tituloEje="Exposición anual, por región (ARS)"
+                  anchoEtiqueta={anchoEtiqueta} notaAncho={notaAncho}
+                  onBarra={verEnLista ? (i, d) => verEnLista('region', d.idxOriginal) : undefined}
+                />
+              </div>
+            )
+          }}
         </Lienzo>
         <div className="tarjeta" style={{ flex: '0 0 auto' }}>
           <div className="kpi-lbl">Solo online</div>
           <div className="kpi-sub">
-            sin región asignable · {entero(online.n)} clientes · {pct(onlineTasa)} en riesgo
+            sin región asignable · {entero(online.n)} {online.n === 1 ? 'cliente' : 'clientes'} · {onlineTasaTxt}
           </div>
         </div>
       </div>

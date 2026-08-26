@@ -1,0 +1,30 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Tabla de símbolos}{3}{}%
+\contentsline {section}{\numberline {2}Limpieza de transacciones}{3}{}%
+\contentsline {section}{\numberline {3}Métricas por cliente}{4}{}%
+\contentsline {subsection}{\numberline {3.1}Facturación acumulada}{4}{}%
+\contentsline {subsection}{\numberline {3.2}Recency}{4}{}%
+\contentsline {subsection}{\numberline {3.3}Gap mediano propio}{4}{}%
+\contentsline {subsection}{\numberline {3.4}Elegibilidad}{5}{}%
+\contentsline {subsection}{\numberline {3.5}Riesgo}{5}{}%
+\contentsline {subsection}{\numberline {3.6}Anualización del gasto}{5}{}%
+\contentsline {subsection}{\numberline {3.7}Quintil de facturación}{6}{}%
+\contentsline {subsection}{\numberline {3.8}Región dominante}{6}{}%
+\contentsline {subsection}{\numberline {3.9}Categoría dominante}{6}{}%
+\contentsline {section}{\numberline {4}Segmentación RFM}{6}{}%
+\contentsline {subsection}{\numberline {4.1}Scores R, F, M}{6}{}%
+\contentsline {subsection}{\numberline {4.2}Reglas de segmento}{7}{}%
+\contentsline {section}{\numberline {5}Tabla de contingencia}{7}{}%
+\contentsline {subsection}{\numberline {5.1}Clave empaquetada $k$}{7}{}%
+\contentsline {subsection}{\numberline {5.2}Celdas agregadas}{8}{}%
+\contentsline {section}{\numberline {6}Exposición agregada}{8}{}%
+\contentsline {subsection}{\numberline {6.1}Descomposición por dimensión}{8}{}%
+\contentsline {section}{\numberline {7}Indicadores de la Parte D, sección 2.1}{8}{}%
+\contentsline {subsection}{\numberline {7.1}Tasa de recompra a 90 días}{9}{}%
+\contentsline {subsection}{\numberline {7.2}Ingreso anual en riesgo (exposición)}{9}{}%
+\contentsline {subsection}{\numberline {7.3}Clientes en riesgo}{9}{}%
+\contentsline {subsection}{\numberline {7.4}Riesgo en el quintil de mayor valor (Q5)}{9}{}%
+\contentsline {subsection}{\numberline {7.5}Cobertura de contacto}{10}{}%
+\contentsline {subsection}{\numberline {7.6}Compra a 7 días sobre contactados}{10}{}%
+\contentsline {section}{\numberline {8}Supuesto: la exposición no es recupero}{10}{}%
+\contentsline {section}{\numberline {9}Supuesto: el proxy de churn no es churn}{10}{}%

@@ -36,10 +36,7 @@ export default function D4Recompra() {
         La recompra pasó de {pct(pico.valor)} a {pct(ultimo.valor)} en {trimestresDesdePico} trimestres,
         por debajo de la línea base de {baseLo}-{baseHi} %
       </h1>
-      <p className="bajada">
-        Serie completa 2022Q1–2025Q3. Los trimestres sin ventana de 90 días completa se
-        cortan, no se interpolan.
-      </p>
+      <p className="bajada">Serie completa 2022Q1–2025Q3.</p>
 
       <div className="lienzo">
         <div className="tarjeta" style={{ flex: 1, minHeight: 0 }}>
