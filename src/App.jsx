@@ -27,6 +27,9 @@ export default function App() {
   const [iCorte, setICorte] = useState(CORTE_INICIAL)
   const [filtro, setFiltro] = useState(SIN_FILTRO)
   const [imprimiendo, setImprimiendo] = useState(false)
+  // De dónde vino el drill-down. Sin esto el lector que hizo clic en una barra queda en la
+  // lista de Marketing y tiene que rastrear en la lateral la vista que estaba mirando.
+  const [origen, setOrigen] = useState(null)
 
   const pantalla = PANTALLAS[indice]
   const info = useMemo(() => corteInfo(iCorte, filtro), [iCorte, filtro])
@@ -34,16 +37,31 @@ export default function App() {
   const usaFiltros = pantalla.depende === 'todo'
 
   const irA = useCallback((i) => {
+    // Navegar a mano cancela la vuelta: el origen deja de ser el lugar del que se salió.
+    setOrigen(null)
     setIndice(Math.max(0, Math.min(PANTALLAS.length - 1, i)))
   }, [])
 
   /** Drill-down: fija el valor como filtro y salta a la lista (Parte D §4.1). */
   const verEnLista = useCallback((dim, idx) => {
+    setOrigen({ indice, filtro })
     setFiltro((f) => ({ ...f, [dim]: idx }))
     setIndice(INDICE_LISTA)
-  }, [])
+  }, [indice, filtro])
+
+  /** Deshace el drill-down entero: filtro y vista vuelven a como estaban antes del clic. */
+  const volverAlOrigen = useCallback(() => {
+    if (!origen) return
+    setFiltro(origen.filtro)
+    setIndice(origen.indice)
+    setOrigen(null)
+  }, [origen])
 
   const imprimirTodo = useCallback(() => {
+    // Los dos rAF existen para que el flujo de 14 hojas esté montado y medido antes del
+    // diálogo. En una pestaña oculta rAF no dispara: quedaría el flujo montado y el diálogo
+    // saltaría de sorpresa al volver. Con la pestaña oculta no se imprime.
+    if (document.visibilityState === 'hidden') return
     setImprimiendo(true)
     requestAnimationFrame(() => requestAnimationFrame(() => {
       window.print()
@@ -74,14 +92,18 @@ export default function App() {
       if (t.tagName === 'SELECT' || t.tagName === 'INPUT' || t.isContentEditable) return
       if (t.getAttribute && t.getAttribute('role') === 'slider') return
       if (e.metaKey || e.ctrlKey || e.altKey) return
+      // 2.1.4 pide que un atajo de una sola letra se pueda apagar, remapear, o que actúe solo
+      // cuando el componente tiene el foco. Vale la tercera: 'f' e 'i' andan con el foco suelto
+      // y no dentro de un control, así que tipear en un chip de filtro ya no abre la impresión.
+      const suelto = t === document.body || t === document.documentElement
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { irA(indice + 1); e.preventDefault() }
       else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { irA(indice - 1); e.preventDefault() }
       else if (e.key === 'Home') { irA(0); e.preventDefault() }
       else if (e.key === 'End') { irA(PANTALLAS.length - 1); e.preventDefault() }
-      else if (e.key === 'f' || e.key === 'F') {
+      else if ((e.key === 'f' || e.key === 'F') && suelto) {
         if (document.fullscreenElement) document.exitFullscreen()
         else document.documentElement.requestFullscreen?.()
-      } else if (e.key === 'i' || e.key === 'I') imprimirTodo()
+      } else if ((e.key === 'i' || e.key === 'I') && suelto) imprimirTodo()
       else if (e.key === 'Escape' && modificado) reiniciar()
     }
     window.addEventListener('keydown', onKey)
@@ -89,7 +111,11 @@ export default function App() {
   }, [indice, modificado, irA, reiniciar, imprimirTodo])
 
   const irALista = useCallback(() => setIndice(INDICE_LISTA), [])
-  const ctx = { info, filtro, setFiltro, iCorte, irA, irALista, verEnLista, usaFiltros }
+  const ctx = {
+    info, filtro, setFiltro, iCorte, irA, irALista, verEnLista, usaFiltros,
+    volverAlOrigen: origen ? volverAlOrigen : null,
+    origenCorto: origen ? PANTALLAS[origen.indice].corto : null,
+  }
 
   return (
     <div className="app">
@@ -196,9 +222,13 @@ function Impresion({ ctx, info, filtro }) {
  * denominador del anualizado) y la hoja se lee sin el tablero al lado.
  */
 function PieImpreso({ info, filtro, pantalla, usaFiltros, usaCorte }) {
+  // El filtro de la dimensión que la vista desagrega NO recorta su propio eje (agregacion.js).
+  // En pantalla lo declara el chip; en papel el chip no existe, así que si el pie lo listara
+  // como uno más, la hoja afirmaría un recorte que el gráfico no aplicó.
   const activos = DIMENSIONES
     .filter(({ id }) => filtro[id] !== null)
-    .map(({ id, etq }) => `${etq}: ${etiquetaValor(id, filtro[id])}`)
+    .map(({ id, etq }) => `${etq}: ${etiquetaValor(id, filtro[id])}`
+      + (id === pantalla.eje ? ' (no recorta el eje de esta vista)' : ''))
 
   return (
     <footer className="pie-impreso">

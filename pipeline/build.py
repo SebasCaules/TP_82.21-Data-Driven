@@ -127,7 +127,7 @@ def main():
             "umbral_en_riesgo": [38.0, 42.0],
             "umbral_q5": [45.0, 52.0],
             "moneda": "ARS nominales, sin deflactar",
-            "proxy": "sin compra por mas de 90 dias o mas de 1,5 veces el ritmo propio del cliente",
+            "proxy": "sin compra por más de 90 días o más de 1,5 veces el ritmo propio del cliente",
         },
     }
 

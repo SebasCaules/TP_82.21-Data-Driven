@@ -6,7 +6,7 @@
 // se comprueba la SUPERPOSICION de rectangulos, no solo el scroll.
 
 const SELECTORES = [
-  '.titulo', '.bajada', '.rotulo', '.lienzo', '.tarjeta', '.ban',
+  '.titulo', '.bajada', '.rotulo', '.lienzo', '.tarjeta', '.ban-track',
   'table', 'svg', '.lista-tabla', '.cierre', '.kpi',
 ]
 
@@ -37,10 +37,14 @@ export function chequear() {
     }
   }
 
-  const pie = document.querySelector('.pie')
-  const enc = document.querySelector('.enc')
-  const pieTop = pie ? pie.getBoundingClientRect().top : vh
-  const encBot = enc ? enc.getBoundingClientRect().bottom : 0
+  // El pie de pantalla salio (N0-13) y el encabezado de cada vista nunca existio como `.enc`:
+  // el encabezado real es la barra de controles. Con los selectores viejos, `.pie` y `.enc` no
+  // matcheaban nada y los dos chequeos de superposicion comparaban contra el borde de la
+  // ventana y contra cero, o sea que no comparaban nada. Las cajas que existen hoy son estas.
+  const barra = document.querySelector('.barra')
+  const cuerpo = document.querySelector('.cuerpo')
+  const pieTop = cuerpo ? cuerpo.getBoundingClientRect().bottom : vh
+  const encBot = barra ? barra.getBoundingClientRect().bottom : 0
 
   // 1. scroll real, en el documento y en cada contenedor
   if (document.documentElement.scrollHeight > vh + 1) {
@@ -61,17 +65,17 @@ export function chequear() {
   // 2. superposicion con el pie o con el encabezado. Este es el chequeo que el
   //    scrollHeight no ve cuando hay overflow:hidden.
   for (const { el, sel, r } of rects(document)) {
-    if (el.closest('.pie') || el.closest('.enc') || el.closest('.impresion-flujo')) continue
+    if (el.closest('.barra') || el.closest('.impresion-flujo')) continue
     if (r.bottom > pieTop + 1) {
       problemas.push({
-        tipo: 'pisa-el-pie',
-        detalle: `${sel} ${clase(el)} llega a ${Math.round(r.bottom)} y el pie arranca en ${Math.round(pieTop)}`,
+        tipo: 'se-pasa-del-cuerpo',
+        detalle: `${sel} ${clase(el)} llega a ${Math.round(r.bottom)} y el cuerpo termina en ${Math.round(pieTop)}`,
       })
     }
     if (r.top < encBot - 1) {
       problemas.push({
-        tipo: 'pisa-el-encabezado',
-        detalle: `${sel} ${clase(el)} arranca en ${Math.round(r.top)} y el encabezado termina en ${Math.round(encBot)}`,
+        tipo: 'pisa-la-barra',
+        detalle: `${sel} ${clase(el)} arranca en ${Math.round(r.top)} y la barra termina en ${Math.round(encBot)}`,
       })
     }
     if (r.right > vw + 1) {
