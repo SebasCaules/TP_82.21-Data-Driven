@@ -44,6 +44,11 @@ export function Lienzo({ children, className = '' }) {
   )
 }
 
+/** Ancho aproximado de un texto, para ubicar el icono a su izquierda sin medir el DOM. */
+function anchoTexto(t, fuente) {
+  return String(t).length * fuente * 0.55
+}
+
 const ACC = 'var(--acc)'
 const GRIS = 'var(--gris)'
 const INK = 'var(--ink)'
@@ -92,6 +97,14 @@ export function BarrasH({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132, 
         const color = d.enfasis ? ACC : GRIS
         return (
           <g key={d.etiqueta}>
+            {/* Icono opcional: redundante con la etiqueta a proposito, para encontrar la
+                fila de un vistazo. No codifica el dato. */}
+            {d.Icono && (
+              <g transform={`translate(${x0 - 10 - anchoTexto(d.etiqueta, fuente) - 21} ${y + alto / 2 - 6.5})`}
+                 color={d.enfasis ? ACC : MUT2} opacity={d.enfasis ? 1 : .72}>
+                <d.Icono width={13} height={13} />
+              </g>
+            )}
             <text x={x0 - 10} y={y + alto / 2} fontSize={fuente} fill={d.enfasis ? INK : MUT2}
                   textAnchor="end" dominantBaseline="central"
                   fontWeight={d.enfasis ? 600 : 400}>{d.etiqueta}</text>

@@ -81,8 +81,12 @@ export function chequear() {
     }
   }
 
-  // 4. un grafico aplastado es ilegible aunque no desborde
+  // 4. un grafico aplastado es ilegible aunque no desborde.
+  //    Solo los SVG de grafico: los iconos van DENTRO de un <svg> y miden 13 px a proposito,
+  //    asi que un chequeo ingenuo los reportaba a los siete como aplastados.
   for (const svg of document.querySelectorAll('.lienzo svg')) {
+    if (svg.parentElement.closest('svg')) continue        // icono anidado
+    if (svg.hasAttribute('data-icono')) continue
     const r = svg.getBoundingClientRect()
     if (r.height < 90) {
       problemas.push({ tipo: 'grafico-aplastado', detalle: `svg de ${Math.round(r.height)} px de alto` })

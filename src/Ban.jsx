@@ -15,8 +15,10 @@ export default function Ban({ info, grande = false }) {
     ? (100 * info.exposicionPrevia) / info.baseAnualizada
     : null
 
+  // El valor escala con el ancho disponible, no con el viewport: la barra lateral le come
+  // 216 px y a 4,2vw "ARS 94,9 M" partía en dos líneas.
   return (
-    <div className="ban" style={grande ? { '--val': 'clamp(38px, 4.2vw, 62px)' } : undefined}>
+    <div className="ban" style={grande ? { '--val': 'clamp(30px, 3.1vw, 50px)' } : undefined}>
       <div className="ban-lbl">Exposición anual en riesgo</div>
       <div className="ban-val tabular">ARS {millones(info.exposicion)}</div>
       <div className="ban-sub">exposición, no recupero</div>

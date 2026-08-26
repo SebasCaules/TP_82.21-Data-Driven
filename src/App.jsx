@@ -1,66 +1,45 @@
-// Armazon del tablero. Incorpora las correcciones de HCI del comite (compuerta 3):
-// riel clickeable, tecla 0, aterrizaje declarado al cambiar de bloque con memoria por
-// bloque, filtros apagados con leyenda donde no aplican, drill-down a la lista, vuelta
-// al estado inicial, y el selector de corte dibujado como serie de exposicion.
+// Armazón del tablero.
+//
+// Estructura: barra lateral con las 14 vistas numeradas, timeline de cortes arriba y una
+// franja de filtros debajo. No hay conmutador de bloques: las 14 vistas son un solo
+// recorrido y la audiencia se declara con una marca por vista.
+//
+// Lo que la verificación dejó fijo y no cambia al cambiar de piel: el corte y los filtros se
+// apagan con leyenda donde no aplican (Nielsen H1), el drill-down salta a la lista con el
+// filtro puesto (Parte D §4.1), imprimir da las 14 hojas, y el pie de dos líneas lleva las
+// cuatro correcciones obligatorias.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  SIN_FILTRO, corteInfo, cortes, dims, hayFiltro, mesCorte, meta, series,
-} from './agregacion.js'
-import { SerieCortes } from './graficos.jsx'
-import { BLOQUES, PANTALLAS } from './pantallas/index.jsx'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { SIN_FILTRO, corteInfo, cortes, hayFiltro, mesCorte, meta } from './agregacion.js'
+import Filtros, { DIMENSIONES, etiquetaValor } from './Filtros.jsx'
+import LineaTiempo from './LineaTiempo.jsx'
+import { ICONOS, MarcaAudiencia } from './Iconos.jsx'
+import { GRUPOS, PANTALLAS } from './pantallas/index.jsx'
 
-const DIM_ETIQUETA = {
-  region: 'Región',
-  categoria: 'Categoría',
-  rfm: 'Segmento',
-  quintil: 'Quintil',
-}
 const CORTE_INICIAL = cortes.length - 1
+const INDICE_LISTA = PANTALLAS.findIndex((p) => p.id === 'M1')
 
 export default function App() {
-  const [bloque, setBloque] = useState('directorio')
-  const [indices, setIndices] = useState({ directorio: 0, marketing: 0 })
+  const [indice, setIndice] = useState(0)
   const [iCorte, setICorte] = useState(CORTE_INICIAL)
   const [filtro, setFiltro] = useState(SIN_FILTRO)
-  const ultimoBloque = useRef({ directorio: 0, marketing: 0 })
   const [imprimiendo, setImprimiendo] = useState(false)
 
-  const pantallas = useMemo(() => PANTALLAS.filter((p) => p.bloque === bloque), [bloque])
-  const indice = Math.min(indices[bloque], pantallas.length - 1)
-  const pantalla = pantallas[indice]
+  const pantalla = PANTALLAS[indice]
   const info = useMemo(() => corteInfo(iCorte, filtro), [iCorte, filtro])
-
-  // Que controles tienen efecto en esta pantalla. Un control que se ve activo y no hace
-  // nada es la falla canonica de visibilidad del estado (Nielsen H1).
   const usaCorte = pantalla.depende !== 'ninguno'
   const usaFiltros = pantalla.depende === 'todo'
 
   const irA = useCallback((i) => {
-    setIndices((s) => ({ ...s, [bloque]: Math.max(0, Math.min(pantallas.length - 1, i)) }))
-  }, [bloque, pantallas.length])
+    setIndice(Math.max(0, Math.min(PANTALLAS.length - 1, i)))
+  }, [])
 
-  const cambiarBloque = useCallback((b) => {
-    if (b === bloque) return
-    ultimoBloque.current[bloque] = indices[bloque]
-    setBloque(b)
-    // Aterriza en la pantalla 0 del destino la primera vez; despues, donde quedo.
-    setIndices((s) => ({ ...s, [b]: ultimoBloque.current[b] ?? 0 }))
-  }, [bloque, indices])
-
-  /** Drill-down: fija el valor como filtro y salta a la lista. Lo promete la Parte D §4.1
-   *  y es el unico puente por contenido entre los dos bloques. */
+  /** Drill-down: fija el valor como filtro y salta a la lista (Parte D §4.1). */
   const verEnLista = useCallback((dim, idx) => {
     setFiltro((f) => ({ ...f, [dim]: idx }))
-    ultimoBloque.current.directorio = indices.directorio
-    setBloque('marketing')
-    setIndices((s) => ({ ...s, marketing: PANTALLAS.filter((p) => p.bloque === 'marketing')
-      .findIndex((p) => p.id === 'M1') }))
-  }, [indices.directorio])
+    setIndice(INDICE_LISTA)
+  }, [])
 
-  /** Imprime las 14 pantallas, no solo la activa. Se renderizan en flujo normal (no con
-   *  display:none) porque el ResizeObserver que dimensiona cada SVG mide cero en un
-   *  elemento oculto y los graficos saldrian vacios. */
   const imprimirTodo = useCallback(() => {
     setImprimiendo(true)
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -69,8 +48,7 @@ export default function App() {
     }))
   }, [])
 
-  // A-01: sin esto, imprimir desde el menu del navegador (Ctrl+P) sacaba UNA pantalla.
-  // Las 14 hojas solo existian si se apretaba la tecla i.
+  // Imprimir desde el menú del navegador tiene que dar las 14 hojas, no la vista activa.
   useEffect(() => {
     const antes = () => setImprimiendo(true)
     const despues = () => setImprimiendo(false)
@@ -88,17 +66,16 @@ export default function App() {
   useEffect(() => {
     const onKey = (e) => {
       const t = e.target
-      // Dentro de un control mandan las teclas nativas: un select de 25 cortes consume
-      // flechas y digitos.
+      // Dentro de un control mandan las teclas nativas: el select de filtros y el slider
+      // del timeline consumen flechas.
       if (t.tagName === 'SELECT' || t.tagName === 'INPUT' || t.isContentEditable) return
+      if (t.getAttribute && t.getAttribute('role') === 'slider') return
       if (e.metaKey || e.ctrlKey || e.altKey) return
-      if (e.key === 'ArrowRight') { irA(indice + 1); e.preventDefault() }
-      else if (e.key === 'ArrowLeft') { irA(indice - 1); e.preventDefault() }
-      else if (e.key === '0') irA(0)
-      else if (e.key >= '1' && e.key <= '9') irA(Number(e.key) - 1)
-      else if (e.key === 'b' || e.key === 'B') {
-        cambiarBloque(bloque === 'directorio' ? 'marketing' : 'directorio')
-      } else if (e.key === 'f' || e.key === 'F') {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { irA(indice + 1); e.preventDefault() }
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { irA(indice - 1); e.preventDefault() }
+      else if (e.key === 'Home') { irA(0); e.preventDefault() }
+      else if (e.key === 'End') { irA(PANTALLAS.length - 1); e.preventDefault() }
+      else if (e.key === 'f' || e.key === 'F') {
         if (document.fullscreenElement) document.exitFullscreen()
         else document.documentElement.requestFullscreen?.()
       } else if (e.key === 'i' || e.key === 'I') imprimirTodo()
@@ -106,14 +83,12 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [indice, bloque, modificado, irA, cambiarBloque, reiniciar])
+  }, [indice, modificado, irA, reiniciar, imprimirTodo])
 
   const ctx = { info, filtro, setFiltro, iCorte, irA, verEnLista, usaFiltros }
 
   return (
     <div className="app">
-      {/* El tablero se resuelve sin scroll y eso fija un piso de tamano. Abajo de ese piso
-          el contenido no entra: antes se pisaba en silencio, ahora lo declara. */}
       <div className="chico">
         <h1>Este tablero necesita una pantalla más grande</h1>
         <p>
@@ -122,91 +97,75 @@ export default function App() {
           pantalla más grande.
         </p>
       </div>
-      <header className="enc">
-        <div className="marca">Casa Óga <span>· riesgo de pérdida de clientes</span></div>
 
-        {/* Conmutador, no tab set: el patron ARIA de tablist reserva las flechas para
-            moverse entre pestanas y aca las flechas cambian de pantalla. */}
-        <div className="bloques" role="group" aria-label="Vista">
-          {BLOQUES.map((b) => (
-            <button key={b.id} onClick={() => cambiarBloque(b.id)}
-                    aria-pressed={bloque === b.id}>
-              <Marca activo={bloque === b.id} />
-              {b.nombre}<span style={{ opacity: 0.72, fontWeight: 400 }}> · {b.cadencia}</span>
-            </button>
-          ))}
+      <Lateral indice={indice} irA={irA} />
+
+      <div className="principal">
+        <div className={`barra${usaCorte ? '' : ' apagada'}`}>
+          <LineaTiempo iCorte={iCorte} setICorte={setICorte} activo={usaCorte} />
         </div>
 
-        <nav className="riel" aria-label="Pantallas">
-          {pantallas.map((p, i) => (
-            <button key={p.id} onClick={() => irA(i)}
-                    aria-current={i === indice}
-                    aria-label={`Pantalla ${i + 1}: ${p.corto}`} title={p.corto}>{i + 1}</button>
-          ))}
-        </nav>
+        <Filtros filtro={filtro} setFiltro={setFiltro} activos={usaFiltros}
+                 reiniciar={reiniciar} modificado={modificado} />
 
-        <div className="ctrl">
-          <div className={`corte-caja ${usaCorte ? '' : 'apagado'}`}>
-            <label htmlFor="corte">Mes de corte</label>
-            <select id="corte" value={iCorte} disabled={!usaCorte}
-                    onChange={(e) => setICorte(Number(e.target.value))}>
-              {cortes.map((c, i) => <option key={c} value={i}>{mesCorte(c)}</option>)}
-            </select>
-            <div className="corte-serie"
-                 title="Exposición nacional por corte · no responde a los filtros">
-              <SerieCortes
-                valores={series.exposicion_por_corte.map((x) => x.exposicion)}
-                activo={iCorte} w={148} h={20} />
-            </div>
-            <span className="serie-nota">exposición nacional · sin filtros</span>
-          </div>
+        <main className="cuerpo">
+          {imprimiendo
+            ? <Impresion ctx={ctx} info={info} filtro={filtro} />
+            : <pantalla.Componente {...ctx} />}
+        </main>
 
-          <div className={usaFiltros ? '' : 'apagado'} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {Object.entries(DIM_ETIQUETA).map(([dim, etq]) => (
-              <select key={dim} aria-label={etq} disabled={!usaFiltros}
-                      value={filtro[dim] === null ? '' : filtro[dim]}
-                      onChange={(e) => setFiltro({
-                        ...filtro,
-                        [dim]: e.target.value === '' ? null : Number(e.target.value),
-                      })}>
-                <option value="">{etq}: todas</option>
-                {dims[dim].map((v, i) => (
-                  <option key={v} value={i}>{dim === 'quintil' ? `Q${v}` : v}</option>
-                ))}
-              </select>
-            ))}
-          </div>
-
-          {!usaFiltros && (
-            <span className="aviso">
-              {usaCorte ? 'Esta pantalla no depende de los filtros'
-                        : 'Serie completa: no depende del corte ni de los filtros'}
-            </span>
-          )}
-
-          {modificado && (
-            <button className="chip" onClick={reiniciar} title="Volver al estado inicial (Esc)">
-              volver al inicio <b>×</b>
-            </button>
-          )}
-        </div>
-      </header>
-
-      <main className="cuerpo">
-        {imprimiendo
-          ? <Impresion ctx={ctx} info={info} filtro={filtro} />
-          : <pantalla.Componente {...ctx} />}
-      </main>
-
-      {!imprimiendo && (
-        <Pie info={info} filtro={filtro} pantalla={pantalla}
-             usaFiltros={usaFiltros} usaCorte={usaCorte} />
-      )}
+        {!imprimiendo && (
+          <Pie info={info} filtro={filtro} pantalla={pantalla}
+               usaFiltros={usaFiltros} usaCorte={usaCorte} />
+        )}
+      </div>
     </div>
   )
 }
 
-/** Las 14 pantallas, una hoja A4 apaisada cada una, con corte y filtros en el pie. */
+/** Las 14 vistas numeradas. Los grupos separan con una marca, no con un conmutador. */
+function Lateral({ indice, irA }) {
+  return (
+    <nav className="lat" aria-label="Vistas del tablero">
+      <div className="lat-marca">
+        <span className="lat-oga">Casa Óga</span>
+        <span className="lat-sub">riesgo de pérdida de clientes</span>
+      </div>
+
+      <ol className="lat-lista">
+        {PANTALLAS.map((p, i) => {
+          const grupo = GRUPOS.find((g) => g.id === p.grupo)
+          const abre = i === 0 || PANTALLAS[i - 1].grupo !== p.grupo
+          const Icono = ICONOS[p.id]
+          return (
+            <li key={p.id}>
+              {abre && (
+                <div className="lat-grupo">
+                  <span>{grupo.nombre}</span>
+                  <i>{grupo.detalle}</i>
+                </div>
+              )}
+              <button type="button" onClick={() => irA(i)}
+                      className={`lat-item${i === indice ? ' on' : ''}`}
+                      aria-current={i === indice ? 'page' : undefined}>
+                <span className="lat-n tabular">{String(i + 1).padStart(2, '0')}</span>
+                <Icono />
+                <span className="lat-txt">{p.corto}</span>
+                <MarcaAudiencia audiencia={p.audiencia} />
+              </button>
+            </li>
+          )
+        })}
+      </ol>
+
+      <div className="lat-pie">
+        <span>↑ ↓ cambia de vista</span>
+        <span>F pantalla completa · I imprime</span>
+      </div>
+    </nav>
+  )
+}
+
 function Impresion({ ctx, info, filtro }) {
   return (
     <div className="impresion-flujo">
@@ -221,30 +180,18 @@ function Impresion({ ctx, info, filtro }) {
   )
 }
 
-/** Marca del bloque activo: forma distinta, no solo color. */
-function Marca({ activo }) {
-  return (
-    <span aria-hidden="true" style={{
-      width: 8, height: 8, flexShrink: 0,
-      background: activo ? 'currentColor' : 'transparent',
-      border: '1.5px solid currentColor',
-      borderRadius: activo ? 0 : '50%',
-    }} />
-  )
-}
-
-/** Pie de dos lineas. Antes eran cinco y comian 107 px de 640. */
+/** Pie de dos líneas con las cuatro correcciones obligatorias. */
 function Pie({ info, filtro, pantalla, usaFiltros, usaCorte }) {
-  const activos = Object.entries(filtro)
-    .filter(([, v]) => v !== null)
-    .map(([d, v]) => `${DIM_ETIQUETA[d]}: ${d === 'quintil' ? `Q${dims.quintil[v]}` : dims[d][v]}`)
+  const activos = DIMENSIONES
+    .filter(({ id }) => filtro[id] !== null)
+    .map(({ id, etq }) => `${etq}: ${etiquetaValor(id, filtro[id])}`)
 
   return (
     <footer className="pie">
       <div className="pie-l">
         <span><b>Corte</b> {usaCorte ? mesCorte(info.corte) : 'serie completa 2022-2025'}</span>
         <span className="sep">|</span>
-        <span><b>Filtros</b> {!usaFiltros ? 'no aplican en esta pantalla'
+        <span><b>Filtros</b> {!usaFiltros ? 'no aplican en esta vista'
           : activos.length ? activos.join(' · ') : 'ninguno'}</span>
         <span className="sep">|</span>
         <span><b>{pantalla.predictivo ? 'Modelo predictivo · en desarrollo' : 'Diagnóstico · datos históricos'}</b></span>

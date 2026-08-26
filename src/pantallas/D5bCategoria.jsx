@@ -7,6 +7,7 @@
 // nada viene hardcodeado.
 
 import { Lienzo, BarrasH } from '../graficos.jsx'
+import { ICONO_CATEGORIA } from '../Iconos.jsx'
 import { dims, pct, pesos, porDimension } from '../agregacion.js'
 
 export default function D5b({ iCorte, filtro, verEnLista }) {
@@ -34,6 +35,7 @@ export default function D5b({ iCorte, filtro, verEnLista }) {
     // Solo la de mayor tasa: es la que el titulo nombra como "la que mueve la aguja".
     // La del extremo bajo se identifica por su etiqueta y su nota, no por el color.
     enfasis: !!alta && f.etiqueta === alta.etiqueta,
+    Icono: ICONO_CATEGORIA[f.etiqueta],
     _i: f._i,
   }))
 
@@ -57,7 +59,7 @@ export default function D5b({ iCorte, filtro, verEnLista }) {
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => {
-            const anchoEtiqueta = 118
+            const anchoEtiqueta = 140  // +22 por el icono de categoria
             const notaAncho = 64
             const padTop = 20
             const padBot = 4

@@ -1,28 +1,28 @@
-/* Tokens tomados de la ficha F07 del BAN (congelada, decision D11). El resto del
-   tablero hereda de ahi para que "mismo color, mismo significado" (Knaflic regla 19)
-   valga en las doce pantallas. */
+/* Tokens. El acento y la tarjeta salen de la ficha F07 del BAN (congelada, dec-D11); el
+   papel cálido, las hairlines y las etiquetas en versalita mono vienen del mockup de
+   direcciones. La tipografía es stack del sistema: la restricción de cero red no admite
+   Google Fonts, y el mono del sistema tiene el mismo carácter que IBM Plex Mono. */
 
 :root {
-  --sup: #fff;
-  --fondo: #eceef1;
-  --rule: #16181d;
-  --bd: #dcdfe4;
-  --lbl: #3a3f4a;
+  --papel: #eceae5;        /* fondo de la aplicación */
+  --lat: #f4f2ee;          /* barra lateral */
+  --sup: #fff;             /* tarjetas */
   --ink: #1a1a1a;
-  --mut: #8a919c;
-  --mut2: #4a4a4a;
-  --trk: #eceef1;
-  --acc: #b8433a;          /* unico color de enfasis del tablero (regla 18) */
-  --gris: #8f97a3;         /* las series que NO son el enfasis. 3,0:1 contra el fondo:
-                              por debajo de eso WCAG no da para un objeto grafico */
-  --gris2: #d5d9e0;
-  --meta: #6a7180;
+  --lbl: #3a3f4a;
+  --mut: #6f6b64;          /* texto secundario */
+  --mut2: #4a463f;
+  --bd: rgba(0, 0, 0, .14);
+  --bd2: rgba(0, 0, 0, .07);
+  --trk: #e2dfd9;
+  --acc: #b8433a;          /* único color de énfasis (regla 18) */
+  --gris: #8d8a83;         /* las series que NO son el énfasis, 3,2:1 sobre blanco */
+  --gris2: #c9c5bd;
 
   --fuente: "Segoe UI", Tahoma, Helvetica, Arial, sans-serif;
-  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 
-  --pad-x: clamp(20px, 2.6vw, 44px);
-  --pie-h: 46px;
+  --lat-w: clamp(196px, 15.5vw, 244px);
+  --pad-x: clamp(18px, 2.2vw, 40px);
 }
 
 * { box-sizing: border-box; }
@@ -30,11 +30,11 @@
 html, body, #root {
   height: 100%;
   margin: 0;
-  overflow: hidden;               /* D1: nada scrollea, en ninguna resolucion */
+  overflow: hidden;               /* nada scrollea, en ninguna resolución */
 }
 
 body {
-  background: var(--fondo);
+  background: var(--papel);
   color: var(--ink);
   font: 15px/1.5 var(--fuente);
   -webkit-font-smoothing: antialiased;
@@ -42,209 +42,255 @@ body {
 
 .tabular { font-variant-numeric: tabular-nums; }
 
-/* ---------- armazon: encabezado fijo, cuerpo flexible, pie fijo ---------- */
+/* ---------- armazón: lateral + principal ---------- */
 
 .app {
   height: 100%;
+  display: grid;
+  grid-template-columns: var(--lat-w) 1fr;
+  background: var(--papel);
+}
+
+.principal { min-width: 0; display: flex; flex-direction: column; }
+
+/* ---------- barra lateral ---------- */
+
+.lat {
+  background: var(--lat);
+  border-right: 1px solid var(--bd);
   display: flex;
   flex-direction: column;
-  background: var(--fondo);
+  min-height: 0;
+  padding: 16px 0 12px;
 }
+
+.lat-marca {
+  padding: 0 16px 14px;
+  display: flex; flex-direction: column; gap: 2px;
+  border-bottom: 1px solid var(--bd);
+}
+.lat-oga { font: 600 14px/1.2 var(--fuente); letter-spacing: -.01em; }
+.lat-sub {
+  font: 400 9.5px/1.3 var(--mono);
+  letter-spacing: .1em; text-transform: uppercase; color: var(--mut);
+}
+
+.lat-lista {
+  list-style: none; margin: 0; padding: 8px 8px 0;
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; gap: 1px;
+}
+
+/* La "división con marcas": un rótulo fino separa los grupos sin partir el recorrido. */
+.lat-grupo {
+  display: flex; align-items: baseline; gap: 6px;
+  padding: 12px 8px 5px; margin-top: 2px;
+  border-top: 1px dashed rgba(0, 0, 0, .22);
+}
+.lat-lista > li:first-child .lat-grupo { border-top: 0; margin-top: 0; padding-top: 2px; }
+.lat-grupo span {
+  font: 600 9.5px/1.2 var(--mono);
+  letter-spacing: .13em; text-transform: uppercase; color: var(--mut2);
+}
+.lat-grupo i {
+  font: 400 9.5px/1.2 var(--fuente); font-style: normal;
+  color: var(--mut); opacity: .85;
+}
+
+.lat-item {
+  width: 100%;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px;
+  border: 0; border-radius: 3px; background: none;
+  color: var(--mut2);
+  font: 400 12px/1.25 var(--fuente);
+  text-align: left; cursor: pointer;
+}
+.lat-item:hover { background: rgba(0, 0, 0, .045); color: var(--ink); }
+.lat-item:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+/* La vista activa no se distingue solo por color: se invierte y engrosa. */
+.lat-item.on { background: var(--ink); color: #fff; font-weight: 500; }
+.lat-item.on .lat-n { color: rgba(255, 255, 255, .62); }
+
+.lat-n { font: 500 9.5px var(--mono); color: var(--mut); flex-shrink: 0; }
+.lat-txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Marca de audiencia: cuadro = directorio, círculo = marketing, los dos = ambas. */
+.aud { display: inline-flex; gap: 2px; flex-shrink: 0; opacity: .55; }
+.lat-item.on .aud { opacity: .9; }
+.aud i { width: 6px; height: 6px; border: 1.2px solid currentColor; }
+.aud-marketing i { border-radius: 50%; }
+.aud-ambas i.dos { border-radius: 50%; }
+
+.lat-pie {
+  padding: 10px 16px 0;
+  border-top: 1px solid var(--bd);
+  display: flex; flex-direction: column; gap: 3px;
+  font: 400 9.5px/1.4 var(--mono); color: var(--mut);
+}
+
+/* ---------- timeline de cortes ---------- */
+
+.barra { border-bottom: 1px solid var(--bd); padding: 10px var(--pad-x); background: var(--papel); }
+.barra.apagada { opacity: .42; pointer-events: none; }
+
+.tl { display: flex; align-items: center; gap: 16px; }
+.tl-izq, .tl-der { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; }
+.tl-der { align-items: flex-end; }
+.tl-lbl {
+  font: 500 9px/1.2 var(--mono);
+  letter-spacing: .13em; text-transform: uppercase; color: var(--mut);
+}
+.tl-val { font: 600 15px/1.15 var(--fuente); letter-spacing: -.01em; }
+.tl-rango { font: 400 10px/1.2 var(--mono); color: var(--mut2); }
+
+.tl-pista {
+  flex: 1; min-width: 0; height: 40px;
+  position: relative; cursor: ew-resize;
+  border-bottom: 1px solid var(--bd);
+  touch-action: none;
+}
+.tl-pista:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+.tl-svg { position: absolute; inset: 0 0 6px; width: 100%; height: calc(100% - 6px); }
+.tl-area { fill: var(--acc); opacity: .1; }
+.tl-linea { fill: none; stroke: var(--acc); stroke-width: 1.5; }
+
+.tl-ticks {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+.tl-tick { width: 1px; height: 4px; background: rgba(0, 0, 0, .22); }
+.tl-tick.anio { height: 8px; background: rgba(0, 0, 0, .38); }
+.tl-tick.on { background: var(--ink); height: 11px; width: 2px; }
+
+.tl-cursor { position: absolute; top: -2px; bottom: 0; width: 0; border-left: 2px solid var(--ink); }
+.tl-cursor b {
+  position: absolute; right: 6px; top: -1px;
+  font: 600 11px var(--mono); color: var(--ink); white-space: nowrap;
+}
+
+/* ---------- filtros ---------- */
+
+.filtros {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  padding: 8px var(--pad-x);
+  border-bottom: 1px solid var(--bd);
+  background: var(--papel);
+}
+.filtros.inertes .chip-f { opacity: .38; }
+.filtros-lbl {
+  font: 500 9px/1.2 var(--mono);
+  letter-spacing: .13em; text-transform: uppercase; color: var(--mut);
+  margin-right: 2px;
+}
+.filtros-nota { font: italic 400 10.5px var(--fuente); color: var(--mut); }
+
+.chip-f {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 5px;
+  border: 1px solid rgba(0, 0, 0, .28); border-radius: 3px;
+  padding: 4px 8px;
+  background: transparent; color: var(--mut2);
+  cursor: pointer;
+}
+.chip-f select {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer; font: inherit;
+}
+.chip-f:hover { border-color: rgba(0, 0, 0, .5); color: var(--ink); }
+.chip-f:has(select:focus-visible) { outline: 2px solid var(--ink); outline-offset: 1px; }
+.chip-f-txt {
+  font: 500 10.5px/1.2 var(--mono);
+  letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+}
+.chip-f-txt i { font-style: normal; opacity: .62; font-weight: 400; }
+/* Chip con filtro puesto: se invierte, engrosa y suma la ✕, que no existe en el vacío.
+   No depende solo del color. */
+.chip-f.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.chip-f-x {
+  position: relative; z-index: 1;
+  border: 0; background: none; padding: 0 0 0 1px;
+  color: inherit; opacity: .65;
+  font: 400 13px/1 var(--fuente); cursor: pointer;
+}
+.chip-f-x:hover { opacity: 1; }
+.chip-f-x:focus-visible { outline: 1px solid currentColor; }
+.chip-f.reset { border-style: dashed; margin-left: 4px; }
+
+/* ---------- cuerpo ---------- */
 
 .cuerpo {
-  flex: 1;
-  min-height: 0;                  /* sin esto el hijo desborda en vez de encogerse */
-  display: flex;
-  flex-direction: column;
-  padding: clamp(10px, 1.6vh, 22px) var(--pad-x) 0;
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  padding: clamp(10px, 1.5vh, 20px) var(--pad-x) 0;
 }
 
-/* ---------- encabezado ---------- */
-
-.enc {
-  background: var(--rule);
-  color: #fff;
-  padding: 10px var(--pad-x);
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-  row-gap: 8px;
-}
-
-.enc .marca {
-  font-weight: 600;
-  font-size: 13.5px;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-.enc .marca span { color: var(--mut); font-weight: 400; }
-
-.bloques { display: flex; gap: 0; border: 1px solid #3a404b; border-radius: 5px; overflow: hidden; }
-.bloques button {
-  font: 600 12px/1 var(--fuente);
-  background: #22252c;
-  color: #c9ced8;
-  border: 0;
-  padding: 8px 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.bloques button + button { border-left: 1px solid #3a404b; }
-.bloques button[aria-pressed="true"] { background: #fff; color: var(--rule); }
-.bloques button:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
-
-/* ---------- controles: corte y filtros ---------- */
-
-.ctrl { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
-
-.ctrl label { font-size: 11px; color: var(--mut); text-transform: uppercase; letter-spacing: 0.06em; }
-
-.ctrl select {
-  font: 500 12.5px/1 var(--fuente);
-  background: #22252c;
-  color: #e6e8ec;
-  border: 1px solid #3a404b;
-  border-radius: 4px;
-  padding: 7px 9px;
-}
-.ctrl select:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
-
-.chip {
-  font: 500 11.5px/1 var(--fuente);
-  background: #2c313a;
-  color: #e6e8ec;
-  border: 1px solid #3a404b;
-  border-radius: 3px;
-  padding: 6px 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.chip b { font-weight: 600; }
-.chip button {
-  background: none; border: 0; color: var(--mut); cursor: pointer;
-  font: 600 13px/1 var(--fuente); padding: 0 1px;
-}
-.chip button:hover { color: #fff; }
-.chip button:focus-visible { outline: 1px solid #fff; }
-
-/* ---------- riel de pantallas ---------- */
-
-.riel { display: flex; gap: 5px; align-items: center; }
-.riel button {
-  width: 26px; height: 22px;
-  font: 600 11px/1 var(--fuente);
-  background: #22252c; color: #8a919c;
-  border: 1px solid #3a404b; border-radius: 3px;
-  cursor: pointer;
-}
-/* La pantalla activa no se distingue solo por color: cambia el borde y se rellena.
-   Requisito del negocio (relevamiento) y restriccion 5 del runbook. */
-.riel button[aria-current="true"] {
-  background: #fff; color: var(--rule); border-color: #fff; font-weight: 700;
-}
-.riel button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
-
-/* ---------- pantalla ---------- */
-
-.pant { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: clamp(6px, 1.1vh, 14px); }
+.pant { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: clamp(6px, 1vh, 13px); }
 
 .rotulo {
   display: inline-flex; align-items: center; gap: 7px;
-  font: 600 10.5px/1 var(--fuente);
-  text-transform: uppercase; letter-spacing: 0.09em;
-  color: var(--mut2);
+  font: 600 10.5px/1 var(--mono);
+  text-transform: uppercase; letter-spacing: .09em; color: var(--mut2);
   align-self: flex-start;
 }
-.rotulo::before {
-  content: ""; width: 9px; height: 9px; border: 1.5px solid var(--mut2);
-}
+.rotulo::before { content: ""; width: 9px; height: 9px; border: 1.5px solid var(--mut2); }
 .rotulo.predictivo::before { background: none; border-style: dashed; }
 .rotulo.diagnostico::before { background: var(--mut2); }
 
 .titulo {
   font: 600 clamp(19px, 2.05vw, 30px)/1.22 var(--fuente);
-  letter-spacing: -0.015em;
-  margin: 0;
-  max-width: 46ch;
+  letter-spacing: -.015em; margin: 0; max-width: 46ch;
 }
 .bajada {
-  font-size: clamp(12.5px, 1.05vw, 14.5px);
-  color: var(--mut2);
-  margin: 0;
-  max-width: 82ch;
+  font-size: clamp(12.5px, 1.02vw, 14.5px);
+  color: var(--mut2); margin: 0; max-width: 82ch;
 }
 
 .lienzo {
   flex: 1;
   min-height: 150px;              /* piso: sin esto una columna corta colapsa el SVG */
-  display: flex;
-  gap: clamp(14px, 2vw, 34px);
-  align-items: stretch;
+  display: flex; gap: clamp(12px, 1.8vw, 30px); align-items: stretch;
 }
 .lienzo > * { min-width: 0; }
 
 .tarjeta {
   background: var(--sup);
   border: 1px solid var(--bd);
-  border-top: 3px solid var(--rule);
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
+  border-top: 3px solid var(--ink);
+  padding: 13px 15px;
+  display: flex; flex-direction: column;
 }
 
-/* ---------- pie fijo ---------- */
+.kpi-lbl {
+  font: 600 10.5px/1.2 var(--mono); color: var(--lbl);
+  text-transform: uppercase; letter-spacing: .07em;
+  display: flex; justify-content: space-between; gap: 8px; align-items: center;
+}
+.kpi-lbl b { color: var(--acc); font-variant-numeric: tabular-nums; }
+.kpi-val {
+  font: 600 clamp(21px, 2.2vw, 31px)/1.08 var(--fuente); color: var(--ink);
+  letter-spacing: -.02em; margin-top: 5px;
+}
+.kpi-sub { font-size: 11.5px; color: var(--mut2); margin-top: 3px; }
+.kpi-base {
+  font: 400 10.5px/1.4 var(--mono); color: var(--mut);
+  margin-top: auto; padding-top: 7px; border-top: 1px dotted var(--bd);
+}
+
+/* ---------- pie ---------- */
 
 .pie {
   flex-shrink: 0;
   border-top: 1px solid var(--bd);
   padding: 7px var(--pad-x) 9px;
-  font-size: 11px;
-  line-height: 1.4;
-  /* El pie es donde viven las 4 correcciones obligatorias del rulebook. Con --mut daba
-     2,6:1 contra el fondo, por debajo del minimo. --mut2 da 7,6:1. */
-  color: var(--mut2);
-  background: var(--fondo);
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+  font-size: 11px; line-height: 1.4;
+  color: var(--mut2); background: var(--papel);
+  display: flex; flex-direction: column; gap: 3px;
 }
 .pie-l { display: flex; gap: 5px 14px; flex-wrap: wrap; align-items: baseline; }
-.pie b { color: var(--mut2); font-weight: 600; }
+.pie b { color: var(--ink); font-weight: 600; }
 .pie .sep { color: var(--gris2); }
-
-/* ---------- impresion: A4 apaisada, una pantalla por hoja ---------- */
-
-@page { size: A4 landscape; margin: 10mm; }
-
-@media print {
-  /* Sin esto Chrome y Safari descartan los fondos, y la barra del BAN, su marca del corte
-     anterior y los cuadros del semaforo salen en blanco: justo lo que comunica el estado. */
-  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  html, body, #root { height: auto; overflow: visible; background: #fff; }
-  .app { height: auto; display: block; }
-  .enc, .riel { display: none !important; }
-  .impresion { display: block !important; }
-  .hoja {
-    break-after: page;
-    height: 178mm;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 6mm;
-  }
-  .hoja:last-child { break-after: auto; }
-  .titulo { font-size: 20px; }
-  .pie { border-top: 1px solid var(--bd); color: #555; }
-}
-
-.impresion { display: none; }
-
-/* ---------- detector de desborde (?fit) ---------- */
-
-.fit-mal { outline: 3px solid #b8433a !important; outline-offset: -3px; }
 
 /* ---------- BAN (ficha F07, congelada) ---------- */
 
@@ -252,19 +298,19 @@ body {
   --val: 38px;
   background: var(--sup);
   border: 1px solid var(--bd);
-  border-top: 3px solid var(--rule);
-  padding: 14px 16px;
+  border-top: 3px solid var(--ink);
+  padding: 13px 15px;
   font-family: var(--fuente);
-  display: flex;
-  flex-direction: column;
+  display: flex; flex-direction: column;
 }
 .ban-lbl {
-  font-size: 12px; font-weight: 600; color: var(--lbl);
-  text-transform: uppercase; letter-spacing: .05em;
+  font: 600 12px var(--mono); color: var(--lbl);
+  text-transform: uppercase; letter-spacing: .07em;
 }
 .ban-val {
   font-size: var(--val); color: var(--ink); font-weight: 600;
   letter-spacing: -1px; margin: 6px 0 0; line-height: 1.05;
+  white-space: nowrap;
 }
 .ban-sub { font-size: 12px; color: var(--mut); margin-top: 3px; }
 .ban-track { position: relative; height: 24px; background: var(--trk); margin-top: 10px; }
@@ -272,36 +318,20 @@ body {
 .ban-mk { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); }
 .ban-sc {
   position: absolute; top: calc(100% + 5px);
-  font-size: 10.5px; color: var(--mut); white-space: nowrap;
+  font: 400 10.5px var(--mono); color: var(--mut); white-space: nowrap;
 }
 .ban-scrow { height: 16px; }
 .ban table { width: 100%; border-collapse: collapse; margin-top: 11px; font-size: 11.5px; }
 .ban td { padding: 3px 0; color: var(--mut2); border-bottom: 1px dotted var(--bd); }
 .ban td:last-child { text-align: right; font-weight: 600; color: var(--ink); }
-.ban-note { font-size: 10.5px; color: var(--mut); margin-top: 9px; line-height: 1.5; }
+.ban-note { font: 400 10.5px/1.5 var(--fuente); color: var(--mut); margin-top: 9px; }
 
-/* ---------- tarjetas de KPI ---------- */
-.kpi-lbl {
-  font-size: 11px; font-weight: 600; color: var(--lbl);
-  text-transform: uppercase; letter-spacing: .05em;
-  display: flex; justify-content: space-between; gap: 8px;
-}
-.kpi-lbl b { color: var(--acc); font-variant-numeric: tabular-nums; }
-.kpi-val {
-  font-size: clamp(22px, 2.3vw, 32px); font-weight: 600; color: var(--ink);
-  letter-spacing: -.5px; line-height: 1.1; margin-top: 5px;
-}
-.kpi-sub { font-size: 11.5px; color: var(--mut2); margin-top: 3px; }
-.kpi-base {
-  font-size: 10.5px; color: var(--mut); margin-top: auto; padding-top: 7px;
-  border-top: 1px dotted var(--bd);
-}
+/* ---------- semáforo: forma + etiqueta, nunca solo color ---------- */
 
-/* ---------- semaforo: forma + etiqueta, nunca solo color ---------- */
 .sem {
   display: inline-flex; align-items: center; gap: 6px;
-  font: 600 11px/1 var(--fuente); color: var(--mut2);
-  text-transform: uppercase; letter-spacing: .05em;
+  font: 600 10.5px/1 var(--mono); color: var(--mut2);
+  text-transform: uppercase; letter-spacing: .06em;
 }
 .sem i { width: 10px; height: 10px; border: 1.5px solid currentColor; flex-shrink: 0; }
 .sem-lleno i { background: currentColor; }
@@ -310,64 +340,41 @@ body {
 .sem-vacio { color: var(--acc); }
 
 /* ---------- tabla de la lista ---------- */
-.lista-tabla { width: 100%; border-collapse: collapse; font-size: clamp(11px, .95vw, 13px); }
+
+.lista-tabla { width: 100%; border-collapse: collapse; font-size: clamp(11px, .92vw, 12.5px); }
 .lista-tabla th {
-  text-align: left; font: 600 10px/1 var(--fuente); color: var(--mut);
-  text-transform: uppercase; letter-spacing: .06em;
+  text-align: left; font: 600 9.5px/1 var(--mono); color: var(--mut);
+  text-transform: uppercase; letter-spacing: .08em;
   padding: 0 10px 6px 0; border-bottom: 1px solid var(--bd); white-space: nowrap;
 }
 .lista-tabla th.num, .lista-tabla td.num { text-align: right; }
 .lista-tabla td {
-  padding: 4px 10px 4px 0; border-bottom: 1px dotted var(--bd);
+  padding: 4px 10px 4px 0; border-bottom: 1px dotted var(--bd2);
   color: var(--mut2); font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 .lista-tabla td.destacado { color: var(--ink); font-weight: 600; }
 .lista-tabla .no { color: var(--acc); font-weight: 600; }
 
-/* ---------- serie bajo el selector de corte ---------- */
-.corte-caja { display: flex; flex-direction: column; gap: 2px; }
-.corte-serie { line-height: 0; }
-
-/* ---------- aviso de control inerte ---------- */
-.ctrl .apagado { opacity: .42; pointer-events: none; }
-.ctrl .aviso {
-  font: 500 10.5px/1.3 var(--fuente); color: var(--mut);
-  max-width: 21ch;
-}
-
-/* ---------- modo impresion: las 14 pantallas en flujo ---------- */
-.impresion-flujo { display: flex; flex-direction: column; }
-/* flex-shrink:0 es lo que hace que la hoja mida de verdad: sin eso el contenedor flex
-   reparte su alto entre las 14 y cada hoja termina en ~490 px, con los graficos aplastados. */
-.impresion-flujo .hoja {
-  height: 180mm; flex-shrink: 0; display: flex; flex-direction: column;
-}
-.impresion-flujo .hoja .pant { flex: 1; min-height: 0; }
-@media screen {
-  .impresion-flujo { overflow: auto; }
-}
-
-/* boton claro sobre fondo de pantalla (el .chip vive en el encabezado oscuro) */
 .chip-claro {
-  font: 600 11px/1 var(--fuente); color: var(--mut2);
+  font: 600 10.5px/1 var(--mono); color: var(--mut2);
+  text-transform: uppercase; letter-spacing: .05em;
   background: var(--sup); border: 1px solid var(--bd); border-radius: 3px;
   padding: 6px 9px; cursor: pointer; margin-left: auto;
 }
 .chip-claro:hover { border-color: var(--mut); color: var(--ink); }
 
-/* ---------- pantallas bajas: el alto es la restriccion, no el ancho ----------
-   A 640 px de alto el presupuesto es 132 de encabezado + 429 de cuerpo + 69 de pie, y el
-   grafico de la pantalla mas densa quedaba en 81 px, ilegible en proyector. Se recorta
-   cromo, no el grafico: es la regla de la guia (si un parrafo no cabe, se corta el
-   parrafo antes que achicar el grafico). */
+/* ---------- pantallas bajas: el alto es la restricción, no el ancho ---------- */
+
 @media (max-height: 730px) {
-  .enc { padding: 6px var(--pad-x); gap: 12px; row-gap: 5px; }
-  .enc .marca { font-size: 12.5px; }
-  .bloques button { padding: 6px 11px; font-size: 11.5px; }
-  .riel button { height: 20px; width: 24px; }
-  .ctrl select { padding: 5px 7px; font-size: 12px; }
-  .ctrl label { font-size: 10px; }
-  .corte-serie { display: none; }
+  :root { --lat-w: clamp(192px, 16vw, 214px); }
+  .lat { padding-top: 12px; }
+  .lat-marca { padding-bottom: 10px; }
+  .lat-item { padding: 5px 8px; font-size: 11.5px; }
+  .lat-grupo { padding: 8px 8px 4px; }
+  .lat-pie { font-size: 9px; gap: 2px; padding-top: 8px; }
+  .barra { padding: 7px var(--pad-x); }
+  .tl-pista { height: 30px; }
+  .filtros { padding: 6px var(--pad-x); }
   .cuerpo { padding-top: 8px; }
   .titulo { font-size: clamp(17px, 1.75vw, 23px); }
   .tarjeta { padding: 9px 12px; }
@@ -379,22 +386,51 @@ body {
   .pie { font-size: 10.5px; padding: 5px var(--pad-x) 7px; line-height: 1.35; }
 }
 
-.serie-nota { font-size: 9.5px; color: var(--mut); letter-spacing: .02em; }
-@media (max-height: 730px) { .serie-nota { display: none; } }
+/* ---------- impresión: A4 apaisada, una vista por hoja ---------- */
 
-/* ---------- fuera del rango soportado ----------
-   El tablero se diseñó sin scroll para proyector y laptop, de 1152x640 a 1920x1080. Por
-   debajo de eso el contenido no entra y antes rompía en silencio: ahora lo dice. */
+@page { size: A4 landscape; margin: 10mm; }
+
+@media print {
+  /* Sin esto Chrome y Safari descartan los fondos, y la barra del BAN, su marca del corte
+     anterior y los cuadros del semáforo salen en blanco. */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body, #root { height: auto; overflow: visible; background: #fff; }
+  .app { height: auto; display: block; }
+  .lat, .barra, .filtros { display: none !important; }
+  .principal { display: block; }
+  .cuerpo { padding: 0; }
+  .titulo { font-size: 20px; }
+  .chico { display: none !important; }
+}
+
+.impresion-flujo { display: flex; flex-direction: column; }
+/* flex-shrink:0 es lo que hace que la hoja mida de verdad: sin eso el contenedor flex
+   reparte su alto entre las 14 y los gráficos salen aplastados. */
+.impresion-flujo .hoja {
+  height: 180mm; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  break-after: page;
+}
+.impresion-flujo .hoja:last-child { break-after: auto; }
+.impresion-flujo .hoja .pant { flex: 1; min-height: 0; }
+@media screen { .impresion-flujo { overflow: auto; } }
+
+/* ---------- fuera del rango soportado ---------- */
+
 .chico { display: none; }
 
 @media (max-width: 1000px), (max-height: 560px) {
-  .app > .enc, .app > .cuerpo, .app > .pie { display: none !important; }
+  .app { display: block; }
+  .app > .lat, .app > .principal { display: none !important; }
   .chico {
     display: flex; flex-direction: column; justify-content: center;
-    height: 100%; padding: 28px; gap: 10px; background: var(--fondo);
+    height: 100%; padding: 28px; gap: 10px; background: var(--papel);
   }
   .chico h1 { font: 600 19px/1.3 var(--fuente); margin: 0; max-width: 30ch; }
   .chico p { font-size: 13.5px; color: var(--mut2); margin: 0; max-width: 44ch; line-height: 1.5; }
   .chico b { color: var(--ink); }
 }
-@media print { .chico { display: none !important; } }
+
+/* ---------- detector de desborde (?fit) ---------- */
+
+.fit-mal { outline: 3px solid var(--acc) !important; outline-offset: -3px; }
