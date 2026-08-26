@@ -44,7 +44,10 @@ export default function M0({ info, iCorte, filtro }) {
   const azarBase = enRiesgo ? Math.min(100, (100 * kBase) / enRiesgo) : 0
 
   const onHover = useCallback((v) => setHover(v), [])
-  const onFijar = useCallback((v) => { setFijado(v); setHover(null) }, [])
+  const onFijar = useCallback((v) => {
+    setFijado(Math.max(1, Math.min(acum.length || 1, Math.round(v))))
+    setHover(null)
+  }, [acum.length])
 
   return (
     <section className="pant">
@@ -57,14 +60,38 @@ export default function M0({ info, iCorte, filtro }) {
         {hay
           ? <>La lista se ordena por exposición, así que el orden rinde{' '}
               {(cubreBase / (azarBase || 1)).toFixed(2).replace('.', ',')} veces más que el
-              alcance. Movete sobre la curva para ver cuánto cubre cada corte; hacé clic para fijarlo.</>
+              alcance. Movete sobre la curva, hacé clic para fijar un corte, o escribí el
+              número exacto arriba.</>
           : 'Ninguna combinación de filtros deja clientes en riesgo en este corte.'}
       </p>
 
-      {/* Los tres KPIs son la lectura del punto elegido, no cifras fijas. */}
+      {/* Los tres KPIs son la lectura del punto elegido, no cifras fijas. El primero ademas
+          es el CONTROL: se escribe el numero exacto, o se mueve de a diez, o se salta a los
+          dos cortes declarados. Acertar 640 arrastrando el mouse sobre 800 px es cuestion de
+          punteria; escribirlo no. */}
       <div className="cob-cab">
-        <Kpi etq="Contactos" val={hay ? entero(k) : '—'}
-             ap={hay ? `de ${entero(enRiesgo)} en riesgo · capacidad ${capLo} a ${capHi}` : '—'} />
+        <div className="cob-k">
+          <span className="cob-k-etq"><label htmlFor="cob-n">Contactos</label></span>
+          <span className="cob-k-ctl">
+            <button type="button" onClick={() => onFijar(k - 10)} disabled={!hay || k <= 1}
+                    aria-label="Diez contactos menos">−</button>
+            <input id="cob-n" type="number" className="cob-k-val tabular" value={hay ? k : ''}
+                   min={1} max={n} disabled={!hay}
+                   onChange={(ev) => {
+                     const v = Number(ev.target.value)
+                     if (Number.isFinite(v)) onFijar(v)
+                   }} />
+            <button type="button" onClick={() => onFijar(k + 10)} disabled={!hay || k >= n}
+                    aria-label="Diez contactos más">+</button>
+          </span>
+          <span className="cob-k-ap">
+            de {entero(enRiesgo)} en riesgo · ir a{' '}
+            <button type="button" className="cob-salto" onClick={() => onFijar(capLo)}
+                    disabled={!hay || capLo > n}>{capLo}</button>{' o '}
+            <button type="button" className="cob-salto" onClick={() => onFijar(capHi)}
+                    disabled={!hay || capHi > n}>{capHi}</button>
+          </span>
+        </div>
         <Kpi etq="Exposición que cubre" val={hay ? pct(cubre) : '—'} acc
              ap={hay ? `${pesos(acum[k - 1])} de ${pesos(total)}` : '—'} />
         <Kpi etq="Ventaja sobre el azar"
@@ -78,7 +105,9 @@ export default function M0({ info, iCorte, filtro }) {
             <CurvaConcentracion
               acum={acum} total={total} nRiesgo={enRiesgo} capLo={capLo} capHi={capHi}
               w={w} h={h} kFijado={fijado} kHover={hover}
-              onHover={onHover} onFijar={onFijar} formatoPct={(v) => pct(v)} />
+              onHover={onHover} onFijar={onFijar} formatoPct={(v) => pct(v)}
+              tituloY="% de la exposición en riesgo que queda cubierta"
+              tituloX="Clientes contactados, de mayor a menor exposición" />
           )}
         </Lienzo>
       </div>

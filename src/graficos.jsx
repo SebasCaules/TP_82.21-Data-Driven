@@ -876,13 +876,16 @@ export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion
  * series no depende del color.
  */
 export function CurvaConcentracion({ acum, total, nRiesgo, capLo, capHi, w, h,
-                                     kFijado, kHover, onHover, onFijar, formatoPct }) {
+                                     kFijado, kHover, onHover, onFijar, formatoPct,
+                                     tituloX, tituloY }) {
   if (!acum || !acum.length || !(total > 0) || w < 60 || h < 60) return null
 
   const padL = 46
   const padR = 16
-  const padT = 14
-  const padB = 52
+  // Los dos ejes llevan titulo (regla 21). El de la Y va en su punta, arriba a la izquierda,
+  // por encima del primer tick: ahi no compite con ninguna marca.
+  const padT = tituloY ? 32 : 14
+  const padB = 56
   const iw = Math.max(20, w - padL - padR)
   const ih = Math.max(20, h - padT - padB)
   const n = acum.length
@@ -920,6 +923,10 @@ export function CurvaConcentracion({ acum, total, nRiesgo, capLo, capHi, w, h,
               height={ih} fill="var(--azul1)" opacity=".5" />
       )}
 
+      {tituloY && (
+        <text x={4} y={11} fontSize="11" fill={MUT2} letterSpacing=".09em" fontWeight={600}
+              style={{ textTransform: 'uppercase' }}>{tituloY}</text>
+      )}
       <line x1={padL} x2={padL} y1={padT} y2={yBase} stroke={EJE} strokeWidth="1" />
       {ticks.map((t) => (
         <g key={t}>
@@ -946,19 +953,21 @@ export function CurvaConcentracion({ acum, total, nRiesgo, capLo, capHi, w, h,
       ))}
 
       <text x={padL} y={yBase + 15} fontSize="10.5" fill={MUT} textAnchor="middle">0</text>
-      <text x={padL + iw} y={yBase + 32} fontSize="11" fill={MUT2} textAnchor="end"
-            letterSpacing=".09em" fontWeight={600} style={{ textTransform: 'uppercase' }}>
-        Clientes contactados, de mayor a menor exposición
-      </text>
+      {tituloX && (
+        <text x={padL + iw} y={yBase + 34} fontSize="11" fill={MUT2} textAnchor="end"
+              letterSpacing=".09em" fontWeight={600} style={{ textTransform: 'uppercase' }}>
+          {tituloX}
+        </text>
+      )}
 
       {/* Dos series: leyenda siempre presente. */}
       <g>
-        <line x1={padL + 12} x2={padL + 34} y1={padT + 8} y2={padT + 8} stroke={ACC} strokeWidth="2.25" />
-        <text x={padL + 40} y={padT + 8} fontSize="11" fill={MUT2} dominantBaseline="central"
+        <line x1={padL + 14} x2={padL + 36} y1={padT + 10} y2={padT + 10} stroke={ACC} strokeWidth="2.25" />
+        <text x={padL + 42} y={padT + 10} fontSize="11" fill={MUT2} dominantBaseline="central"
               fontWeight={600}>lista ordenada por exposición</text>
-        <line x1={padL + 12} x2={padL + 34} y1={padT + 25} y2={padT + 25} stroke={GRIS}
+        <line x1={padL + 14} x2={padL + 36} y1={padT + 27} y2={padT + 27} stroke={GRIS}
               strokeWidth="2" strokeDasharray="5 4" />
-        <text x={padL + 40} y={padT + 25} fontSize="11" fill={MUT} dominantBaseline="central">
+        <text x={padL + 42} y={padT + 27} fontSize="11" fill={MUT} dominantBaseline="central">
           contactando al azar
         </text>
       </g>

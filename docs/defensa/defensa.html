@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tablero Casa Óga · guía de defensa</title>
+<style>
+  @page { size: A4 portrait; margin: 13mm 12mm 11mm 12mm; }
+
+  :root {
+    --ink: #16233a;
+    --lbl: #3d4d66;
+    --mut: #5f6779;
+    --acc: #22456f;
+    --terra: #b8433a;
+    --bd: rgba(22,35,58,.18);
+    --bd2: rgba(22,35,58,.08);
+    --papel: #eceae5;
+    --fuente: "Segoe UI", Tahoma, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--fuente);
+    color: var(--ink);
+    font-size: 9.3pt;
+    line-height: 1.45;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .hoja { page-break-after: always; break-after: page;
+          display: flex; flex-direction: column; min-height: 266mm; }
+  .pie { margin-top: auto; padding-top: 6px; border-top: 1px solid var(--bd2);
+         display: flex; justify-content: space-between;
+         font-family: var(--mono); font-size: 6.8pt; letter-spacing: .06em;
+         text-transform: uppercase; color: var(--mut); }
+  .hoja:last-child { page-break-after: auto; break-after: auto; }
+
+  /* ---------- encabezado de vista ---------- */
+  .cab { display: flex; align-items: baseline; gap: 8px; border-bottom: 1.6px solid var(--ink); padding-bottom: 4px; }
+  .cab .n { font-family: var(--mono); font-size: 16.5pt; font-weight: 700; color: var(--acc); letter-spacing: -.02em; }
+  .cab .id { font-family: var(--mono); font-size: 7.6pt; color: var(--mut); border: 1px solid var(--bd); padding: 1px 4px; }
+  .cab h2 { font-size: 14.5pt; margin: 0; font-weight: 700; letter-spacing: -.01em; }
+  .cab .grupo { margin-left: auto; font-family: var(--mono); font-size: 7pt; text-transform: uppercase; letter-spacing: .09em; color: var(--mut); }
+
+  .preg { margin: 5px 0 0; font-size: 9.8pt; color: var(--lbl); }
+  .preg b { font-family: var(--mono); font-size: 7pt; text-transform: uppercase; letter-spacing: .09em; color: var(--mut); font-weight: 400; margin-right: 6px; }
+
+  figure { margin: 6px 0 0; }
+  figure img { width: 100%; display: block; border: 1px solid var(--bd); }
+  figcaption { font-size: 7.7pt; color: var(--mut); margin-top: 3px; }
+  figcaption b { color: var(--lbl); font-weight: 600; }
+
+  /* ---------- cuerpo en dos columnas ---------- */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; margin-top: 8px; }
+  .col > *:first-child { margin-top: 0; }
+
+  h3 {
+    font-family: var(--mono); font-size: 7.4pt; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--acc); margin: 9px 0 4px; padding-bottom: 2px; border-bottom: 1px solid var(--bd2);
+    font-weight: 700;
+  }
+  ul { margin: 0; padding-left: 11px; }
+  li { margin-bottom: 4.5px; }
+  li::marker { color: var(--acc); }
+  p { margin: 0 0 4px; }
+  .dato { color: var(--lbl); }
+  b, strong { font-weight: 700; }
+  .tab { font-variant-numeric: tabular-nums; }
+  .cita { font-family: var(--mono); font-size: 7pt; color: var(--mut); white-space: nowrap; }
+  .q { color: var(--acc); font-weight: 700; }
+  .terra { color: var(--terra); }
+
+  /* ---------- portada ---------- */
+  .portada h1 { font-size: 23pt; line-height: 1.1; margin: 0 0 4px; letter-spacing: -.02em; }
+  .portada .sub { font-size: 11pt; color: var(--lbl); margin: 0 0 2px; }
+  .portada .meta { font-family: var(--mono); font-size: 7.8pt; color: var(--mut); margin: 0 0 14px; }
+  .regla { border: 0; border-top: 1.6px solid var(--ink); margin: 10px 0; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 8.4pt; }
+  th { text-align: left; font-family: var(--mono); font-size: 7pt; text-transform: uppercase;
+       letter-spacing: .08em; color: var(--mut); font-weight: 400; border-bottom: 1px solid var(--bd);
+       padding: 3px 6px 3px 0; vertical-align: bottom; }
+  td { padding: 3px 6px 3px 0; border-bottom: 1px solid var(--bd2); vertical-align: top; }
+  td.num, th.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .caja { border: 1px solid var(--bd); padding: 7px 9px; margin: 8px 0; background: #fbfaf8; }
+  .caja h3 { margin-top: 0; }
+  .aviso { border-left: 3px solid var(--terra); padding-left: 8px; }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  .pie-hoja { position: running(pie); }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 1px 8px; font-size: 8.6pt; }
+  .kv dt { font-family: var(--mono); font-size: 7.4pt; text-transform: uppercase; letter-spacing: .07em; color: var(--mut); padding-top: 1.5px; }
+  .kv dd { margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- ================= PORTADA ================= -->
+<section class="hoja portada">
+  <h1>Tablero de riesgo de pérdida de clientes</h1>
+  <p class="sub">Guía de defensa, vista por vista</p>
+  <p class="meta">Casa Óga · Entregable 1, Parte D · 82.21 Factibilidad de Proyectos Data Driven · Grupo 2 · corte de datos 31/12/2025</p>
+
+  <hr class="regla">
+
+  <div class="dos">
+    <div>
+      <h3>Qué es este documento</h3>
+      <p>Una hoja por vista del tablero. En cada una: la captura, qué significa cada
+      número y cada forma del gráfico, qué se decidió al diseñarla y contra qué fuente,
+      de dónde sale el dato y qué contestar si la cátedra pregunta.</p>
+
+      <h3>Cómo está armado el tablero</h3>
+      <ul>
+        <li>14 vistas en un solo recorrido, una pregunta de negocio por vista. Tres grupos:
+        <b>Diagnóstico</b> (01-08, datos históricos), <b>Operación</b> (09-13, a quién se
+        contacta) y <b>Decisión</b> (14, qué se pide).</li>
+        <li>Cada vista se resuelve <b>sin scroll</b>, de 1152×640 a 1920×1080. Verificado con
+        detector propio en las cinco resoluciones, con filtros y en tres cortes.</li>
+        <li>Un solo HTML autocontenido: datos embebidos, cero CDN, cero pedidos de red. Se
+        abre con doble clic. El aula puede no tener red.</li>
+        <li>Dos audiencias con dos cadencias: directorio mensual, Marketing semanal, como
+        pidió el negocio. No se partió en dos tableros, se marca por grupo de vistas.</li>
+      </ul>
+
+      <h3>Los controles</h3>
+      <ul>
+        <li><b>Filtros</b>: región, categoría, segmento RFM y quintil. Toda combinación es una
+        suma de celdas ya resueltas por el pipeline.</li>
+        <li><b>Mes de corte</b>: 25 cortes mensuales, dic 2023 a dic 2025. Mover el corte es ver
+        la trayectoria, que es lo que pidió la clase 4 ("mirar cómo vengo").</li>
+        <li><b>Drill-down</b>: clic en cualquier barra de las vistas 03, 04, 06 y 07 fija ese valor
+        como filtro y salta a la lista <span class="cita">Parte D §4.1</span>.</li>
+        <li>Los controles que no aplican a una vista <b>se apagan con leyenda</b> en vez de quedar
+        activos e inertes <span class="cita">Nielsen H1</span>.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Las seis preguntas de la Parte D y dónde se responden</h3>
+      <table>
+        <thead><tr><th>Pregunta de negocio §1.2</th><th class="num">Vista</th></tr></thead>
+        <tbody>
+          <tr><td>¿Cuánta facturación anual está hoy en riesgo y qué parte de la base la explica?</td><td class="num">01 · 02</td></tr>
+          <tr><td>¿El riesgo se concentra en los que más facturan o en los de menor valor?</td><td class="num">03</td></tr>
+          <tr><td>¿La recompra a 90 días se mueve hacia la meta de 10-11 %?</td><td class="num">05</td></tr>
+          <tr><td>¿Qué región y qué categoría concentran la pérdida esperada del mes?</td><td class="num">06 · 07</td></tr>
+          <tr><td>¿A cuántos alcanza a contactar Marketing y cuáles quedan sin cubrir?</td><td class="num">09</td></tr>
+          <tr><td>¿La lista priorizada rinde más que el criterio actual (1,39 %)?</td><td class="num">08</td></tr>
+        </tbody>
+      </table>
+      <p class="dato" style="margin-top:5px">Las vistas 04, 10, 11, 12, 13 y 14 no están en esa lista y se agregaron:
+      dónde conviene gastar (04), si la lista se puede ejecutar (10), la lista misma (11), qué
+      rindió la campaña (12 y 13) y qué se decide (14).</p>
+
+      <h3>Lo que obliga el apunte de la clase 4</h3>
+      <ul>
+        <li>"Dashboard: sostiene una decisión recurrente", no informa y cierra un ciclo. Cada
+        vista se juzga por si permite tomar una decisión concreta.</li>
+        <li>"Mirar el futuro pero también el pasado para ver cómo vengo" → el selector de corte
+        y la serie trimestral.</li>
+        <li>"Se debe poder explorar, debe haber movimiento" → filtros, corte móvil y drill-down.</li>
+        <li>"Las preguntas del diseño del dashboard son las que van a decidir las decisiones" →
+        las 6 preguntas de la Parte D son el índice de vistas.</li>
+      </ul>
+
+      <div class="caja aviso">
+        <h3 style="border:0;padding:0;margin-bottom:3px">Lo que el tablero no afirma</h3>
+        <ul style="margin-bottom:0">
+          <li>Que una campaña recupere los ARS 94,9 M. Es exposición, no recupero.</li>
+          <li>Que el proxy mida churn. Es una regla operativa sobre inactividad.</li>
+          <li>Que exista un modelo predictivo. Lo que lo anticipa va rotulado "en desarrollo".</li>
+          <li>Ninguna relación causal: no hay grupo de control en ningún dato de campañas.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 1 de 17</span></footer>
+</section>
+
+<!-- ================= ANTES DE LA PRIMERA PREGUNTA ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">00</span><h2>Antes de la primera pregunta</h2>
+    <span class="grupo">definiciones · datos · validación</span></div>
+
+  <div class="dos" style="margin-top:8px">
+    <div>
+      <h3>Las cuatro cosas que hay que decir antes de que las pregunten</h3>
+      <dl class="kv">
+        <dt>Proxy</dt>
+        <dd>Un cliente está <b>en riesgo</b> si tiene 3 compras o más y su recency supera
+        <b>máx(90 días, 1,5 × su propio gap mediano)</b>. Es una regla operativa sobre
+        inactividad, no una medición de churn: nadie dio de baja nada.</dd>
+        <dt>Exposición</dt>
+        <dd>Los ARS 94,9 M son la facturación anual que hoy está en manos de clientes sin
+        compra reciente. <b>Exposición, no recupero.</b></dd>
+        <dt>Moneda</dt>
+        <dd>Pesos nominales corrientes, <b>sin deflactar por IPC</b>. Decisión del equipo,
+        declarada en cada vista en pesos.</dd>
+        <dt>Anualizado</dt>
+        <dd>Facturación del cliente ÷ años entre su <b>primera compra y el corte</b>, no hasta
+        su última compra. Por eso un cliente inactivo sigue pesando en el denominador.</dd>
+      </dl>
+
+      <h3>Las bases que no se mezclan</h3>
+      <table>
+        <tbody>
+          <tr><td>Clientes con compra válida al corte</td><td class="num"><b>5.978</b></td></tr>
+          <tr><td>Elegibles (3 compras o más)</td><td class="num"><b>4.940</b></td></tr>
+          <tr><td>En riesgo</td><td class="num"><b>2.452</b> · 41,0 %</td></tr>
+          <tr><td>Gasto anual estimado de la base</td><td class="num"><b>204,6 M</b></td></tr>
+          <tr><td>Facturación acumulada desde 2022</td><td class="num"><b>550,2 M</b></td></tr>
+          <tr><td>Ventas reales 2025 (no es lo mismo)</td><td class="num">225,0 M</td></tr>
+          <tr><td>Envíos de campaña, base del dataset</td><td class="num"><b>23.729</b></td></tr>
+          <tr><td>Envíos limpios (sin 200 duplicados exactos)</td><td class="num"><b>23.529</b></td></tr>
+        </tbody>
+      </table>
+      <p class="dato" style="margin-top:5px">Casi toda pregunta incómoda sobre una cifra es una
+      pregunta sobre cuál de estas bases se usó. Cada vista lleva la suya escrita.</p>
+    </div>
+
+    <div>
+      <h3>De dónde sale cada número</h3>
+      <table>
+        <thead><tr><th>Dataset de la cátedra</th><th>Qué alimenta</th></tr></thead>
+        <tbody>
+          <tr><td>Transacciones_clientes.csv<br><span class="dato">50.250 filas crudas</span></td>
+              <td>Riesgo, exposición, quintiles, RFM, recompra trimestral. Todas las vistas 01 a 07 y la lista.</td></tr>
+          <tr><td>Clientes.csv <span class="dato">6.050</span></td><td>Consentimiento de marketing. Vistas 10, 11 y 14.</td></tr>
+          <tr><td>Campanias_marketing.csv <span class="dato">23.729</span></td><td>Embudo, compra a 7 días, consentimiento. Vistas 08, 10, 12 y 13.</td></tr>
+          <tr><td>Tiendas.csv <span class="dato">28</span></td><td>Región de cada transacción. Vista 06.</td></tr>
+          <tr><td>Fidelizacion.csv <span class="dato">4.043</span></td><td>Contexto del caso, no alimenta ninguna cifra en pantalla.</td></tr>
+          <tr><td>Calendario.csv</td><td>Ídem.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>La limpieza, en orden fijo</h3>
+      <p>50.250 crudas → <b>50.000</b> tras sacar 250 duplicados de fila completa → <b>27.606</b>
+      con id de cliente → <b>27.276</b> con monto positivo. Los cuatro conteos son salida del
+      pipeline, no un log. Ventana real de datos: 03/01/2022 a 29/12/2025.</p>
+      <p class="dato">Sin id de cliente queda el <b>44,8 %</b> de las transacciones. Todo el análisis
+      corre sobre la base identificada y eso es un sesgo declarado, no un descuido.</p>
+
+      <h3>Por qué las cifras se sostienen</h3>
+      <ul>
+        <li>El navegador <b>no calcula</b> riesgo, recency, quintiles ni RFM. Recibe una tabla de
+        contingencia ya resuelta y hace filtrar y sumar. Toda la aritmética con riesgo de
+        divergencia vive en Python.</li>
+        <li><b>75 anclas</b> contra las cifras del wiki de la materia. Si una falla, el pipeline corta
+        y no hay tablero.</li>
+        <li><b>201.900</b> chequeos del payload contra una verdad independiente, más <b>606.270</b> de
+        paridad entre Python y el JavaScript del navegador.</li>
+        <li>La grilla de filtros se valida <b>completa</b>: 2.688 combinaciones × 25 cortes. No es
+        una muestra.</li>
+      </ul>
+
+      <div class="caja">
+        <h3 style="border:0;padding:0;margin-bottom:3px">La herramienta, y por qué no Looker ni Tableau</h3>
+        <p style="margin:0">Clientes.csv trae mail, edad, género y provincia. Subirlo a una
+        herramienta en la nube es tratamiento de datos personales bajo la Ley 25.326 art. 12.
+        El pipeline corre local, el tablero no sale de la máquina y en pantalla nunca aparece
+        nombre ni mail, solo código de cliente <span class="cita">Parte D §6.1</span>.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 2 de 17</span></footer>
+</section>
+
+<!-- ================= 01 · D0 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">01</span><span class="id">D0</span><h2>Cuánto hay en riesgo</h2>
+    <span class="grupo">diagnóstico</span></div>
+  <p class="preg"><b>Pregunta</b>¿Cuánta facturación anual está hoy en riesgo y qué parte de la base la explica?</p>
+  <figure><img src="img/01-D0.png" alt="Vista 01">
+    <figcaption><b>Título en pantalla:</b> "Casi la mitad del gasto anual de la base está en clientes sin compra reciente"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>ARS 94,9 M</b>: suma del gasto anualizado de los 2.452 clientes en riesgo al corte.
+        Al lado, pegado al número y no al pie, "exposición, no recupero".</li>
+        <li><b>El riel bajo la cifra</b>: qué parte de los 204,6 M de gasto anual estimado ocupa esa
+        exposición. La marca vertical es el <b>corte anterior</b>, así se ve si subió o bajó sin
+        cambiar de vista.</li>
+        <li><b>Base, corte y moneda</b>: 5.978 clientes, 31/12/2025, pesos nominales. Sin esos tres
+        el número no se puede leer.</li>
+        <li><b>Las tres comparaciones</b>: 46,4 % del gasto anual, 47,8 % del histórico acumulado,
+        2.452 de 5.978 clientes. Van rotuladas una por una porque 46,4 % y 47,8 % no miden lo mismo.</li>
+        <li><b>La serie de recompra</b>: 2022Q1 a 2025Q3 con las tres franjas del semáforo
+        (en meta ≥10 %, por debajo 9-10 %, fuera de meta &lt;9 %). Último punto 8,5 %.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Transacciones_clientes.csv. Todo se recalcula desde cero en cada corte usando solo las
+      transacciones anteriores a esa fecha, nunca con <span class="cita">MAX(fecha)</span>.
+      La serie de recompra es global y no responde a los controles.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li>El número grande ocupa el arriba a la izquierda, no el título. Un número solo comunica
+        más como texto grande que dentro de una tabla o de una barra única
+        <span class="cita">Knaflic cap. 2, pp. 38-40</span>.</li>
+        <li>El título da la <b>lectura</b> y no repite la cifra que está doce píxeles más abajo. Con un
+        filtro puesto la frase sigue siendo cierta porque se deriva del mismo número.</li>
+        <li>El estado del indicador es <b>posición dentro de una franja</b>, no una pastilla de color, y
+        cada zona lleva su rango escrito. El negocio pidió no depender solo del color
+        <span class="cita">relevamiento 18/08</span>.</li>
+        <li>La tarjeta declara <b>dueña y cadencia</b> ("María G. · mensual"). Un indicador sin dueño ni
+        periodicidad no está bien definido <span class="cita">clase 2</span>.</li>
+        <li>La serie va rotulada "no usa corte ni filtros": un control que se ve activo y no hace
+        nada es la falla canónica de visibilidad del estado <span class="cita">Nielsen H1</span>.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿Se recuperan los 94,9 M?</span> No. Es la facturación anual que hoy está en
+      clientes sin compra reciente. Medir recupero exige una campaña contra un grupo de control,
+      y eso está declarado como V2.</p>
+      <p><span class="q">¿Y si el umbral no fuera 90 días?</span> A 60 días la exposición da 95,1 M y a
+      120 días 93,5 M. El valor casi no depende del umbral elegido, y decirlo juega a favor.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 3 de 17</span></footer>
+</section>
+
+<!-- ================= 02 · D1 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">02</span><span class="id">D1</span><h2>Exposición contra la base</h2>
+    <span class="grupo">diagnóstico</span></div>
+  <p class="preg"><b>Pregunta</b>¿De qué tamaño es el problema contra el total?</p>
+  <figure><img src="img/02-D1.png" alt="Vista 02">
+    <figcaption><b>Título en pantalla:</b> "No es un mal año: el 47,8 % de todo lo facturado desde 2022 está en las mismas manos"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Barra de arriba</b>: 94,9 M sobre 204,6 M de gasto anual estimado de la base, 46,4 %.</li>
+        <li><b>Barra de abajo</b>: 262,8 M sobre 550,2 M facturados desde 2022, 47,8 %.</li>
+        <li>Cada tramo lleva <b>rótulo y valor encima</b>. El tramo que no está en riesgo va con trama,
+        así que ninguna lectura depende solo del color.</li>
+        <li>Las dos barras arrancan en cero y comparten forma: la comparación que importa es entre
+        tramos dentro de cada barra, no entre barras.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Los mismos datos de la vista 01. El <b>anualizado</b> de cada cliente es su facturación dividida
+      por los años entre su primera compra y el corte. Esa elección es la que hace que un cliente
+      inactivo siga pesando en el denominador en vez de desaparecer.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li><b>Dos bases y no una.</b> Cuánto por año y cuánto acumulado son dos preguntas con dos
+        denominadores. Mezclarlas era el error que corrigió el comité de revisión.</li>
+        <li>El denominador se llama <b>gasto anual estimado</b>, nunca "lo que la base factura por año".
+        204,6 M no son ventas: las ventas reales de 2025 fueron 225,0 M y un directorio compararía
+        contra ese número.</li>
+        <li><b>Barras desde cero, sin truncar.</b> El ojo compara longitudes, y truncar el eje convierte
+        un aumento real en uno que parece cinco veces mayor. Knaflic lo trata como falta ética, no
+        estética <span class="cita">cap. 2, pp. 50-53</span>.</li>
+        <li>El título no repite lo que dijo la vista 01. Leer solo los títulos, en orden, tiene que
+        contar la historia completa <span class="cita">Knaflic cap. 7</span>.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿No es que 2025 fue un mal año y ya está?</span> El 47,8 % es sobre todo lo
+      facturado desde 2022. No es un bache de un ejercicio, es acumulación.</p>
+      <p><span class="q">¿Por qué 204,6 M y no 225,0 M?</span> Porque 225,0 M son las ventas totales de
+      2025, con transacciones anónimas incluidas. 204,6 M es el gasto anual estimado de los 5.978
+      clientes identificados, que es la única base sobre la que se puede calcular riesgo por cliente.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 4 de 17</span></footer>
+</section>
+
+<!-- ================= 03 · D2 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">03</span><span class="id">D2</span><h2>Riesgo por valor del cliente</h2>
+    <span class="grupo">diagnóstico</span></div>
+  <p class="preg"><b>Pregunta</b>¿El riesgo se concentra en los que más facturan o en los de menor valor?</p>
+  <figure><img src="img/03-D2.png" alt="Vista 03">
+    <figcaption><b>Título en pantalla:</b> "El riesgo sube con el valor, pero menos de lo que sugiere el total"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Cinco barras</b>: porcentaje en riesgo sobre el total de cada quintil de facturación
+        histórica. Q1 13,3 %, Q5 51,8 %.</li>
+        <li><b>Línea vertical de referencia</b>: 41,0 %, la tasa general de la base. Cada barra se lee
+        contra ella sin hacer la cuenta.</li>
+        <li><b>Nota en cada barra</b>: cuántos clientes en riesgo sobre cuántos <b>elegibles</b>, que es la
+        base comparable.</li>
+        <li><b>KPI de Q5</b> arriba, con su semáforo: verde &lt;45 %, ámbar 45-52 %, rojo &gt;52 %. Con
+        51,8 % está en ámbar, al borde.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Quintiles por corte sobre la facturación histórica acumulada de cada cliente. Elegible es
+      tener 3 compras o más. Los umbrales del semáforo son los de la Parte D §2.1, no inventados acá.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li>El <b>denominador no se toca</b>: riesgo sobre el total del quintil, como lo fijó la Parte D.
+        Lo que cambió es lo que se afirma sobre él.</li>
+        <li>La bajada explica el salto Q1→Q2: el <b>67,5 % de Q1 tiene menos de 3 compras</b> y por
+        definición no puede estar en riesgo. Entre elegibles el gradiente va de 40,9 % a 52,1 %,
+        <b>1,27×</b> y no 3,89×.</li>
+        <li>Clic en cualquier barra fija ese quintil como filtro y salta a la lista
+        <span class="cita">Parte D §4.1</span>.</li>
+        <li>Barra horizontal para comparar categorías: el nombre se lee antes de llegar al dato
+        <span class="cita">Knaflic cap. 2, p. 57</span>.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">La Parte D decía que Q5 casi cuadruplica a Q1.</span> Ese 3,89× compara
+      poblaciones distintas: Q1 tiene 32,5 % de elegibles y Q5 el 99,3 %. Entre clientes comparables
+      el ratio es 1,27×. El KPI de la Parte D sigue siendo correcto; lo que no se sostiene es leerlo
+      como un gradiente de riesgo por valor. <span class="cita">enmienda 2 del documento integrado</span></p>
+      <p><span class="q">¿Entonces no importa el valor?</span> Importa, pero como magnitud de plata, no
+      como diferencia de tasa. Ese es el argumento de la vista siguiente.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 5 de 17</span></footer>
+</section>
+
+<!-- ================= 04 · D3 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">04</span><span class="id">D3</span><h2>Dónde está la plata</h2>
+    <span class="grupo">diagnóstico</span></div>
+  <p class="preg"><b>Pregunta</b>¿Dónde conviene gastar el presupuesto de retención?</p>
+  <figure><img src="img/04-D3.png" alt="Vista 04">
+    <figcaption><b>Título en pantalla:</b> "El riesgo no está donde está la plata: Campeones concentra 29,1 % de lo facturado y 16,4 % de la exposición"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Barras horizontales por segmento RFM</b>, ordenadas por exposición en pesos, de mayor a
+        menor. El largo es plata expuesta, nada más.</li>
+        <li><b>La tasa de riesgo va como nota</b> a la derecha de cada barra, con la referencia general
+        (41,0 %) rotulada arriba de esa columna.</li>
+        <li><b>Campeones</b> destacado: 29,1 % de lo facturado histórico y 16,4 % de la exposición, con
+        25,3 % de sus clientes en riesgo.</li>
+        <li><b>En riesgo</b> (95,7 %) va marcado como <b>circular</b>: la R de RFM es la misma recency que
+        define el target, así que ese segmento no aporta información nueva.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>R, F y M son quintiles de rank sobre recency, cantidad de compras y facturación al corte.
+      Los siete segmentos son reglas excluyentes con orden fijo, escrito en el contrato de datos:
+      la primera que aplica gana.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li>El eje dice <b>"Exposición anual (ARS)"</b> y no "pérdida esperada". No hay ninguna
+        probabilidad aplicada a ningún cliente; llamarla pérdida esperada sería prometer un modelo
+        que no existe.</li>
+        <li>La tasa <b>no va como segunda escala</b>. Un eje Y secundario obliga a decidir qué serie
+        corresponde a qué eje antes de leer el dato <span class="cita">Knaflic cap. 2, pp. 66-68</span>.</li>
+        <li>Se sacó del título la frase de la Parte D "con la tasa más baja": <b>era falsa</b>. Campeones
+        es el cuarto segmento más bajo de siete, no el primero
+        <span class="cita">enmienda 1</span>.</li>
+        <li>La circularidad se declara en la vista, no en un anexo. Es el mismo problema de
+        <b>leakage</b> que el proyecto ya tiene identificado en la definición del target.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿Dónde gasto el presupuesto?</span> Donde hay plata expuesta, que no coincide
+      con donde la tasa es alta. Hibernando y Leales tienen tasa alta sobre clientes de menor valor;
+      Campeones aporta el 16,4 % de la exposición con la tasa más baja de los segmentos grandes.</p>
+      <p><span class="q">¿Por qué dejan un segmento circular en pantalla?</span> Porque sacarlo rompe la
+      suma de la base. Se muestra rotulado, que es lo honesto.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 6 de 17</span></footer>
+</section>
+
+<!-- ================= 05 · D4 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">05</span><span class="id">D4</span><h2>La recompra contra la meta</h2>
+    <span class="grupo">diagnóstico</span></div>
+  <p class="preg"><b>Pregunta</b>¿La recompra a 90 días se mueve hacia la meta de 10-11 % o sigue en la línea base de 8-9 %?</p>
+  <figure><img src="img/05-D4.png" alt="Vista 05">
+    <figcaption><b>Título en pantalla:</b> "La recompra pasó de 19,0 % a 8,5 % en 5 trimestres y quedó fuera de meta"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Serie trimestral</b> de la tasa de recompra a 90 días, 2022Q1 a 2025Q3.</li>
+        <li><b>Tres franjas</b> con su rango escrito: en meta ≥10,0 %, por debajo 9,0-10,0 %, fuera de
+        meta &lt;9,0 %. El estado es la franja donde cae la línea.</li>
+        <li><b>Pico marcado</b> en 19,0 % (2024Q2) y último punto en 8,5 % con la etiqueta de estado.</li>
+        <li>La línea base histórica del negocio, 8-9 %, cae dentro de la franja de fuera de meta.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Transacciones_clientes.csv. Un trimestre entra en el cálculo solo si su cierre más 90 días
+      cae dentro del horizonte real de datos, que termina el 29/12/2025. Por eso la serie corta en
+      2025Q3 y no hay un 2025Q4 con media ventana.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li><b>Tiempo en línea, no en barras.</b> El tiempo en barras genera un efecto escalera
+        artificial <span class="cita">Knaflic cap. 2, pp. 45-46</span>.</li>
+        <li>El título dice <b>cinco trimestres</b> y no "cuatro seguidos" como la Parte D: la caída no es
+        monótona, 2024Q3 baja a 18,4 y 2024Q4 sube a 18,6 <span class="cita">enmienda 4</span>.</li>
+        <li>Los trimestres sin ventana completa <b>se cortan, no se interpolan</b>. Un punto inventado
+        en el extremo derecho es el que más se mira.</li>
+        <li>Corte y filtros se apagan con leyenda: la serie es global y los controles no la tocan.</li>
+        <li>Toda banda lleva etiqueta. Un semáforo sin texto falla para el 8 % de los varones con
+        daltonismo rojo-verde y en cualquier impresión en blanco y negro.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿De dónde sale la meta de 10-11 %?</span> La declaró el negocio en el
+      relevamiento del 18/08 como meta preliminar del primer año, explícitamente abierta a que el
+      equipo la ajuste con el diagnóstico. La línea base 8-9 % era una estimación de ellos y el dato
+      la confirma.</p>
+      <p><span class="q">¿Por qué el indicador del directorio es este y no la exposición?</span> Porque
+      la exposición no tiene meta: se sigue su variación. La recompra tiene meta, umbrales, dueña y
+      cadencia, que es lo que hace a un indicador bien definido.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 7 de 17</span></footer>
+</section>
+
+<!-- ================= 06 · D5a ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">06</span><span class="id">D5a</span><h2>Región</h2>
+    <span class="grupo">diagnóstico</span></div>
+  <p class="preg"><b>Pregunta</b>¿Qué región concentra la exposición?</p>
+  <figure><img src="img/06-D5a.png" alt="Vista 06">
+    <figcaption><b>Título en pantalla:</b> "AMBA concentra el 43,2 % de la exposición de las regiones"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Exposición en pesos por región</b>, ordenada de mayor a menor, con AMBA destacada.</li>
+        <li><b>Nota por barra</b>: la tasa de riesgo de esa región. Van de 40,4 % a 43,2 %, una amplitud
+        de <b>2,8 puntos</b>.</li>
+        <li><b>Solo online</b> va aparte, bajo línea divisoria: 317 clientes sin ninguna compra en tienda
+        física, sin región asignable.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Transacciones_clientes.csv cruzado con Tiendas.csv, 28 tiendas. La región de un cliente es
+      <b>la tienda donde concentra su gasto</b> hasta el corte, y la regla va escrita al pie de la vista.
+      Sin ninguna compra física, el cliente cae en Solo online.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li>La barra codifica <b>pesos</b> y no porcentaje: la pregunta es dónde se concentra la plata.
+        La tasa, que es otra unidad, va de nota.</li>
+        <li><b>Solo online sale del panel.</b> Adentro estiraba el rango visible a 30,3 puntos y
+        desmentía la lectura de planitud. Tampoco se esconde: el corte por región tiene que
+        reconciliar con el total de la base.</li>
+        <li>El título dice lo que el gráfico <b>dibuja</b> (concentración) y la planitud de la tasa baja a
+        la bajada. Antes el título afirmaba una propiedad de la tasa sobre un gráfico de pesos.</li>
+        <li>La apertura por tienda queda <b>fuera de la V1</b>, declarado, aunque le sirve a Lucía O. de
+        Operaciones <span class="cita">Parte D §6.1</span>.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿Hay una región problema?</span> No. 2,8 puntos entre la más alta y la más baja.
+      Lo que separa a las regiones es el tamaño, no el riesgo. La vista sirve para <b>descartar</b> la
+      lectura geográfica, que es un resultado útil y no un gráfico vacío.</p>
+      <p><span class="q">¿Por qué mostrar algo que no discrimina?</span> Porque el directorio pidió abrir
+      por región. Mostrar solo lo que da hallazgo es elegir el gráfico después de ver el resultado.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 8 de 17</span></footer>
+</section>
+
+<!-- ================= 07 · D5b ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">07</span><span class="id">D5b</span><h2>Categoría</h2>
+    <span class="grupo">diagnóstico</span></div>
+  <p class="preg"><b>Pregunta</b>¿Qué categoría concentra la exposición?</p>
+  <figure><img src="img/07-D5b.png" alt="Vista 07">
+    <figcaption><b>Título en pantalla:</b> "La categoría sí mueve la aguja: 15,5 puntos entre Muebles y Baño"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Misma forma y misma escala</b> que la vista de región, a propósito: las dos se leen como
+        un par.</li>
+        <li>Exposición en pesos por categoría, ordenada de mayor a menor, con la tasa de riesgo como
+        nota.</li>
+        <li><b>Muebles 44,4 % contra Baño 28,9 %</b>: 15,5 puntos de amplitud, contra los 2,8 de región.</li>
+        <li>Énfasis en la categoría de <b>mayor tasa</b>, que es la que el título nombra.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Categoría donde el cliente concentra su gasto hasta el corte, sobre las 7 del dataset. Misma
+      tabla de contingencia que el resto: región × categoría × RFM × quintil, resuelta por corte.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li><b>Un solo color de énfasis.</b> Marcar los dos extremos le daría al mismo color dos
+        significados opuestos dentro del mismo gráfico <span class="cita">Knaflic cap. 3, pp. 86-90</span>.
+        El extremo bajo se identifica por su etiqueta y su nota.</li>
+        <li>La amplitud en puntos <b>se recalcula en cada render</b>, también con filtros puestos. Nada
+        está escrito a mano en el título.</li>
+        <li>Las dos categorías del extremo bajo tienen <b>menos de 200 clientes</b> cada una, y eso se
+        declara: con esa base la tasa se mueve mucho por pocos casos.</li>
+        <li>Clic en una barra salta a la lista filtrada por esa categoría.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿Por qué mantener las dos vistas si una no dice nada?</span> Porque el par es el
+      argumento: la categoría mueve 15,5 puntos y la región 2,8. Sin la de región, la de categoría no
+      tiene contra qué compararse.</p>
+      <p><span class="q">¿Se puede accionar sobre Muebles?</span> Es la hipótesis que abre, no una
+      conclusión. Muebles tiene ciclo de recompra largo por naturaleza, y separar eso del abandono
+      real necesita el modelo.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 9 de 17</span></footer>
+</section>
+
+<!-- ================= 08 · D6 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">08</span><span class="id">D6</span><h2>Contra el criterio actual</h2>
+    <span class="grupo">modelo predictivo · en desarrollo</span></div>
+  <p class="preg"><b>Pregunta</b>¿La lista priorizada rinde más que el criterio actual?</p>
+  <figure><img src="img/08-D6.png" alt="Vista 08">
+    <figcaption><b>Título en pantalla:</b> "Todavía no hay score que comparar: la vara es 1,39 %, IC [1,08-1,78 %]"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Compra a 7 días del envío</b> por segmento objetivo de la campaña, sobre los 23.729 envíos
+        del dataset.</li>
+        <li><b>Inactivos 90d destacado</b>: 1,39 %, 61 compras sobre 4.399 envíos, con intervalo de
+        confianza al 95 % de 1,08 a 1,78 %. Es el criterio que Marketing usa hoy.</li>
+        <li>Cada barra lleva su <b>n de envíos y de compras</b>, que es lo que permite juzgar si la
+        diferencia entre segmentos significa algo.</li>
+        <li>La vista va rotulada <b>"modelo predictivo, en desarrollo"</b>.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Campanias_marketing.csv, envíos con fecha anterior al corte. El intervalo es de Wilson, que
+      es el que corresponde a una proporción chica sobre una muestra finita.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li>Se sacó de la comparación el <b>1,2 % global</b>: es otra base (23.529 limpios) y hacía ver la
+        vara cuatro veces más grande contra su comparable real, que es "Todos" con 1,34 %.</li>
+        <li>La vara va <b>con su intervalo</b>. Con 61 compras, presentar 1,39 % como número exacto es
+        falsa precisión, y el tablero pide lo mismo en las otras vistas de campañas.</li>
+        <li>El título dice lo que hay. La formulación de la Parte D ("la lista priorizada rinde más")
+        era verdadera por construcción antes de existir la lista.</li>
+        <li>La vista existe para <b>fijar la vara antes</b> de tener modelo. Es el baseline contra el que se
+        va a evaluar, y sin él cualquier resultado del modelo es inaudible.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿Contra qué se va a medir el modelo?</span> Contra 1,39 %, que es lo que rinde
+      hoy el criterio manual. Y para decir que lo supera hay que salirse del intervalo, no ganarle
+      por una décima.</p>
+      <p><span class="q">¿No es raro un gráfico sin resultado?</span> Es el estado real del proyecto en el
+      Entregable 1: diagnóstico, sin score. Rotularlo es preferible a dejar el espacio vacío o a
+      simular una comparación.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 10 de 17</span></footer>
+</section>
+
+<!-- ================= 09 · M0 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">09</span><span class="id">M0</span><h2>Cobertura contra capacidad</h2>
+    <span class="grupo">operación</span></div>
+  <p class="preg"><b>Pregunta</b>¿A cuántos alcanza a contactar Marketing y cuáles quedan sin cubrir?</p>
+  <figure><img src="img/09-M0.png" alt="Vista 09">
+    <figcaption><b>Título en pantalla:</b> "La capacidad cubre entre el 20,4 % y el 32,6 % de los clientes en riesgo: el orden importa más que el alcance"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Cada cuadro son 50 clientes.</b> La cuadrícula entera son los 2.452 en riesgo del corte.</li>
+        <li><b>Relleno oscuro</b>: los primeros 500, la capacidad mínima comprometida.
+        <b>Relleno claro</b>: hasta 800, el máximo declarado. <b>Con trama</b>: los 1.952 que quedan afuera
+        con la capacidad mínima.</li>
+        <li>La columna izquierda repite los tres números con rótulo, para que la lectura no dependa
+        de contar cuadros ni de distinguir dos azules.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Los 2.452 salen del pipeline y se mueven con el corte y con los filtros. La capacidad de
+      <b>500 a 800 contactos personalizados por mes</b> es dato del relevamiento al negocio, no un
+      supuesto del equipo.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li><b>Cuadrícula de unidades y no barra partida.</b> La pregunta es cuánta gente entra y cuánta
+        queda afuera, y eso se cuenta. Una barra al 20 % dice la proporción y nada más.</li>
+        <li>Se sacó la frase de la Parte C sobre el excedente como <b>grupo de control natural</b>. La
+        lista se ordena por exposición y se corta, así que el excedente es por construcción el tramo
+        de menor exposición: compararlo mide el ordenamiento, no la campaña
+        <span class="cita">enmienda 3</span>.</li>
+        <li>El control aleatorio <b>estratificado por quintil</b> queda para la V2, como ya decía la
+        Parte D §6.1. Sofía R. aceptó dejar clientes sin contactar con dos condiciones: porción
+        menor y sin comprometer a los de mayor valor.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿Alcanza la capacidad?</span> No: cubre entre uno de cada cinco y uno de cada
+      tres. Por eso lo que se pide aprobar es el <b>orden</b> de la lista y no más presupuesto de equipo.</p>
+      <p><span class="q">¿Y si contactaran a todos con envío masivo?</span> Eso ya existe y rinde 1,2 %
+      (vista 12). El recurso escaso es el contacto personalizado, y esta vista mide ese.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 11 de 17</span></footer>
+</section>
+
+<!-- ================= 10 · M3 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">10</span><span class="id">M3</span><h2>Consentimiento</h2>
+    <span class="grupo">operación</span></div>
+  <p class="preg"><b>Pregunta</b>¿La lista se puede ejecutar tal cual?</p>
+  <figure><img src="img/10-M3.png" alt="Vista 10">
+    <figcaption><b>Título en pantalla:</b> "Tres de cada diez envíos van a clientes que no dieron consentimiento"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Dos barras de envíos</b>: 16.451 con consentimiento y 7.078 sin, sobre 23.529 envíos
+        limpios. El 30,1 % del total.</li>
+        <li>La bajada agrega las dos cifras que el gráfico no puede mostrar: esos envíos alcanzan al
+        <b>98,3 % de los 1.809 clientes</b> que no consintieron, y hay <b>46 envíos a ids que no existen</b>
+        en el maestro de clientes.</li>
+        <li>El tramo sin consentimiento va en terracota, el único color que el tablero reserva para
+        excepciones.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Campanias_marketing.csv cruzado con el campo <span class="cita">acepta_marketing</span> de
+      Clientes.csv. Los 46 envíos huérfanos quedan fuera del numerador y del denominador porque no se
+      pueden clasificar, y se reportan aparte en vez de repartirse a criterio.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li>Los dos porcentajes van en <b>líneas separadas</b>: 30,1 % es sobre envíos y 98,3 % es sobre
+        clientes. Juntos se leen como si midieran lo mismo.</li>
+        <li>La vista va <b>antes que la lista</b> en el recorrido. "¿Se puede ejecutar?" es una pregunta
+        previa a "¿a quiénes contacto?".</li>
+        <li>Se presenta como <b>incumplimiento reconocido por el negocio con corrección en marcha</b>, no
+        como una denuncia del equipo. Ley 25.326 art. 12, ya declarada en la Parte D §6.1.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿Es un problema del dato o de la operación?</span> De la operación. El negocio
+      contestó que el consentimiento <b>se registra bien al alta</b> y que la plataforma de campañas no lo
+      usa como filtro obligatorio. Por eso la decisión 03 del cierre es un filtro previo y no un
+      proyecto de sistemas.</p>
+      <p><span class="q">¿Frena el proyecto?</span> No, lo condiciona. La lista de la vista 11 ya trae la
+      columna de consentimiento, y de los 800 priorizados solo 568 se pueden contactar hoy.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 12 de 17</span></footer>
+</section>
+
+<!-- ================= 11 · M1 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">11</span><span class="id">M1</span><h2>La lista</h2>
+    <span class="grupo">operación</span></div>
+  <p class="preg"><b>Pregunta</b>¿A quiénes contacto esta semana?</p>
+  <figure><img src="img/11-M1.png" alt="Vista 11">
+    <figcaption><b>Título en pantalla:</b> "Los 800 de mayor exposición concentran ARS 49,5 M de los 94,9 M, y solo 568 se pueden contactar"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li>Los <b>800 clientes en riesgo de mayor exposición</b> del corte, que concentran 49,5 M de los
+        94,9 M. El tope de 800 es la capacidad máxima declarada.</li>
+        <li><b>Exposición anual</b>: el criterio de orden, resaltado. <b>Recency y gap propio</b>: por qué ese
+        cliente está en la lista. <b>Consentimiento</b>: si se lo puede contactar.</li>
+        <li><b>Cuatro tramos de 200</b>, uno por semana. La capacidad es mensual y la decisión de Sofía R.
+        es semanal.</li>
+        <li>Cabeceras ordenables y botón que exporta los 800 completos a CSV.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Los 800 salen del pipeline por corte, ya ordenados. Recency y gap mediano son de cada
+      cliente, calculados al corte. Región y categoría aparecen como columna solo cuando son el
+      recorte activo, porque si no las 200 filas dicen lo mismo.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li><b>Solo código de cliente.</b> Sin nombre ni mail: el negocio dijo que alcanza con el código,
+        y Clientes.csv trae datos personales alcanzados por la Ley 25.326.</li>
+        <li><b>Sin columna de acción sugerida por fila.</b> Veinte celdas idénticas no son datos; el
+        modelo en desarrollo se declara una vez en la bajada.</li>
+        <li>Cuántas filas entran <b>se mide</b> contra el alto real de la caja, no se fija. Doce filas
+        desbordaban a 1152×640 y sobraba lugar a 1920×1080.</li>
+        <li>Si un filtro no aporta ningún cliente al top global, la vista <b>lo declara</b> en vez de
+        mostrar una tabla vacía con ceros.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">Filtré por una región y la lista quedó corta.</span> El ranking se recorta sobre
+      el top global por exposición individual. Un recorte puede tener exposición agregada alta sin que
+      ninguno de sus clientes llegue al piso de ese top.</p>
+      <p><span class="q">¿Por qué ordenar por exposición y no por probabilidad?</span> Porque todavía no
+      hay probabilidad. Cuando haya score, el orden pasa a ser pérdida esperada, que es probabilidad
+      por exposición. La estructura de la lista ya está preparada para eso.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 13 de 17</span></footer>
+</section>
+
+<!-- ================= 12 · M2a ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">12</span><span class="id">M2a</span><h2>El embudo de la campaña</h2>
+    <span class="grupo">operación</span></div>
+  <p class="preg"><b>Pregunta</b>¿Qué rindió la campaña?</p>
+  <figure><img src="img/12-M2a.png" alt="Vista 12">
+    <figcaption><b>Título en pantalla:</b> "El embudo termina en 1,2 %: las campañas masivas no discriminan"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Cuatro etapas en conteos absolutos</b>: 23.529 envíos, 35,1 % abre, 8,8 % clic, 1,2 %
+        compra dentro de los 7 días, que son 284 compras.</li>
+        <li>El porcentaje sobre el total va <b>pegado al valor</b> de cada barra.</li>
+        <li>A la derecha, la <b>conversión respecto de la etapa anterior</b>, que es lo propio de un
+        embudo y lo que dice dónde se cae la gente.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Campanias_marketing.csv. Base limpia de 23.529 envíos: los 200 que la separan de los 23.729
+      del dataset son duplicados exactos de fila completa, id de envío incluido.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li><b>Las dos bases van declaradas</b> en la bajada. Es la misma disciplina que en el resto del
+        tablero: cada cifra con su denominador al lado.</li>
+        <li>Se avisa que <b>ninguna compra a 7 días ocurre sin clic previo</b>, cero casos verificados. El
+        salto que aparece al abrir es mecánico, no un efecto de la campaña.</li>
+        <li>Ese aviso existe porque el embudo invita a leer causalidad donde no la hay. Sin grupo de
+        control no se puede afirmar que abrir el mail cause la compra.</li>
+        <li>Barras desde cero, escala del eje en miles: la magnitud alcanza y el número exacto ya está
+        en la nota de cada barra.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿1,2 % es poco?</span> Es lo que rinde el envío masivo sin discriminar, y está
+      en el tablero justamente para ser la referencia contra la que se juzga cualquier cosa que el
+      proyecto proponga.</p>
+      <p><span class="q">¿Se puede decir que la campaña funcionó?</span> No con estos datos. No hay grupo
+      de control, así que no hay contra qué medir el efecto incremental. Está declarado fuera de
+      alcance de la V1.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 14 de 17</span></footer>
+</section>
+
+<!-- ================= 13 · M2b ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">13</span><span class="id">M2b</span><h2>Por segmento</h2>
+    <span class="grupo">operación</span></div>
+  <p class="preg"><b>Pregunta</b>¿Algún segmento discrimina?</p>
+  <figure><img src="img/13-M2b.png" alt="Vista 13">
+    <figcaption><b>Título en pantalla:</b> "Ningún segmento se despega: Inactivos 90d y Bronze se solapan entre 1,08 % y 1,28 %"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Un punto por segmento</b> con su barra de intervalo de confianza al 95 %, sobre la misma
+        serie de campañas de la vista 08.</li>
+        <li><b>Punteada vertical</b>: la tasa global de compra a 7 días.</li>
+        <li>El hallazgo se lee en el dibujo: el intervalo del mejor segmento y el del peor <b>se pisan</b>
+        entre 1,08 % y 1,28 %.</li>
+        <li>Énfasis en Inactivos 90d, el mismo segmento que la vista 08 usa como vara.</li>
+      </ul>
+
+      <h3>De dónde sale</h3>
+      <p>Campanias_marketing.csv, cinco segmentos objetivo sobre 23.729 envíos. Intervalo de Wilson
+      al 95 %, calculado en el pipeline y validado contra los golden files.</p>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li><b>Punto con intervalo en vez de barras.</b> Con tasas del orden del 1 %, cinco barras desde
+        cero dan cinco rectángulos casi iguales y el hallazgo real no se ve en el largo.</li>
+        <li>Posición sobre una escala común se lee mejor que largo cuando la diferencia entre valores
+        es chica <span class="cita">Cleveland y McGill</span>.</li>
+        <li>El intervalo <b>vuelve verificable</b> la afirmación del título. "Ninguno se despega" a secas
+        es una opinión; el solapamiento se mira.</li>
+        <li>Es la misma serie que la vista 08 para otra pregunta: allá se mide contra la vara, acá si
+        algún segmento sirve para priorizar.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">¿Sirve el segmento de fidelización para priorizar?</span> No. Ninguno se despega
+      y los intervalos se pisan. Es el argumento de por qué la lista se ordena por exposición, que es
+      la decisión 02 del cierre.</p>
+      <p><span class="q">¿Por qué dos vistas sobre la misma tabla?</span> Porque responden dos preguntas
+      distintas de dos audiencias distintas. Juntarlas obligaba a que un gráfico sostuviera dos
+      lecturas y no sostiene bien ninguna.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 15 de 17</span></footer>
+</section>
+
+<!-- ================= 14 · D7 ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">14</span><span class="id">D7</span><h2>Cierre</h2>
+    <span class="grupo">decisión</span></div>
+  <p class="preg"><b>Pregunta</b>¿Qué se decide hoy?</p>
+  <figure><img src="img/14-D7.png" alt="Vista 14">
+    <figcaption><b>Título en pantalla:</b> "Tres decisiones, ninguna cuesta presupuesto nuevo"</figcaption></figure>
+
+  <div class="cols">
+    <div class="col">
+      <h3>Qué muestra</h3>
+      <ul>
+        <li><b>Sin gráfico nuevo.</b> Arriba el pedido: aprobar las tres decisiones y tomar el corte de
+        dic 2025 como primera lectura contra los umbrales declarados.</li>
+        <li><b>01 · Indicador de directorio.</b> La recompra a 90 días pasa a ser el número del
+        directorio: 8,5 % contra meta 10-11 %, dueña María G., cadencia mensual.</li>
+        <li><b>02 · Orden de la lista.</b> Se ordena por exposición, no por segmento: 800 clientes
+        concentran el 52,1 % de los 94,9 M.</li>
+        <li><b>03 · Filtro de consentimiento.</b> Cada envío se filtra antes de salir. Hoy el 30,1 % de
+        los envíos no lo tiene, y en este corte son 232 de los 800 priorizados.</li>
+        <li>Cada artículo cierra con <b>su prueba dibujada</b> y con su costo.</li>
+      </ul>
+    </div>
+
+    <div class="col">
+      <h3>Decisiones y por qué</h3>
+      <ul>
+        <li><b>Conclusión arriba, fundamento abajo, pedido explícito</b> <span class="cita">pirámide de Minto</span>.
+        El pedido subió del pie al encabezado: al pie lo leía solo el que llegaba hasta abajo.</li>
+        <li>Las tres decisiones <b>no piden presupuesto nuevo</b>. Corren con los datos y la capacidad que
+        el tablero ya mostró, y eso es lo que las hace aprobables en una reunión mensual.</li>
+        <li>El pedido ya apareció en la vista 01. Esta es su desarrollo, no su primera aparición
+        <span class="cita">lead with the ending</span>.</li>
+        <li>Los tres artículos se recalculan con el corte activo: la cifra del artículo 02 se mueve si
+        se mueve el corte.</li>
+      </ul>
+
+      <h3>Si preguntan</h3>
+      <p><span class="q">El directorio hoy no mira esto.</span> Correcto: mira ventas por tienda y canal,
+      clientes nuevos por mes, actividad de fidelización y desvíos contra presupuesto. La decisión 01
+      es exactamente que empiece a mirarlo, y cuesta cero porque el número ya se calcula.</p>
+      <p><span class="q">¿Qué pasa si no aprueban nada?</span> El tablero sigue siendo diagnóstico y el
+      Entregable 2 arranca sin indicador de seguimiento acordado. Las tres decisiones son la condición
+      mínima para que el proyecto tenga contra qué medirse.</p>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 16 de 17</span></footer>
+</section>
+
+<!-- ================= CIERRE ================= -->
+<section class="hoja">
+  <div class="cab"><span class="n">✓</span><h2>Una hoja para llevar</h2>
+    <span class="grupo">números y correcciones</span></div>
+
+  <div class="dos" style="margin-top:8px">
+    <div>
+      <h3>Los números de memoria</h3>
+      <table>
+        <tbody>
+          <tr><td>Exposición anual al 31/12/2025</td><td class="num"><b>ARS 94,9 M</b></td></tr>
+          <tr><td>Sobre el gasto anual estimado (204,6 M)</td><td class="num">46,4 %</td></tr>
+          <tr><td>Sobre lo facturado desde 2022 (550,2 M)</td><td class="num">47,8 %</td></tr>
+          <tr><td>Clientes en riesgo</td><td class="num"><b>2.452</b> de 5.978 · 41,0 %</td></tr>
+          <tr><td>Elegibles (3 compras o más)</td><td class="num">4.940</td></tr>
+          <tr><td>Riesgo en Q5 · entre elegibles</td><td class="num">51,8 % · 52,1 %</td></tr>
+          <tr><td>Riesgo en Q1 · entre elegibles</td><td class="num">13,3 % · 40,9 %</td></tr>
+          <tr><td>Recompra a 90 días, último trimestre</td><td class="num"><b>8,5 %</b> (2025Q3)</td></tr>
+          <tr><td>Pico de recompra</td><td class="num">19,0 % (2024Q2)</td></tr>
+          <tr><td>Meta · línea base</td><td class="num">10-11 % · 8-9 %</td></tr>
+          <tr><td>Amplitud de riesgo entre regiones</td><td class="num">2,8 pp</td></tr>
+          <tr><td>Amplitud entre categorías</td><td class="num">15,5 pp</td></tr>
+          <tr><td>Capacidad de contacto por mes</td><td class="num">500 a 800</td></tr>
+          <tr><td>Top 800 · exposición que concentra</td><td class="num">ARS 49,5 M · 52,1 %</td></tr>
+          <tr><td>Del top 800, contactables hoy</td><td class="num">568</td></tr>
+          <tr><td>Embudo de campaña</td><td class="num">35,1 % → 8,8 % → 1,2 %</td></tr>
+          <tr><td>Criterio actual, compra a 7 días</td><td class="num">1,39 % [1,08-1,78]</td></tr>
+          <tr><td>Envíos sin consentimiento</td><td class="num">7.078 de 23.529 · 30,1 %</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <h3>Las cuatro correcciones que conviene decir primero</h3>
+      <p class="dato">Salen de recomputar las cifras de las partes ya entregadas con el pipeline del
+      tablero. Decirlas antes de que las pregunten muestra control sobre el dato.</p>
+      <ul>
+        <li><b>Campeones no tiene la tasa más baja.</b> Tiene 25,3 % de clientes en riesgo y es el cuarto
+        más bajo de siete. Se dice: "concentra el 29,1 % de la facturación con 25,3 % en riesgo, menos
+        de dos tercios del 41,0 % general".</li>
+        <li><b>El gradiente por quintil está inflado por la elegibilidad.</b> Sobre el total el ratio Q5/Q1
+        es 3,89×; entre clientes comparables es 1,27×. El KPI de la Parte D no cambia, cambia la
+        lectura.</li>
+        <li><b>El excedente de capacidad no es grupo de control.</b> La lista se ordena y se corta, así que
+        el excedente es el tramo de menor exposición. El control estratificado va en V2.</li>
+        <li><b>La recompra no cae cuatro trimestres seguidos.</b> Desde el pico: 19,0 → 18,4 → 18,6 → 16,0
+        → 12,9 → 8,5. No es monótona.</li>
+      </ul>
+
+      <h3>Las trampas más probables</h3>
+      <ul>
+        <li><span class="q">"¿Esto es churn?"</span> No. Es un proxy operativo sobre inactividad, escrito
+        antes de tocar el dato y reproducible.</li>
+        <li><span class="q">"¿Cuánto recuperan?"</span> No se afirma recupero en ninguna vista.</li>
+        <li><span class="q">"¿Y la inflación?"</span> Pesos nominales sin deflactar, declarado. Afecta la
+        comparación entre años, no el reparto de la exposición dentro de un corte.</li>
+        <li><span class="q">"¿Los datos son representativos?"</span> No del todo: el 44,8 % de las
+        transacciones no tiene id de cliente. La base identificada es la única sobre la que se puede
+        calcular riesgo, y el sesgo está declarado.</li>
+        <li><span class="q">"¿Cómo sabemos que los números están bien?"</span> 75 anclas, 201.900 chequeos
+        contra una verdad independiente y 606.270 de paridad entre el pipeline y el navegador. Si una
+        falla, el build corta.</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer class="pie"><span>Casa Óga · tablero de riesgo de pérdida de clientes</span><span>hoja 17 de 17</span></footer>
+</section>
+
+</body>
+</html>

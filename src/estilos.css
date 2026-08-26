@@ -731,6 +731,38 @@ body {
   letter-spacing: -.025em; white-space: nowrap;
 }
 .cob-k-val.acc { color: var(--acc); }
+
+/* El primer KPI es también el control: número exacto escribible, y ± de a diez. */
+.cob-k-ctl { display: flex; align-items: center; gap: 6px; }
+.cob-k-ctl input {
+  width: 4.2ch; padding: 0; margin: 0;
+  border: 0; border-bottom: 2px solid var(--bd); border-radius: 0;
+  background: none; color: var(--ink); text-align: left;
+  -moz-appearance: textfield;
+}
+.cob-k-ctl input::-webkit-outer-spin-button,
+.cob-k-ctl input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.cob-k-ctl input:hover { border-bottom-color: var(--mut); }
+.cob-k-ctl input:focus { outline: 0; border-bottom-color: var(--acc); }
+.cob-k-ctl button {
+  display: grid; place-items: center;
+  width: 24px; height: 24px; flex-shrink: 0;
+  border: 1px solid var(--bd); border-radius: 4px;
+  background: var(--sup); color: var(--mut2);
+  font: 400 15px/1 var(--fuente); cursor: pointer;
+}
+.cob-k-ctl button:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); }
+.cob-k-ctl button:disabled { opacity: .35; cursor: default; }
+.cob-k-ctl button:focus-visible { outline: 2px solid var(--sel); outline-offset: 1px; }
+
+/* Saltos a los dos cortes de capacidad declarados. */
+.cob-salto {
+  border: 0; background: none; padding: 0 1px; cursor: pointer;
+  font: inherit; color: var(--acc); font-weight: 600;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.cob-salto:hover:not(:disabled) { color: var(--sel); }
+.cob-salto:disabled { color: var(--mut); text-decoration: none; cursor: default; }
 .cob-k-ap { font: 400 10.5px/1.4 var(--mono); color: var(--mut); min-height: 2.8em; }
 
 @media (max-height: 730px) {
