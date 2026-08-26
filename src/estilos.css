@@ -213,16 +213,24 @@ body {
 }
 .filtros.inertes .chip-f { opacity: .35; }
 .chip-f-caja .chip-f { width: 100%; }
-.filtros-n {
+.filtros-lbl {
   flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 5px;
+  font: 500 9px/1.2 var(--mono);
+  letter-spacing: .13em; text-transform: uppercase; color: var(--mut);
+  margin-right: 2px;
+}
+.filtros-lbl b {
   display: inline-grid; place-items: center;
-  min-width: 17px; height: 17px; padding: 0 4px; margin-right: 2px;
+  min-width: 16px; height: 16px; padding: 0 4px;
   background: var(--sel); color: #fff;
-  border-radius: 9px; font: 600 10px/1 var(--mono);
+  border-radius: 8px; font: 600 9.5px/1 var(--mono);
 }
 .filtros-nota { font: italic 400 10.5px var(--fuente); color: var(--mut); }
+/* Ancho fijo para que el riel del corte no se mueva. 84 px entra tanto "Limpiar" como el
+   aviso corto de "no aplican acá"; con el aviso largo hacían falta 128. */
 .filtros-cola {
-  flex: 0 0 auto; width: 128px;
+  flex: 0 0 auto; width: 84px;
   display: flex; align-items: center;
 }
 
@@ -870,6 +878,17 @@ body {
   padding: 6px 9px; cursor: pointer; margin-left: auto;
 }
 .chip-claro:hover { border-color: var(--mut); color: var(--ink); }
+
+/* ---------- barra angosta: los rótulos ceden antes que el riel ---------- */
+/* Por debajo de 1300 px los dos rótulos ("Filtros" y "Mes de corte") se comen el ancho que
+   necesita la pista: a 1152 la dejaban en 81 px, o sea 3 px por corte. Se ocultan y su
+   significado queda en el aria-label y en los propios controles, que ya se explican. */
+
+@media (max-width: 1300px) {
+  .filtros-lbl { font-size: 0; gap: 0; }
+  .filtros-lbl b { font-size: 9.5px; }
+  .tl-lbl { display: none; }
+}
 
 /* ---------- pantallas bajas: el alto es la restricción, no el ancho ---------- */
 

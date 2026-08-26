@@ -51,10 +51,29 @@ export function Lienzo({ children, className = '' }) {
   )
 }
 
-/** Ancho aproximado de un texto. Sirve para presupuestar columnas y para dimensionar la
- *  plaqueta blanca de un rotulo sin medir el DOM. */
-function anchoTexto(t, fuente) {
-  return String(t).length * fuente * 0.56
+/**
+ * Ancho REAL de un texto, medido con canvas.
+ *
+ * Antes era una estimacion (largo x cuerpo x 0,56) y se quedaba corta con versalitas y con
+ * letter-spacing: la caja salia mas angosta que su contenido y el texto se desbordaba. El
+ * canvas se crea una sola vez y la familia sale del body, asi que mide con la tipografia que
+ * se esta usando de verdad. Si no hay canvas (impresion, entorno sin DOM) cae a la
+ * estimacion vieja, que para presupuestar columnas alcanza.
+ */
+let _ctx = null
+let _fam = null
+function anchoTexto(t, fuente, peso = 400, espaciado = 0) {
+  const txt = String(t)
+  try {
+    if (!_ctx) {
+      _ctx = document.createElement('canvas').getContext('2d')
+      _fam = getComputedStyle(document.body).fontFamily || 'sans-serif'
+    }
+    _ctx.font = `${peso} ${fuente}px ${_fam}`
+    return _ctx.measureText(txt).width + espaciado * fuente * txt.length
+  } catch {
+    return txt.length * fuente * 0.6
+  }
 }
 
 const ACC = 'var(--acc)'
@@ -125,7 +144,7 @@ function CorteDeEje({ x, y }) {
  */
 export function Plaqueta({ x, y, texto, fuente = 12, peso = 600, color = INK,
                            anclaje = 'start', padX = 5 }) {
-  const w = anchoTexto(texto, fuente) + padX * 2
+  const w = anchoTexto(texto, fuente, peso) + padX * 2
   const h = fuente + 7
   const rx = anclaje === 'end' ? x - w + padX : anclaje === 'middle' ? x - w / 2 : x - padX
   return (
@@ -185,8 +204,8 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
   // ancho de la etiqueta de valor y el de la columna de notas salen de los datos reales.
   // Con notaAncho fijo, "ARS 36,8 M" y "9,1 % en riesgo (circular)" terminaban encimados.
   const textoValor = (d) => formato(d.valor) + (d.sufijo ? `  ${d.sufijo}` : '')
-  const anchoValor = Math.max(38, ...datos.map((d) => anchoTexto(textoValor(d), fuente) + 12))
-  const anchoNota = Math.max(0, ...datos.map((d) => (d.nota ? anchoTexto(d.nota, fuente - 1.5) + 14 : 0)))
+  const anchoValor = Math.max(38, ...datos.map((d) => anchoTexto(textoValor(d), fuente, 600) + 12))
+  const anchoNota = Math.max(0, ...datos.map((d) => (d.nota ? anchoTexto(d.nota, fuente - 1.5, 400) + 14 : 0)))
   const ancho = Math.max(40, w - x0 - anchoNota - anchoValor - 6)
 
   const crudo = Math.max(...datos.map((d) => d.valor), 0)
@@ -291,8 +310,8 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
   // +26 por la muestra de color y su aire. Con zonas el rotulo va en dos renglones (nombre
   // y rango), asi que el ancho lo fija el mas largo de los dos.
   const anchoRotulo = zonas
-    ? Math.max(...zonas.map((z) => Math.max(anchoTexto(z.etiqueta, 11.5), anchoTexto(z.rango, 11.5))))
-    : Math.max(...rotulos.map((r) => anchoTexto(r, 10)))
+    ? Math.max(...zonas.map((z) => Math.max(anchoTexto(z.etiqueta, 11.5, 700), anchoTexto(z.rango, 11.5, 400))))
+    : Math.max(...rotulos.map((r) => anchoTexto(r, 10, 600)))
   const padR = Math.min(w * 0.36, Math.max(30, anchoRotulo + 26))
   const iw = Math.max(20, w - padL - padR)
   const ih = Math.max(20, h - padT - padB)
@@ -459,6 +478,13 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
         </g>
       )}
 
+      {/* La cruz va DEBAJO de la curva y de la bandera: dibujada al final le pasaba por
+          encima al tag y lo partia al medio. El trimestre lo dice ella sobre el eje X. */}
+      {foco != null && serie[foco] && serie[foco].valor != null && (
+        <line x1={X(foco)} x2={X(foco)} y1={padT} y2={yBase} stroke={MUT2} strokeWidth="1"
+              opacity=".4" pointerEvents="none" />
+      )}
+
       {tramos.map((t, i) => (
         <polyline key={i} points={t.map((p) => p.join(',')).join(' ')} fill="none"
                   stroke={ACC} strokeWidth="2.25" strokeLinejoin="round" strokeLinecap="round" />
@@ -473,48 +499,53 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
       )}
       {/* El ultimo punto casi siempre cae en el borde derecho, donde ya viven los rotulos de
           las bandas: su plaqueta se ancla hacia adentro para no encimarse con ellos. */}
-      {/* El ultimo punto, su valor y SU ESTADO, juntos. El estado vivia en una pastilla
-          arriba a la derecha, lejos del dato que califica; aca va pegado al punto, que es
-          donde el ojo ya esta. No depende del color: lleva el nombre de la zona escrito y
-          la forma del semaforo (llena / media / punteada).
-          La bandera va del lado donde hay lugar (abajo si el punto esta en la mitad
-          inferior) y se clampea contra los cuatro bordes del lienzo. */}
-      {ultimo && (() => {
+      {/* El punto APUNTADO, su valor y su estado, en una sola bandera que acompana al
+          cursor. Antes el estado seguia al mouse y el valor se quedaba en el ultimo punto,
+          asi que al recorrer la serie la bandera decia "8,5 % EN META", que es falso.
+          Sin cursor muestra el ultimo punto. El ancho sale de medir el texto, no de
+          estimarlo, y la caja se clampea contra los cuatro bordes del lienzo. */}
+      {(() => {
+        const i = foco != null && serie[foco] && serie[foco].valor != null ? foco : iUlt
+        const p = serie[i]
+        if (!p || p.valor == null) return null
         const zActiva = zonas && iZona >= 0 ? zonas[iZona] : null
-        const val = formato(ultimo.valor)
+        // Solo el valor: el trimestre ya lo senala la cruz sobre el eje X, y repetirlo
+        // obligaba a una caja del doble de ancho que tapaba mas serie.
+        const linea1 = formato(p.valor)
         const est = zActiva ? zActiva.etiqueta.toUpperCase() : null
-        const bw = Math.max(anchoTexto(val, 13), est ? anchoTexto(est, 9) + 13 : 0) + 18
-        const bh = est ? 34 : 21
-        const yp = Y(ultimo.valor)
+        const anchoEst = est ? anchoTexto(est, 9, 600, 0.07) + 22 : 0
+        const bw = Math.max(anchoTexto(linea1, 13, 700), anchoEst) + 20
+        const bh = est ? 36 : 22
+        const yp = Y(p.valor)
         const abajo = yp > padT + (yBase - padT) * 0.5
         let by = abajo ? yp + 14 : yp - 14 - bh
         by = Math.max(padT + 2, Math.min(by, yBase - bh - 2))
-        const bx = Math.max(padL + 2, Math.min(X(iUlt) - bw / 2, xFin - bw - 2))
+        const bx = Math.max(padL + 2, Math.min(X(i) - bw / 2, xFin - bw - 2))
         const tono = zActiva ? zActiva.tono : ACC
         return (
-          <g>
-            <circle cx={X(iUlt)} cy={yp} r="4" fill={ACC} stroke="var(--sup)" strokeWidth="2" />
+          <g pointerEvents="none">
+            <circle cx={X(i)} cy={yp} r="4.5" fill={ACC} stroke="var(--sup)" strokeWidth="2" />
             <rect x={bx} y={by} width={bw} height={bh} rx="3"
                   fill="var(--sup)" stroke={tono} strokeWidth="1.25" />
             <text x={bx + bw / 2} y={by + (est ? 12 : 11)} fontSize="13" fontWeight={700}
                   fill={INK} textAnchor="middle" dominantBaseline="central"
-                  className="tabular">{val}</text>
+                  className="tabular">{linea1}</text>
             {est && (
               <g>
                 {/* La forma del semaforo: llena en meta, media por debajo, punteada fuera. */}
-                {iZona === 2 && <rect x={bx + 9} y={by + 20} width={7} height={7} fill={tono} />}
+                {iZona === 2 && <rect x={bx + 10} y={by + 21} width={7} height={7} fill={tono} />}
                 {iZona === 1 && (
                   <g>
-                    <rect x={bx + 9} y={by + 20} width={7} height={7} fill="none"
+                    <rect x={bx + 10} y={by + 21} width={7} height={7} fill="none"
                           stroke={tono} strokeWidth="1.2" />
-                    <rect x={bx + 9} y={by + 23.5} width={7} height={3.5} fill={tono} />
+                    <rect x={bx + 10} y={by + 24.5} width={7} height={3.5} fill={tono} />
                   </g>
                 )}
                 {iZona === 0 && (
-                  <rect x={bx + 9} y={by + 20} width={7} height={7} fill="none"
+                  <rect x={bx + 10} y={by + 21} width={7} height={7} fill="none"
                         stroke={tono} strokeWidth="1.2" strokeDasharray="2 1.6" />
                 )}
-                <text x={bx + 21} y={by + 24} fontSize="9" fontWeight={600} fill={tono}
+                <text x={bx + 22} y={by + 25} fontSize="9" fontWeight={600} fill={tono}
                       letterSpacing=".07em" dominantBaseline="central">{est}</text>
               </g>
             )}
@@ -542,27 +573,6 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
               style={{ textTransform: 'uppercase' }}>{tituloEje}</text>
       )}
 
-      {foco != null && serie[foco] && serie[foco].valor != null && (() => {
-        const x = X(foco)
-        const y = Y(serie[foco].valor)
-        const txt = `${serie[foco].etiqueta}  ${formato(serie[foco].valor)}`
-        const bw = anchoTexto(txt, 11) + 18
-        // La caja se da vuelta contra el borde derecho en vez de salirse del lienzo.
-        const bx = Math.min(x + 12, xFin - bw) < padL ? x + 12
-          : (x + 12 + bw > w - 4 ? x - 12 - bw : x + 12)
-        return (
-          <g pointerEvents="none">
-            <line x1={x} x2={x} y1={padT} y2={yBase} stroke={MUT2} strokeWidth="1" opacity=".45" />
-            <circle cx={x} cy={y} r="4.5" fill={ACC} stroke="var(--sup)" strokeWidth="2" />
-            <g transform={`translate(0 ${Math.max(padT + 12, Math.min(y - 14, yBase - 14))})`}>
-              <rect x={bx} y={-11} width={bw} height={22} rx="3"
-                    fill="var(--sup)" stroke="var(--bd)" strokeWidth="1" />
-              <text x={bx + 9} y={0} fontSize="11" fill={INK} dominantBaseline="central"
-                    className="tabular">{txt}</text>
-            </g>
-          </g>
-        )
-      })()}
 
       {/* Zona de captura: cubre todo el area de dibujo, asi el objetivo es la columna del
           trimestre y no el punto de 8 px. */}
@@ -607,7 +617,7 @@ export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132,
   const fuente = Math.max(10.5, Math.min(13, paso * 0.4))
 
   const x0 = anchoEtiqueta
-  const anchoNota = Math.max(0, ...datos.map((d) => (d.nota ? anchoTexto(d.nota, fuente - 1.5) + 14 : 0)))
+  const anchoNota = Math.max(0, ...datos.map((d) => (d.nota ? anchoTexto(d.nota, fuente - 1.5, 400) + 14 : 0)))
   const ancho = Math.max(40, w - x0 - anchoNota - 16)
   const lo = 0
   const crudo = Math.max(...datos.map((d) => d.ic[1]), referencia ? referencia.ic[1] : 0)
@@ -772,7 +782,7 @@ export function Chispa({ serie, w, h, banda, tonoBanda = 'var(--acc)', rotulo, r
   const R = 3.5
   // El rotulo del ultimo valor se lleva su ancho del area de dibujo, y el punto se mete R
   // hacia adentro: dibujado en x = w quedaba cortado a la mitad por el borde del SVG.
-  const anchoRot = rotulo ? anchoTexto(rotulo, 11) + 12 : 0
+  const anchoRot = rotulo ? anchoTexto(rotulo, 11, 700) + 12 : 0
   const iw = Math.max(20, w - anchoRot - R * 2)
   const X = (i) => R + (i / Math.max(1, serie.length - 1)) * iw
   const Y = (v) => R + ((max - v) / (max - min)) * Math.max(1, h - R * 2)
@@ -832,7 +842,7 @@ export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion
   const tono = excepcion ? EXC : ACC
   // El dato marcado: adentro del tramo si entra, si no pegado a su borde. Una barra sin
   // cifra obliga a leer el numero que esta en otro renglon.
-  const dentro = rotulo ? anchoTexto(rotulo, 15) + 20 < ancho : false
+  const dentro = rotulo ? anchoTexto(rotulo, 15, 700) + 20 < ancho : false
   return (
     <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
       <Tramas />

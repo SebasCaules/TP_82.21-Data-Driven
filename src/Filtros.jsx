@@ -70,7 +70,9 @@ function Chip({ dim, valor, onElegir, activo, exento }) {
     if (!abierto) {
       if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault(); e.stopPropagation()
-        setFoco(valor ?? 0); setAbierto(true)
+        // -1 es la fila "Todas las ...", que es la que esta elegida cuando no hay filtro:
+        // arrancar en 0 dejaba resaltada la primera opcion real, que no es la vigente.
+        setFoco(valor ?? -1); setAbierto(true)
       }
       return
     }
@@ -108,7 +110,7 @@ function Chip({ dim, valor, onElegir, activo, exento }) {
         aria-label={`${aviso}${puesto ? `: ${texto}` : ''}`}
         disabled={!activo}
         title={exento ? aviso : undefined}
-        onClick={() => { if (activo) { setFoco(valor ?? 0); setAbierto((a) => !a) } }}
+        onClick={() => { if (activo) { setFoco(valor ?? -1); setAbierto((a) => !a) } }}
         onKeyDown={onKey}
       >
         <IconoActual aria-hidden="true" />
@@ -157,12 +159,13 @@ export default function Filtros({ filtro, setFiltro, activos, reiniciar, modific
 
   return (
     <div className={`filtros${activos ? '' : ' inertes'}`}>
-      {/* Sin el rótulo "Filtrar por": ocupaba 92 px de la barra y los cuatro chips ya dicen
-          qué son. Queda el contador, que es lo único que el rótulo aportaba de verdad, y su
-          lugar está reservado para que el riel del corte no se mueva al aparecer. */}
-      <span className="filtros-n tabular" aria-label={`${puestos} filtros puestos`}
-            style={puestos ? undefined : { visibility: 'hidden' }} aria-hidden={!puestos}>
-        {puestos || 0}
+      {/* "Filtros" y no "Filtrar por": el rótulo hace falta para saber qué es esa fila, pero
+          la versión larga costaba 92 px del riel del corte. El contador tiene su lugar
+          reservado aunque esté en cero, para que el riel no se mueva al aparecer. */}
+      <span className="filtros-lbl">
+        Filtros
+        <b className="tabular" style={puestos ? undefined : { visibility: 'hidden' }}
+           aria-hidden={!puestos}>{puestos || 0}</b>
       </span>
 
       {DIMENSIONES.map((d) => (
@@ -176,7 +179,7 @@ export default function Filtros({ filtro, setFiltro, activos, reiniciar, modific
           filtro le movería el riel del mes de corte, que está pegado a la derecha. */}
       <span className="filtros-cola">
         {!activos
-          ? <span className="filtros-nota">no aplican en esta vista</span>
+          ? <span className="filtros-nota">no aplican acá</span>
           : modificado && (
             <button type="button" className="chip-f reset" onClick={reiniciar}
                     title="Volver al estado inicial (Esc)">
