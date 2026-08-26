@@ -35,9 +35,15 @@ export default function D0({ info }) {
   return (
     <section className="pant cab-1">
       {/* Una linea cada uno. El BAN es el heroe de esta pantalla, asi que el titulo va en
-          cuerpo chico: si compite con la cifra, no gana ninguno de los dos. */}
+          cuerpo chico: si compite con la cifra, no gana ninguno de los dos.
+
+          El titulo lleva SIEMPRE el n. Con cuatro filtros encima el recorte puede quedar en
+          tres clientes, y "el 100,0 % del gasto anual" sobre tres clientes es cierto y
+          enganoso a la vez. Con "3 de 3" al lado, el lector ve de que tamano es la base de
+          la que se esta hablando sin tener que mirar la tarjeta. */}
       <h1 className="titulo" style={{ fontWeight: 500, fontSize: 'clamp(14px, 1.25vw, 18px)' }}>
-        El {pct(info.pct)} del gasto anual de la base está en clientes sin compra reciente
+        El {pct(info.pct)} del gasto anual está en {entero(info.enRiesgo)} de{' '}
+        {entero(info.clientes)} clientes sin compra reciente
       </h1>
       <p className="bajada">
         En {ultimoAnio.anio} la base activa cayó {pct(caidaBase)} y la recompra a 90 días
