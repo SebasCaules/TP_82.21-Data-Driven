@@ -60,7 +60,7 @@ def main():
 
     for corte in lista_cortes:
         facts = features.client_facts(tx, corte)
-        cont = features.contingency(facts, DIMS)
+        cont = features.contingency(facts, DIMS, corte=corte)
         lista = features.top_lista(facts, clientes, DIMS, n=800)
         lista["id"] = lista["id"].map(pos_cliente).astype(int)
 
@@ -85,6 +85,7 @@ def main():
             "clientes_historia_corta": int(corta.sum()),
             "elegibles": int(facts["elegible"].sum()),
             "en_riesgo": int(en_riesgo.sum()),
+            "sensibilidad": features.sensibilidad_umbral(tx, corte),
         })
         resumen_por_corte.append(facts)
 
@@ -122,6 +123,9 @@ def main():
             "meta_recompra": [10.0, 11.0],
             "base_recompra": [8.0, 9.0],
             "marca_a_superar": 1.39,
+            # Umbrales de semaforo de la Parte D §2.1. En los dos de riesgo, menos es mejor.
+            "umbral_en_riesgo": [38.0, 42.0],
+            "umbral_q5": [45.0, 52.0],
             "moneda": "ARS nominales, sin deflactar",
             "proxy": "sin compra por mas de 90 dias o mas de 1,5 veces el ritmo propio del cliente",
         },
@@ -221,7 +225,60 @@ def _anclas(counts, facts, tx):
     ] + [
         chk(f"ventas {v['anio']} (M)", _millones(v["ventas"]), esperado)
         for v, esperado in zip(_ventas_anuales(DATA_DIR), [123.8, 295.8, 349.7, 225.0])
-    ] + _anclas_estacionalidad(tx) + _anclas_campanias()
+    ] + _anclas_estacionalidad(tx) + _anclas_campanias() + _anclas_dimensiones(facts) \
+      + _anclas_sensibilidad(tx)
+
+
+def _anclas_dimensiones(facts):
+    """Las dos dimensiones que el arnes de contingencia no ancla contra el wiki: la tabla
+    RFM y el corte por region y categoria. Sin esto, un cambio en la regla de segmentacion
+    o en la asignacion de region pasaria los 201.819 chequeos sin que nadie se entere: el
+    arnes prueba que el payload coincide con client_facts, no que client_facts sea correcto.
+    Los valores son los recomputados, no los del wiki: cuatro filas del wiki difieren por un
+    empate de borde de un solo cliente (ver docs/verificacion.md)."""
+    def chk(nombre, real, esperado):
+        return {"nombre": nombre, "real": real, "esperado": esperado, "ok": real == esperado}
+
+    rfm = facts.groupby("rfm").agg(n=("en_riesgo", "size"), ri=("en_riesgo", "sum"),
+                                   f=("facturacion", "sum"))
+    esperado_rfm = {
+        "Campeones": (1014, 257, 160.0), "En riesgo": (1018, 974, 109.9),
+        "Leales": (820, 478, 90.6), "Perdidos": (1128, 230, 86.7),
+        "Hibernando": (1373, 490, 66.9), "Potenciales": (591, 23, 35.5),
+        "Nuevos": (34, 0, 0.5),
+    }
+    out = []
+    for seg, (n, ri, fm) in esperado_rfm.items():
+        out.append(chk(f"rfm {seg} clientes", int(rfm.loc[seg, "n"]), n))
+        out.append(chk(f"rfm {seg} en riesgo", int(rfm.loc[seg, "ri"]), ri))
+        out.append(chk(f"rfm {seg} facturacion (M)", _millones(rfm.loc[seg, "f"]), fm))
+
+    reg = facts.groupby("region")["en_riesgo"].agg(["size", "mean"])
+    out.append(chk("region AMBA (%)", round(100 * reg.loc["AMBA", "mean"], 1), 43.2))
+    out.append(chk("region Patagonia (%)", round(100 * reg.loc["Patagonia", "mean"], 1), 40.4))
+    out.append(chk("Solo online clientes", int(reg.loc["Solo online", "size"]), 317))
+    out.append(chk("Solo online riesgo (%)", round(100 * reg.loc["Solo online", "mean"], 1), 12.9))
+
+    cat = facts.groupby("categoria")["en_riesgo"].mean() * 100
+    out.append(chk("amplitud categoria (pp)", round(cat.max() - cat.min(), 1), 15.5))
+    out.append(chk("categoria Muebles (%)", round(cat.loc["Muebles"], 1), 44.4))
+    out.append(chk("categoria Bano (%)", round(cat.loc["Baño"], 1), 28.9))
+    return out
+
+
+def _anclas_sensibilidad(tx):
+    """El rango del umbral del proxy que muestra D0. Antes eran tres literales en el JSX
+    sin ninguna linea de codigo que los generara, que es exactamente lo que la capa (d) del
+    protocolo prohibe."""
+    import pandas as pd
+
+    s = features.sensibilidad_umbral(tx, pd.Timestamp(CORTE_REF))
+    esperado = {60: 95.1, 90: 94.9, 120: 93.5}
+    return [
+        {"nombre": f"sensibilidad umbral {x['umbral']}d (M)", "real": _millones(x["exposicion"]),
+         "esperado": esperado[x["umbral"]], "ok": _millones(x["exposicion"]) == esperado[x["umbral"]]}
+        for x in s
+    ]
 
 
 def _anclas_campanias():

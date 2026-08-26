@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 
 # columnas de cada bloque, en el orden que fija CONTRACT.md (4.2 y 4.3)
-_COLS_CONTINGENCIA = ("k", "n", "nr", "ne", "f", "fr", "a", "ar")
+_COLS_CONTINGENCIA = ("k", "n", "nr", "ne", "f", "fr", "a", "ar", "nhc", "ahc")
 _COLS_LISTA = ("id", "a", "rec", "gap", "qs", "gk", "mk")
 
 

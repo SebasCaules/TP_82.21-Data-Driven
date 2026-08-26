@@ -4,7 +4,8 @@
 // clientes sin historial suficiente para calificar como riesgo), no un efecto de valor.
 
 import { Lienzo, BarrasH } from '../graficos.jsx'
-import { entero, pct, porDimension } from '../agregacion.js'
+import Semaforo, { estadoInverso } from '../Semaforo.jsx'
+import { entero, meta, pct, porDimension } from '../agregacion.js'
 
 const ANCHO_ETIQUETA = 54
 // 180, no 140: con la barra de énfasis (Q5, siempre la más larga) el valor arranca en
@@ -61,6 +62,11 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
       </h1>
       <p className="bajada">{bajada}</p>
 
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span className="kpi-lbl" style={{ display: 'inline' }}>Riesgo en Q5</span>
+        <b className="tabular" style={{ fontSize: 15 }}>{pct(datos[4].valor)}</b>
+        <Semaforo estado={estadoInverso(datos[4].valor, meta.umbral_q5)} />
+      </div>
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => (

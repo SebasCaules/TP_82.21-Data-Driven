@@ -100,13 +100,46 @@ def client_facts(tx: pd.DataFrame, corte: pd.Timestamp) -> pd.DataFrame:
     return agg
 
 
-def contingency(facts: pd.DataFrame, dims: dict) -> pd.DataFrame:
+def sensibilidad_umbral(tx: pd.DataFrame, corte: pd.Timestamp, umbrales=(60, 90, 120)) -> list:
+    """Exposicion recalculada con otros umbrales del proxy. El BAN muestra un valor puntual
+    y la guia (Cairo) pide declarar la incertidumbre: esto la mide en vez de suponerla.
+    Va sobre la base completa del corte, sin filtros: es una propiedad del proxy, no del corte
+    de la base."""
+    d = tx[tx["fecha"] <= corte]
+    agg = d.groupby("id_cliente").agg(
+        facturacion=("monto_neto", "sum"), n_compras=("monto_neto", "size"),
+        primera=("fecha", "min"), ultima=("fecha", "max"))
+    recency = (corte - agg["ultima"]).dt.days
+    gap = _gap_mediano_por_cliente(d)
+    anios = (corte - agg["primera"]).dt.days / 365.25
+    anualizado = np.where(anios == 0, agg["facturacion"], agg["facturacion"] / anios)
+    elegible = agg["n_compras"] >= 3
+
+    salida = []
+    for u in umbrales:
+        en_riesgo = elegible & (recency > np.maximum(u, 1.5 * gap))
+        salida.append({
+            "umbral": int(u),
+            "en_riesgo": int(en_riesgo.sum()),
+            "exposicion": int(round(float(np.asarray(anualizado)[en_riesgo.to_numpy()].sum()))),
+        })
+    return salida
+
+
+def contingency(facts: pd.DataFrame, dims: dict, corte=None) -> pd.DataFrame:
     reg_idx = facts["region"].map({r: i for i, r in enumerate(dims["region"])})
     cat_idx = facts["categoria"].map({c: i for i, c in enumerate(dims["categoria"])})
     rfm_idx = facts["rfm"].map({s: i for i, s in enumerate(dims["rfm"])})
     q = facts["quintil"].astype(int)
 
     k = ((reg_idx * 7 + cat_idx) * 7 + rfm_idx) * 5 + (q - 1)
+
+    # Historia corta por celda, no global: la nota del BAN se filtra igual que el BAN.
+    if corte is not None:
+        anios = (pd.Timestamp(corte) - facts["primera"]).dt.days / 365.25
+        corta = (anios < 1.0).to_numpy()
+    else:
+        corta = np.zeros(len(facts), dtype=bool)
 
     tabla = pd.DataFrame({
         "k": k,
@@ -117,10 +150,12 @@ def contingency(facts: pd.DataFrame, dims: dict) -> pd.DataFrame:
         "fr": np.where(facts["en_riesgo"], facts["facturacion"], 0.0),
         "a": facts["anualizado"],
         "ar": np.where(facts["en_riesgo"], facts["anualizado"], 0.0),
+        "nhc": corta.astype(int),
+        "ahc": np.where(corta, facts["anualizado"], 0.0),
     })
 
     out = tabla.groupby("k", as_index=False).sum()
-    for col in ["k", "n", "nr", "ne", "f", "fr", "a", "ar"]:
+    for col in ["k", "n", "nr", "ne", "f", "fr", "a", "ar", "nhc", "ahc"]:
         out[col] = out[col].round().astype(int)
     return out.sort_values("k").reset_index(drop=True)
 

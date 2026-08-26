@@ -9,20 +9,26 @@ Se cierra en dos tramos y los dos usan `client_facts` como verdad independiente.
 compara el payload contra sí mismo, que sería probar nada.
 
 ```
-pipeline/validate.py    payload == client_facts                201.819 chequeos
-test/paridad.mjs        agregacion.js(payload) == client_facts  471.870 chequeos
+pipeline/validate.py    payload == client_facts                201.900 chequeos
+test/paridad.mjs        agregacion.js(payload) == client_facts  606.270 chequeos
 ```
 
 | Etapa | Cobertura | Resultado |
 |---|---|---|
-| Anclas | 44 cifras del wiki, del corte de referencia y del corte anterior | **44/44** |
-| Contingencia | celda a celda, 25 cortes | **175/175** |
+| Anclas | 75 cifras: el wiki completo, la tabla RFM, región y categoría, el embudo y la sensibilidad del proxy | **75/75** |
+| Contingencia | celda a celda, 9 campos, 25 cortes | **225/225** |
 | Grilla de filtros | 2.688 combinaciones × 25 cortes | **201.600/201.600** |
-| Paridad Python ↔ JS | las mismas 2.688 × 25, más la decodificación de las 1.470 claves | **471.870/471.870** |
+| Paridad Python ↔ JS | las mismas 2.688 × 25 sobre 9 campos, más la decodificación de las 1.470 claves | **606.270/606.270** |
+
+Las anclas pasaron de 44 a 75 por un hallazgo de la auditoría: el arnés probaba que el
+payload coincide con `client_facts`, pero de ahí no se sigue que `client_facts` sea correcto.
+La tabla RFM, la asignación de región y la de categoría no estaban ancladas contra ninguna
+fuente externa: un cambio en esas reglas habría pasado los 201.819 chequeos sin que nadie se
+enterara. Ahora tienen ancla propia.
 
 Tolerancias declaradas: los conteos (`n`, `nr`, `ne`) se exigen exactos, sin tolerancia. En
 los campos de dinero se acepta 1 peso por celda sumada, porque Python redondea el total de
-cada celda y el navegador suma celdas ya redondeadas. En la práctica se activa en 11 de 175
+cada celda y el navegador suma celdas ya redondeadas. En la práctica se activa en 11 de 225
 casos, y 1 peso sobre ARS 94,9 M es 1 parte en 95 millones.
 
 ## Contraste contra "Los números disponibles" del wiki
@@ -132,3 +138,52 @@ El chequeo de Knaflic cap. 7: leer solo los títulos tiene que contar la histori
 
 Todos los títulos se recalculan con el corte y los filtros. Ninguno lleva una magnitud fija
 escrita a mano, que con corte móvil sería falsa en 24 de los 25 cortes.
+
+
+## Auditoría final adversarial
+
+Cinco auditores horizontales en modelo N0, uno por capa del protocolo más contrato y
+accesibilidad. Cada hallazgo alto o medio pasó por un refutador independiente que arranca
+del supuesto contrario: si no reproduce la evidencia exacta, el hallazgo cae.
+
+| | |
+|---|---|
+| Hallazgos | 63 |
+| Refutados | 22 |
+| **Confirmados** | **29** |
+
+Los auditores verificaron por su cuenta los cuatro números que se les dieron como estado
+(44/44, 201.819, 471.870, cero subrecursos) y confirmaron los cuatro. El diagnóstico del
+auditor de la capa (a) resume dónde estaba el problema real:
+
+> El tablero tiene 25 cortes × 2.688 combinaciones de filtro = 67.200 estados. Las cifras
+> están validadas en los 67.200; las frases, en uno.
+
+### Lo que se corrigió
+
+| Hallazgo | Qué pasaba |
+|---|---|
+| A-01 | Imprimir desde el menú del navegador daba **una** pantalla. Las 14 hojas solo existían si se apretaba la tecla `i`: no había listener de `beforeprint` |
+| D-01 | La tarjeta del rango del umbral tenía las tres cifras escritas a mano y **no existía la línea de código que las generara**. Es exactamente lo que la capa (d) prohíbe. Ahora se calculan en `features.sensibilidad_umbral` y tienen ancla |
+| D-02 | El arnés no ancla la tabla RFM ni la asignación de región y categoría contra ninguna fuente externa. 31 anclas nuevas |
+| B-05 | La nota de historia corta del BAN salía de la serie global: con un filtro puesto mostraba el número nacional al lado de una cifra filtrada. Ahora viaja por celda de contingencia |
+| B-01 | En `BarrasH`, la etiqueta de valor de la barra más larga se metía dentro de la columna de notas. El ancho de la etiqueta no salía del presupuesto de la barra |
+| A-05 · B-06 | D5b marcaba con el mismo color de énfasis la categoría de **mayor** y la de **menor** tasa: dos significados opuestos en un mismo gráfico (regla 19) |
+| A-02 | De los cuatro KPIs computables que la Parte D declara con semáforo, solo uno lo tenía |
+| A-04 | El pie, donde viven las cuatro correcciones obligatorias, se pintaba a 2,6:1 de contraste |
+| A-06 | Las barras sin énfasis quedaban a 1,64:1 contra el fondo, por debajo del mínimo de 3:1 para un objeto gráfico |
+| A-08 | Al imprimir se colaba un decimoquinto pie, el de la pantalla activa |
+| A-09 | Sin `print-color-adjust`, la barra del BAN y los cuadros del semáforo salían en blanco al imprimir |
+| A-11 | Los SVG con drill-down llevaban `role="img"`, que en ARIA 1.2 poda todo el subárbol accesible, incluidos los botones |
+| A-12 | `role="tablist"` reserva las flechas para moverse entre pestañas, y el handler global las usa para cambiar de pantalla |
+| A-14 | Las bandas de meta y línea base quedaban a 1,14:1: invisibles en proyector |
+| B-08 | El tope duro de 40 px de alto de barra invertía la regla 10 cuando el paso pasaba de 60 px |
+| B-09 · B-10 | El sparkline del encabezado y una tarjeta de D7 mezclaban serie nacional con cifra filtrada sin declararlo |
+| D-06 | El README prometía `npm run todo` pero tres de las cinco etapas son Python y el repo no declaraba sus dependencias |
+
+### Lo que se declinó, con motivo
+
+El auditor propuso poner énfasis en AMBA en D5a. No se hizo: el título de esa pantalla dice
+que **la geografía no explica el riesgo**, así que resaltar una región contradiría el
+hallazgo. Un gráfico sin énfasis es la codificación correcta cuando el mensaje es que no hay
+diferencia; la regla 18 pide que no haya más de un énfasis, no que haya uno.

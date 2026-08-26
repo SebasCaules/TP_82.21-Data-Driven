@@ -69,6 +69,19 @@ export default function App() {
     }))
   }, [])
 
+  // A-01: sin esto, imprimir desde el menu del navegador (Ctrl+P) sacaba UNA pantalla.
+  // Las 14 hojas solo existian si se apretaba la tecla i.
+  useEffect(() => {
+    const antes = () => setImprimiendo(true)
+    const despues = () => setImprimiendo(false)
+    window.addEventListener('beforeprint', antes)
+    window.addEventListener('afterprint', despues)
+    return () => {
+      window.removeEventListener('beforeprint', antes)
+      window.removeEventListener('afterprint', despues)
+    }
+  }, [])
+
   const modificado = iCorte !== CORTE_INICIAL || hayFiltro(filtro)
   const reiniciar = useCallback(() => { setICorte(CORTE_INICIAL); setFiltro(SIN_FILTRO) }, [])
 
@@ -102,10 +115,12 @@ export default function App() {
       <header className="enc">
         <div className="marca">Casa Óga <span>· riesgo de pérdida de clientes</span></div>
 
-        <div className="bloques" role="tablist" aria-label="Vista">
+        {/* Conmutador, no tab set: el patron ARIA de tablist reserva las flechas para
+            moverse entre pestanas y aca las flechas cambian de pantalla. */}
+        <div className="bloques" role="group" aria-label="Vista">
           {BLOQUES.map((b) => (
-            <button key={b.id} role="tab" onClick={() => cambiarBloque(b.id)}
-                    aria-selected={bloque === b.id} aria-pressed={bloque === b.id}>
+            <button key={b.id} onClick={() => cambiarBloque(b.id)}
+                    aria-pressed={bloque === b.id}>
               <Marca activo={bloque === b.id} />
               {b.nombre}<span style={{ opacity: 0.72, fontWeight: 400 }}> · {b.cadencia}</span>
             </button>
@@ -127,11 +142,13 @@ export default function App() {
                     onChange={(e) => setICorte(Number(e.target.value))}>
               {cortes.map((c, i) => <option key={c} value={i}>{mesCorte(c)}</option>)}
             </select>
-            <div className="corte-serie" title="Exposición por corte">
+            <div className="corte-serie"
+                 title="Exposición nacional por corte · no responde a los filtros">
               <SerieCortes
                 valores={series.exposicion_por_corte.map((x) => x.exposicion)}
                 activo={iCorte} w={148} h={20} />
             </div>
+            <span className="serie-nota">exposición nacional · sin filtros</span>
           </div>
 
           <div className={usaFiltros ? '' : 'apagado'} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -171,7 +188,10 @@ export default function App() {
           : <pantalla.Componente {...ctx} />}
       </main>
 
-      <Pie info={info} filtro={filtro} pantalla={pantalla} usaFiltros={usaFiltros} usaCorte={usaCorte} />
+      {!imprimiendo && (
+        <Pie info={info} filtro={filtro} pantalla={pantalla}
+             usaFiltros={usaFiltros} usaCorte={usaCorte} />
+      )}
     </div>
   )
 }

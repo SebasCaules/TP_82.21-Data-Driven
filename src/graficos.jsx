@@ -62,9 +62,16 @@ export function BarrasH({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132, 
   const disponible = h - padTop - padBot
   const paso = disponible / datos.length
   // Ancho de barra ni fino ni grueso: mas ancho que el espacio entre barras (regla 10)
-  const alto = Math.max(9, Math.min(paso * 0.66, 40))
+  // Regla 10: la barra mas ancha que el espacio entre barras. Un tope duro de 40 px
+  // invertia la relacion en cuanto el paso pasaba de 60, que es lo que pasa con 5 barras
+  // en una pantalla alta.
+  const alto = Math.max(9, Math.min(paso * 0.66, Math.max(40, paso * 0.6)))
   const x0 = anchoEtiqueta
-  const ancho = Math.max(40, w - x0 - notaAncho - 12)
+  // La etiqueta de valor se dibuja DESPUES del extremo de la barra, asi que su ancho tiene
+  // que salir del presupuesto: sin esto, la barra mas larga empuja su propia etiqueta
+  // dentro de la columna de notas y los dos textos se pisan.
+  const anchoValor = Math.max(38, formato(Math.max(...datos.map((d) => d.valor), 0)).length * 6.6 + 10)
+  const ancho = Math.max(40, w - x0 - notaAncho - anchoValor - 8)
   const max = Math.max(...datos.map((d) => d.valor), 0) || 1
   const fuente = Math.max(10.5, Math.min(13, paso * 0.42))
   // La escala y el drill-down viven ACA, no en cada pantalla: cuatro pantallas replicaban
@@ -73,7 +80,8 @@ export function BarrasH({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132, 
   const xDe = (v) => x0 + (v / max) * ancho
 
   return (
-    <svg width={w} height={h} role="img" style={{ display: 'block' }}>
+    <svg width={w} height={h} role={onBarra ? 'group' : 'img'}
+         aria-label={tituloEje || 'Gráfico de barras'} style={{ display: 'block' }}>
       {tituloEje && (
         <text x={x0} y={11} fontSize="10" fill={MUT} letterSpacing=".07em"
               textAnchor="start" style={{ textTransform: 'uppercase' }}>{tituloEje}</text>
@@ -162,11 +170,16 @@ export function Linea({ serie, w, h, formato, banda, banda2, tituloEje, resaltar
   const pico = serie.reduce((a, p, i) => (p.valor != null && p.valor > (a.v ?? -1) ? { v: p.valor, i } : a), {})
 
   return (
-    <svg width={w} height={h} role="img" style={{ display: 'block' }}>
+    <svg width={w} height={h} role="img" aria-label={tituloEje || 'Serie de tiempo'}
+         style={{ display: 'block' }}>
       {banda && (
         <g>
           <rect x={padL} y={Y(banda[1])} width={iw} height={Math.max(1, Y(banda[0]) - Y(banda[1]))}
-                fill="var(--acc)" opacity=".09" />
+                fill="var(--acc)" opacity=".16" />
+          <line x1={padL} x2={padL + iw} y1={Y(banda[1])} y2={Y(banda[1])}
+                stroke={MUT2} strokeWidth="1" strokeDasharray="4 3" />
+          <line x1={padL} x2={padL + iw} y1={Y(banda[0])} y2={Y(banda[0])}
+                stroke={MUT2} strokeWidth="1" strokeDasharray="4 3" />
           <text x={padL + 6} y={Y(banda[1]) - 4} fontSize="10" fill={MUT2} fontWeight={600}>
             meta {formato(banda[0])}–{formato(banda[1])}
           </text>
@@ -175,7 +188,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, tituloEje, resaltar
       {banda2 && (
         <g>
           <rect x={padL} y={Y(banda2[1])} width={iw} height={Math.max(1, Y(banda2[0]) - Y(banda2[1]))}
-                fill="var(--mut)" opacity=".13" />
+                fill="var(--mut)" opacity=".22" />
           <text x={padL + 6} y={Y(banda2[0]) + 11} fontSize="10" fill={MUT}>
             línea base {formato(banda2[0])}–{formato(banda2[1])}
           </text>
@@ -292,7 +305,8 @@ export function BarraTramos({ tramos, w, h, formato, banda }) {
   const y = 22
   let x = 0
   return (
-    <svg width={w} height={h} role="img" style={{ display: 'block' }}>
+    <svg width={w} height={h} role="img" aria-label="Barra segmentada"
+         style={{ display: 'block' }}>
       <Tramas />
       {tramos.map((t, i) => {
         const ancho = (t.valor / total) * w

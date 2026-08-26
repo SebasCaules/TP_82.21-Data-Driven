@@ -16,6 +16,7 @@ cifra que muestra.
 
 ```bash
 npm install
+pip install -r requirements.txt
 npm run todo
 ```
 
@@ -37,13 +38,14 @@ Ninguna cifra llega a pantalla sin chequeo. La cadena se cierra en dos tramos, y
 usan `client_facts` como verdad independiente:
 
 ```
-pipeline/validate.py   payload            == client_facts     201.819 chequeos
-test/paridad.mjs       agregacion.js(payload) == client_facts  471.870 chequeos
+pipeline/validate.py   payload            == client_facts     201.900 chequeos
+test/paridad.mjs       agregacion.js(payload) == client_facts  606.270 chequeos
 ```
 
-Las 44 anclas cubren las cifras del wiki de la materia: 27.276 filas identificadas, ventana
+Las 75 anclas cubren las cifras del wiki de la materia: 27.276 filas identificadas, ventana
 2022-01-03 a 2025-12-29, 5.978 clientes con compra válida, 4.940 elegibles, 2.452 en riesgo,
-ARS 94,9 M de exposición anual, y el resto del análisis exploratorio.
+ARS 94,9 M de exposición anual, la tabla RFM completa, el corte por región y categoría, el
+embudo de campañas y la sensibilidad del proxy a su umbral.
 
 La grilla de filtros se valida completa: 2.688 combinaciones × 25 cortes. No es una muestra.
 
@@ -56,7 +58,7 @@ pipeline/          Python. Toda la aritmética con riesgo de divergencia vive ac
   features.py      métricas por cliente, contingencia y lista de contacto
   series.py        recompra trimestral, embudo de campañas, consentimiento
   pack.py          empaquetado columnar del payload
-  build.py         orquestación + las 44 anclas
+  build.py         orquestación + las 75 anclas
   validate.py      el arnés
   golden.py        golden files para el test de paridad
 src/               React. Solo filtra y suma

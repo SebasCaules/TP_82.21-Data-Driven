@@ -1,6 +1,8 @@
 // D5b — exposicion por categoria. Barras horizontales en pesos (regla 6), ordenadas de
 // mayor a menor exposicion (regla 11), con la tasa de riesgo como nota junto a cada barra
-// (regla 14) y un solo color de enfasis en los dos extremos de tasa (regla 18). La bajada
+// (regla 14) y un solo color de enfasis (regla 18): la categoria que el titulo defiende.
+// Marcar los dos extremos con el mismo acento le daba dos significados opuestos al color
+// dentro del mismo grafico, que es lo que prohibe la regla 19. La bajada
 // calcula la amplitud en pp y el n de las categorias de menor exposicion en cada render:
 // nada viene hardcodeado.
 
@@ -29,7 +31,9 @@ export default function D5b({ iCorte, filtro, verEnLista }) {
     etiqueta: f.etiqueta,
     valor: f.valor,
     nota: pct(f.tasa),
-    enfasis: !!alta && !!baja && (f.etiqueta === alta.etiqueta || f.etiqueta === baja.etiqueta),
+    // Solo la de mayor tasa: es la que el titulo nombra como "la que mueve la aguja".
+    // La del extremo bajo se identifica por su etiqueta y su nota, no por el color.
+    enfasis: !!alta && f.etiqueta === alta.etiqueta,
     _i: f._i,
   }))
 

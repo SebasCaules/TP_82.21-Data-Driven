@@ -33,7 +33,7 @@ DATA_DIR = RAIZ / "data" / "raw"
 PAYLOAD = RAIZ / "data" / "payload" / "datos.json"
 
 NREG, NCAT, NRFM, NQ = 6, 7, 7, 5
-CAMPOS = ["n", "nr", "ne", "f", "fr", "a", "ar"]
+CAMPOS = ["n", "nr", "ne", "f", "fr", "a", "ar", "nhc", "ahc"]
 
 
 def _dense_desde_facts(facts, dims):
@@ -47,12 +47,16 @@ def _dense_desde_facts(facts, dims):
     ele = facts["elegible"].to_numpy()
     f = facts["facturacion"].to_numpy()
     a = facts["anualizado"].to_numpy()
+    corte_ts = pd.Timestamp(facts.attrs.get("corte")) if facts.attrs.get("corte") else None
+    corta = ((corte_ts - facts["primera"]).dt.days / 365.25 < 1.0).to_numpy() if corte_ts is not None \
+        else np.zeros(len(facts), dtype=bool)
 
     idx = ((reg * NCAT + cat) * NRFM + rfm) * NQ + q
     out = {}
     for nombre, valores in [
         ("n", np.ones(len(facts))), ("nr", er.astype(float)), ("ne", ele.astype(float)),
         ("f", f), ("fr", np.where(er, f, 0.0)), ("a", a), ("ar", np.where(er, a, 0.0)),
+        ("nhc", corta.astype(float)), ("ahc", np.where(corta, a, 0.0)),
     ]:
         acc = np.zeros(NREG * NCAT * NRFM * NQ)
         np.add.at(acc, idx, valores)
@@ -131,6 +135,7 @@ def main():
 
     for i, corte_str in enumerate(cortes_payload):
         facts = features.client_facts(tx, pd.Timestamp(corte_str))
+        facts.attrs["corte"] = corte_str
         ref = _dense_desde_facts(facts, dims)
         got = _dense_desde_payload(payload["contingencias"][i])
 
@@ -141,7 +146,7 @@ def main():
             if d == 0:
                 cel_ok += 1
                 ok += 1
-            elif campo in ("f", "fr", "a", "ar") and d <= 1:
+            elif campo in ("f", "fr", "a", "ar", "ahc") and d <= 1:
                 # Un peso de diferencia en un campo de dinero es orden de acumulacion
                 # en punto flotante (pandas groupby vs np.add.at), no un error de
                 # calculo. Se acepta pero se cuenta y se informa: si el numero deja

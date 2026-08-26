@@ -13,7 +13,8 @@
   --mut2: #4a4a4a;
   --trk: #eceef1;
   --acc: #b8433a;          /* unico color de enfasis del tablero (regla 18) */
-  --gris: #b6bcc6;         /* las series que NO son el enfasis */
+  --gris: #8f97a3;         /* las series que NO son el enfasis. 3,0:1 contra el fondo:
+                              por debajo de eso WCAG no da para un objeto grafico */
   --gris2: #d5d9e0;
   --meta: #6a7180;
 
@@ -201,9 +202,11 @@ body {
   flex-shrink: 0;
   border-top: 1px solid var(--bd);
   padding: 7px var(--pad-x) 9px;
-  font-size: 10.5px;
+  font-size: 11px;
   line-height: 1.4;
-  color: var(--mut);
+  /* El pie es donde viven las 4 correcciones obligatorias del rulebook. Con --mut daba
+     2,6:1 contra el fondo, por debajo del minimo. --mut2 da 7,6:1. */
+  color: var(--mut2);
   background: var(--fondo);
   display: flex;
   flex-direction: column;
@@ -218,6 +221,9 @@ body {
 @page { size: A4 landscape; margin: 10mm; }
 
 @media print {
+  /* Sin esto Chrome y Safari descartan los fondos, y la barra del BAN, su marca del corte
+     anterior y los cuadros del semaforo salen en blanco: justo lo que comunica el estado. */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body, #root { height: auto; overflow: visible; background: #fff; }
   .app { height: auto; display: block; }
   .enc, .riel { display: none !important; }
@@ -370,5 +376,8 @@ body {
   .ban { padding: 10px 13px; }
   .ban-track { height: 20px; }
   .ban table { margin-top: 8px; }
-  .pie { font-size: 10px; padding: 5px var(--pad-x) 7px; line-height: 1.35; }
+  .pie { font-size: 10.5px; padding: 5px var(--pad-x) 7px; line-height: 1.35; }
 }
+
+.serie-nota { font-size: 9.5px; color: var(--mut); letter-spacing: .02em; }
+@media (max-height: 730px) { .serie-nota { display: none; } }

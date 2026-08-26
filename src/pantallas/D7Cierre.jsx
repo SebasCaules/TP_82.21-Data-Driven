@@ -77,10 +77,10 @@ export default function D7({ info, iCorte, filtro }) {
               <b>{pct(cs.pct_envios_a_no_acepta * 100)}</b>
             </div>
             <p className="bajada">
-              Cada envío se filtra por consentimiento antes de salir. Hoy{' '}
-              {entero(cs.envios_a_no_acepta)} de {entero(cs.envios_base)} envíos van a
-              clientes que no lo dieron; en la lista ordenada por exposición son{' '}
-              {entero(sinConsentimiento)} de los {entero(topExposicion.length)}.
+              Cada envío se filtra por consentimiento antes de salir. En la campaña completa
+              (serie global, no responde a los filtros) son{' '}
+              {entero(cs.envios_a_no_acepta)} de {entero(cs.envios_base)} envíos; en la lista
+              de este corte, {entero(sinConsentimiento)} de los {entero(topExposicion.length)}.
             </p>
             <div className="kpi-base">
               Costo cero: es un filtro previo sobre la misma lista, no suma envíos ni

@@ -29,7 +29,7 @@ DIMS = {
     "rfm": features.RFM_SEGMENTOS,
     "quintil": [1, 2, 3, 4, 5],
 }
-CAMPOS = ["n", "nr", "ne", "f", "fr", "a", "ar"]
+CAMPOS = ["n", "nr", "ne", "f", "fr", "a", "ar", "nhc", "ahc"]
 
 
 def main():
@@ -61,6 +61,7 @@ def main():
         ele = f["elegible"].to_numpy()
         fact = f["facturacion"].to_numpy()
         anu = f["anualizado"].to_numpy()
+        corta = ((corte - f["primera"]).dt.days / 365.25 < 1.0).to_numpy()
 
         # Se agrega primero a la grilla densa y se redondea igual que contingency():
         # una sola vez, al final. Redondear por cliente daria otro total.
@@ -70,6 +71,7 @@ def main():
             ("n", np.ones(len(f))), ("nr", er.astype(float)), ("ne", ele.astype(float)),
             ("f", fact), ("fr", np.where(er, fact, 0.0)),
             ("a", anu), ("ar", np.where(er, anu, 0.0)),
+            ("nhc", corta.astype(float)), ("ahc", np.where(corta, anu, 0.0)),
         ]:
             acc = np.zeros(n_reg * 7 * 7 * 5)
             np.add.at(acc, idx, val)

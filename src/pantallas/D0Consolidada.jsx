@@ -5,7 +5,7 @@
 // puso el BAN -no el titulo- en el arriba-a-la-izquierda (regla 23 vs. Wexler).
 
 import Ban from '../Ban.jsx'
-import Semaforo, { estadoRecompra } from '../Semaforo.jsx'
+import Semaforo, { estadoInverso, estadoRecompra } from '../Semaforo.jsx'
 import { Lienzo, Linea } from '../graficos.jsx'
 import { entero, mesCorte, meta, millones, pct, series } from '../agregacion.js'
 
@@ -14,6 +14,8 @@ import { entero, mesCorte, meta, millones, pct, series } from '../agregacion.js'
 const INDICE_D7 = 8
 
 export default function D0({ info, irA }) {
+  const pctRiesgo = info.clientes ? (100 * info.enRiesgo) / info.clientes : 0
+  const sens90 = info.sensibilidad ? info.sensibilidad.find((x) => x.umbral === 90) : null
   const recompra = series.recompra_trimestral
     .filter((r) => r.tasa != null)
     .map((r) => ({ etiqueta: r.trimestre.replace('20', "'"), valor: r.tasa * 100 }))
@@ -49,9 +51,10 @@ export default function D0({ info, irA }) {
           <div style={{ display: 'flex', gap: 'clamp(8px,1.1vw,16px)' }}>
             <Kpi
               etiqueta="Clientes en riesgo"
-              valor={pct((100 * info.enRiesgo) / (info.clientes || 1))}
+              valor={pct(pctRiesgo)}
               apoyo={`${entero(info.enRiesgo)} de ${entero(info.clientes)} con compra válida`}
               baseline={`${entero(info.elegibles)} elegibles (3 compras o más)`}
+              estado={<Semaforo estado={estadoInverso(pctRiesgo, meta.umbral_en_riesgo)} />}
             />
             <Kpi
               etiqueta="Facturación histórica en riesgo"
@@ -61,9 +64,11 @@ export default function D0({ info, irA }) {
             />
             <Kpi
               etiqueta="Rango del umbral del proxy"
-              valor="ARS 94,9 M"
-              apoyo="60 d 95,1 M · 90 d 94,9 M · 120 d 93,5 M"
-              baseline={`casi insensible al umbral · corte de referencia ${mesCorte(meta.corte_ref)}`}
+              valor={`ARS ${millones(sens90 ? sens90.exposicion : info.exposicion)}`}
+              apoyo={info.sensibilidad
+                ? info.sensibilidad.map((x) => `${x.umbral} d ${millones(x.exposicion)}`).join(' · ')
+                : '—'}
+              baseline={`casi insensible al umbral · base completa del corte, sin filtros`}
             />
           </div>
 
@@ -109,10 +114,10 @@ export default function D0({ info, irA }) {
   )
 }
 
-function Kpi({ etiqueta, valor, apoyo, baseline }) {
+function Kpi({ etiqueta, valor, apoyo, baseline, estado }) {
   return (
     <div className="tarjeta kpi" style={{ flex: 1, minWidth: 0 }}>
-      <div className="kpi-lbl">{etiqueta}</div>
+      <div className="kpi-lbl">{etiqueta}{estado}</div>
       <div className="kpi-val tabular">{valor}</div>
       <div className="kpi-sub">{apoyo}</div>
       <div className="kpi-base">{baseline}</div>

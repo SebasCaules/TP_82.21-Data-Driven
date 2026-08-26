@@ -30,7 +30,7 @@ export function decodificar(k) {
   return { reg, cat, rfm, q }
 }
 
-const CAMPOS = ['n', 'nr', 'ne', 'f', 'fr', 'a', 'ar']
+const CAMPOS = ['n', 'nr', 'ne', 'f', 'fr', 'a', 'ar', 'nhc', 'ahc']
 
 /** Filtro vacio: todas las dimensiones en "todos". */
 export const SIN_FILTRO = { region: null, categoria: null, rfm: null, quintil: null }
@@ -46,7 +46,7 @@ export function hayFiltro(filtro) {
  */
 export function agregar(iCorte, filtro = SIN_FILTRO) {
   const c = D.contingencias[iCorte]
-  const acc = { n: 0, nr: 0, ne: 0, f: 0, fr: 0, a: 0, ar: 0 }
+  const acc = { n: 0, nr: 0, ne: 0, f: 0, fr: 0, a: 0, ar: 0, nhc: 0, ahc: 0 }
 
   for (let i = 0; i < c.k.length; i++) {
     const { reg, cat, rfm, q } = decodificar(c.k[i])
@@ -66,7 +66,7 @@ export function agregar(iCorte, filtro = SIN_FILTRO) {
 export function porDimension(iCorte, eje, filtro = SIN_FILTRO) {
   const largos = { region: dims.region.length, categoria: NCAT, rfm: NRFM, quintil: NQ }
   const salida = Array.from({ length: largos[eje] }, () => ({
-    n: 0, nr: 0, ne: 0, f: 0, fr: 0, a: 0, ar: 0,
+    n: 0, nr: 0, ne: 0, f: 0, fr: 0, a: 0, ar: 0, nhc: 0, ahc: 0,
   }))
   const c = D.contingencias[iCorte]
 
@@ -132,10 +132,14 @@ export function corteInfo(iCorte, filtro = SIN_FILTRO) {
     enRiesgo: a.nr,
     facturacion: a.f,
     facturacionRiesgo: a.fr,
-    // Declarado, no corregido: en cortes viejos el anualizado infla el denominador
-    // porque divide por los anios desde la primera compra. Ver EXEC_STATE N0-7.
-    historiaCorta: s.clientes_historia_corta,
-    baseAnualizada1a: s.base_anualizada_1a,
+    // Declarado, no corregido: en cortes viejos el anualizado infla el denominador porque
+    // divide por los anios desde la primera compra. Sale de la celda, no de la serie global:
+    // con un filtro puesto, la nota tiene que hablar de la base filtrada.
+    historiaCorta: a.nhc,
+    baseAnualizada1a: a.a - a.ahc,
+    // La sensibilidad al umbral del proxy es una propiedad del proxy, no del corte de la
+    // base: va sobre la base completa y la pantalla lo declara.
+    sensibilidad: s.sensibilidad,
   }
 }
 

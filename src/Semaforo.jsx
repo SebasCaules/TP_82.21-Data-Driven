@@ -14,6 +14,15 @@ export function estadoRecompra(valor, [lo]) {
   return 'fuera'
 }
 
+/** Para los KPIs donde MENOS es mejor: clientes en riesgo (verde <38 %, amarillo 38-42 %,
+ *  rojo >42 %) y riesgo en Q5 (verde <45 %, amarillo 45-52 %, rojo >52 %). Los umbrales
+ *  salen de la Parte D §2.1 entregada, no se inventan aca. */
+export function estadoInverso(valor, [lo, hi]) {
+  if (valor < lo) return 'meta'
+  if (valor <= hi) return 'cerca'
+  return 'fuera'
+}
+
 export default function Semaforo({ estado, sufijo }) {
   const e = ESTADOS[estado] ?? ESTADOS.fuera
   return (

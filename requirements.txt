@@ -1,0 +1,4 @@
+# Las mismas versiones que fija el workflow de CI. Tres de las cinco etapas de
+# `npm run todo` son Python, y sin esto un clone limpio no las puede correr.
+pandas==2.3.3
+numpy==2.1.0
