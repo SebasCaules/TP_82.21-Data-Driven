@@ -226,6 +226,7 @@ def _anclas(counts, facts, tx):
         chk(f"ventas {v['anio']} (M)", _millones(v["ventas"]), esperado)
         for v, esperado in zip(_ventas_anuales(DATA_DIR), [123.8, 295.8, 349.7, 225.0])
     ] + _anclas_estacionalidad(tx) + _anclas_campanias() + _anclas_dimensiones(facts) \
+        + _anclas_concentracion(facts) \
       + _anclas_sensibilidad(tx)
 
 
@@ -278,6 +279,38 @@ def _anclas_sensibilidad(tx):
         {"nombre": f"sensibilidad umbral {x['umbral']}d (M)", "real": _millones(x["exposicion"]),
          "esperado": esperado[x["umbral"]], "ok": _millones(x["exposicion"]) == esperado[x["umbral"]]}
         for x in s
+    ]
+
+
+def _anclas_concentracion(facts):
+    """La curva de concentracion de la vista 09: que parte de la EXPOSICION cubre el
+    operativo si contacta a los primeros k de la lista, contra lo que cubriria contactando
+    a k al azar.
+
+    Es el argumento de esa pantalla ("el orden importa mas que el alcance") y hasta ahora
+    no estaba en ningun lado: la pantalla solo mostraba cobertura de cabezas. Se calcula
+    aca, desde client_facts, que es el camino independiente del payload.
+    """
+    riesgo = facts[facts["en_riesgo"]].sort_values("anualizado", ascending=False)
+    total = float(riesgo["anualizado"].sum())
+    n = int(len(riesgo))
+    acum = riesgo["anualizado"].cumsum()
+
+    def chk(nombre, real, esperado):
+        return {"nombre": nombre, "real": real, "esperado": esperado, "ok": real == esperado}
+
+    def parte(k):
+        return round(100 * float(acum.iloc[min(k, n) - 1]) / total, 1)
+
+    return [
+        chk("clientes en riesgo (corte ref)", n, 2452),
+        chk("concentracion top 500 (%)", parte(500), 37.0),
+        chk("concentracion top 800 (%)", parte(800), 52.1),
+        # El contrafactual: contactar k al azar cubre k/n de la exposicion en esperanza.
+        chk("al azar top 500 (%)", round(100 * 500 / n, 1), 20.4),
+        chk("al azar top 800 (%)", round(100 * 800 / n, 1), 32.6),
+        # Lo que la pantalla afirma: ordenar rinde casi el doble a 500 contactos.
+        chk("ventaja del orden a 500 (x)", round(parte(500) / (100 * 500 / n), 2), 1.81),
     ]
 
 

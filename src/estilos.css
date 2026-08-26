@@ -706,12 +706,18 @@ body {
 
 .cob { gap: clamp(16px, 2.4vw, 40px); }
 .cob-kpi {
-  flex: 0 0 clamp(190px, 20%, 270px);
-  display: flex; flex-direction: column; justify-content: space-between;
+  flex: 0 0 clamp(196px, 21%, 280px);
+  display: flex; flex-direction: column;
   background: var(--sup); border: 1px solid var(--bd); border-top: 3px solid var(--ink);
   padding: clamp(10px, 1.4vh, 16px) clamp(12px, 1.4vw, 18px);
 }
-.cob-dato { display: flex; flex-direction: column; gap: 1px; padding: clamp(4px, .8vh, 9px) 0; }
+/* Tercios con su filete, no tres bloques con huecos: con space-between los tres datos
+   quedaban separados por 90 px de nada en una tarjeta de 430 px de alto. */
+.cob-dato {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; justify-content: center; gap: 1px;
+  padding: clamp(4px, .8vh, 9px) 0;
+}
 .cob-dato + .cob-dato { border-top: 1px dotted var(--bd); }
 .cob-etq {
   display: flex; align-items: center;

@@ -1,72 +1,77 @@
-// M0 — cobertura de la capacidad de Marketing contra el total en riesgo. Responde si el
-// operativo alcanza a cubrir la base priorizada. El excedente no es grupo de control
-// (comite-adjudicacion.md, hallazgo 3): es el tramo de menor exposición.
+// M0 — cobertura de la capacidad de Marketing. La pregunta de la vista es a cuantos alcanza
+// a contactar Marketing y que queda afuera, y su titulo afirma que EL ORDEN importa mas que
+// el alcance.
 //
-// Cuadricula de unidades y no barra partida: la pregunta es cuántas personas entran y
-// cuántas quedan afuera, y eso se cuenta. Cincuenta cuadros con diez llenos se lee sin
-// leer el número; una barra al 20 % dice la proporción y nada más. El KPI va al costado,
-// no arriba, porque la cifra y su dibujo son una sola lectura.
+// Curva de concentracion y no cuadricula de unidades: la cuadricula solo sabia contar
+// cabezas, asi que el dibujo no sostenia el titulo. Con las dos curvas la afirmacion se
+// verifica de un vistazo — a 500 contactos la lista ordenada cubre el 37,0 % de la
+// exposicion y contactar 500 al azar cubriria el 20,4 % — y la distancia vertical entre
+// ellas ES la ventaja de ordenar. Las cifras estan ancladas en el pipeline
+// (_anclas_concentracion, desde client_facts).
+//
+// El excedente no es grupo de control (comite-adjudicacion.md, hallazgo 3): es el tramo de
+// menor exposicion, que es justo lo que la cola aplanada de la curva muestra.
 
-import { Lienzo, Unidades } from '../graficos.jsx'
-import { entero, pct, meta } from '../agregacion.js'
+import { Lienzo, CurvaConcentracion } from '../graficos.jsx'
+import { entero, lista, meta, pct, pesos } from '../agregacion.js'
 
-const POR_CUADRO = 50
-
-export default function M0({ info }) {
+export default function M0({ info, iCorte, filtro }) {
   const [capLo, capHi] = meta.capacidad_contacto
   const enRiesgo = info.enRiesgo
-  const capacidadAlcanza = enRiesgo <= capHi
-  const pctLo = enRiesgo ? Math.min(100, (100 * capLo) / enRiesgo) : 0
-  const pctHi = enRiesgo ? Math.min(100, (100 * capHi) / enRiesgo) : 0
-  const sinCubrir = Math.max(0, enRiesgo - capLo)
+  const total = info.exposicion
+
+  // La lista ya viene ordenada por gasto anualizado descendente desde el pipeline.
+  const filas = lista(iCorte, filtro)
+  const acum = []
+  filas.reduce((s, r) => { const v = s + r.anualizado; acum.push(v); return v }, 0)
+
+  const hay = acum.length > 0 && total > 0
+  const kLo = Math.min(capLo, acum.length)
+  const kHi = Math.min(capHi, acum.length)
+  const cubreLo = hay ? (100 * acum[kLo - 1]) / total : 0
+  const cubreHi = hay ? (100 * acum[kHi - 1]) / total : 0
+  const azarLo = enRiesgo ? Math.min(100, (100 * kLo) / enRiesgo) : 0
+  const ventaja = azarLo ? cubreLo / azarLo : 0
 
   return (
     <section className="pant">
       <h1 className="titulo">
-        {capacidadAlcanza
-          ? `La capacidad alcanza para contactar a los ${entero(enRiesgo)} en riesgo: este mes el corte no aprieta`
-          : `La capacidad cubre entre el ${pct(pctLo)} y el ${pct(pctHi)} de los clientes en riesgo: el orden importa más que el alcance`}
+        {hay
+          ? `Contactar a ${entero(kLo)} de los ${entero(enRiesgo)} en riesgo cubre el ${pct(cubreLo)} de la exposición, no el ${pct(azarLo)}`
+          : 'Sin clientes en riesgo con este recorte'}
       </h1>
       <p className="bajada">
-        {entero(enRiesgo)} de {entero(info.elegibles)} elegibles en riesgo contra una
-        capacidad de {entero(capLo)} a {entero(capHi)} contactos. El resto no es grupo de
-        control: es el tramo de menor exposición, porque la lista se ordena y se corta.
+        {hay
+          ? <>La lista se ordena por exposición, así que el orden rinde {ventaja.toFixed(2).replace('.', ',')} veces
+              más que el alcance. El resto no es grupo de control: es la cola de menor exposición.</>
+          : 'Ninguna combinación de filtros deja clientes en riesgo en este corte.'}
       </p>
 
       <div className="lienzo cob">
         <div className="cob-kpi fijo">
-          {/* La muestra de color va acá, pegada a su cifra, y no en una leyenda aparte:
-              esta columna YA dice los tres números, así que repetirlos abajo del gráfico era
-              decir dos veces lo mismo y dejaba la leyenda apretada contra la cuadrícula. */}
           <div className="cob-dato">
             <span className="cob-etq">En riesgo este corte</span>
             <span className="cob-val tabular">{entero(enRiesgo)}</span>
             <span className="cob-ap">clientes elegibles sin compra reciente</span>
           </div>
           <div className="cob-dato">
-            <span className="cob-etq"><i className="cob-m ll" />Los alcanza la capacidad</span>
-            <span className="cob-val tabular acc">{entero(capLo)} a {entero(capHi)}</span>
-            <span className="cob-ap">{pct(pctLo)} a {pct(pctHi)} del total. El tramo claro es
-              hasta el máximo declarado</span>
+            <span className="cob-etq">Capacidad declarada</span>
+            <span className="cob-val tabular">{entero(capLo)} a {entero(capHi)}</span>
+            <span className="cob-ap">contactos por mes · {pct(azarLo)} de las cabezas</span>
           </div>
           <div className="cob-dato">
-            <span className="cob-etq"><i className="cob-m lt" />Quedan sin contactar</span>
-            <span className="cob-val tabular">{entero(sinCubrir)}</span>
-            <span className="cob-ap">el tramo de menor exposición</span>
+            <span className="cob-etq">Exposición que cubre</span>
+            <span className="cob-val tabular acc">{pct(cubreLo)} a {pct(cubreHi)}</span>
+            <span className="cob-ap">{pesos(hay ? acum[kLo - 1] : 0)} a {pesos(hay ? acum[kHi - 1] : 0)} de {pesos(total)}</span>
           </div>
         </div>
 
         <div className="cob-grilla">
-          {/* Una sola cosa arriba de la cuadrícula: cuánto vale un cuadro, con un cuadro de
-              verdad al lado y aire suficiente. Una llave sobre DOS cuadros decía "estos dos"
-              mientras el texto decía "cada uno", que es lo contrario. */}
-          <p className="cob-unidad">
-            <i className="cob-m ll" /> un cuadro <b>= {POR_CUADRO} clientes</b>
-          </p>
           <Lienzo>
             {({ w, h }) => (
-              <Unidades total={enRiesgo} cubiertoLo={capLo} cubiertoHi={capHi}
-                        porCuadro={POR_CUADRO} w={w} h={h} />
+              <CurvaConcentracion
+                acum={acum} total={total} nRiesgo={enRiesgo} capLo={capLo} capHi={capHi}
+                w={w} h={h} formatoDinero={pesos} formatoPct={(v) => pct(v)} />
             )}
           </Lienzo>
         </div>
