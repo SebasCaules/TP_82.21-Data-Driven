@@ -13,7 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { SIN_FILTRO, corteInfo, cortes, hayFiltro, mesCorte, meta } from './agregacion.js'
 import Filtros, { DIMENSIONES, etiquetaValor } from './Filtros.jsx'
 import LineaTiempo from './LineaTiempo.jsx'
-import { ICONOS, MarcaAudiencia } from './Iconos.jsx'
+import { MarcaAudiencia } from './Iconos.jsx'
 import { GRUPOS, PANTALLAS } from './pantallas/index.jsx'
 
 const CORTE_INICIAL = cortes.length - 1
@@ -101,12 +101,13 @@ export default function App() {
       <Lateral indice={indice} irA={irA} />
 
       <div className="principal">
-        <div className={`barra${usaCorte ? '' : ' apagada'}`}>
-          <LineaTiempo iCorte={iCorte} setICorte={setICorte} activo={usaCorte} />
+        <div className="barra">
+          <Filtros filtro={filtro} setFiltro={setFiltro} activos={usaFiltros}
+                   reiniciar={reiniciar} modificado={modificado} />
+          <div className={`barra-corte${usaCorte ? '' : ' apagada'}`}>
+            <LineaTiempo iCorte={iCorte} setICorte={setICorte} activo={usaCorte} />
+          </div>
         </div>
-
-        <Filtros filtro={filtro} setFiltro={setFiltro} activos={usaFiltros}
-                 reiniciar={reiniciar} modificado={modificado} />
 
         <main className="cuerpo">
           {imprimiendo
@@ -136,7 +137,6 @@ function Lateral({ indice, irA }) {
         {PANTALLAS.map((p, i) => {
           const grupo = GRUPOS.find((g) => g.id === p.grupo)
           const abre = i === 0 || PANTALLAS[i - 1].grupo !== p.grupo
-          const Icono = ICONOS[p.id]
           return (
             <li key={p.id}>
               {abre && (
@@ -149,7 +149,6 @@ function Lateral({ indice, irA }) {
                       className={`lat-item${i === indice ? ' on' : ''}`}
                       aria-current={i === indice ? 'page' : undefined}>
                 <span className="lat-n tabular">{String(i + 1).padStart(2, '0')}</span>
-                <Icono />
                 <span className="lat-txt">{p.corto}</span>
                 <MarcaAudiencia audiencia={p.audiencia} />
               </button>

@@ -21,7 +21,7 @@
   --fuente: "Segoe UI", Tahoma, Helvetica, Arial, sans-serif;
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 
-  --lat-w: clamp(196px, 15.5vw, 244px);
+  --lat-w: clamp(182px, 14.5vw, 232px);
   --pad-x: clamp(18px, 2.2vw, 40px);
 }
 
@@ -129,94 +129,134 @@ body {
   font: 400 9.5px/1.4 var(--mono); color: var(--mut);
 }
 
-/* ---------- timeline de cortes ---------- */
+/* ---------- barra única: filtros a la izquierda, mes de corte a la derecha ---------- */
 
-.barra { border-bottom: 1px solid var(--bd); padding: 10px var(--pad-x); background: var(--papel); }
-.barra.apagada { opacity: .42; pointer-events: none; }
+.barra {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(16px, 3vw, 44px);
+  padding: 9px var(--pad-x) 10px;
+  border-bottom: 1px solid var(--bd);
+  background: var(--papel);
+}
+.barra-corte { flex: 0 0 auto; width: clamp(230px, 26%, 340px); }
+.barra-corte.apagada { opacity: .4; pointer-events: none; }
 
-.tl { display: flex; align-items: center; gap: 16px; }
-.tl-izq, .tl-der { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; }
-.tl-der { align-items: flex-end; }
+/* ---------- mes de corte ---------- */
+
+.tl { display: flex; flex-direction: column; gap: 4px; user-select: none; }
+.tl-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .tl-lbl {
   font: 500 9px/1.2 var(--mono);
   letter-spacing: .13em; text-transform: uppercase; color: var(--mut);
 }
-.tl-val { font: 600 15px/1.15 var(--fuente); letter-spacing: -.01em; }
-.tl-rango { font: 400 10px/1.2 var(--mono); color: var(--mut2); }
+.tl-val { font: 600 14px/1.15 var(--fuente); letter-spacing: -.01em; }
 
 .tl-pista {
-  flex: 1; min-width: 0; height: 40px;
-  position: relative; cursor: ew-resize;
-  border-bottom: 1px solid var(--bd);
+  height: 20px;
+  position: relative;
+  cursor: ew-resize;
+  border-bottom: 1px solid rgba(0, 0, 0, .3);
   touch-action: none;
+  /* Sin esto, arrastrar el cursor selecciona el texto de alrededor. */
+  user-select: none; -webkit-user-select: none;
 }
 .tl-pista:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-
-.tl-svg { position: absolute; inset: 0 0 6px; width: 100%; height: calc(100% - 6px); }
-.tl-area { fill: var(--acc); opacity: .1; }
-.tl-linea { fill: none; stroke: var(--acc); stroke-width: 1.5; }
 
 .tl-ticks {
   position: absolute; left: 0; right: 0; bottom: 0;
   display: flex; justify-content: space-between; align-items: flex-end;
 }
-.tl-tick { width: 1px; height: 4px; background: rgba(0, 0, 0, .22); }
-.tl-tick.anio { height: 8px; background: rgba(0, 0, 0, .38); }
-.tl-tick.on { background: var(--ink); height: 11px; width: 2px; }
+/* El corte activo no se distingue por color: es el único tick que llega arriba y engrosa. */
+.tl-tick { width: 1px; height: 5px; background: rgba(0, 0, 0, .25); }
+.tl-tick.anio { height: 9px; background: rgba(0, 0, 0, .42); }
+.tl-tick.on { background: var(--ink); height: 18px; width: 2px; }
 
-.tl-cursor { position: absolute; top: -2px; bottom: 0; width: 0; border-left: 2px solid var(--ink); }
-.tl-cursor b {
-  position: absolute; right: 6px; top: -1px;
-  font: 600 11px var(--mono); color: var(--ink); white-space: nowrap;
+.tl-pie {
+  display: flex; justify-content: space-between;
+  font: 400 9px/1.2 var(--mono); color: var(--mut);
+  letter-spacing: .04em;
 }
 
 /* ---------- filtros ---------- */
 
 .filtros {
-  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
-  padding: 8px var(--pad-x);
-  border-bottom: 1px solid var(--bd);
-  background: var(--papel);
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  padding-bottom: 2px;
 }
-.filtros.inertes .chip-f { opacity: .38; }
+.filtros.inertes .chip-f { opacity: .35; }
 .filtros-lbl {
+  display: inline-flex; align-items: center; gap: 5px;
   font: 500 9px/1.2 var(--mono);
   letter-spacing: .13em; text-transform: uppercase; color: var(--mut);
-  margin-right: 2px;
+  margin-right: 3px;
+}
+.filtros-lbl b {
+  display: inline-grid; place-items: center;
+  min-width: 15px; height: 15px; padding: 0 3px;
+  background: var(--acc); color: #fff;
+  border-radius: 8px; font: 600 9.5px/1 var(--mono);
 }
 .filtros-nota { font: italic 400 10.5px var(--fuente); color: var(--mut); }
 
+/* Afordancia: fondo propio, sombra de una línea, icono y caret. Un borde fino sobre el
+   fondo no se lee como algo que se puede tocar. */
 .chip-f {
   position: relative;
-  display: inline-flex; align-items: center; gap: 5px;
-  border: 1px solid rgba(0, 0, 0, .28); border-radius: 3px;
-  padding: 4px 8px;
-  background: transparent; color: var(--mut2);
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 9px;
+  border: 1px solid rgba(0, 0, 0, .2);
+  border-radius: 4px;
+  background: var(--sup);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .05);
+  color: var(--mut2);
   cursor: pointer;
+  transition: border-color .12s, box-shadow .12s, transform .12s;
 }
 .chip-f select {
   position: absolute; inset: 0; width: 100%; height: 100%;
   opacity: 0; cursor: pointer; font: inherit;
 }
-.chip-f:hover { border-color: rgba(0, 0, 0, .5); color: var(--ink); }
-.chip-f:has(select:focus-visible) { outline: 2px solid var(--ink); outline-offset: 1px; }
-.chip-f-txt {
-  font: 500 10.5px/1.2 var(--mono);
-  letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+.chip-f:hover {
+  border-color: var(--ink); color: var(--ink);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+  transform: translateY(-1px);
 }
-.chip-f-txt i { font-style: normal; opacity: .62; font-weight: 400; }
-/* Chip con filtro puesto: se invierte, engrosa y suma la ✕, que no existe en el vacío.
-   No depende solo del color. */
-.chip-f.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.chip-f:has(select:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+.chip-f .caret { opacity: .5; margin-left: -1px; }
+.chip-f:hover .caret { opacity: .9; }
+
+.chip-f-txt {
+  font: 600 11px/1 var(--fuente);
+  letter-spacing: .01em; white-space: nowrap;
+  max-width: 13ch; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Con filtro puesto: se invierte, y la ✕ reemplaza al caret. El estado no depende del
+   color — cambian el fondo, el peso y el control de la derecha. */
+.chip-f.on {
+  background: var(--ink); border-color: var(--ink); color: #fff;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .18);
+}
+.chip-f.on:hover { background: #000; }
 .chip-f-x {
   position: relative; z-index: 1;
-  border: 0; background: none; padding: 0 0 0 1px;
-  color: inherit; opacity: .65;
-  font: 400 13px/1 var(--fuente); cursor: pointer;
+  display: grid; place-items: center;
+  width: 15px; height: 15px; margin-right: -3px;
+  border: 0; border-radius: 3px; background: rgba(255, 255, 255, .16);
+  color: inherit;
+  font: 400 12px/1 var(--fuente); cursor: pointer;
 }
-.chip-f-x:hover { opacity: 1; }
+.chip-f-x:hover { background: rgba(255, 255, 255, .3); }
 .chip-f-x:focus-visible { outline: 1px solid currentColor; }
-.chip-f.reset { border-style: dashed; margin-left: 4px; }
+
+.chip-f.reset {
+  background: transparent; border-style: dashed; box-shadow: none;
+  margin-left: 2px;
+}
+.chip-f.reset .chip-f-txt { font-weight: 500; color: var(--mut); }
+.chip-f.reset:hover .chip-f-txt { color: var(--ink); }
 
 /* ---------- cuerpo ---------- */
 
@@ -366,15 +406,15 @@ body {
 /* ---------- pantallas bajas: el alto es la restricción, no el ancho ---------- */
 
 @media (max-height: 730px) {
-  :root { --lat-w: clamp(192px, 16vw, 214px); }
+  :root { --lat-w: clamp(178px, 15vw, 206px); }
   .lat { padding-top: 12px; }
   .lat-marca { padding-bottom: 10px; }
   .lat-item { padding: 5px 8px; font-size: 11.5px; }
   .lat-grupo { padding: 8px 8px 4px; }
   .lat-pie { font-size: 9px; gap: 2px; padding-top: 8px; }
-  .barra { padding: 7px var(--pad-x); }
-  .tl-pista { height: 30px; }
-  .filtros { padding: 6px var(--pad-x); }
+  .barra { padding: 7px var(--pad-x) 8px; }
+  .tl-pista { height: 17px; }
+  .chip-f { height: 26px; }
   .cuerpo { padding-top: 8px; }
   .titulo { font-size: clamp(17px, 1.75vw, 23px); }
   .tarjeta { padding: 9px 12px; }
