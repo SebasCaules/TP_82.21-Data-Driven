@@ -320,6 +320,15 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
 
   const ultimo = [...serie].reverse().find((p) => p.valor != null)
   const iUlt = serie.findIndex((p) => p === ultimo)
+  // La franja que se prende es la del valor APUNTADO: el del cursor mientras se recorre la
+  // serie, y el ultimo cuando no hay cursor. Asi "en que zona estoy" deja de depender de
+  // leer una etiqueta y pasa a ser lo primero que se ve.
+  const vApuntado = foco != null && serie[foco] && serie[foco].valor != null
+    ? serie[foco].valor
+    : (ultimo ? ultimo.valor : null)
+  const iZona = zonas && vApuntado != null
+    ? zonas.findIndex((z) => vApuntado >= z.desde && vApuntado < z.hasta)
+    : -1
   const pico = serie.reduce((a, p, i) => (p.valor != null && p.valor > (a.v ?? -1) ? { v: p.valor, i } : a), {})
   const xFin = padL + iw
 
@@ -355,16 +364,21 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
           el lector busca la respuesta. El estado deja de ser una pastilla suelta arriba a la
           derecha y pasa a ser POSICION: la linea cae adentro de una de las tres. Tinte al
           10 % para que la serie siga mandando, y un filete solido en cada corte declarado. */}
-      {zonas && zonas.map((z) => {
+      {zonas && zonas.map((z, i) => {
         const yTop = Y(Math.min(max, z.hasta))
         const yBot = Y(Math.max(min, z.desde))
+        const on = i === iZona
         return (
           <g key={z.etiqueta}>
             <rect x={padL} y={yTop} width={iw} height={Math.max(1, yBot - yTop)}
-                  fill={z.tono} opacity=".1" />
-            {z.desde > min && (
+                  fill={z.tono} opacity={on ? '.26' : '.06'} />
+            {on && (
+              <rect x={padL} y={yTop} width={iw} height={Math.max(1, yBot - yTop)}
+                    fill="none" stroke={z.tono} strokeWidth="1.5" opacity=".8" />
+            )}
+            {!on && z.desde > min && (
               <line x1={padL} x2={xFin} y1={yBot} y2={yBot} stroke={z.tono}
-                    strokeWidth="1" opacity=".65" />
+                    strokeWidth="1" opacity=".45" />
             )}
           </g>
         )
@@ -408,9 +422,10 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
         return (
           <g key={`rot-${z.etiqueta}`}>
             <rect x={xFin + 7} y={yc - 4.5} width={9} height={9}
-                  fill={z.tono} opacity=".22" stroke={z.tono} strokeWidth="1" strokeOpacity=".8" />
-            <text x={xFin + 20} y={yc} fontSize="10" fill={MUT2} dominantBaseline="central"
-                  fontWeight={z.activa ? 700 : 400}>{rotulos[i]}</text>
+                  fill={z.tono} opacity={i === iZona ? '.55' : '.18'}
+                  stroke={z.tono} strokeWidth="1" strokeOpacity={i === iZona ? 1 : '.6'} />
+            <text x={xFin + 20} y={yc} fontSize="10" fill={i === iZona ? INK : MUT}
+                  dominantBaseline="central" fontWeight={i === iZona ? 700 : 400}>{rotulos[i]}</text>
           </g>
         )
       })}
@@ -437,7 +452,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
                   stroke={ACC} strokeWidth="2.25" strokeLinejoin="round" strokeLinecap="round" />
       ))}
 
-      {pico.i != null && pico.i !== iUlt && (
+      {pico.i != null && pico.i !== iUlt && (foco == null || Math.abs(foco - pico.i) > 1) && (
         <g>
           <circle cx={X(pico.i)} cy={Y(pico.v)} r="3.5" fill="var(--sup)" stroke={ACC} strokeWidth="1.75" />
           <Plaqueta x={X(pico.i)} y={Y(pico.v) - 13} texto={formato(pico.v)} fuente={10.5}
