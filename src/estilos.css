@@ -381,3 +381,20 @@ body {
 
 .serie-nota { font-size: 9.5px; color: var(--mut); letter-spacing: .02em; }
 @media (max-height: 730px) { .serie-nota { display: none; } }
+
+/* ---------- fuera del rango soportado ----------
+   El tablero se diseñó sin scroll para proyector y laptop, de 1152x640 a 1920x1080. Por
+   debajo de eso el contenido no entra y antes rompía en silencio: ahora lo dice. */
+.chico { display: none; }
+
+@media (max-width: 1000px), (max-height: 560px) {
+  .app > .enc, .app > .cuerpo, .app > .pie { display: none !important; }
+  .chico {
+    display: flex; flex-direction: column; justify-content: center;
+    height: 100%; padding: 28px; gap: 10px; background: var(--fondo);
+  }
+  .chico h1 { font: 600 19px/1.3 var(--fuente); margin: 0; max-width: 30ch; }
+  .chico p { font-size: 13.5px; color: var(--mut2); margin: 0; max-width: 44ch; line-height: 1.5; }
+  .chico b { color: var(--ink); }
+}
+@media print { .chico { display: none !important; } }

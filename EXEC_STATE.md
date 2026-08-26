@@ -10,9 +10,9 @@ Método: workforce (olas verificadas). Arranque 2026-08-25. Entrega **mar 01/09/
 | 1 | Alcance | **APROBADA** | 4 recomendaciones aceptadas: 25 cortes, pesos nominales, lista top-N, backlog fuera |
 | 2 | Contrato de datos | **APROBADA** | 44/44 anclas, 201.819/201.819 chequeos, payload 1.089 KB, ola 1 cerrada |
 | 3 | Diseño por pantalla | **APROBADA** | comité de 4 lentes: 72 hallazgos, 49 bloqueantes, 49 aceptados. 12 → 14 pantallas |
-| 4 | Esqueleto navegable | **ESPERANDO VISTO BUENO** | 14 pantallas con datos reales, cero desborde en 5 resoluciones × 3 cortes × 2 estados de filtro |
-| 5 | Verificación | TODO | |
-| 6 | Cierre | TODO | |
+| 4 | Esqueleto navegable | **APROBADA** | 14 pantallas con datos reales, cero desborde |
+| 5 | Verificación | **APROBADA** | auditoría adversarial: 63 hallazgos, 22 refutados, 29 confirmados y corregidos. 44 → 75 anclas |
+| 6 | Cierre | **CERRADA** | push, deploy en verde, wiki propagado, `log.md` actualizado |
 
 ## Fase 0 — pasos
 
@@ -111,6 +111,48 @@ Cada fórmula cita el archivo y la línea que la implementa y su valor al corte 
 Encontró un error en un comentario de `build.py`: decía "31 clientes y 2,8 %" mezclando el
 conteo de los de menos de medio año con la participación de los de menos de un año. Son
 **111 clientes** y 2,8 %. Corregido.
+
+## Ola 4 — auditoría final adversarial (compuerta 5)
+
+56 agentes: 5 auditores horizontales en modelo N0 (uno por capa del protocolo, más contrato
+y accesibilidad) y un refutador independiente por cada hallazgo alto o medio.
+
+| | |
+|---|---|
+| Hallazgos | 63 |
+| Refutados | 22 |
+| **Confirmados y corregidos** | **29** |
+| Declinados con motivo | 1 |
+
+Los auditores verificaron por su cuenta los cuatro números de estado que se les dieron y
+confirmaron los cuatro. Los tres hallazgos que valían la corrida:
+
+1. **Imprimir desde el menú del navegador daba una sola pantalla.** Las 14 hojas solo
+   existían con la tecla `i`: faltaba el listener de `beforeprint`.
+2. **La tarjeta del rango del umbral tenía sus cifras escritas a mano y no existía la línea
+   de código que las generara.** Estaban declaradas como excepción autorizada, pero
+   autorizarlas no crea el cómputo. Ahora se calculan en `features.sensibilidad_umbral`.
+3. **El arnés probaba que el payload coincide con `client_facts`, no que `client_facts` sea
+   correcto.** La tabla RFM y la asignación de región y categoría no estaban ancladas contra
+   ninguna fuente externa. 31 anclas nuevas.
+
+| | Antes | Después |
+|---|---|---|
+| Anclas | 44 | **75** |
+| `validate.py` | 201.819 | **201.900** |
+| `paridad.mjs` | 471.870 | **606.270** |
+
+## Cierre (compuerta 6)
+
+| Ítem | Estado |
+|---|---|
+| Repo `app/` pusheado | `main` en `SebasCaules/TP_82.21-Data-Driven` |
+| CI | build y deploy en verde: el pipeline corre de cero en un clone limpio |
+| Pages | `sebascaules.github.io/TP_82.21-Data-Driven`, cero subrecursos en producción |
+| Offline | cero subrecursos, una sola petición |
+| Wiki propagado | `analisis-exploratorio-churn`, `guia-dashboard-directorio`, `entregable-1`, `index`, `CLAUDE.md` |
+| `log.md` | entrada del 2026-08-26 |
+| Enmiendas | 10, en `entregas/entregable-1/25-08/enmiendas-para-el-integrado.md` |
 
 ## Decisiones N0
 

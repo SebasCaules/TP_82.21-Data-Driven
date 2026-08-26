@@ -112,6 +112,16 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* El tablero se resuelve sin scroll y eso fija un piso de tamano. Abajo de ese piso
+          el contenido no entra: antes se pisaba en silencio, ahora lo declara. */}
+      <div className="chico">
+        <h1>Este tablero necesita una pantalla más grande</h1>
+        <p>
+          Está diseñado para resolverse <b>sin scroll</b> en proyector y en laptop, de
+          1152&nbsp;×&nbsp;640 a 1920&nbsp;×&nbsp;1080. Agrandá la ventana o abrilo en una
+          pantalla más grande.
+        </p>
+      </div>
       <header className="enc">
         <div className="marca">Casa Óga <span>· riesgo de pérdida de clientes</span></div>
 
