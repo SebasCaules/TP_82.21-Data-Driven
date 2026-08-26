@@ -4,7 +4,7 @@
 // ni de los filtros, por eso no toma `iCorte` ni `filtro` de las props.
 
 import { Lienzo, Linea } from '../graficos.jsx'
-import Semaforo, { estadoRecompra } from '../Semaforo.jsx'
+import { estadoRecompra } from '../Semaforo.jsx'
 import { zonasRecompra } from './D0Consolidada.jsx'
 import { meta, pct, series } from '../agregacion.js'
 
@@ -48,7 +48,6 @@ export default function D4Recompra() {
             Estado contra la meta
             {/* El estado ES el mensaje de esta pantalla (Parte D §2.1): pastilla grande,
                 no un renglon chico que compite con el grafico. */}
-            <Semaforo estado={estado} tamano="grande" de="recompra a 90 días" />
           </div>
           {/* Serie de tiempo trimestral contra una banda de meta: va en linea (regla 7).
               Se sostiene: es la unica primitiva que muestra tendencia y quiebre en el

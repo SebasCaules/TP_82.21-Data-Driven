@@ -283,13 +283,17 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
   // El margen derecho lo fija el rotulo de banda mas largo, no un porcentaje del ancho: con
   // un ancho fijo, "meta 10,0%-11,0%" se cortaba a "meta 10,0%-1" en la resolucion minima.
   const rotulos = zonas
-    ? zonas.map((z) => `${z.etiqueta} ${z.rango}`)
+    ? zonas.map((z) => z.etiqueta)
     : [
       banda ? `${rotuloBanda} ${formato(banda[0])}–${formato(banda[1])}` : '',
       banda2 ? `${rotuloBanda2} ${formato(banda2[0])}–${formato(banda2[1])}` : '',
     ]
-  // +25 por la muestra de color y su aire; sin eso el rotulo se sale del lienzo.
-  const padR = Math.min(w * 0.34, Math.max(30, ...rotulos.map((r) => anchoTexto(r, 10) + 25)))
+  // +26 por la muestra de color y su aire. Con zonas el rotulo va en dos renglones (nombre
+  // y rango), asi que el ancho lo fija el mas largo de los dos.
+  const anchoRotulo = zonas
+    ? Math.max(...zonas.map((z) => Math.max(anchoTexto(z.etiqueta, 11.5), anchoTexto(z.rango, 11.5))))
+    : Math.max(...rotulos.map((r) => anchoTexto(r, 10)))
+  const padR = Math.min(w * 0.36, Math.max(30, anchoRotulo + 26))
   const iw = Math.max(20, w - padL - padR)
   const ih = Math.max(20, h - padT - padB)
 
@@ -422,13 +426,18 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
           la serie confunde texto con dato. */}
       {zonas && zonas.map((z, i) => {
         const yc = (Y(Math.min(max, z.hasta)) + Y(Math.max(min, z.desde))) / 2
+        const on = i === iZona
         return (
           <g key={`rot-${z.etiqueta}`}>
-            <rect x={xFin + 7} y={yc - 4.5} width={9} height={9}
-                  fill={z.tono} opacity={i === iZona ? '.35' : '.12'}
-                  stroke={z.tono} strokeWidth="1" strokeOpacity={i === iZona ? '.85' : '.45'} />
-            <text x={xFin + 20} y={yc} fontSize="10" fill={i === iZona ? MUT2 : MUT}
-                  dominantBaseline="central" fontWeight={i === iZona ? 600 : 400}>{rotulos[i]}</text>
+            <rect x={xFin + 7} y={yc - 12} width={10} height={10}
+                  fill={z.tono} opacity={on ? '.35' : '.12'}
+                  stroke={z.tono} strokeWidth="1" strokeOpacity={on ? '.85' : '.45'} />
+            {/* Dos renglones: el nombre de la zona y su rango. En uno solo obligaba a un
+                margen derecho enorme y el cuerpo quedaba en 10 px para que entrara. */}
+            <text x={xFin + 22} y={yc - 7} fontSize="11.5" fill={on ? INK : MUT2}
+                  dominantBaseline="central" fontWeight={on ? 700 : 500}>{z.etiqueta}</text>
+            <text x={xFin + 22} y={yc + 8} fontSize="11.5" fill={on ? MUT2 : MUT}
+                  dominantBaseline="central" className="tabular">{z.rango}</text>
           </g>
         )
       })}
@@ -464,18 +473,54 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
       )}
       {/* El ultimo punto casi siempre cae en el borde derecho, donde ya viven los rotulos de
           las bandas: su plaqueta se ancla hacia adentro para no encimarse con ellos. */}
-      {ultimo && (
-        <g>
-          {/* Anillo de superficie: el ultimo punto cae encima de la banda y sin el se
-              empasta con ella. */}
-          <circle cx={X(iUlt)} cy={Y(ultimo.valor)} r="4" fill={ACC}
-                  stroke="var(--sup)" strokeWidth="2" />
-          <Plaqueta x={X(iUlt) - (iUlt === serie.length - 1 ? 8 : 0)}
-                    y={Y(ultimo.valor) - 15} texto={formato(ultimo.valor)}
-                    fuente={12} peso={700} color={INK}
-                    anclaje={iUlt === serie.length - 1 ? 'end' : 'middle'} />
-        </g>
-      )}
+      {/* El ultimo punto, su valor y SU ESTADO, juntos. El estado vivia en una pastilla
+          arriba a la derecha, lejos del dato que califica; aca va pegado al punto, que es
+          donde el ojo ya esta. No depende del color: lleva el nombre de la zona escrito y
+          la forma del semaforo (llena / media / punteada).
+          La bandera va del lado donde hay lugar (abajo si el punto esta en la mitad
+          inferior) y se clampea contra los cuatro bordes del lienzo. */}
+      {ultimo && (() => {
+        const zActiva = zonas && iZona >= 0 ? zonas[iZona] : null
+        const val = formato(ultimo.valor)
+        const est = zActiva ? zActiva.etiqueta.toUpperCase() : null
+        const bw = Math.max(anchoTexto(val, 13), est ? anchoTexto(est, 9) + 13 : 0) + 18
+        const bh = est ? 34 : 21
+        const yp = Y(ultimo.valor)
+        const abajo = yp > padT + (yBase - padT) * 0.5
+        let by = abajo ? yp + 14 : yp - 14 - bh
+        by = Math.max(padT + 2, Math.min(by, yBase - bh - 2))
+        const bx = Math.max(padL + 2, Math.min(X(iUlt) - bw / 2, xFin - bw - 2))
+        const tono = zActiva ? zActiva.tono : ACC
+        return (
+          <g>
+            <circle cx={X(iUlt)} cy={yp} r="4" fill={ACC} stroke="var(--sup)" strokeWidth="2" />
+            <rect x={bx} y={by} width={bw} height={bh} rx="3"
+                  fill="var(--sup)" stroke={tono} strokeWidth="1.25" />
+            <text x={bx + bw / 2} y={by + (est ? 12 : 11)} fontSize="13" fontWeight={700}
+                  fill={INK} textAnchor="middle" dominantBaseline="central"
+                  className="tabular">{val}</text>
+            {est && (
+              <g>
+                {/* La forma del semaforo: llena en meta, media por debajo, punteada fuera. */}
+                {iZona === 2 && <rect x={bx + 9} y={by + 20} width={7} height={7} fill={tono} />}
+                {iZona === 1 && (
+                  <g>
+                    <rect x={bx + 9} y={by + 20} width={7} height={7} fill="none"
+                          stroke={tono} strokeWidth="1.2" />
+                    <rect x={bx + 9} y={by + 23.5} width={7} height={3.5} fill={tono} />
+                  </g>
+                )}
+                {iZona === 0 && (
+                  <rect x={bx + 9} y={by + 20} width={7} height={7} fill="none"
+                        stroke={tono} strokeWidth="1.2" strokeDasharray="2 1.6" />
+                )}
+                <text x={bx + 21} y={by + 24} fontSize="9" fontWeight={600} fill={tono}
+                      letterSpacing=".07em" dominantBaseline="central">{est}</text>
+              </g>
+            )}
+          </g>
+        )
+      })()}
 
       {/* eje X: nada en diagonal (regla 16). Se saltean etiquetas si no entran. */}
       {serie.map((p, i) => {

@@ -10,15 +10,23 @@
 //     al corte ni a los filtros: lo mas grande era lo menos accionable.
 //   - El titulo afirmaba el 46,4 % y la cifra de abajo lo repetia. Ahora el titulo da la
 //     LECTURA y no el numero, que esta doce pixeles mas abajo en cuerpo 40.
-//   - La sensibilidad del umbral baja a nota al pie, que es su rango real de importancia.
+//   - La sensibilidad del umbral se va de esta pantalla. Sigue en la hoja impresa (el pie
+//     de las 14 lleva el proxy declarado) y en el documento integrado; en pantalla era una
+//     linea de 10 px que nadie leia y que cobraba alto.
+//
+// Sin la zona Z5 que 5a proponia (el puente a la operacion). Sus tres cifras -2.452 en
+// riesgo, capacidad 500 a 800, cubre 20,4 % a 32,6 %- son EXACTAMENTE las de la vista 09,
+// que existe para eso y las dice con mas contexto. Repetir la afirmacion entera es el mismo
+// problema que 5a viene a corregir en Z2/Z3. El enlace a la lista lo da la barra lateral.
+// 5a se escribio mirando la vista 01 vieja, cuando la 09 todavia no tenia su cuadricula.
 //
 // Nota sobre la ficha F07 (dec-D11): el BAN se reparte en Z2 (la cifra) y Z3 (las dos bases).
 // La barra de progreso del F07 decia lo mismo que Z3 dice rotulado, y su tabla de tres filas
 // es Z3. La ficha no se rediseño: se desarmo en las zonas que 5a define.
 
-import Semaforo, { estadoRecompra } from '../Semaforo.jsx'
+import { estadoRecompra } from '../Semaforo.jsx'
 import { Lienzo, Linea } from '../graficos.jsx'
-import { entero, fechaCorta, meta, millones, pct, pesos, series } from '../agregacion.js'
+import { entero, fechaCorta, meta, pct, pesos, series } from '../agregacion.js'
 
 // El titulo dice la lectura, no la cifra. La escala se deriva del mismo numero que Z2
 // muestra, asi que con un filtro puesto sigue siendo cierta.
@@ -37,28 +45,27 @@ export function zonasRecompra(valor) {
   const [lo] = meta.meta_recompra
   const cerca = lo - 1
   const f = (v) => `${v.toFixed(1).replace('.', ',')} %`
+  // Notacion matematica en el rango: "< 9,0 %" se lee de un golpe y "menos de 9,0 %" hay que
+  // leerlo. El borde de cada zona es el mismo que usa estadoRecompra, sin redondear.
   const zs = [
-    { etiqueta: 'Fuera de meta', desde: 0, hasta: cerca, tono: 'var(--sem-fuera)', rango: `menos de ${f(cerca)}` },
-    { etiqueta: 'Por debajo', desde: cerca, hasta: lo, tono: 'var(--sem-cerca)', rango: `${f(cerca)} a ${f(lo)}` },
-    { etiqueta: 'En meta', desde: lo, hasta: Infinity, tono: 'var(--sem-meta)', rango: `${f(lo)} o más` },
+    { etiqueta: 'Fuera de meta', desde: 0, hasta: cerca, tono: 'var(--sem-fuera)', rango: `< ${f(cerca)}` },
+    { etiqueta: 'Por debajo', desde: cerca, hasta: lo, tono: 'var(--sem-cerca)', rango: `${f(cerca)} – ${f(lo)}` },
+    { etiqueta: 'En meta', desde: lo, hasta: Infinity, tono: 'var(--sem-meta)', rango: `≥ ${f(lo)}` },
   ]
   const i = valor == null ? -1 : valor >= lo ? 2 : valor >= cerca ? 1 : 0
   return zs.map((z, k) => ({ ...z, activa: k === i }))
 }
 
-export default function D0({ info, irALista }) {
+export default function D0({ info }) {
   const recompra = series.recompra_trimestral
     .filter((r) => r.tasa != null)
     .map((r) => ({ etiqueta: r.trimestre.replace('20', "\'"), valor: r.tasa * 100 }))
   const ultima = recompra[recompra.length - 1]
-  const [capLo, capHi] = meta.capacidad_contacto
   const estado = ultima ? estadoRecompra(ultima.valor, meta.meta_recompra) : 'fuera'
 
   const sujeto = LECTURA.find(([tope]) => info.pct < tope)[1]
   const pctHist = info.facturacion ? (100 * info.facturacionRiesgo) / info.facturacion : 0
   const pctClientes = info.clientes ? (100 * info.enRiesgo) / info.clientes : 0
-  const cobLo = info.enRiesgo ? Math.min(100, (100 * capLo) / info.enRiesgo) : 0
-  const cobHi = info.enRiesgo ? Math.min(100, (100 * capHi) / info.enRiesgo) : 0
   const marcaPrevia = info.exposicionPrevia != null && info.baseAnualizada
     ? (100 * info.exposicionPrevia) / info.baseAnualizada
     : null
@@ -128,8 +135,6 @@ export default function D0({ info, irALista }) {
           <div className="kpi-lbl z-serie-cab">
             <span className="z-serie-tit">Recompra a 90 días · María G. · mensual</span>
             <span className="z-global">Serie global · no usa corte ni filtros</span>
-            <Semaforo estado={estado} tamano="grande" sufijo={pct(ultima ? ultima.valor : 0)}
-                      de="recompra a 90 días" />
           </div>
           <Lienzo>
             {({ w, h }) => (
@@ -143,30 +148,8 @@ export default function D0({ info, irALista }) {
           </Lienzo>
         </div>
 
-        {/* Z5 — puente a la operacion. El salto a la lista es un boton que dice a donde va:
-            el drill-down por click en una barra sorprendia, este no. */}
-        <div className="z-puente">
-          <span className="z5-val tabular">{entero(info.enRiesgo)}</span>
-          <span className="z5-txt">
-            en riesgo contra una capacidad de {capLo} a {capHi} contactos por mes:
-            cubre {pct(cobLo)} a {pct(cobHi)}
-          </span>
-          {irALista && (
-            <button type="button" className="z5-ir" onClick={irALista}>
-              Ver los {entero(info.enRiesgo)} en la lista →
-            </button>
-          )}
-        </div>
       </div>
 
-      {/* Z6 — la nota. Acá viven el proxy y la sensibilidad al umbral, que es su rango real
-          de importancia: mueve la cifra 1,4 M entre 60 y 120 días. */}
-      <p className="z-nota">
-        {meta.proxy}. Sensibilidad al umbral:{' '}
-        {info.sensibilidad
-          ? info.sensibilidad.map((x) => `${x.umbral} d ${pesos(x.exposicion)}`).join(' · ')
-          : '—'}. Sin modelo predictivo.
-      </p>
     </section>
   )
 }
