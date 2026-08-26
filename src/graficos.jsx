@@ -865,35 +865,37 @@ export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion
  * Curva de concentracion: que parte de la EXPOSICION cubre el operativo si contacta a los
  * primeros k de la lista, contra lo que cubriria contactando a k al azar.
  *
- * Por que esta forma y no la cuadricula de unidades que habia antes: la pantalla se titula
- * "el orden importa mas que el alcance" y la cuadricula solo sabia contar cabezas, asi que
- * el dibujo no sostenia la frase. Aca las dos curvas la prueban de un vistazo — a 500
- * contactos la lista ordenada cubre 37,0 % de la plata y el azar 20,4 % — y la distancia
- * vertical entre ellas ES la ventaja de ordenar.
+ * Por que esta forma y no una cuadricula de unidades: la pantalla se titula "el orden importa
+ * mas que el alcance" y la cuadricula solo sabia contar cabezas, asi que el dibujo no
+ * sostenia la frase. Aca las dos curvas la prueban de un vistazo y la distancia vertical
+ * entre ellas ES la ventaja de ordenar.
  *
- * El contrafactual va punteado ademas de gris: la diferencia entre las dos series no
- * depende del color.
+ * El estado del punto elegido NO vive aca: vive en la pantalla, porque lo que cambia con el
+ * cursor son los KPIs de la cabecera. La curva recibe el k y avisa cuando el usuario lo
+ * mueve o lo fija. El contrafactual va punteado ademas de gris: la diferencia entre las dos
+ * series no depende del color.
  */
 export function CurvaConcentracion({ acum, total, nRiesgo, capLo, capHi, w, h,
-                                     formatoDinero, formatoPct }) {
-  const [foco, setFoco] = useState(null)
+                                     kFijado, kHover, onHover, onFijar, formatoPct }) {
   if (!acum || !acum.length || !(total > 0) || w < 60 || h < 60) return null
 
   const padL = 46
   const padR = 16
-  const padT = 16
+  const padT = 14
   const padB = 52
   const iw = Math.max(20, w - padL - padR)
   const ih = Math.max(20, h - padT - padB)
   const n = acum.length
 
-  const pctDe = (k) => (100 * acum[k - 1]) / total
+  const pctDe = (k) => (100 * acum[Math.max(1, Math.min(n, k)) - 1]) / total
   const azarDe = (k) => Math.min(100, (100 * k) / nRiesgo)
   const { max, ticks } = escalaNice(Math.max(pctDe(n), azarDe(n)), 4)
 
   const X = (k) => padL + (k / n) * iw
   const Y = (v) => padT + ih - (v / max) * ih
   const yBase = Y(0)
+  const kBase = Math.min(capLo, n)
+  const kSel = Math.max(1, Math.min(n, kHover ?? kFijado ?? kBase))
 
   const puntos = []
   // Un punto cada ~2 px: dibujar los 800 no cambia la curva y multiplica el nodo por 400.
@@ -901,35 +903,23 @@ export function CurvaConcentracion({ acum, total, nRiesgo, capLo, capHi, w, h,
   for (let k = paso; k <= n; k += paso) puntos.push([X(k), Y(pctDe(k))])
   if (puntos.length && puntos[puntos.length - 1][0] < X(n)) puntos.push([X(n), Y(pctDe(n))])
 
-  const k = foco != null ? Math.max(1, Math.min(n, foco)) : null
-  // La marca se rotula con el k que REALMENTE dibuja. Con un filtro puesto la lista puede
-  // quedar en 110 filas y entonces el corte de capacidad no existe: rotularlo "500" sobre el
-  // punto 110 era decir una cifra que no es la de ese punto.
-  const marca = (kk) => (
-    <g key={kk}>
-      <line x1={X(kk)} x2={X(kk)} y1={Y(pctDe(kk))} y2={yBase} stroke={EJE}
-            strokeWidth="1" strokeDasharray="3 3" />
-      <circle cx={X(kk)} cy={Y(pctDe(kk))} r="4" fill={ACC} stroke="var(--sup)" strokeWidth="2" />
-      <text x={X(kk)} y={yBase + 15} fontSize="10.5" fill={MUT2} textAnchor="middle"
-            fontWeight={600} className="tabular">{kk}</text>
-    </g>
-  )
-  // Los cortes de capacidad que caen dentro de la lista; si ninguno entra, se marca su final,
-  // que es hasta donde el operativo puede llegar con este recorte.
+  // Las marcas del eje: los cortes de capacidad que caen dentro de la lista, y su final.
+  // Rotuladas con el k que dibujan: con un filtro la lista puede quedar en 110 filas y
+  // rotular ese punto "500" seria decir una cifra que no es la de ese punto.
   const cortes = [...new Set([capLo, capHi].filter((c) => c < n))]
   if (!cortes.length || cortes[cortes.length - 1] !== n) cortes.push(n)
 
+  const desdeX = (cx, caja) => Math.max(1, Math.min(n,
+    Math.round(((cx - caja.left) / Math.max(1, caja.width)) * n)))
+
   return (
     <svg width={w} height={h} role="img" style={{ display: 'block' }}
-         aria-label={`Curva de concentracion: contactando a ${capLo} de los ${nRiesgo} en riesgo se cubre ${formatoPct(pctDe(Math.min(capLo, n)))} de la exposicion, contra ${formatoPct(azarDe(capLo))} contactando al azar`}>
-      {/* Banda de capacidad: el tramo que el operativo puede recorrer hoy. Si la lista no
-          llega ni al piso de capacidad, no hay banda que dibujar. */}
+         aria-label={`Curva de concentracion: contactando a ${kBase} de los ${nRiesgo} en riesgo se cubre ${formatoPct(pctDe(kBase))} de la exposicion, contra ${formatoPct(azarDe(kBase))} contactando al azar`}>
       {capLo < n && (
         <rect x={X(capLo)} y={padT} width={Math.max(1, X(Math.min(capHi, n)) - X(capLo))}
-              height={ih} fill="var(--azul1)" opacity=".55" />
+              height={ih} fill="var(--azul1)" opacity=".5" />
       )}
 
-      {/* eje Y */}
       <line x1={padL} x2={padL} y1={padT} y2={yBase} stroke={EJE} strokeWidth="1" />
       {ticks.map((t) => (
         <g key={t}>
@@ -940,79 +930,65 @@ export function CurvaConcentracion({ acum, total, nRiesgo, capLo, capHi, w, h,
       ))}
       <line x1={padL} x2={padL + iw} y1={yBase} y2={yBase} stroke={EJE} strokeWidth="1" />
 
-      {/* el contrafactual: contactar k al azar cubre k/n en esperanza */}
       <line x1={X(0)} x2={X(n)} y1={Y(0)} y2={Y(azarDe(n))} stroke={GRIS} strokeWidth="2"
             strokeDasharray="5 4" strokeLinecap="round" />
       <polyline points={[[X(0), Y(0)], ...puntos].map((q) => q.join(',')).join(' ')}
                 fill="none" stroke={ACC} strokeWidth="2.25"
                 strokeLinejoin="round" strokeLinecap="round" />
 
-      {cortes.map((c) => marca(c))}
+      {cortes.map((c) => (
+        <g key={c}>
+          <line x1={X(c)} x2={X(c)} y1={padT} y2={yBase} stroke={EJE}
+                strokeWidth="1" strokeDasharray="3 3" />
+          <text x={X(c)} y={yBase + 15} fontSize="10.5" fill={MUT} textAnchor="middle"
+                className="tabular">{c}</text>
+        </g>
+      ))}
 
-      {/* eje X */}
       <text x={padL} y={yBase + 15} fontSize="10.5" fill={MUT} textAnchor="middle">0</text>
       <text x={padL + iw} y={yBase + 32} fontSize="11" fill={MUT2} textAnchor="end"
             letterSpacing=".09em" fontWeight={600} style={{ textTransform: 'uppercase' }}>
         Clientes contactados, de mayor a menor exposición
       </text>
 
-      {/* Leyenda: dos series, siempre presente, y ademas cada una rotulada sobre su punta. */}
+      {/* Dos series: leyenda siempre presente. */}
       <g>
-        <line x1={padL + 10} x2={padL + 32} y1={padT + 9} y2={padT + 9} stroke={ACC} strokeWidth="2.25" />
-        <text x={padL + 38} y={padT + 9} fontSize="11" fill={MUT2} dominantBaseline="central"
+        <line x1={padL + 12} x2={padL + 34} y1={padT + 8} y2={padT + 8} stroke={ACC} strokeWidth="2.25" />
+        <text x={padL + 40} y={padT + 8} fontSize="11" fill={MUT2} dominantBaseline="central"
               fontWeight={600}>lista ordenada por exposición</text>
-        <line x1={padL + 10} x2={padL + 32} y1={padT + 26} y2={padT + 26} stroke={GRIS}
+        <line x1={padL + 12} x2={padL + 34} y1={padT + 25} y2={padT + 25} stroke={GRIS}
               strokeWidth="2" strokeDasharray="5 4" />
-        <text x={padL + 38} y={padT + 26} fontSize="11" fill={MUT} dominantBaseline="central">
+        <text x={padL + 40} y={padT + 25} fontSize="11" fill={MUT} dominantBaseline="central">
           contactando al azar
         </text>
       </g>
 
-      {k != null && (
-        <g pointerEvents="none">
-          <line x1={X(k)} x2={X(k)} y1={padT} y2={yBase} stroke={MUT2} strokeWidth="1" opacity=".45" />
-          <circle cx={X(k)} cy={Y(azarDe(k))} r="3.5" fill={GRIS} stroke="var(--sup)" strokeWidth="1.5" />
-          <circle cx={X(k)} cy={Y(pctDe(k))} r="4.5" fill={ACC} stroke="var(--sup)" strokeWidth="2" />
-          {/* La lectura va arriba a la izquierda: la curva es concava y arranca en cero, asi
-              que ese rincon esta vacio por construccion y el cuadro nunca la tapa. */}
-          <g transform={`translate(${padL + 10} ${padT + 46})`}>
-            <rect x={0} y={0} width={214} height={54} rx="3" fill="var(--sup)"
-                  stroke="var(--bd)" strokeWidth="1" />
-            <text x={11} y={17} fontSize="11.5" fill={MUT} dominantBaseline="central">
-              contactando a <tspan fontWeight={700} fill={INK} className="tabular">{k}</tspan> clientes
-            </text>
-            <text x={11} y={34} fontSize="13" fontWeight={700} fill={ACC} dominantBaseline="central"
-                  className="tabular">
-              {formatoPct(pctDe(k))}
-              <tspan fontSize="11" fontWeight={400} fill={MUT2}>{`  ${formatoDinero(acum[k - 1])}`}</tspan>
-            </text>
-            <text x={11} y={47} fontSize="10.5" fill={MUT} dominantBaseline="central">
-              al azar serían <tspan className="tabular">{formatoPct(azarDe(k))}</tspan>
-            </text>
-          </g>
-        </g>
-      )}
+      {/* El punto elegido: la manija que el usuario mueve, y que es lo que leen los KPIs. */}
+      <g pointerEvents="none">
+        <line x1={X(kSel)} x2={X(kSel)} y1={padT} y2={yBase} stroke={ACC} strokeWidth="1.5"
+              opacity={kHover != null ? '.55' : '.8'} />
+        <circle cx={X(kSel)} cy={Y(azarDe(kSel))} r="3.5" fill={GRIS}
+                stroke="var(--sup)" strokeWidth="1.5" />
+        <circle cx={X(kSel)} cy={Y(pctDe(kSel))} r="6" fill={ACC}
+                stroke="var(--sup)" strokeWidth="2.5" />
+      </g>
 
       <rect x={padL} y={padT} width={iw} height={ih} fill="transparent"
-            tabIndex={0} style={{ cursor: 'crosshair', outline: 'none' }}
-            onPointerMove={(e) => {
-              const c = e.currentTarget.getBoundingClientRect()
-              setFoco(Math.round(((e.clientX - c.left) / Math.max(1, c.width)) * n))
-            }}
-            onMouseMove={(e) => {
-              const c = e.currentTarget.getBoundingClientRect()
-              setFoco(Math.round(((e.clientX - c.left) / Math.max(1, c.width)) * n))
-            }}
-            onPointerLeave={() => setFoco(null)}
-            onMouseLeave={() => setFoco(null)}
-            onFocus={() => setFoco((f) => (f == null ? Math.min(capLo, n) : f))}
-            onBlur={() => setFoco(null)}
+            tabIndex={0} role="slider" aria-label="Cantidad de clientes a contactar"
+            aria-valuemin={1} aria-valuemax={n} aria-valuenow={kSel}
+            style={{ cursor: 'pointer', outline: 'none' }}
+            onPointerMove={(e) => onHover(desdeX(e.clientX, e.currentTarget.getBoundingClientRect()))}
+            onMouseMove={(e) => onHover(desdeX(e.clientX, e.currentTarget.getBoundingClientRect()))}
+            onPointerLeave={() => onHover(null)}
+            onMouseLeave={() => onHover(null)}
+            onClick={(e) => onFijar(desdeX(e.clientX, e.currentTarget.getBoundingClientRect()))}
             onKeyDown={(e) => {
               const d = { ArrowLeft: -10, ArrowRight: 10, PageUp: 100, PageDown: -100 }[e.key]
               if (d !== undefined) {
                 e.preventDefault(); e.stopPropagation()
-                setFoco((f) => Math.max(1, Math.min(n, (f ?? capLo) + d)))
-              } else if (e.key === 'Escape') { e.stopPropagation(); setFoco(null) }
+                onFijar(Math.max(1, Math.min(n, kSel + d)))
+              } else if (e.key === 'Home') { e.preventDefault(); e.stopPropagation(); onFijar(kBase) }
+              else if (e.key === 'End') { e.preventDefault(); e.stopPropagation(); onFijar(n) }
             }} />
     </svg>
   )
