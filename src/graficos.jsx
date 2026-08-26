@@ -370,15 +370,18 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
         const on = i === iZona
         return (
           <g key={z.etiqueta}>
+            {/* La franja activa se distingue por CONTRASTE con las otras, no por saturacion:
+                el tinte sube poco y lo que la separa es que las demas bajan. Una zona
+                pintada fuerte compite con la linea, que es el dato. */}
             <rect x={padL} y={yTop} width={iw} height={Math.max(1, yBot - yTop)}
-                  fill={z.tono} opacity={on ? '.26' : '.06'} />
+                  fill={z.tono} opacity={on ? '.14' : '.045'} />
             {on && (
               <rect x={padL} y={yTop} width={iw} height={Math.max(1, yBot - yTop)}
-                    fill="none" stroke={z.tono} strokeWidth="1.5" opacity=".8" />
+                    fill="none" stroke={z.tono} strokeWidth="1" opacity=".4" />
             )}
             {!on && z.desde > min && (
               <line x1={padL} x2={xFin} y1={yBot} y2={yBot} stroke={z.tono}
-                    strokeWidth="1" opacity=".45" />
+                    strokeWidth="1" opacity=".28" />
             )}
           </g>
         )
@@ -422,10 +425,10 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
         return (
           <g key={`rot-${z.etiqueta}`}>
             <rect x={xFin + 7} y={yc - 4.5} width={9} height={9}
-                  fill={z.tono} opacity={i === iZona ? '.55' : '.18'}
-                  stroke={z.tono} strokeWidth="1" strokeOpacity={i === iZona ? 1 : '.6'} />
-            <text x={xFin + 20} y={yc} fontSize="10" fill={i === iZona ? INK : MUT}
-                  dominantBaseline="central" fontWeight={i === iZona ? 700 : 400}>{rotulos[i]}</text>
+                  fill={z.tono} opacity={i === iZona ? '.35' : '.12'}
+                  stroke={z.tono} strokeWidth="1" strokeOpacity={i === iZona ? '.85' : '.45'} />
+            <text x={xFin + 20} y={yc} fontSize="10" fill={i === iZona ? MUT2 : MUT}
+                  dominantBaseline="central" fontWeight={i === iZona ? 600 : 400}>{rotulos[i]}</text>
           </g>
         )
       })}
