@@ -4,11 +4,11 @@ Ejecución por olas verificadas de los 72 hallazgos que quedaron en pie tras la 
 (8 lentes de revisión, 13 verificadores adversariales, 9 hallazgos descartados). El informe
 completo, con la prueba y el argumento de cada uno, está publicado como artefacto.
 
-Rama de trabajo: `fix/auditoria-diseno`, desde `9dcb97c`.
+Rama de trabajo: `fix/auditoria-diseno`, desde `6b7c86c`.
 
 ## Fase 0 — reconciliación
 
-La auditoría se hizo contra `92ea0e2` más cinco archivos sin commitear. Entre medio entraron
+La auditoría se hizo contra `b74f474` más cinco archivos sin commitear. Entre medio entraron
 tres commits que reescribieron la vista 09 y tocaron `estilos.css`, `graficos.jsx`, `datos.js`
 y `build.py`. Los 45 hallazgos que viven en archivos que esos commits no tocaron quedan firmes
 por `git diff`. Los 27 que sí, se re-adjudicaron uno por uno contra HEAD:

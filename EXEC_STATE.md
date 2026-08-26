@@ -207,7 +207,7 @@ Se asigna antes de spawnear cada ola. Reservados al orquestador (N0) en todo mom
 
 ## Ejecución de los fixes de auditoría (2026-08-26)
 
-Plan: `docs/plan-fixes-auditoria.md`. Rama: `fix/auditoria-diseno` desde `9dcb97c`.
+Plan: `docs/plan-fixes-auditoria.md`. Rama: `fix/auditoria-diseno` desde `6b7c86c`.
 72 hallazgos verificados, 23 unidades de trabajo, 4 olas.
 
 | Paso | Estado | Commit | Notas |
