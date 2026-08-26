@@ -88,7 +88,8 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [indice, modificado, irA, reiniciar, imprimirTodo])
 
-  const ctx = { info, filtro, setFiltro, iCorte, irA, verEnLista, usaFiltros }
+  const irALista = useCallback(() => setIndice(INDICE_LISTA), [])
+  const ctx = { info, filtro, setFiltro, iCorte, irA, irALista, verEnLista, usaFiltros }
 
   return (
     <div className="app">
@@ -122,11 +123,10 @@ export default function App() {
   )
 }
 
-/** La marca: la misma casa del favicon (ver index.html), con las tres barras que bajan y la
-    última en terracota. No vive en `Iconos.jsx` porque ese set es monolínea en currentColor
-    y solo para filtros; esta es una forma plana de cuatro colores. Va sin el rect de fondo
-    del favicon (papel #eceae5): en la pestaña ese fondo da contraste, sobre la lateral
-    #f2f1ee se vería como una baldosa. */
+/** La marca: el favicon 4b del mockup de direcciones ("la casa que se apaga"). No vive en
+    `Iconos.jsx` porque ese set es monolínea en currentColor y solo para filtros; esta es una
+    forma plana de cuatro colores. Va sin el rect de fondo del favicon (papel #eceae5): en la
+    pestaña ese fondo da contraste, sobre la lateral #f2f1ee se vería como una baldosa. */
 const Marca = () => (
   <svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true" style={{ flexShrink: 0 }}>
     <path d="M16 1.5 L31 13 L31 30.5 L1 30.5 L1 13 Z" fill="var(--ink)" />

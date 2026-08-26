@@ -157,10 +157,12 @@ export default function Filtros({ filtro, setFiltro, activos, reiniciar, modific
 
   return (
     <div className={`filtros${activos ? '' : ' inertes'}`}>
-      <span className="filtros-lbl">
-        Filtrar por
-        <b className="tabular" style={puestos ? undefined : { visibility: 'hidden' }}
-           aria-hidden={!puestos}>{puestos || 0}</b>
+      {/* Sin el rótulo "Filtrar por": ocupaba 92 px de la barra y los cuatro chips ya dicen
+          qué son. Queda el contador, que es lo único que el rótulo aportaba de verdad, y su
+          lugar está reservado para que el riel del corte no se mueva al aparecer. */}
+      <span className="filtros-n tabular" aria-label={`${puestos} filtros puestos`}
+            style={puestos ? undefined : { visibility: 'hidden' }} aria-hidden={!puestos}>
+        {puestos || 0}
       </span>
 
       {DIMENSIONES.map((d) => (

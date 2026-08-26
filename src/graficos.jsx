@@ -148,7 +148,7 @@ function EjeXValor({ x0, ancho, y, ticks, max, formato, titulo }) {
         return (
           <g key={t}>
             <line x1={x} x2={x} y1={y} y2={y + 4} stroke={EJE} strokeWidth="1" />
-            <text x={x} y={y + 15} fontSize="10.5" fill={MUT} textAnchor="middle"
+            <text x={x} y={y + 17} fontSize="10.5" fill={MUT} textAnchor="middle"
                   className="tabular">{formato(t)}</text>
           </g>
         )
@@ -156,7 +156,7 @@ function EjeXValor({ x0, ancho, y, ticks, max, formato, titulo }) {
       {/* El titulo va en la PUNTA del eje y debajo de los rotulos de las marcas: pegado al
           origen se confundia con la primera marca. */}
       {titulo && (
-        <text x={x0 + ancho} y={y + 29} fontSize="11" fill={MUT2} textAnchor="end"
+        <text x={x0 + ancho} y={y + 38} fontSize="11" fill={MUT2} textAnchor="end"
               letterSpacing=".09em" fontWeight={600}
               style={{ textTransform: 'uppercase' }}>{titulo}</text>
       )}
@@ -173,7 +173,7 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
   if (!datos.length) return null
   const fmtEje = formatoEje || formato
   const padTop = 8
-  const altoEje = tituloEje ? 38 : 22
+  const altoEje = tituloEje ? 48 : 26
   const disponible = h - padTop - altoEje
   const paso = disponible / datos.length
   // Regla 10: la barra mas ancha que el espacio entre barras.
@@ -184,7 +184,8 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
   // Los dos presupuestos que antes eran constantes del llamador y se pisaban entre si: el
   // ancho de la etiqueta de valor y el de la columna de notas salen de los datos reales.
   // Con notaAncho fijo, "ARS 36,8 M" y "9,1 % en riesgo (circular)" terminaban encimados.
-  const anchoValor = Math.max(38, ...datos.map((d) => anchoTexto(formato(d.valor), fuente) + 12))
+  const textoValor = (d) => formato(d.valor) + (d.sufijo ? `  ${d.sufijo}` : '')
+  const anchoValor = Math.max(38, ...datos.map((d) => anchoTexto(textoValor(d), fuente) + 12))
   const anchoNota = Math.max(0, ...datos.map((d) => (d.nota ? anchoTexto(d.nota, fuente - 1.5) + 14 : 0)))
   const ancho = Math.max(40, w - x0 - anchoNota - anchoValor - 6)
 
@@ -212,6 +213,7 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
                   fill={d.excepcion ? EXC : d.enfasis ? INK : MUT2} dominantBaseline="central"
                   fontWeight={d.enfasis || d.excepcion ? 600 : 500} className="tabular">
               {formato(d.valor)}
+              {d.sufijo && <tspan fill={MUT} fontWeight={400}>{`  ${d.sufijo}`}</tspan>}
             </text>
             {d.nota && (
               <text x={w} y={y + alto / 2} fontSize={fuente - 1.5} fill={MUT}
@@ -260,7 +262,7 @@ export function ReferenciaV({ x, h, etiqueta, y = 0 }) {
  * dibujo. Rotuladas adentro se cruzaban con la curva justo en el tramo final, que es el que
  * importa.
  */
-export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta',
+export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda = 'meta',
                         rotuloBanda2 = 'línea base', tituloEje, tituloY }) {
   // Un grafico SVG en pantalla ES interactivo: de los 15 trimestres solo dos llevan
   // etiqueta directa (el pico y el ultimo), asi que sin esto los otros trece no se pueden
@@ -274,16 +276,18 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
   }
   const padL = 50
   const padT = tituloY ? 26 : 14
-  const padB = 46          // dos renglones: marcas del eje X y, debajo, su titulo
+  const padB = 56          // dos renglones con aire: marcas del eje X y, debajo, su titulo
   const vals = serie.filter((p) => p.valor != null).map((p) => p.valor)
   if (!vals.length) return null
 
   // El margen derecho lo fija el rotulo de banda mas largo, no un porcentaje del ancho: con
   // un ancho fijo, "meta 10,0%-11,0%" se cortaba a "meta 10,0%-1" en la resolucion minima.
-  const rotulos = [
-    banda ? `${rotuloBanda} ${formato(banda[0])}–${formato(banda[1])}` : '',
-    banda2 ? `${rotuloBanda2} ${formato(banda2[0])}–${formato(banda2[1])}` : '',
-  ]
+  const rotulos = zonas
+    ? zonas.map((z) => `${z.etiqueta} ${z.rango}`)
+    : [
+      banda ? `${rotuloBanda} ${formato(banda[0])}–${formato(banda[1])}` : '',
+      banda2 ? `${rotuloBanda2} ${formato(banda2[0])}–${formato(banda2[1])}` : '',
+    ]
   // +25 por la muestra de color y su aire; sin eso el rotulo se sale del lienzo.
   const padR = Math.min(w * 0.34, Math.max(30, ...rotulos.map((r) => anchoTexto(r, 10) + 25)))
   const iw = Math.max(20, w - padL - padR)
@@ -292,7 +296,8 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
   // Escala: si forzar el cero deja mas de un tercio del alto vacio, el eje arranca en un
   // numero redondo por debajo del minimo y se DECLARA cortado. Con la recompra entre 6,3 % y
   // 19,0 %, el cero se comia el 33 % del grafico y aplastaba justo la caida que es el tema.
-  const topes = [...vals, ...(banda || []), ...(banda2 || [])]
+  const topes = [...vals, ...(banda || []), ...(banda2 || []),
+                 ...(zonas ? zonas.flatMap((z) => [z.desde, z.hasta]).filter((v) => Number.isFinite(v)) : [])]
   const crudo = Math.max(...topes)
   const piso = Math.min(...topes)
   // Umbral: si el cero se come mas de una cuarta parte del alto, no vale la pena pagarlo.
@@ -345,6 +350,26 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
           por textura antes que por color, que es lo unico que sobrevive a la impresion en
           blanco y negro. */}
       <Tramas />
+
+      {/* Franjas de umbral: las tres zonas del semaforo de la Parte D §2.1, dibujadas donde
+          el lector busca la respuesta. El estado deja de ser una pastilla suelta arriba a la
+          derecha y pasa a ser POSICION: la linea cae adentro de una de las tres. Tinte al
+          10 % para que la serie siga mandando, y un filete solido en cada corte declarado. */}
+      {zonas && zonas.map((z) => {
+        const yTop = Y(Math.min(max, z.hasta))
+        const yBot = Y(Math.max(min, z.desde))
+        return (
+          <g key={z.etiqueta}>
+            <rect x={padL} y={yTop} width={iw} height={Math.max(1, yBot - yTop)}
+                  fill={z.tono} opacity=".1" />
+            {z.desde > min && (
+              <line x1={padL} x2={xFin} y1={yBot} y2={yBot} stroke={z.tono}
+                    strokeWidth="1" opacity=".65" />
+            )}
+          </g>
+        )
+      })}
+
       {banda2 && (
         <rect x={padL} y={Y(banda2[1])} width={iw} height={Math.max(1, Y(banda2[0]) - Y(banda2[1]))}
               fill="url(#trama)" stroke="var(--bd2)" strokeWidth="1" />
@@ -378,6 +403,18 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
       {/* Rotulo de cada banda en el margen, no encima de la curva. La identidad la lleva la
           muestra de color al lado, no el color del texto: un rotulo pintado con el color de
           la serie confunde texto con dato. */}
+      {zonas && zonas.map((z, i) => {
+        const yc = (Y(Math.min(max, z.hasta)) + Y(Math.max(min, z.desde))) / 2
+        return (
+          <g key={`rot-${z.etiqueta}`}>
+            <rect x={xFin + 7} y={yc - 4.5} width={9} height={9}
+                  fill={z.tono} opacity=".22" stroke={z.tono} strokeWidth="1" strokeOpacity=".8" />
+            <text x={xFin + 20} y={yc} fontSize="10" fill={MUT2} dominantBaseline="central"
+                  fontWeight={z.activa ? 700 : 400}>{rotulos[i]}</text>
+          </g>
+        )
+      })}
+
       {banda && (
         <g>
           <rect x={xFin + 7} y={(Y(banda[0]) + Y(banda[1])) / 2 - 4} width={9} height={9}
@@ -429,7 +466,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
         return (
           <g key={p.etiqueta}>
             <line x1={X(i)} x2={X(i)} y1={yBase} y2={yBase + 4} stroke={EJE} strokeWidth="1" />
-            <text x={X(i)} y={yBase + 16} fontSize="10.5" fill={MUT} textAnchor="middle">
+            <text x={X(i)} y={yBase + 18} fontSize="10.5" fill={MUT} textAnchor="middle">
               {p.etiqueta}
             </text>
           </g>
@@ -437,7 +474,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
       })}
       {/* Titulo del eje X en su punta derecha, por debajo de los rotulos de trimestre. */}
       {tituloEje && (
-        <text x={xFin} y={yBase + 33} fontSize="11" fill={MUT2} textAnchor="end"
+        <text x={xFin} y={yBase + 42} fontSize="11" fill={MUT2} textAnchor="end"
               letterSpacing=".09em" fontWeight={600}
               style={{ textTransform: 'uppercase' }}>{tituloEje}</text>
       )}
@@ -501,7 +538,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, rotuloBanda = 'meta
 export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132, referencia }) {
   if (!datos.length) return null
   const padTop = 8
-  const altoEje = tituloEje ? 38 : 22
+  const altoEje = tituloEje ? 48 : 26
   const disponible = h - padTop - altoEje
   const paso = disponible / datos.length
   const fuente = Math.max(10.5, Math.min(13, paso * 0.4))
@@ -558,15 +595,24 @@ export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132,
 }
 
 /** Embudo en barras desde cero (no en trapecios: el area engana, Cleveland-McGill). */
-export function Embudo({ etapas, w, h, formato, formatoEje, tituloEje }) {
+export function Embudo({ etapas, w, h, formato, formatoEje, tituloEje, formatoPct }) {
+  const fp = formatoPct || ((v) => `${(v * 100).toFixed(1).replace('.', ',')} %`)
+  const base = etapas[0] ? etapas[0].valor : 0
   const datos = etapas.map((e, i) => ({
     etiqueta: e.etiqueta,
+    // El porcentaje sobre el total va PEGADO al valor, no flotando en la columna derecha:
+    // ahi quedaba en gris chico y a 400 px del dato que califica.
     valor: e.valor,
-    nota: i > 0 ? `${e.pct}` : '',
+    sufijo: i > 0 && base ? fp(e.valor / base) : null,
+    // La columna derecha pasa a decir la conversion respecto de la etapa anterior, que es
+    // la informacion propia de un embudo y no estaba en ningun lado.
+    nota: i > 0 && etapas[i - 1].valor
+      ? `${fp(e.valor / etapas[i - 1].valor)} de ${etapas[i - 1].etiqueta.toLowerCase()}`
+      : '',
     enfasis: i === etapas.length - 1,
   }))
   return <BarrasH datos={datos} w={w} h={h} formato={formato} formatoEje={formatoEje}
-                  tituloEje={tituloEje} anchoEtiqueta={116} />
+                  tituloEje={tituloEje} anchoEtiqueta={124} />
 }
 
 /** Trama diagonal para distinguir tramos sin depender del color. En una impresion en blanco
@@ -651,29 +697,46 @@ export function BarraTramos({ tramos, w, h, formato, banda, alturaBarra }) {
  * la prueba al pie de una afirmacion que ya trae su cifra escrita al lado. El eje rotulado
  * de esta misma serie vive en D4, que es la pantalla que la analiza.
  */
-export function Chispa({ serie, w, h, banda }) {
+export function Chispa({ serie, w, h, banda, tonoBanda = 'var(--acc)', rotulo, rotuloBanda }) {
   const vals = serie.filter((v) => v != null)
-  if (!vals.length || w < 24 || h < 14) return null
+  if (!vals.length || w < 40 || h < 14) return null
   const topes = [...vals, ...(banda || [])]
   const hi = Math.max(...topes)
   const lo = Math.min(...topes)
   const pad = (hi - lo) * 0.12 || 1
   const max = hi + pad
   const min = Math.max(0, lo - pad)
-  const X = (i) => (i / Math.max(1, serie.length - 1)) * w
-  const Y = (v) => h - ((v - min) / (max - min)) * h
+  const R = 3.5
+  // El rotulo del ultimo valor se lleva su ancho del area de dibujo, y el punto se mete R
+  // hacia adentro: dibujado en x = w quedaba cortado a la mitad por el borde del SVG.
+  const anchoRot = rotulo ? anchoTexto(rotulo, 11) + 12 : 0
+  const iw = Math.max(20, w - anchoRot - R * 2)
+  const X = (i) => R + (i / Math.max(1, serie.length - 1)) * iw
+  const Y = (v) => R + ((max - v) / (max - min)) * Math.max(1, h - R * 2)
   const pts = serie.map((v, i) => (v == null ? null : [X(i), Y(v)])).filter(Boolean)
   const iUlt = pts.length - 1
 
   return (
     <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
       {banda && (
-        <rect x={0} y={Y(banda[1])} width={w} height={Math.max(1, Y(banda[0]) - Y(banda[1]))}
-              fill="var(--acc)" opacity=".13" />
+        <g>
+          <rect x={0} y={Y(banda[1])} width={iw + R * 2} height={Math.max(1, Y(banda[0]) - Y(banda[1]))}
+                fill={tonoBanda} opacity=".14" />
+          <line x1={0} x2={iw + R * 2} y1={Y(banda[0])} y2={Y(banda[0])} stroke={tonoBanda}
+                strokeWidth="1" opacity=".6" />
+          {rotuloBanda && (
+            <text x={2} y={Y(banda[0]) - 4} fontSize="9" fill={MUT}>{rotuloBanda}</text>
+          )}
+        </g>
       )}
       <polyline points={pts.map((q) => q.join(',')).join(' ')} fill="none"
                 stroke={ACC} strokeWidth="1.75" strokeLinejoin="round" strokeLinecap="round" />
-      <circle cx={pts[iUlt][0]} cy={pts[iUlt][1]} r="2.75" fill={ACC} />
+      <circle cx={pts[iUlt][0]} cy={pts[iUlt][1]} r={R} fill={ACC}
+              stroke="var(--sup)" strokeWidth="1.5" />
+      {rotulo && (
+        <text x={pts[iUlt][0] + 8} y={pts[iUlt][1]} fontSize="11" fill={INK} fontWeight={700}
+              dominantBaseline="central" className="tabular">{rotulo}</text>
+      )}
     </svg>
   )
 }
@@ -683,7 +746,8 @@ export function Chispa({ serie, w, h, banda }) {
  * tramo que no lleva enfasis va con trama, para que la particion se lea tambien impresa en
  * blanco y negro.
  */
-export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion = false }) {
+export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion = false,
+                            rotulo, pie }) {
   if (w < 20) return null
   // Recorte vacio: 0 sobre 0 no es una proporcion. Se dibuja el marco sin relleno y con la
   // leyenda que corresponde, en vez de devolver null y dejar la caja en blanco.
@@ -702,11 +766,69 @@ export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion
   // Se centra en la caja que le den: adentro de un Lienzo alto quedaria pegada arriba.
   const alto = Math.min(alturaBarra, h)
   const y = Math.max(0, (h - alto) / 2)
+  const tono = excepcion ? EXC : ACC
+  // El dato marcado: adentro del tramo si entra, si no pegado a su borde. Una barra sin
+  // cifra obliga a leer el numero que esta en otro renglon.
+  const dentro = rotulo ? anchoTexto(rotulo, 15) + 20 < ancho : false
   return (
     <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
       <Tramas />
       <rect x={0} y={y} width={w} height={alto} fill="url(#trama)" stroke="var(--bd2)" strokeWidth="1" />
-      <rect x={0} y={y} width={ancho} height={alto} fill={excepcion ? EXC : ACC} />
+      <rect x={0} y={y} width={ancho} height={alto} fill={tono} />
+      {rotulo && (
+        <text x={dentro ? 10 : ancho + 8} y={y + alto / 2} fontSize="15" fontWeight={700}
+              fill={dentro ? '#fff' : tono} dominantBaseline="central" className="tabular">
+          {rotulo}
+        </text>
+      )}
+      {pie && (
+        <text x={0} y={y + alto + 13} fontSize="9.5" fill={MUT}>{pie}</text>
+      )}
+    </svg>
+  )
+}
+
+/**
+ * Cuadricula de unidades. Un cuadro por cada `porCuadro` clientes, los cubiertos llenos y
+ * el resto en trama.
+ *
+ * Por que esto y no una barra partida: la barra dice la proporcion, pero la pregunta de la
+ * pantalla es cuantas personas entran y cuantas quedan afuera, y eso se cuenta. Cincuenta
+ * cuadros de los que diez estan llenos se lee de un vistazo y sin leer el numero. El tramo
+ * de la banda de capacidad (de 500 a 800) se dibuja con relleno intermedio, asi que el rango
+ * declarado se ve en vez de anunciarse.
+ */
+export function Unidades({ total, cubiertoLo, cubiertoHi, porCuadro, w, h }) {
+  if (!(total > 0) || w < 40 || h < 30) return null
+  const n = Math.ceil(total / porCuadro)
+  const g = 4
+  // Columnas por proporcion de la caja, no "las que entren": tomar el cuadro mas grande
+  // posible daba una sola fila larguisima, que se cuenta peor que una cuadricula.
+  const cols = Math.max(1, Math.min(n, Math.round(Math.sqrt((n * w) / Math.max(1, h)))))
+  const filas = Math.ceil(n / cols)
+  const s = Math.max(4, Math.min((w - (cols - 1) * g) / cols, (h - (filas - 1) * g) / filas))
+  const ancho = cols * (s + g) - g
+  const alto = filas * (s + g) - g
+  const x0 = Math.max(0, (w - ancho) / 2)
+  const y0 = Math.max(0, (h - alto) / 2)
+  const nLo = Math.round(cubiertoLo / porCuadro)
+  const nHi = Math.round(cubiertoHi / porCuadro)
+
+  return (
+    <svg width={w} height={h} role="img" style={{ display: 'block' }}
+         aria-label={`${n} cuadros de ${porCuadro} clientes cada uno; los primeros ${nLo} a ${nHi} son los que la capacidad alcanza a contactar`}>
+      <Tramas />
+      {Array.from({ length: n }, (_, i) => {
+        const fila = Math.floor(i / cols)
+        const col = i % cols
+        const dentro = i < nLo
+        const rango = i >= nLo && i < nHi
+        return (
+          <rect key={i} x={x0 + col * (s + g)} y={y0 + fila * (s + g)} width={s} height={s} rx="1"
+                fill={dentro ? ACC : rango ? 'var(--azul3)' : 'url(#trama)'}
+                stroke={dentro || rango ? 'none' : 'var(--bd2)'} strokeWidth="1" />
+        )
+      })}
     </svg>
   )
 }

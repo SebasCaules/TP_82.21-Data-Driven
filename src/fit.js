@@ -26,6 +26,17 @@ export function chequear() {
   const vw = window.innerWidth
   const vh = window.innerHeight
 
+  // 0. Lo primero: ¿hay app? Con una excepcion en render, React deja el root vacio y
+  //    todos los chequeos de abajo recorren cero elementos y devuelven OK. Un barrido
+  //    automatico daba "todo bien" sobre una pantalla en blanco por un crash.
+  const raiz = document.getElementById('root')
+  if (!raiz || !raiz.querySelector('.pant, .impresion-flujo')) {
+    return {
+      ancho: vw, alto: vh, ok: false,
+      problemas: [{ tipo: 'sin-pantalla', detalle: 'el root no tiene ninguna .pant: la app no montó' }],
+    }
+  }
+
   const pie = document.querySelector('.pie')
   const enc = document.querySelector('.enc')
   const pieTop = pie ? pie.getBoundingClientRect().top : vh

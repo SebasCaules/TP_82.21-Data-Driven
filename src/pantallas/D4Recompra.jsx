@@ -5,6 +5,7 @@
 
 import { Lienzo, Linea } from '../graficos.jsx'
 import Semaforo, { estadoRecompra } from '../Semaforo.jsx'
+import { zonasRecompra } from './D0Consolidada.jsx'
 import { meta, pct, series } from '../agregacion.js'
 
 export default function D4Recompra() {
@@ -33,10 +34,13 @@ export default function D4Recompra() {
   return (
     <section className="pant">
       <h1 className="titulo">
-        La recompra pasó de {pct(pico.valor)} a {pct(ultimo.valor)} en {trimestresDesdePico} trimestres,
-        por debajo de la línea base de {baseLo}-{baseHi} %
+        La recompra pasó de {pct(pico.valor)} a {pct(ultimo.valor)} en {trimestresDesdePico}{' '}
+        trimestres y quedó fuera de meta
       </h1>
-      <p className="bajada">Serie completa 2022Q1–2025Q3.</p>
+      <p className="bajada">
+        Serie completa 2022Q1–2025Q3. La línea base histórica es {baseLo}-{baseHi} %, adentro
+        de la franja de fuera de meta.
+      </p>
 
       <div className="lienzo">
         <div className="tarjeta" style={{ flex: 1, minHeight: 0 }}>
@@ -54,8 +58,7 @@ export default function D4Recompra() {
               <Linea
                 serie={trimestral} w={w} h={h}
                 formato={(v) => pct(v)}
-                banda={meta.meta_recompra}
-                banda2={meta.base_recompra}
+                zonas={zonasRecompra(ultimo.valor)}
                 tituloEje="% que recompra en 90 días"
               />
             )}

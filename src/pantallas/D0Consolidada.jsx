@@ -1,123 +1,183 @@
-// D0 — la pantalla consolidada. Es la respuesta a la tension entre D1 (una pantalla por
-// grafico) y Few, citado en el propio rulebook: "consolidated and arranged on a single
-// screen so the information can be monitored at a glance". El comite subio a esta pantalla
-// el dueno y la cadencia del indicador (regla 24, lead with the ending), y puso el BAN -no
-// el titulo- en el arriba-a-la-izquierda (regla 23 vs. Wexler).
+// D0 — la vista 01. Sigue la direccion 5a del mockup ("tres bandas horizontales"): se lee de
+// arriba a abajo como una frase — la cifra, contra que se compara, de donde viene — y todo
+// lo que NO reacciona a los filtros vive abajo y esta rotulado como tal.
 //
-// Composicion: DOS bloques, no cuatro. Antes eran el BAN, tres tarjetas de KPI en fila y el
-// grafico, en forma de L, y se leia como un rejunte. Ahora la columna izquierda es "la
-// cifra y lo que la sostiene" (BAN arriba, los tres apoyos repartidos abajo) y la derecha
-// es la serie. Los tres apoyos dejaron de ser tarjetas: no son pares del BAN, son su letra
-// chica, y como tarjetas competian con el.
+// Lo que 5a corrige de la version anterior, y por que tenia razon:
+//   - La columna izquierda apilaba cuatro cifras de universos distintos (exposicion anual,
+//     % de clientes, facturacion historica acumulada y sensibilidad del umbral) con el mismo
+//     peso visual, y repetia ARS 94,9 M dos veces.
+//   - La serie de recompra ocupaba el 60 % de la pantalla y es la unica pieza que no responde
+//     al corte ni a los filtros: lo mas grande era lo menos accionable.
+//   - El titulo afirmaba el 46,4 % y la cifra de abajo lo repetia. Ahora el titulo da la
+//     LECTURA y no el numero, que esta doce pixeles mas abajo en cuerpo 40.
+//   - La sensibilidad del umbral baja a nota al pie, que es su rango real de importancia.
+//
+// Nota sobre la ficha F07 (dec-D11): el BAN se reparte en Z2 (la cifra) y Z3 (las dos bases).
+// La barra de progreso del F07 decia lo mismo que Z3 dice rotulado, y su tabla de tres filas
+// es Z3. La ficha no se rediseño: se desarmo en las zonas que 5a define.
 
-import Ban from '../Ban.jsx'
-import Semaforo, { estadoInverso, estadoRecompra } from '../Semaforo.jsx'
+import Semaforo, { estadoRecompra } from '../Semaforo.jsx'
 import { Lienzo, Linea } from '../graficos.jsx'
-import { entero, meta, millones, pct, series } from '../agregacion.js'
+import { entero, fechaCorta, meta, millones, pct, pesos, series } from '../agregacion.js'
 
-export default function D0({ info }) {
-  const pctRiesgo = info.clientes ? (100 * info.enRiesgo) / info.clientes : 0
-  const sens90 = info.sensibilidad ? info.sensibilidad.find((x) => x.umbral === 90) : null
+// El titulo dice la lectura, no la cifra. La escala se deriva del mismo numero que Z2
+// muestra, asi que con un filtro puesto sigue siendo cierta.
+const LECTURA = [
+  [20, 'Una porción chica del gasto anual'],
+  [38, 'Cerca de un tercio del gasto anual'],
+  [55, 'Casi la mitad del gasto anual'],
+  [70, 'Más de la mitad del gasto anual'],
+  [90, 'La mayor parte del gasto anual'],
+  [Infinity, 'Casi todo el gasto anual'],
+]
+
+/** Las tres zonas del semaforo de la Parte D §2.1, como franjas del grafico. El estado deja
+ *  de ser una pastilla suelta y pasa a ser POSICION: la linea cae adentro de una de las tres. */
+export function zonasRecompra(valor) {
+  const [lo] = meta.meta_recompra
+  const cerca = lo - 1
+  const f = (v) => `${v.toFixed(1).replace('.', ',')} %`
+  const zs = [
+    { etiqueta: 'Fuera de meta', desde: 0, hasta: cerca, tono: 'var(--sem-fuera)', rango: `menos de ${f(cerca)}` },
+    { etiqueta: 'Por debajo', desde: cerca, hasta: lo, tono: 'var(--sem-cerca)', rango: `${f(cerca)} a ${f(lo)}` },
+    { etiqueta: 'En meta', desde: lo, hasta: Infinity, tono: 'var(--sem-meta)', rango: `${f(lo)} o más` },
+  ]
+  const i = valor == null ? -1 : valor >= lo ? 2 : valor >= cerca ? 1 : 0
+  return zs.map((z, k) => ({ ...z, activa: k === i }))
+}
+
+export default function D0({ info, irALista }) {
   const recompra = series.recompra_trimestral
     .filter((r) => r.tasa != null)
-    .map((r) => ({ etiqueta: r.trimestre.replace('20', "'"), valor: r.tasa * 100 }))
+    .map((r) => ({ etiqueta: r.trimestre.replace('20', "\'"), valor: r.tasa * 100 }))
   const ultima = recompra[recompra.length - 1]
-  const [metaLo, metaHi] = meta.meta_recompra
+  const [capLo, capHi] = meta.capacidad_contacto
   const estado = ultima ? estadoRecompra(ultima.valor, meta.meta_recompra) : 'fuera'
 
-  // Los dos ultimos puntos de la serie, no dos anios escritos a mano: si la serie se
-  // recorta o se extiende, la cifra sigue siendo la que corresponde.
-  const [anteultimo, ultimoAnio] = series.base_activa_anual.slice(-2)
-  const caidaBase = anteultimo && anteultimo.activos
-    ? (100 * (anteultimo.activos - ultimoAnio.activos)) / anteultimo.activos
-    : 0
+  const sujeto = LECTURA.find(([tope]) => info.pct < tope)[1]
+  const pctHist = info.facturacion ? (100 * info.facturacionRiesgo) / info.facturacion : 0
+  const pctClientes = info.clientes ? (100 * info.enRiesgo) / info.clientes : 0
+  const cobLo = info.enRiesgo ? Math.min(100, (100 * capLo) / info.enRiesgo) : 0
+  const cobHi = info.enRiesgo ? Math.min(100, (100 * capHi) / info.enRiesgo) : 0
+  const marcaPrevia = info.exposicionPrevia != null && info.baseAnualizada
+    ? (100 * info.exposicionPrevia) / info.baseAnualizada
+    : null
 
   return (
-    <section className="pant cab-1">
-      {/* Una linea cada uno. El BAN es el heroe de esta pantalla, asi que el titulo va en
-          cuerpo chico: si compite con la cifra, no gana ninguno de los dos.
+    <section className="pant cab-1 v01">
+      {/* Z1 — la lectura, sin repetir la cifra de abajo */}
+      <h1 className="titulo">{sujeto} de la base está en clientes sin compra reciente</h1>
 
-          El titulo lleva SIEMPRE el n. Con cuatro filtros encima el recorte puede quedar en
-          tres clientes, y "el 100,0 % del gasto anual" sobre tres clientes es cierto y
-          enganoso a la vez. Con "3 de 3" al lado, el lector ve de que tamano es la base de
-          la que se esta hablando sin tener que mirar la tarjeta. */}
-      <h1 className="titulo" style={{ fontWeight: 500, fontSize: 'clamp(14px, 1.25vw, 18px)' }}>
-        El {pct(info.pct)} del gasto anual está en {entero(info.enRiesgo)} de{' '}
-        {entero(info.clientes)} clientes sin compra reciente
-      </h1>
-      <p className="bajada">
-        En {ultimoAnio.anio} la base activa cayó {pct(caidaBase)} y la recompra a 90 días
-        bajó a {pct(ultima ? ultima.valor : 0)}.
-      </p>
+      <div className="lienzo v01-cuerpo">
+        {/* Z2 y Z3 comparten superficie: la respuesta y su encuadre son una sola idea.
+            El riel de proporcion es el de la ficha F07 (dec-D11), con su marca del corte
+            anterior: dice de un vistazo que parte del total es la cifra, que es lo que un
+            numero suelto no puede decir. */}
+        <div className="tarjeta z-resp">
+          <div className="z2">
+            <span className="z2-lbl">Exposición anual en riesgo</span>
+            <div className="z2-fila">
+              <span className="z2-val">{pesos(info.exposicion)}</span>
+              <span className="z2-nota">exposición,<br />no recupero</span>
+            </div>
 
-      <div className="lienzo">
-        <div className="col-cifra">
-          <Ban info={info} grande />
+            <div className="ban-track z2-track">
+              <i style={{ width: `${Math.min(100, info.pct)}%` }} />
+              {marcaPrevia != null && (
+                <span className="ban-mk" style={{ left: `${Math.min(100, marcaPrevia)}%` }}
+                      aria-hidden="true" />
+              )}
+              <span className="ban-sc" style={{ left: 0 }}>0</span>
+              <span className="ban-sc" style={{ right: 0 }}>
+                {pesos(info.baseAnualizada)} anualizados
+              </span>
+              {marcaPrevia != null && (
+                <span className="ban-sc z2-mk" style={{ left: `${Math.min(100, marcaPrevia)}%` }}>
+                  corte anterior
+                </span>
+              )}
+            </div>
+            <div className="ban-scrow" />
 
-          {/* Los tres apoyos repartidos en el alto que sobra: es lo que antes quedaba en
-              blanco debajo del BAN. space-between los distribuye sin estirar el texto. */}
-          <div className="tarjeta apoyos">
-            <Dato
-              etiqueta="Clientes en riesgo"
-              valor={pct(pctRiesgo)}
-              apoyo={`${entero(info.enRiesgo)} de ${entero(info.clientes)} con compra válida · ${entero(info.elegibles)} elegibles`}
-              estado={<Semaforo estado={estadoInverso(pctRiesgo, meta.umbral_en_riesgo)}
-                                de="clientes en riesgo" />}
-            />
-            <Dato
-              etiqueta="Facturación histórica en riesgo"
-              valor={`ARS ${millones(info.facturacionRiesgo)}`}
-              apoyo={`${pct((100 * info.facturacionRiesgo) / (info.facturacion || 1))} de ARS ${millones(info.facturacion)} acumulados, no anuales`}
-            />
-            <Dato
-              etiqueta="Umbral del proxy"
-              valor={`ARS ${millones(sens90 ? sens90.exposicion : info.exposicion)}`}
-              apoyo={info.sensibilidad
-                ? `${info.sensibilidad.map((x) => `${x.umbral} d ${millones(x.exposicion)}`).join(' · ')} · base completa`
-                : '—'}
-            />
+            {/* Los tres datos que encuadran la cifra, cada uno con su rótulo y su valor en
+                tinta: como renglón corrido de 10 px en gris no los leía nadie, y son los que
+                dicen sobre qué base y a qué fecha vale el número de arriba. */}
+            <div className="z2-base">
+              <span><i>Base</i><b className="tabular">{entero(info.clientes)}</b>clientes</span>
+              <span><i>Corte</i><b className="tabular">{fechaCorta(info.corte)}</b></span>
+              <span><i>Moneda</i><b>pesos nominales</b></span>
+            </div>
+          </div>
+
+          {/* Z3 — al costado y en columna: los tres apoyos puestos en fila abajo quedaban
+              escondidos. Rotulados uno por uno porque 46,4 % y 47,8 % NO miden lo mismo, que
+              era la confusion que 5a viene a resolver. */}
+          <div className="z3">
+            <Contra etq="Sobre el gasto anual" val={pct(info.pct)}
+                    ap={`de ${pesos(info.baseAnualizada)}`} />
+            <Contra etq="Sobre el histórico" val={pct(pctHist)}
+                    ap={`de ${pesos(info.facturacion)} acumulados`} />
+            <Contra etq="Clientes en riesgo" val={`${entero(info.enRiesgo)} / ${entero(info.clientes)}`}
+                    ap={`${pct(pctClientes)} de la base con compra válida`} />
           </div>
         </div>
 
-        <div className="tarjeta" style={{ flex: 1, minHeight: 0 }}>
-          <div className="kpi-lbl">
-            Recompra · María G. · mensual
+        {/* Z4 — contexto historico. Rotulado como contexto y con el alto que le corresponde:
+            es la unica pieza que no responde a los controles de arriba. */}
+        <div className="tarjeta z-serie">
+          <div className="kpi-lbl z-serie-cab">
+            <span className="z-serie-tit">Recompra a 90 días · María G. · mensual</span>
+            <span className="z-global">Serie global · no usa corte ni filtros</span>
             <Semaforo estado={estado} tamano="grande" sufijo={pct(ultima ? ultima.valor : 0)}
                       de="recompra a 90 días" />
           </div>
-          {/* Unica salvedad de la tarjeta, dicha una sola vez: la serie es global y no
-              responde al corte ni a los filtros del resto de la pantalla. */}
-          <div className="kpi-base" style={{ marginTop: 0, borderTop: 0, paddingTop: 2, minHeight: 0 }}>
-            no responde al corte ni a los filtros
-          </div>
-          {/* Serie de tiempo trimestral contra una banda de meta: va en linea (regla 7).
-              Sin banda2 (linea base) aca a proposito: el 8,5 % final cae adentro de esa
-              banda y las dos etiquetas se pisan. D4 hace la comparacion completa contra la
-              linea base con toda la pantalla disponible; aca alcanza con la meta, que es lo
-              que el semaforo ya califica. */}
           <Lienzo>
             {({ w, h }) => (
               <Linea
                 serie={recompra} w={w} h={h}
                 formato={(v) => `${v.toFixed(1).replace('.', ',')}%`}
-                banda={[metaLo, metaHi]}
+                zonas={zonasRecompra(ultima ? ultima.valor : null)}
                 tituloEje="% que recompra en 90 días"
               />
             )}
           </Lienzo>
         </div>
+
+        {/* Z5 — puente a la operacion. El salto a la lista es un boton que dice a donde va:
+            el drill-down por click en una barra sorprendia, este no. */}
+        <div className="z-puente">
+          <span className="z5-val tabular">{entero(info.enRiesgo)}</span>
+          <span className="z5-txt">
+            en riesgo contra una capacidad de {capLo} a {capHi} contactos por mes:
+            cubre {pct(cobLo)} a {pct(cobHi)}
+          </span>
+          {irALista && (
+            <button type="button" className="z5-ir" onClick={irALista}>
+              Ver los {entero(info.enRiesgo)} en la lista →
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Z6 — la nota. Acá viven el proxy y la sensibilidad al umbral, que es su rango real
+          de importancia: mueve la cifra 1,4 M entre 60 y 120 días. */}
+      <p className="z-nota">
+        {meta.proxy}. Sensibilidad al umbral:{' '}
+        {info.sensibilidad
+          ? info.sensibilidad.map((x) => `${x.umbral} d ${pesos(x.exposicion)}`).join(' · ')
+          : '—'}. Sin modelo predictivo.
+      </p>
     </section>
   )
 }
 
-/** Un apoyo del BAN: rotulo, cifra y una linea de contexto. No es una tarjeta. */
-function Dato({ etiqueta, valor, apoyo, estado }) {
+/** Una de las tres comparaciones de Z3. */
+function Contra({ etq, val, ap }) {
   return (
-    <div className="dato">
-      <div className="dato-cab"><span>{etiqueta}</span>{estado}</div>
-      <div className="dato-val tabular">{valor}</div>
-      <div className="dato-sub">{apoyo}</div>
+    <div className="z3-item">
+      <span className="z3-etq">{etq}</span>
+      <span className="z3-val tabular">{val}</span>
+      <span className="z3-ap">{ap}</span>
     </div>
   )
 }

@@ -1,5 +1,11 @@
 // D5a — región. Barras horizontales en pesos: la pregunta es dónde se concentra la
 // exposición, no qué tan alta es la tasa de riesgo (esa va de nota al lado de cada barra).
+//
+// El título dice lo que el gráfico DIBUJA. Antes afirmaba que la geografía no explica el
+// riesgo (una propiedad de la tasa) sobre un gráfico de exposición, y ninguna barra llevaba
+// énfasis: el lector no sabía dónde mirar y el dibujo no sostenía la frase. Ahora el título
+// es la concentración —que es lo que las barras muestran y lo que se puede accionar— con la
+// barra más alta destacada, y la planitud de la tasa baja a la bajada, que es su lugar.
 // "Solo online" no tiene región asignable: va aparte, bajo línea divisoria, para que su
 // tasa no infle el rango visible de las 5 regiones reales y desmienta el título.
 
@@ -27,9 +33,9 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
       etiqueta: dims.region[i],
       valor: c.ar,
       nota: c.n ? `${pct((100 * c.nr) / c.n)} en riesgo` : '—',
-      enfasis: false,
       idxOriginal: i,
     }))
+    .map((d, k) => ({ ...d, enfasis: k === 0 }))
 
   const totalReal = datos.reduce((s, d) => s + d.valor, 0)
   const top = datos[0]
@@ -43,15 +49,14 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
   return (
     <section className="pant">
       <h1 className="titulo">
-        {hayTasas
-          ? `La geografía no explica el riesgo: ${amplitudTxt} puntos entre la región más alta y la más baja`
-          : 'La geografía no explica el riesgo'}
+        {pesoTop != null
+          ? `${top.etiqueta} concentra el ${pct(pesoTop)} de la exposición de las regiones`
+          : 'Sin exposición asignable a una región'}
       </h1>
       <p className="bajada">
         {hayTasas
-          ? <>Entre las regiones la tasa de riesgo va de {pct(minT)} a {pct(maxT)}.{' '}
-              {pesoTop != null && <>{top.etiqueta} concentra {pct(pesoTop)} de la exposición de las regiones.</>}
-            </>
+          ? <>La tasa de riesgo casi no cambia entre regiones: va de {pct(minT)} a {pct(maxT)},{' '}
+              {amplitudTxt} puntos. Lo que separa a las regiones es el tamaño, no el riesgo.</>
           : 'Ninguna región tiene clientes en la base filtrada.'}
       </p>
 

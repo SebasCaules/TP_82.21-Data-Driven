@@ -48,12 +48,23 @@ export default function D7({ info, iCorte, filtro }) {
       <h1 className="titulo">Tres decisiones, ninguna cuesta presupuesto nuevo</h1>
       <p className="bajada">Corren con los datos y la capacidad que ya mostró el tablero.</p>
 
+      {/* El pedido va arriba, no al pie: es lo único que la pantalla le pide al directorio,
+          y al pie lo leía el que llegaba hasta abajo. Los tres artículos pasan a ser su
+          fundamento, que es el orden de Minto. */}
+      <div className="pedido">
+        <span className="pedido-lbl">Pedido</span>
+        <p className="pedido-txt">
+          Aprobar las tres decisiones y tomar el corte de <b>{mesCorte(info.corte)}</b> como
+          primera lectura contra los umbrales declarados.
+        </p>
+      </div>
+
       <div className="lienzo acta-wrap">
         <div className="acta">
           <Articulo
             n="01"
             rotulo="Indicador de directorio"
-            decision="La recompra a 90 días pasa a ser el número que el directorio mira cada corte."
+            decision="La recompra a 90 días pasa a ser el número del directorio."
             cifra={valorRecompra != null ? pct(valorRecompra) : '—'}
             pieCifra={`meta ${metaLo} a ${metaHi} %`}
             marca={valorRecompra != null && (
@@ -63,25 +74,28 @@ export default function D7({ info, iCorte, filtro }) {
             apoyo="Dueña: María G. Cadencia mensual."
             prueba={<Lienzo>{({ w, h }) => (
               <Chispa serie={serieRecompra.map((r) => r.tasa * 100)} w={w} h={h}
-                      banda={[metaLo, metaHi]} />
+                      banda={[metaLo, metaHi]} tonoBanda="var(--sem-meta)"
+                      rotuloBanda="meta" rotulo={pct(valorRecompra)} />
             )}</Lienzo>}
-            pieprueba={`${serieRecompra[0].trimestre} a ${ultima.trimestre} contra la banda de meta`}
-            costo="Ya se mide todos los cortes. El semáforo y la cadencia están fijados en la Parte D."
+            pieprueba={`${serieRecompra[0].trimestre} a ${ultima.trimestre}`}
+            costo="Ya se mide cada corte, con semáforo y cadencia de la Parte D."
           />
           <Articulo
             n="02"
             rotulo="Orden de la lista"
-            decision="La lista de Marketing se ordena por exposición, no por segmento de fidelización."
+            decision="La lista se ordena por exposición, no por segmento."
             cifra={vacio ? '—' : pct(pctTop)}
             pieCifra={vacio ? 'no hay clientes con este recorte' : `de los ${pesos(info.exposicion)} en riesgo`}
             apoyo={vacio
-              ? 'La decisión no depende del recorte: es el criterio con el que se ordena la lista.'
-              : `Los ${entero(topExposicion.length)} primeros concentran ${pesos(sumaTop)}.`}
+              ? 'El criterio no depende del recorte.'
+              : `${entero(topExposicion.length)} clientes de ${pesos(sumaTop)}.`}
             prueba={<Lienzo>{({ w, h }) => (
-              <BarraMini parte={sumaTop} total={info.exposicion} w={w} h={h} alturaBarra={Math.min(78, h * 0.5)} />
+              <BarraMini parte={sumaTop} total={info.exposicion} w={w} h={h}
+                         alturaBarra={Math.min(66, h * 0.46)} rotulo={vacio ? null : pct(pctTop)}
+                         pie={vacio ? null : `de ${pesos(info.exposicion)} en riesgo`} />
             )}</Lienzo>}
-            pieprueba={vacio ? '' : `la parte llena son los ${entero(topExposicion.length)} de mayor exposición`}
-            costo={`Misma capacidad de ${capLo} a ${capHi} contactos por mes: cambia el criterio de corte, no el cupo.`}
+            pieprueba=""
+            costo={`Misma capacidad de ${capLo} a ${capHi} por mes: cambia el corte, no el cupo.`}
           />
           <Articulo
             n="03"
@@ -90,26 +104,19 @@ export default function D7({ info, iCorte, filtro }) {
             cifra={pct(cs.pct_envios_a_no_acepta * 100)}
             pieCifra={`${entero(cs.envios_a_no_acepta)} de ${entero(cs.envios_base)} envíos hoy`}
             apoyo={vacio
-              ? 'La campaña completa es la base de esta cifra, no el recorte.'
-              : `En este corte son ${entero(sinConsentimiento)} de ${entero(topExposicion.length)}.`}
+              ? 'La base es la campaña completa, no el recorte.'
+              : `En este corte, ${entero(sinConsentimiento)} de ${entero(topExposicion.length)}.`}
             prueba={<Lienzo>{({ w, h }) => (
               <BarraMini parte={cs.envios_a_no_acepta} total={cs.envios_base} w={w} h={h}
-                         alturaBarra={Math.min(78, h * 0.5)} excepcion />
+                         alturaBarra={Math.min(66, h * 0.46)} excepcion
+                         rotulo={pct(cs.pct_envios_a_no_acepta * 100)}
+                         pie={`de ${entero(cs.envios_base)} envíos`} />
             )}</Lienzo>}
-            pieprueba="la parte llena son los envíos que hoy salen sin permiso"
-            costo="Filtro previo sobre la misma lista. No suma envíos ni gente nueva."
+            pieprueba=""
+            costo="Filtro previo sobre la misma lista. No suma envíos."
           />
         </div>
 
-        <div className="pedido">
-          <span className="pedido-lbl">Pedido<br />al directorio</span>
-          <p className="pedido-txt">
-            Aprobar las tres decisiones en esta reunión y tomar el corte de{' '}
-            <b>{mesCorte(info.corte)}</b> como primera lectura contra los umbrales ya
-            declarados.
-          </p>
-          <span className="pedido-sello tabular">{mesCorte(info.corte)}</span>
-        </div>
       </div>
     </section>
   )

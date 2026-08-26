@@ -1,6 +1,7 @@
 // M2a — el embudo de la campaña masiva, sobre series.embudo_campanias.global (base limpia,
-// 23.529 envíos). Las cuatro etapas van en conteos absolutos (envíos * fracción), con el
-// porcentaje de nota al lado de cada barra. La bajada declara las dos bases y que la compra
+// 23.529 envíos). Las cuatro etapas van en conteos absolutos (envíos * fracción). El
+// porcentaje sobre el total va pegado al valor de cada barra, y la columna derecha dice la
+// conversión respecto de la etapa anterior, que es lo propio de un embudo. La bajada declara las dos bases y que la compra
 // a 7 días nunca ocurre sin clic previo: el salto al abrir es mecánico, no un efecto causal.
 // Serie global: no depende del corte ni de los filtros.
 // formatoEje en miles ("24 mil" en vez de "23.529"): la escala del eje solo necesita marcar
@@ -36,7 +37,8 @@ export default function M2a() {
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => (
-            <Embudo etapas={etapas} w={w} h={h} formato={entero} formatoEje={formatoEje} />
+            <Embudo etapas={etapas} w={w} h={h} formato={entero} formatoEje={formatoEje}
+                    tituloEje="Envíos de la campaña que llegan a cada etapa" />
           )}
         </Lienzo>
       </div>

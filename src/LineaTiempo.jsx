@@ -41,7 +41,9 @@ export default function LineaTiempo({ iCorte, setICorte, activo = true }) {
 
   return (
     <div className="tl">
-      <span className="tl-lbl">Mes de corte</span>
+      {/* "Corte" y no "Mes de corte": el rótulo corto le devuelve ~55 px a la pista,
+          que es el control que gana con ser largo. El mockup 5a lo escribe así. */}
+      <span className="tl-lbl">Corte</span>
 
       <div
         ref={ref}
