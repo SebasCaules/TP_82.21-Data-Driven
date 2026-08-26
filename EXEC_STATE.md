@@ -139,6 +139,7 @@ Se asigna antes de spawnear cada ola. Reservados al orquestador (N0) en todo mom
 | # | Fix | Superficie | Origen | Cuándo |
 |---|---|---|---|---|
 | S-01 | `wiki/index.md:151` apunta a `raw/catedra/Respuestas Grupo2.xlsx`, ruta inexistente. La real es `raw/Respuestas_Preguntas.xlsx` | wiki | runbook §2 | compuerta 6 |
+| S-05 | El wiki declara Campeones con ARS 159,9 M de facturación y valor medio 157.655. El cálculo reproducible da **160,0 M** y 157.806: es el mismo cliente de diferencia en el desempate de quintiles que mueve Perdidos 1.128/1.129 y Potenciales 591/590 | wiki | verificación de compuerta 5 | compuerta 6 |
 | S-03 | La Parte D §4.1 viz 2 afirma que Campeones tiene "la tasa más baja" de riesgo: es falso, es el cuarto más bajo | entregas | comité, lente de dato | enmienda en el documento integrado del 01/09 |
 | S-04 | El criterio de éxito 5 de la Parte C llama "grupo de control natural" al excedente de capacidad; es el tramo de menor exposición, no un control | entregas | comité, lente de dato | enmienda en el documento integrado del 01/09 |
 | S-02 | El backlog de 8 épicas sigue sin entrar a ninguna entrega (checklist de `entregable-1` abierto). Lo pide el programa dentro del Entregable 1 | entregas | `entregable-1.md` | fuera de alcance de esta corrida, antes del 01/09 |
