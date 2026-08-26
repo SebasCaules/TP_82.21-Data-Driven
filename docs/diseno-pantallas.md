@@ -187,13 +187,26 @@ Pie: las dos categorías del extremo bajo tienen menos de 200 clientes cada una.
 |---|---|
 | Pregunta | ¿La lista priorizada rinde más que el criterio actual? |
 | Cifra | compra a 7 días por segmento objetivo, sobre la base de 23.729: Inactivos 90d 1,39 % (61 compras) · Todos 1,34 % (45) · Silver 1,33 % (82) · Gold 1,04 % (53) · Bronze 0,96 % (45) |
-| Gráfico | barras desde cero con el **n de envíos y de compras** en cada una |
-| Título | Todavía no hay score que comparar: el objetivo es superar el 1,39 % del criterio actual |
+| Gráfico | **punto con intervalo de Wilson al 95 %**, con la banda del IC de la vara de lado a lado y una fila punteada reservada al score. Sin ordenar por valor. `n` de envíos y de compras en cada fila |
+| Título | Todavía no hay score que comparar: la vara es 1,39 %, IC [1,08–1,78 %] |
 | Reglas | 4, 6, 18 · corrección 4 (descriptivo contra predictivo) · Tufte, lie factor |
 
 Rotulado **"Modelo predictivo (en desarrollo)"**. Cambios: sale el 1,2 % global, que es de
 otra base y hacía parecer la marca cuatro veces más grande de lo que es contra su comparable
 real ("Todos", 1,34 %); y el título deja de ser verdadero por construcción.
+
+**Cambio del 26/08/2026: las barras ordenadas salen.** La v2 pedía cinco barras desde cero de
+mayor a menor y ese orden no lo sostienen los datos: los diez pares de intervalos se solapan,
+el IC de una sola barra mide 0,70 pp contra los 0,43 pp que separan a la más alta de la más
+baja, y con las cinco tasas iguales el azar reproduce esa amplitud en el 32,5 % de las
+corridas. La vista 13, que muestra los mismos cinco números, titula que ninguno se despega: el
+tablero se contradecía a sí mismo. Ahora la banda es el IC de la vara, los otros cuatro
+criterios caen adentro y van como contexto tenue, y la fila punteada de arriba reserva el lugar
+del score. El gráfico afirma lo mismo que el título.
+
+> **Nota.** La vara no es el máximo de los cinco. `pipeline/series.py` la fija a
+> "Inactivos 90d" porque es el criterio que Marketing usa hoy, y la Parte D §5 lo declara como
+> baseline. Elegirla por ser la más alta habría sido sesgo de selección; no lo es.
 
 ### D7 · Cierre
 

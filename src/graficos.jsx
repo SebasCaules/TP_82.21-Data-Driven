@@ -564,6 +564,14 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
  * solapamiento se ve, y "no discrimina" pasa a ser algo que el lector verifica.
  * Cleveland-McGill: posicion sobre escala comun rankea por encima de largo.
  */
+/**
+ * Punto con intervalo. Dos banderas por dato, las dos aditivas y apagadas por defecto:
+ *   `tenue`  el dato va como contexto: mismo color, trazo y punto mas finos, valor sin peso.
+ *            Se atenua por PESO y no bajando el contraste, que dejaria la marca por debajo
+ *            del 3:1 que pide 1.4.11 para un objeto grafico.
+ *   `vacio`  la fila existe pero todavia no tiene valor: pista punteada de lado a lado en vez
+ *            de punto e intervalo. Es como la vista 08 reserva el lugar del score.
+ */
 export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132, referencia }) {
   if (!datos.length) return null
   const padTop = 8
@@ -576,14 +584,16 @@ export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132,
   const anchoNota = Math.max(0, ...datos.map((d) => (d.nota ? anchoTexto(d.nota, fuente - 1.5, 400) + 14 : 0)))
   const ancho = Math.max(40, w - x0 - anchoNota - 16)
   const lo = 0
-  const crudo = Math.max(...datos.map((d) => d.ic[1]), referencia ? referencia.ic[1] : 0)
+  const crudo = Math.max(...datos.map((d) => (d.ic ? d.ic[1] : 0)), referencia ? referencia.ic[1] : 0)
   const { max, ticks } = escalaNice(crudo, 5)
   const X = (v) => x0 + ((v - lo) / (max - lo)) * ancho
   const yBase = padTop + disponible
 
   return (
     <svg width={w} height={h} role="img"
-         aria-label={(tituloEje || 'Puntos con intervalo') + ': ' + datos.map((d) => d.etiqueta + ' ' + formato(d.valor) + ' [' + formato(d.ic[0]) + '-' + formato(d.ic[1]) + ']').join(', ')}
+         aria-label={(tituloEje || 'Puntos con intervalo') + ': ' + datos.map((d) => (d.ic
+           ? d.etiqueta + ' ' + formato(d.valor) + ' [' + formato(d.ic[0]) + '-' + formato(d.ic[1]) + ']'
+           : d.etiqueta + ' ' + (d.nota || 'sin valor todavía'))).join(', ')}
          style={{ display: 'block' }}>
       {referencia && (
         <g>
@@ -604,19 +614,39 @@ export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132,
       {datos.map((d, i) => {
         const y = padTop + i * paso + paso / 2
         const color = d.excepcion ? EXC : d.enfasis ? ACC : GRIS
+
+        if (d.vacio) {
+          return (
+            <g key={d.etiqueta}>
+              <text x={x0 - 9} y={y} fontSize={fuente} fill={MUT2} textAnchor="end"
+                    dominantBaseline="central" fontWeight={600}>{d.etiqueta}</text>
+              <line x1={x0} x2={x0 + ancho} y1={y} y2={y} stroke={EJE} strokeWidth="1.5"
+                    strokeDasharray="5 5" />
+              {d.nota && (
+                <text x={w} y={y} fontSize={fuente - 1.5} fill={MUT} textAnchor="end"
+                      dominantBaseline="central">{d.nota}</text>
+              )}
+            </g>
+          )
+        }
+
+        const grosor = d.tenue ? 1.25 : 2
         return (
           <g key={d.etiqueta}>
             <text x={x0 - 9} y={y} fontSize={fuente} fill={d.enfasis ? INK : MUT2}
                   textAnchor="end" dominantBaseline="central"
                   fontWeight={d.enfasis ? 600 : 400}>{d.etiqueta}</text>
             {/* barra de intervalo: remates en los extremos para que se lea como rango */}
-            <line x1={X(d.ic[0])} x2={X(d.ic[1])} y1={y} y2={y} stroke={color} strokeWidth="2" />
-            <line x1={X(d.ic[0])} x2={X(d.ic[0])} y1={y - 5} y2={y + 5} stroke={color} strokeWidth="1.5" />
-            <line x1={X(d.ic[1])} x2={X(d.ic[1])} y1={y - 5} y2={y + 5} stroke={color} strokeWidth="1.5" />
-            <circle cx={X(d.valor)} cy={y} r={d.enfasis ? 5 : 4.25} fill={color}
+            <line x1={X(d.ic[0])} x2={X(d.ic[1])} y1={y} y2={y} stroke={color} strokeWidth={grosor} />
+            <line x1={X(d.ic[0])} x2={X(d.ic[0])} y1={y - (d.tenue ? 3.5 : 5)} y2={y + (d.tenue ? 3.5 : 5)}
+                  stroke={color} strokeWidth={d.tenue ? 1 : 1.5} />
+            <line x1={X(d.ic[1])} x2={X(d.ic[1])} y1={y - (d.tenue ? 3.5 : 5)} y2={y + (d.tenue ? 3.5 : 5)}
+                  stroke={color} strokeWidth={d.tenue ? 1 : 1.5} />
+            <circle cx={X(d.valor)} cy={y} r={d.enfasis ? 5 : d.tenue ? 3.25 : 4.25} fill={color}
                     stroke="var(--sup)" strokeWidth="1.5" />
             <text x={X(d.ic[1]) + 9} y={y} fontSize={fuente} fill={d.enfasis ? INK : MUT2}
-                  dominantBaseline="central" fontWeight={d.enfasis ? 700 : 600}
+                  dominantBaseline="central"
+                  fontWeight={d.enfasis ? 700 : d.tenue ? 400 : 600}
                   className="tabular">{formato(d.valor)}</text>
             {d.nota && (
               <text x={w} y={y} fontSize={fuente - 1.5} fill={MUT} textAnchor="end"
