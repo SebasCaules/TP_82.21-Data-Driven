@@ -8,6 +8,10 @@
 //   'corte'   -> solo el corte
 //   'ninguno' -> serie global, ni corte ni filtros
 //
+// `eje` es la dimension sobre la que la pantalla desagrega. El filtro de ESA dimension no
+// se aplica a su propio eje (si no, el grafico colapsaria a una sola barra), asi que el pie
+// lo declara en vez de dejar creer que la vista esta recortada.
+//
 // El bloque de Marketing va M0 · M3 · M1 · M2a · M2b: "¿se puede ejecutar la lista?" es
 // previa a "¿a quienes contacto?".
 
@@ -47,13 +51,13 @@ export const PANTALLAS = [
     pregunta: '¿De qué tamaño es el problema contra el total?',
   },
   {
-    id: 'D2', grupo: 'diagnostico', audiencia: 'directorio', depende: 'todo', Componente: D2,
+    id: 'D2', eje: 'quintil', grupo: 'diagnostico', audiencia: 'directorio', depende: 'todo', Componente: D2,
     corto: 'Riesgo por valor',
     pregunta: '¿El riesgo se concentra en los que más facturan o en los de menor valor?',
     pie: 'La tasa va sobre el total del quintil, que es el denominador del KPI de la Parte D',
   },
   {
-    id: 'D3', grupo: 'diagnostico', audiencia: 'ambas', depende: 'todo', Componente: D3,
+    id: 'D3', eje: 'rfm', grupo: 'diagnostico', audiencia: 'ambas', depende: 'todo', Componente: D3,
     corto: 'Dónde está la plata',
     pregunta: '¿Dónde conviene gastar el presupuesto de retención?',
   },
@@ -64,13 +68,13 @@ export const PANTALLAS = [
     pie: 'Los trimestres sin ventana de 90 días completa se cortan, no se interpolan',
   },
   {
-    id: 'D5a', grupo: 'diagnostico', audiencia: 'ambas', depende: 'todo', Componente: D5a,
+    id: 'D5a', eje: 'region', grupo: 'diagnostico', audiencia: 'ambas', depende: 'todo', Componente: D5a,
     corto: 'Región',
     pregunta: '¿Qué región concentra la exposición?',
     pie: 'Región = la tienda donde el cliente concentra su gasto hasta el corte. Apertura por tienda: fuera de alcance V1',
   },
   {
-    id: 'D5b', grupo: 'diagnostico', audiencia: 'ambas', depende: 'todo', Componente: D5b,
+    id: 'D5b', eje: 'categoria', grupo: 'diagnostico', audiencia: 'ambas', depende: 'todo', Componente: D5b,
     corto: 'Categoría',
     pregunta: '¿Qué categoría concentra la exposición?',
     pie: 'Categoría = donde el cliente concentra su gasto hasta el corte',

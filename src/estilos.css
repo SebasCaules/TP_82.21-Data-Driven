@@ -331,6 +331,10 @@ body {
 .pie-l { display: flex; gap: 5px 14px; flex-wrap: wrap; align-items: baseline; }
 .pie b { color: var(--ink); font-weight: 600; }
 .pie .sep { color: var(--gris2); }
+.pie-ojo {
+  border: 1px solid var(--acc); border-radius: 3px;
+  padding: 0 5px; color: var(--acc); font-weight: 600;
+}
 
 /* ---------- BAN (ficha F07, congelada) ---------- */
 

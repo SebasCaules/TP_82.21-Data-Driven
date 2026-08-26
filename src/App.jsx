@@ -185,6 +185,12 @@ function Pie({ info, filtro, pantalla, usaFiltros, usaCorte }) {
     .filter(({ id }) => filtro[id] !== null)
     .map(({ id, etq }) => `${etq}: ${etiquetaValor(id, filtro[id])}`)
 
+  // El filtro de la dimension que la pantalla desagrega no se aplica a su propio eje: el
+  // grafico quedaria en una sola barra. Se declara, no se esconde.
+  const eje = pantalla.eje
+  const ejeFiltrado = usaFiltros && eje && filtro[eje] !== null
+  const etqEje = ejeFiltrado ? DIMENSIONES.find((d) => d.id === eje).etq : null
+
   return (
     <footer className="pie">
       <div className="pie-l">
@@ -192,6 +198,9 @@ function Pie({ info, filtro, pantalla, usaFiltros, usaCorte }) {
         <span className="sep">|</span>
         <span><b>Filtros</b> {!usaFiltros ? 'no aplican en esta vista'
           : activos.length ? activos.join(' · ') : 'ninguno'}</span>
+        {ejeFiltrado && (
+          <span className="pie-ojo">el filtro de {etqEje.toLowerCase()} no recorta su propio eje: las barras siguen mostrando todas</span>
+        )}
         <span className="sep">|</span>
         <span><b>{pantalla.predictivo ? 'Modelo predictivo · en desarrollo' : 'Diagnóstico · datos históricos'}</b></span>
         {pantalla.pie && (<><span className="sep">|</span><span>{pantalla.pie}</span></>)}
