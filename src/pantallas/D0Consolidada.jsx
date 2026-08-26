@@ -24,7 +24,6 @@
 // La barra de progreso del F07 decia lo mismo que Z3 dice rotulado, y su tabla de tres filas
 // es Z3. La ficha no se rediseño: se desarmo en las zonas que 5a define.
 
-import Semaforo, { estadoInverso } from '../Semaforo.jsx'
 import { Lienzo, Linea } from '../graficos.jsx'
 import { entero, fechaCorta, meta, pct, pesos, series } from '../agregacion.js'
 
@@ -136,22 +135,6 @@ export default function D0({ info }) {
                     ap={`de ${pesos(info.facturacion)} acumulados`} />
             <Contra etq="Clientes en riesgo" val={`${entero(info.enRiesgo)} / ${entero(info.clientes)}`}
                     ap={`${pct(pctClientes)} de la base con compra válida`} />
-
-            {/* Estado de "Clientes en riesgo" contra el umbral (Parte D §2.1). La pastilla
-                completa mide ~153 px por su etiqueta ("En zona de alerta") y ninguno de los
-                tres tercios de arriba tiene ese ancho disponible ni compartiendo fila con la
-                cifra ni solo: a 1152 px el tercio mide ~137 px (estilos.css:653 ya deja
-                registrado que esa columna está al límite solo para el texto). Por eso va en
-                una fila propia que ocupa las tres columnas del mismo grid (gridColumn ocupa
-                lo que ya existe, no agrega CSS), en vez de meterse en un tercio que la
-                aplasta a 0 px de ancho como pasaba antes. */}
-            <div className="z3-estado" style={{
-              gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 8,
-              marginTop: 8, paddingTop: 8, borderTop: '1px dotted var(--bd)',
-            }}>
-              <span className="kpi-lbl" style={{ display: 'inline' }}>Frente al umbral</span>
-              <Semaforo estado={estadoInverso(pctClientes, meta.umbral_en_riesgo)} de="clientes en riesgo" />
-            </div>
           </div>
         </div>
 
