@@ -1,0 +1,132 @@
+{
+  "projectId": "90597520-275c-4172-9af5-924d06a639a3",
+  "shape": "package",
+  "pkg": "tablero-casa-oga",
+  "globalName": "TableroCasaOga",
+  "srcDir": "src",
+  "cssEntry": "src/estilos.css",
+  "componentSrcMap": {
+    "Lienzo": "src/graficos.jsx",
+    "Plaqueta": "src/graficos.jsx",
+    "BarrasH": "src/graficos.jsx",
+    "ReferenciaV": "src/graficos.jsx",
+    "Linea": "src/graficos.jsx",
+    "PuntosIC": "src/graficos.jsx",
+    "Tramas": "src/graficos.jsx",
+    "BarraTramos": "src/graficos.jsx",
+    "BarrasApiladas100": "src/graficos.jsx",
+    "BarrasDivergentes": "src/graficos.jsx",
+    "Chispa": "src/graficos.jsx",
+    "BarraMini": "src/graficos.jsx",
+    "CurvaConcentracion": "src/graficos.jsx",
+    "SerieCortes": "src/graficos.jsx",
+    "Semaforo": "src/Semaforo.jsx",
+    "Region": "src/Iconos.jsx",
+    "Categoria": "src/Iconos.jsx",
+    "Segmentos": "src/Iconos.jsx",
+    "Escalera": "src/Iconos.jsx"
+  },
+  "dtsPropsFor": {
+    "Lienzo": "  /** Render prop: recibe el ancho y alto ya medidos del contenedor. Todas las primitivas\n   *  SVG piden w y h explicitos, y este es el unico componente que los mide. */\n  children: (medida: { w: number; h: number }) => React.ReactNode;\n  className?: string;",
+    "Plaqueta": "  /** Va DENTRO de un <svg>: devuelve un <g>, no un svg propio. */\n  x: number;\n  y: number;\n  texto: string;\n  fuente?: number;\n  peso?: number;\n  color?: string;\n  anclaje?: 'start' | 'middle' | 'end';\n  padX?: number;",
+    "ReferenciaV": "  /** Va DENTRO de un <svg>: devuelve un <g>, no un svg propio. */\n  x: number;\n  h: number;\n  etiqueta?: string;\n  y?: number;",
+    "Tramas": "  /** Sin props. Monta los <pattern> que usan los tonos 'trama' y 'trama-exc'.\n   *  Va una sola vez dentro del <svg> que los referencia. */",
+    "BarrasH": "  datos: Array<{ etiqueta: string; valor: number; nota?: string; sufijo?: string; enfasis?: boolean; excepcion?: boolean }>;\n  w: number;\n  h: number;\n  formato?: (v: number) => string;\n  formatoEje?: (v: number) => string;\n  tituloEje?: string;\n  anchoEtiqueta?: number;\n  onBarra?: (i: number, d: unknown) => void;\n  referencia?: { valor: number; etiqueta?: string };\n  tope?: number;",
+    "Linea": "  /** `valor: null` deja un hueco: el tramo no se dibuja y NO se interpola. */\n  serie: Array<{ etiqueta: string; valor: number | null }>;\n  w: number;\n  h: number;\n  formato?: (v: number) => string;\n  /** Banda de meta, [minimo, maximo]. */\n  banda?: [number, number];\n  /** Segunda banda, tipicamente la linea base historica. */\n  banda2?: [number, number];\n  /** Franjas de estado sobre el eje Y: la posicion de la linea ES el estado. */\n  zonas?: Array<{ etiqueta: string; desde: number; hasta: number; tono: string; rango?: string; activa?: boolean }>;\n  rotuloBanda?: string;\n  rotuloBanda2?: string;\n  tituloEje?: string;\n  tituloY?: string;",
+    "PuntosIC": "  /** Una fila por criterio. `vacio` reserva el renglon sin dibujar punto: es como se\n   *  declara un score que todavia no existe. `tenue` baja la fila a contexto. */\n  datos: Array<{ etiqueta: string; valor?: number; ic?: [number, number]; nota?: string; enfasis?: boolean; tenue?: boolean; vacio?: boolean; excepcion?: boolean }>;\n  w: number;\n  h: number;\n  formato?: (v: number) => string;\n  tituloEje?: string;\n  anchoEtiqueta?: number;\n  /** Vara punteada, con su propio intervalo. */\n  referencia?: { valor: number; ic?: [number, number]; rotulo?: string };",
+    "BarraTramos": "  /** Barra unica partida en tramos que suman el total. Se normaliza contra su propio\n   *  total, asi que dos BarraTramos con bases distintas miden lo mismo en pantalla:\n   *  la base va escrita al lado, no dibujada. */\n  tramos: Array<{ etiqueta: string; valor: number; enfasis?: boolean }>;\n  w: number;\n  h: number;\n  formato?: (v: number) => string;\n  banda?: [number, number];\n  alturaBarra?: number;",
+    "BarrasApiladas100": "  /** Una barra por fila, escala fija de 0 a 100 por ciento. `sub` declara la base de esa\n   *  fila. Los tonos 'trama' y 'trama-exc' resuelven a patrones (ver Tramas). */\n  filas: Array<{ etiqueta: string; sub?: string | null; nota?: string; enfasis?: boolean; segmentos: Array<{ clave: string; valor: number; tono: string; tinta?: string; enfasis?: boolean; plaqueta?: boolean; texto?: string | null; idx?: number }> }>;\n  w: number;\n  h: number;\n  anchoEtiqueta?: number;\n  tituloEje?: string;\n  encabezadoNota?: string;\n  leyenda?: Array<{ etiqueta: string; tono: string; enfasis?: boolean }>;\n  /** Une los cortes de filas consecutivas: la inclinacion ES la diferencia. */\n  conectores?: boolean;\n  alturaBarra?: number;\n  referencia?: { valor: number; etiqueta?: string };\n  onFila?: (i: number) => void;\n  onSegmento?: (s: unknown) => void;\n  /** Texto de los tramos sin lugar para su rotulo, que bajan a la linea de resto. */\n  textoResto?: (it: unknown) => string;\n  rotuloResto?: string;",
+    "BarrasDivergentes": "  /** Barras alrededor de cero, ordenadas por valor. `nota` es la columna de la derecha;\n   *  `notaValor` le agrega su propia barra. */\n  datos: Array<{ etiqueta: string; valor: number; nota?: string; notaValor?: number; notaSuf?: string | null; enfasis?: boolean }>;\n  w: number;\n  h: number;\n  formato?: (v: number) => string;\n  formatoEje?: (v: number) => string;\n  tituloEje?: string;\n  anchoEtiqueta?: number;\n  minimoEje?: number;\n  encabezadoNota?: string;\n  rotuloPos?: string;\n  rotuloNeg?: string;\n  onBarra?: (i: number, d: unknown) => void;",
+    "Chispa": "  /** Sparkline. La serie son valores crudos, sin etiquetas. */\n  serie: number[];\n  w: number;\n  h: number;\n  banda?: [number, number];\n  tonoBanda?: string;\n  rotulo?: string;\n  rotuloBanda?: string;",
+    "BarraMini": "  /** Una parte sobre un total, para la prueba grafica de una tarjeta. */\n  parte: number;\n  total: number;\n  w: number;\n  h?: number;\n  alturaBarra?: number;\n  /** Pinta la parte como excepcion (terracota) en vez de enfasis (azul). */\n  excepcion?: boolean;\n  rotulo?: string | null;\n  pie?: string | null;",
+    "CurvaConcentracion": "  /** Curva de cobertura acumulada. `acum` viene ya ordenado de mayor a menor aporte. */\n  acum: number[];\n  total: number;\n  nRiesgo: number;\n  /** Los dos cortes declarados de capacidad, marcados sobre la curva. */\n  capLo: number;\n  capHi: number;\n  w: number;\n  h: number;\n  kFijado?: number | null;\n  kHover?: number | null;\n  onHover?: (k: number | null) => void;\n  onFijar?: (k: number) => void;\n  formatoPct?: (v: number) => string;\n  tituloX?: string;\n  tituloY?: string;",
+    "SerieCortes": "  /** Serie chica de los cortes, con el activo marcado por indice. */\n  valores: number[];\n  activo: number;\n  w: number;\n  h: number;",
+    "Semaforo": "  /** Cada estado cambia de FORMA ademas de color: se lee impreso en blanco y negro.\n   *  Los 'inv-*' son los mismos tres estados con rotulo invertido, para indicadores\n   *  donde mas alto es peor (ver estadoInverso). */\n  estado: 'meta' | 'cerca' | 'fuera' | 'inv-meta' | 'inv-cerca' | 'inv-fuera';\n  sufijo?: string;\n  /** Nombra el indicador: una pastilla suelta que dice \"Fuera de meta\" no dice de que. */\n  de?: string;\n  contra?: string;\n  tamano?: 'chico' | 'grande';",
+    "Region": "  /** Se derraman sobre el <svg> raiz, pisando los defaults (12x12, viewBox 0 0 16 16,\n   *  stroke currentColor de 1.4 a 1.5, aria-hidden). */\n  width?: number | string;\n  height?: number | string;\n  className?: string;\n  style?: React.CSSProperties;\n  color?: string;\n  [key: string]: unknown;",
+    "Categoria": "  /** Se derraman sobre el <svg> raiz, pisando los defaults (12x12, viewBox 0 0 16 16,\n   *  stroke currentColor de 1.4 a 1.5, aria-hidden). */\n  width?: number | string;\n  height?: number | string;\n  className?: string;\n  style?: React.CSSProperties;\n  color?: string;\n  [key: string]: unknown;",
+    "Segmentos": "  /** Se derraman sobre el <svg> raiz, pisando los defaults (12x12, viewBox 0 0 16 16,\n   *  stroke currentColor de 1.4 a 1.5, aria-hidden). */\n  width?: number | string;\n  height?: number | string;\n  className?: string;\n  style?: React.CSSProperties;\n  color?: string;\n  [key: string]: unknown;",
+    "Escalera": "  /** Se derraman sobre el <svg> raiz, pisando los defaults (12x12, viewBox 0 0 16 16,\n   *  stroke currentColor de 1.4 a 1.5, aria-hidden). */\n  width?: number | string;\n  height?: number | string;\n  className?: string;\n  style?: React.CSSProperties;\n  color?: string;\n  [key: string]: unknown;"
+  },
+  "overrides": {
+    "Semaforo": {
+      "cardMode": "column",
+      "viewport": "880x130"
+    },
+    "Linea": {
+      "cardMode": "column",
+      "viewport": "980x380"
+    },
+    "BarrasApiladas100": {
+      "cardMode": "column",
+      "viewport": "1020x400"
+    },
+    "BarrasH": {
+      "cardMode": "column",
+      "viewport": "980x360"
+    },
+    "BarrasDivergentes": {
+      "cardMode": "column",
+      "viewport": "1020x400"
+    },
+    "PuntosIC": {
+      "cardMode": "column",
+      "viewport": "1020x400"
+    },
+    "BarraTramos": {
+      "cardMode": "column",
+      "viewport": "980x230"
+    },
+    "CurvaConcentracion": {
+      "cardMode": "column",
+      "viewport": "980x400"
+    },
+    "Chispa": {
+      "cardMode": "column",
+      "viewport": "680x130"
+    },
+    "BarraMini": {
+      "cardMode": "column",
+      "viewport": "700x150"
+    },
+    "SerieCortes": {
+      "cardMode": "column",
+      "viewport": "620x120"
+    },
+    "Lienzo": {
+      "cardMode": "column",
+      "viewport": "960x360"
+    },
+    "Tramas": {
+      "cardMode": "column",
+      "viewport": "900x190"
+    },
+    "Plaqueta": {
+      "cardMode": "column",
+      "viewport": "900x170"
+    },
+    "ReferenciaV": {
+      "cardMode": "column",
+      "viewport": "900x240"
+    },
+    "Region": {
+      "cardMode": "column",
+      "viewport": "700x120"
+    },
+    "Categoria": {
+      "cardMode": "column",
+      "viewport": "700x120"
+    },
+    "Segmentos": {
+      "cardMode": "column",
+      "viewport": "700x120"
+    },
+    "Escalera": {
+      "cardMode": "column",
+      "viewport": "700x120"
+    }
+  },
+  "guidelinesGlob": [
+    "docs/diseno-pantallas.md"
+  ],
+  "readmeHeader": ".design-sync/conventions.md"
+}
