@@ -6,18 +6,8 @@
 // Ahora es una pastilla con borde, rotulo ESTADO y la forma a la izquierda: el elemento que
 // el directorio mira primero tiene que verse primero.
 
-const ESTADOS = {
-  meta: { texto: 'En meta', forma: 'lleno' },
-  cerca: { texto: 'Por debajo', forma: 'medio' },
-  fuera: { texto: 'Fuera de meta', forma: 'vacio' },
-  // Rótulos propios para estadoInverso: comparten forma/color con meta/cerca/fuera (mismo
-  // umbral, mismo semáforo) pero no su texto. 'Por debajo' tiene sentido para la recompra
-  // (más es mejor), no para un KPI donde menos es mejor: ahí la banda del medio no está
-  // "por debajo" de nada, está en zona de alerta arriba del umbral verde.
-  'inv-meta': { texto: 'Dentro del umbral', forma: 'lleno' },
-  'inv-cerca': { texto: 'En zona de alerta', forma: 'medio' },
-  'inv-fuera': { texto: 'Sobre el umbral', forma: 'vacio' },
-}
+import { Def } from './Glosario.jsx'
+import { ESTADOS, Luz } from './SemaforoLuz.jsx'
 
 export function estadoRecompra(valor, [lo]) {
   if (valor >= lo) return 'meta'
@@ -39,22 +29,37 @@ export function estadoInverso(valor, [lo, hi]) {
  * `tamano`: 'chico' para meterlo en la cabecera de una tarjeta, 'grande' para cuando el
  * estado ES el mensaje de la pantalla. `de` nombra el indicador, porque una pastilla suelta
  * que dice "Fuera de meta" no dice fuera de meta de que.
+ *
+ * `glosario` es la entrada del glosario con los tres cortes del semaforo. Sin ella la
+ * pastilla dice el estado pero no contra que: los umbrales estaban en la Parte D, o sea en
+ * otro archivo, y "fuera de meta" es justo la afirmacion que alguien va a querer discutir en
+ * el momento. Con ella, la pastilla entera es el disparador y muestra verde/ambar/rojo con
+ * sus cortes. El espaciador invisible de D7 no la pasa, y por eso no se vuelve interactivo.
  */
-export default function Semaforo({ estado, sufijo, de, contra, tamano = 'chico' }) {
+export default function Semaforo({ estado, sufijo, de, contra, tamano = 'chico', glosario }) {
   const e = ESTADOS[estado] ?? ESTADOS.fuera
   const leido = `Estado${de ? ` de ${de}` : ''}: ${e.texto}${sufijo ? `, ${sufijo}` : ''}` +
                 `${contra ? `, ${contra}` : ''}`
-  return (
-    <span className={`sem sem-${e.forma} sem-${tamano}`} role="img" aria-label={leido}>
+  const pastilla = (
+    <span className={`sem sem-${e.forma} sem-${tamano}`}
+          role={glosario ? undefined : 'img'}
+          aria-label={glosario ? undefined : leido}>
       {/* El rótulo ESTADO al frente es lo que separa la pastilla de una leyenda del gráfico.
           Solo en el tamaño grande: dentro de una tarjeta angosta empuja el texto afuera, y
           ahí el rótulo de la tarjeta ya dice de qué indicador se trata. */}
       {tamano === 'grande' && <span className="sem-cab" aria-hidden="true">Estado</span>}
-      <i aria-hidden="true" />
+      <Luz luz={e.luz} />
       <span className="sem-txt" aria-hidden="true">
         {e.texto}{sufijo ? <b className="tabular">{'\u00a0'}{sufijo}</b> : null}
       </span>
       {contra && <span className="sem-contra" aria-hidden="true">{contra}</span>}
     </span>
+  )
+
+  if (!glosario) return pastilla
+  return (
+    <Def id={glosario} className="def-sem" etiqueta={`${leido}. Ver los umbrales y la ecuación`}>
+      {pastilla}
+    </Def>
   )
 }

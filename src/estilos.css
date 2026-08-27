@@ -33,6 +33,8 @@
   --azul3: #7ea6c9;        /* azul-300: series secundarias, solo como relleno */
   --azul1: #d7e2ec;        /* azul-100: fondo de fila activa */
   --terra: #b8433a;        /* SOLO excepción: sin consentimiento, no contactable */
+  --terra-osc: #8f3128;    /* la trama sobre el terracota: misma familia, un paso más
+                              oscura, para que la excepción no dependa solo del color */
 
   /* Semáforo: paleta de ESTADO, reservada. No se reusa nunca para una serie, y las series
      no la usan. Los tres pasan >= 4,5:1 de texto sobre blanco (no solo el 3:1 de objeto
@@ -49,6 +51,8 @@
   --eje: #79839a;          /* ejes y marcas: presentes, nunca protagonistas. 3,16:1 sobre
                               papel y 3,80:1 sobre blanco (antes #97a0af daba 2,19:1 sobre
                               papel, bajo el 3:1 de 1.4.11). */
+  --zona: rgba(22, 35, 58, .055);  /* lavado de zona: separa las dos mitades de un gráfico
+                              divergente sin agregarle un color con significado propio */
   --tram-b: #d3d8e0;       /* trama: base clara para que el rótulo encima se lea */
   --tram-l: #f4f6f8;
 
@@ -366,22 +370,21 @@ body {
 .rotulo.predictivo::before { background: none; border-style: dashed; }
 .rotulo.diagnostico::before { background: var(--mut2); }
 
-/* Título y bajada ocupan SIEMPRE el mismo alto, tenga el texto una línea o dos. Es lo que
-   hace que el gráfico de abajo mida igual con cualquier filtro puesto: si la cabecera crece
-   al cambiar de "Muebles y Baño" a "Iluminación y Organización", el lienzo se achica y las
-   tarjetas cambian de tamaño solas. El tope de dos líneas es dur o a propósito: obliga a que
-   el título entre, y el detector de desborde marca el que no entra. */
+/* Título y bajada ocupan SIEMPRE el mismo alto. Es lo que hace que el gráfico de abajo mida
+   igual con cualquier filtro puesto: si la cabecera crece al cambiar de "Muebles y Baño" a
+   "Iluminación y Organización", el lienzo se achica y las tarjetas cambian de tamaño solas.
+
+   UNA sola línea, en las catorce vistas. El tope de dos renglones dejaba lugar para relleno
+   y el relleno apareció: subordinadas, aposiciones y la segunda mitad de la frase repitiendo
+   la primera. Con un renglón el título tiene que ser la afirmación y nada más, y el que no
+   entra se ve cortado enseguida en vez de esconderse en el segundo renglón. El presupuesto
+   real es ~88 caracteres a 1152 px, que es el ancho mínimo declarado. */
 .titulo {
   font: 600 clamp(19px, 2.05vw, 30px)/1.22 var(--fuente);
   letter-spacing: -.015em; margin: 0;
-  /* El tope de medida existe para que un titulo largo no cruce la pantalla de lado a lado,
-     pero 46ch topeaba en 590 px una columna de 923 y partia en dos titulos que entraban
-     enteros en una linea, dejando huerfano el final ("[1,08-1,78 %]" en la vista 08). El
-     `min` deja mandar a la columna cuando ella es la restriccion, que es lo que pasa de
-     1440 para arriba, y al tope de medida cuando sobra ancho. */
-  max-width: min(100%, 68ch);
-  height: 2.44em;
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  max-width: 100%;
+  height: 1.22em;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1;
   overflow: hidden;
 }
 .bajada {
@@ -391,10 +394,8 @@ body {
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
   overflow: hidden;
 }
-/* Pantallas que declaran su cabecera de una sola línea (el cierre, la lista, la
-   consolidada). El tope de 46ch es para un título de dos renglones; en uno solo estorba y
-   corta la frase, así que acá el título usa el ancho completo. */
-.pant.cab-1 .titulo { height: 1.22em; -webkit-line-clamp: 1; max-width: 100%; }
+/* Pantallas que además aprietan la bajada a un renglón, para darle el alto al cuerpo (el
+   cierre y la consolidada, que llevan tarjetas altas). El título ya va en una línea siempre. */
 .pant.cab-1 .bajada { height: 1.45em; -webkit-line-clamp: 1; max-width: 100%; }
 
 .lienzo {
@@ -565,8 +566,8 @@ body {
   background: var(--tono); color: var(--sup);
   font-size: .88em; letter-spacing: .12em;
 }
-.sem > i { align-self: center; margin: 0 0 0 9px; }
-.sem-chico > i { margin-left: 8px; }
+.sem > .sem-ico { align-self: center; margin: 0 0 0 8px; }
+.sem-chico > .sem-ico { margin-left: 7px; }
 .sem-txt { display: flex; align-items: center; padding: 5px 9px 5px 7px; }
 .sem-contra {
   display: flex; align-items: center;
@@ -575,12 +576,10 @@ body {
 }
 .sem-grande { font-size: 12.5px; }
 .sem-grande .sem-txt { padding: 8px 12px 8px 8px; }
-.sem-grande > i { margin-left: 12px; }
-.sem i { width: 11px; height: 11px; border: 1.5px solid currentColor; flex-shrink: 0; }
-.sem-grande i { width: 14px; height: 14px; }
-.sem-lleno i { background: currentColor; }
-.sem-medio i { background: linear-gradient(to top, currentColor 50%, transparent 50%); }
-.sem-vacio i { background: none; border-style: dashed; }
+.sem-grande > .sem-ico { margin-left: 10px; }
+/* El alto lo fija el ícono, no la caja: un semáforo es vertical y la pastilla lo acompaña. */
+.sem .sem-ico { width: 11px; height: 17.9px; flex-shrink: 0; overflow: visible; }
+.sem-grande .sem-ico { width: 14px; height: 22.8px; }
 .sem-lleno { --tono: var(--sem-meta); }
 .sem-medio { --tono: var(--sem-cerca); }
 .sem-vacio { --tono: var(--sem-fuera); }
@@ -1040,3 +1039,93 @@ body {
 /* ---------- detector de desborde (?fit) ---------- */
 
 .fit-mal { outline: 3px solid var(--terra) !important; outline-offset: -3px; }
+
+/* ---------- glosario: el término que se puede abrir ---------- */
+/* Subrayado punteado y nada más: el término tiene que verse consultable sin competir con el
+   dato. Nada de ícono de ayuda al lado, que en catorce vistas serían decenas de íconos
+   pidiendo atención por algo que casi nadie va a abrir. */
+.def {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0;
+  text-align: inherit; cursor: help;
+  border-bottom: 1px dotted var(--mut);
+  text-underline-offset: 2px;
+}
+.def:hover { border-bottom-color: var(--acc); color: var(--acc); }
+.def:focus-visible { outline: 2px solid var(--sel); outline-offset: 2px; border-radius: 2px; }
+.def[aria-expanded="true"] { color: var(--acc); border-bottom-color: var(--acc); }
+/* Dentro del título el punteado a 30 px pesaría como una línea de subrayado entera. */
+.titulo .def { border-bottom-width: 1px; border-bottom-color: var(--bd); }
+
+.def-pop {
+  position: fixed; z-index: 60;
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 13px 15px 11px;
+  background: var(--sup); color: var(--mut2);
+  border: 1px solid var(--bd); border-radius: 6px;
+  box-shadow: 0 6px 22px rgba(22, 35, 58, .16);
+  font: 400 12.5px/1.5 var(--fuente);
+  text-align: left; white-space: normal; letter-spacing: 0;
+  /* A 640 px de alto, con la ventana chica, una ficha larga puede no entrar entera: scrollea
+     ella y no la pantalla, que es lo que la promesa de cero scroll no admite. */
+  max-height: calc(100vh - 16px); overflow-y: auto;
+}
+.def-pop-term {
+  font: 600 10px/1 var(--mono); color: var(--ink);
+  text-transform: uppercase; letter-spacing: .09em;
+}
+.def-pop-def { margin: 0; }
+/* La ecuación en mono y sobre papel: es lo único de la ficha que se copia a un mail. */
+.def-pop-eq {
+  display: block; padding: 7px 9px;
+  background: var(--papel); border-left: 2px solid var(--acc); border-radius: 0 3px 3px 0;
+  font: 400 11.5px/1.55 var(--mono); color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.def-pop-umb { margin: 0; }
+.def-pop-umb i {
+  display: block;
+  font: 600 9.5px/1 var(--mono); color: var(--mut); font-style: normal;
+  text-transform: uppercase; letter-spacing: .09em; margin-bottom: 4px;
+}
+.def-pop-src {
+  padding-top: 7px; border-top: 1px dotted var(--bd2);
+  font: 400 10.5px/1.4 var(--mono); color: var(--mut);
+}
+
+/* El semáforo abre su ficha con la pastilla entera de disparador. Sin punteado: debajo de
+   una pastilla con borde propio se leería como un error de dibujo, no como una afinidad. El
+   aro neutro del hover es el que dice que se puede tocar, y sirve para los tres tonos sin
+   tener que mezclar color. */
+.def.def-sem { border-bottom: 0; display: inline-flex; vertical-align: middle; }
+.def.def-sem:hover { color: inherit; }
+.def.def-sem:hover .sem,
+.def.def-sem[aria-expanded="true"] .sem { box-shadow: 0 0 0 2.5px rgba(22, 35, 58, .1); }
+.def.def-sem:focus-visible { outline: none; }
+.def.def-sem:focus-visible .sem { outline: 2px solid var(--sel); outline-offset: 2px; }
+
+/* En impresión no hay nada que tocar: el punteado sobra y la ficha no existe. */
+@media print {
+  .def { border-bottom: 0; }
+  .def-sem .sem { box-shadow: none; }
+  .def-pop { display: none; }
+}
+
+/* Los tres cortes del semáforo, dentro de su ficha. Una fila por banda, cada una con su
+   propio semáforo y la luz que le toca prendida: el orden vertical de las filas es el mismo
+   que el de las luces en la caja, así que la fila de arriba tiene la luz de arriba. La
+   clase sem-lleno/medio/vacio de cada <li> es la que define --tono, que la caja del ícono
+   hereda por currentColor. */
+.def-pop-sem { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.def-pop-sem li {
+  display: flex; align-items: center; gap: 9px;
+  color: var(--tono);
+  padding: 4px 9px; border-radius: 4px;
+  border: 1px solid var(--tono); background: var(--sup);
+}
+.def-pop-sem .sem-ico { width: 12px; height: 19.5px; flex-shrink: 0; overflow: visible; }
+.def-pop-sem b {
+  font: 600 10px/1 var(--mono); text-transform: uppercase; letter-spacing: .07em;
+  white-space: nowrap;
+}
+/* El rango va a la derecha y en tinta: es el dato, el rótulo es la etiqueta. */
+.def-pop-sem span { margin-left: auto; color: var(--ink); font-size: 12px; white-space: nowrap; }

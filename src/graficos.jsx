@@ -92,6 +92,17 @@ const EJE = 'var(--eje)'
  * Sin esto el eje termina en 21,3 % (max x 1,12) y arranca "muy de arriba": el tope tiene
  * que ser un numero que alguien diria en voz alta, no el maximo de la serie inflado.
  */
+/**
+ * Lectura de una marca, para el <title> nativo del SVG. Cada barra, punto y tramo lleva la
+ * suya: el rotulo directo dice el valor, y esto dice el valor CON su etiqueta, su nota y su
+ * base, que es lo que hace falta cuando alguien senala un dibujo en una reunion y pregunta
+ * "¿este cual era?". Va en <title> y no en un popover propio porque el navegador ya lo
+ * resuelve, sobrevive a la impresion y no roba el foco.
+ */
+function lectura(...partes) {
+  return partes.filter((x) => x != null && x !== '').join(' · ')
+}
+
 export function escalaNice(max, objetivo = 5) {
   if (!(max > 0)) return { max: 1, ticks: [0, 1] }
   const bruto = max / objetivo
@@ -143,12 +154,19 @@ function EjeXValor({ x0, ancho, y, ticks, max, formato, titulo }) {
       })}
       {/* El titulo va en la PUNTA del eje y debajo de los rotulos de las marcas: pegado al
           origen se confundia con la primera marca. */}
-      {titulo && (
-        <text fontFamily="var(--mono)" x={x0 + ancho} y={y + 38} fontSize="11" fill={MUT2} textAnchor="end"
-              letterSpacing=".09em" fontWeight={600}
-              style={{ textTransform: 'uppercase' }}>{titulo}</text>
-      )}
+      <TituloEje x={x0 + ancho} y={y + 38} texto={titulo} />
     </g>
+  )
+}
+
+/** Titulo de eje (regla 21). Aparte de EjeXValor porque el eje divergente arma sus propias
+ *  marcas y el titulo tiene que verse igual en los dos. */
+function TituloEje({ x, y, texto }) {
+  if (!texto) return null
+  return (
+    <text fontFamily="var(--mono)" x={x} y={y} fontSize="11" fill={MUT2} textAnchor="end"
+          letterSpacing=".09em" fontWeight={600}
+          style={{ textTransform: 'uppercase' }}>{texto}</text>
   )
 }
 
@@ -193,6 +211,7 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
         const largo = Math.max(1, (d.valor / max) * ancho)
         return (
           <g key={d.etiqueta}>
+            <title>{lectura(d.etiqueta, formato(d.valor), d.sufijo, d.nota, tituloEje)}</title>
             <text x={x0 - 9} y={y + alto / 2} fontSize={fuente}
                   fill={d.excepcion ? EXC : d.enfasis ? INK : MUT2}
                   textAnchor="end" dominantBaseline="central"
@@ -618,6 +637,7 @@ export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132,
         if (d.vacio) {
           return (
             <g key={d.etiqueta}>
+              <title>{lectura(d.etiqueta, 'sin valor todavía', d.nota)}</title>
               <text x={x0 - 9} y={y} fontSize={fuente} fill={MUT2} textAnchor="end"
                     dominantBaseline="central" fontWeight={600}>{d.etiqueta}</text>
               <line x1={x0} x2={x0 + ancho} y1={y} y2={y} stroke={EJE} strokeWidth="1.5"
@@ -633,6 +653,8 @@ export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132,
         const grosor = d.tenue ? 1.25 : 2
         return (
           <g key={d.etiqueta}>
+            <title>{lectura(d.etiqueta, formato(d.valor),
+              `IC 95 % ${formato(d.ic[0])} a ${formato(d.ic[1])}`, d.nota, tituloEje)}</title>
             <text x={x0 - 9} y={y} fontSize={fuente} fill={d.enfasis ? INK : MUT2}
                   textAnchor="end" dominantBaseline="central"
                   fontWeight={d.enfasis ? 600 : 400}>{d.etiqueta}</text>
@@ -662,27 +684,6 @@ export function PuntosIC({ datos, w, h, formato, tituloEje, anchoEtiqueta = 132,
   )
 }
 
-/** Embudo en barras desde cero (no en trapecios: el area engana, Cleveland-McGill). */
-export function Embudo({ etapas, w, h, formato, formatoEje, tituloEje, formatoPct }) {
-  const fp = formatoPct || ((v) => `${(v * 100).toFixed(1).replace('.', ',')} %`)
-  const base = etapas[0] ? etapas[0].valor : 0
-  const datos = etapas.map((e, i) => ({
-    etiqueta: e.etiqueta,
-    // El porcentaje sobre el total va PEGADO al valor, no flotando en la columna derecha:
-    // ahi quedaba en gris chico y a 400 px del dato que califica.
-    valor: e.valor,
-    sufijo: i > 0 && base ? fp(e.valor / base) : null,
-    // La columna derecha pasa a decir la conversion respecto de la etapa anterior, que es
-    // la informacion propia de un embudo y no estaba en ningun lado.
-    nota: i > 0 && etapas[i - 1].valor
-      ? `${fp(e.valor / etapas[i - 1].valor)} de ${etapas[i - 1].etiqueta.toLowerCase()}`
-      : '',
-    enfasis: i === etapas.length - 1,
-  }))
-  return <BarrasH datos={datos} w={w} h={h} formato={formato} formatoEje={formatoEje}
-                  tituloEje={tituloEje} anchoEtiqueta={124} />
-}
-
 /** Trama diagonal para distinguir tramos sin depender del color. En una impresion en blanco
  *  y negro dos rellenos grises son el mismo relleno; una trama no.
  *
@@ -696,6 +697,13 @@ export function Tramas() {
                patternTransform="rotate(45)">
         <rect width="7" height="7" fill="var(--tram-b)" />
         <line x1="0" y1="0" x2="0" y2="7" stroke="var(--tram-l)" strokeWidth="3" />
+      </pattern>
+      {/* La misma trama sobre el terracota de excepcion: un tramo que ya es la excepcion no
+          puede depender solo del color para serlo. Base oscura y rotulo blanco (5,2:1). */}
+      <pattern id="trama-exc" width="7" height="7" patternUnits="userSpaceOnUse"
+               patternTransform="rotate(45)">
+        <rect width="7" height="7" fill="var(--terra)" />
+        <line x1="0" y1="0" x2="0" y2="7" stroke="var(--terra-osc)" strokeWidth="3" />
       </pattern>
     </defs>
   )
@@ -725,6 +733,8 @@ export function BarraTramos({ tramos, w, h, formato, banda, alturaBarra }) {
         const ancho = (t.valor / total) * w
         const el = (
           <g key={t.etiqueta}>
+            <title>{lectura(t.etiqueta, formato(t.valor),
+              `${((t.valor / total) * 100).toFixed(1).replace('.', ',')} % del total`, t.nota)}</title>
             <rect x={x} y={y} width={Math.max(0, ancho - (i < tramos.length - 1 ? 2 : 0))}
                   height={alto} fill={t.excepcion ? EXC : t.enfasis ? ACC : 'url(#trama)'}
                   stroke={t.enfasis ? 'none' : GRIS} strokeWidth="1" />
@@ -760,6 +770,365 @@ export function BarraTramos({ tramos, w, h, formato, banda, alturaBarra }) {
 }
 
 /**
+ * Rampa de tonos para composiciones apiladas. La barra al 100 % obliga a poner el rotulo
+ * ADENTRO del segmento, y ahi el relleno deja de ser decorativo: es el fondo de un texto.
+ * Por eso la rampa salta del azul oscuro (rotulo blanco, 10,1:1) al azul-500 (blanco,
+ * 5,3:1) y de ahi a tonos claros con rotulo en tinta (>= 6,9:1). Los grises medios del
+ * medio de la rampa no aparecen: contra blanco dan 4,0:1 y contra tinta 3,9:1, o sea que
+ * ningun rotulo se lee bien encima.
+ */
+const RAMPA = ['var(--acc)', '#4c6c8f', '#9fb0c2', '#bcc8d4', '#d3dbe3', '#e3e8ee', '#eef1f5']
+
+/** Tono y color de rotulo del escalon i de la rampa. */
+export function rampa(i) {
+  const j = Math.min(Math.max(i, 0), RAMPA.length - 1)
+  return { tono: RAMPA[j], tinta: j <= 1 ? '#fff' : INK }
+}
+
+function relleno(tono) {
+  return tono === 'trama' ? 'url(#trama)' : tono === 'trama-exc' ? 'url(#trama-exc)' : tono
+}
+
+/**
+ * Composicion al 100 %: una barra por fila, partida en segmentos que suman el total de ESA
+ * fila. La escala es fija de 0 a 100 %, asi que ningun filtro puede inflar la forma: es lo
+ * contrario de una barra de conteo, donde el eje se reacomoda al maximo del recorte.
+ *
+ * Cada fila declara su base (`sub`), porque tres barras del mismo largo sobre bases de
+ * 23.529, 8.266 y 2.059 no son tres poblaciones iguales y sin la base escrita lo parecen.
+ *
+ * Rotulos: adentro del segmento cuando entra medido de verdad (canvas, no estimacion); si
+ * no entra y el segmento es el ultimo, sale a la derecha de la barra, que para eso se
+ * reserva el margen; si no entra y esta en el medio, no se dibuja y la clave baja a la
+ * linea de resto de la cabecera. Nunca texto en diagonal ni rotulo pisando el corte.
+ *
+ * `conectores` une los cortes de filas consecutivas: la inclinacion ES la diferencia entre
+ * las dos composiciones, que es la lectura que el par region/categoria promete.
+ */
+export function BarrasApiladas100({
+  filas, w, h, anchoEtiqueta = 120, tituloEje, encabezadoNota, leyenda, conectores,
+  alturaBarra, referencia, onFila, onSegmento, textoResto, rotuloResto,
+}) {
+  if (!filas.length || w < 160) return null
+
+  const hayCabecera = !!(leyenda || encabezadoNota || textoResto)
+  const padTop = hayCabecera ? 26 : 8
+  const altoEje = tituloEje ? 48 : 26
+  const disponible = Math.max(40, h - padTop - altoEje)
+  const paso = disponible / filas.length
+  // Tope duro al alto de barra por la misma razon que en BarraTramos: una composicion mas
+  // gruesa no dice mas, la proporcion ya la dice el ancho.
+  const alto = Math.max(14, Math.min(paso * 0.52, alturaBarra ?? 76))
+  const fuenteEtq = Math.max(10.5, Math.min(13, paso * 0.42))
+  const fuente = Math.max(10.5, Math.min(13.5, alto * 0.36))
+
+  const x0 = anchoEtiqueta
+  const anchoNota = Math.max(
+    encabezadoNota ? anchoTexto(encabezadoNota, 10, 400, 0.07) + 14 : 0,
+    ...filas.map((f) => (f.nota ? anchoTexto(f.nota, fuenteEtq - 1.5, 400) + 14 : 0))
+  )
+  // Margen derecho para el rotulo de la cola. Se decide por participacion (dato, no pixel)
+  // para no entrar en el bucle "el ancho depende del rotulo que depende del ancho".
+  const anchoCola = Math.max(0, ...filas.map((f) => {
+    const tot = f.segmentos.reduce((s, g) => s + g.valor, 0)
+    const u = f.segmentos[f.segmentos.length - 1]
+    if (!u || !u.texto || !tot || u.valor / tot >= 0.16) return 0
+    return anchoTexto(u.texto, fuente, 500) + 12
+  }))
+  const ancho = Math.max(60, w - x0 - anchoNota - Math.max(6, anchoCola))
+  const yBase = padTop + disponible
+
+  // Todo el calculo de posiciones y de que rotulo entra pasa aca, antes de devolver JSX:
+  // la linea de resto de la cabecera necesita saber que segmentos se quedaron sin rotulo.
+  const claveResto = []
+  const vistas = filas.map((f, i) => {
+    const tot = f.segmentos.reduce((s, g) => s + g.valor, 0) || 1
+    const y = padTop + i * paso + (paso - alto) / 2
+    let x = x0
+    const segs = f.segmentos.map((g, j) => {
+      const share = g.valor / tot
+      // Piso de 3 px: un segmento de 0,4 % existe y tiene que dejar marca, pero sin piso se
+      // dibuja en medio pixel y desaparece.
+      const ws = g.valor > 0 ? Math.max(3, share * ancho) : 0
+      const s = { ...g, x, w: ws, share, j }
+      x += ws
+      return s
+    })
+    segs.forEach((s, j) => {
+      if (!s.texto) return
+      if (s.w > 0 && s.w >= anchoTexto(s.texto, fuente, 600) + 16) s.rotulo = 'dentro'
+      // El tramo que no entra y no es la cola sale sobre plaqueta opaca, que es el recurso
+      // que ya usa BarraTramos para un rotulo que cae encima de la trama del vecino. Es
+      // tambien el unico rotulo que sobrevive a un tramo en cero: el llamador lo pide para
+      // la cifra que no se puede caer del dibujo (la tasa del KPI en D2, por ejemplo).
+      else if (s.plaqueta) s.rotulo = 'plaqueta'
+      // Un tramo vacio no es un tramo chico: no existe en la composicion y no baja a la
+      // linea de resto, que quedaria llena de "0,0 → 0,0".
+      else if (s.w <= 0) return
+      else if (j === segs.length - 1) s.rotulo = 'fuera'
+      else if (!claveResto.includes(s.clave)) claveResto.push(s.clave)
+    })
+    return { fila: f, y, segs, cortes: segs.slice(0, -1).map((s) => s.x + s.w) }
+  })
+
+  // La linea de resto se arma en el orden del dibujo, no en el orden en que se descubrio
+  // que un rotulo no entraba: si no, la lista sale desordenada respecto de la barra. Y se
+  // corta donde deja de entrar, con puntos suspensivos: un texto que se sale del SVG no se
+  // ve cortado, se ve ausente.
+  let resto = null
+  if (textoResto && claveResto.length) {
+    const orden = vistas[0].segs.map((g) => g.clave).filter((c) => claveResto.includes(c))
+    const disponibleResto = w - x0 - (encabezadoNota ? anchoNota : 0) - 8
+    const piezas = orden.map((clave) => textoResto({
+      clave,
+      pcts: vistas.map((v) => {
+        const g = v.segs.find((x) => x.clave === clave)
+        return g ? g.share * 100 : 0
+      }),
+    }))
+    const prefijo = rotuloResto ? `${rotuloResto} ` : ''
+    let lista = ''
+    let cortada = false
+    for (const pieza of piezas) {
+      const tentativa = lista ? `${lista} · ${pieza}` : pieza
+      if (anchoTexto(prefijo + tentativa, 11.5) > disponibleResto) { cortada = true; break }
+      lista = tentativa
+    }
+    resto = lista ? prefijo + lista + (cortada ? ' …' : '') : null
+  }
+
+  const etiquetaAria = vistas.map((v) => v.fila.etiqueta + ': ' +
+    v.segs.map((s) => `${s.clave} ${(s.share * 100).toFixed(1).replace('.', ',')} %`).join(', ')).join(' · ')
+
+  let lx = x0
+  return (
+    <svg width={w} height={h} role={onFila || onSegmento ? 'group' : 'img'}
+         aria-label={(tituloEje || 'Composición') + '. ' + etiquetaAria}
+         style={{ display: 'block' }}>
+      <Tramas />
+
+      {leyenda && leyenda.map((l) => {
+        const el = (
+          <g key={l.etiqueta}>
+            <rect x={lx} y={6} width={12} height={12} fill={relleno(l.tono)}
+                  stroke={l.tono === 'trama' ? GRIS : 'none'} strokeWidth="1" />
+            <text x={lx + 17} y={12} fontSize="11.5" fontWeight={500} dominantBaseline="central"
+                  fill={l.enfasis ? INK : MUT2}>{l.etiqueta}</text>
+          </g>
+        )
+        lx += anchoTexto(l.etiqueta, 11.5, 500) + 17 + 20
+        return el
+      })}
+      {!leyenda && resto && (
+        <text x={x0} y={12} fontSize="11.5" fill={MUT} dominantBaseline="central">{resto}</text>
+      )}
+      {encabezadoNota && (
+        <text x={w} y={11} fontSize="10" fill={MUT} letterSpacing=".07em" textAnchor="end"
+              style={{ textTransform: 'uppercase' }}>{encabezadoNota}</text>
+      )}
+
+      {conectores && vistas.slice(0, -1).map((v, i) => v.cortes.map((cx, k) => {
+        const cy = vistas[i + 1].cortes[k]
+        if (cy == null) return null
+        return <line key={`c${i}-${k}`} x1={cx} y1={v.y + alto} x2={cy} y2={vistas[i + 1].y}
+                     stroke="var(--gris2)" strokeWidth="1" strokeDasharray="4 4" />
+      }))}
+
+      {vistas.map((v) => (
+        <g key={v.fila.etiqueta}>
+          <title>{lectura(v.fila.etiqueta, v.fila.sub, v.fila.nota,
+            v.segs.map((s) => `${s.clave} ${(s.share * 100).toFixed(1).replace('.', ',')} %`).join(', '))}</title>
+          <text x={x0 - 9} y={v.fila.sub ? v.y + alto / 2 - 8 : v.y + alto / 2} fontSize={fuenteEtq}
+                fill={v.fila.enfasis ? INK : MUT2} fontWeight={v.fila.enfasis ? 600 : 400}
+                textAnchor="end" dominantBaseline="central">{v.fila.etiqueta}</text>
+          {v.fila.sub && (
+            <text x={x0 - 9} y={v.y + alto / 2 + 9} fontSize={Math.max(9.5, fuenteEtq - 2.5)}
+                  fill={MUT} textAnchor="end" dominantBaseline="central"
+                  className="tabular">{v.fila.sub}</text>
+          )}
+          {v.segs.map((s) => s.w > 0 && (
+            <rect key={s.clave} x={s.x} y={v.y} width={Math.max(1, s.w - (s.j < v.segs.length - 1 ? 1 : 0))}
+                  height={alto} fill={relleno(s.tono)}
+                  stroke={s.tono === 'trama' ? GRIS : 'none'} strokeWidth="1" />
+          ))}
+          {v.segs.map((s) => s.rotulo === 'dentro' && (
+            <text key={'d' + s.clave} x={s.x + 8} y={v.y + alto / 2} fontSize={fuente}
+                  fontWeight={s.enfasis ? 700 : 500} fill={s.tinta || INK}
+                  dominantBaseline="central" className="tabular">{s.texto}</text>
+          ))}
+          {v.segs.map((s) => s.rotulo === 'plaqueta' && (
+            <Plaqueta key={'p' + s.clave} x={s.x + s.w + 8} y={v.y + alto / 2} texto={s.texto}
+                      fuente={fuente} peso={600} color={INK} />
+          ))}
+          {v.segs.map((s) => s.rotulo === 'fuera' && (
+            <text key={'f' + s.clave} x={Math.min(s.x + s.w + 7, w - anchoNota - anchoTexto(s.texto, fuente, 500) - 2)}
+                  y={v.y + alto / 2} fontSize={fuente} fill={MUT2} fontWeight={500}
+                  dominantBaseline="central" className="tabular">{s.texto}</text>
+          ))}
+          {v.fila.nota && (
+            <text x={w} y={v.y + alto / 2} fontSize={fuenteEtq - 1.5} fill={MUT} textAnchor="end"
+                  dominantBaseline="central" className="tabular">{v.fila.nota}</text>
+          )}
+        </g>
+      ))}
+
+      <line x1={x0} x2={x0} y1={padTop} y2={yBase} stroke={EJE} strokeWidth="1" />
+      <EjeXValor x0={x0} ancho={ancho} y={yBase} ticks={[0, 25, 50, 75, 100]} max={100}
+                 formato={(v) => `${v} %`} titulo={tituloEje} />
+      {referencia != null && referencia.valor > 0 && (
+        <ReferenciaV x={x0 + (referencia.valor / 100) * ancho} h={yBase} y={padTop}
+                     etiqueta={referencia.etiqueta} />
+      )}
+
+      {onFila && vistas.map((v, i) => (
+        <rect key={'hf' + v.fila.etiqueta} x={0} y={padTop + i * paso} width={w} height={paso}
+              fill="transparent" style={{ cursor: 'pointer' }}
+              onClick={() => onFila(i, v.fila)} tabIndex={0} role="button"
+              aria-label={`Ver ${v.fila.etiqueta} en la lista de contacto`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onFila(i, v.fila) } }} />
+      ))}
+      {onSegmento && vistas[0] && vistas[0].segs.map((s) => s.w > 2 && (
+        <rect key={'hs' + s.clave} x={s.x} y={padTop} width={s.w} height={disponible}
+              fill="transparent" style={{ cursor: 'pointer' }}
+              onClick={() => onSegmento(s)} tabIndex={0} role="button"
+              aria-label={`Ver ${s.clave} en la lista de contacto`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSegmento(s) } }} />
+      ))}
+    </svg>
+  )
+}
+
+/**
+ * Barras divergentes desde cero: el largo es un desvio con signo y el lado es el signo.
+ *
+ * El eje se simetriza al maximo absoluto, asi que un filtro que deje desvios de decimas los
+ * dibujaria del tamano de una pantalla entera: `minimoEje` es el piso que lo impide.
+ *
+ * La trama del lado negativo es redundante con el lado a proposito (regla: nada depende
+ * solo del color ni solo de la posicion), y es lo que hace que el grafico sobreviva a una
+ * impresion en blanco y negro.
+ */
+export function BarrasDivergentes({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiqueta = 120,
+                                    minimoEje = 10, encabezadoNota, rotuloPos, rotuloNeg, onBarra }) {
+  if (!datos.length || w < 200) return null
+  const fmtEje = formatoEje || formato
+  const hayCabecera = !!(rotuloPos || rotuloNeg || encabezadoNota)
+  const padTop = hayCabecera ? 24 : 8
+  const altoEje = tituloEje ? 48 : 26
+  const disponible = Math.max(40, h - padTop - altoEje)
+  const paso = disponible / datos.length
+  const alto = Math.max(9, Math.min(paso * 0.62, 40))
+  const fuente = Math.max(10.5, Math.min(13, paso * 0.42))
+
+  const anchoValor = Math.max(34, ...datos.map((d) => anchoTexto(formato(d.valor), fuente, 600) + 10))
+  const textoNota = (d) => (d.nota ? d.nota + (d.notaSuf ? `  ${d.notaSuf}` : '') : '')
+  const anchoNota = Math.max(
+    encabezadoNota ? anchoTexto(encabezadoNota, 10, 400, 0.07) + 14 : 0,
+    ...datos.map((d) => (d.nota ? anchoTexto(textoNota(d), fuente, 600) + 14 : 0))
+  )
+  // Barra de magnitud de la columna de nota: es lo que el formato divergente pierde (el
+  // desvio no dice cuanta plata hay detras) y lo que hace que la columna se lea como plata y
+  // no como un pie de pagina. Va topeada a 84 px para quedar por debajo de la barra
+  // principal: es evidencia al costado, no una segunda serie.
+  const maxNota = Math.max(0, ...datos.map((d) => d.notaValor || 0))
+  const anchoBarraNota = Math.min(Math.max(0, anchoNota - 14), 84)
+  const hayBarraNota = maxNota > 0 && paso >= 32 && anchoBarraNota >= 24
+  // El rotulo del extremo negativo sale para la izquierda: si el area de dibujo arrancara en
+  // anchoEtiqueta, ese rotulo se comeria la etiqueta de la fila.
+  const x0 = anchoEtiqueta + anchoValor
+  const ancho = Math.max(60, w - x0 - anchoValor - anchoNota)
+  const yBase = padTop + disponible
+
+  const mag = Math.max(minimoEje, ...datos.map((d) => Math.abs(d.valor)))
+  const { max: tope, ticks: mitad } = escalaNice(mag, 2)
+  const ticks = [...mitad.slice(1).map((t) => -t).reverse(), ...mitad]
+  const xc = x0 + ancho / 2
+  const xDe = (v) => xc + (v / tope) * (ancho / 2)
+
+  return (
+    <svg width={w} height={h} role={onBarra ? 'group' : 'img'}
+         aria-label={(tituloEje || 'Desvíos') + ': ' + datos.map((d) => d.etiqueta + ' ' + formato(d.valor)).join(', ')}
+         style={{ display: 'block' }}>
+      <Tramas />
+      {/* La mitad del mal desempeno va sobre un lavado neutro. Sin el, los dos lados se
+          distinguen solo por el lado de una linea, que es justo lo que hay que leer rapido;
+          con el, la zona se ve antes que las barras. Neutro y no de color: el lado ya tiene
+          significado y un color le agregaria un segundo. */}
+      <rect x={x0} y={padTop} width={ancho / 2} height={disponible} fill="var(--zona)" />
+      {rotuloNeg && <text x={xc - 10} y={12} fontSize="12" fontWeight={600} fill={MUT2}
+                          textAnchor="end" dominantBaseline="central">{rotuloNeg}</text>}
+      {rotuloPos && <text x={xc + 10} y={12} fontSize="12" fontWeight={600} fill={MUT2}
+                          dominantBaseline="central">{rotuloPos}</text>}
+      {encabezadoNota && (
+        <text x={w} y={11} fontSize="10" fill={MUT} letterSpacing=".07em" textAnchor="end"
+              style={{ textTransform: 'uppercase' }}>{encabezadoNota}</text>
+      )}
+
+      {datos.map((d, i) => {
+        const y = padTop + i * paso + (paso - alto) / 2
+        const neg = d.valor < 0
+        const x1 = xDe(Math.min(0, d.valor))
+        const x2 = xDe(Math.max(0, d.valor))
+        const tono = d.enfasis ? ACC : neg ? 'trama' : GRIS
+        return (
+          <g key={d.etiqueta}>
+            <title>{lectura(d.etiqueta, formato(d.valor), tituloEje,
+              d.nota ? `${encabezadoNota || 'nota'}: ${d.nota}${d.notaSuf ? ` ${d.notaSuf}` : ''}` : null)}</title>
+            <text x={anchoEtiqueta - 9} y={y + alto / 2} fontSize={fuente}
+                  fill={d.enfasis ? INK : MUT2} fontWeight={d.enfasis ? 600 : 400}
+                  textAnchor="end" dominantBaseline="central">{d.etiqueta}</text>
+            {d.valor !== 0 && (
+              <rect x={x1} y={y} width={Math.max(2, x2 - x1)} height={alto} fill={relleno(tono)}
+                    stroke={tono === 'trama' ? GRIS : 'none'} strokeWidth="1" />
+            )}
+            <text x={neg ? x1 - 6 : x2 + 6} y={y + alto / 2} fontSize={fuente}
+                  fill={d.enfasis ? ACC : MUT2} fontWeight={d.enfasis ? 700 : 500}
+                  textAnchor={neg ? 'end' : 'start'} dominantBaseline="central"
+                  className="tabular">{formato(d.valor)}</text>
+            {d.nota && (
+              <text x={w} y={hayBarraNota ? y + alto / 2 - 6 : y + alto / 2} fontSize={fuente}
+                    fill={INK} fontWeight={600} textAnchor="end" dominantBaseline="central"
+                    className="tabular">
+                {d.nota}
+                {d.notaSuf && <tspan fill={MUT} fontWeight={400}>{`  ${d.notaSuf}`}</tspan>}
+              </text>
+            )}
+            {hayBarraNota && d.notaValor > 0 && (
+              <rect x={w - (d.notaValor / maxNota) * anchoBarraNota} y={y + alto / 2 + 6}
+                    width={Math.max(1, (d.notaValor / maxNota) * anchoBarraNota)} height={3}
+                    fill={d.enfasis ? ACC : GRIS} />
+            )}
+          </g>
+        )
+      })}
+
+      <g>
+        <line x1={x0} x2={x0 + ancho} y1={yBase} y2={yBase} stroke={EJE} strokeWidth="1" />
+        {ticks.map((t) => (
+          <g key={t}>
+            <line x1={xDe(t)} x2={xDe(t)} y1={yBase} y2={yBase + 4} stroke={EJE} strokeWidth="1" />
+            <text x={xDe(t)} y={yBase + 17} fontSize="10.5" fill={MUT} textAnchor="middle"
+                  className="tabular">{fmtEje(t)}</text>
+          </g>
+        ))}
+        <TituloEje x={x0 + ancho} y={yBase + 38} texto={tituloEje} />
+      </g>
+      {/* El cero es el eje de este grafico, no una marca mas: va en tinta, de punta a punta y
+          mas grueso que cualquier otra linea del dibujo. */}
+      <line x1={xc} x2={xc} y1={padTop - 4} y2={yBase + 7} stroke={INK} strokeWidth="2" />
+
+      {onBarra && datos.map((d, i) => (
+        <rect key={'hit' + d.etiqueta} x={0} y={padTop + i * paso} width={w} height={paso}
+              fill="transparent" style={{ cursor: 'pointer' }}
+              onClick={() => onBarra(i, d)} tabIndex={0} role="button"
+              aria-label={`Ver ${d.etiqueta} en la lista de contacto`}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onBarra(i, d) } }} />
+      ))}
+    </svg>
+  )
+}
+
+/**
  * Sparkline: la serie entera en pocos pixeles, con su banda y el ultimo punto marcado.
  *
  * No lleva eje a proposito, y no contradice la regla 21: no es un grafico de analisis sino
@@ -789,6 +1158,7 @@ export function Chispa({ serie, w, h, banda, tonoBanda = 'var(--acc)', rotulo, r
 
   return (
     <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
+      <title>{lectura(rotulo && `último ${rotulo}`, `${vals.length} valores`, rotuloBanda && banda && `${rotuloBanda} ${banda[0]} a ${banda[1]}`)}</title>
       {banda && (
         <g>
           <rect x={0} y={Y(banda[1])} width={iw + R * 2} height={Math.max(1, Y(banda[0]) - Y(banda[1]))}
@@ -843,6 +1213,7 @@ export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion
   const dentro = rotulo ? anchoTexto(rotulo, 15, 700) + 20 < ancho : false
   return (
     <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
+      <title>{lectura(rotulo, `${((parte / total) * 100).toFixed(1).replace('.', ',')} % del total`, pie)}</title>
       <Tramas />
       <rect x={0} y={y} width={w} height={alto} fill="url(#trama)" stroke={GRIS} strokeWidth="1" />
       <rect x={0} y={y} width={ancho} height={alto} fill={tono} />
