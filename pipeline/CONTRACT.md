@@ -132,6 +132,20 @@ sin cubrir:
 | `base_activa_anual` | clientes activos y primeras compras por año |
 | `consentimiento` | envíos a clientes con `acepta_marketing = False` |
 | `exposicion_por_corte` | la serie de los 25 cortes, para el "cómo vengo" que pide la clase 4 |
+| `facturacion_anual_cohorte` | por corte y por año, la facturación identificada partida entre los clientes en riesgo AL CORTE y el resto. Cohorte fija mirada hacia atrás; no es la tasa de riesgo de cada año |
+| `consentimiento_anual` | el mismo corte de `consentimiento` abierto por año de `fecha_envio`, cada año sobre su propia base de envíos |
+| `criterios_orden` | por criterio de armado de la lista: clientes que alcanza, exposición cubierta, costo contra el actual, y la tasa de compra a 7 días con su IC de las campañas que ya salieron a esos mismos clientes |
+| `potencia_experimento` | diferencia mínima detectable del experimento que declara `meta.experimento`, en puntos porcentuales |
+
+Las cuatro últimas se agregaron el 27/08/2026 con el rediseño de las vistas 02, 08, 10 y 13.
+Ninguna cambia una definición existente: son cortes nuevos de las mismas bases. Las tres
+primeras salen de `pipeline/series.py`; la cuarta es aritmética de potencia sobre la tasa
+global del embudo. Todas están ancladas en `_anclas_variantes` de `build.py`.
+
+`meta.experimento` declara el reparto de la capacidad en ramas (360/360/80) y cuántos cortes
+se prevé correr. Vive en el payload y no en la pantalla porque `potencia_experimento` se
+calcula con esos mismos números: separados, el MDE podría quedar describiendo un experimento
+distinto del que la vista propone.
 
 ## 5. Anclas — el pipeline para si alguna falla
 
@@ -151,6 +165,21 @@ Corte 31/12/2025:
 | exposición al 30/09/2025 | ARS 80,1 M |
 | riesgo Q5 / riesgo Q1 | 51,8 % / 13,3 % |
 | amplitud de riesgo entre las 5 regiones | 2,8 pp |
+
+Las series del rediseño suman 25 anclas más (`_anclas_variantes`), y tres de ellas son
+booleanas: anclan el **hallazgo** que el título de la pantalla afirma, no solo la cifra.
+
+| Chequeo | Esperado |
+|---|---|
+| peso de la cohorte en riesgo, 2022 a 2025 | 47,3 / 52,1 / 54,8 / 31,2 % |
+| la cohorte pesa menos en 2025 que en cualquier año previo | verdadero |
+| envíos sin consentimiento, 2022 a 2025 | 29,5 / 31,2 / 30,3 / 29,6 % |
+| amplitud del incumplimiento entre años | 1,7 pp |
+| exposición por criterio (actual / Q5+180d / Hibernando / azar) | 49,5 / 32,1 / 12,3 / 31,0 M |
+| ningún criterio alternativo se distingue del actual por tasa | verdadero |
+| MDE del experimento propuesto | 1,71 pp |
+
+Total con el rediseño: **121 anclas**.
 
 ## 6. Reglas duras para todo worker
 

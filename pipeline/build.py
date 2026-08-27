@@ -32,6 +32,17 @@ DIMS = {
 CORTE_REF = "2025-12-31"
 CORTE_ANTERIOR = "2025-09-30"
 
+# Capacidad de contacto declarada (CONTRACT 4.3, decision compuerta 1).
+CAPACIDAD = (500, 800)
+
+# El experimento que la vista 13 propone: la capacidad del corte partida en dos ramas de
+# mensaje y un control sin envio, y cuantos cortes se corre. El reparto es 9-9-2 en cada
+# ciclo de 20 sobre la lista ya ordenada por exposicion, asi que las tres ramas quedan
+# estratificadas por exposicion sin sortear nada (la pantalla arma la asignacion con el
+# mismo ciclo). 800 / 20 = 40 ciclos exactos -> 360 / 360 / 80.
+RAMAS_EXPERIMENTO = (360, 360, 80)
+CORTES_EXPERIMENTO = 3
+
 
 def _millones(x):
     return round(x / 1e6, 1)
@@ -56,6 +67,7 @@ def main():
     contingencias = []
     listas = []
     exposicion_por_corte = []
+    facturacion_anual_cohorte = []
     resumen_por_corte = []
 
     for corte in lista_cortes:
@@ -87,6 +99,15 @@ def main():
             "en_riesgo": int(en_riesgo.sum()),
             "sensibilidad": features.sensibilidad_umbral(tx, corte),
         })
+        # La cohorte fija del corte mirada hacia atras, anio por anio. Va por corte y no
+        # por celda a proposito: partir `f` por anio en la contingencia serian ocho columnas
+        # mas sobre 17.136 celdas y casi un mega de payload, y el bundle de un solo archivo
+        # es una promesa del proyecto. El precio es que la vista D1 no acepta filtros, y lo
+        # declara (PANTALLAS.depende = 'corte').
+        facturacion_anual_cohorte.append({
+            "corte": corte.strftime("%Y-%m-%d"),
+            "anios": series.facturacion_anual_cohorte(tx, facts, corte),
+        })
         resumen_por_corte.append(facts)
 
     # El corte de referencia es el ultimo de la lista (2025-12-31)
@@ -114,12 +135,28 @@ def main():
             "consentimiento": series.consentimiento(camp, clientes),
             "estacionalidad": series.estacionalidad(tx, tx_total=_tx_total(DATA_DIR)),
             "exposicion_por_corte": exposicion_por_corte,
+            "facturacion_anual_cohorte": facturacion_anual_cohorte,
+            "consentimiento_anual": series.consentimiento_anual(camp, clientes),
+            "criterios_orden": series.criterios_orden(facts_ref, camp, capacidad=CAPACIDAD[1]),
+            "potencia_experimento": series.potencia_experimento(
+                p0=series.embudo_campanias(camp, pd.Timestamp(CORTE_REF))["global"]["compra_7dias"],
+                n_por_rama=RAMAS_EXPERIMENTO[0],
+                cortes=CORTES_EXPERIMENTO,
+            ),
         },
         "stage_counts": counts,
         "anclas": anclas,
         "meta": {
             "corte_ref": CORTE_REF,
-            "capacidad_contacto": [500, 800],
+            "capacidad_contacto": list(CAPACIDAD),
+            # Reparto propuesto de la capacidad del corte en dos ramas y un control. Vive
+            # aca y no en la pantalla porque `potencia_experimento` se calcula con estos
+            # mismos numeros: si la pantalla los tuviera aparte, el MDE del payload podria
+            # quedar describiendo un experimento distinto del que la vista propone.
+            "experimento": {
+                "ramas": list(RAMAS_EXPERIMENTO),
+                "cortes_previstos": CORTES_EXPERIMENTO,
+            },
             "meta_recompra": [10.0, 11.0],
             "base_recompra": [8.0, 9.0],
             "marca_a_superar": 1.39,
@@ -227,7 +264,88 @@ def _anclas(counts, facts, tx):
         for v, esperado in zip(_ventas_anuales(DATA_DIR), [123.8, 295.8, 349.7, 225.0])
     ] + _anclas_estacionalidad(tx) + _anclas_campanias() + _anclas_dimensiones(facts) \
         + _anclas_concentracion(facts) \
-      + _anclas_sensibilidad(tx)
+      + _anclas_sensibilidad(tx) + _anclas_variantes(facts, tx)
+
+
+def _anclas_variantes(facts, tx):
+    """Las cuatro series que alimentan las vistas 02, 08, 10 y 13 despues del rediseno.
+    Ninguna de las cuatro estaba anclada porque ninguna existia, y las cuatro afirman algo
+    en un titulo de pantalla: si el numero se mueve, el titulo miente y el pipeline tiene
+    que frenar antes de escribir el payload.
+
+    Las tres afirmaciones ancladas como booleano son las que se leen en el dibujo:
+    la cohorte se derrumba en 2025, el incumplimiento NO baja anio a anio, y ningun
+    criterio alternativo se distingue del actual por su tasa de compra."""
+    import pandas as pd
+    import series
+
+    camp = loader.load_campanias(DATA_DIR)
+    clientes = loader.load_clientes(DATA_DIR)
+
+    coh = series.facturacion_anual_cohorte(tx, facts, pd.Timestamp(CORTE_REF))
+    con = series.consentimiento_anual(camp, clientes)
+    cri = series.criterios_orden(facts, camp, capacidad=CAPACIDAD[1])
+    pot = series.potencia_experimento(
+        p0=series.embudo_campanias(camp, pd.Timestamp(CORTE_REF))["global"]["compra_7dias"],
+        n_por_rama=RAMAS_EXPERIMENTO[0], cortes=CORTES_EXPERIMENTO)
+
+    por_anio = {c["anio"]: c for c in coh}
+    con_anio = {c["anio"]: c for c in con}
+    por_crit = {c["criterio"]: c for c in cri["criterios"]}
+    actual = por_crit["Exposición · actual"]
+
+    def chk(nombre, real, esperado):
+        return {"nombre": nombre, "real": real, "esperado": esperado, "ok": real == esperado}
+
+    return [
+        chk(f"cohorte en riesgo {a} (%)", round(100 * por_anio[a]["pct_en_riesgo"], 1), e)
+        for a, e in ((2022, 47.3), (2023, 52.1), (2024, 54.8), (2025, 31.2))
+    ] + [
+        # El titulo de la vista 02: la cohorte pesaba mas de la mitad y este anio pesa un
+        # tercio. Si el maximo dejara de estar en 2024 o 2025 dejara de ser el minimo, la
+        # frase "dejaron de comprar este anio" ya no sale del dibujo.
+        chk("la cohorte pesa menos en 2025 que en cualquier anio previo",
+            por_anio[2025]["pct_en_riesgo"] < min(por_anio[a]["pct_en_riesgo"] for a in (2022, 2023, 2024)),
+            True),
+        chk("facturacion identificada de la cohorte 2024 (M)", _millones(por_anio[2024]["en_riesgo"]), 106.0),
+    ] + [
+        chk(f"envios sin consentimiento {a} (%)", round(100 * con_anio[a]["pct_sin_consentimiento"], 1), e)
+        for a, e in ((2022, 29.5), (2023, 31.2), (2024, 30.3), (2025, 29.6))
+    ] + [
+        # La vista 10 tenia que titular "la correccion ya esta en marcha". No hay correccion:
+        # los cuatro anios caen en menos de dos puntos de amplitud. El ancla fija el hallazgo.
+        chk("amplitud del incumplimiento entre anios (pp)",
+            round(100 * (max(c["pct_sin_consentimiento"] for c in con)
+                         - min(c["pct_sin_consentimiento"] for c in con)), 1), 1.7),
+        chk("envios por anio suman la base limpia",
+            sum(c["envios"] for c in con), 23529),
+    ] + [
+        chk(f"exposicion criterio {c} (M)", _millones(por_crit[c]["exposicion"]), e)
+        for c, e in (("Exposición · actual", 49.5), ("Q5 con recency > 180 d", 32.1),
+                     ("Segmento Hibernando", 12.3), ("Azar", 31.0))
+    ] + [
+        chk(f"clientes disponibles criterio {c}", por_crit[c]["clientes_disponibles"], e)
+        for c, e in (("Exposición · actual", 2452), ("Q5 con recency > 180 d", 525),
+                     ("Segmento Hibernando", 490), ("Azar", 2452))
+    ] + [
+        chk(f"compra 7d criterio {c} (%)", round(100 * por_crit[c]["compra_7dias"], 2), e)
+        for c, e in (("Exposición · actual", 1.42), ("Q5 con recency > 180 d", 1.72),
+                     ("Segmento Hibernando", 0.84), ("Azar", 1.18))
+    ] + [
+        # El titulo de la vista 08: en tasa de compra no se distingue ninguno del actual,
+        # en pesos la diferencia es de decenas de millones. Las dos mitades, ancladas.
+        chk("ningun criterio alternativo se distingue del actual por tasa",
+            all(c["solapa_con_actual"] for c in cri["criterios"]), True),
+        chk("el criterio actual es el de mayor exposicion",
+            all(c["exposicion"] <= actual["exposicion"] for c in cri["criterios"]), True),
+        chk("costo en exposicion del peor criterio (M)",
+            _millones(min(c["costo_exposicion"] for c in cri["criterios"])), -37.2),
+    ] + [
+        # La vista 13 propone un experimento y declara lo que ese experimento NO puede
+        # detectar. El MDE es el numero que sostiene esa salvedad.
+        chk("MDE del experimento propuesto (pp)", round(pot["mde_pp"], 2), 1.71),
+        chk("el MDE supera la tasa base", pot["mde"] > pot["p0"], True),
+    ]
 
 
 def _anclas_dimensiones(facts):

@@ -7,6 +7,7 @@ hacen I/O. Ningun redondeo intermedio; se redondea solo al formatear en la vista
 from __future__ import annotations
 
 import math
+from statistics import NormalDist
 
 import pandas as pd
 
@@ -337,3 +338,216 @@ def estacionalidad(tx: pd.DataFrame, tx_total: pd.DataFrame | None = None) -> li
         resultado.append(fila)
 
     return resultado
+
+
+def facturacion_anual_cohorte(tx: pd.DataFrame, facts: pd.DataFrame, corte) -> list[dict]:
+    """Por anio calendario, la facturacion identificada del anio partida en dos: la que
+    aportaron los clientes que estan EN RIESGO AL CORTE y el resto de la base.
+
+    Es una cohorte FIJA mirada hacia atras, no la tasa de riesgo de cada anio: los
+    clientes se clasifican una sola vez, al corte, y despues se les mira toda la historia.
+    Las dos lecturas responden preguntas distintas y no tienen por que coincidir; la de
+    cada anio ya vive en `exposicion_por_corte`.
+
+    Solo entran anios con datos hasta el corte. `parcial` marca el anio del propio corte
+    cuando el corte cae antes del 31/12: sin esa marca, una barra corta se lee como caida
+    cuando en realidad es un anio incompleto.
+
+    `total` es facturacion IDENTIFICADA (el tx que llega ya viene filtrado por id_cliente
+    en loader.load_transacciones), la misma base que `base_activa_anual.ventas_identificadas`
+    y NO la venta total de la empresa de `ventas_anuales`.
+    """
+    corte = pd.Timestamp(corte)
+    d = tx[tx["fecha"] <= corte][["id_cliente", "fecha", "monto_neto"]].copy()
+    d["anio"] = d["fecha"].dt.year
+    en_riesgo = set(facts.index[facts["en_riesgo"]])
+    d["riesgo"] = d["id_cliente"].isin(en_riesgo)
+
+    salida = []
+    for anio in range(int(d["anio"].min()), corte.year + 1):
+        sub = d[d["anio"] == anio]
+        total = float(sub["monto_neto"].sum())
+        riesgo = float(sub.loc[sub["riesgo"], "monto_neto"].sum())
+        salida.append({
+            "anio": int(anio),
+            "total": int(round(total)),
+            "en_riesgo": int(round(riesgo)),
+            "pct_en_riesgo": (riesgo / total) if total else None,
+            "parcial": bool(corte < pd.Timestamp(year=anio, month=12, day=31)),
+        })
+    return salida
+
+
+def consentimiento_anual(camp: pd.DataFrame, clientes: pd.DataFrame) -> list[dict]:
+    """El mismo corte de `consentimiento()` abierto por anio de `fecha_envio`: envios del
+    anio sobre la base limpia y cuantos de esos salieron a un cliente con
+    acepta_marketing=False.
+
+    El agregado de cuatro anios no distingue un incumplimiento que se esta corrigiendo de
+    uno estable. Abierto por anio, cada barra va sobre SU propia base de envios, que cambia
+    fuerte entre anios (de 3.915 a 8.028): comparar los conteos crudos no diria nada.
+
+    Los envios a id_cliente ausente del maestro cuentan en el denominador del anio y no en
+    el numerador, igual que en `consentimiento()`: no se pueden clasificar.
+    """
+    base = camp.drop_duplicates()
+    merged = base.merge(
+        clientes[["acepta_marketing"]], left_on="id_cliente", right_index=True, how="left"
+    )
+    merged = merged.assign(anio=merged["fecha_envio"].dt.year)
+
+    salida = []
+    for anio, sub in merged.groupby("anio"):
+        n = int(len(sub))
+        sin = int((sub["acepta_marketing"] == False).sum())  # noqa: E712
+        salida.append({
+            "anio": int(anio),
+            "envios": n,
+            "sin_consentimiento": sin,
+            "pct_sin_consentimiento": (sin / n) if n else None,
+        })
+    return salida
+
+
+def criterios_orden(facts: pd.DataFrame, camp: pd.DataFrame, capacidad: int = 800) -> dict:
+    """Que cuesta, en pesos y en compras, elegir otro criterio para armar la lista.
+
+    Cada criterio define un subconjunto de la base EN RIESGO al corte; de ese subconjunto
+    se toman los `capacidad` de mayor anualizado (es lo que Marketing ejecutaria) y se
+    reportan dos cosas independientes:
+
+    - `exposicion`: los pesos que el criterio alcanza. Es aritmetica de la base, sin ruido.
+    - `compra_7dias` con su IC de Wilson: la tasa observada en las campanias que YA salieron
+      a esos mismos clientes. Es una tasa observada sobre una muestra chica, con ruido.
+
+    La comparacion util es que las dos columnas tienen precision distinta. Los IC de compra
+    se solapan entre criterios (ninguno se distingue del otro); las diferencias de exposicion
+    son de decenas de millones y no dependen de ninguna muestra.
+
+    `Azar` no se sortea: se reporta el VALOR ESPERADO (capacidad x anualizado medio de la
+    base en riesgo) y la tasa de la base en riesgo entera, que es lo que una eleccion al
+    azar da en esperanza. Una corrida con semilla habria pedido justificar la semilla.
+
+    Un criterio que no llega a `capacidad` clientes se reporta con los que tiene:
+    `clientes_disponibles` menor que `capacidad` ya es, en si mismo, un costo del criterio.
+    """
+    en_riesgo = facts[facts["en_riesgo"]]
+    limpia = camp.drop_duplicates()
+
+    def rendimiento(ids: set) -> dict:
+        sub = limpia[limpia["id_cliente"].isin(ids)]
+        n = int(len(sub))
+        compras = int(sub["compra_7dias"].sum())
+        return {
+            "envios": n,
+            "compras": compras,
+            "compra_7dias": (compras / n) if n else None,
+            "compra_7dias_ic": _wilson(compras, n),
+        }
+
+    def criterio(nombre: str, definicion: str, sub: pd.DataFrame) -> dict:
+        sel = sub.sort_values("anualizado", ascending=False).head(capacidad)
+        return {
+            "criterio": nombre,
+            "definicion": definicion,
+            "clientes_disponibles": int(len(sub)),
+            "clientes": int(len(sel)),
+            "exposicion": int(round(sel["anualizado"].sum())),
+            **rendimiento(set(sel.index)),
+        }
+
+    filas = [
+        criterio(
+            "Exposición · actual",
+            f"los {capacidad} clientes en riesgo de mayor anualizado (el criterio que la lista usa hoy)",
+            en_riesgo,
+        ),
+        criterio(
+            "Q5 con recency > 180 d",
+            "clientes en riesgo del quintil 5 de facturacion con mas de 180 dias sin comprar",
+            en_riesgo[(en_riesgo["quintil"] == 5) & (en_riesgo["recency"] > 180)],
+        ),
+        criterio(
+            "Segmento Hibernando",
+            "clientes en riesgo con segmento RFM Hibernando (R<=2 y F<=2)",
+            en_riesgo[en_riesgo["rfm"] == "Hibernando"],
+        ),
+        {
+            "criterio": "Azar",
+            "definicion": (
+                f"{capacidad} clientes en riesgo al azar; la exposicion es el valor esperado "
+                "(capacidad x anualizado medio de la base en riesgo), no una corrida con semilla"
+            ),
+            "clientes_disponibles": int(len(en_riesgo)),
+            "clientes": int(min(capacidad, len(en_riesgo))),
+            "exposicion": int(round(capacidad * en_riesgo["anualizado"].mean())),
+            **rendimiento(set(en_riesgo.index)),
+        },
+    ]
+
+    actual = filas[0]
+    for f in filas:
+        f["costo_exposicion"] = f["exposicion"] - actual["exposicion"]
+        f["solapa_con_actual"] = bool(
+            f["compra_7dias_ic"] is not None
+            and actual["compra_7dias_ic"] is not None
+            and f["compra_7dias_ic"][0] <= actual["compra_7dias_ic"][1]
+            and f["compra_7dias_ic"][1] >= actual["compra_7dias_ic"][0]
+        )
+
+    return {
+        "capacidad": int(capacidad),
+        "criterios": filas,
+        "notas": (
+            "Los envios de cada fila son las campanias que ya salieron a ESOS clientes, no un "
+            "experimento: los criterios no se asignaron al azar y las bases se pisan entre si "
+            "(un cliente puede estar en mas de un criterio). La tasa sirve para mostrar que "
+            "ninguna diferencia sobrevive a su intervalo, no para estimar el efecto de cambiar "
+            "de criterio."
+        ),
+    }
+
+
+def potencia_experimento(p0: float, n_por_rama: int, cortes: int,
+                         alpha: float = 0.05, potencia: float = 0.80) -> dict:
+    """Diferencia minima detectable (MDE) entre dos ramas de igual tamano, en puntos
+    porcentuales, para una tasa base `p0`.
+
+    Es la contracara de reportar una tasa con su intervalo: si el experimento no puede
+    distinguir el efecto que se busca, el resultado va a ser "no concluyente" se corra o
+    no. Declararlo ANTES es lo que evita gastar tres cortes para no aprender nada.
+
+    Formula estandar de dos proporciones, dos colas, con la varianza combinada bajo H0 y
+    la separada bajo H1. Se resuelve por biseccion sobre delta porque n(delta) no se
+    invierte en forma cerrada.
+    """
+    n = int(n_por_rama) * int(cortes)
+    z_alpha = NormalDist().inv_cdf(1 - alpha / 2)
+    z_beta = NormalDist().inv_cdf(potencia)
+
+    def n_requerido(delta: float) -> float:
+        p1 = p0 + delta
+        pbar = (p0 + p1) / 2
+        num = (z_alpha * math.sqrt(2 * pbar * (1 - pbar))
+               + z_beta * math.sqrt(p0 * (1 - p0) + p1 * (1 - p1))) ** 2
+        return num / (delta * delta)
+
+    lo, hi = 1e-9, 1.0 - p0
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        if n_requerido(mid) > n:
+            lo = mid
+        else:
+            hi = mid
+
+    return {
+        "p0": float(p0),
+        "n_por_rama_por_corte": int(n_por_rama),
+        "cortes": int(cortes),
+        "n_por_rama": n,
+        "alpha": float(alpha),
+        "potencia": float(potencia),
+        "mde": float(hi),
+        "mde_pp": float(100 * hi),
+        "veces_la_base": float(hi / p0) if p0 else None,
+    }
