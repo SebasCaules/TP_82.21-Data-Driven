@@ -18,6 +18,7 @@
 import { useCallback, useState } from 'react'
 import { Lienzo, CurvaConcentracion } from '../graficos.jsx'
 import { entero, lista, meta, pct, pesos } from '../agregacion.js'
+import { Def } from '../Glosario.jsx'
 
 export default function M0({ info, iCorte, filtro }) {
   const [capLo, capHi] = meta.capacidad_contacto
@@ -80,7 +81,7 @@ export default function M0({ info, iCorte, filtro }) {
     <section className="pant">
       <h1 className="titulo">
         {hay
-          ? `Contactar a ${entero(kBase)} de los ${entero(enRiesgo)} en riesgo cubre el ${pct(cubreBase)} de la exposición, no el ${pct(azarBase)}`
+          ? `Contactar ${entero(kBase)} de ${entero(enRiesgo)} cubre ${pct(cubreBase)} de la exposición, no ${pct(azarBase)}`
           : enRiesgo === 0
             ? 'Sin clientes en riesgo con este recorte'
             : 'El filtro activo no aporta ningún cliente al ranking de exposición'}

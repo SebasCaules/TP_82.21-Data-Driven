@@ -1,66 +1,102 @@
-// M3 — consentimiento de la lista de Marketing. Responde si la lista se puede ejecutar tal
-// cual: dos barras desde cero sobre series.consentimiento, envíos con consentimiento contra
-// envíos sin. Se presenta como incumplimiento reconocido por el negocio, con corrección en
-// marcha (Ley 25.326, ya declarada en la Parte D §6.1). Serie global: no depende del corte
-// ni de los filtros.
+// M3 — consentimiento, abierto por año (dirección 12c). Antes era una sola barra al 100 %
+// con el agregado de los cuatro años. Una cifra acumulada no distingue un incumplimiento
+// que se está corrigiendo de uno estable, y esa es la primera pregunta que hace cualquiera
+// que lo lee. Abierto por año, cada barra va sobre SU propia base de envíos, que cambia
+// fuerte entre años (3.915 en 2023 contra 8.028 en 2024): comparar conteos crudos no diría
+// nada, comparar participaciones sí.
+//
+// Lo que muestra el dibujo NO es lo que la dirección 12c anticipaba. El wireframe titulaba
+// "la corrección ya está en marcha" con una caída de 38,2 % a 22,6 %; los datos reales dan
+// 29,5 / 31,2 / 30,3 / 29,6 %, una amplitud de 1,7 pp en cuatro años. No hay corrección en
+// marcha: hay una tasa estable. El título dice eso, no lo otro. El ancla
+// "amplitud del incumplimiento entre anios (pp)" de build.py lo deja fijo: si algún día la
+// serie se moviera de verdad, el pipeline corta y este texto se reescribe.
+//
+// Orden de los tramos: el cumplidor arranca contra el eje en el azul de énfasis y el
+// bloqueante cierra a la derecha, en terracota con trama. La trama es lo que lo sostiene en
+// blanco y negro, donde el color no existe.
+//
+// Los años van de más reciente a más viejo, con el último arriba y en énfasis: la lectura
+// arranca por el año del corte, no por el más lejano.
+//
+// Serie global, ni corte ni filtros (Ley 25.326, declarada en la Parte D §6.1).
 
-import { Lienzo, BarrasH } from '../graficos.jsx'
+import { Lienzo, BarrasApiladas100 } from '../graficos.jsx'
 import { entero, pct, series } from '../agregacion.js'
+import { Def } from '../Glosario.jsx'
 
 export default function M3() {
   const c = series.consentimiento
-  const conConsentimiento = c.envios_base - c.envios_a_no_acepta
-  const pctSinConsentimiento = 100 * c.pct_envios_a_no_acepta
-  const pctConConsentimiento = 100 - pctSinConsentimiento
+  const anios = series.consentimiento_anual
+  const pctAgregado = 100 * c.pct_envios_a_no_acepta
   const pctAlcance = 100 * c.pct_alcance
 
-  const datos = [
-    {
-      etiqueta: 'Con consentimiento',
-      valor: conConsentimiento,
-      nota: `${pct(pctConConsentimiento)} del total`,
-      enfasis: false,
-    },
-    {
-      etiqueta: 'Sin consentimiento',
-      valor: c.envios_a_no_acepta,
-      nota: `${pct(pctSinConsentimiento)} del total`,
-      excepcion: true,
-    },
+  const pcts = anios.map((a) => 100 * a.pct_sin_consentimiento)
+  const minimo = Math.min(...pcts)
+  const maximo = Math.max(...pcts)
+
+  const reciente = anios[anios.length - 1]
+  const filas = [...anios].reverse().map((a) => {
+    const con = a.envios - a.sin_consentimiento
+    const pctSin = 100 * a.pct_sin_consentimiento
+    return {
+      etiqueta: String(a.anio),
+      sub: `${entero(a.envios)} envíos`,
+      enfasis: a === reciente,
+      segmentos: [
+        {
+          clave: 'Con consentimiento', valor: con, tono: 'var(--acc)', tinta: '#fff',
+          enfasis: true,
+          texto: `${entero(con)} · ${pct(100 - pctSin)}`,
+        },
+        {
+          clave: 'Sin consentimiento', valor: a.sin_consentimiento, tono: 'trama-exc',
+          tinta: '#fff', excepcion: true,
+          texto: `${entero(a.sin_consentimiento)} · ${pct(pctSin)}`,
+        },
+      ],
+    }
+  })
+
+  const leyenda = [
+    { etiqueta: 'con consentimiento', tono: 'var(--acc)', enfasis: true },
+    { etiqueta: 'sin consentimiento · bloqueante', tono: 'trama-exc' },
   ]
 
   return (
     <section className="pant">
       <h1 className="titulo">
-        Tres de cada diez envíos van a clientes que no dieron consentimiento
+        El incumplimiento va de {pct(minimo)} a {pct(maximo)} en cuatro años: no baja
       </h1>
 
-      {/* Una sola bajada, no tres: el titulo ya da el dato de sin-consentimiento (y el
-          grafico lo repite con nota por barra), asi que acá van solo los dos datos que no
-          estan en ningun otro lado. Tres <p className="bajada"> con su alto fijo de dos
-          lineas cada uno era el grueso del hueco blanco de esta pantalla. */}
-      {/* CIF-09: la bajada vieja decia "quedan fuera de esta cuenta" y se podia leer como
-          que los 46 huerfanos quedan afuera del grafico entero. No es asi: conConsentimiento
-          = envios_base - envios_a_no_acepta los deja adentro de la barra "Con consentimiento"
-          porque no hay maestro contra el cual clasificarlos. Se declara sin tocar los datos. */}
+      {/* CIF-09: los 46 huérfanos no quedan afuera del gráfico. Sin maestro contra el cual
+          clasificarlos cuentan en el denominador del año y no en el numerador, igual que en
+          la serie agregada. Se declara sin tocar los datos. */}
       <p className="bajada">
-        Esa lista alcanza al <b>{pct(pctAlcance)}</b> de los {entero(c.clientes_no_acepta_total)}{' '}
-        clientes que no consintieron. {entero(c.envios_huerfanos)} envíos van a ids ausentes
-        del maestro: no entran en esta cuenta, pero la barra sí los cuenta.
+        El {pct(pctAgregado)} agregado no esconde ninguna corrección en marcha.
+        {' '}{entero(c.envios_a_no_acepta)} de {entero(c.envios_base)} envíos salen{' '}
+        <Def id="consentimiento">sin consentimiento</Def> y alcanzan al <b>{pct(pctAlcance)}</b>{' '}
+        de los {entero(c.clientes_no_acepta_total)} clientes que no consintieron.
       </p>
 
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => (
-            <BarrasH
-              datos={datos} w={w} h={h}
-              formato={entero}
-              tituloEje="Envíos de la campaña, por consentimiento del cliente"
-              anchoEtiqueta={168}
+            <BarrasApiladas100
+              filas={filas} leyenda={leyenda} w={w} h={h}
+              anchoEtiqueta={132}
+              alturaBarra={110}
+              tituloEje="Composición de los envíos del año"
             />
           )}
         </Lienzo>
       </div>
+
+      <p className="z-nota">
+        La meta es cero, no una tendencia: {pct(minimo)} sigue siendo incumplimiento.
+        Los {entero(c.envios_huerfanos)} envíos a ids ausentes del maestro cuentan en la base
+        de su año y no en el tramo bloqueante: no se pueden clasificar.
+      </p>
     </section>
   )
 }

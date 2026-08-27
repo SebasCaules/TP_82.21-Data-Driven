@@ -20,6 +20,7 @@
 
 import Semaforo, { estadoRecompra } from '../Semaforo.jsx'
 import { Lienzo, Chispa, BarraMini } from '../graficos.jsx'
+import { Def } from '../Glosario.jsx'
 import {
   entero, lista, meta, mesCorte, pesos, pct, series,
 } from '../agregacion.js'
@@ -64,12 +65,12 @@ export default function D7({ info, iCorte, filtro }) {
           <Articulo
             n="01"
             rotulo="Indicador de directorio"
-            decision="La recompra a 90 días pasa a ser el número del directorio."
+            decision={<>La <Def id="recompra-90">recompra a 90 días</Def> pasa a ser el número del directorio.</>}
             cifra={valorRecompra != null ? pct(valorRecompra) : '—'}
             pieCifra={`meta ${metaLo} a ${metaHi} %`}
             marca={valorRecompra != null && (
               <Semaforo estado={estadoRecompra(valorRecompra, meta.meta_recompra)}
-                        de="recompra a 90 días" />
+                        de="recompra a 90 días" glosario="recompra-90" />
             )}
             apoyo="Dueña: María G. Cadencia mensual."
             prueba={<Lienzo>{({ w, h }) => (
@@ -83,7 +84,7 @@ export default function D7({ info, iCorte, filtro }) {
           <Articulo
             n="02"
             rotulo="Orden de la lista"
-            decision="La lista se ordena por exposición, no por segmento."
+            decision={<>La lista se ordena por <Def id="criterio-orden">exposición</Def>, no por segmento.</>}
             cifra={vacio ? '—' : pct(pctTop)}
             pieCifra={vacio ? 'no hay clientes con este recorte' : `de los ${pesos(info.exposicion)} en riesgo`}
             apoyo={vacio
@@ -100,7 +101,7 @@ export default function D7({ info, iCorte, filtro }) {
           <Articulo
             n="03"
             rotulo="Filtro de consentimiento"
-            decision="Cada envío se filtra por consentimiento antes de salir."
+            decision={<>Cada envío se filtra por <Def id="consentimiento">consentimiento</Def> antes de salir.</>}
             cifra={pct(cs.pct_envios_a_no_acepta * 100)}
             pieCifra={`${entero(cs.envios_a_no_acepta)} de ${entero(cs.envios_base)} envíos hoy`}
             apoyo={vacio

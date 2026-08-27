@@ -1,101 +1,95 @@
-// D5b — exposicion por categoria. Barras horizontales en pesos (regla 6), ordenadas de
-// mayor a menor exposicion (regla 11), con la tasa de riesgo como nota junto a cada barra
-// (regla 14) y un solo color de enfasis (regla 18): la categoria que el titulo defiende.
-// Marcar los dos extremos con el mismo acento le daba dos significados opuestos al color
-// dentro del mismo grafico, que es lo que prohibe la regla 19. La bajada calcula la
-// amplitud en pp en cada render: nada viene hardcodeado.
+// D5b — categoría, gemelo exacto de D5a: dos composiciones al 100 % alineadas, clientes
+// contra exposición, con los cortes conectados. El par se lee comparando formas entre
+// pantallas, y por eso los dos usan el mismo formato y la misma escala fija (0-100 %), que
+// además vuelve al gráfico inmune al filtro: nada acá se puede inflar recortando la base.
+//
+// Acá los conectores no son verticales como en región: todos los cortes se corren hacia la
+// derecha porque Muebles se lleva más exposición que clientes y cada categoría chica pierde
+// participación al pasar de personas a pesos. Esa es la lectura que la barra de pesos sola
+// no daba. La tasa de riesgo, que era la nota al costado, baja a la bajada.
 
-import { Lienzo, BarrasH } from '../graficos.jsx'
-import { dims, millones, pct, pesos, porDimension, topeExposicionPar } from '../agregacion.js'
+import { Lienzo, BarrasApiladas100, rampa } from '../graficos.jsx'
+import { Def } from '../Glosario.jsx'
+import { dims, entero, pct, pesos, porDimension } from '../agregacion.js'
 
 export default function D5b({ iCorte, filtro, verEnLista }) {
   const cat = porDimension(iCorte, 'categoria', filtro)
-  const filas = cat.map((c, i) => ({
+  const filas0 = cat.map((c, i) => ({
     etiqueta: dims.categoria[i],
-    valor: c.ar,
-    tasa: c.n ? (100 * c.nr) / c.n : 0,
+    ar: c.ar,
     n: c.n,
-    nr: c.nr,
+    tasa: c.n ? (100 * c.nr) / c.n : 0,
     _i: i,
   }))
 
-  const porTasa = [...filas].filter((f) => f.n > 0).sort((a, b) => b.tasa - a.tasa)
+  const porTasa = filas0.filter((f) => f.n > 0).sort((a, b) => b.tasa - a.tasa)
   const alta = porTasa[0]
   const baja = porTasa[porTasa.length - 1]
   const amplitud = alta && baja ? (alta.tasa - baja.tasa).toFixed(1).replace('.', ',') : null
-  // Con un filtro que deja las categorias empatadas en tasa, "0,0" no puede ir bajo un
-  // titulo que afirma "si mueve la aguja": pasa a decir el empate en vez de una amplitud
-  // que ese caso vuelve falsa.
-  const empate = amplitud === '0,0'
-  // Un filtro puede dejar una sola categoria con clientes: ahi alta y baja son el mismo
-  // objeto y "X y X empatan" repite el nombre sin sentido. Se distingue de un empate real
-  // entre dos categorias distintas.
   const unaSola = porTasa.length === 1
 
-  const porExposicion = [...filas].sort((a, b) => b.valor - a.valor)
+  const totalN = filas0.reduce((s, f) => s + f.n, 0)
+  const totalAr = filas0.reduce((s, f) => s + f.ar, 0)
 
-  // Tasa de riesgo general de las 7 categorias: mismo denominador que la nota de cada
-  // barra, para que el encabezado de la columna y las notas midan lo mismo.
-  const totCat = filas.reduce((s, f) => ({ n: s.n + f.n, nr: s.nr + f.nr }), { n: 0, nr: 0 })
-  const tasaGeneral = totCat.n ? (100 * totCat.nr) / totCat.n : null
-
-  const datos = porExposicion.map((f) => ({
+  const orden = [...filas0].sort((a, b) => b.ar - a.ar)
+  const partes = orden.map((f, k) => ({
     etiqueta: f.etiqueta,
-    valor: f.valor,
-    nota: `${pct(f.tasa)} en riesgo`,
-    // Solo la de mayor tasa: es la que el titulo nombra como "la que mueve la aguja".
-    // La del extremo bajo se identifica por su etiqueta y su nota, no por el color.
-    enfasis: !!alta && f.etiqueta === alta.etiqueta,
-    _i: f._i,
+    idx: f._i,
+    n: f.n,
+    ar: f.ar,
+    pClientes: totalN ? (100 * f.n) / totalN : 0,
+    pExposicion: totalAr ? (100 * f.ar) / totalAr : 0,
+    ...rampa(k),
   }))
+
+  const segmento = (p, valor, share) => ({
+    clave: p.etiqueta, valor, tono: p.tono, tinta: p.tinta, idx: p.idx,
+    enfasis: p === partes[0], texto: `${p.etiqueta} ${pct(share)}`,
+  })
+
+  const filas = [
+    {
+      etiqueta: 'Clientes', sub: `base ${entero(totalN)}`,
+      segmentos: partes.map((p) => segmento(p, p.n, p.pClientes)),
+    },
+    {
+      etiqueta: 'Exposición', sub: `base ${pesos(totalAr)}`,
+      segmentos: partes.map((p) => segmento(p, p.ar, p.pExposicion)),
+    },
+  ]
+
+  const top = partes[0]
+  // "Todas las demás pierden participación" es una afirmación sobre el dibujo entero, no
+  // sobre la primera barra: con otro filtro puede ser falsa, así que se chequea antes de
+  // escribirla.
+  const restoBaja = partes.length > 1 && partes.slice(1).every((p) => p.pExposicion < p.pClientes)
 
   return (
     <section className="pant">
       <h1 className="titulo">
-        {alta && baja
-          ? (unaSola
-              ? `Este filtro deja una sola categoría: ${alta.etiqueta}, ${pct(alta.tasa)} en riesgo`
-              : empate
-                ? `La categoría no separa con este filtro: ${alta.etiqueta} y ${baja.etiqueta} empatan en ${pct(alta.tasa)}`
-                : `La categoría sí mueve la aguja: ${amplitud} puntos entre ${alta.etiqueta} y ${baja.etiqueta}`)
-          : 'La categoría sí mueve la aguja'}
+        {!top || !totalAr
+          ? 'Sin exposición asignable a una categoría'
+          : `${top.etiqueta} ocupa ${pct(top.pExposicion)} de la exposición con ${pct(top.pClientes)} de los clientes`}
       </h1>
       <p className="bajada">
-        {alta && baja && (
-          unaSola
-            ? <>No queda otra categoría con clientes para comparar en este filtro.</>
-            : <>{alta.etiqueta} {pct(alta.tasa)} contra {baja.etiqueta} {pct(baja.tasa)}, {amplitud} puntos
-              de diferencia.</>
-        )}
+        {alta && baja && !unaSola
+          ? <>La tasa de <Def id="en-riesgo">riesgo</Def> va de {pct(alta.tasa)} en{' '}
+              {alta.etiqueta} a {pct(baja.tasa)} en {baja.etiqueta}, {amplitud} puntos.{restoBaja ? ' Todas las demás categorías pierden participación al pasar de clientes a pesos.' : ''}</>
+          : 'Este filtro deja una sola categoría con clientes: no hay con qué comparar la tasa de riesgo.'}
       </p>
       <div className="lienzo">
         <Lienzo>
-          {({ w, h }) => {
-            const anchoEtiqueta = 118  // cubre "Cocina y mesa" / "Organizacion", la más larga de las 7
-            return (
-              <div style={{ position: 'relative', width: w, height: h }}>
-                <BarrasH
-                  datos={datos} w={w} h={h}
-                  formato={(v) => pesos(v)} formatoEje={(v) => millones(v, 0)}
-                  tituloEje="Exposición anual, por categoría (ARS)"
-                  tope={topeExposicionPar(iCorte, filtro)}
-                  anchoEtiqueta={anchoEtiqueta}
-                  onBarra={verEnLista ? (i, d) => verEnLista('categoria', d._i) : undefined}
-                />
-                {/* Encabezado de la columna de notas: sin esto el porcentaje se lee como
-                    participacion en pesos, que es justo lo que no es. Mismo patron que
-                    D3Segmentos. */}
-                {tasaGeneral != null && (
-                  <svg width={w} height={h} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                    <text x={w} y={11} fontSize="10" fill="var(--mut)" letterSpacing=".07em"
-                          textAnchor="end" style={{ textTransform: 'uppercase' }}>
-                      tasa de riesgo · general {pct(tasaGeneral)}
-                    </text>
-                  </svg>
-                )}
-              </div>
-            )
-          }}
+          {({ w, h }) => (
+            <BarrasApiladas100
+              filas={filas} w={w} h={h}
+              anchoEtiqueta={106}
+              conectores
+              tituloEje="Participación de cada categoría en el total"
+              rotuloResto="Tramos sin lugar para el rótulo (clientes → exposición):"
+              textoResto={(it) => `${it.clave} ${pct(it.pcts[0])} → ${pct(it.pcts[1])}`}
+              onSegmento={verEnLista ? (s) => verEnLista('categoria', s.idx) : undefined}
+            />
+          )}
         </Lienzo>
       </div>
     </section>

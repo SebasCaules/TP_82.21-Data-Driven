@@ -1,13 +1,18 @@
-// D2 — riesgo por quintil de valor. La barra sigue el denominador que fija la Parte D
-// (riesgo sobre el total del quintil, nr/n): eso no se toca. Lo que corrige el comité
-// es la lectura: el salto Q1→Q2 es de composición (Q1 está compuesto en su mayoría por
-// clientes sin historial suficiente para calificar como riesgo), no un efecto de valor.
+// D2 — riesgo por quintil de valor, en composición al 100 %. La barra sigue el denominador
+// que fija la Parte D (riesgo sobre el total del quintil, nr/n): ese bloque arranca en cero
+// y es el mismo largo que dibujaba la barra simple, no se toca. Lo que agrega el formato es
+// la CAUSA del salto Q1→Q2: la cuña de no elegibles (menos de 3 compras, por definición
+// fuera del cálculo de riesgo) se derrite de Q1 a Q5 y se ve por qué Q1 marca 13,3 %.
+//
+// La tasa entre elegibles (nr/ne) no está dibujada: es una razón entre dos bloques que el
+// ojo no calcula. Va como nota de cada fila, con su encabezado, igual que en D3.
 
-import { Lienzo, BarrasH } from '../graficos.jsx'
+import { Lienzo, BarrasApiladas100 } from '../graficos.jsx'
 import Semaforo, { estadoInverso } from '../Semaforo.jsx'
 import { entero, meta, pct, porDimension } from '../agregacion.js'
+import { Def } from '../Glosario.jsx'
 
-const ANCHO_ETIQUETA = 54
+const ANCHO_ETIQUETA = 78
 
 export default function D2({ iCorte, filtro, info, verEnLista }) {
   const q = porDimension(iCorte, 'quintil', filtro)
@@ -18,11 +23,27 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
   const totalGeneral = q.reduce((s, c) => ({ n: s.n + c.n, nr: s.nr + c.nr }), { n: 0, nr: 0 })
   const promedio = totalGeneral.n ? (100 * totalGeneral.nr) / totalGeneral.n : 0
 
-  const datos = q.map((c, i) => ({
+  const tasa = (c) => (c.n ? (100 * c.nr) / c.n : 0)
+  const filas = q.map((c, i) => ({
     etiqueta: `Q${i + 1}`,
-    valor: c.n ? (100 * c.nr) / c.n : 0,
-    nota: `${entero(c.nr)} de ${entero(c.ne)} elegibles`,
+    sub: i === 0 ? 'menor valor' : i === 4 ? 'mayor valor' : null,
+    nota: c.ne ? pct((100 * c.nr) / c.ne) : '—',
     enfasis: i === 4,
+    segmentos: [
+      {
+        clave: 'En riesgo', valor: c.nr, tono: 'var(--acc)', tinta: '#fff', enfasis: true,
+        // Con un filtro que deja la tasa en un dígito, el bloque de acento se angosta y su
+        // cifra —que es el KPI de la pantalla— no entra adentro: sale sobre plaqueta, nunca
+        // se cae del dibujo.
+        plaqueta: true,
+        texto: c.n ? pct(tasa(c)) : null,
+      },
+      { clave: 'Elegible sin riesgo', valor: Math.max(0, c.ne - c.nr), tono: 'var(--gris)' },
+      {
+        clave: 'No elegible', valor: Math.max(0, c.n - c.ne), tono: 'trama',
+        texto: c.n ? pct((100 * (c.n - c.ne)) / c.n) : null,
+      },
+    ],
   }))
 
   // Tasa entre clientes comparables: sobre elegibles (nr/ne), no sobre el total del quintil.
@@ -46,60 +67,57 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
   const BASE_MINIMA_GRADIENTE = 30
   const baseFlaca = !sinBaseQ1 && (q[0].ne < BASE_MINIMA_GRADIENTE || q[4].ne < BASE_MINIMA_GRADIENTE)
 
+  // El título es lo que el gráfico dibuja: el salto entre extremos y la cuña que lo explica.
+  const titulo = sinBaseQ1
+    ? `Q1 se queda sin base en este recorte: Q5 marca ${pct(tasa(q[4]))}`
+    : `El salto de ${pct(tasa(q[0]))} a ${pct(tasa(q[4]))} es composición: ${pct(sinHistoriaQ1)} de Q1 no califica`
+
   let bajada
   if (sinBaseQ1) {
     bajada = 'Con este filtro Q1 no tiene clientes con historia suficiente: el gradiente entre elegibles se lee sobre los quintiles con base.'
   } else if (baseFlaca) {
-    bajada = `El salto Q1→Q2 es de composición: ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras, no califica como riesgo. La base de elegibles es chica en este recorte (Q1: ${entero(q[0].ne)}, Q5: ${entero(q[4].ne)}): la tasa entre elegibles no alcanza para comparar.`
+    bajada = `La base de elegibles es chica en este recorte (Q1: ${entero(q[0].ne)}, Q5: ${entero(q[4].ne)}): la tasa entre elegibles no alcanza para comparar. El bloque de acento sigue siendo nr/n, el denominador del KPI.`
   } else if (sube) {
     // ratio puede quedar en null con gradQ1 en 0 (hay elegibles pero ninguno en riesgo):
     // ahí no hay "veces" que declarar, y el guard evita imprimir "null" en pantalla.
-    bajada = `El salto Q1→Q2 es de composición: ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras, no califica como riesgo. Entre elegibles el gradiente real va de ${pct(gradQ1)} a ${pct(gradQ5)}${ratio != null ? `, ${ratio}×` : ''}.`
+    bajada = `Entre elegibles el gradiente real va de ${pct(gradQ1)} a ${pct(gradQ5)}${ratio != null ? `, ${ratio}×` : ''}: menos de la mitad del salto que muestra el total. El bloque de acento es nr/n, el denominador del KPI.`
   } else {
-    // gradQ5 < gradQ1: no llamarlo "gradiente" ni prometer una subida que en este
-    // estado no se da, para no chocar con el título de la pantalla.
-    bajada = `El salto Q1→Q2 es de composición: ${pct(sinHistoriaQ1)} de Q1 tiene menos de 3 compras, no califica como riesgo. Entre elegibles, Q1 y Q5 van de ${pct(gradQ1)} a ${pct(gradQ5)}.`
+    // gradQ5 < gradQ1: no prometer una subida que en este estado no se da.
+    bajada = `Entre elegibles, Q1 y Q5 van de ${pct(gradQ1)} a ${pct(gradQ5)}. El bloque de acento es nr/n, el denominador del KPI.`
   }
 
   return (
     <section className="pant">
-      <h1 className="titulo">
-        El riesgo sube con el valor, pero menos de lo que sugiere el total
-      </h1>
+      <h1 className="titulo">{titulo}</h1>
       <p className="bajada">{bajada}</p>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span className="kpi-lbl" style={{ display: 'inline' }}>Riesgo en Q5</span>
-        <b className="tabular" style={{ fontSize: 15 }}>{pct(datos[4].valor)}</b>
-        <Semaforo estado={estadoInverso(datos[4].valor, meta.umbral_q5)} de="riesgo en Q5" />
+        <span className="kpi-lbl" style={{ display: 'inline' }}>
+          <Def id="umbral-q5">Riesgo en Q5</Def>
+        </span>
+        <b className="tabular" style={{ fontSize: 15 }}>{pct(tasa(q[4]))}</b>
+        <Semaforo estado={estadoInverso(tasa(q[4]), meta.umbral_q5)} de="riesgo en Q5"
+                  glosario="umbral-q5" />
       </div>
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => (
-            <div style={{ position: 'relative', width: w, height: h }}>
-              <BarrasH
-                datos={datos} w={w} h={h}
-                formato={(v) => pct(v)} formatoEje={(v) => pct(v, 0)}
-                tituloEje="% en riesgo sobre el total del quintil"
-                anchoEtiqueta={ANCHO_ETIQUETA}
-                referencia={{ valor: promedio, etiqueta: `general ${pct(promedio)}` }}
-                onBarra={verEnLista ? (i) => verEnLista('quintil', i) : undefined}
-              />
-              {/* Cabecera de la columna de notas, mismo recurso que D3: la nota es nr/ne
-                  (otro denominador que el de la barra, que es nr/n) y sin rótulo se lee
-                  como si fuera la fracción que dibuja la barra. */}
-              <svg width={w} height={h} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                <text x={w} y={11} fontSize="10" fill="var(--mut)" letterSpacing=".07em"
-                      textAnchor="end" style={{ textTransform: 'uppercase' }}>
-                  riesgo entre elegibles
-                </text>
-              </svg>
-            </div>
+            <BarrasApiladas100
+              filas={filas} w={w} h={h}
+              anchoEtiqueta={ANCHO_ETIQUETA}
+              tituloEje="Composición del quintil (% sobre sus clientes)"
+              encabezadoNota="riesgo entre elegibles"
+              leyenda={[
+                { etiqueta: 'En riesgo (nr/n, desde cero)', tono: 'var(--acc)', enfasis: true },
+                { etiqueta: 'Elegible sin riesgo', tono: 'var(--gris)' },
+                { etiqueta: 'No elegible (menos de 3 compras)', tono: 'trama' },
+              ]}
+              referencia={{ valor: promedio, etiqueta: `general ${pct(promedio)}` }}
+              onFila={verEnLista ? (i) => verEnLista('quintil', i) : undefined}
+            />
           )}
         </Lienzo>
       </div>
     </section>
   )
 }
-
-

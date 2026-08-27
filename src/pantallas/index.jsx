@@ -46,9 +46,10 @@ export const PANTALLAS = [
     pregunta: '¿Cuánta facturación anual está hoy en riesgo y qué parte de la base la explica?',
   },
   {
-    id: 'D1', grupo: 'diagnostico', audiencia: 'directorio', depende: 'todo', Componente: D1,
-    corto: 'Exposición vs. base',
-    pregunta: '¿De qué tamaño es el problema contra el total?',
+    id: 'D1', grupo: 'diagnostico', audiencia: 'directorio', depende: 'corte', Componente: D1,
+    corto: 'Desde cuándo',
+    pregunta: '¿El problema es de este año o viene de antes?',
+    pie: 'Cohorte fija: los clientes en riesgo al corte, mirados hacia atrás. La serie va por corte y no por celda, así que los filtros no la recortan',
   },
   {
     id: 'D2', eje: 'quintil', grupo: 'diagnostico', audiencia: 'directorio', depende: 'todo', Componente: D2,
@@ -82,8 +83,8 @@ export const PANTALLAS = [
   {
     id: 'D6', grupo: 'diagnostico', audiencia: 'directorio', depende: 'ninguno', Componente: D6, predictivo: true,
     corto: 'Contra el criterio',
-    pregunta: '¿La lista priorizada rinde más que el criterio actual?',
-    pie: 'Base de campañas: 23.729 envíos del dataset',
+    pregunta: '¿Conviene cambiar el criterio con el que se arma la lista?',
+    pie: 'Base de campañas: 23.729 envíos del dataset. Los criterios no se asignaron al azar y sus bases se pisan',
   },
   {
     id: 'M0', grupo: 'operacion', audiencia: 'marketing', depende: 'todo', Componente: M0,
@@ -98,8 +99,8 @@ export const PANTALLAS = [
   {
     id: 'M1', grupo: 'operacion', audiencia: 'marketing', depende: 'todo', Componente: M1,
     corto: 'La lista',
-    pregunta: '¿A quiénes contacto esta semana?',
-    pie: 'Solo código de cliente: sin nombre ni mail',
+    pregunta: '¿Cómo se reparte la lista entre las semanas de contacto?',
+    pie: 'Las filas cliente por cliente bajan por CSV. Solo código de cliente: sin nombre ni mail',
   },
   {
     id: 'M2a', grupo: 'operacion', audiencia: 'marketing', depende: 'ninguno', Componente: M2a,
@@ -109,9 +110,9 @@ export const PANTALLAS = [
   },
   {
     id: 'M2b', grupo: 'operacion', audiencia: 'marketing', depende: 'ninguno', Componente: M2b,
-    corto: 'Por segmento',
-    pregunta: '¿Algún segmento discrimina?',
-    pie: 'Base de campañas: 23.729 envíos del dataset',
+    corto: 'El experimento',
+    pregunta: '¿Con qué comparación se mide la próxima campaña?',
+    pie: 'Tasas de campaña globales. Las ramas se arman sobre la capacidad declarada del corte de referencia, no sobre el corte activo',
   },
   {
     id: 'D7', grupo: 'decision', audiencia: 'ambas', depende: 'todo', Componente: D7,

@@ -1,16 +1,17 @@
-// D5a — región. Barras horizontales en pesos: la pregunta es dónde se concentra la
-// exposición, no qué tan alta es la tasa de riesgo (esa va de nota al lado de cada barra).
+// D5a — región, en dos composiciones al 100 % alineadas: cómo se reparten los CLIENTES y
+// cómo se reparte la EXPOSICIÓN, con los cortes conectados. La pregunta del par region/
+// categoría es de concentración, y una concentración sin su referencia no se puede juzgar:
+// "AMBA concentra el 43,2 %" pesa distinto sabiendo que AMBA es el 41,1 % de la base.
+// La inclinación del conector ES la diferencia entre las dos composiciones.
 //
-// El título dice lo que el gráfico DIBUJA. Antes afirmaba que la geografía no explica el
-// riesgo (una propiedad de la tasa) sobre un gráfico de exposición, y ninguna barra llevaba
-// énfasis: el lector no sabía dónde mirar y el dibujo no sostenía la frase. Ahora el título
-// es la concentración —que es lo que las barras muestran y lo que se puede accionar— con la
-// barra más alta destacada, y la planitud de la tasa baja a la bajada, que es su lugar.
-// "Solo online" no tiene región asignable: va aparte, bajo línea divisoria, para que su
-// tasa no infle el rango visible de las 5 regiones reales y desmienta el título.
+// Lo que se pierde respecto de la barra de pesos es la tasa de riesgo y el monto absoluto:
+// la tasa baja a la bajada (que es donde vivía su planitud) y las dos bases van escritas al
+// lado de cada barra. "Solo online" no tiene región asignable: queda fuera de las dos bases
+// y se declara aparte, bajo línea divisoria.
 
-import { Lienzo, BarrasH } from '../graficos.jsx'
-import { entero, millones, pesos, pct, porDimension, topeExposicionPar, dims } from '../agregacion.js'
+import { Lienzo, BarrasApiladas100, rampa } from '../graficos.jsx'
+import { Def } from '../Glosario.jsx'
+import { entero, pesos, pct, porDimension, dims } from '../agregacion.js'
 
 export default function D5a({ iCorte, filtro, verEnLista }) {
   const r = porDimension(iCorte, 'region', filtro)
@@ -18,7 +19,7 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
 
   const reales = r.map((c, i) => ({ c, i })).filter(({ i }) => i !== onlineIdx)
   // Amplitud solo sobre regiones con clientes: una región en n=0 no tiene tasa de
-  // riesgo (0 % sería falso, no hay base), y su nota ya se muestra como "—".
+  // riesgo (0 % sería falso, no hay base).
   const conClientes = reales.filter(({ c }) => c.n > 0)
   const tasas = conClientes.map(({ c }) => Math.round((1000 * c.nr) / c.n) / 10)
   const hayTasas = tasas.length > 0
@@ -26,79 +27,85 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
   const maxT = hayTasas ? Math.max(...tasas) : null
   const amplitudTxt = hayTasas ? (maxT - minT).toFixed(1).replace('.', ',') : null
 
-  // Total del universo de las 5 regiones (excluye Solo online): mismo denominador que la
-  // nota de cada barra, para que el encabezado de la columna y las notas midan lo mismo y
-  // no se confunda con el porcentaje del titulo (que es participacion en pesos, otra cosa).
-  const totalesReg = reales.reduce((s, { c }) => ({ n: s.n + c.n, nr: s.nr + c.nr }), { n: 0, nr: 0 })
-  const tasaGeneral = totalesReg.n ? (100 * totalesReg.nr) / totalesReg.n : null
+  const totalN = reales.reduce((s, { c }) => s + c.n, 0)
+  const totalAr = reales.reduce((s, { c }) => s + c.ar, 0)
 
-  const datos = reales
-    .slice()
-    .sort((a, b) => b.c.ar - a.c.ar)
-    .map(({ c, i }) => ({
-      etiqueta: dims.region[i],
-      valor: c.ar,
-      nota: c.n ? `${pct((100 * c.nr) / c.n)} en riesgo` : '—',
-      idxOriginal: i,
-    }))
-    .map((d, k) => ({ ...d, enfasis: k === 0 }))
+  // Un solo orden para las dos barras: si cada una se ordenara por lo suyo, el conector
+  // dejaría de medir la diferencia y pasaría a medir el reordenamiento.
+  const orden = [...reales].sort((a, b) => b.c.ar - a.c.ar)
+  const partes = orden.map(({ c, i }, k) => ({
+    etiqueta: dims.region[i],
+    idx: i,
+    n: c.n,
+    ar: c.ar,
+    pClientes: totalN ? (100 * c.n) / totalN : 0,
+    pExposicion: totalAr ? (100 * c.ar) / totalAr : 0,
+    ...rampa(k),
+  }))
 
-  const totalReal = datos.reduce((s, d) => s + d.valor, 0)
-  const top = datos[0]
-  const pesoTop = top && totalReal ? (100 * top.valor) / totalReal : null
+  const segmento = (p, valor, share) => ({
+    clave: p.etiqueta, valor, tono: p.tono, tinta: p.tinta, idx: p.idx,
+    enfasis: p === partes[0], texto: `${p.etiqueta} ${pct(share)}`,
+  })
 
-  const online = r[onlineIdx]
-  const onlineTasaTxt = online.n ? `${pct((100 * online.nr) / online.n)} en riesgo` : 'sin clientes en riesgo calculable'
+  const filas = [
+    {
+      etiqueta: 'Clientes', sub: `base ${entero(totalN)}`,
+      segmentos: partes.map((p) => segmento(p, p.n, p.pClientes)),
+    },
+    {
+      etiqueta: 'Exposición', sub: `base ${pesos(totalAr)}`,
+      segmentos: partes.map((p) => segmento(p, p.ar, p.pExposicion)),
+    },
+  ]
 
-  const anchoEtiqueta = 92
+  const top = partes[0]
+  // El corte que más se mueve: es lo que el conector dibuja, y sin la cifra el lector
+  // tiene que estimar una inclinación.
+  const mayorDesvio = partes.reduce(
+    (m, p) => (Math.abs(p.pExposicion - p.pClientes) > Math.abs(m.pExposicion - m.pClientes) ? p : m),
+    partes[0]
+  )
+  const desvio = mayorDesvio ? Math.abs(mayorDesvio.pExposicion - mayorDesvio.pClientes) : 0
+  const parejo = desvio < 3
 
   return (
     <section className="pant">
       <h1 className="titulo">
-        {pesoTop != null
-          ? `${top.etiqueta} concentra el ${pct(pesoTop)} de la exposición de las regiones`
-          : 'Sin exposición asignable a una región'}
+        {!top || !totalAr
+          ? 'Sin exposición asignable a una región'
+          : parejo
+            ? `${top.etiqueta} es ${pct(top.pClientes)} de la base y ${pct(top.pExposicion)} de lo expuesto: se reparte parejo`
+            : `${top.etiqueta} concentra ${pct(top.pExposicion)} de la exposición con ${pct(top.pClientes)} de los clientes`}
       </h1>
       <p className="bajada">
         {hayTasas
-          ? <>La tasa de riesgo casi no cambia entre regiones: va de {pct(minT)} a {pct(maxT)},{' '}
-              {amplitudTxt} puntos. Lo que separa a las regiones es el tamaño, no el riesgo.</>
+          ? <>La tasa de <Def id="en-riesgo">riesgo</Def> casi no cambia entre regiones: va
+              de {pct(minT)} a {pct(maxT)}, {amplitudTxt} puntos. El corte que más se mueve
+              entre las dos barras es {mayorDesvio.etiqueta}:{' '}
+              {desvio.toFixed(1).replace('.', ',')} puntos.</>
           : 'Ninguna región tiene clientes en la base filtrada.'}
       </p>
 
       <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(6px, 1vh, 14px)' }}>
         <Lienzo>
-          {({ w, h }) => {
-            return (
-              <div style={{ position: 'relative', width: w, height: h }}>
-                <BarrasH
-                  datos={datos} w={w} h={h}
-                  formato={pesos} formatoEje={(v) => millones(v, 0)}
-                  tituloEje="Exposición anual, por región (ARS)"
-                  tope={topeExposicionPar(iCorte, filtro)}
-                  anchoEtiqueta={anchoEtiqueta}
-                  onBarra={verEnLista ? (i, d) => verEnLista('region', d.idxOriginal) : undefined}
-                />
-                {/* Encabezado de la columna de notas: sin esto "X % en riesgo" no declara su
-                    base y en el corte por defecto coincide en redondeo con el porcentaje del
-                    titulo, que mide otra cosa (participacion en pesos). Mismo patron que
-                    D3Segmentos. */}
-                {tasaGeneral != null && (
-                  <svg width={w} height={h} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                    <text x={w} y={11} fontSize="10" fill="var(--mut)" letterSpacing=".07em"
-                          textAnchor="end" style={{ textTransform: 'uppercase' }}>
-                      tasa de riesgo · general {pct(tasaGeneral)}
-                    </text>
-                  </svg>
-                )}
-              </div>
-            )
-          }}
+          {({ w, h }) => (
+            <BarrasApiladas100
+              filas={filas} w={w} h={h}
+              anchoEtiqueta={106}
+              conectores
+              tituloEje="Participación de cada región en el total"
+              rotuloResto="Tramos sin lugar para el rótulo (clientes → exposición):"
+              textoResto={(it) => `${it.clave} ${pct(it.pcts[0])} → ${pct(it.pcts[1])}`}
+              onSegmento={verEnLista ? (s) => verEnLista('region', s.idx) : undefined}
+            />
+          )}
         </Lienzo>
         <div className="tarjeta" style={{ flex: '0 0 auto' }}>
           <div className="kpi-lbl">Solo online</div>
           <div className="kpi-sub">
-            sin región asignable · {entero(online.n)} {online.n === 1 ? 'cliente' : 'clientes'} · {onlineTasaTxt}
+            sin región asignable, fuera de las dos bases · {entero(r[onlineIdx].n)}{' '}
+            {r[onlineIdx].n === 1 ? 'cliente' : 'clientes'} · {pesos(r[onlineIdx].ar)} de exposición
           </div>
         </div>
       </div>

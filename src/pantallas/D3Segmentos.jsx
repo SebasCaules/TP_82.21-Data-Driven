@@ -1,89 +1,97 @@
-// D3 — dónde está la plata contra dónde está el riesgo. Barras horizontales por segmento
-// RFM ordenadas por EXPOSICIÓN (pesos), no por tasa: la tasa va de nota al lado de cada
-// barra, nunca como largo de barra ni "pérdida esperada" (no hay probabilidad aplicada).
-// Título y referencia general salen de porDimension, no de info: no mezclan bases con filtro.rfm activo.
+// D3 — dónde está la plata contra dónde está el riesgo, en barras divergentes. Cada barra es
+// la diferencia entre cuánto pesa el segmento en la FACTURACIÓN y cuánto pesa en la
+// EXPOSICIÓN, en puntos de participación: es la frase del título convertida en una sola
+// cifra dibujada, en vez de dos distribuciones que el lector tiene que restar de memoria.
+//
+// El orden de la resta lo fija el signo, no la comodidad: el negativo tiene que ser el mal
+// desempeño. Un segmento que pesa más en el riesgo que en lo que factura está sobreexpuesto
+// y va a la izquierda; el que factura más de lo que arriesga va a la derecha. Con la resta
+// al revés, el −12,7 le tocaba a Campeones, que es justamente el segmento sano.
+//
+// Lo que el formato pierde son los niveles (un segmento chico y uno grande pueden dar el
+// mismo desvío), así que la exposición de cada segmento va como columna al costado, con su
+// barra de magnitud: el desvío dice de qué lado está el segmento, la columna dice cuánta
+// plata hay detrás.
+// Título y bases salen de porDimension, no de info: no mezclan bases con filtro.rfm activo.
 
-import { Lienzo, BarrasH } from '../graficos.jsx'
-import { millones, pesos, pct, porDimension, dims } from '../agregacion.js'
+import { Lienzo, BarrasDivergentes } from '../graficos.jsx'
+import { montoM, pesos, pct, porDimension, dims } from '../agregacion.js'
+import { Def } from '../Glosario.jsx'
+
+// Puntos de participación, con signo. No es un porcentaje de nada: es la resta de dos.
+// El signo lo pone el formato y no el eje: el lado ya dice de qué lado cae, pero el número
+// suelto ("6,0") copiado a un mail o leído en la impresión no.
+const puntos = (v) => Math.abs(v).toFixed(1).replace('.', ',')
+const conSigno = (v) => (v < -0.05 ? `−${puntos(v)}` : v > 0.05 ? `+${puntos(v)}` : puntos(v))
+const marcaEje = (v) => (v < 0 ? `−${Math.abs(v)}` : v > 0 ? `+${v}` : '0')
 
 export default function D3({ iCorte, filtro, info, verEnLista }) {
   const r = porDimension(iCorte, 'rfm', filtro)
-
-  const campeonesIdx = dims.rfm.indexOf('Campeones')
   const enRiesgoIdx = dims.rfm.indexOf('En riesgo')
-  const campeones = r[campeonesIdx]
-  const enRiesgo = r[enRiesgoIdx]
 
   // porDimension('rfm', filtro) neutraliza filtro.rfm sobre su propio eje: usar sus
-  // propios totales como base del título y del promedio, no info (que sí aplica filtro.rfm
-  // y quedaría con un numerador de 7 segmentos contra un denominador de uno solo).
+  // propios totales como base, no info (que sí aplica filtro.rfm y quedaría con un
+  // numerador de 7 segmentos contra un denominador de uno solo).
   const tot = r.reduce(
-    (s, c) => ({ f: s.f + c.f, ar: s.ar + c.ar, n: s.n + c.n, nr: s.nr + c.nr }),
-    { f: 0, ar: 0, n: 0, nr: 0 }
+    (s, c) => ({ f: s.f + c.f, ar: s.ar + c.ar }),
+    { f: 0, ar: 0 }
   )
-  const promedio = tot.n ? (100 * tot.nr) / tot.n : 0
 
-  const orden = r
-    .map((c, i) => ({ c, i }))
-    .sort((a, b) => b.c.ar - a.c.ar)
+  const filas = r.map((c, i) => {
+    const pExp = tot.ar ? (100 * c.ar) / tot.ar : 0
+    const pFac = tot.f ? (100 * c.f) / tot.f : 0
+    return { etiqueta: dims.rfm[i], exp: pExp, fac: pFac, dif: pFac - pExp, ar: c.ar, _i: i }
+  })
 
-  const datos = orden.map(({ c, i }) => ({
-    etiqueta: dims.rfm[i],
-    valor: c.ar,
-    nota: `${c.n ? pct((100 * c.nr) / c.n) : '—'} en riesgo${i === enRiesgoIdx ? ' (circular)' : ''}`,
-    enfasis: i === campeonesIdx,
-    _i: i,
+  // Las dos participaciones suman 100 cada una, así que los desvíos suman cero: siempre hay
+  // al menos uno de cada lado y orden[0] no puede ser negativo.
+  const orden = [...filas].sort((a, b) => b.dif - a.dif)
+  const subexpuesto = orden[0]
+  // Con un filtro que deja un solo segmento con datos, la diferencia es cero por
+  // construcción y no hay nada que afirmar: el título lo dice en vez de nombrar un desvío
+  // de décimas como si fuera un hallazgo.
+  const plano = !subexpuesto || Math.abs(subexpuesto.dif) < 0.05
+
+  const datos = orden.map((f) => ({
+    etiqueta: f.etiqueta,
+    valor: f.dif,
+    // Cada monto lleva su signo de peso además de la magnitud: la columna se lee como plata
+    // sin ir a buscar la moneda al encabezado, que es lo que pasaba con "23,5 M" a secas.
+    nota: montoM(f.ar),
+    notaValor: f.ar,
+    notaSuf: f._i === enRiesgoIdx ? 'circular' : null,
+    enfasis: !plano && f._i === subexpuesto._i,
+    _i: f._i,
   }))
-
-  const pctFacturacion = tot.f ? (100 * campeones.f) / tot.f : 0
-  const pctEnRiesgo = enRiesgo.n ? (100 * enRiesgo.nr) / enRiesgo.n : 0
-  // Contraste que da título al gráfico: cuánto de lo facturado (no visible en este
-  // gráfico, que es solo exposición) contra cuánta exposición aporta el mismo segmento.
-  // El monto de exposición de Campeones ya se lee directo en su barra: no se repite. Las
-  // dos bases (tot.f, tot.ar) van en la bajada junto a cada porcentaje: sin ellas ninguno
-  // de los dos se puede chequear a mano.
-  const pctExposicionCampeones = tot.ar ? (100 * campeones.ar) / tot.ar : 0
 
   return (
     <section className="pant">
-      {/* El título original generalizaba desde un solo segmento ("el riesgo no está donde
-          está la plata") y quedaba leído en contra del título de D2 ("el riesgo sube con
-          el valor"), que habla de quintiles, no de segmentos. Acotado a "entre segmentos"
-          y con Campeones nombrado como la excepción, no como la regla. */}
       <h1 className="titulo">
-        Entre segmentos, el riesgo no está donde está la plata: la excepción es Campeones
+        {plano
+          ? 'Con este recorte el riesgo se reparte igual que la facturación'
+          : `${subexpuesto.etiqueta}: ${pct(subexpuesto.fac)} de lo facturado y ${pct(subexpuesto.exp)} de la exposición`}
       </h1>
       <p className="bajada">
-        Campeones: {pct(pctFacturacion)} de {pesos(tot.f)} facturados contra{' '}
-        {pct(pctExposicionCampeones)} de {pesos(tot.ar)} de exposición. El {pct(pctEnRiesgo)} del
-        segmento En riesgo es circular: la R de RFM es la misma recency que define el target.
+        {plano ? null : <>Son {puntos(subexpuesto.dif)} puntos de desvío. </>}
+        Cuánto pesa cada <Def id="rfm">segmento</Def> en la facturación ({pesos(tot.f)}) contra
+        cuánto pesa en la <Def id="exposicion">exposición</Def> ({pesos(tot.ar)}). El desvío de
+        En riesgo es circular por construcción.
       </p>
 
       <div className="lienzo">
         <Lienzo>
-          {({ w, h }) => {
-            const anchoEtiqueta = 106
-            return (
-              <div style={{ position: 'relative', width: w, height: h }}>
-                <BarrasH
-                  datos={datos} w={w} h={h}
-                  formato={pesos} formatoEje={(v) => millones(v, 0)}
-                  tituloEje="Exposición anual (ARS)"
-                  anchoEtiqueta={anchoEtiqueta}
-                  onBarra={verEnLista ? (i, d) => verEnLista('rfm', d._i) : undefined}
-                />
-                {/* Cabecera de la columna de notas: la tasa es un eje distinto (fracción,
-                    no pesos), así que la referencia va como texto, no como ReferenciaV
-                    sobre el eje de barras (sería un eje Y secundario encubierto). */}
-                <svg width={w} height={h} style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-                  <text x={w} y={11} fontSize="10" fill="var(--mut)" letterSpacing=".07em"
-                        textAnchor="end" style={{ textTransform: 'uppercase' }}>
-                    tasa de riesgo · general {pct(promedio)}
-                  </text>
-                </svg>
-              </div>
-            )
-          }}
+          {({ w, h }) => (
+            <BarrasDivergentes
+              datos={datos} w={w} h={h}
+              formato={conSigno} formatoEje={marcaEje}
+              tituloEje="Facturación menos exposición, en puntos de participación"
+              anchoEtiqueta={106}
+              encabezadoNota="exposición del segmento"
+              rotuloPos="más plata que riesgo →"
+              rotuloNeg="← más riesgo que plata (trama)"
+              onBarra={verEnLista ? (i, d) => verEnLista('rfm', d._i) : undefined}
+            />
+          )}
         </Lienzo>
       </div>
     </section>

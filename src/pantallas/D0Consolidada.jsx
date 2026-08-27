@@ -25,6 +25,7 @@
 // es Z3. La ficha no se rediseño: se desarmo en las zonas que 5a define.
 
 import { Lienzo, Linea } from '../graficos.jsx'
+import { Def } from '../Glosario.jsx'
 import { entero, fechaCorta, meta, pct, pesos, series } from '../agregacion.js'
 
 // El titulo dice la lectura, no la cifra. La escala se deriva del mismo numero que Z2
@@ -85,7 +86,9 @@ export default function D0({ info }) {
             numero suelto no puede decir. */}
         <div className="tarjeta z-resp">
           <div className="z2">
-            <span className="z2-lbl">Exposición anual en riesgo</span>
+            <span className="z2-lbl">
+              <Def id="exposicion">Exposición anual en riesgo</Def>
+            </span>
             <div className="z2-fila">
               <span className="z2-val">{pesos(info.exposicion)}</span>
               <span className="z2-nota">exposición,<br />no recupero</span>
@@ -118,9 +121,9 @@ export default function D0({ info }) {
                 su lectura sin decir contra qué monto vale. */}
             <div className="z2-base">
               <span><i>Base</i><b className="tabular">{entero(info.clientes)}</b>clientes</span>
-              <span><i>Corte</i><b className="tabular">{fechaCorta(info.corte)}</b></span>
-              <span><i>Moneda</i><b>pesos nominales</b></span>
-              <span><i>Con menos de 1 año</i><b className="tabular">{entero(info.historiaCorta)}</b>clientes</span>
+              <span><i><Def id="corte">Corte</Def></i><b className="tabular">{fechaCorta(info.corte)}</b></span>
+              <span><i>Moneda</i><b><Def id="pesos-nominales">pesos nominales</Def></b></span>
+              <span><i><Def id="anualizado">Con menos de 1 año</Def></i><b className="tabular">{entero(info.historiaCorta)}</b>clientes</span>
               <span><i>Base sin ellos</i><b className="tabular">{pesos(info.baseAnualizada1a)}</b>anualizados</span>
             </div>
           </div>
@@ -133,7 +136,8 @@ export default function D0({ info }) {
                     ap={`de ${pesos(info.baseAnualizada)}`} />
             <Contra etq="Sobre el histórico" val={pct(pctHist)}
                     ap={`de ${pesos(info.facturacion)} acumulados`} />
-            <Contra etq="Clientes en riesgo" val={`${entero(info.enRiesgo)} / ${entero(info.clientes)}`}
+            <Contra etq={<Def id="umbral-riesgo">Clientes en riesgo</Def>}
+                    val={`${entero(info.enRiesgo)} / ${entero(info.clientes)}`}
                     ap={`${pct(pctClientes)} de la base con compra válida`} />
           </div>
         </div>
@@ -142,7 +146,9 @@ export default function D0({ info }) {
             es la unica pieza que no responde a los controles de arriba. */}
         <div className="tarjeta z-serie">
           <div className="kpi-lbl z-serie-cab">
-            <span className="z-serie-tit">Recompra a 90 días · María G. · mensual</span>
+            <span className="z-serie-tit">
+              <Def id="recompra-90">Recompra a 90 días</Def> · María G. · mensual
+            </span>
             <span className="z-global">Serie global · no usa corte ni filtros</span>
           </div>
           <Lienzo>

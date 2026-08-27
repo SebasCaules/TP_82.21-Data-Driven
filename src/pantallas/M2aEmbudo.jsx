@@ -1,49 +1,79 @@
 // M2a — el embudo de la campaña masiva, sobre series.embudo_campanias.global (base limpia,
-// 23.529 envíos). Las cuatro etapas van en conteos absolutos (envíos * fracción). El
-// porcentaje sobre el total va pegado al valor de cada barra, y la columna derecha dice la
-// conversión respecto de la etapa anterior, que es lo propio de un embudo. La bajada declara las dos bases y que la compra
-// a 7 días nunca ocurre sin clic previo: el salto al abrir es mecánico, no un efecto causal.
+// 23.529 envíos). Un paso por barra, cada barra al 100 % de SU propia base: lo que avanza
+// contra lo que se pierde. Las cuatro etapas en conteo absoluto tenían tres órdenes de
+// magnitud entre la primera y la última, así que la barra de compra a 7 días era un pelo
+// contra el borde y la conversión de cada paso —que es lo propio de un embudo— no estaba
+// dibujada en ningún lado.
+//
+// Lo que se pierde es la escala absoluta: tres barras del mismo largo sobre bases de 23.529,
+// 8.266 y 2.059 se pueden leer como tres poblaciones iguales. Por eso cada fila lleva su
+// base escrita y la bajada declara la compra sobre el total.
 // Serie global: no depende del corte ni de los filtros.
-// formatoEje en miles ("24 mil" en vez de "23.529"): la escala del eje solo necesita marcar
-// la magnitud, y el numero exacto ya esta en la nota de cada barra.
 
-import { Lienzo, Embudo } from '../graficos.jsx'
+import { Lienzo, BarrasApiladas100 } from '../graficos.jsx'
 import { entero, pct, series } from '../agregacion.js'
-
-const formatoEje = (v) => (v >= 1000 ? `${Math.round(v / 1000)} mil` : entero(v))
+import { Def } from '../Glosario.jsx'
 
 export default function M2a() {
   const emb = series.embudo_campanias
   const g = emb.global
   const envios = g.envios
-  const compras = envios * g.compra_7dias
+  const abre = Math.round(envios * g.abre)
+  const clic = Math.round(envios * g.clic)
+  const compras = Math.round(envios * g.compra_7dias)
 
-  const etapas = [
-    { etiqueta: 'Envíos', valor: envios },
-    { etiqueta: 'Abre', valor: envios * g.abre, pct: pct(g.abre * 100) },
-    { etiqueta: 'Clic', valor: envios * g.clic, pct: pct(g.clic * 100) },
-    { etiqueta: 'Compra a 7 días', valor: compras, pct: pct(g.compra_7dias * 100) },
-  ]
+  const pasos = [
+    { etiqueta: 'Envío → Abre', base: envios, avanza: abre },
+    { etiqueta: 'Abre → Clic', base: abre, avanza: clic },
+    { etiqueta: 'Clic → Compra', base: clic, avanza: compras },
+  ].map((p) => ({ ...p, retencion: p.base ? (100 * p.avanza) / p.base : 0 }))
+
+  // El peor paso se nombra en el título y se marca en la fila. No lleva un color propio:
+  // el acento ya significa "los que avanzan" adentro de este gráfico y no puede significar
+  // dos cosas a la vez.
+  const peor = pasos.reduce((m, p) => (p.retencion < m.retencion ? p : m), pasos[0])
+  const mejor = pasos.reduce((m, p) => (p.retencion > m.retencion ? p : m), pasos[0])
+
+  const filas = pasos.map((p) => ({
+    etiqueta: p.etiqueta,
+    sub: `base ${entero(p.base)}`,
+    enfasis: p === peor,
+    segmentos: [
+      {
+        clave: `avanza ${p.etiqueta}`, valor: p.avanza, tono: 'var(--acc)', tinta: '#fff',
+        enfasis: true, plaqueta: true,
+        texto: `${entero(p.avanza)} · ${pct(p.retencion)}`,
+      },
+      {
+        clave: `se pierde ${p.etiqueta}`, valor: Math.max(0, p.base - p.avanza), tono: 'trama',
+        texto: `se pierden ${entero(p.base - p.avanza)} · ${pct(100 - p.retencion)}`,
+      },
+    ],
+  }))
 
   return (
     <section className="pant">
-      {/* COPY-05: "las campañas masivas no discriminan" era una afirmacion sobre diferencias
+      {/* COPY-05: "las campañas masivas no discriminan" era una afirmación sobre diferencias
           entre segmentos que este embudo, un solo agregado sin desagregar, no puede sostener.
-          Esa comparacion es tema de M2b (M2bSegmentos.jsx), que la dibuja con evidencia. Acá
-          el titulo se queda en lo que el embudo muestra: cuanto llega a compra. */}
+          Esa comparación es tema de M2b (M2bSegmentos.jsx), que la dibuja con evidencia. */}
       <h1 className="titulo">
-        De {entero(envios)} envíos, {entero(compras)} terminan en compra a 7 días
+        El peor paso, {peor.etiqueta}, pierde {pct(100 - peor.retencion)} de lo que recibe
       </h1>
       <p className="bajada">
-        {entero(emb.base_completa_envios)} envíos en la base completa, {entero(emb.base_limpia_envios)} en
-        la limpia. Compra a 7 días nunca ocurre sin clic: el salto al abrir es mecánico, no causal.
+        Ninguno pierde menos de {pct(100 - mejor.retencion)}. Sobre el total, la{' '}
+        <Def id="compra-7dias">compra a 7 días</Def> es {pct(100 * g.compra_7dias)}{' '}
+        ({entero(compras)} de {entero(envios)} envíos limpios).
+        Compra nunca ocurre sin clic previo: el salto al abrir es mecánico, no causal.
       </p>
 
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => (
-            <Embudo etapas={etapas} w={w} h={h} formato={entero} formatoEje={formatoEje}
-                    tituloEje="Envíos de la campaña que llegan a cada etapa" />
+            <BarrasApiladas100
+              filas={filas} w={w} h={h}
+              anchoEtiqueta={122}
+              tituloEje="Participación dentro de cada paso · avanza contra se pierde"
+            />
           )}
         </Lienzo>
       </div>
