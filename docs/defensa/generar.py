@@ -25,7 +25,9 @@ IDS = ["D0", "D1", "D2", "D3", "D4", "D5a", "D5b", "D6", "M0", "M3", "M1", "M2a"
 def capturar(pw):
     IMG.mkdir(exist_ok=True)
     nav = pw.chromium.launch()
-    pag = nav.new_page(viewport={"width": 1440, "height": 810}, device_scale_factor=2)
+    # 1600x900: a 1440 la barra de controles se pasa del ancho en las cuatro vistas con
+    # eje propio (D2, D3, D5a, D5b) y el rotulo del corte sale cortado en la captura.
+    pag = nav.new_page(viewport={"width": 1600, "height": 900}, device_scale_factor=2)
     pag.goto(BUNDLE.as_uri())
     pag.wait_for_timeout(2500)
     for i, sid in enumerate(IDS):

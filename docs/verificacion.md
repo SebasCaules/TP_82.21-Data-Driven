@@ -138,26 +138,39 @@ El chequeo de Knaflic cap. 7: leer solo los títulos tiene que contar la histori
 
 **Directorio**
 
-1. Casi la mitad del ingreso anual de la base está en clientes hoy en riesgo por falta de compra reciente
-2. No es un mal año: el 47,8 % de todo lo facturado desde 2022 está en las mismas manos
-3. El riesgo sube con el valor del cliente, pero menos de lo que sugiere el total
-4. El riesgo no está donde está la plata: Campeones concentra ARS 160,0 M de los 550,2 M históricos (29,1 %) y aporta ARS 15,5 M de los 94,9 M de exposición
-5. La recompra pasó de 19,0 % a 8,5 % en 5 trimestres, por debajo de la línea base de 8-9 %
-6. La geografía no explica el riesgo: 2,8 puntos entre la región más alta y la más baja
-7. La categoría sí mueve la aguja: 15,5 puntos entre Muebles y Baño
-8. Todavía no hay score que comparar: el objetivo es superar el 1,39 % del criterio actual
+1. Casi la mitad del gasto anual de la base está en clientes sin compra reciente
+2. Los mismos clientes pesaban 54,8 % de lo facturado en 2024 y 31,2 % en 2025
+3. El salto de 13,3 % a 51,8 % es composición: 67,5 % de Q1 no califica
+4. Campeones: 29,1 % de lo facturado y 16,4 % de la exposición
+5. La recompra pasó de 19,0 % a 8,5 % en 5 trimestres y quedó fuera de meta
+6. AMBA es 41,1 % de la base y 43,2 % de lo expuesto: se reparte parejo
+7. Muebles ocupa 47,8 % de la exposición con 31,7 % de los clientes
+8. Cambiar de criterio no gana compras y cuesta de 17,4 M a 37,2 M de cobertura
 9. Tres decisiones, ninguna cuesta presupuesto nuevo
 
 **Marketing**
 
-1. La capacidad cubre entre el 20,4 % y el 32,6 % de los clientes en riesgo: el orden importa más que el alcance
-2. Tres de cada diez envíos van a clientes que no dieron consentimiento
-3. Los 800 de mayor exposición concentran ARS 49,5 M de los 94,9 M, y solo 568 se pueden contactar
-4. El embudo termina en 1,2 %: las campañas masivas no discriminan
-5. Ningún segmento se despega: entre 0,96 % y 1,39 % de compra a 7 días
+1. Contactar 500 de 2.452 cubre 37,0 % de la exposición, no 20,4 %
+2. El incumplimiento va de 29,5 % a 31,2 % en cuatro años: no baja
+3. La semana 1 vale 1,9 veces la semana 4 con los mismos 200 contactos
+4. El peor paso, Clic → Compra, pierde 86,2 % de lo que recibe
+5. Falta el control: 3 cortes solo detectan 1,71 pp sobre una base de 1,21 %
 
 Todos los títulos se recalculan con el corte y los filtros. Ninguno lleva una magnitud fija
 escrita a mano, que con corte móvil sería falsa en 24 de los 25 cortes.
+
+> **Nota (26/08/2026).** Seis de estos títulos cambiaron junto con el formato de su gráfico
+> (D2, D3, D5a, D5b, M3 y M2a pasaron a composición al 100 % o a barras divergentes). El
+> título sigue a lo que el gráfico dibuja, así que si el dibujo cambia de pregunta el título
+> cambia con él. El detalle de qué formato tiene cada uno está en `diseno-pantallas.md`.
+
+> **Nota (27/08/2026).** Los catorce pasaron a **una sola línea**. El tope de dos renglones
+> dejaba lugar para relleno y el relleno apareció: subordinadas, aposiciones y la segunda
+> mitad de la frase repitiendo la primera. Con un renglón el título tiene que ser la
+> afirmación y nada más, y lo que sobraba bajó a la bajada. El presupuesto es ~88 caracteres
+> a 1152 px, el ancho mínimo declarado; los catorce entran con margen (el más largo pide 784
+> px de los 923 disponibles). Además cinco vistas cambiaron de pregunta con su rediseño
+> (D1, D6, M3, M1 y M2b), así que su título es otro y no una versión corta del anterior.
 
 
 ## Auditoría final adversarial

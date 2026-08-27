@@ -91,20 +91,32 @@ Cambios del comité:
 - Una línea de rango: la exposición al umbral de 60 d es 95,1 M y a 120 d es 93,5 M. El valor
   es **casi insensible al umbral del proxy**, y decirlo es un argumento a favor, no una salvedad.
 
-### D1 · Exposición contra base
+### D1 · Desde cuándo
 
 | | |
 |---|---|
-| Pregunta | ¿De qué tamaño es el problema contra el total? |
-| Cifra | 94,9 M sobre 204,6 M anualizados · 262,8 M sobre 550,2 M históricos |
-| Gráfico | dos barras segmentadas desde cero, con **rótulo y valor sobre cada tramo** y trama en el tramo en riesgo |
-| Título | No es un mal año: el 47,8 % de todo lo facturado desde 2022 está en las mismas manos |
-| Reglas | 4, 6, 18 · capa (a) del protocolo (declarar la base de todo número en pesos) |
+| Pregunta | ¿El problema es de este año o viene de antes? |
+| Cifra | la cohorte en riesgo pesa 47,3 / 52,1 / 54,8 / 31,2 % de la facturación identificada de 2022 a 2025 |
+| Gráfico | **cuatro barras al 100 %, una por año**, cada una sobre la facturación de SU año, partida entre la cohorte en riesgo al corte y el resto. Años de más reciente a más viejo, con el último arriba y en énfasis |
+| Título | Los mismos clientes pesaban 54,8 % de lo facturado en 2024 y 31,2 % en 2025 |
+| Reglas | 4, 6, 18 · capa (a) del protocolo |
 
-Cambios: el título ya no repite lo que D0 dijo (lógica horizontal); los tramos no dependen
-solo del color; y el denominador se nombra **gasto anual estimado**, no "lo que la base
-factura por año" — 204,6 M no son ventas y un directorio los compararía contra los 225,0 M
-reales de 2025.
+**Cambio del 27/08/2026: de "de qué tamaño" a "desde cuándo" (dirección 4c).** Las dos barras
+de tramos decían el tamaño del problema y no el eje del tiempo, y el tamaño ya lo contestan
+D0 (la cifra) y D2 (el reparto por quintil). Lo que faltaba era la MISMA gente mirada año por
+año. La cohorte es fija: se clasifica una sola vez, al corte, y se mira hacia atrás.
+
+Cada barra va sobre la facturación de su propio año porque entre 2022 y 2024 la base casi se
+triplica; comparar montos crudos no diría nada.
+
+> **Cuidado:** el proxy define la cohorte por haber dejado de comprar, así que la caída de
+> 2025 es en parte definición y no hallazgo. Lo que no es definición es cuánto pesaba esa
+> misma gente antes: 47,3 % en 2022 y 54,8 % en 2024. La pantalla lo declara al pie.
+
+La serie va **por corte y no por celda de contingencia**: partir `f` por año serían ocho
+columnas más sobre 17.136 celdas y casi un mega de payload, contra la promesa del bundle de
+un solo archivo. El precio es que la vista no acepta filtros, y lo declara
+(`depende: 'corte'`, App.jsx los apaga con leyenda).
 
 ### D2 · Riesgo por quintil de valor
 
@@ -112,8 +124,8 @@ reales de 2025.
 |---|---|
 | Pregunta | ¿El riesgo se concentra en los que más facturan o en los de menor valor? |
 | Cifra | Q1 13,3 % → Q5 51,8 % sobre el total · 40,9 % → 52,1 % entre elegibles |
-| Gráfico | cinco barras desde cero, Q5 en énfasis, con el **n de elegibles etiquetado** en cada barra y la línea del 41,0 % general |
-| Título | El riesgo sube con el valor del cliente, pero menos de lo que sugiere el total |
+| Gráfico | cinco barras **apiladas al 100 %**, una por quintil: en riesgo (acento, desde cero) · elegible sin riesgo · no elegible (trama). Tasa entre elegibles como nota de fila y línea del 41,0 % general |
+| Título | El salto de 13,3 % a 51,8 % es composición: el 67,5 % de Q1 no califica para el cálculo |
 | Reglas | 4, 6, 11, 14, 18 · Tufte, lie factor · baseline al lado |
 
 El pie es obligatorio y es el hallazgo real: *el salto Q1→Q2 es de composición. El 67,5 % de
@@ -123,21 +135,49 @@ comparables el gradiente va de 40,9 % a 52,1 %, o sea 1,27×.*
 El denominador del KPI (51,8 % sobre el total de Q5) **no se toca**: lo fija la Parte D §2.1.
 Lo que cambia es lo que se afirma.
 
+**Cambio del 26/08/2026: la barra simple pasa a composición al 100 %.** El bloque de acento
+mide exactamente lo mismo que medía la barra —nr/n, desde cero— así que el contrato queda
+intacto; lo que agrega el formato es la causa del salto, que antes solo estaba escrita en la
+bajada: la cuña tramada de no elegibles se derrite de Q1 a Q5. Lo que se pierde es la tasa
+entre elegibles como dibujo (es una razón entre dos bloques que el ojo no calcula) y por eso
+sigue como nota de cada fila, con su encabezado. Con un filtro que angosta el bloque de
+acento, su cifra sale sobre plaqueta: el KPI no se cae del gráfico.
+
 ### D3 · Dónde está la plata contra dónde está el riesgo
 
 | | |
 |---|---|
 | Pregunta | ¿Dónde conviene gastar el presupuesto de retención? |
-| Cifra | exposición anual por segmento RFM, con la tasa de riesgo etiquetada |
-| Gráfico | barras horizontales ordenadas por exposición, con la tasa de riesgo de cada segmento como nota al lado y el 41,0 % general en el encabezado de esa columna |
-| Título | El riesgo no está donde está la plata: Campeones concentra ARS 159,9 M de los 550,2 M históricos (29,1 %) y aporta ARS 15,5 M de los 94,9 M de exposición |
-| Reglas | 6, 11, 14, 18, 21 · capa (a), no mezclar bases |
+| Cifra | desvío entre participación en la facturación y participación en la exposición, en puntos, por segmento RFM |
+| Gráfico | **barras divergentes desde cero**, ordenadas por el desvío; lavado de zona en la mitad negativa y trama en sus barras (redundante con el lado, para impresión en B/N); eje simétrico con piso de ±10 puntos; columna de exposición con barra de magnitud |
+| Título | Campeones está 12,7 puntos subexpuesto: 29,1 % de lo facturado, 16,4 % de la exposición |
+| Reglas | 4, 6, 11, 14, 18, 21 · capa (a), no mezclar bases |
 
 Cambios: **"con la tasa más baja" era falso** y sale (Campeones es el cuarto más bajo, no el
 primero); las dos bases van escritas; el eje se rotula "Exposición anual (ARS)" y no "pérdida
 esperada", porque no hay ninguna probabilidad aplicada.
 
-El 95,7 % del segmento "En riesgo" va con la aclaración de circularidad al lado.
+El segmento "En riesgo" va con la aclaración de circularidad al lado.
+
+**Cambio del 26/08/2026: de barras de exposición a barras divergentes.** El título afirmaba
+una resta ("el riesgo no está donde está la plata") que el gráfico no dibujaba: había una
+sola distribución en pantalla y la otra estaba escrita en la bajada. Ahora la resta es la
+barra. Lo que se pierde son los niveles —un segmento chico y uno grande pueden dar el mismo
+desvío— y por eso la exposición en pesos de cada uno queda como nota. El piso de ±10 puntos
+del eje existe porque el eje se simetriza al máximo absoluto: sin piso, un filtro que deje
+desvíos de décimas los dibujaría del ancho de la pantalla.
+
+El orden de la resta lo fija el signo, no la comodidad: **el negativo tiene que ser el mal
+desempeño**. Un segmento que pesa más en el riesgo que en lo que factura está sobreexpuesto,
+va a la izquierda y con trama; el que factura más de lo que arriesga va a la derecha. Con la
+resta al revés, el −12,7 le tocaba a Campeones, que es justamente el segmento sano.
+
+La mitad negativa va sobre un lavado neutro: sin él los dos lados se distinguen solo por el
+lado de una línea, que es justo lo que hay que leer rápido. Es neutro y no de color porque el
+lado ya tiene significado y un color le agregaría un segundo. La columna de exposición lleva
+la moneda declarada una vez en el encabezado y las cifras en magnitud, igual que el eje de
+las pantallas de pesos, más una barra de magnitud: el desvío dice de qué lado cae el
+segmento, la columna dice cuánta plata hay detrás.
 
 ### D4 · La recompra contra la meta
 
@@ -158,37 +198,50 @@ cortan, no se interpolan. **Los filtros se apagan**: la serie es global.
 | | |
 |---|---|
 | Pregunta | ¿Qué región concentra la exposición? |
-| Cifra | exposición en ARS por región, con la tasa de riesgo etiquetada. Amplitud 2,8 pp entre las 5 regiones |
-| Gráfico | barras horizontales en **pesos**, no en porcentaje |
-| Título | AMBA concentra el 43,2 % de la exposición de las regiones (la planitud de la tasa, 2,8 puntos entre la más alta y la más baja, baja a la bajada) |
-| Reglas | 4, 6, 11, 14, 18 |
+| Cifra | reparto de los clientes contra reparto de la exposición, por región. Amplitud de tasa 2,8 pp entre las 5 |
+| Gráfico | **dos barras apiladas al 100 % alineadas** (clientes arriba, exposición abajo) con los cortes conectados; mismo orden en las dos; base escrita al lado de cada barra |
+| Título | La exposición se reparte igual que los clientes: AMBA es 41,1 % de la base y 43,2 % de lo expuesto |
+| Reglas | 6, 11, 14, 18, 21 |
 
-Cambios: la barra codifica pesos porque la pregunta es de concentración de plata; y
-**"Solo online" va separado bajo una línea divisoria**, rotulado "sin región asignable ·
-317 clientes · 12,9 %". Dentro del panel, esa barra hacía que el rango visible fuera 30,3 pp
-y desmentía el título. Pie con la regla de asignación (C-04) y con la apertura por tienda
+**"Solo online" va separado bajo una línea divisoria**, rotulado "sin región asignable, fuera
+de las dos bases". Pie con la regla de asignación (C-04) y con la apertura por tienda
 declarada fuera de alcance V1 (Parte D §6.1).
+
+**Cambio del 26/08/2026: de barras de pesos al par de composiciones.** Una concentración sin
+su referencia no se puede juzgar: "AMBA concentra el 43,2 %" pesa distinto sabiendo que AMBA
+es el 41,1 % de la base. La inclinación del conector ES la diferencia entre las dos
+composiciones, y acá son casi verticales: ninguna región concentra riesgo por encima de su
+tamaño. Lo que se pierde es la tasa de riesgo (baja a la bajada), el monto absoluto (las dos
+bases van escritas) y la comparación fina entre tramos que no arrancan en el mismo punto. La
+escala fija al 100 % lo vuelve inmune al filtro: nada acá se puede inflar recortando la base.
 
 ### D5b · Categoría
 
 | | |
 |---|---|
 | Pregunta | ¿Qué categoría concentra la exposición? |
-| Cifra | exposición por categoría · amplitud 15,5 pp de tasa (Muebles 44,4 % contra Baño 28,9 %) |
-| Gráfico | barras horizontales en pesos, misma escala que D5a |
-| Título | La categoría sí mueve la aguja: 15,5 puntos entre Muebles y Baño |
+| Cifra | reparto de clientes contra reparto de exposición, por categoría · amplitud 15,5 pp de tasa (Muebles 44,4 % contra Baño 28,9 %) |
+| Gráfico | gemelo exacto de D5a: dos barras apiladas al 100 % alineadas, con conectores |
+| Título | Muebles ocupa 47,8 % de la exposición con 31,7 % de los clientes |
 | Reglas | ídem D5a |
 
 Pie: las dos categorías del extremo bajo tienen menos de 200 clientes cada una.
+
+**Cambio del 26/08/2026: mismo formato que D5a, a propósito.** El par se lee comparando
+formas entre pantallas: en región los conectores salen casi verticales y acá todos se corren
+a la derecha, porque Muebles se lleva más exposición que clientes y cada categoría chica
+pierde participación al pasar de personas a pesos. Con siete categorías los tramos de la cola
+no aceptan rótulo adentro: bajan a una línea de resto arriba del gráfico, en el orden del
+dibujo, que se corta con puntos suspensivos cuando no entra.
 
 ### D6 · Contra el criterio actual
 
 | | |
 |---|---|
-| Pregunta | ¿La lista priorizada rinde más que el criterio actual? |
-| Cifra | compra a 7 días por segmento objetivo, sobre la base de 23.729: Inactivos 90d 1,39 % (61 compras) · Todos 1,34 % (45) · Silver 1,33 % (82) · Gold 1,04 % (53) · Bronze 0,96 % (45) |
-| Gráfico | **punto con intervalo de Wilson al 95 %**, con la banda del IC de la vara de lado a lado y una fila punteada reservada al score. Sin ordenar por valor. `n` de envíos y de compras en cada fila |
-| Título | Todavía no hay score que comparar: la vara es 1,39 %, IC [1,08–1,78 %] |
+| Pregunta | ¿Conviene cambiar el criterio con el que se arma la lista? |
+| Cifra | por criterio de orden: exposición cubierta 49,5 / 32,1 / 12,3 / 31,0 M y compra a 7 días 1,42 / 1,72 / 0,84 / 1,18 %, todas con IC solapado contra el actual |
+| Gráfico | **punto con intervalo de Wilson al 95 %** con la banda del IC de la vara y una fila punteada reservada al score, más una **tabla de seis columnas** que pone la decisión en pesos y en compras esperadas |
+| Título | Cambiar de criterio no gana compras y cuesta de 17,4 M a 37,2 M de cobertura |
 | Reglas | 4, 6, 18 · corrección 4 (descriptivo contra predictivo) · Tufte, lie factor |
 
 Rotulado **"Modelo predictivo (en desarrollo)"**. Cambios: sale el 1,2 % global, que es de
@@ -207,6 +260,26 @@ del score. El gráfico afirma lo mismo que el título.
 > **Nota.** La vara no es el máximo de los cinco. `pipeline/series.py` la fija a
 > "Inactivos 90d" porque es el criterio que Marketing usa hoy, y la Parte D §5 lo declara como
 > baseline. Elegirla por ser la más alta habría sido sesgo de selección; no lo es.
+
+**Cambio del 27/08/2026: el costo de equivocarse (dirección 17e).** La vista contestaba solo
+en tasa, y en tasa la respuesta era "no se puede saber": correcta y estéril. Ahora contesta en
+las dos monedas que el directorio va a mirar igual, y el contraste entre ellas ES la vista:
+
+- la **tasa** sale de una muestra chica y llega con un intervalo que se come cualquier
+  diferencia entre criterios (los cuatro se solapan con el actual);
+- la **exposición cubierta** es aritmética de la base, sin ruido, y las diferencias son de
+  17,4 a 37,2 M.
+
+Por eso el criterio se elige por cobertura y no por tasa. Dos de los cuatro criterios ni
+siquiera llegan a llenar los 800 (525 y 490 clientes disponibles), que es un costo propio y va
+en su columna.
+
+Los datos salen de `series.criterios_orden`: cada criterio define un subconjunto de la base en
+riesgo, se toman los 800 de mayor anualizado —lo que Marketing ejecutaría— y se mide la tasa
+de las campañas que ya salieron a esos mismos clientes. **No es un experimento**: los criterios
+no se asignaron al azar y sus bases se pisan. Sirve para mostrar que ninguna diferencia
+sobrevive a su intervalo, no para estimar el efecto de cambiar de criterio. "Azar" no se
+sortea: se reporta el valor esperado, para no tener que justificar una semilla.
 
 ### D7 · Cierre
 
@@ -246,55 +319,166 @@ El control estratificado por quintil es V2 (Parte D §6.1).
 | | |
 |---|---|
 | Pregunta | ¿La lista se puede ejecutar tal cual? |
-| Cifra | 7.078 de 23.529 envíos (30,1 %) · alcanza al 98,3 % de los clientes que no consintieron · 46 envíos a ids inexistentes |
-| Gráfico | dos barras desde cero |
-| Título | Tres de cada diez envíos van a clientes que no dieron consentimiento |
+| Cifra | 29,5 / 31,2 / 30,3 / 29,6 % de envíos sin consentimiento por año, sobre bases de 4.515 / 3.915 / 8.028 / 7.071 · agregado 7.078 de 23.529 (30,1 %) |
+| Gráfico | **cuatro barras al 100 %, una por año**, cada una sobre sus propios envíos. Cumplidor en azul contra el eje, bloqueante en terracota con trama a la derecha. Años de más reciente a más viejo, el último arriba y en énfasis |
+| Título | El incumplimiento va de 29,5 % a 31,2 % en cuatro años: no baja |
 | Reglas | 4, 6 · Ley 25.326, ya declarada en Parte D §6.1 |
 
 Las dos cifras van en líneas separadas: 30,1 % es sobre envíos y 98,3 % es sobre clientes.
 Se presenta como incumplimiento reconocido por el negocio con corrección en marcha.
 
+**Cambio del 26/08/2026: de dos barras sueltas a una sola al 100 %.** La afirmación es una
+razón sobre un total, y con dos barras el total no estaba dibujado: había que dividirlas de
+memoria. Lo que se pierde es la magnitud absoluta —16.451 y 7.078 dejan de compararse por
+largo contra un eje de conteo—, así que los dos conteos van escritos, uno en el rótulo del
+tramo y el otro en el título.
+
+**Cambio del 27/08/2026: abierto por año (dirección 12c).** Una cifra acumulada de cuatro años
+no distingue un incumplimiento que se corrige de uno estable, y esa es la primera pregunta que
+hace cualquiera que lo lee. Cada barra va sobre SU propia base de envíos, que cambia fuerte
+entre años (3.915 en 2023 contra 8.028 en 2024).
+
+> **Cuidado:** la dirección 12c anticipaba "la corrección ya está en marcha", con una caída de
+> 38,2 % a 22,6 %. **Los datos reales no la sostienen**: 29,5 / 31,2 / 30,3 / 29,6 %, una
+> amplitud de 1,7 pp en cuatro años. No hay corrección en marcha, hay una tasa estable, y el
+> título dice eso. El ancla `amplitud del incumplimiento entre anios (pp)` de `build.py` lo
+> deja fijo: si algún día la serie se moviera de verdad, el pipeline corta y el texto se
+> reescribe.
+
+La meta sigue siendo cero, no una tendencia: 29,5 % también es incumplimiento.
+
 ### M1 · La lista
 
 | | |
 |---|---|
-| Pregunta | ¿A quiénes contacto esta semana? |
-| Cifra | top 800 por exposición = ARS 49,5 M de los 94,9 M (52,1 %). **568 de los 800 tienen consentimiento** |
-| Gráfico | tabla en pantalla con **las filas que entran medidas contra el alto real**, no un número fijo; las 800 por exportación e impresión |
-| Título | Los 800 de mayor exposición concentran ARS 49,5 M de los 94,9 M, y solo 568 se pueden contactar |
-| Reglas | Shneiderman (details-on-demand) · Parte D §4.1 |
+| Pregunta | ¿Cómo se reparte la lista entre las semanas de contacto? |
+| Cifra | los cuatro tramos de 200: 17,2 / 12,4 / 10,5 / 9,3 M, con 139 / 138 / 144 / 147 contactables. Total 49,5 M de los 94,9 M (52,1 %), 568 contactables |
+| Gráfico | **barras horizontales de la exposición de cada tramo** más una tabla de siete columnas con su subtotal, ticket medio, contactables y composición dominante |
+| Título | La semana 1 vale 1,9 veces la semana 4 con los mismos 200 contactos |
+| Reglas | 4, 6, 18 · Shneiderman (details-on-demand) · Parte D §4.1 |
 
 Cambios: el marcador "ARS X M" del título se calculó y se recalcula por corte; 800 filas
 paginadas sin scroll eran 60 páginas; el ranking se parte en cuatro tramos de 200, uno por
-semana, porque la decisión de Sofía R. es semanal y la lista es mensual; y se declara
-ordenable y exportable, como promete la Parte D. La columna "acción sugerida" va rotulada
-"Modelo predictivo (en desarrollo)" mientras no haya score, con el mismo criterio que los dos
-KPIs no computables (C-10). Solo código de cliente, sin nombre ni mail.
+semana, porque la decisión de Marketing es semanal y la lista es mensual; y se declara
+exportable, como promete la Parte D. Solo código de cliente, sin nombre ni mail.
+
+**Cambio del 27/08/2026: la lista leída por tramo (dirección 13d).** La pantalla mostraba las
+filas de un tramo por vez, con orden por cabecera. Lo que NO mostraba es que los cuatro lotes
+no valen lo mismo: como la lista sale ordenada por exposición, la semana 1 concentra casi el
+doble de pesos que la semana 4 con la misma cantidad de contactos. Eso es lo que decide cómo
+se reparte el esfuerzo del mes, y no se veía en ningún lado.
+
+> **Cuidado:** las filas cliente por cliente **ya no están en pantalla**. El botón de exportar
+> sigue bajando los ~800 completos, con su tramo en una columna nueva, que es como la lista
+> llega a Marketing de verdad. El drill-down de las vistas de diagnóstico sigue trayendo acá
+> con el filtro puesto; lo que cambia es que la respuesta pasa a ser "cuánto pesa este recorte
+> y en qué semana cae", no "estos veinte ids".
+
+Los tramos se recalculan sobre el recorte activo: con un filtro puesto la lista puede tener
+menos de 800 y los tramos son los que haya. Con un recorte de un solo cliente la escala del
+eje pasa de millones a miles, porque en millones colapsa a "0,1 M" repetido seis veces.
+
+Repartir por exposición en vez de por orden dejaría los cuatro tramos parejos y quitaría la
+urgencia de la semana 1. Es una decisión de Marketing, no del tablero, y la pantalla la deja
+planteada al pie.
 
 ### M2a · El embudo
 
 | | |
 |---|---|
 | Pregunta | ¿Qué rindió la campaña? |
-| Cifra | 35,1 % abre → 8,8 % clic → 1,2 % compra a 7 días, sobre 23.529 limpios |
-| Gráfico | embudo en barras desde cero |
-| Título | El embudo termina en 1,2 %: las campañas masivas no discriminan |
+| Cifra | 35,1 % → 24,9 % → 13,8 % de retención paso a paso, sobre bases de 23.529, 8.266 y 2.059 |
+| Gráfico | **tres barras apiladas al 100 %**, una por paso, cada una sobre su propia base: avanza (acento) contra se pierde (trama), con la base escrita en cada fila |
+| Título | Cada paso del embudo pierde al menos 64,9 % de lo que recibe; el peor, Clic → Compra, pierde 86,2 % |
 | Reglas | 4, 6, 18 |
 
 Pie con las dos bases y con la advertencia de que `compra_7dias` nunca ocurre sin clic previo
 (0 excepciones), así que el "uplift" de abrir es mecánico, no causal.
 
-### M2b · Por segmento
+**Cambio del 26/08/2026: de cuatro barras de conteo a tres barras de conversión.** Entre la
+primera etapa y la última hay tres órdenes de magnitud, así que en escala lineal la barra de
+compra a 7 días medía unos 9 px sobre 827 y la conversión de cada paso —lo propio de un
+embudo— no estaba dibujada en ningún lado. Agrandar esa barra habría sido el lie factor que
+la regla 4 prohíbe; el formato lo resuelve sin tocar el dato, porque cada barra va sobre su
+propia base. Lo que se pierde es la escala absoluta: tres barras del mismo largo sobre
+23.529, 8.266 y 2.059 se pueden leer como tres poblaciones iguales, y por eso cada fila lleva
+su base escrita y la bajada declara la compra sobre el total (1,2 %). El título propuesto por
+la lámina de formatos ("ningún paso retiene más de un tercio") no se usó: el primer paso
+retiene 35,1 %, que es más de un tercio.
+
+### M2b · El experimento
 
 | | |
 |---|---|
-| Pregunta | ¿Algún segmento discrimina? |
-| Cifra | los cinco segmentos sobre la base de 23.729, con n de envíos y de compras |
-| Gráfico | barras desde cero |
-| Título | Ningún segmento se despega: entre 0,96 % y 1,39 % de compra a 7 días |
-| Reglas | 4, 6, 11, 18 |
+| Pregunta | ¿Con qué comparación se mide la próxima campaña? |
+| Cifra | una sola tasa medible: 1,21 % sobre 23.529 envíos y 284 compras. MDE de 1,71 pp con 3 cortes de 360 por rama |
+| Gráfico | **punto con intervalo más dos renglones vacíos** (el control que no existe y el efecto que no es computable), con una vara punteada en el mínimo detectable, más la tabla de las tres ramas propuestas |
+| Título | Falta el control: 3 cortes solo detectan 1,71 pp sobre una base de 1,21 % |
+| Reglas | 4, 6, 11, 18 · ninguna afirmación causal sin grupo de control |
+
+**Cambio del 27/08/2026: de reportar cinco segmentos a proponer un experimento
+(dirección 15f).** La versión anterior dibujaba las cinco tasas con su intervalo y titulaba que
+ninguno se despega. Era cierto y estaba bien dibujado, pero la conclusión era "no se puede
+concluir nada", repetida cada mes sobre los mismos datos. Con cinco tasas indistinguibles el
+reporte no cambia ninguna decisión.
+
+Lo que la reemplaza es la comparación que falta y por qué falta. Los **dos renglones vacíos**
+son la mitad del argumento: el dataset no tiene grupo de control, así que el efecto de la
+campaña no es computable por más grande que sea la base.
+
+La otra mitad es el tamaño. `series.potencia_experimento` calcula la diferencia mínima
+detectable con las ramas y los cortes que declara `meta.experimento`: **1,71 pp sobre una tasa
+base de 1,21 %**, o sea que el experimento propuesto solo puede ganar si el efecto es enorme.
+Declararlo antes de correrlo es lo que evita gastar tres cortes para volver a escribir "no
+concluyente". La vara punteada del gráfico está justamente en ese umbral, y que caiga tan a la
+derecha del punto medido ES la advertencia.
+
+> **Cuidado:** el control de 80 clientes no se contacta durante tres cortes. Son ARS 4,9 M de
+> exposición que se dejan sin tocar a propósito, y la pantalla lo dice al pie.
+
+La asignación a ramas es **determinística, no sorteada**: un ciclo fijo de 20 sobre la lista ya
+ordenada por exposición reparte 9-9-2, así que las tres ramas quedan estratificadas por
+exposición sin depender de una semilla que después habría que justificar. La propuesta se arma
+sobre la lista del corte de referencia y no sobre el corte activo: en cortes viejos la base en
+riesgo es más chica y las ramas no darían los 360 con los que está calculado el MDE.
 
 ---
+
+## Reglas transversales del 27/08/2026
+
+**Títulos de una sola línea.** Las catorce. El tope de dos renglones dejaba lugar para relleno
+y el relleno apareció: subordinadas, aposiciones y la segunda mitad de la frase repitiendo la
+primera. Con un renglón el título tiene que ser la afirmación y nada más, y el que no entra se
+ve cortado enseguida en vez de esconderse en el segundo renglón. El presupuesto real es ~88
+caracteres a 1152 px, que es el ancho mínimo declarado; los catorce entran con margen. Lo que
+salió del título bajó a la bajada, que sigue en dos renglones.
+
+**Glosario a un toque.** Todo término que decide algo —en riesgo, elegible, anualizado,
+exposición, quintil, RFM, recompra a 90 días, compra a 7 días, IC de Wilson, consentimiento,
+capacidad, tramo, MDE, corte, pesos nominales, y once más— lleva subrayado punteado y abre una
+ficha con **definición, ecuación, umbral de decisión y fuente**. El tablero afirma cosas que
+dependen de definiciones que no estaban en pantalla: vivían en la Parte D y en
+`pipeline/CONTRACT.md`, es decir en otro archivo y en otra reunión. Un directorio que pregunta
+"¿por qué ese es el umbral?" en la mitad de la presentación tiene que poder verlo ahí mismo.
+Los umbrales numéricos de la ficha salen de `meta`, no del glosario: si `build.py` cambia
+`umbral_en_riesgo`, la ficha lo sigue sola. En impresión el punteado desaparece y la ficha no
+existe. Ver `src/Glosario.jsx`.
+
+**Cada marca dice su lectura.** Barras, tramos, puntos con intervalo y sparklines llevan
+`<title>` nativo con etiqueta, valor, base y nota. Es lo que hace falta cuando alguien señala
+un dibujo en una reunión y pregunta "¿este cuál era?". Va en `<title>` y no en un popover
+propio porque el navegador ya lo resuelve, sobrevive a la impresión y no roba el foco.
+
+**El semáforo es un semáforo.** Caja, tres luces y poste. La luz encendida marca el estado por
+**posición** antes que por color —arriba fuera, medio alerta, abajo en meta—, que es el canal
+redundante que la pastilla necesita para sobrevivir a una impresión en blanco y negro y a un
+daltónico. Las apagadas quedan como aro tenue: sin ellas no se lee como semáforo sino como un
+punto de color. Los tres colores son la paleta reservada `--sem-*`, la misma de antes: no entra
+ningún color nuevo.
+
+**Los montos en escala llevan `$`.** Donde la unidad va en un eje o en una columna de
+magnitudes, el signo evita ir a buscar la moneda al encabezado ("$ 23,5 M" y no "23,5 M").
+`pesos()` sigue siendo la forma larga para la prosa.
 
 ## Lo que ninguna pantalla hace
 
