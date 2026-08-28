@@ -163,7 +163,10 @@ def main():
             # Umbrales de semaforo de la Parte D §2.1. En los dos de riesgo, menos es mejor.
             "umbral_en_riesgo": [38.0, 42.0],
             "umbral_q5": [45.0, 52.0],
-            "moneda": "ARS nominales, sin deflactar",
+            # No es "ARS nominales": el extracto no tiene deriva de precios (medicion
+            # 27/08/2026, CONTRACT.md 1). Decir "nominales" afirma del dato algo que el
+            # dato no sostiene.
+            "moneda": "ARS del extracto, sin deriva de precios (-7,6 % de 2022 a 2025)",
             "proxy": "sin compra por más de 90 días o más de 1,5 veces el ritmo propio del cliente",
         },
     }

@@ -268,7 +268,7 @@ if __name__ == "__main__":
         "facturacion_historica_en_riesgo_ars": 262_800_000, "facturacion_base_ars": 550_200_000,
     }
 
-    meta = {"corte_default": "2025-12-31", "moneda": "ARS nominal", "n_cortes": N_CORTES}
+    meta = {"corte_default": "2025-12-31", "moneda": "ARS del extracto", "n_cortes": N_CORTES}
 
     bloques = {
         "dims": dims,
