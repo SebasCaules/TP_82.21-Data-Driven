@@ -218,7 +218,7 @@ function Impresion({ ctx, info, filtro }) {
 
 /**
  * Pie SOLO de la hoja impresa. En pantalla estorbaba; en papel es obligatorio: la cátedra
- * pidió las cuatro correcciones (proxy declarado, exposición ≠ recupero, pesos nominales,
+ * pidió las cuatro correcciones (proxy declarado, exposición ≠ recupero, base de precios,
  * denominador del anualizado) y la hoja se lee sin el tablero al lado.
  */
 function PieImpreso({ info, filtro, pantalla, usaFiltros, usaCorte }) {
@@ -246,7 +246,7 @@ function PieImpreso({ info, filtro, pantalla, usaFiltros, usaCorte }) {
         <span className="sep">|</span>
         <span>el monto en riesgo es <b>exposición, no recupero</b></span>
         <span className="sep">|</span>
-        <span>pesos nominales sin deflactar</span>
+        <span>importes sin deriva de precios: −7,6 % de 2022 a 2025</span>
         <span className="sep">|</span>
         <span>gasto anual estimado = facturación ÷ años desde la primera compra hasta el corte</span>
       </div>

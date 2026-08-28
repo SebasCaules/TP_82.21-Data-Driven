@@ -52,8 +52,9 @@ que se lee sin el tablero al lado, es donde hace falta. Lo que la pantalla sí c
 dato que las resume, "exposición, no recupero", pegado al número en vez de a 600 px.
 
 1. Corte activo · filtros activos · rótulo del bloque (Diagnóstico / Modelo predictivo).
-2. Proxy de churn · "el monto en riesgo es exposición, no recupero" · pesos nominales sin
-   deflactar · gasto anual estimado = facturación ÷ años desde la primera compra hasta el corte.
+2. Proxy de churn · "el monto en riesgo es exposición, no recupero" · importes sin deriva
+   de precios (−7,6 % de 2022 a 2025) · gasto anual estimado = facturación ÷ años desde la
+   primera compra hasta el corte.
 
 La nota de exposición **ya no lleva el número**: el valor se mueve con el corte y el pie lo
 contradecía en los otros 24.

@@ -203,10 +203,11 @@ export const GLOSARIO = {
     ecuacion: '25 cortes mensuales, de dic 2023 a dic 2025',
     fuente: 'CONTRACT.md §2 y §6.2',
   },
-  'pesos-nominales': {
-    termino: 'Pesos nominales',
-    definicion: 'Importes corrientes, sin deflactar por inflación. Comparar 2022 contra 2025 en pesos nominales mezcla crecimiento con inflación: por eso las lecturas entre años van en participación y no en monto.',
-    fuente: 'CONTRACT.md §1 · decisión compuerta 1',
+  'base-de-precios': {
+    termino: 'Base de precios',
+    definicion: 'El extracto no tiene deriva de precios: el precio unitario implícito baja 7,6 % entre 2022 y 2025 y va plano en las siete categorías, contra un IPC que en el período multiplicó los precios por más de 13. Los importes no son pesos corrientes y el negocio todavía no declaró qué son. Por eso no se deflacta: no hay inflación en el dato que corregir.',
+    ecuacion: 'mediana de monto_neto / unidades: 8.900 (2022) → 8.221 (2025)',
+    fuente: 'CONTRACT.md §1 · medición del 27/08/2026',
   },
 }
 

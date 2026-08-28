@@ -122,7 +122,7 @@ export default function D0({ info }) {
             <div className="z2-base">
               <span><i>Base</i><b className="tabular">{entero(info.clientes)}</b>clientes</span>
               <span><i><Def id="corte">Corte</Def></i><b className="tabular">{fechaCorta(info.corte)}</b></span>
-              <span><i>Moneda</i><b><Def id="pesos-nominales">pesos nominales</Def></b></span>
+              <span><i>Importes</i><b><Def id="base-de-precios">sin deriva de precios</Def></b></span>
               <span><i><Def id="anualizado">Con menos de 1 año</Def></i><b className="tabular">{entero(info.historiaCorta)}</b>clientes</span>
               <span><i>Base sin ellos</i><b className="tabular">{pesos(info.baseAnualizada1a)}</b>anualizados</span>
             </div>

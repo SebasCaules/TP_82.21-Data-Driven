@@ -99,8 +99,9 @@ export default function D1({ info, iCorte }) {
         El <Def id="en-riesgo">proxy</Def> define la cohorte por haber dejado de comprar, así
         que el peso de {ultimo.anio} está en parte determinado por esa definición y no es
         hallazgo. Lo que no es definición es cuánto pesaba esa misma gente
-        antes: {pct(100 * anios[0].pct_en_riesgo)} en {anios[0].anio}. En{' '}
-        <Def id="pesos-nominales">pesos nominales</Def>, sin deflactar.
+        antes: {pct(100 * anios[0].pct_en_riesgo)} en {anios[0].anio}. Cada barra es una
+        participación dentro de su propio año, así que la lectura no depende de la{' '}
+        <Def id="base-de-precios">base de precios</Def> del extracto.
       </p>
     </section>
   )

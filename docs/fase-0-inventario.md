@@ -42,7 +42,7 @@ vengo". Ninguna de las dos se recorta por tiempo.
 | Meta y baseline del indicador | relevamiento: base 8-9 %, meta 10-11 % primer año, dueño María G. | nada |
 | Capacidad de contacto | relevamiento: 500 a 800 clientes/mes | nada |
 | Esquema de los 6 CSV | `fuente-dataset-*` + `head -1` confirmado hoy | nada |
-| Serie de IPC para deflactar | **no está en `raw/`** | decisión Q-03 |
+| Serie de IPC para deflactar | **no está en `raw/`** y ya no hace falta: el extracto no tiene deriva de precios (medición 27/08) | Q-02 cerrada |
 | Costos y margen | no existen en los datasets | fuera de alcance, ya declarado en Parte D §5.1 |
 
 ## 2. Contradicciones encontradas
@@ -97,7 +97,7 @@ Cuatro recortes, todos con motivo:
 |---|---|---|
 | R-01 | Meses de corte: **25** (2023-12-31 a 2025-12-31), no los 37 posibles desde 2022-12 | 2022 es año de ramp-up declarado por el propio wiki ("arranca en enero casi sin volumen"). Un corte con menos de dos años de historia hace la exposición anualizada incomparable. 25 cortes dejan igual la comparación interanual del primer mes mostrado. Reduce el payload y la grilla de validación en un tercio |
 | R-02 | La tabla de detalle de Marketing muestra el **top-N por pérdida esperada atado a la capacidad de 500-800**, con el total en riesgo declarado al lado, en vez de las 2.452 filas | es más fiel al pedido del negocio que un volcado completo: Sofía R. decide a quién contacta esta semana dentro de su capacidad. Además una lista completa no se resuelve sin scroll (D1) |
-| R-03 | Sin deflactación por IPC salvo que se decida lo contrario (Q-03) | no hay serie de IPC en `raw/` y la alternativa que el propio wiki acepta es declarar los pesos como nominales |
+| R-03 | Sin deflactación por IPC | el motivo original era que no hay serie de IPC en `raw/`. La medición del 27/08 lo reemplaza por uno más fuerte: el precio unitario implícito del extracto baja 7,6 % entre 2022 y 2025 y va plano en las siete categorías, así que **no hay inflación que deflactar** |
 | R-04 | Drill-down por tienda queda fuera, como ya declara la Parte D §6.1 ("fuera de alcance V1") | no se amplía el alcance ya entregado |
 
 Un agregado, no un recorte, y es la respuesta a C-13: **el bloque de directorio abre con una
@@ -128,7 +128,7 @@ el nivel "todos" de cada dimensión). Medición fina y decisión definitiva, en 
 | # | Pregunta | Recomendación | Compuerta | Estado |
 |---|---|---|---|---|
 | Q-01 | ¿25 meses de corte (2023-12 a 2025-12) o los 37 desde 2022-12? | 25, por R-01 | 1 | abierta |
-| Q-02 | ¿Deflactar por IPC o declarar los pesos como nominales? El wiki lo pide "antes del tablero del 01/09" y la Parte C ya comprometió importes deflactados en dos criterios de éxito, pero no hay serie de IPC en `raw/` y bajar una es traer un dato que el equipo no puede citar de una fuente propia | declarar nominal, con la nota al pie en las pantallas en pesos y una línea en el documento integrado que explique por qué. Es la alternativa que el propio wiki admite | 1 | abierta |
+| Q-02 | ¿Deflactar por IPC o declarar los pesos como nominales? El wiki lo pide "antes del tablero del 01/09" y la Parte C ya comprometió importes deflactados en dos criterios de éxito, pero no hay serie de IPC en `raw/` y bajar una es traer un dato que el equipo no puede citar de una fuente propia | **ninguna de las dos.** La medición del 27/08 muestra que el extracto no tiene deriva de precios: deflactar fabrica una caída real del 95 % y "pesos nominales" afirma del dato algo que el dato no sostiene. Se declara lo medido y se le pide al negocio la base de precios de `monto_neto`. Enmienda 15 | 1 | **cerrada 27/08** |
 | Q-03 | La tabla de detalle de Marketing, ¿top-N por capacidad (R-02) o las 2.452 filas paginadas? | top-N, por R-02 | 1 | abierta |
 | Q-04 | El backlog de 8 épicas sigue sin entrar a ninguna entrega y el programa lo pide dentro del Entregable 1. ¿Entra a esta corrida o se resuelve aparte? | aparte: es documento, no tablero, y meterlo acá desenfoca la corrida a 7 días | 1 | abierta |
 

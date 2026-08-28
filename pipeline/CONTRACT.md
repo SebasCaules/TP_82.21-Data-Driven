@@ -26,8 +26,12 @@ Notas que el pipeline declara y que resuelven contradicciones del wiki:
   etapa; el pipeline informa ambos.
 - `canal` se normaliza de 4 etiquetas a 2: `Tienda`/`tienda` → `fisico`,
   `Online`/`E-commerce` → `online`.
-- No se deflacta por IPC (decisión del usuario, compuerta 1). Todos los importes son
-  **pesos nominales corrientes** y toda pantalla en pesos lo declara al pie.
+- No se deflacta por IPC. La decisión de compuerta 1 era declarar los importes como pesos
+  nominales; la medición del 27/08/2026 la reemplaza por un motivo más fuerte: **el extracto
+  no tiene deriva de precios** (precio unitario implícito −7,6 % de 2022 a 2025, plano en las
+  siete categorías, contra un IPC que multiplicó los precios por más de 13). No hay inflación
+  en el dato que deflactar, y la base de precios de `monto_neto` sigue sin estar declarada por
+  el negocio. Toda pantalla en pesos lo dice al pie.
 
 ## 2. Cortes
 
