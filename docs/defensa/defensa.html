@@ -141,21 +141,22 @@
     </div>
 
     <div>
-      <h3>Las seis preguntas de la Parte D y dónde se responden</h3>
+      <h3>Las siete preguntas de la Parte D y dónde se responden</h3>
       <table>
         <thead><tr><th>Pregunta de negocio §1.2</th><th class="num">Vista</th></tr></thead>
         <tbody>
           <tr><td>¿Cuánta facturación anual está hoy en riesgo y qué parte de la base la explica?</td><td class="num">01</td></tr>
           <tr><td>¿El riesgo se concentra en los que más facturan o en los de menor valor?</td><td class="num">03</td></tr>
           <tr><td>¿La recompra a 90 días se mueve hacia la meta de 10-11 %?</td><td class="num">05</td></tr>
-          <tr><td>¿Qué región y qué categoría concentran la pérdida esperada del mes?</td><td class="num">06 · 07</td></tr>
+          <tr><td>¿Qué región y qué categoría concentran la exposición?</td><td class="num">06 · 07</td></tr>
           <tr><td>¿A cuántos alcanza a contactar Marketing y cuáles quedan sin cubrir?</td><td class="num">09</td></tr>
+          <tr><td>¿A cuántos de esos clientes se los puede contactar sin incumplir el consentimiento?</td><td class="num">10</td></tr>
           <tr><td>¿La lista priorizada rinde más que el criterio actual (1,39 %)?</td><td class="num">08</td></tr>
         </tbody>
       </table>
-      <p class="dato" style="margin-top:5px">Las otras ocho se agregaron: desde cuándo viene el problema
-      (02), dónde conviene gastar (04), si la lista se puede ejecutar (10), cómo se reparte entre
-      semanas (11), qué rindió la campaña (12), con qué se la compara (13) y qué se decide (14).</p>
+      <p class="dato" style="margin-top:5px">Las otras seis se agregaron: desde cuándo viene el problema
+      (02), dónde conviene gastar (04), cómo se reparte entre semanas (11), qué rindió la
+      campaña (12), con qué se la compara (13) y qué se decide (14).</p>
 
       <h3>Lo que obliga el apunte de la clase 4</h3>
       <ul>
@@ -165,7 +166,7 @@
         la serie trimestral y la cohorte de la vista 02.</li>
         <li>"Se debe poder explorar, debe haber movimiento" → filtros, corte móvil, drill-down y la
         curva de cobertura, que se recorre con el mouse.</li>
-        <li>"Las preguntas del diseño son las que van a decidir las decisiones" → las 6 preguntas de la
+        <li>"Las preguntas del diseño son las que van a decidir las decisiones" → las 7 preguntas de la
         Parte D son el índice de vistas.</li>
       </ul>
 
@@ -201,8 +202,10 @@
         <dd>Los ARS 94,9 M son la facturación anual que hoy está en manos de clientes sin
         compra reciente. <b>Exposición, no recupero.</b></dd>
         <dt>Moneda</dt>
-        <dd>Pesos nominales corrientes, <b>sin deflactar por IPC</b>. Decisión del equipo,
-        declarada en cada vista en pesos.</dd>
+        <dd>ARS del extracto, <b>sin deriva de precios</b>: el precio unitario implícito baja
+        7,6 % entre 2022 y 2025 y va plano en las siete categorías, contra un IPC que en el
+        período multiplicó los precios por más de 13. Por eso no se deflacta. Falta que el
+        negocio declare en qué base de precios está <code>monto_neto</code>.</dd>
         <dt>Anualizado</dt>
         <dd>Facturación del cliente ÷ años entre su <b>primera compra y el corte</b>, no hasta
         su última compra. Por eso un cliente inactivo sigue pesando en el denominador.</dd>
@@ -252,22 +255,25 @@
         <li>El navegador <b>no calcula</b> riesgo, recency, quintiles ni RFM. Recibe una tabla de
         contingencia ya resuelta y hace filtrar y sumar. Toda la aritmética con riesgo de
         divergencia vive en Python.</li>
-        <li><b>121 anclas</b> contra las cifras del wiki de la materia. Si una falla, el pipeline
+        <li><b>134 anclas</b> contra las cifras del wiki de la materia. Si una falla, el pipeline
         corta y no hay tablero.</li>
-        <li><b>201.946</b> chequeos del payload contra una verdad independiente, más <b>606.270</b> de
+        <li><b>201.959</b> chequeos del payload contra una verdad independiente, más <b>606.270</b> de
         paridad entre Python y el JavaScript del navegador. La grilla de filtros se valida
         completa: 2.688 combinaciones × 25 cortes.</li>
-        <li>Tres anclas son <b>booleanas</b>: fijan el hallazgo que el título afirma, no solo la
+        <li>Cinco anclas son <b>booleanas</b>: fijan el hallazgo que el título afirma, no solo la
         cifra. Si la cohorte dejara de pesar menos en 2025, o si algún criterio se separara de
         la vara por tasa, el build corta y el título se reescribe.</li>
       </ul>
 
       <div class="caja">
         <h3 style="border:0;padding:0;margin-bottom:3px">La herramienta, y por qué no Looker ni Tableau</h3>
-        <p style="margin:0">Clientes.csv trae mail, edad, género y provincia. Subirlo a una
-        herramienta en la nube es tratamiento de datos personales bajo la Ley 25.326 art. 12.
-        El pipeline corre local, el tablero no sale de la máquina y en pantalla nunca aparece
-        nombre ni mail, solo código de cliente <span class="cita">Parte D §6.1</span>.</p>
+        <p style="margin:0">Tres motivos: exigen red en el aula, obligan a subir los datos a un
+        tercero y no dejan abrir el tablero con doble clic. El dataset de cátedra es sintético
+        (los correos de Clientes.csv usan dominios reservados de la RFC 2606), pero el mismo
+        tablero sobre el padrón real de Casa Óga cae bajo la Ley 25.326, así que el criterio se
+        fija ahora. El pipeline corre local, el tablero no sale de la máquina y en pantalla
+        nunca aparece nombre ni mail, solo código de cliente
+        <span class="cita">Parte D §6.1</span>.</p>
       </div>
     </div>
   </div>
@@ -292,8 +298,8 @@
         <li><b>El riel bajo la cifra</b>: qué parte de los 204,6 M de gasto anual estimado ocupa esa
         exposición. La marca vertical es el <b>corte anterior</b>, así se ve si subió o bajó sin
         cambiar de vista.</li>
-        <li><b>La línea de encuadre</b>: base 5.978 clientes, corte 31/12/2025, pesos nominales y
-        cuántos tienen menos de un año de historia. Sin eso el número no se puede leer.</li>
+        <li><b>La línea de encuadre</b>: base 5.978 clientes, corte 31/12/2025, importes sin deriva
+        de precios y cuántos tienen menos de un año de historia. Sin eso el número no se puede leer.</li>
         <li><b>Las tres comparaciones</b>: 46,4 % del gasto anual, 47,8 % del histórico acumulado,
         2.452 de 5.978 clientes. Van rotuladas una por una porque 46,4 % y 47,8 % no miden lo mismo.</li>
         <li><b>La serie de recompra</b>: 2022Q1 a 2025Q3 con las tres franjas del semáforo
@@ -517,8 +523,8 @@
         <li><b>Tres franjas</b> con su rango escrito: en meta ≥10,0 %, por debajo 9,0-10,0 %, fuera de
         meta &lt;9,0 %. El estado es la franja donde cae la línea.</li>
         <li><b>Pico marcado</b> en 19,0 % (2024Q2) y último punto en 8,5 % con la etiqueta de estado.</li>
-        <li>La línea base histórica del negocio, 8-9 %, queda en el borde entre las dos franjas
-        bajas.</li>
+        <li>El 8-9 % que estimó el negocio queda en el borde entre las dos franjas bajas. Es una
+        estimación de ellos, no un nivel de la serie.</li>
       </ul>
 
       <h3>De dónde sale</h3>
@@ -545,8 +551,10 @@
       <h3>Si preguntan</h3>
       <p><span class="q">¿De dónde sale la meta de 10-11 %?</span> La declaró el negocio en el
       relevamiento del 18/08 como meta preliminar del primer año, explícitamente abierta a que el
-      equipo la ajuste con el diagnóstico. La línea base 8-9 % era una estimación de ellos y el dato
-      la confirma.</p>
+      equipo la ajuste con el diagnóstico. El 8-9 % es una estimación de ellos y el dato solo la toca en el
+      último trimestre: de 2023Q1 a 2025Q1 la recompra estuvo entre 16 % y 19 %, así que la meta
+      de 10-11 % queda por debajo del nivel de 2024. Vale decírselo al directorio antes de que
+      lo pregunte.</p>
       <p><span class="q">¿Por qué el indicador del directorio es este y no la exposición?</span> Porque
       la exposición no tiene meta: se sigue su variación. La recompra tiene meta, umbrales, dueña y
       cadencia, que es lo que hace a un indicador bien definido.</p>
@@ -631,7 +639,7 @@
         hacia la derecha.</li>
         <li>La tasa de riesgo, en la bajada: <b>44,4 % en Muebles contra 28,9 % en Baño, 15,5 puntos</b>,
         contra los 2,8 de región.</li>
-        <li>Al pie: Organización tiene 199 clientes y Baño 166. Las tasas del extremo bajo se mueven
+        <li>Al pie: Organizacion tiene 199 clientes y Baño 166 (el tablero las rotula sin tilde, como vienen del dataset). Las tasas del extremo bajo se mueven
         con pocos casos.</li>
       </ul>
 
@@ -906,7 +914,7 @@
       <h3>Qué muestra</h3>
       <ul>
         <li><b>Un paso por barra, cada una al 100 % de su propia base</b>: Envío → Abre sobre 23.529,
-        Abre → Clic sobre 8.266, Clic → Compra sobre 2.059. La base va escrita bajo cada etiqueta.</li>
+        Abre → Clic sobre 8.265, Clic → Compra sobre 2.059. La base va escrita bajo cada etiqueta.</li>
         <li><b>Tramo de acento</b>: lo que avanza, con su conteo y su porcentaje. <b>Trama</b>: lo que se
         pierde en ese paso.</li>
         <li>El peor paso es <b>Clic → Compra</b>, que pierde 86,2 %. Ninguno pierde menos de 64,9 %.</li>
@@ -1085,7 +1093,7 @@
           <tr><td>Costo de cambiar de criterio</td><td class="num">17,4 M a 37,2 M</td></tr>
           <tr><td>Envíos sin consentimiento · por año</td><td class="num">30,1 % · 29,5 a 31,2 %</td></tr>
           <tr><td>Experimento: ramas · cortes · MDE</td><td class="num">360/360/80 · 3 · 1,71 pp</td></tr>
-          <tr><td>Validación</td><td class="num">121 anclas · 201.946 · 606.270</td></tr>
+          <tr><td>Validación</td><td class="num">134 anclas · 201.959 · 606.270</td></tr>
         </tbody>
       </table>
     </div>
@@ -1112,15 +1120,16 @@
         <li><span class="q">"¿Esto es churn?"</span> No. Es un proxy operativo sobre inactividad, escrito
         antes de tocar el dato y reproducible.</li>
         <li><span class="q">"¿Cuánto recuperan?"</span> No se afirma recupero en ninguna vista.</li>
-        <li><span class="q">"¿Y la inflación?"</span> Pesos nominales sin deflactar, declarado. Por eso las
-        vistas 02 y 10 comparan participaciones y no montos entre años.</li>
+        <li><span class="q">"¿Y la inflación?"</span> El extracto no la tiene: medimos el precio
+        unitario implícito y baja 7,6 % de 2022 a 2025, plano en las siete categorías. No hay
+        deflactor que aplicar. Igual las vistas 02 y 10 comparan participaciones y no montos.</li>
         <li><span class="q">"¿Los datos son representativos?"</span> No del todo: el 44,8 % de las
         transacciones no tiene id de cliente. La base identificada es la única sobre la que se puede
         calcular riesgo, y el sesgo está declarado.</li>
         <li><span class="q">"¿Midieron el efecto de la campaña?"</span> No, y no se puede con estos datos.
         La vista 13 muestra el hueco y propone el experimento que lo llena.</li>
-        <li><span class="q">"¿Cómo sabemos que los números están bien?"</span> 121 anclas, 201.946 chequeos
-        contra una verdad independiente y 606.270 de paridad. Tres anclas son booleanas: fijan el
+        <li><span class="q">"¿Cómo sabemos que los números están bien?"</span> 134 anclas, 201.959 chequeos
+        contra una verdad independiente y 606.270 de paridad. Cinco anclas son booleanas: fijan el
         hallazgo del título, no solo la cifra.</li>
       </ul>
     </div>
