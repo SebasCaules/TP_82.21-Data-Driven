@@ -15,7 +15,7 @@ export const NQ = 5
 // Las categorias llegan del CSV de la catedra sin tilde ("Decoracion", "Iluminacion",
 // "Organizacion") mientras "Bano" si conserva la enie. En crudo no se tocan: raw/ es inmutable,
 // y renombrarlas en el pipeline tampoco sirve porque validate.py mapea los valores del CSV a
-// traves de esta misma lista y romperia los 201.900 chequeos. Se corrigen aca, que es la capa
+// traves de esta misma lista y romperia los 201.946 chequeos. Se corrigen aca, que es la capa
 // de display: el empaquetado usa indices, nunca la etiqueta.
 const TILDES = {
   Decoracion: 'Decoración',

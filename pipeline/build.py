@@ -267,7 +267,49 @@ def _anclas(counts, facts, tx):
         for v, esperado in zip(_ventas_anuales(DATA_DIR), [123.8, 295.8, 349.7, 225.0])
     ] + _anclas_estacionalidad(tx) + _anclas_campanias() + _anclas_dimensiones(facts) \
         + _anclas_concentracion(facts) \
-      + _anclas_sensibilidad(tx) + _anclas_variantes(facts, tx)
+      + _anclas_sensibilidad(tx) + _anclas_variantes(facts, tx) \
+      + _anclas_series_globales(tx)
+
+
+def _anclas_series_globales(tx):
+    """Las dos series que no dependen del corte: recompra trimestral y base activa anual.
+
+    Ninguna estaba anclada, y la recompra es el KPI de cabecera de la vista 05 y el
+    primero de los tres pedidos de la vista 14. La Parte D §6.1 afirma que ninguna cifra
+    llega a pantalla sin chequeo; sin estas anclas la afirmacion era falsa justo para el
+    numero que el directorio mira primero.
+    """
+    import pandas as pd
+
+    import series
+
+    rec = series.recompra_trimestral(tx, hasta=pd.Timestamp(CORTE_REF))
+    con_tasa = [x for x in rec if x["tasa"] is not None]
+    pico = max(con_tasa, key=lambda x: x["tasa"])
+    ultimo = con_tasa[-1]
+
+    base = series.base_activa_anual(tx)
+    activos = [x["activos"] for x in base]
+    var_2025 = round((activos[3] - activos[2]) / activos[2] * 100, 1)
+
+    def chk(nombre, real, esperado):
+        return {"nombre": nombre, "real": real, "esperado": esperado, "ok": real == esperado}
+
+    return [
+        chk("recompra trimestres calculables", len(con_tasa), 15),
+        chk("recompra pico (trimestre)", pico["trimestre"], "2024Q2"),
+        chk("recompra pico (%)", round(pico["tasa"] * 100, 1), 19.0),
+        chk("recompra ultimo (trimestre)", ultimo["trimestre"], "2025Q3"),
+        chk("recompra ultimo (%)", round(ultimo["tasa"] * 100, 1), 8.5),
+        chk("recompra ultimo por debajo de la linea base 8-9", round(ultimo["tasa"] * 100, 1) < 9.0, True),
+        chk("base activa 2022", activos[0], 2472),
+        chk("base activa 2023", activos[1], 4472),
+        chk("base activa 2024", activos[2], 4755),
+        chk("base activa 2025", activos[3], 3956),
+        chk("primeras compras 2023", base[1]["nuevos"], 2647),
+        chk("primeras compras 2025", base[3]["nuevos"], 111),
+        chk("variacion base activa 2025 (%)", var_2025, -16.8),
+    ]
 
 
 def _anclas_variantes(facts, tx):

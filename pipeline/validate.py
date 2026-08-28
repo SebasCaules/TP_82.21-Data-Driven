@@ -8,11 +8,12 @@ Prueba tres cosas, y las tres tienen que dar N/N:
    una afirmacion sin respaldo.
 3. Que toda combinacion de la grilla de filtros declarada (region x categoria x
    segmento RFM x quintil, con el nivel "todos" en cada dimension) da lo mismo
-   sumando celdas del payload que filtrando client_facts directo. Son 2.304
-   combinaciones por corte, 57.600 en total.
+   sumando celdas del payload que filtrando client_facts directo. Son 2.688
+   combinaciones por corte (7x8x8x6, contando el nivel "todos" y las 6 regiones
+   con "Solo online"), 67.200 en total.
 
 El punto 3 es lo que habilita que el navegador solo filtre y sume: si la identidad
-vale para las 57.600, no hay aritmetica en JS que pueda divergir de Python.
+vale para las 67.200, no hay aritmetica en JS que pueda divergir de Python.
 
     python3 pipeline/validate.py
 """

@@ -40,8 +40,8 @@ export default function D4Recompra() {
       </h1>
       <p className="bajada">
         Serie completa 2022Q1–2025Q3 de la{' '}
-        <Def id="recompra-90">recompra a 90 días</Def>. La línea base histórica
-        es {pct(baseLo)} – {pct(baseHi)}, en el borde entre fuera de meta y por debajo.
+        <Def id="recompra-90">recompra a 90 días</Def>. El {pct(baseLo)}–{pct(baseHi)} lo estimó
+        el negocio, no la serie: de 2023Q1 a 2025Q1 estuvo entre 16 % y 19 %.
       </p>
 
       <div className="lienzo">
