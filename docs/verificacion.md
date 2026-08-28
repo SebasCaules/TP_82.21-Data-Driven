@@ -9,13 +9,13 @@ Se cierra en dos tramos y los dos usan `client_facts` como verdad independiente.
 compara el payload contra sí mismo, que sería probar nada.
 
 ```
-pipeline/validate.py    payload == client_facts                201.900 chequeos
+pipeline/validate.py    payload == client_facts                201.959 chequeos
 test/paridad.mjs        agregacion.js(payload) == client_facts  606.270 chequeos
 ```
 
 | Etapa | Cobertura | Resultado |
 |---|---|---|
-| Anclas | 75 cifras: el wiki completo, la tabla RFM, región y categoría, el embudo y la sensibilidad del proxy | **75/75** |
+| Anclas | 134 cifras: el wiki completo, la tabla RFM, región y categoría, el embudo, la sensibilidad del proxy y las dos series globales (recompra trimestral y base activa anual) | **134/134** |
 | Contingencia | celda a celda, 9 campos, 25 cortes | **225/225** |
 | Grilla de filtros | 2.688 combinaciones × 25 cortes | **201.600/201.600** |
 | Paridad Python ↔ JS | las mismas 2.688 × 25 sobre 9 campos, más la decodificación de las 1.470 claves | **606.270/606.270** |
@@ -25,6 +25,12 @@ payload coincide con `client_facts`, pero de ahí no se sigue que `client_facts`
 La tabla RFM, la asignación de región y la de categoría no estaban ancladas contra ninguna
 fuente externa: un cambio en esas reglas habría pasado los 201.819 chequeos sin que nadie se
 enterara. Ahora tienen ancla propia.
+
+Del 75 al 134 hubo dos saltos más. El rediseño de las vistas 02, 08, 10 y 13 sumó 25 anclas
+(`_anclas_variantes`, sección 5 del contrato). El audit de consistencia del 28/08 sumó las
+últimas 13: `recompra_trimestral` y `base_activa_anual` eran las dos series que alimentan
+pantalla sin ancla propia, y la recompra es el KPI de cabecera del directorio. Mientras
+faltaron, la Parte D §6.1 afirmaba cobertura total y no la tenía.
 
 Tolerancias declaradas: los conteos (`n`, `nr`, `ne`) se exigen exactos, sin tolerancia. En
 los campos de dinero se acepta 1 peso por celda sumada, porque Python redondea el total de
@@ -109,7 +115,8 @@ Dos fallas reales que el detector cazó y que la captura de pantalla no mostraba
 ## Impresión
 
 14 hojas A4 apaisadas de 180 mm, una por pantalla, con corte y filtros activos en el pie de
-cada hoja. Ningún gráfico por debajo de 90 px (mínimo 193). M1 imprime 16 filas.
+cada hoja. Ningún gráfico por debajo de 90 px (mínimo 193). M1 imprime los cuatro tramos
+más la fila de total; las filas cliente por cliente salen por el CSV.
 
 El modo de impresión renderiza las 14 en flujo normal, no con `display:none`: el
 `ResizeObserver` que dimensiona cada SVG mide cero en un elemento oculto y los gráficos
@@ -202,7 +209,7 @@ auditor de la capa (a) resume dónde estaba el problema real:
 | B-05 | La nota de historia corta del BAN salía de la serie global: con un filtro puesto mostraba el número nacional al lado de una cifra filtrada. Ahora viaja por celda de contingencia |
 | B-01 | En `BarrasH`, la etiqueta de valor de la barra más larga se metía dentro de la columna de notas. El ancho de la etiqueta no salía del presupuesto de la barra |
 | A-05 · B-06 | D5b marcaba con el mismo color de énfasis la categoría de **mayor** y la de **menor** tasa: dos significados opuestos en un mismo gráfico (regla 19) |
-| A-02 | De los cuatro KPIs computables que la Parte D declara con semáforo, solo uno lo tenía. Tras el fix del 26/08/2026 son **dos de cuatro**: recompra a 90 días y clientes en riesgo. Los otros dos siguen sin pastilla |
+| A-02 | De los cuatro KPIs computables que la Parte D declara con semáforo, solo uno lo tenía. Tras el fix del 26/08/2026 son **dos de cuatro**: recompra a 90 días (`D4Recompra.jsx`) y riesgo en Q5 (`D2Quintiles.jsx`). Los otros dos siguen sin pastilla |
 | A-04 | El pie, donde viven las cuatro correcciones obligatorias, se pintaba a 2,6:1 de contraste |
 | A-06 | Las barras sin énfasis quedaban a 1,64:1 contra el fondo, por debajo del mínimo de 3:1 para un objeto gráfico |
 | A-08 | Al imprimir se colaba un decimoquinto pie, el de la pantalla activa |

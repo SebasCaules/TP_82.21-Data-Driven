@@ -13,6 +13,7 @@ Método: workforce (olas verificadas). Arranque 2026-08-25. Entrega **mar 01/09/
 | 4 | Esqueleto navegable | **APROBADA** | 14 pantallas con datos reales, cero desborde |
 | 5 | Verificación | **APROBADA** | auditoría adversarial: 63 hallazgos, 22 refutados, 29 confirmados y corregidos. 44 → 75 anclas |
 | 6 | Cierre | **CERRADA** | push, deploy en verde, wiki propagado, `log.md` actualizado |
+| 7 | Audit de consistencia | **CERRADA** | 28/08: 100 conflictos verificados contra las entregas, el relevamiento y el wiki. Ver abajo |
 
 ## Fase 0 — pasos
 
@@ -181,7 +182,7 @@ confirmaron los cuatro. Los tres hallazgos que valían la corrida:
 | N0-21 | El **valor** de un token vive en `estilos.css`; su **uso dentro del SVG** vive en `graficos.jsx`. Ningún worker cruza esa frontera | dos hallazgos de contraste (A11Y-02, A11Y-11) se arreglan a los dos lados; sin la frontera, dos workers se pisan el mismo archivo | 2026-08-26 |
 | N0-22 | `src/Ban.jsx` se borra. Las clases `.ban-*` de `estilos.css` se conservan | el componente no lo monta ninguna pantalla desde que D0 desarmó la ficha F07 en zonas, pero D0 sigue usando `.ban-track`, `.ban-sc` y `.ban-scrow`. Muere el componente, no los estilos | 2026-08-26 |
 | N0-23 | ~~El semáforo de "Clientes en riesgo" se monta en `D0Consolidada.jsx`~~ **Revertida el 26/08/2026: la pastilla sale de D0 por pedido del usuario.** El umbral sigue viajando en el payload sin que ninguna pantalla lo consuma | `umbral_en_riesgo` ya viaja en el payload desde `build.py`: lo que falta es consumirlo. El hallazgo se archivó contra el pipeline pero el arreglo es de pantalla | 2026-08-26 |
-| N0-24 | Las tildes de las categorías se corrigen en la **capa de display del navegador** (`agregacion.js`), no en el pipeline | `validate.py` mapea los valores crudos del CSV a través de `dims.categoria`: renombrarlas ahí rompe los 201.900 chequeos. El empaquetado usa índices, nunca la etiqueta, así que corregirlas al leerlas es seguro y alcanza a las cuatro pantallas que las muestran | 2026-08-26 |
+| N0-24 | Las tildes de las categorías se corrigen en la **capa de display del navegador** (`agregacion.js`), no en el pipeline | `validate.py` mapea los valores crudos del CSV a través de `dims.categoria`: renombrarlas ahí rompe los 201.959 chequeos. El empaquetado usa índices, nunca la etiqueta, así que corregirlas al leerlas es seguro y alcanza a las cuatro pantallas que las muestran | 2026-08-26 |
 | N0-25 | El gris de las series sin énfasis prioriza separarse **del fondo**, no del azul de énfasis | son objetivos incompatibles y está probado: papel `#eceae5` contra acento `#22456f` da 8,13:1, y para que el gris quede a 3:1 de los dos haría falta un producto de 9. El viejo `#8891a3` daba 3,08 contra el énfasis y 2,64 contra el papel; el nuevo `#767f91` da 3,35 contra el papel y 2,43 contra el énfasis. 1.4.11 pide la marca contra su fondo, y el énfasis además ya lo cargan la etiqueta en negrita y el valor en tinta | 2026-08-26 |
 
 ## Ownership de archivos
@@ -217,7 +218,7 @@ Plan: `docs/plan-fixes-auditoria.md`. Rama: `fix/auditoria-diseno` desde `6b7c86
 | Ola 2 · controles (`App.jsx`, `Filtros.jsx`, `LineaTiempo.jsx`, `fit.js`, `Ban.jsx`) | DONE | | 11 cerrados. `App.jsx` y `fit.js` los hizo N0; `Ban.jsx` se borró |
 | Ola 3 · las 14 pantallas | DONE | | 31 cerrados en 6 workers. 5 de 6 VERDE; el ROJO de `cortes` fue un falso positivo mío (le di al builder la instrucción de saltear NAR-05 y no al verificador) |
 | Ola 4 · documentos | DONE | | 7 cerrados: los 6 choques doc/código de N0-19 más la matriz de resoluciones |
-| Cierre · gates + barrido visual | DONE | | `npm run todo` verde (92 anclas, 201.917 y 606.270 chequeos). Las 14 vistas con `__fit()` limpio a 1152×640 y a 1440×900 |
+| Cierre · gates + barrido visual | DONE | | `npm run todo` verde (134 anclas, 201.959 y 606.270 chequeos, tras el audit del 28/08). Las 14 vistas con `__fit()` limpio a 1152×640 y a 1440×900 |
 
 **70 de 72 hallazgos cerrados**, uno abierto y uno descartado por el usuario. El barrido visual del cierre encontró dos cosas que la
 verificación por unidad no vio, las dos ya corregidas: la bajada nueva de D3 no entraba en las
@@ -231,3 +232,36 @@ vistas porque comparaba la marca de la lateral contra la barra de otra columna.
 | S-09 | OV-5: el semáforo de "Clientes en riesgo" se montó en D0 y se sacó a pedido del usuario. `meta.umbral_en_riesgo` ([38, 42]) vuelve a viajar en el payload sin que ninguna pantalla lo consuma, así que de los cuatro KPIs con semáforo de la Parte D sigue habiendo uno solo en pantalla. Si la cátedra pregunta, esa es la respuesta. **Actualización 27/08:** el umbral vuelve a estar en pantalla, pero como ficha y no como pastilla: el rótulo "Clientes en riesgo" de D0 abre la entrada `umbral-riesgo` del glosario, que dibuja las tres bandas con su semáforo. La decisión del usuario (sacar la pastilla de D0) se respeta; lo que se recupera es el umbral consultable | app | decisión del usuario 26/08 | cerrado por decisión |
 
 | S-10 | DVZ-03 se reabre y se cierra. La auditoría lo había levantado (D6 ordenaba cinco barras cuyos intervalos se solapan todos) y un verificador lo refutó apoyándose en que el contrato prescribía las barras y en que N0-16 gobierna la vista 13. Las dos cosas eran ciertas, pero la refutación no llegó a preguntarse si el gráfico sostenía lo que la pantalla afirma. Reabierto por el usuario el 26/08 y resuelto: D6 pasa a punto con intervalo, con la banda de la vara y el lugar del score reservado | app | usuario 26/08 | cerrado |
+
+## Audit de consistencia — 28/08/2026
+
+Auditoría cruzada de las cuatro partes del Entregable 1, las 77 respuestas del relevamiento,
+el wiki y el tablero. 170 conflictos levantados, 26 refutados, 27 rectificados, **100
+confirmados**. Detalle en `wiki/sintesis/audit-consistencia-entregable-1.md`.
+
+Lo que se corrigió del lado del tablero, que es donde el equivocado era el código:
+
+| Fix | Archivo | Origen |
+|---|---|---|
+| El 8-9 % dejó de llamarse "línea base histórica": lo estimó el negocio (respuesta 3) y la serie estuvo entre 16 % y 19 % de 2023Q1 a 2025Q1 | `src/pantallas/D4Recompra.jsx` | E-08 |
+| 13 anclas para `recompra_trimestral` y `base_activa_anual`, las dos series que alimentaban pantalla sin arnés | `pipeline/build.py` | C-04 |
+| El docstring declaraba 2.304 combinaciones y 57.600 chequeos; la grilla recorre 2.688 y 67.200 | `pipeline/validate.py` | C-07 |
+| Comentario con el conteo viejo de chequeos | `src/agregacion.js` | C-05 |
+
+Barrido de los `.md` internos, que habían quedado en cuatro versiones distintas del arnés:
+`README.md`, `docs/verificacion.md`, `pipeline/CONTRACT.md` y este archivo pasan a **134
+anclas / 201.959 chequeos**. `docs/parte-d-entregada.txt` se renombró a `docs/parte-d-v1.txt`
+porque no era la versión entregada y `comite-adjudicacion.md` la usaba como regla de desempate.
+`docs/diseno-pantallas.md` decía que la Parte D no declara el filtro de quintil, y la v2.0 sí.
+`docs/plan-fixes-auditoria.md` apuntaba a `src/Ban.jsx`, borrado por N0-22.
+
+Las actas de compuerta (44/44, 201.819, 471.870, 44 → 75) se dejan como están: son registro
+histórico de lo que era cierto en cada cierre, no afirmaciones vigentes.
+
+| Estado del arnés | Valor |
+|---|---|
+| anclas | 134/134 |
+| chequeos `validate.py` | 201.959/201.959 |
+| paridad `paridad.mjs` | 606.270/606.270 |
+| payload | 1.217 KB |
+| bundle | 1,49 MB |

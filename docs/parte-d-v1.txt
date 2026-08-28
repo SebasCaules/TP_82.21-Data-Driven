@@ -1,4 +1,9 @@
-# Transcripcion de la Parte D entregada (DOCX, v1.0, no se toca — decision D8)
+# Transcripcion de la Parte D **v1.0** (borrador del 25/08, NO es lo que se entrego)
+# Lo entregado el 01/09 es la v2.1: entregas/entregable-1/25-08/*.docx
+# La v1.0 declara seis preguntas de negocio y seis KPIs; la v2.0 sumo la del
+# consentimiento y el KPI de cobertura ejecutable, y la v2.1 (audit del 28/08)
+# reescribio las visualizaciones 2, 3, 4, 6, 7, 8, 10, 11 y 13.
+# Se conserva como registro de que decia el borrador. No usar como regla de desempate.
 # Fuente: entregas/entregable-1/25-08/
 
 

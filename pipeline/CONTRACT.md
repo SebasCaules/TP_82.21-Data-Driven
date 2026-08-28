@@ -109,7 +109,7 @@ Por cada corte, una fila por celda **ocupada** de `region × categoria × rfm ×
 **Toda combinación de filtros es una suma de celdas.** El navegador no calcula riesgo,
 recency, quintiles ni RFM: filtra celdas y suma. Toda la aritmética con riesgo de
 divergencia queda en Python. Esto es lo que hace validable la grilla completa de
-2.304 combinaciones × 25 cortes = 57.600 celdas agregadas.
+2.688 combinaciones × 25 cortes = 67.200 celdas agregadas.
 
 ### 4.3 Listas de Marketing
 
@@ -170,7 +170,7 @@ Corte 31/12/2025:
 | riesgo Q5 / riesgo Q1 | 51,8 % / 13,3 % |
 | amplitud de riesgo entre las 5 regiones | 2,8 pp |
 
-Las series del rediseño suman 25 anclas más (`_anclas_variantes`), y tres de ellas son
+Las series del rediseño suman 25 anclas más (`_anclas_variantes`), y cinco de ellas son
 booleanas: anclan el **hallazgo** que el título de la pantalla afirma, no solo la cifra.
 
 | Chequeo | Esperado |
@@ -183,7 +183,24 @@ booleanas: anclan el **hallazgo** que el título de la pantalla afirma, no solo 
 | ningún criterio alternativo se distingue del actual por tasa | verdadero |
 | MDE del experimento propuesto | 1,71 pp |
 
-Total con el rediseño: **121 anclas**.
+Subtotal con el rediseño: **121 anclas**.
+
+### 5.1 Series globales (`_anclas_series_globales`)
+
+Las dos series que no dependen del corte no tenían ancla, y una de ellas es el KPI de
+cabecera. Son 13 chequeos, uno booleano.
+
+| Chequeo | Esperado |
+|---|---|
+| trimestres con recompra calculable | 15 |
+| pico de recompra | 2024Q2 · 19,0 % |
+| último calculable | 2025Q3 · 8,5 % |
+| el último queda por debajo de la línea base 8-9 | verdadero |
+| base activa 2022 a 2025 | 2.472 / 4.472 / 4.755 / 3.956 |
+| primeras compras 2023 y 2025 | 2.647 / 111 |
+| variación de la base activa en 2025 | −16,8 % |
+
+**Total del arnés: 134 anclas.**
 
 ## 6. Reglas duras para todo worker
 

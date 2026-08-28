@@ -39,7 +39,7 @@ que hay que respetar sí o sí:
 | 2 · controles y armazón | `src/Filtros.jsx` | 4 | 2 | A11Y-03, A11Y-08, HCI-01, HCI-08 |
 | 2 · controles y armazón | `src/LineaTiempo.jsx` | 1 | 1 | A11Y-04 |
 | 2 · controles y armazón | `src/fit.js` | 1 | — | LAY-07 |
-| 2 · controles y armazón | `src/Ban.jsx` | 1 | — | VIS-08 |
+| 2 · controles y armazón | `src/pantallas/D0Consolidada.jsx` (era `src/Ban.jsx`, borrado por N0-22) | 1 | — | VIS-08 |
 | 3 · las 14 pantallas | `src/pantallas/D0Consolidada.jsx` | 6 | 2 | CIF-05, COPY-08, NAR-01, NAR-08, OV-3, OV-5 |
 | 3 · las 14 pantallas | `src/pantallas/D1Exposicion.jsx` | 2 | — | CIF-10, DVZ-08 |
 | 3 · las 14 pantallas | `src/pantallas/D2Quintiles.jsx` | 4 | 1 | CIF-02, CIF-06, CIF-07, OV-2 |

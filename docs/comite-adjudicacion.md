@@ -4,6 +4,10 @@ Cuatro revisores read-only, modelo N0, una sola ronda. 72 hallazgos, **49 bloque
 Regla de desempate del runbook: gana la regla citada del rulebook; si ninguna aplica, manda
 la Parte D; si tampoco, decide el usuario en compuerta.
 
+> **Nota (28/08).** Cuando el comité corrió, "la Parte D" era la v1.0 (hoy `docs/parte-d-v1.txt`).
+> Las adjudicaciones de abajo se resolvieron contra ese texto. La versión vigente es la v2.1, que
+> incorporó las 14 enmiendas del 26/08 y los 21 puntos del audit del 28/08.
+
 Resultado: **49 aceptados, 0 rechazados, 3 con la respuesta mejor de lo que el comité
 suponía.** Ninguno se descartó por falta de cita.
 

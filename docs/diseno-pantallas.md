@@ -38,10 +38,9 @@ Dos bloques, una pantalla por gráfico, sin scroll (`dec-D1`, `dec-D2`).
 > tres rótulos de grupo separan igual y no obligan a recordar en qué bloque se está. La tabla
 > de arriba es lo que el tablero hace hoy.
 
-> **Nota.** El **quintil** es un cuarto filtro que la Parte D no declara (declara tres:
-> región, categoría, segmento RFM). Se agrega porque el contrato ya lo trae como dimensión
-> de la contingencia y porque D2 es su pantalla. Queda documentado como agregado, igual que
-> el corte móvil contra C-06.
+> **Nota.** Los cuatro filtros (región, categoría, segmento RFM y quintil) los declara la
+> Parte D v2.0 §4.1. Esta nota se escribió contra la v1.0, que solo declaraba tres. El único
+> agregado que sobrevive es el corte móvil contra C-06.
 
 ## Pie de dos líneas — solo en la hoja impresa
 
