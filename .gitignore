@@ -10,3 +10,11 @@ ds-bundle/
 .design-sync/.cache/
 .design-sync/learnings/
 .design-sync/node_modules
+
+# Subproductos de LaTeX: formulas.pdf si se versiona, el resto se regenera
+*.aux
+*.toc
+*.fls
+*.out
+*.fdb_latexmk
+docs/formulas.log
