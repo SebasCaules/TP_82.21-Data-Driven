@@ -184,18 +184,6 @@ export default function Filtros({ filtro, setFiltro, activos, reiniciar, modific
            aria-hidden={!puestos}>{puestos || 0}</b>
       </span>
 
-      {/* Montado siempre que la vista tenga eje exento (nunca cambia en la vida del
-          componente: lo fija la pantalla, no el filtro), y oculto con visibility en vez
-          de desmontado. Mismo motivo que el contador de arriba y la ✕ de cada chip: si el
-          ancho lo decidiera el contenido, poner o sacar el filtro de ese eje le correría
-          el riel del mes de corte de al lado. */}
-      {dimExenta && activos && (
-        <span className="filtros-nota" aria-hidden={!filtroExento}
-              style={filtroExento ? undefined : { visibility: 'hidden' }}>
-          {dimExenta.etq} no recorta esta vista
-        </span>
-      )}
-
       {DIMENSIONES.map((d) => (
         <Chip key={d.id} dim={d} valor={filtro[d.id]} activo={activos}
               exento={activos && filtro[d.id] !== null && d.id === ejeExento}
@@ -217,6 +205,18 @@ export default function Filtros({ filtro, setFiltro, activos, reiniciar, modific
           )
           : !activos && <span className="filtros-nota">no aplican acá</span>}
       </span>
+
+      {/* El aviso del eje exento va al FINAL y solo cuando hay algo que avisar. Antes iba
+          antes de los chips y montado siempre que la vista tuviera eje, oculto con
+          visibility: reservaba entre 128 y 144 px según el largo del nombre de la dimensión,
+          así que las cuatro vistas con eje tenían la barra corrida respecto de las otras
+          diez y entre ellas. La reserva existía para que el riel del corte no se moviera al
+          poner ese filtro; el precio era un header distinto por vista, que es peor. Ahora lo
+          único que se mueve es el riel, que es elástico, y solo en el estado en que el aviso
+          hace falta. */}
+      {filtroExento && (
+        <span className="filtros-nota">{dimExenta.etq} no recorta esta vista</span>
+      )}
     </div>
   )
 }
