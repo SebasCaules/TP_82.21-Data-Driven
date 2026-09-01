@@ -35,9 +35,9 @@ export default function M3() {
   const minimo = Math.min(...pcts)
   const maximo = Math.max(...pcts)
 
-  // El año del corte va arriba y a full; los tres anteriores, translúcidos (`apagaResto`):
-  // la pregunta de la pantalla es si la lista se puede ejecutar HOY, y los otros tres años
-  // son la evidencia de que el incumplimiento no está bajando solo.
+  // El año del corte se marca en la etiqueta (`marcaEnfasis`): la pregunta de la pantalla es
+  // si la lista se puede ejecutar HOY. Los otros tres años quedan con los mismos colores,
+  // que es lo que sostiene el "no baja" del título.
   const reciente = anios[anios.length - 1]
   const filas = [...anios].reverse().map((a) => {
     const con = a.envios - a.sin_consentimiento
@@ -89,7 +89,7 @@ export default function M3() {
               filas={filas} leyenda={leyenda} w={w} h={h}
               anchoEtiqueta={132}
               alturaBarra={110}
-              apagaResto
+              marcaEnfasis
               tituloEje="Composición de los envíos del año"
             />
           )}

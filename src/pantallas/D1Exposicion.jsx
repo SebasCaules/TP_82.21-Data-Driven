@@ -36,8 +36,9 @@ export default function D1({ info, iCorte }) {
   const totales = anios.map((a) => a.total)
 
   // De más reciente a más viejo: el año del corte va arriba y en énfasis, que es por donde
-  // arranca la lectura. El eje del tiempo baja, no sube. Los tres años anteriores van
-  // translúcidos (`apagaResto`): son el contexto contra el que se lee ese año.
+  // arranca la lectura. El eje del tiempo baja, no sube. El énfasis va en la etiqueta
+  // (`marcaEnfasis`), no en el relleno: los tres años anteriores son el contexto contra el
+  // que se lee ese año y llevan los mismos colores.
   const filas = [...anios].reverse().map((a) => {
     const resto = a.total - a.en_riesgo
     const pctRiesgo = 100 * a.pct_en_riesgo
@@ -88,7 +89,7 @@ export default function D1({ info, iCorte }) {
               filas={filas} leyenda={leyenda} w={w} h={h}
               anchoEtiqueta={150}
               alturaBarra={110}
-              apagaResto
+              marcaEnfasis
               tituloEje="Participación en la facturación identificada del año"
             />
           )}

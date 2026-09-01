@@ -47,10 +47,13 @@ export function zonasRecompra(valor) {
   const f = (v) => `${v.toFixed(1).replace('.', ',')} %`
   // Notacion matematica en el rango: "< 9,0 %" se lee de un golpe y "menos de 9,0 %" hay que
   // leerlo. El borde de cada zona es el mismo que usa estadoRecompra, sin redondear.
+  // `luz` es la posición de la zona en el semáforo, de arriba abajo: es lo que le permite a
+  // la leyenda dibujar la zona activa como el semáforo de la pastilla en vez de un cuadrado
+  // de color. El orden de este array ES el del semáforo, así que la posición alcanza.
   const zs = [
-    { etiqueta: 'Fuera de meta', desde: 0, hasta: cerca, tono: 'var(--sem-fuera)', rango: `< ${f(cerca)}` },
-    { etiqueta: 'Por debajo', desde: cerca, hasta: lo, tono: 'var(--sem-cerca)', rango: `${f(cerca)} – ${f(lo)}` },
-    { etiqueta: 'En meta', desde: lo, hasta: Infinity, tono: 'var(--sem-meta)', rango: `≥ ${f(lo)}` },
+    { etiqueta: 'Fuera de meta', desde: 0, hasta: cerca, tono: 'var(--sem-fuera)', rango: `< ${f(cerca)}`, luz: 0 },
+    { etiqueta: 'Por debajo', desde: cerca, hasta: lo, tono: 'var(--sem-cerca)', rango: `${f(cerca)} – ${f(lo)}`, luz: 1 },
+    { etiqueta: 'En meta', desde: lo, hasta: Infinity, tono: 'var(--sem-meta)', rango: `≥ ${f(lo)}`, luz: 2 },
   ]
   const i = valor == null ? -1 : valor >= lo ? 2 : valor >= cerca ? 1 : 0
   return zs.map((z, k) => ({ ...z, activa: k === i }))

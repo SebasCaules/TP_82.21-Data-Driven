@@ -30,8 +30,7 @@ export default function M2a() {
 
   // El peor paso se nombra en el título y se marca en la fila. No lleva un color propio:
   // el acento ya significa "los que avanzan" adentro de este gráfico y no puede significar
-  // dos cosas a la vez. Los otros dos pasos van translúcidos (`apagaResto`): son contra qué
-  // se compara el peor, no la cifra que el título pone arriba.
+  // dos cosas a la vez: la marca va en la etiqueta de la fila (`marcaEnfasis`).
   const peor = pasos.reduce((m, p) => (p.retencion < m.retencion ? p : m), pasos[0])
   const mejor = pasos.reduce((m, p) => (p.retencion > m.retencion ? p : m), pasos[0])
 
@@ -52,6 +51,14 @@ export default function M2a() {
     ],
   }))
 
+  // Las otras composiciones al 100 % declaran sus dos tramos en la leyenda y esta no lo
+  // hacía: el bloque de acento se identificaba solo por el título del eje, y la cifra que
+  // lleva adentro son números pelados. Con dos series, leyenda.
+  const leyenda = [
+    { etiqueta: 'avanza al paso siguiente', tono: 'var(--acc)', enfasis: true },
+    { etiqueta: 'se pierde en el paso', tono: 'trama' },
+  ]
+
   return (
     <section className="pant">
       {/* COPY-05: "las campañas masivas no discriminan" era una afirmación sobre diferencias
@@ -71,10 +78,10 @@ export default function M2a() {
         <Lienzo>
           {({ w, h }) => (
             <BarrasApiladas100
-              filas={filas} w={w} h={h}
-              anchoEtiqueta={122}
-              apagaResto
-              tituloEje="Participación dentro de cada paso · avanza contra se pierde"
+              filas={filas} leyenda={leyenda} w={w} h={h}
+              anchoEtiqueta={138}
+              marcaEnfasis
+              tituloEje="Participación dentro de cada paso"
             />
           )}
         </Lienzo>

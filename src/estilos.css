@@ -53,6 +53,9 @@
                               papel, bajo el 3:1 de 1.4.11). */
   --zona: rgba(22, 35, 58, .055);  /* lavado de zona: separa las dos mitades de un gráfico
                               divergente sin agregarle un color con significado propio */
+  --realce: rgba(22, 35, 58, .09); /* banda de la fila que nombra el título. Un paso más que
+                              el lavado de zona porque acá tiene que ganarle a una grilla de
+                              barras, y sigue siendo fondo: no es tinta de dato */
   --tram-b: #aab4c3;       /* trama: base del tramo de contexto. Antes #d3d8e0, que daba
                               1,43:1 contra la tarjeta — abajo del piso de 2:1 de un extremo
                               claro de rampa ordinal, o sea que el tramo se leía como hueco

@@ -13,6 +13,7 @@
 // eje no cumple la regla 12, no tiene eje, que es otra cosa.
 
 import { useEffect, useRef, useState } from 'react'
+import { LUCES } from './SemaforoLuz.jsx'
 
 /** Mide la caja y devuelve px reales. El SVG se dibuja al tamano medido en vez de
  *  escalarse con viewBox: escalar deformaria la tipografia y rompe la legibilidad
@@ -185,6 +186,8 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
   // Regla 10: la barra mas ancha que el espacio entre barras.
   const alto = Math.max(9, Math.min(paso * 0.66, Math.max(40, paso * 0.6)))
   const fuente = Math.max(10.5, Math.min(13, paso * 0.42))
+  // Misma regla que en la composicion al 100 %: la etiqueta de fila, un escalon arriba.
+  const fuenteEtq = Math.max(11.5, Math.min(15, paso * 0.46))
 
   const x0 = anchoEtiqueta
   // Los dos presupuestos que antes eran constantes del llamador y se pisaban entre si: el
@@ -212,7 +215,7 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
         return (
           <g key={d.etiqueta}>
             <title>{lectura(d.etiqueta, formato(d.valor), d.sufijo, d.nota, tituloEje)}</title>
-            <text x={x0 - 9} y={y + alto / 2} fontSize={fuente}
+            <text x={x0 - 9} y={y + alto / 2} fontSize={fuenteEtq}
                   fill={d.excepcion ? EXC : d.enfasis ? INK : MUT2}
                   textAnchor="end" dominantBaseline="central"
                   fontWeight={d.enfasis || d.excepcion ? 600 : 400}>{d.etiqueta}</text>
@@ -298,12 +301,13 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
       banda ? `${rotuloBanda} ${formato(banda[0])}–${formato(banda[1])}` : '',
       banda2 ? `${rotuloBanda2} ${formato(banda2[0])}–${formato(banda2[1])}` : '',
     ]
-  // +26 por la muestra de color y su aire. Con zonas el rotulo va en dos renglones (nombre
-  // y rango), asi que el ancho lo fija el mas largo de los dos.
+  // +28 por la muestra y su aire. La muestra de la zona activa es el semaforo, que es mas
+  // ancho que un cuadradito. Con zonas el rotulo va en dos renglones (nombre y rango), asi
+  // que el ancho lo fija el mas largo de los dos.
   const anchoRotulo = zonas
     ? Math.max(...zonas.map((z) => Math.max(anchoTexto(z.etiqueta, 11.5, 700), anchoTexto(z.rango, 11.5, 400))))
     : Math.max(...rotulos.map((r) => anchoTexto(r, 10, 600)))
-  const padR = Math.min(w * 0.36, Math.max(30, anchoRotulo + 26))
+  const padR = Math.min(w * 0.36, Math.max(30, anchoRotulo + 28))
   const iw = Math.max(20, w - padL - padR)
   const ih = Math.max(20, h - padT - padB)
 
@@ -373,17 +377,19 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
         return (
           <g key={z.etiqueta}>
             {/* La franja activa se distingue por CONTRASTE con las otras, no por saturacion:
-                el tinte sube poco y lo que la separa es que las demas bajan. Una zona
-                pintada fuerte compite con la linea, que es el dato. */}
+                lo que la separa es que las demas se quedan abajo. Los tintes estaban tan
+                bajos que las tres zonas se leian casi iguales: suben las dos, y la razon
+                entre activa e inactiva pasa de 3,1x a 3,7x. El techo es la linea, que es el
+                dato y tiene que seguir mandando. */}
             <rect x={padL} y={yTop} width={iw} height={Math.max(1, yBot - yTop)}
-                  fill={z.tono} opacity={on ? '.14' : '.045'} />
+                  fill={z.tono} opacity={on ? '.22' : '.06'} />
             {on && (
               <rect x={padL} y={yTop} width={iw} height={Math.max(1, yBot - yTop)}
-                    fill="none" stroke={z.tono} strokeWidth="1" opacity=".4" />
+                    fill="none" stroke={z.tono} strokeWidth="1" opacity=".6" />
             )}
             {!on && z.desde > min && (
               <line x1={padL} x2={xFin} y1={yBot} y2={yBot} stroke={z.tono}
-                    strokeWidth="1" opacity=".28" />
+                    strokeWidth="1" opacity=".42" />
             )}
           </g>
         )
@@ -423,14 +429,32 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
         const on = i === iZona
         return (
           <g key={`rot-${z.etiqueta}`}>
-            <rect x={xFin + 7} y={yc - 12} width={10} height={10}
-                  fill={z.tono} opacity={on ? '.35' : '.12'}
-                  stroke={z.tono} strokeWidth="1" strokeOpacity={on ? '.85' : '.45'} />
+            {/* La zona activa lleva el semaforo, el mismo de la pastilla: la luz encendida
+                marca el estado por POSICION antes que por color, que es lo que lo salva en
+                blanco y negro. Las otras dos siguen con su muestra de color, que es lo que
+                son: una franja del dibujo, no un estado. */}
+            {on && z.luz != null ? (
+              <g>
+                <rect x={xFin + 7} y={yc - 10} width={11.5} height={17} rx="3"
+                      fill="none" stroke={z.tono} strokeWidth="1.3" />
+                <path d={`M ${xFin + 12.75} ${yc + 7}v3M ${xFin + 10.2} ${yc + 10}h5.1`}
+                      stroke={z.tono} strokeWidth="1.3" strokeLinecap="round" />
+                {LUCES.map((tono, k) => (
+                  <circle key={tono} cx={xFin + 12.75} cy={yc - 6.4 + k * 4.6} r="1.75"
+                          fill={k === z.luz ? tono : 'none'} stroke={tono} strokeWidth="1"
+                          opacity={k === z.luz ? 1 : 0.3} />
+                ))}
+              </g>
+            ) : (
+              <rect x={xFin + 7} y={yc - 12} width={11} height={11}
+                    fill={z.tono} opacity={on ? '.45' : '.18'}
+                    stroke={z.tono} strokeWidth="1" strokeOpacity={on ? '.9' : '.6'} />
+            )}
             {/* Dos renglones: el nombre de la zona y su rango. En uno solo obligaba a un
                 margen derecho enorme y el cuerpo quedaba en 10 px para que entrara. */}
-            <text x={xFin + 22} y={yc - 7} fontSize="11.5" fill={on ? INK : MUT2}
+            <text x={xFin + 24} y={yc - 7} fontSize="11.5" fill={on ? INK : MUT2}
                   dominantBaseline="central" fontWeight={on ? 700 : 500}>{z.etiqueta}</text>
-            <text x={xFin + 22} y={yc + 8} fontSize="11.5" fill={on ? MUT2 : MUT}
+            <text x={xFin + 24} y={yc + 8} fontSize="11.5" fill={on ? MUT2 : MUT}
                   dominantBaseline="central" className="tabular">{z.rango}</text>
           </g>
         )
@@ -488,7 +512,7 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
         // obligaba a una caja del doble de ancho que tapaba mas serie.
         const linea1 = formato(p.valor)
         const est = zActiva ? zActiva.etiqueta.toUpperCase() : null
-        const anchoEst = est ? anchoTexto(est, 9, 600, 0.07) + 22 : 0
+        const anchoEst = est ? anchoTexto(est, 9, 600, 0.07) + 24 : 0
         const bw = Math.max(anchoTexto(linea1, 13, 700), anchoEst) + 20
         const bh = est ? 36 : 22
         const yp = Y(p.valor)
@@ -507,20 +531,26 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
                   className="tabular">{linea1}</text>
             {est && (
               <g>
-                {/* La forma del semaforo: llena en meta, media por debajo, punteada fuera. */}
-                {iZona === 2 && <rect x={bx + 10} y={by + 21} width={7} height={7} fill={tono} />}
-                {iZona === 1 && (
+                {/* El semaforo, el mismo de la pastilla y de la leyenda de zonas. Antes eran
+                    tres formas propias de la bandera —cuadrado lleno, medio y punteado—: el
+                    tablero decia el mismo estado con dos vocabularios distintos segun donde
+                    lo miraras. */}
+                {zActiva && zActiva.luz != null ? (
                   <g>
-                    <rect x={bx + 10} y={by + 21} width={7} height={7} fill="none"
-                          stroke={tono} strokeWidth="1.2" />
-                    <rect x={bx + 10} y={by + 24.5} width={7} height={3.5} fill={tono} />
+                    <rect x={bx + 10} y={by + 18} width={8} height={11.8} rx="2.2"
+                          fill="none" stroke={tono} strokeWidth="1.15" />
+                    <path d={`M ${bx + 14} ${by + 29.8}v2.2M ${bx + 11.6} ${by + 32}h4.8`}
+                          stroke={tono} strokeWidth="1.15" strokeLinecap="round" />
+                    {LUCES.map((t, k) => (
+                      <circle key={t} cx={bx + 14} cy={by + 21.2 + k * 3.2} r="1.25"
+                              fill={k === zActiva.luz ? t : 'none'} stroke={t} strokeWidth="0.9"
+                              opacity={k === zActiva.luz ? 1 : 0.3} />
+                    ))}
                   </g>
+                ) : (
+                  <rect x={bx + 10} y={by + 21} width={7} height={7} fill={tono} />
                 )}
-                {iZona === 0 && (
-                  <rect x={bx + 10} y={by + 21} width={7} height={7} fill="none"
-                        stroke={tono} strokeWidth="1.2" strokeDasharray="2 1.6" />
-                )}
-                <text fontFamily="var(--mono)" x={bx + 22} y={by + 25} fontSize="9" fontWeight={600} fill={tono}
+                <text fontFamily="var(--mono)" x={bx + 24} y={by + 25} fontSize="9" fontWeight={600} fill={tono}
                       letterSpacing=".07em" dominantBaseline="central">{est}</text>
               </g>
             )}
@@ -809,23 +839,20 @@ function relleno(tono) {
  * `conectores` une los cortes de filas consecutivas: la inclinacion ES la diferencia entre
  * las dos composiciones, que es la lectura que el par region/categoria promete.
  *
- * `apagaResto` baja de intensidad la barra de las filas que no son el mensaje. Es para la
- * grilla donde todas las barras miden lo mismo (composicion al 100 %) y el titulo habla de
- * filas puntuales: sin eso hay que buscarlas leyendo etiquetas una por una. La grilla queda
- * equiespaciada — el paso es el mismo para todas, apagadas o no.
+ * `marcaEnfasis` le pone a la fila con `enfasis` una banda de fondo y una marca de 4 px
+ * contra el margen. Es para la grilla donde todas las barras miden lo mismo (composicion al
+ * 100 %) y el titulo habla de filas puntuales: sin eso hay que buscarlas leyendo etiquetas
+ * una por una.
  *
- * La fila de apoyo mantiene los colores y el alto de la fila del mensaje: lo unico que
- * cambia es la alfa de los rellenos. Va bien abajo (0,45) para que la barra se lea como un
- * fantasma de si misma y no como un azul distinto.
- *
- * Dos detalles que la alfa arrastra. Va SOLO sobre los rellenos: un rotulo con la misma alfa
- * que su fondo pierde todo el contraste. Y un relleno translucido sobre papel blanco siempre
- * termina claro, asi que la cifra de la fila apagada va en tinta aunque el tramo pida rotulo
- * blanco — sobre el acento al 45 % la tinta da 6,7:1 y el blanco 2,1:1.
+ * Las dos van DETRAS de la barra y NO tocan un solo relleno. Es a proposito: el color de los
+ * tramos ya esta hablado por la leyenda, que promete un color por tramo. Cualquier enfasis
+ * que le meta mano al relleno — alfa, otro escalon de rampa, un velo — hace que el mismo
+ * tramo aparezca en dos colores y la leyenda deje de describir el dibujo. El unico canal
+ * libre para la jerarquia de FILA es el que la leyenda no usa.
  */
 export function BarrasApiladas100({
   filas, w, h, anchoEtiqueta = 120, tituloEje, encabezadoNota, leyenda, conectores,
-  alturaBarra, referencia, onFila, onSegmento, textoResto, rotuloResto, apagaResto,
+  alturaBarra, referencia, onFila, onSegmento, textoResto, rotuloResto, marcaEnfasis,
 }) {
   if (!filas.length || w < 160) return null
 
@@ -838,19 +865,21 @@ export function BarrasApiladas100({
   // Tope duro al alto de barra por la misma razon que en BarraTramos: una composicion mas
   // gruesa no dice mas, la proporcion ya la dice el ancho.
   const alto = Math.max(14, Math.min(paso * 0.52, alturaBarra ?? 76))
-  // Alfa de los rellenos de la fila de apoyo. Ver la nota del encabezado antes de moverla.
-  const ALFA_APOYO = 0.45
   // Separador entre tramos: 2 px de superficie. Lo que separa es el hueco, no un trazo
   // alrededor del tramo. Con piso, porque un tramo de 0,7 % mide 3 px y sin piso el
   // separador se lo comeria entero.
   const SEPARADOR = 2
-  const fuenteEtq = Math.max(10.5, Math.min(13, paso * 0.42))
+  // La etiqueta de fila va un escalon arriba del resto de la microtipografia: es lo primero
+  // que se lee de cada barra y en proyector es lo primero que se pierde. La columna de notas
+  // se queda donde estaba, para que crecer la etiqueta no le coma ancho al dibujo.
+  const fuenteEtq = Math.max(11.5, Math.min(15, paso * 0.46))
+  const fuenteNota = Math.max(9, Math.min(11.5, paso * 0.42))
   const fuente = Math.max(10.5, Math.min(13.5, alto * 0.36))
 
   const x0 = anchoEtiqueta
   const anchoNota = Math.max(
     encabezadoNota ? anchoTexto(encabezadoNota, 10, 400, 0.07) + 14 : 0,
-    ...filas.map((f) => (f.nota ? anchoTexto(f.nota, fuenteEtq - 1.5, 400) + 14 : 0))
+    ...filas.map((f) => (f.nota ? anchoTexto(f.nota, fuenteNota, 400) + 14 : 0))
   )
   // Margen derecho para el rotulo de la cola. Se decide por participacion (dato, no pixel)
   // para no entrar en el bucle "el ancho depende del rotulo que depende del ancho".
@@ -893,8 +922,7 @@ export function BarrasApiladas100({
       else if (j === segs.length - 1) s.rotulo = 'fuera'
       else if (!claveResto.includes(s.clave)) claveResto.push(s.clave)
     })
-    return { fila: f, y, apagada: !!apagaResto && !f.enfasis, segs,
-             cortes: segs.slice(0, -1).map((s) => s.x + s.w) }
+    return { fila: f, y, segs, cortes: segs.slice(0, -1).map((s) => s.x + s.w) }
   })
 
   // La linea de resto se arma en el orden del dibujo, no en el orden en que se descubrio
@@ -957,6 +985,17 @@ export function BarrasApiladas100({
               style={{ textTransform: 'uppercase' }}>{encabezadoNota}</text>
       )}
 
+      {/* Banda y marca al margen: van detras de todo lo de la fila, asi que el enfasis no
+          agrega tinta encima del dato. La banda toma la fila entera —etiqueta, barra y
+          nota— porque lo que se marca es la fila, no el dibujo. */}
+      {marcaEnfasis && vistas.map((v, i) => v.fila.enfasis && (
+        <g key={'mf' + v.fila.etiqueta}>
+          <rect x={0} y={topeFila(i) + 2} width={w} height={Math.max(4, paso - 4)}
+                rx="3" fill="var(--realce)" />
+          <rect x={0} y={topeFila(i) + 2} width={4} height={Math.max(4, paso - 4)} fill={INK} />
+        </g>
+      ))}
+
       {conectores && vistas.slice(0, -1).map((v, i) => v.cortes.map((cx, k) => {
         const cy = vistas[i + 1].cortes[k]
         if (cy == null) return null
@@ -972,11 +1011,10 @@ export function BarrasApiladas100({
                 fill={v.fila.enfasis ? INK : MUT2} fontWeight={v.fila.enfasis ? 600 : 400}
                 textAnchor="end" dominantBaseline="central">{v.fila.etiqueta}</text>
           {v.fila.sub && (
-            <text x={x0 - 9} y={v.y + alto / 2 + 9} fontSize={Math.max(9.5, fuenteEtq - 2.5)}
+            <text x={x0 - 9} y={v.y + alto / 2 + 10} fontSize={Math.max(9.5, Math.min(11.5, fuenteEtq - 3))}
                   fill={MUT} textAnchor="end" dominantBaseline="central"
                   className="tabular">{v.fila.sub}</text>
           )}
-          <g opacity={v.apagada ? ALFA_APOYO : 1}>
           {v.segs.map((s) => {
             if (s.w <= 0) return null
             // El trazo va CENTRADO en el borde del rectangulo, asi que un tramo contorneado
@@ -993,10 +1031,9 @@ export function BarrasApiladas100({
                     stroke={borde ? GRIS : 'none'} strokeWidth="1" />
             )
           })}
-          </g>
           {v.segs.map((s) => s.rotulo === 'dentro' && (
             <text key={'d' + s.clave} x={s.x + 8} y={v.y + alto / 2} fontSize={fuente}
-                  fontWeight={s.enfasis ? 700 : 500} fill={v.apagada ? INK : s.tinta || INK}
+                  fontWeight={s.enfasis ? 700 : 500} fill={s.tinta || INK}
                   dominantBaseline="central" className="tabular">{s.texto}</text>
           ))}
           {v.segs.map((s) => s.rotulo === 'plaqueta' && (
@@ -1009,7 +1046,7 @@ export function BarrasApiladas100({
                   dominantBaseline="central" className="tabular">{s.texto}</text>
           ))}
           {v.fila.nota && (
-            <text x={w} y={v.y + alto / 2} fontSize={fuenteEtq - 1.5} fill={MUT} textAnchor="end"
+            <text x={w} y={v.y + alto / 2} fontSize={fuenteNota} fill={MUT} textAnchor="end"
                   dominantBaseline="central" className="tabular">{v.fila.nota}</text>
           )}
         </g>
@@ -1062,6 +1099,8 @@ export function BarrasDivergentes({ datos, w, h, formato, formatoEje, tituloEje,
   const paso = disponible / datos.length
   const alto = Math.max(9, Math.min(paso * 0.62, 40))
   const fuente = Math.max(10.5, Math.min(13, paso * 0.42))
+  // Misma regla que en la composicion al 100 %: la etiqueta de fila, un escalon arriba.
+  const fuenteEtq = Math.max(11.5, Math.min(15, paso * 0.46))
 
   const anchoValor = Math.max(34, ...datos.map((d) => anchoTexto(formato(d.valor), fuente, 600) + 10))
   const textoNota = (d) => (d.nota ? d.nota + (d.notaSuf ? `  ${d.notaSuf}` : '') : '')
@@ -1117,7 +1156,7 @@ export function BarrasDivergentes({ datos, w, h, formato, formatoEje, tituloEje,
           <g key={d.etiqueta}>
             <title>{lectura(d.etiqueta, formato(d.valor), tituloEje,
               d.nota ? `${encabezadoNota || 'nota'}: ${d.nota}${d.notaSuf ? ` ${d.notaSuf}` : ''}` : null)}</title>
-            <text x={anchoEtiqueta - 9} y={y + alto / 2} fontSize={fuente}
+            <text x={anchoEtiqueta - 9} y={y + alto / 2} fontSize={fuenteEtq}
                   fill={d.enfasis ? INK : MUT2} fontWeight={d.enfasis ? 600 : 400}
                   textAnchor="end" dominantBaseline="central">{d.etiqueta}</text>
             {d.valor !== 0 && (

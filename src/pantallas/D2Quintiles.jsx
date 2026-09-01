@@ -12,7 +12,9 @@ import Semaforo, { estadoInverso } from '../Semaforo.jsx'
 import { entero, meta, pct, porDimension } from '../agregacion.js'
 import { Def } from '../Glosario.jsx'
 
-const ANCHO_ETIQUETA = 78
+// La columna de etiquetas reserva, además del rótulo, los 4 px de la marca de fila y su
+// aire: sin eso "menor valor" queda pegado a la marca.
+const ANCHO_ETIQUETA = 92
 
 // El bloque del medio lleva su cifra adentro, así que su relleno es el fondo de un rótulo:
 // no puede ser el gris medio de las series, que da 3,9:1 con la tinta. Es el paso intermedio
@@ -39,8 +41,9 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
     sub: i === 0 ? 'menor valor' : i === 4 ? 'mayor valor' : null,
     nota: c.ne ? pct((100 * c.nr) / c.ne) : '—',
     // Los dos extremos son la comparación del título (13,3 % contra 51,8 %) y de la bajada
-    // (40,9 % contra 52,1 % entre elegibles). Q2-Q4 son el camino entre uno y otro: van
-    // translúcidos, y los extremos se leen a full. La grilla queda equiespaciada.
+    // (40,9 % contra 52,1 % entre elegibles). Q2-Q4 son el camino entre uno y otro. Los dos
+    // extremos se marcan en la etiqueta, no en la barra: el color de los tramos ya está
+    // hablado por la leyenda.
     enfasis: i === 0 || i === 4,
     segmentos: [
       {
@@ -124,7 +127,7 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
             <BarrasApiladas100
               filas={filas} w={w} h={h}
               anchoEtiqueta={ANCHO_ETIQUETA}
-              apagaResto
+              marcaEnfasis
               tituloEje="Composición del quintil (% sobre sus clientes)"
               encabezadoNota="riesgo entre elegibles"
               leyenda={[
