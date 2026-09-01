@@ -53,8 +53,12 @@
                               papel, bajo el 3:1 de 1.4.11). */
   --zona: rgba(22, 35, 58, .055);  /* lavado de zona: separa las dos mitades de un gráfico
                               divergente sin agregarle un color con significado propio */
-  --tram-b: #d3d8e0;       /* trama: base clara para que el rótulo encima se lea */
-  --tram-l: #f4f6f8;
+  --tram-b: #aab4c3;       /* trama: base del tramo de contexto. Antes #d3d8e0, que daba
+                              1,43:1 contra la tarjeta — abajo del piso de 2:1 de un extremo
+                              claro de rampa ordinal, o sea que el tramo se leía como hueco
+                              y no como bloque. Ahora 2,09:1, y el rótulo en tinta 7,5:1 */
+  --tram-l: #c6ced9;       /* las líneas de la trama, un paso más claro que su base: tono
+                              sobre tono. Con la base vieja iban en #f4f6f8 */
 
   --fuente: "Segoe UI", Tahoma, Helvetica, Arial, sans-serif;
   --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;

@@ -14,6 +14,16 @@ import { Def } from '../Glosario.jsx'
 
 const ANCHO_ETIQUETA = 78
 
+// El bloque del medio lleva su cifra adentro, así que su relleno es el fondo de un rótulo:
+// no puede ser el gris medio de las series, que da 3,9:1 con la tinta. Es el paso intermedio
+// de la rampa de composición, corrido un escalón desde rampa(2) para conservar 0,06 de salto
+// de luminosidad contra la base nueva de la trama. Los tres pasos de D2 —#22456f, este y
+// #aab4c3— pasan las cuatro comprobaciones de rampa ordinal contra la tarjeta blanca:
+// monótona, saltos ≥ 0,06, extremo claro 2,09:1, un solo tono (8° de dispersión).
+// Con la tinta da 5,9:1. El 3:1 contra el papel lo da el contorno.
+const SIN_RIESGO = { tono: '#8ba0b7', tinta: 'var(--ink)' }
+
+
 export default function D2({ iCorte, filtro, info, verEnLista }) {
   const q = porDimension(iCorte, 'quintil', filtro)
 
@@ -28,7 +38,10 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
     etiqueta: `Q${i + 1}`,
     sub: i === 0 ? 'menor valor' : i === 4 ? 'mayor valor' : null,
     nota: c.ne ? pct((100 * c.nr) / c.ne) : '—',
-    enfasis: i === 4,
+    // Los dos extremos son la comparación del título (13,3 % contra 51,8 %) y de la bajada
+    // (40,9 % contra 52,1 % entre elegibles). Q2-Q4 son el camino entre uno y otro: van
+    // translúcidos, y los extremos se leen a full. La grilla queda equiespaciada.
+    enfasis: i === 0 || i === 4,
     segmentos: [
       {
         clave: 'En riesgo', valor: c.nr, tono: 'var(--acc)', tinta: '#fff', enfasis: true,
@@ -38,7 +51,13 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
         plaqueta: true,
         texto: c.n ? pct(tasa(c)) : null,
       },
-      { clave: 'Elegible sin riesgo', valor: Math.max(0, c.ne - c.nr), tono: 'var(--gris)' },
+      {
+        // Los otros dos bloques llevaban su cifra y este no: la composición se leía
+        // incompleta y había que restar de cabeza.
+        clave: 'Elegible sin riesgo', valor: Math.max(0, c.ne - c.nr), ...SIN_RIESGO,
+        borde: true,
+        texto: c.n ? pct((100 * Math.max(0, c.ne - c.nr)) / c.n) : null,
+      },
       {
         clave: 'No elegible', valor: Math.max(0, c.n - c.ne), tono: 'trama',
         texto: c.n ? pct((100 * (c.n - c.ne)) / c.n) : null,
@@ -105,11 +124,12 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
             <BarrasApiladas100
               filas={filas} w={w} h={h}
               anchoEtiqueta={ANCHO_ETIQUETA}
+              apagaResto
               tituloEje="Composición del quintil (% sobre sus clientes)"
               encabezadoNota="riesgo entre elegibles"
               leyenda={[
                 { etiqueta: 'En riesgo (nr/n, desde cero)', tono: 'var(--acc)', enfasis: true },
-                { etiqueta: 'Elegible sin riesgo', tono: 'var(--gris)' },
+                { etiqueta: 'Elegible sin riesgo', tono: SIN_RIESGO.tono, borde: true },
                 { etiqueta: 'No elegible (menos de 3 compras)', tono: 'trama' },
               ]}
               referencia={{ valor: promedio, etiqueta: `general ${pct(promedio)}` }}

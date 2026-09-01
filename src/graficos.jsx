@@ -802,12 +802,30 @@ function relleno(tono) {
  * reserva el margen; si no entra y esta en el medio, no se dibuja y la clave baja a la
  * linea de resto de la cabecera. Nunca texto en diagonal ni rotulo pisando el corte.
  *
+ * `borde` contornea el tramo en gris: es lo que le permite a un relleno claro (el unico que
+ * puede ser fondo de un rotulo en tinta) cumplir igual el 3:1 contra el papel, que en un
+ * relleno solido lo daba el propio color.
+ *
  * `conectores` une los cortes de filas consecutivas: la inclinacion ES la diferencia entre
  * las dos composiciones, que es la lectura que el par region/categoria promete.
+ *
+ * `apagaResto` baja de intensidad la barra de las filas que no son el mensaje. Es para la
+ * grilla donde todas las barras miden lo mismo (composicion al 100 %) y el titulo habla de
+ * filas puntuales: sin eso hay que buscarlas leyendo etiquetas una por una. La grilla queda
+ * equiespaciada — el paso es el mismo para todas, apagadas o no.
+ *
+ * La fila de apoyo mantiene los colores y el alto de la fila del mensaje: lo unico que
+ * cambia es la alfa de los rellenos. Va bien abajo (0,45) para que la barra se lea como un
+ * fantasma de si misma y no como un azul distinto.
+ *
+ * Dos detalles que la alfa arrastra. Va SOLO sobre los rellenos: un rotulo con la misma alfa
+ * que su fondo pierde todo el contraste. Y un relleno translucido sobre papel blanco siempre
+ * termina claro, asi que la cifra de la fila apagada va en tinta aunque el tramo pida rotulo
+ * blanco — sobre el acento al 45 % la tinta da 6,7:1 y el blanco 2,1:1.
  */
 export function BarrasApiladas100({
   filas, w, h, anchoEtiqueta = 120, tituloEje, encabezadoNota, leyenda, conectores,
-  alturaBarra, referencia, onFila, onSegmento, textoResto, rotuloResto,
+  alturaBarra, referencia, onFila, onSegmento, textoResto, rotuloResto, apagaResto,
 }) {
   if (!filas.length || w < 160) return null
 
@@ -816,9 +834,16 @@ export function BarrasApiladas100({
   const altoEje = tituloEje ? 48 : 26
   const disponible = Math.max(40, h - padTop - altoEje)
   const paso = disponible / filas.length
+  const topeFila = (i) => padTop + i * paso
   // Tope duro al alto de barra por la misma razon que en BarraTramos: una composicion mas
   // gruesa no dice mas, la proporcion ya la dice el ancho.
   const alto = Math.max(14, Math.min(paso * 0.52, alturaBarra ?? 76))
+  // Alfa de los rellenos de la fila de apoyo. Ver la nota del encabezado antes de moverla.
+  const ALFA_APOYO = 0.45
+  // Separador entre tramos: 2 px de superficie. Lo que separa es el hueco, no un trazo
+  // alrededor del tramo. Con piso, porque un tramo de 0,7 % mide 3 px y sin piso el
+  // separador se lo comeria entero.
+  const SEPARADOR = 2
   const fuenteEtq = Math.max(10.5, Math.min(13, paso * 0.42))
   const fuente = Math.max(10.5, Math.min(13.5, alto * 0.36))
 
@@ -843,7 +868,7 @@ export function BarrasApiladas100({
   const claveResto = []
   const vistas = filas.map((f, i) => {
     const tot = f.segmentos.reduce((s, g) => s + g.valor, 0) || 1
-    const y = padTop + i * paso + (paso - alto) / 2
+    const y = topeFila(i) + (paso - alto) / 2
     let x = x0
     const segs = f.segmentos.map((g, j) => {
       const share = g.valor / tot
@@ -868,7 +893,8 @@ export function BarrasApiladas100({
       else if (j === segs.length - 1) s.rotulo = 'fuera'
       else if (!claveResto.includes(s.clave)) claveResto.push(s.clave)
     })
-    return { fila: f, y, segs, cortes: segs.slice(0, -1).map((s) => s.x + s.w) }
+    return { fila: f, y, apagada: !!apagaResto && !f.enfasis, segs,
+             cortes: segs.slice(0, -1).map((s) => s.x + s.w) }
   })
 
   // La linea de resto se arma en el orden del dibujo, no en el orden en que se descubrio
@@ -908,10 +934,14 @@ export function BarrasApiladas100({
       <Tramas />
 
       {leyenda && leyenda.map((l) => {
+        // Misma correccion de medio pixel que en los tramos: las casillas de la leyenda
+        // tienen que medir los mismos 12 px, con contorno y sin el.
+        const d = l.tono === 'trama' || l.borde ? 0.5 : 0
         const el = (
           <g key={l.etiqueta}>
-            <rect x={lx} y={6} width={12} height={12} fill={relleno(l.tono)}
-                  stroke={l.tono === 'trama' ? GRIS : 'none'} strokeWidth="1" />
+            <rect x={lx + d} y={6 + d} width={12 - 2 * d} height={12 - 2 * d}
+                  fill={relleno(l.tono)}
+                  stroke={d ? GRIS : 'none'} strokeWidth="1" />
             <text x={lx + 17} y={12} fontSize="11.5" fontWeight={500} dominantBaseline="central"
                   fill={l.enfasis ? INK : MUT2}>{l.etiqueta}</text>
           </g>
@@ -946,14 +976,27 @@ export function BarrasApiladas100({
                   fill={MUT} textAnchor="end" dominantBaseline="central"
                   className="tabular">{v.fila.sub}</text>
           )}
-          {v.segs.map((s) => s.w > 0 && (
-            <rect key={s.clave} x={s.x} y={v.y} width={Math.max(1, s.w - (s.j < v.segs.length - 1 ? 1 : 0))}
-                  height={alto} fill={relleno(s.tono)}
-                  stroke={s.tono === 'trama' ? GRIS : 'none'} strokeWidth="1" />
-          ))}
+          <g opacity={v.apagada ? ALFA_APOYO : 1}>
+          {v.segs.map((s) => {
+            if (s.w <= 0) return null
+            // El trazo va CENTRADO en el borde del rectangulo, asi que un tramo contorneado
+            // se dibujaba medio pixel afuera por cada lado: mas alto que sus vecinos y mas
+            // ancho que su propia participacion. Se mete medio pixel para adentro y el borde
+            // exterior del trazo cae justo donde caeria el de un tramo sin contorno.
+            const borde = s.tono === 'trama' || s.borde
+            const d = borde ? 0.5 : 0
+            const ws = s.j < v.segs.length - 1
+              ? Math.max(2, s.w - SEPARADOR) : Math.max(1, s.w)
+            return (
+              <rect key={s.clave} x={s.x + d} y={v.y + d} width={Math.max(1, ws - 2 * d)}
+                    height={alto - 2 * d} fill={relleno(s.tono)}
+                    stroke={borde ? GRIS : 'none'} strokeWidth="1" />
+            )
+          })}
+          </g>
           {v.segs.map((s) => s.rotulo === 'dentro' && (
             <text key={'d' + s.clave} x={s.x + 8} y={v.y + alto / 2} fontSize={fuente}
-                  fontWeight={s.enfasis ? 700 : 500} fill={s.tinta || INK}
+                  fontWeight={s.enfasis ? 700 : 500} fill={v.apagada ? INK : s.tinta || INK}
                   dominantBaseline="central" className="tabular">{s.texto}</text>
           ))}
           {v.segs.map((s) => s.rotulo === 'plaqueta' && (
@@ -981,7 +1024,7 @@ export function BarrasApiladas100({
       )}
 
       {onFila && vistas.map((v, i) => (
-        <rect key={'hf' + v.fila.etiqueta} x={0} y={padTop + i * paso} width={w} height={paso}
+        <rect key={'hf' + v.fila.etiqueta} x={0} y={topeFila(i)} width={w} height={paso}
               fill="transparent" style={{ cursor: 'pointer' }}
               onClick={() => onFila(i, v.fila)} tabIndex={0} role="button"
               aria-label={`Ver ${v.fila.etiqueta} en la lista de contacto`}
