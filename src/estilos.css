@@ -377,7 +377,7 @@ body {
 .rotulo.predictivo::before { background: none; border-style: dashed; }
 .rotulo.diagnostico::before { background: var(--mut2); }
 
-/* Título y bajada ocupan SIEMPRE el mismo alto. Es lo que hace que el gráfico de abajo mida
+/* El título ocupa SIEMPRE el mismo alto. Es lo que hace que el gráfico de abajo mida
    igual con cualquier filtro puesto: si la cabecera crece al cambiar de "Muebles y Baño" a
    "Iluminación y Organización", el lienzo se achica y las tarjetas cambian de tamaño solas.
 
@@ -394,16 +394,6 @@ body {
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1;
   overflow: hidden;
 }
-.bajada {
-  font-size: clamp(12.5px, 1.02vw, 14.5px); line-height: 1.45;
-  color: var(--mut2); margin: 0; max-width: 82ch;
-  height: 2.9em;
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-/* Pantallas que además aprietan la bajada a un renglón, para darle el alto al cuerpo (el
-   cierre y la consolidada, que llevan tarjetas altas). El título ya va en una línea siempre. */
-.pant.cab-1 .bajada { height: 1.45em; -webkit-line-clamp: 1; max-width: 100%; }
 
 .lienzo {
   flex: 1;
@@ -998,7 +988,6 @@ body {
   .app > .principal { display: block !important; }
   .cuerpo { padding: 0; }
   .titulo { font-size: 20px; height: auto; -webkit-line-clamp: none; display: block; }
-  .bajada { height: auto; -webkit-line-clamp: none; display: block; }
   .chico { display: none !important; }
 }
 

@@ -108,12 +108,6 @@ export default function M2b() {
         Falta el control: {nCortes} cortes solo detectan {pp(mde)} sobre una base
         de {pct(tasa, 2)}
       </h1>
-      <p className="bajada">
-        Hay una sola tasa medible y nada contra qué compararla: los cinco segmentos que se
-        reportaban tienen <Def id="ic-wilson">intervalos solapados</Def>. Una rama sin envío
-        de {entero(reparto[2])} clientes crea la comparación; {entero(reparto[0])} por rama
-        deciden si alcanza.
-      </p>
 
       <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(6px, 1vh, 14px)' }}>
         <Lienzo>

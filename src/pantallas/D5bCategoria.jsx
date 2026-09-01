@@ -9,7 +9,6 @@
 // no daba. La tasa de riesgo, que era la nota al costado, baja a la bajada.
 
 import { Lienzo, BarrasApiladas100, rampa } from '../graficos.jsx'
-import { Def } from '../Glosario.jsx'
 import { dims, entero, pct, pesos, porDimension } from '../agregacion.js'
 
 export default function D5b({ iCorte, filtro, verEnLista }) {
@@ -23,10 +22,7 @@ export default function D5b({ iCorte, filtro, verEnLista }) {
   }))
 
   const porTasa = filas0.filter((f) => f.n > 0).sort((a, b) => b.tasa - a.tasa)
-  const alta = porTasa[0]
   const baja = porTasa[porTasa.length - 1]
-  const amplitud = alta && baja ? (alta.tasa - baja.tasa).toFixed(1).replace('.', ',') : null
-  const unaSola = porTasa.length === 1
 
   const totalN = filas0.reduce((s, f) => s + f.n, 0)
   const totalAr = filas0.reduce((s, f) => s + f.ar, 0)
@@ -62,7 +58,6 @@ export default function D5b({ iCorte, filtro, verEnLista }) {
   // "Todas las demás pierden participación" es una afirmación sobre el dibujo entero, no
   // sobre la primera barra: con otro filtro puede ser falsa, así que se chequea antes de
   // escribirla.
-  const restoBaja = partes.length > 1 && partes.slice(1).every((p) => p.pExposicion < p.pClientes)
 
   return (
     <section className="pant">
@@ -71,12 +66,6 @@ export default function D5b({ iCorte, filtro, verEnLista }) {
           ? 'Sin exposición asignable a una categoría'
           : `${top.etiqueta} ocupa ${pct(top.pExposicion)} de la exposición con ${pct(top.pClientes)} de los clientes`}
       </h1>
-      <p className="bajada">
-        {alta && baja && !unaSola
-          ? <>La tasa de <Def id="en-riesgo">riesgo</Def> va de {pct(alta.tasa)} en{' '}
-              {alta.etiqueta} a {pct(baja.tasa)} en {baja.etiqueta}, {amplitud} puntos.{restoBaja ? ' Todas las demás categorías pierden participación al pasar de clientes a pesos.' : ''}</>
-          : 'Este filtro deja una sola categoría con clientes: no hay con qué comparar la tasa de riesgo.'}
-      </p>
       <div className="lienzo">
         <Lienzo>
           {({ w, h }) => (

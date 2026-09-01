@@ -23,13 +23,10 @@
 
 import { Lienzo, BarrasApiladas100 } from '../graficos.jsx'
 import { entero, pct, series } from '../agregacion.js'
-import { Def } from '../Glosario.jsx'
 
 export default function M3() {
   const c = series.consentimiento
   const anios = series.consentimiento_anual
-  const pctAgregado = 100 * c.pct_envios_a_no_acepta
-  const pctAlcance = 100 * c.pct_alcance
 
   const pcts = anios.map((a) => 100 * a.pct_sin_consentimiento)
   const minimo = Math.min(...pcts)
@@ -75,12 +72,6 @@ export default function M3() {
       {/* CIF-09: los 46 huérfanos no quedan afuera del gráfico. Sin maestro contra el cual
           clasificarlos cuentan en el denominador del año y no en el numerador, igual que en
           la serie agregada. Se declara sin tocar los datos. */}
-      <p className="bajada">
-        El {pct(pctAgregado)} agregado no esconde ninguna corrección en marcha.
-        {' '}{entero(c.envios_a_no_acepta)} de {entero(c.envios_base)} envíos salen{' '}
-        <Def id="consentimiento">sin consentimiento</Def> y alcanzan al <b>{pct(pctAlcance)}</b>{' '}
-        de los {entero(c.clientes_no_acepta_total)} clientes que no consintieron.
-      </p>
 
       <div className="lienzo">
         <Lienzo>

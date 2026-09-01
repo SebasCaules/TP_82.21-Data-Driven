@@ -45,9 +45,8 @@ export default function D7({ info, iCorte, filtro }) {
   const vacio = topExposicion.length === 0
 
   return (
-    <section className="pant cab-1">
+    <section className="pant">
       <h1 className="titulo">Tres decisiones, ninguna cuesta presupuesto nuevo</h1>
-      <p className="bajada">Corren con los datos y la capacidad que ya mostró el tablero.</p>
 
       {/* El pedido va arriba, no al pie: es lo único que la pantalla le pide al directorio,
           y al pie lo leía el que llegaba hasta abajo. Los tres artículos pasan a ser su

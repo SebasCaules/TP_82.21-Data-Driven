@@ -85,12 +85,6 @@ export default function D6() {
         Cambiar de criterio no gana compras y cuesta de {millones(costoMin)} a{' '}
         {millones(costoMax)} de cobertura
       </h1>
-      <p className="bajada">
-        Ningún <Def id="ic-wilson">intervalo</Def> alternativo se separa del de la vara, que
-        es {marca}: el <Def id="criterio-orden">criterio</Def> que Marketing usa hoy, no el
-        mejor de los cinco. <Def id="compras-esperadas">Compras esperadas</Def> = tasa ×{' '}
-        {entero(capacidad)} envíos, con su intervalo propagado.
-      </p>
 
       <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(6px, 1vh, 14px)' }}>
         <Lienzo>

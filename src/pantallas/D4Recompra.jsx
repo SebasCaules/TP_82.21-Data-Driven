@@ -4,7 +4,6 @@
 // ni de los filtros, por eso no toma `iCorte` ni `filtro` de las props.
 
 import { Lienzo, Linea } from '../graficos.jsx'
-import { Def } from '../Glosario.jsx'
 import { estadoRecompra } from '../Semaforo.jsx'
 import { zonasRecompra } from './D0Consolidada.jsx'
 import { meta, pct, series } from '../agregacion.js'
@@ -38,11 +37,6 @@ export default function D4Recompra() {
         La recompra pasó de {pct(pico.valor)} a {pct(ultimo.valor)} en {trimestresDesdePico}{' '}
         trimestres y quedó fuera de meta
       </h1>
-      <p className="bajada">
-        Serie completa 2022Q1–2025Q3 de la{' '}
-        <Def id="recompra-90">recompra a 90 días</Def>. El {pct(baseLo)}–{pct(baseHi)} lo estimó
-        el negocio, no la serie: de 2023Q1 a 2025Q1 estuvo entre 16 % y 19 %.
-      </p>
 
       <div className="lienzo">
         <div className="tarjeta" style={{ flex: 1, minHeight: 0 }}>

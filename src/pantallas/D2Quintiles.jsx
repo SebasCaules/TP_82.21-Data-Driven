@@ -9,7 +9,7 @@
 
 import { Lienzo, BarrasApiladas100 } from '../graficos.jsx'
 import Semaforo, { estadoInverso } from '../Semaforo.jsx'
-import { entero, meta, pct, porDimension } from '../agregacion.js'
+import { meta, pct, porDimension } from '../agregacion.js'
 import { Def } from '../Glosario.jsx'
 
 // La columna de etiquetas reserva, además del rótulo, los 4 px de la marca de fila y su
@@ -69,49 +69,21 @@ export default function D2({ iCorte, filtro, info, verEnLista }) {
   }))
 
   // Tasa entre clientes comparables: sobre elegibles (nr/ne), no sobre el total del quintil.
-  const tasaElegibles = (c) => (c.ne ? (100 * c.nr) / c.ne : 0)
-  const gradQ1 = tasaElegibles(q[0])
-  const gradQ5 = tasaElegibles(q[4])
   const pctElegiblesQ1 = q[0].n ? (100 * q[0].ne) / q[0].n : 0
   const sinHistoriaQ1 = 100 - pctElegiblesQ1
 
-  // Con algunos filtros Q1 se queda sin clientes o sin elegibles: ahí el 100 % y el 0,0 %
-  // del gradiente no son una medición, son el guard de división por cero. La bajada de
-  // composición no aplica: no hay nada que descomponer.
+  // Con algunos filtros Q1 se queda sin clientes o sin elegibles: ahí el título no puede
+  // afirmar el salto, porque el 13,3 % de Q1 sería el guard de división por cero.
   const sinBaseQ1 = q[0].n === 0 || q[0].ne === 0
-  const sube = gradQ5 >= gradQ1
-  const ratio = gradQ1 ? (gradQ5 / gradQ1).toFixed(2).replace('.', ',') : null
-
-  // Piso de base para la comparación entre elegibles: con ne de un dígito la tasa cae en
-  // un puñado de valores posibles (1 de 2 da 50,0 %) y puesta al lado de una tasa de
-  // cientos de casos parece medir lo mismo sin serlo. Por debajo del piso, la bajada
-  // declara los conteos en vez de la tasa.
-  const BASE_MINIMA_GRADIENTE = 30
-  const baseFlaca = !sinBaseQ1 && (q[0].ne < BASE_MINIMA_GRADIENTE || q[4].ne < BASE_MINIMA_GRADIENTE)
 
   // El título es lo que el gráfico dibuja: el salto entre extremos y la cuña que lo explica.
   const titulo = sinBaseQ1
     ? `Q1 se queda sin base en este recorte: Q5 marca ${pct(tasa(q[4]))}`
     : `El salto de ${pct(tasa(q[0]))} a ${pct(tasa(q[4]))} es composición: ${pct(sinHistoriaQ1)} de Q1 no califica`
 
-  let bajada
-  if (sinBaseQ1) {
-    bajada = 'Con este filtro Q1 no tiene clientes con historia suficiente: el gradiente entre elegibles se lee sobre los quintiles con base.'
-  } else if (baseFlaca) {
-    bajada = `La base de elegibles es chica en este recorte (Q1: ${entero(q[0].ne)}, Q5: ${entero(q[4].ne)}): la tasa entre elegibles no alcanza para comparar. El bloque de acento sigue siendo nr/n, el denominador del KPI.`
-  } else if (sube) {
-    // ratio puede quedar en null con gradQ1 en 0 (hay elegibles pero ninguno en riesgo):
-    // ahí no hay "veces" que declarar, y el guard evita imprimir "null" en pantalla.
-    bajada = `Entre elegibles el gradiente real va de ${pct(gradQ1)} a ${pct(gradQ5)}${ratio != null ? `, ${ratio}×` : ''}: menos de la mitad del salto que muestra el total. El bloque de acento es nr/n, el denominador del KPI.`
-  } else {
-    // gradQ5 < gradQ1: no prometer una subida que en este estado no se da.
-    bajada = `Entre elegibles, Q1 y Q5 van de ${pct(gradQ1)} a ${pct(gradQ5)}. El bloque de acento es nr/n, el denominador del KPI.`
-  }
-
   return (
     <section className="pant">
       <h1 className="titulo">{titulo}</h1>
-      <p className="bajada">{bajada}</p>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span className="kpi-lbl" style={{ display: 'inline' }}>

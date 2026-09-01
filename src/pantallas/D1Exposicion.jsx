@@ -5,8 +5,16 @@
 //
 // Cohorte fija: los clientes en riesgo AL CORTE, mirados hacia atrás año por año. No es la
 // tasa de riesgo de cada año — esa es la serie de 25 cortes de la vista 01 — y las dos no
-// tienen por qué coincidir. Cada barra va al 100 % sobre la facturación identificada de SU
-// año, que entre 2022 y 2024 casi se triplica: comparar los montos crudos no diría nada.
+// tienen por qué coincidir.
+//
+// El eje va en PESOS, no en participación. La versión anterior normalizaba cada barra al
+// 100 % sobre la facturación identificada de su propio año, con el argumento de que entre
+// 2022 y 2024 la base casi se triplica y comparar montos crudos no diría nada. El precio era
+// esconder justamente ese crecimiento: cuatro barras del mismo largo para años de 68,6 M y
+// 193,4 M. Con eje absoluto el largo ES la plata y los tramos siguen siendo el reparto, así
+// que la pantalla dice las dos cosas. Se apoya en que el extracto no tiene deriva de precios
+// (ver `base-de-precios`), o sea que los pesos de 2022 y los de 2025 se comparan sin
+// deflactar; si eso dejara de ser cierto, esta vista vuelve a la participación.
 //
 // Por qué no acepta filtros. Abrir la serie por celda de contingencia serían ocho columnas
 // más sobre 17.136 celdas, casi un mega de payload, y el bundle de un solo archivo que se
@@ -31,8 +39,6 @@ export default function D1({ info, iCorte }) {
   const pico = previos.reduce((a, b) => (b.pct_en_riesgo > a.pct_en_riesgo ? b : a))
   const pctPico = 100 * pico.pct_en_riesgo
   const pctUltimo = 100 * ultimo.pct_en_riesgo
-  const cae = pctUltimo < pctPico
-  const caida = Math.abs(pctPico - pctUltimo)
   const totales = anios.map((a) => a.total)
 
   // De más reciente a más viejo: el año del corte va arriba y en énfasis, que es por donde
@@ -70,17 +76,6 @@ export default function D1({ info, iCorte }) {
         Los mismos clientes pesaban {pct(pctPico)} de lo facturado en {pico.anio} y
         {' '}{pct(pctUltimo)} en {ultimo.anio}
       </h1>
-      <p className="bajada">
-        {cae
-          ? <>Son {caida.toFixed(1).replace('.', ',')} puntos menos sobre exactamente la misma
-              gente. </>
-          : <>El peso de la cohorte todavía no baja. </>}
-        <Def id="cohorte-fija">Cohorte fija</Def>: los {entero(info.enRiesgo)} clientes{' '}
-        <Def id="en-riesgo">en riesgo</Def> al <Def id="corte">corte</Def>, mirados hacia atrás.
-        Cada barra va sobre la <Def id="facturacion-identificada">facturación identificada</Def>{' '}
-        de su propio año, de ARS {millones(Math.min(...totales))} a
-        ARS {millones(Math.max(...totales))}.
-      </p>
 
       <div className="lienzo">
         <Lienzo>
@@ -90,7 +85,9 @@ export default function D1({ info, iCorte }) {
               anchoEtiqueta={150}
               alturaBarra={110}
               marcaEnfasis
-              tituloEje="Participación en la facturación identificada del año"
+              maximo={Math.max(...totales)}
+              formatoEje={(v) => (v ? millones(v) : '0')}
+              tituloEje="Facturación identificada del año (ARS)"
             />
           )}
         </Lienzo>
@@ -102,9 +99,10 @@ export default function D1({ info, iCorte }) {
         El <Def id="en-riesgo">proxy</Def> define la cohorte por haber dejado de comprar, así
         que el peso de {ultimo.anio} está en parte determinado por esa definición y no es
         hallazgo. Lo que no es definición es cuánto pesaba esa misma gente
-        antes: {pct(100 * anios[0].pct_en_riesgo)} en {anios[0].anio}. Cada barra es una
-        participación dentro de su propio año, así que la lectura no depende de la{' '}
-        <Def id="base-de-precios">base de precios</Def> del extracto.
+        antes: {pct(100 * anios[0].pct_en_riesgo)} en {anios[0].anio}. El eje va en pesos
+        corrientes: se apoya en que el extracto no tiene deriva de precios, así que los de
+        2022 y los de 2025 se comparan sin deflactar (<Def id="base-de-precios">base de
+        precios</Def>).
       </p>
     </section>
   )

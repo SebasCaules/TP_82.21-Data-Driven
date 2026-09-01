@@ -10,7 +10,6 @@
 // y se declara aparte, bajo línea divisoria.
 
 import { Lienzo, BarrasApiladas100, rampa } from '../graficos.jsx'
-import { Def } from '../Glosario.jsx'
 import { entero, pesos, pct, porDimension, dims } from '../agregacion.js'
 
 export default function D5a({ iCorte, filtro, verEnLista }) {
@@ -18,14 +17,6 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
   const onlineIdx = dims.region.indexOf('Solo online')
 
   const reales = r.map((c, i) => ({ c, i })).filter(({ i }) => i !== onlineIdx)
-  // Amplitud solo sobre regiones con clientes: una región en n=0 no tiene tasa de
-  // riesgo (0 % sería falso, no hay base).
-  const conClientes = reales.filter(({ c }) => c.n > 0)
-  const tasas = conClientes.map(({ c }) => Math.round((1000 * c.nr) / c.n) / 10)
-  const hayTasas = tasas.length > 0
-  const minT = hayTasas ? Math.min(...tasas) : null
-  const maxT = hayTasas ? Math.max(...tasas) : null
-  const amplitudTxt = hayTasas ? (maxT - minT).toFixed(1).replace('.', ',') : null
 
   const totalN = reales.reduce((s, { c }) => s + c.n, 0)
   const totalAr = reales.reduce((s, { c }) => s + c.ar, 0)
@@ -78,14 +69,6 @@ export default function D5a({ iCorte, filtro, verEnLista }) {
             ? `${top.etiqueta} es ${pct(top.pClientes)} de la base y ${pct(top.pExposicion)} de lo expuesto: se reparte parejo`
             : `${top.etiqueta} concentra ${pct(top.pExposicion)} de la exposición con ${pct(top.pClientes)} de los clientes`}
       </h1>
-      <p className="bajada">
-        {hayTasas
-          ? <>La tasa de <Def id="en-riesgo">riesgo</Def> casi no cambia entre regiones: va
-              de {pct(minT)} a {pct(maxT)}, {amplitudTxt} puntos. El corte que más se mueve
-              entre las dos barras es {mayorDesvio.etiqueta}:{' '}
-              {desvio.toFixed(1).replace('.', ',')} puntos.</>
-          : 'Ninguna región tiene clientes en la base filtrada.'}
-      </p>
 
       <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(6px, 1vh, 14px)' }}>
         <Lienzo>

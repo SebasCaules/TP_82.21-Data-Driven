@@ -824,6 +824,13 @@ function relleno(tono) {
  * fila. La escala es fija de 0 a 100 %, asi que ningun filtro puede inflar la forma: es lo
  * contrario de una barra de conteo, donde el eje se reacomoda al maximo del recorte.
  *
+ * `maximo` cambia esa escala por una absoluta y compartida: el eje deja de ir de 0 a 100 % y
+ * pasa a ir de 0 al maximo declarado, asi que el LARGO de cada barra es su total y los
+ * tramos siguen siendo su reparto. Es para cuando la magnitud es parte del mensaje y la
+ * composicion sola la esconde. El precio hay que pagarlo afuera: con eje absoluto la lectura
+ * pasa a depender de la unidad, y si esa unidad es plata de anios distintos, de si esa plata
+ * es comparable entre anios.
+ *
  * Cada fila declara su base (`sub`), porque tres barras del mismo largo sobre bases de
  * 23.529, 8.266 y 2.059 no son tres poblaciones iguales y sin la base escrita lo parecen.
  *
@@ -853,6 +860,7 @@ function relleno(tono) {
 export function BarrasApiladas100({
   filas, w, h, anchoEtiqueta = 120, tituloEje, encabezadoNota, leyenda, conectores,
   alturaBarra, referencia, onFila, onSegmento, textoResto, rotuloResto, marcaEnfasis,
+  maximo, formatoEje,
 }) {
   if (!filas.length || w < 160) return null
 
@@ -891,6 +899,10 @@ export function BarrasApiladas100({
   }))
   const ancho = Math.max(60, w - x0 - anchoNota - Math.max(6, anchoCola))
   const yBase = padTop + disponible
+  // Con eje absoluto la escala sale de escalaNice, igual que en cualquier barra de conteo:
+  // marcas redondas y tope por encima del dato, nunca el maximo crudo.
+  const escala = maximo ? escalaNice(maximo) : null
+  const largo = (valor, share) => (escala ? valor / escala.max : share) * ancho
 
   // Todo el calculo de posiciones y de que rotulo entra pasa aca, antes de devolver JSX:
   // la linea de resto de la cabecera necesita saber que segmentos se quedaron sin rotulo.
@@ -903,7 +915,7 @@ export function BarrasApiladas100({
       const share = g.valor / tot
       // Piso de 3 px: un segmento de 0,4 % existe y tiene que dejar marca, pero sin piso se
       // dibuja en medio pixel y desaparece.
-      const ws = g.valor > 0 ? Math.max(3, share * ancho) : 0
+      const ws = g.valor > 0 ? Math.max(3, largo(g.valor, share)) : 0
       const s = { ...g, x, w: ws, share, j }
       x += ws
       return s
@@ -921,6 +933,22 @@ export function BarrasApiladas100({
       else if (s.w <= 0) return
       else if (j === segs.length - 1) s.rotulo = 'fuera'
       else if (!claveResto.includes(s.clave)) claveResto.push(s.clave)
+    })
+    // La x de cada rotulo se resuelve aca y en orden, porque unos dependen de otros. La
+    // plaqueta va pegada a SU tramo, que es lo que la hace legible como cifra de ese bloque;
+    // lo que no puede es taparle el rotulo al vecino, asi que los que vienen despues se
+    // corren detras de ella. Sin esto, con un tramo de acento de 12 px la plaqueta caia
+    // exactamente encima del rotulo del tramo siguiente.
+    let finPlaqueta = 0
+    segs.forEach((s) => {
+      if (s.rotulo === 'plaqueta') {
+        s.xRotulo = s.x + s.w + 8
+        finPlaqueta = s.xRotulo + anchoTexto(s.texto, fuente, 600) + 10
+      } else if (s.rotulo === 'dentro') {
+        s.xRotulo = Math.max(s.x + 8, finPlaqueta ? finPlaqueta + 8 : 0)
+      } else if (s.rotulo === 'fuera') {
+        s.xRotulo = Math.max(s.x + s.w + 7, finPlaqueta ? finPlaqueta + 8 : 0)
+      }
     })
     return { fila: f, y, segs, cortes: segs.slice(0, -1).map((s) => s.x + s.w) }
   })
@@ -1032,16 +1060,17 @@ export function BarrasApiladas100({
             )
           })}
           {v.segs.map((s) => s.rotulo === 'dentro' && (
-            <text key={'d' + s.clave} x={s.x + 8} y={v.y + alto / 2} fontSize={fuente}
+            <text key={'d' + s.clave} x={s.xRotulo} y={v.y + alto / 2} fontSize={fuente}
                   fontWeight={s.enfasis ? 700 : 500} fill={s.tinta || INK}
                   dominantBaseline="central" className="tabular">{s.texto}</text>
           ))}
           {v.segs.map((s) => s.rotulo === 'plaqueta' && (
-            <Plaqueta key={'p' + s.clave} x={s.x + s.w + 8} y={v.y + alto / 2} texto={s.texto}
+            <Plaqueta key={'p' + s.clave} x={s.xRotulo} y={v.y + alto / 2} texto={s.texto}
                       fuente={fuente} peso={600} color={INK} />
           ))}
           {v.segs.map((s) => s.rotulo === 'fuera' && (
-            <text key={'f' + s.clave} x={Math.min(s.x + s.w + 7, w - anchoNota - anchoTexto(s.texto, fuente, 500) - 2)}
+            <text key={'f' + s.clave}
+                  x={Math.min(s.xRotulo, w - anchoNota - anchoTexto(s.texto, fuente, 500) - 2)}
                   y={v.y + alto / 2} fontSize={fuente} fill={MUT2} fontWeight={500}
                   dominantBaseline="central" className="tabular">{s.texto}</text>
           ))}
@@ -1053,10 +1082,13 @@ export function BarrasApiladas100({
       ))}
 
       <line x1={x0} x2={x0} y1={padTop} y2={yBase} stroke={EJE} strokeWidth="1" />
-      <EjeXValor x0={x0} ancho={ancho} y={yBase} ticks={[0, 25, 50, 75, 100]} max={100}
-                 formato={(v) => `${v} %`} titulo={tituloEje} />
+      <EjeXValor x0={x0} ancho={ancho} y={yBase}
+                 ticks={escala ? escala.ticks : [0, 25, 50, 75, 100]}
+                 max={escala ? escala.max : 100}
+                 formato={escala ? (formatoEje || ((v) => v)) : (v) => `${v} %`}
+                 titulo={tituloEje} />
       {referencia != null && referencia.valor > 0 && (
-        <ReferenciaV x={x0 + (referencia.valor / 100) * ancho} h={yBase} y={padTop}
+        <ReferenciaV x={x0 + (referencia.valor / (escala ? escala.max : 100)) * ancho} h={yBase} y={padTop}
                      etiqueta={referencia.etiqueta} />
       )}
 

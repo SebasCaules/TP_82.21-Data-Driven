@@ -15,8 +15,7 @@
 // Título y bases salen de porDimension, no de info: no mezclan bases con filtro.rfm activo.
 
 import { Lienzo, BarrasDivergentes } from '../graficos.jsx'
-import { montoM, pesos, pct, porDimension, dims } from '../agregacion.js'
-import { Def } from '../Glosario.jsx'
+import { montoM, pct, porDimension, dims } from '../agregacion.js'
 
 // Puntos de participación, con signo. No es un porcentaje de nada: es la resta de dos.
 // El signo lo pone el formato y no el eje: el lado ya dice de qué lado cae, pero el número
@@ -71,12 +70,6 @@ export default function D3({ iCorte, filtro, info, verEnLista }) {
           ? 'Con este recorte el riesgo se reparte igual que la facturación'
           : `${subexpuesto.etiqueta}: ${pct(subexpuesto.fac)} de lo facturado y ${pct(subexpuesto.exp)} de la exposición`}
       </h1>
-      <p className="bajada">
-        {plano ? null : <>Son {puntos(subexpuesto.dif)} puntos de desvío. </>}
-        Cuánto pesa cada <Def id="rfm">segmento</Def> en la facturación ({pesos(tot.f)}) contra
-        cuánto pesa en la <Def id="exposicion">exposición</Def> ({pesos(tot.ar)}). El desvío de
-        En riesgo es circular por construcción.
-      </p>
 
       <div className="lienzo">
         <Lienzo>

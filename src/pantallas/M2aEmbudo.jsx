@@ -12,7 +12,6 @@
 
 import { Lienzo, BarrasApiladas100 } from '../graficos.jsx'
 import { entero, pct, series } from '../agregacion.js'
-import { Def } from '../Glosario.jsx'
 
 export default function M2a() {
   const emb = series.embudo_campanias
@@ -32,21 +31,25 @@ export default function M2a() {
   // el acento ya significa "los que avanzan" adentro de este gráfico y no puede significar
   // dos cosas a la vez: la marca va en la etiqueta de la fila (`marcaEnfasis`).
   const peor = pasos.reduce((m, p) => (p.retencion < m.retencion ? p : m), pasos[0])
-  const mejor = pasos.reduce((m, p) => (p.retencion > m.retencion ? p : m), pasos[0])
 
+  // Con el eje en base, el largo de la barra ES el embudo: 23.529, 8.265, 2.059. El precio
+  // es que el tramo de acento del ultimo paso mide 12 px, y ahi no entra "284 · 13,8 %".
+  // Adentro va solo el porcentaje, que es lo que se compara entre pasos; los dos conteos
+  // pasan al subtitulo de la fila. Asi cada cifra queda pegada a su bloque en vez de
+  // aparecer sobre plaqueta a la derecha de la barra, leyendose como si fuera del vecino.
   const filas = pasos.map((p) => ({
     etiqueta: p.etiqueta,
-    sub: `base ${entero(p.base)}`,
+    sub: `${entero(p.avanza)} de ${entero(p.base)}`,
     enfasis: p === peor,
     segmentos: [
       {
         clave: `avanza ${p.etiqueta}`, valor: p.avanza, tono: 'var(--acc)', tinta: '#fff',
         enfasis: true, plaqueta: true,
-        texto: `${entero(p.avanza)} · ${pct(p.retencion)}`,
+        texto: pct(p.retencion),
       },
       {
         clave: `se pierde ${p.etiqueta}`, valor: Math.max(0, p.base - p.avanza), tono: 'trama',
-        texto: `se pierden ${entero(p.base - p.avanza)} · ${pct(100 - p.retencion)}`,
+        texto: pct(100 - p.retencion),
       },
     ],
   }))
@@ -67,12 +70,6 @@ export default function M2a() {
       <h1 className="titulo">
         El peor paso, {peor.etiqueta}, pierde {pct(100 - peor.retencion)} de lo que recibe
       </h1>
-      <p className="bajada">
-        Ninguno pierde menos de {pct(100 - mejor.retencion)}. Sobre el total, la{' '}
-        <Def id="compra-7dias">compra a 7 días</Def> es {pct(100 * g.compra_7dias)}{' '}
-        ({entero(compras)} de {entero(envios)} envíos limpios).
-        Compra nunca ocurre sin clic previo: el salto al abrir es mecánico, no causal.
-      </p>
 
       <div className="lienzo">
         <Lienzo>
@@ -81,7 +78,9 @@ export default function M2a() {
               filas={filas} leyenda={leyenda} w={w} h={h}
               anchoEtiqueta={138}
               marcaEnfasis
-              tituloEje="Participación dentro de cada paso"
+              maximo={pasos[0].base}
+              formatoEje={(v) => entero(v)}
+              tituloEje="Envíos que entran a cada paso"
             />
           )}
         </Lienzo>

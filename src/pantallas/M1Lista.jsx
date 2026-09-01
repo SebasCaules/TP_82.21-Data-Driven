@@ -22,7 +22,6 @@ import { DIMENSIONES, etiquetaValor } from '../Filtros.jsx'
 import { Lienzo, BarrasH } from '../graficos.jsx'
 import { Def } from '../Glosario.jsx'
 
-const pesosFinos = (x) => `ARS ${entero(x)}`
 
 const TAMANO_TRAMO = 200
 
@@ -107,21 +106,11 @@ export default function M1({ info, filtro, setFiltro, iCorte, volverAlOrigen, or
   }
 
   if (filas.length === 0) {
-    // El top global se recorta antes de filtrar (agregacion.js): un filtro puede tener
-    // exposición agregada propia y aun así no aportar ningún cliente individual si ninguno
-    // de ellos alcanza el piso del ranking global. Se declara en vez de mostrar 0/0/0.
-    const globalLista = lista(iCorte, SIN_FILTRO)
-    const pisoExposicion = globalLista.length ? Math.min(...globalLista.map((f) => f.anualizado)) : 0
     return (
       <section className="pant">
         <h1 className="titulo">
           El filtro activo no aporta ningún cliente al ranking de exposición
         </h1>
-        <p className="bajada">
-          El ranking sale del top {entero(globalLista.length)} global, cuyo piso es{' '}
-          {pesosFinos(pisoExposicion)} anuales. Este filtro agrega {pesos(info.exposicion)} de
-          exposición, pero ningún cliente del recorte llega a ese piso.
-        </p>
         <div className="lienzo">
           <div className="tarjeta" style={{ flex: 1 }}>
             <div className="kpi-lbl">Sin representantes en el ranking</div>
@@ -176,16 +165,6 @@ export default function M1({ info, filtro, setFiltro, iCorte, volverAlOrigen, or
           : <>El recorte entra en un solo tramo: {entero(total.clientes)}{' '}
               {plural(total.clientes, 'cliente', 'clientes')} y ARS {fmtMonto(total.exposicion)}</>}
       </h1>
-      <p className="bajada">
-        {numTramos > 1 && <>ARS {fmtMonto(primero.exposicion)} contra{' '}
-          {fmtMonto(ultimo.exposicion)}. </>}
-        La lista sale ordenada por <Def id="exposicion">exposición</Def> y se corta en{' '}
-        <Def id="tramo">lotes de {entero(TAMANO_TRAMO)}</Def>, uno por semana.
-        {' '}{entero(total.contactables)} de {entero(total.clientes)}{' '}
-        {plural(total.contactables, 'se puede contactar', 'se pueden contactar')}{' '}
-        ({pct(100 * total.contactables / total.clientes)}): ARS {fmtMonto(total.alcanzable)} de
-        los {fmtMonto(total.exposicion)}.
-      </p>
 
       <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(6px, 1vh, 14px)' }}>
         <Lienzo>

@@ -78,7 +78,7 @@ export default function D0({ info }) {
     : null
 
   return (
-    <section className="pant cab-1 v01">
+    <section className="pant v01">
       {/* Z1 — la lectura, sin repetir la cifra de abajo */}
       <h1 className="titulo">{sujeto} de la base está en clientes sin compra reciente</h1>
 
