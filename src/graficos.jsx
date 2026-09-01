@@ -897,11 +897,18 @@ export function BarrasApiladas100({
     if (!u || !u.texto || !tot || u.valor / tot >= 0.16) return 0
     return anchoTexto(u.texto, fuente, 500) + 12
   }))
-  const ancho = Math.max(60, w - x0 - anchoNota - Math.max(6, anchoCola))
-  const yBase = padTop + disponible
   // Con eje absoluto la escala sale de escalaNice, igual que en cualquier barra de conteo:
   // marcas redondas y tope por encima del dato, nunca el maximo crudo.
   const escala = maximo ? escalaNice(maximo) : null
+  const formatoTick = escala ? (formatoEje || ((v) => v)) : (v) => `${v} %`
+  // El ultimo rotulo del eje va CENTRADO en la punta, asi que la mitad cae fuera del ancho
+  // de dibujo. Con 6 px de margen se dibujaba fuera del SVG y se leia cortado: "25.0" por
+  // "25.000" en el embudo. El margen derecho pasa a ser el mayor entre el rotulo de la cola
+  // y esa media caja.
+  const margenTick = anchoTexto(formatoTick(escala ? escala.ticks[escala.ticks.length - 1] : 100),
+    10.5) / 2 + 2
+  const ancho = Math.max(60, w - x0 - anchoNota - Math.max(6, anchoCola, margenTick))
+  const yBase = padTop + disponible
   const largo = (valor, share) => (escala ? valor / escala.max : share) * ancho
 
   // Todo el calculo de posiciones y de que rotulo entra pasa aca, antes de devolver JSX:
@@ -939,17 +946,49 @@ export function BarrasApiladas100({
     // lo que no puede es taparle el rotulo al vecino, asi que los que vienen despues se
     // corren detras de ella. Sin esto, con un tramo de acento de 12 px la plaqueta caia
     // exactamente encima del rotulo del tramo siguiente.
-    let finPlaqueta = 0
-    segs.forEach((s) => {
-      if (s.rotulo === 'plaqueta') {
-        s.xRotulo = s.x + s.w + 8
-        finPlaqueta = s.xRotulo + anchoTexto(s.texto, fuente, 600) + 10
-      } else if (s.rotulo === 'dentro') {
-        s.xRotulo = Math.max(s.x + 8, finPlaqueta ? finPlaqueta + 8 : 0)
-      } else if (s.rotulo === 'fuera') {
-        s.xRotulo = Math.max(s.x + s.w + 7, finPlaqueta ? finPlaqueta + 8 : 0)
-      }
-    })
+    //
+    // Pegarla deja de ser pegarla cuando el tramo es tan chico que la placa se come todo lo
+    // que sigue. Es el paso Clic → Compra del embudo: 10 px de acento sobre 73 de barra, y
+    // la placa de "13,8 %" tapaba el tramo vecino entero y le empujaba su propio rotulo
+    // afuera de la barra. Cuando pasa eso, la cifra sale DETRAS del fin de la barra —donde
+    // no tapa nada— y se pinta con el color de su tramo, que es lo que la vuelve a atar a su
+    // bloque; el vecino se queda con su rotulo adentro, como en las filas que si entran.
+    const finBarra = segs.length ? segs[segs.length - 1].x + segs[segs.length - 1].w : x0
+    // Ubica los rotulos y avisa si algun tramo quedo con su cifra FUERA de su propio bloque:
+    // ese es el sintoma de que la plaqueta le comio el lugar, y no que la plaqueta se salga
+    // de la barra. Con la barra corta del paso Clic → Compra la placa entraba por 4 px y
+    // igual dejaba "86,2 %" flotando a la derecha de su trama, que es el caso que hay que
+    // detectar.
+    const ubicar = (conPlaqueta) => {
+      let fin = 0
+      let desalojado = false
+      segs.forEach((s) => {
+        if (s.rotulo === 'plaqueta') {
+          if (!conPlaqueta) return
+          s.xRotulo = s.x + s.w + 8
+          fin = s.xRotulo + anchoTexto(s.texto, fuente, 600) + 10
+        } else if (s.rotulo === 'dentro') {
+          s.xRotulo = Math.max(s.x + 8, fin ? fin + 8 : 0)
+          if (s.xRotulo + anchoTexto(s.texto, fuente, s.enfasis ? 700 : 500) > s.x + s.w) {
+            desalojado = true
+          }
+        } else if (s.rotulo === 'fuera') {
+          s.xRotulo = Math.max(s.x + s.w + 7, fin ? fin + 8 : 0)
+        }
+      })
+      return desalojado
+    }
+    const plaq = segs.find((s) => s.rotulo === 'plaqueta')
+    if (ubicar(true) && plaq) {
+      // La cifra sale DETRAS del fin de la barra, donde no tapa nada, y se pinta con el color
+      // de su tramo: es lo que la vuelve a atar a su bloque ahora que no esta pegada. El
+      // vecino recupera su rotulo adentro, como en las filas que si entran.
+      ubicar(false)
+      plaq.xRotulo = Math.max(finBarra, ...segs
+        .filter((s) => s.rotulo === 'fuera')
+        .map((s) => s.xRotulo + anchoTexto(s.texto, fuente, 500))) + 8
+      plaq.trasBarra = true
+    }
     return { fila: f, y, segs, cortes: segs.slice(0, -1).map((s) => s.x + s.w) }
   })
 
@@ -1064,9 +1103,13 @@ export function BarrasApiladas100({
                   fontWeight={s.enfasis ? 700 : 500} fill={s.tinta || INK}
                   dominantBaseline="central" className="tabular">{s.texto}</text>
           ))}
+          {/* La plaqueta siempre cae fuera de su propio tramo —por eso es plaqueta— asi que el
+              color del texto es lo unico que la ata a su bloque. Va en el tono del tramo, no en
+              tinta: sobre la trama del vecino, un numero negro no dice de quien es. */}
           {v.segs.map((s) => s.rotulo === 'plaqueta' && (
             <Plaqueta key={'p' + s.clave} x={s.xRotulo} y={v.y + alto / 2} texto={s.texto}
-                      fuente={fuente} peso={600} color={INK} />
+                      fuente={fuente} peso={600}
+                      color={s.tono && s.tono !== 'trama' ? s.tono : INK} />
           ))}
           {v.segs.map((s) => s.rotulo === 'fuera' && (
             <text key={'f' + s.clave}
@@ -1085,7 +1128,7 @@ export function BarrasApiladas100({
       <EjeXValor x0={x0} ancho={ancho} y={yBase}
                  ticks={escala ? escala.ticks : [0, 25, 50, 75, 100]}
                  max={escala ? escala.max : 100}
-                 formato={escala ? (formatoEje || ((v) => v)) : (v) => `${v} %`}
+                 formato={formatoTick}
                  titulo={tituloEje} />
       {referencia != null && referencia.valor > 0 && (
         <ReferenciaV x={x0 + (referencia.valor / (escala ? escala.max : 100)) * ancho} h={yBase} y={padTop}
@@ -1164,10 +1207,12 @@ export function BarrasDivergentes({ datos, w, h, formato, formatoEje, tituloEje,
          aria-label={(tituloEje || 'Desvíos') + ': ' + datos.map((d) => d.etiqueta + ' ' + formato(d.valor)).join(', ')}
          style={{ display: 'block' }}>
       <Tramas />
-      {/* La mitad del mal desempeno va sobre un lavado neutro. Sin el, los dos lados se
-          distinguen solo por el lado de una linea, que es justo lo que hay que leer rapido;
-          con el, la zona se ve antes que las barras. Neutro y no de color: el lado ya tiene
-          significado y un color le agregaria un segundo. */}
+      {/* La mitad NEGATIVA va sobre un lavado neutro. Sin el, los dos lados se distinguen
+          solo por el lado de una linea, que es justo lo que hay que leer rapido; con el, la
+          zona se ve antes que las barras. Neutro y no de color: el lado ya tiene significado
+          y un color le agregaria un segundo. Que significa cada lado lo fija el llamador con
+          el orden de su resta y lo declara en rotuloPos/rotuloNeg; el componente solo lava el
+          lado negativo, que es el que el llamador manda al segundo plano. */}
       <rect x={x0} y={padTop} width={ancho / 2} height={disponible} fill="var(--zona)" />
       {rotuloNeg && <text x={xc - 10} y={12} fontSize="12" fontWeight={600} fill={MUT2}
                           textAnchor="end" dominantBaseline="central">{rotuloNeg}</text>}

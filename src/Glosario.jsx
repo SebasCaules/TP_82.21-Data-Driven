@@ -89,9 +89,21 @@ export const GLOSARIO = {
   },
   rfm: {
     termino: 'Segmento RFM',
-    definicion: 'Siete segmentos excluyentes sobre los quintiles de recency, frecuencia y monto. Las reglas se evalúan en orden y la primera que aplica gana.',
-    ecuacion: 'Campeones R≥4∧F≥4∧M≥4 · En riesgo R≤2∧F≥3 · Leales R≥3∧F≥4 · Hibernando R≤2∧F≤2 · Nuevos R≥4∧n=1 · Potenciales R≥4∧F≤2 · Perdidos: el resto',
-    fuente: 'CONTRACT.md §3',
+    definicion: 'Cada cliente recibe tres notas de 1 a 5, una por quintil: R por recency, F por cantidad de compras y M por facturación. R va invertida, así que comprar hace poco da 5. Con esas tres notas se aplican siete reglas excluyentes, en orden, y la primera que da verdadero se queda con el cliente.',
+    // Las siete reglas van una por renglón y no en una línea separada por puntos medios: son
+    // una secuencia con orden, y ese orden es lo que decide el segmento. Apiladas se ve
+    // dónde cae cada cliente; en una sola línea había que contar separadores.
+    reglas: [
+      { nombre: 'Campeones', regla: 'R ≥ 4 ∧ F ≥ 4 ∧ M ≥ 4' },
+      { nombre: 'En riesgo', regla: 'R ≤ 2 ∧ F ≥ 3' },
+      { nombre: 'Leales', regla: 'R ≥ 3 ∧ F ≥ 4' },
+      { nombre: 'Hibernando', regla: 'R ≤ 2 ∧ F ≤ 2' },
+      { nombre: 'Nuevos', regla: 'R ≥ 4 ∧ n = 1' },
+      { nombre: 'Potenciales', regla: 'R ≥ 4 ∧ F ≤ 2' },
+      { nombre: 'Perdidos', regla: 'el resto' },
+    ],
+    umbral: 'El orden decide: un cliente que cumple Campeones y Leales sale Campeón, porque la regla de Campeones se evalúa antes. Los quintiles reparten la base en cinco grupos del mismo tamaño, así que las notas son relativas a la base del corte y no a una vara fija.',
+    fuente: 'CONTRACT.md §3 · pipeline/features.py',
   },
   'umbral-riesgo': {
     termino: 'Umbral de clientes en riesgo',
@@ -316,6 +328,15 @@ export function Def({ id, children, className = '', etiqueta }) {
           <span className="def-pop-term">{entrada.termino}</span>
           <p className="def-pop-def">{entrada.definicion}</p>
           {entrada.ecuacion && <code className="def-pop-eq">{entrada.ecuacion}</code>}
+          {/* Reglas en orden: el número dice cuál se evalúa antes, que es la mitad de la
+              definición. Sin él la lista se leería como un conjunto sin prelación. */}
+          {entrada.reglas && (
+            <ol className="def-pop-reglas">
+              {entrada.reglas.map((r) => (
+                <li key={r.nombre}><b>{r.nombre}</b><code>{r.regla}</code></li>
+              ))}
+            </ol>
+          )}
           {/* Los tres cortes dibujados y no escritos. "verde < 45 % · ámbar 45 a 52 %" es
               justamente lo que el semáforo existe para no tener que leer: acá cada banda
               lleva su propio semáforo con la luz que le toca prendida, así la ficha se lee

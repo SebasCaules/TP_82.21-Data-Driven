@@ -1,12 +1,18 @@
-// D3 — dónde está la plata contra dónde está el riesgo, en barras divergentes. Cada barra es
-// la diferencia entre cuánto pesa el segmento en la FACTURACIÓN y cuánto pesa en la
-// EXPOSICIÓN, en puntos de participación: es la frase del título convertida en una sola
+// D3 — dónde está el riesgo contra dónde está la plata, en barras divergentes. Cada barra es
+// la diferencia entre cuánto pesa el segmento en la EXPOSICIÓN y cuánto pesa en la
+// FACTURACIÓN, en puntos de participación: es la frase del título convertida en una sola
 // cifra dibujada, en vez de dos distribuciones que el lector tiene que restar de memoria.
 //
-// El orden de la resta lo fija el signo, no la comodidad: el negativo tiene que ser el mal
-// desempeño. Un segmento que pesa más en el riesgo que en lo que factura está sobreexpuesto
-// y va a la izquierda; el que factura más de lo que arriesga va a la derecha. Con la resta
-// al revés, el −12,7 le tocaba a Campeones, que es justamente el segmento sano.
+// El orden de la resta lo fija la decisión, no la aritmética. La pantalla existe para elegir
+// dónde va el presupuesto de retención, y lo que se elige son los segmentos que pesan más en
+// el riesgo que en lo que facturan. Esos van a la DERECHA, en positivo, sólidos y sobre la
+// mitad limpia: el lado positivo es el lado que se elige. Los sanos quedan a la izquierda, en
+// trama y sobre el lavado.
+//
+// La resta iba al revés y el título terminaba nombrando a Campeones, que es el segmento del
+// que no hay que ocuparse. Un tablero de decisión no puede liderar con la buena noticia.
+// El precio de la vuelta: un número positivo acá NO es una buena noticia, es una prioridad.
+// Por eso los dos extremos van rotulados y el eje dice el orden de la resta.
 //
 // Lo que el formato pierde son los niveles (un segmento chico y uno grande pueden dar el
 // mismo desvío), así que la exposición de cada segmento va como columna al costado, con su
@@ -16,6 +22,7 @@
 
 import { Lienzo, BarrasDivergentes } from '../graficos.jsx'
 import { montoM, pct, porDimension, dims } from '../agregacion.js'
+import { Def } from '../Glosario.jsx'
 
 // Puntos de participación, con signo. No es un porcentaje de nada: es la resta de dos.
 // El signo lo pone el formato y no el eje: el lado ya dice de qué lado cae, pero el número
@@ -39,17 +46,17 @@ export default function D3({ iCorte, filtro, info, verEnLista }) {
   const filas = r.map((c, i) => {
     const pExp = tot.ar ? (100 * c.ar) / tot.ar : 0
     const pFac = tot.f ? (100 * c.f) / tot.f : 0
-    return { etiqueta: dims.rfm[i], exp: pExp, fac: pFac, dif: pFac - pExp, ar: c.ar, _i: i }
+    return { etiqueta: dims.rfm[i], exp: pExp, fac: pFac, dif: pExp - pFac, ar: c.ar, _i: i }
   })
 
   // Las dos participaciones suman 100 cada una, así que los desvíos suman cero: siempre hay
   // al menos uno de cada lado y orden[0] no puede ser negativo.
   const orden = [...filas].sort((a, b) => b.dif - a.dif)
-  const subexpuesto = orden[0]
+  const sobreexpuesto = orden[0]
   // Con un filtro que deja un solo segmento con datos, la diferencia es cero por
   // construcción y no hay nada que afirmar: el título lo dice en vez de nombrar un desvío
   // de décimas como si fuera un hallazgo.
-  const plano = !subexpuesto || Math.abs(subexpuesto.dif) < 0.05
+  const plano = !sobreexpuesto || Math.abs(sobreexpuesto.dif) < 0.05
 
   const datos = orden.map((f) => ({
     etiqueta: f.etiqueta,
@@ -59,7 +66,7 @@ export default function D3({ iCorte, filtro, info, verEnLista }) {
     nota: montoM(f.ar),
     notaValor: f.ar,
     notaSuf: f._i === enRiesgoIdx ? 'circular' : null,
-    enfasis: !plano && f._i === subexpuesto._i,
+    enfasis: !plano && f._i === sobreexpuesto._i,
     _i: f._i,
   }))
 
@@ -68,8 +75,17 @@ export default function D3({ iCorte, filtro, info, verEnLista }) {
       <h1 className="titulo">
         {plano
           ? 'Con este recorte el riesgo se reparte igual que la facturación'
-          : `${subexpuesto.etiqueta}: ${pct(subexpuesto.fac)} de lo facturado y ${pct(subexpuesto.exp)} de la exposición`}
+          : `${sobreexpuesto.etiqueta}: ${pct(sobreexpuesto.exp)} de la exposición contra ${pct(sobreexpuesto.fac)} de lo facturado`}
       </h1>
+
+      {/* Los siete nombres del eje son la única cosa de esta pantalla que no se puede
+          deducir del dibujo: "Hibernando" no dice con qué regla entró nadie ahí. La ficha
+          del glosario trae las tres notas y las siete reglas en orden. */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span className="kpi-lbl" style={{ display: 'inline' }}>
+          <Def id="rfm">Cómo se arma cada segmento</Def>
+        </span>
+      </div>
 
       <div className="lienzo">
         <Lienzo>
@@ -77,11 +93,11 @@ export default function D3({ iCorte, filtro, info, verEnLista }) {
             <BarrasDivergentes
               datos={datos} w={w} h={h}
               formato={conSigno} formatoEje={marcaEje}
-              tituloEje="Facturación menos exposición, en puntos de participación"
+              tituloEje="Exposición menos facturación, en puntos de participación"
               anchoEtiqueta={106}
               encabezadoNota="exposición del segmento"
-              rotuloPos="más plata que riesgo →"
-              rotuloNeg="← más riesgo que plata (trama)"
+              rotuloPos="más riesgo que plata: se eligen →"
+              rotuloNeg="← más plata que riesgo (trama)"
               onBarra={verEnLista ? (i, d) => verEnLista('rfm', d._i) : undefined}
             />
           )}
