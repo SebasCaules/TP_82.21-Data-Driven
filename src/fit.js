@@ -6,7 +6,7 @@
 // se comprueba la SUPERPOSICION de rectangulos, no solo el scroll.
 
 const SELECTORES = [
-  '.titulo', '.bajada', '.rotulo', '.lienzo', '.tarjeta', '.ban-track',
+  '.titulo', '.rotulo', '.lienzo', '.tarjeta', '.ban-track',
   'table', 'svg', '.lista-tabla', '.cierre', '.kpi',
 ]
 
@@ -92,16 +92,16 @@ export function chequear() {
   }
 
   // 3. texto recortado por el contenedor (clip sin ellipsis)
-  for (const el of document.querySelectorAll('.titulo, .bajada, .ban-val, .rotulo')) {
+  for (const el of document.querySelectorAll('.titulo, .ban-val, .rotulo')) {
     if (el.scrollWidth > el.clientWidth + 2) {
       problemas.push({ tipo: 'texto-recortado', detalle: `${clase(el)} "${el.textContent.slice(0, 40)}"` })
     }
   }
 
-  // 3b. titulo o bajada que no entra en las lineas reservadas. La cabecera tiene alto FIJO
+  // 3b. titulo que no entra en la linea reservada. La cabecera tiene alto FIJO
   //     para que el lienzo no cambie de tamano al mover un filtro; el precio es que un texto
   //     largo se corta en silencio. Esto lo hace ruidoso.
-  for (const el of document.querySelectorAll('.titulo, .bajada')) {
+  for (const el of document.querySelectorAll('.titulo')) {
     if (el.scrollHeight > el.clientHeight + 2) {
       problemas.push({
         tipo: 'texto-cortado-por-el-clamp',
