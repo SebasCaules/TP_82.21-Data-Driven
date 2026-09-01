@@ -179,44 +179,167 @@ body {
   background: var(--papel);
 }
 /* El corte se estira hasta casi tocar los filtros: los filtros toman el ancho que
-   necesitan y el sobrante es todo del riel, que es el control que gana con ser largo
-   (25 cortes en 250 px son 10 px por mes; en 600 px son 24). */
-.barra-corte { flex: 1 1 auto; min-width: 240px; }
+   necesitan y el sobrante es todo de la caja del corte, que es el control que gana con ser
+   largo (25 cortes en 250 px son 10 px por mes; en 600 px son 24).
+
+   `min-width: 0` y no un piso en px: los filtros son `flex: 0 0 auto` y no ceden, así que
+   cualquier piso acá se convierte en desborde en vez de en riel. Con el piso de 240 px que
+   había, a 1152 la caja terminaba en x=1226 contra un borde en 1127: el mes de corte
+   quedaba literalmente fuera de la pantalla, cortado por el margen derecho, en la
+   resolución de proyector que la app declara soportar. Lo que garantiza que el riel no se
+   achique es el recorte de los chips más abajo, no un piso acá. */
+.barra-corte { flex: 1 1 auto; min-width: 0; }
 .barra-corte.apagada { opacity: .4; pointer-events: none; }
 
 /* ---------- mes de corte ---------- */
 
-/* Un solo renglón de 28 px, la misma caja que un chip de filtro. */
-.tl { display: flex; align-items: center; gap: 10px; height: 28px; user-select: none; }
+/* UNA caja para todo: rótulo, flechas, riel y mes. Es, a propósito, la MISMA caja que la de
+   un chip de filtro — mismo alto, mismo borde, mismo radio, misma sombra de una línea — y
+   eso es lo que pone al mes de corte en el juego de controles en vez de dejarlo como una
+   regla dibujada al lado de cuatro chips que sí se ven tocables.
+
+   Que el rótulo y el mes vivan ADENTRO, detrás de sendas hairlines, es lo que declara para
+   qué sirve el riel: mover la manija y ver cambiar ese número en el mismo objeto no admite
+   otra lectura. Sueltos afuera, como estaban, el mes se leía como un rótulo de fecha y el
+   riel como un adorno.
+
+   Lo único que no copia del chip es el levante de 1 px en hover: acá se arrastra, y correr
+   la caja bajo el cursor justo cuando se la va a agarrar es ruido. */
+.tl {
+  display: flex; align-items: center; gap: 2px;
+  height: 28px; padding: 0 2px 0 7px;
+  border: 1px solid rgba(22, 35, 58, .24);
+  border-radius: 4px;
+  background: var(--sup);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .05);
+  user-select: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+.tl:hover { border-color: var(--ink); box-shadow: 0 2px 4px rgba(0, 0, 0, .1); }
+.tl:focus-within { border-color: var(--ink); }
+
 .tl-lbl {
-  flex-shrink: 0;
+  flex-shrink: 0; align-self: stretch;
+  /* El espacio entre "Mes de" y "corte" lo pinta el `gap`: son dos ítems flex y el flex no
+     renderiza el blanco que queda entre ítems (se leía "MES DECORTE"). El espacio de texto
+     igual se deja en el JSX, que es de donde sale el `textContent` que lee un lector de
+     pantalla. Con `gap`, además, cuando la palabra larga se apaga por ancho no queda ningún
+     hueco suelto colgando antes de "CORTE". */
+  display: flex; align-items: center; gap: .5em;
+  padding-right: 7px; border-right: 1px solid var(--bd);
   font: 500 9px/1.2 var(--mono);
-  letter-spacing: .13em; text-transform: uppercase; color: var(--mut);
+  letter-spacing: .1em; text-transform: uppercase; color: var(--mut);
 }
-.tl-val {
-  flex-shrink: 0; min-width: 60px; text-align: right;
-  font: 600 13.5px/1.15 var(--fuente); letter-spacing: -.01em;
+.tl-lbl-mes { font-style: normal; }
+/* Suplente del rótulo por debajo de 1300 px, donde el ancho no da para la palabra. */
+.tl-ico { display: none; flex-shrink: 0; color: var(--mut2); }
+
+/* 24x24, el mínimo de objetivo táctil de 2.5.8, igual que la ✕ de los chips. Arrastrar no
+   sirve para elegir un mes exacto entre 25 en 200 px: para eso están estas dos. */
+.tl-paso {
+  flex: 0 0 auto;
+  display: grid; place-items: center;
+  width: 24px; height: 24px; padding: 0;
+  border: 0; border-radius: 3px; background: none;
+  color: var(--mut2); cursor: pointer;
 }
+.tl-paso:hover:not(:disabled) { background: rgba(22, 35, 58, .09); color: var(--ink); }
+.tl-paso:focus-visible { outline: 2px solid var(--ink); outline-offset: -1px; }
+.tl-paso:disabled { opacity: .22; cursor: default; }
 
 .tl-pista {
-  flex: 1; min-width: 60px; height: 100%;
+  flex: 1; min-width: 28px; height: 100%;
   position: relative;
-  cursor: ew-resize;
-  border-bottom: 1px solid rgba(22, 35, 58, .33);
+  padding: 0 7px;                     /* la manija no se sale de la caja en los extremos */
+  cursor: grab;
   touch-action: none;
   /* Sin esto, arrastrar el cursor selecciona el texto de alrededor. */
   user-select: none; -webkit-user-select: none;
 }
-.tl-pista:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.tl-pista:active { cursor: grabbing; }
+.tl-pista:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; border-radius: 3px; }
+
+/* La zona que mide de verdad: el 0 % y el 100 % del riel caen en su borde y no en el de la
+   pista, y por eso la manija centrada nunca queda cortada contra el borde de la caja. */
+.tl-medida { position: absolute; top: 0; bottom: 0; left: 7px; right: 7px; }
+
+/* Riel arriba con el tramo recorrido lleno, regla de ticks abajo. El tramo lleno dice de un
+   vistazo dónde cae el corte dentro de la serie; los ticks, que las paradas son 25 y no un
+   continuo. */
+.tl-riel {
+  position: absolute; left: 0; right: 0; top: 6px; height: 5px;
+  border-radius: 3px; background: var(--trk);
+  box-shadow: inset 0 1px 1px rgba(22, 35, 58, .13);
+  overflow: hidden;
+}
+/* --sel y no --acc: el tramo recorrido es una selección, y en el último corte —que es la
+   posición por defecto— el riel queda lleno de punta a punta: en azul-900 eso se leía como
+   un lingote de tinta en la barra. 4,2:1 contra el riel, arriba del 3:1 de 1.4.11. */
+.tl-lleno { position: absolute; left: 0; top: 0; bottom: 0; background: var(--sel); }
 
 .tl-ticks {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  display: flex; justify-content: space-between; align-items: flex-end;
+  position: absolute; left: 0; right: 0; top: 14px;
+  display: flex; justify-content: space-between; align-items: flex-start;
 }
-/* El corte activo no se distingue por color: es el único tick que llega arriba y engrosa. */
-.tl-tick { width: 1px; height: 7px; background: rgba(22, 35, 58, .32); }
-.tl-tick.anio { height: 12px; background: rgba(22, 35, 58, .5); }
-.tl-tick.on { background: var(--acc); height: 22px; width: 2px; }
+.tl-tick { width: 1px; height: 4px; background: rgba(22, 35, 58, .3); }
+.tl-tick.anio { height: 7px; background: rgba(22, 35, 58, .5); }
+
+/* La manija. El estado no depende del color: es una forma con estrías, puesta sobre el punto
+   del riel que corresponde. El margen negativo la centra sin gastar el `transform`, que
+   queda libre para el apretón. */
+.tl-manija {
+  position: absolute; top: 3px; left: 0;
+  width: 12px; height: 20px; margin-left: -6px;
+  border: 1.5px solid var(--acc); border-radius: 3px;
+  background:
+    linear-gradient(var(--acc), var(--acc)) center center / 1px 9px no-repeat,
+    linear-gradient(var(--acc), var(--acc)) calc(50% - 3px) center / 1px 5px no-repeat,
+    linear-gradient(var(--acc), var(--acc)) calc(50% + 3px) center / 1px 5px no-repeat,
+    var(--sup);
+  box-shadow: 0 1px 2px rgba(22, 35, 58, .22);
+  pointer-events: none;
+  transition: box-shadow .12s, transform .12s;
+}
+.tl:hover .tl-manija,
+.tl-pista:focus-visible .tl-manija {
+  box-shadow: 0 0 0 3px rgba(47, 107, 166, .2), 0 1px 2px rgba(22, 35, 58, .22);
+}
+.tl-pista:active .tl-manija {
+  box-shadow: 0 0 0 4px rgba(47, 107, 166, .28), 0 1px 2px rgba(22, 35, 58, .22);
+  transform: scale(1.06);
+}
+
+/* El mes pegado a la manija mientras se arrastra. El de la caja está a la derecha y el que
+   arrastra no lo mira: mira el dedo. Sale en hover, foco y apretón, y cae por debajo de la
+   barra como el menú de un chip. */
+.tl-globo {
+  position: absolute; top: calc(100% + 10px); left: 0;
+  transform: translateX(-50%);
+  padding: 3px 6px;
+  border-radius: 3px;
+  background: var(--ink); color: #fff;
+  font: 600 10px/1.1 var(--mono); letter-spacing: .04em; white-space: nowrap;
+  opacity: 0; pointer-events: none; z-index: 40;
+  transition: opacity .1s;
+}
+.tl-globo::before {
+  content: ''; position: absolute; left: 50%; top: -3px;
+  width: 7px; height: 7px; margin-left: -3.5px;
+  background: var(--ink); border-radius: 1px;
+  transform: rotate(45deg);
+}
+.tl-pista:hover .tl-globo,
+.tl-pista:active .tl-globo,
+.tl-pista:focus-visible .tl-globo { opacity: 1; }
+
+.tl-val {
+  flex: 0 0 auto; min-width: 52px;
+  align-self: stretch;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 0 4px 0 6px;
+  border-left: 1px solid var(--bd);
+  font: 600 13.5px/1.15 var(--fuente); letter-spacing: -.01em;
+}
 
 /* ---------- filtros ---------- */
 
@@ -935,14 +1058,46 @@ body {
 .chip-claro:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 /* ---------- barra angosta: los rótulos ceden antes que el riel ---------- */
-/* Por debajo de 1300 px los dos rótulos ("Filtros" y "Mes de corte") se comen el ancho que
-   necesita la pista: a 1152 la dejaban en 81 px, o sea 3 px por corte. Se ocultan y su
-   significado queda en el aria-label y en los propios controles, que ya se explican. */
+/* La política es vieja y sigue igual: cuando falta ancho, lo que cede son los rótulos y no
+   la pista. Lo que cambió es que ahora hay dos escalones, porque el corte y los filtros
+   dejan de necesitar el recorte en momentos distintos.
+
+   Primer escalón, 1400 px. Dos cosas a la vez, porque a 1366 —una de las dos pantallas de
+   laptop que este tablero ve todo el tiempo— el riel quedaba en 38 px, un tercio de los
+   cuales los tapa la manija:
+
+   1. El rótulo del corte pasa de "Mes de corte" a "Corte" y devuelve 50 px. La palabra
+      sigue ahí, que es lo que importa.
+   2. Los cuatro chips bajan de 11,5ch a 9ch y devuelven 70 px más. 11,5ch es el ancho de
+      "Cocina y mesa", el valor más largo del catálogo; 9ch son 63 px y siguen entrando los
+      cuatro NOMBRES de dimensión, que es lo que el chip muestra mientras no hay filtro
+      puesto ("Segmento" es el más largo, 57 px). Los tres valores largos que sí se recortan
+      quedan reconocibles por su icono, que es exactamente para lo que ese icono está.
+
+   Sin el punto 2 el escalón no alcanza: a 1301, con los chips todavía en 11,5ch, el riel se
+   quedaba en 24 px. */
+
+@media (max-width: 1400px) {
+  .tl-lbl-mes { display: none; }
+  .chip-f-txt { width: 9ch; }
+  /* Sin piso, el mes ocupa lo que mide y no 52 px reservados. */
+  .tl-val { min-width: 0; }
+}
+
+/* Segundo escalón, 1300 px: cae "Filtros" —queda el contador— y cae también la palabra
+   "Corte", que deja en su lugar el calendario: dice "esto va de meses" en 12 px en vez de
+   41. Apagar el rótulo del todo, como estaba antes, dejaba la caja sin nada que la nombrara.
+
+   Estos son los píxeles que hacían falta para que la caja del corte entrara ENTERA a 1152.
+   Hasta acá terminaba en x=1226 contra un borde en 1127: el mes quedaba fuera de la
+   pantalla, cortado por el margen derecho, en la resolución de proyector que la app declara
+   soportar. */
 
 @media (max-width: 1300px) {
   .filtros-lbl { font-size: 0; gap: 0; }
   .filtros-lbl b { font-size: 9.5px; }
   .tl-lbl { display: none; }
+  .tl-ico { display: block; margin: 0 1px 0 -3px; }
 }
 
 /* ---------- pantallas bajas: el alto es la restricción, no el ancho ---------- */
@@ -957,10 +1112,11 @@ body {
   .lat-grupo i { display: none; }
   .lat-pie { font-size: 9px; gap: 2px; padding-top: 8px; }
   .barra { padding: 7px var(--pad-x) 8px; }
-  .tl-pista { height: 17px; }
   .chip-f { height: 26px; }
   .tl { height: 26px; }
-  .tl-tick.on { height: 20px; }
+  .tl-riel { top: 5px; }
+  .tl-ticks { top: 13px; }
+  .tl-manija { top: 2px; height: 19px; }
   .cuerpo { padding-top: 8px; }
   .titulo { font-size: clamp(17px, 1.75vw, 23px); }
   .tarjeta { padding: 9px 12px; }
