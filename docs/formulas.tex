@@ -26,7 +26,7 @@
 \begin{center}
 {\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
 Materia 82.21 --- Factibilidad de Proyectos Data Driven\\
-Entregable 1 --- Grupo 2\\[3mm]
+Entregable 1 --- Grupo 2 --- Anexo de fórmulas, v2.0\\[3mm]
 \begin{tabular}{ll}
 Sebastián Caules & 64331 \\
 Tomás Ferreccio & 64934 \\
@@ -34,7 +34,7 @@ Matías Sola & 64322 \\
 Francisco Cattaneo & 64900 \\
 Juan Manuel Rilo & 64037 \\
 \end{tabular}\\[3mm]
-01/09/2026
+15/09/2026 (v1.0: 01/09/2026)
 \end{center}
 
 \vspace{4mm}
@@ -389,7 +389,7 @@ Los siete indicadores de la Parte D sección 2.1 se trazan acá contra su implem
 Un trimestre solo entra en el cálculo si su cierre más 90 días cae dentro del horizonte de datos disponible; si no, $\tau_q$ queda indefinido en vez de calcularse sobre una muestra sesgada de clientes con última compra temprana en el trimestre.
 
 \impl{pipeline/series.py:12-90 (\texttt{recompra\_trimestral}). Gate de observabilidad: líneas 44-59. Conteo de retorno: líneas 61-71.}
-\valor{2025Q3 (último trimestre observable con horizonte al 31/12/2025): $\tau = 8{,}5\%$ ($n=$ 1.330 clientes calculables), contra la meta de 10-11\% y la línea base histórica de 8-9\% (\texttt{pipeline/build.py} meta, \texttt{meta\_recompra}/\texttt{base\_recompra}). Pico de la serie: 2024Q2 con 19,0\%.}
+\valor{2025Q3 (último trimestre observable con horizonte al 31/12/2025): $\tau = 8{,}5\%$ ($n=$ 1.330 clientes calculables), contra la meta de 10-11\% y la referencia de 8-9\% que estimó el negocio en el relevamiento (envío 8 / planilla 23; no es una línea base medida: la serie estuvo entre 16\% y 19\% de 2023Q1 a 2025Q1) (\texttt{pipeline/build.py} meta, \texttt{meta\_recompra}/\texttt{base\_recompra}). Pico de la serie: 2024Q2 con 19,0\%.}
 
 \subsection{Ingreso anual en riesgo (exposición)}
 
@@ -435,13 +435,114 @@ Ya definido en la ecuación~\eqref{eq:riesgo}.
 para un grupo $g$ de envíos de \texttt{Campanias\_marketing.csv} con \texttt{fecha\_envio}$\le t$ (base limpia, sin duplicados de fila completa).
 
 \impl{pipeline/series.py:149-158 (\texttt{tasas}). Marca a superar: líneas 171-178, sobre el segmento \texttt{Inactivos 90d}.}
-\valor{global (23.529 envíos limpios al 31/12/2025): abre 35,1\%, clic 8,8\%, compra a 7 días 1,2\%. Marca a superar (segmento \texttt{Inactivos 90d}, criterio actual): 1,39\%.}
+\valor{global (23.529 envíos limpios al 31/12/2025): abre 35,1\%, clic 8,8\%, compra a 7 días 1,2\%. Marca a superar (segmento \texttt{Inactivos 90d}, criterio actual): 1,39\%, 61 compras en 4.399 envíos, intervalo de Wilson al 95\% de 1,08\% a 1,78\%. El desglose por segmento corre sobre el extracto tal cual llega (23.729 envíos, con los 200 \texttt{id\_envio} repetidos), como lo hace el tablero; sobre la base limpia da 61 en 4.359, 1,40\% (1,09\% a 1,79\%). La diferencia es 0,01 pp y no cambia ninguna conclusión; se declara para que papel y pantalla digan lo mismo.}
+
+
+\section{Exposición por ventana de 90 días}
+\label{sec:exposicion-90}
+
+El problem statement de la Parte B declara un horizonte de 90 días. $X(t)$ (ecuación~\eqref{eq:exposicion}) es anual. Para expresar la misma exposición en la ventana que el proyecto dice predecir se prorratea:
+
+\begin{equation}
+X_{90}(t) = X(t)\cdot\frac{90}{365}
+\label{eq:exposicion90}
+\end{equation}
+
+\impl{entregas/entregable-1/\_build/F/recalc\_e1.py, línea C04b (derivada de \texttt{exposicion anual (M)}).}
+\valor{$X_{90} = 94{,}9 \cdot 90/365 = $ ARS 23,4 M por ventana de 90 días.}
+
+\supuesto{Es un prorrateo a ritmo constante, no una predicción: reparte la exposición anual de los clientes hoy en riesgo en cuatro ventanas iguales. Sirve para que la magnitud del problema esté en la misma escala que el período declarado (observación B~1.3 de la devolución del 15/09); no dice cuántos de esos pesos se pierden en el próximo trimestre, cosa que sólo un modelo validado podría estimar. Las dos escalas se muestran juntas: ARS 94,9 M/año y ARS 23,4 M por 90 días, ambas al corte 31/12/2025.}
+
+\section{Poder discriminante de las features}
+\label{sec:discriminante}
+
+La Parte B (sección 3.1) y la Parte C (sección 1.3) citan que ``la mejor variable no circular llega a 1,22$\times$''. Esta sección define esa cifra y la reproduce.
+
+\textbf{Población.} Los 4.940 clientes elegibles al corte, $E_i(t)=1$ (ecuación~\eqref{eq:elegible}): son los únicos sobre los que $B_i(t)$ puede valer 1, así que medir sobre los 5.978 mezclaría la señal con la composición de elegibilidad (sección~\ref{sec:proxy-churn}).
+
+\textbf{Definición.} Para una feature $x$ se parten los elegibles en quintiles por valor de $x$ ($Q_1$ a $Q_5$; \texttt{pd.qcut(x, 5, duplicates='drop')}: cuando los empates no permiten cinco cortes distintos quedan cuatro, y así ocurre con \texttt{n\_tiendas\_distintas}, \texttt{n\_categorias\_distintas} y \texttt{frequency}), se calcula la tasa de riesgo de cada quintil,
+
+\begin{equation}
+r_k(x) = \frac{|\{i \in Q_k(x):\ B_i(t)=1\}|}{|Q_k(x)|},
+\end{equation}
+
+y el poder discriminante es el cociente entre la tasa más alta y la más baja:
+
+\begin{equation}
+D(x) = \frac{\max_k r_k(x)}{\min_k r_k(x)}
+\label{eq:discriminante}
+\end{equation}
+
+\textbf{Features.} \texttt{recency\_dias} $=\rho_i(t)$; \texttt{gap\_mediano\_compras} $=\gamma_i(t)$; \texttt{n\_tiendas\_distintas} $=$ tiendas físicas distintas donde el cliente compró hasta $t$ (las compras online no cuentan una tienda; sin ninguna compra física vale 0); \texttt{n\_categorias\_distintas} $=$ categorías distintas compradas hasta $t$; \texttt{frequency} $=n_i(t)$, el número de compras; \texttt{monetary} $=F_i(t)$, la facturación acumulada.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Feature & $D(x)$ & Lectura \\
+\midrule
+\texttt{recency\_dias} & 41,3$\times$ & circular: es el término izquierdo de la ecuación~\eqref{eq:riesgo} \\
+\texttt{gap\_mediano\_compras} & 9,9$\times$ & circular: define el umbral $\theta_i(t)$ de la ecuación~\eqref{eq:umbral} \\
+\texttt{n\_tiendas\_distintas} & 1,22$\times$ & señal genuina, la mejor \\
+\texttt{n\_categorias\_distintas} & 1,21$\times$ & señal genuina \\
+\texttt{frequency} & 1,21$\times$ & señal genuina \\
+\texttt{monetary} & 1,16$\times$ & señal moderada \\
+\bottomrule
+\end{tabular}
+\caption{Poder discriminante por feature sobre los 4.940 elegibles, corte 31/12/2025.}
+\label{tab:discriminante}
+\end{table}
+
+\impl{entregas/entregable-1/\_build/F/recalc\_e1.py, líneas C21, sobre \texttt{features.client\_facts} del corte de referencia.}
+\valor{los seis valores de la tabla~\ref{tab:discriminante}, reproducidos el 15/09/2026.}
+
+\textbf{Por qué se descartan las dos primeras.} $B_i(t)$ se calcula con $\rho_i(t)$ y $\gamma_i(t)$: que ``predigan'' el riesgo es aritmética, no señal. Entrenar un modelo con ellas como features y $B_i(t)$ como target es el \emph{leakage} que advierte Provost y Fawcett. Descontadas, la mejor señal genuina disponible con los seis datasets del Entregable 1 es \texttt{n\_tiendas\_distintas} con 1,22$\times$. La meta de lift del criterio de éxito 1 de la Parte C ($\ge 1{,}30\times$ del decil superior contra la línea base de recency, en holdout temporal) es una meta y no una proyección: alcanzarla depende de las señales de reclamos, consultas y devoluciones que llegaron el 08/09 (Entregable 2). La pasada exploratoria del 05/08 reportó además una feature ``tendencia'' con 4,5$\times$; su definición no quedó registrada y no se reproduce, así que no se cita.
+
+\section{Anticipación: qué confirma la regla y qué promete el modelo}
+\label{sec:anticipacion}
+
+$B_i(t)$ marca al cliente cuando su recencia \emph{ya superó} su umbral propio: $\rho_i(t) > \theta_i(t)$. Es la misma lógica que el segmento ``Inactivos 90d'' que Casa Óga usa hoy, con el umbral personalizado por el ritmo de cada cliente. Mejora la precisión de a quién se llama ``en riesgo''; no anticipa nada. Ninguna vista del tablero del Entregable 1 anticipa: todas describen el corte.
+
+La anticipación es trabajo del modelo del Entregable 3, con este target:
+
+\begin{equation}
+Y_i(T) = \mathbb{1}\bigl[\,B_i(T)=0 \ \wedge\ \exists\, t \in (T,\ T+90]:\ B_i(t)=1\,\bigr]
+\label{eq:target}
+\end{equation}
+
+es decir, entre los clientes que al corte $T$ todavía no cruzaron su umbral, cuáles lo cruzan dentro de los 90 días siguientes. El modelo puntúa en $T$ la probabilidad de $Y_i(T)=1$ con señales que se mueven \emph{antes} del cruce: caída de frecuencia y de ticket respecto del propio historial, y desde el 08/09 reclamos, consultas de soporte y devoluciones. Se valida con holdout temporal (entrenar hasta un corte, evaluar sobre los 90 días siguientes), contra la línea base de ordenar por $\rho_i(T)$.
+
+\textbf{Las ``dos semanas de anticipación'' del alcance} (Parte C, sección 1.2) no son un horizonte de predicción: son el tiempo operativo entre el corte mensual en que se calcula la lista y la salida de la campaña, para que Marketing la reciba antes de que arme el envío del mes. El horizonte de predicción es el de la ecuación~\eqref{eq:target}: 90 días.
+
+\section{Experimento propuesto y efecto mínimo detectable}
+\label{sec:experimento}
+
+El criterio de éxito 5 de la Parte C y la vista 13 del tablero proponen el mismo diseño: sobre la lista de 800 ya ordenada por $\hat F_i(t)$, asignación por ciclo fijo de 20 clientes a tres ramas, 9 reactivación, 9 cuidado y 2 control, lo que da 360 / 360 / 80 por corte, en 3 cortes. Como el ciclo recorre la lista en orden, las tres ramas quedan estratificadas por exposición sin sortear nada.
+
+El control no puede salir del excedente de capacidad: la lista se ordena por exposición y se corta, así que el excedente es por construcción el tramo de menor exposición, y compararlo contra los contactados mide el ordenamiento, no la campaña.
+
+El efecto mínimo detectable (MDE) entre dos ramas de igual tamaño $n$ (acumulado en los 3 cortes) para una tasa base $p_0$, con $\alpha=0{,}05$ a dos colas y potencia $1-\beta=0{,}80$, es el menor $\delta$ que cumple
+
+\begin{equation}
+n \;\ge\; \frac{\Bigl(z_{1-\alpha/2}\sqrt{2\bar p(1-\bar p)} + z_{1-\beta}\sqrt{p_0(1-p_0)+p_1(1-p_1)}\Bigr)^2}{\delta^2},\qquad p_1 = p_0+\delta,\ \ \bar p = \tfrac{p_0+p_1}{2}
+\label{eq:mde}
+\end{equation}
+
+resuelto por bisección sobre $\delta$.
+
+\impl{pipeline/series.py (\texttt{potencia\_experimento}), con $p_0$ igual a la compra a 7 días global de la ecuación~\eqref{eq:compra7d}, \texttt{n\_por\_rama=360}, \texttt{cortes=3}; reproducido en entregas/entregable-1/\_build/F/recalc\_e1.py, líneas C24.}
+\valor{$p_0 = 1{,}21\%$, $n = 1.080$ por rama: MDE $= 1{,}71$ puntos porcentuales, 1,4 veces la tasa base. Con 80 de control por corte (240 en total) el MDE contra una rama de 1.080 es mayor; la vista 13 lo declara: tres cortes sólo detectan un efecto de 1,71 pp entre las dos ramas de mensaje, y el diseño sirve para aprender si el mensaje importa, no todavía para medir el recupero con precisión.}
+
+\section{Limitación: la carga parcial del extracto en 2025}
+\label{sec:carga-parcial}
+
+El extracto de transacciones tiene carga parcial en los dos extremos: sube de 44 ventas en enero de 2022 a 893 en diciembre, y baja de 1.390 en enero de 2025 a 255 en diciembre, con el ticket medio estable y las altas de clientes sin caída. Como $\rho_i(t)$ se mide contra el corte, una carga incompleta del cierre de 2025 infla la recencia de todos y con ella $B_i(t)$, $X(t)$ y el riesgo por quintil. Las tres cifras (2.452 en riesgo, ARS 94,9 M/año, 51,8\% en Q5) se mantienen como referencia del tablero y se declaran en revisión hasta que Casa Óga informe el criterio de extracción de cada sistema (pedido del Entregable 2, sección 2.4). Ninguna se repite sin esta salvedad.
 
 \section{Supuesto: la exposición no es recupero}
 
 $X(t)$ (ecuación~\eqref{eq:exposicion}) es la facturación anual proyectada de clientes que hoy están en riesgo, calculada con su propio ritmo histórico de gasto. No mide cuánto recuperaría una campaña de retención: recuperar es una afirmación causal (\emph{si contactamos a estos clientes, vuelven a comprar tanto como antes}) y $X(t)$ no compara contactados contra un grupo de control. Afirmar que Casa Óga ``recupera ARS 94,9 M'' es una lectura que el dato no sostiene.
 
-Esta distinción ya está declarada en tres lugares del proyecto, y este documento la reafirma como cuarto: en \texttt{pipeline/CONTRACT.md} sección 3 (\texttt{perdida\_esperada} se define como ``exposición, no recupero''), en la Parte D sección 2.1 (``Es exposición, no recupero'') y en la misma Parte D, sección 6.1, que deja fuera de alcance de la V1 ``la medición de efecto incremental (necesita grupo de control)''. La V2 del proyecto contempla un grupo de control estratificado por quintil de valor (Parte D, sección 6.1, ``Plan de evolución''), que es el diseño mínimo para poder hablar de recupero.
+Esta distinción ya está declarada en tres lugares del proyecto, y este documento la reafirma como cuarto: en \texttt{pipeline/CONTRACT.md} sección 3 (\texttt{perdida\_esperada} se define como ``exposición, no recupero''), en la Parte D sección 2.1 (``Es exposición, no recupero'') y en la misma Parte D, sección 6.1, que deja fuera de alcance de la V1 ``la medición de efecto incremental (necesita grupo de control)''. La V2 del proyecto contempla un grupo de control estratificado por exposición sobre la lista ya ordenada (Parte D, sección 6.1, ``Plan de evolución'', y sección~\ref{sec:experimento} de este anexo), que es el diseño mínimo para poder hablar de recupero.
 
 Mientras no exista ese grupo de control, cualquier pantalla que muestre $X(t)$ debe rotularlo como \emph{exposición} y no como \emph{ahorro} o \emph{recupero potencial}, y la nota al pie del tablero (Parte D, sección 4.1, \texttt{[NOTAS FIJAS AL PIE]}) tiene que sostener esa distinción en cada corte, no solo en el primero.
 
