@@ -153,7 +153,7 @@ confirmaron los cuatro. Los tres hallazgos que valían la corrida:
 | Offline | cero subrecursos, una sola petición |
 | Wiki propagado | `analisis-exploratorio-churn`, `guia-dashboard-directorio`, `entregable-1`, `index`, `CLAUDE.md` |
 | `log.md` | entrada del 2026-08-26 |
-| Enmiendas | 10, en `entregas/entregable-1/25-08/enmiendas-para-el-integrado.md` |
+| Enmiendas | 10, en `entregas/entregable-1/D-enmiendas-para-el-integrado.md` |
 
 ## Decisiones N0
 

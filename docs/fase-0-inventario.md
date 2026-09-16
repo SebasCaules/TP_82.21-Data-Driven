@@ -4,7 +4,7 @@ Salida obligatoria antes de spawnear workers. Fecha 2026-08-25. Entrega 01/09 (7
 Fuentes leídas: `CLAUDE.md`, DOCX Parte D, `guia-dashboard-directorio`,
 `analisis-exploratorio-churn`, `perfilado-datasets-casa-oga`,
 `relevamiento-respuestas-que-cambia`, `entregable-1`, los 6 `fuente-dataset-*`,
-`wiki/index.md`, `entregas/entregable-1/25-08/consignas.md`, ficha F07 del BAN,
+`wiki/index.md`, `entregas/entregable-1/D-consignas.md`, ficha F07 del BAN,
 y `raw/clases/clase-04/Clase 4.md`.
 
 ## 0. Lo que apareció después de escribirse el runbook
