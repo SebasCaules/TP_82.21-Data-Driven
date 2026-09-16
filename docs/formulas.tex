@@ -110,7 +110,7 @@ monto $>$ 0 & \texttt{monto\_neto} $>$ 0 & 27.276 \\
 \impl{pipeline/loader.py:35 (dedupe), :36 (identificado), :37 (monto\_neto\,$>$\,0); los mismos filtros se repiten en \texttt{stage\_counts}, pipeline/loader.py:54-56.}
 \valor{50.250 $\to$ 50.000 $\to$ 27.606 $\to$ 27.276, los cuatro chequeados como anclas en \texttt{pipeline/build.py:213-219}.}
 
-Dos notas de calidad que el pipeline declara en vez de corregir en silencio: las 250 filas que saca el dedupe son exactamente las de \texttt{id\_transaccion} duplicado (\texttt{dup\_ids\_crudo}~=~250, \texttt{dup\_ids\_post}~=~0); y los montos $\le 0$ son 613 en crudo y 608 tras el dedupe, todos estrictamente negativos, ninguno en cero. El canal se normaliza de 4 etiquetas a 2 (\texttt{Tienda}/\texttt{tienda}~$\to$~\texttt{fisico}, \texttt{Online}/\texttt{E-commerce}~$\to$~\texttt{online}), \texttt{pipeline/loader.py:12-17,40}. No se deflacta por IPC: el extracto no tiene deriva de precios (precio unitario implícito −7,6\% de 2022 a 2025, plano en las siete categorías, sección~\ref{sec:carga-parcial} y medición del 27/08/2026), así que todo importe de este documento es en pesos del extracto tal como llegan, y la base de precios de \texttt{monto\_neto} sigue sin estar declarada por el negocio.
+Dos notas de calidad que el pipeline declara en vez de corregir en silencio: las 250 filas que saca el dedupe son exactamente las de \texttt{id\_transaccion} duplicado (\texttt{dup\_ids\_crudo}~=~250, \texttt{dup\_ids\_post}~=~0); y los montos $\le 0$ son 613 en crudo y 608 tras el dedupe, todos estrictamente negativos, ninguno en cero. El canal se normaliza de 4 etiquetas a 2 (\texttt{Tienda}/\texttt{tienda}~$\to$~\texttt{fisico}, \texttt{Online}/\texttt{E-commerce}~$\to$~\texttt{online}), \texttt{pipeline/loader.py:12-17,40}. No se deflacta por IPC. Casa Óga declaró que \texttt{monto\_neto} está en pesos corrientes del día de la venta (relevamiento, envío 54), pero el extracto no tiene deriva de precios (precio unitario implícito −7,6\% de 2022 a 2025, plano en las siete categorías; medición del 27/08/2026): no hay inflación en el dato que corregir. Todo importe de este documento es en pesos del extracto tal como llegan, y la pregunta de si el extracto se normalizó al exportarlo vuelve al negocio en el Entregable 2.
 
 \section{Métricas por cliente}
 
@@ -377,7 +377,7 @@ Solo online & 1,2 & Organización & 1,3 & & \\
 
 \section{Indicadores de la Parte D, sección 2.1}
 
-Los siete indicadores de la Parte D sección 2.1 se trazan acá contra su implementación. Cinco ya quedaron definidos arriba; los otros dos (recompra y compra a 7 días) se definen en esta sección.
+Los siete indicadores de la Parte D sección 2.1 se trazan acá contra su implementación, uno por subsección: recompra, exposición, clientes en riesgo, riesgo en Q5, cobertura de contacto, cobertura ejecutable y compra a 7 días.
 
 \subsection{Tasa de recompra a 90 días}
 
@@ -389,7 +389,7 @@ Los siete indicadores de la Parte D sección 2.1 se trazan acá contra su implem
 Un trimestre solo entra en el cálculo si su cierre más 90 días cae dentro del horizonte de datos disponible; si no, $\tau_q$ queda indefinido en vez de calcularse sobre una muestra sesgada de clientes con última compra temprana en el trimestre.
 
 \impl{pipeline/series.py:12-90 (\texttt{recompra\_trimestral}). Gate de observabilidad: líneas 44-59. Conteo de retorno: líneas 61-71.}
-\valor{2025Q3 (último trimestre observable con horizonte al 31/12/2025): $\tau = 8{,}5\%$ ($n=$ 1.330 clientes calculables), contra la meta de 10-11\% y la referencia de 8-9\% que estimó el negocio en el relevamiento (envío 8 / planilla 23; no es una línea base medida: la serie estuvo entre 16\% y 19\% de 2023Q1 a 2025Q1) (\texttt{pipeline/build.py} meta, \texttt{meta\_recompra}/\texttt{base\_recompra}). Pico de la serie: 2024Q2 con 19,0\%.}
+\valor{2025Q3 (último trimestre observable con horizonte al 31/12/2025): $\tau = 8{,}5\%$ ($n=$ 1.330 clientes calculables), contra la meta de 10-11\% y la referencia de 8-9\% que estimó el negocio en el relevamiento (envío 3 / planilla 3, ``un nivel base cercano al 8-9\%''; no es una línea base medida: la serie estuvo entre 16\% y 19\% de 2023Q1 a 2025Q1) (\texttt{pipeline/build.py} meta, \texttt{meta\_recompra}/\texttt{base\_recompra}). Pico de la serie: 2024Q2 con 19,0\%.}
 
 \subsection{Ingreso anual en riesgo (exposición)}
 
@@ -417,13 +417,29 @@ Ya definido en la ecuación~\eqref{eq:riesgo}.
 
 \subsection{Cobertura de contacto}
 
+Con la lista ordenada por $\hat F_i(t)$ descendente entre los clientes en riesgo, la cobertura de contactar a los $k$ primeros es la porción de la exposición que esos $k$ concentran:
+
 \begin{equation}
-\text{cobertura}(t) = \frac{\min\bigl(800,\ |\{i:\ B_i(t)=1\}|\bigr)}{|\{i:\ B_i(t)=1\}|}\times 100
+\text{cobertura}(k,t) = \frac{\sum_{i \in \text{top}_k(t)} \hat F_i(t)}{X(t)}\times 100,
+\qquad
+\text{azar}(k,t) = \frac{k}{|\{i:\ B_i(t)=1\}|}\times 100
 \label{eq:cobertura}
 \end{equation}
 
-\impl{pipeline/features.py:128-129 (\texttt{top\_lista}, tope \texttt{n=800}, orden descendente por anualizado). Llamado con \texttt{n=800} en pipeline/build.py:64. Capacidad declarada \texttt{[500,800]} en el bloque \texttt{meta} de pipeline/build.py (\texttt{capacidad\_contacto}).}
-\valor{con 2.452 en riesgo y tope de 800: cobertura $= 800/\text{2.452} = 32{,}6\%$ contra el techo de la capacidad, o $500/\text{2.452}=20{,}4\%$ contra el piso. La lista prioriza por $\hat F_i(t)$ descendente, así que lo que queda sin cubrir es la cola de menor anualizado, no un recorte al azar.}
+donde $\text{top}_k(t)$ son los $k$ clientes en riesgo de mayor anualizado y $\text{azar}(k,t)$ es lo que cubriría, en esperanza, elegir $k$ al azar. La ventaja del orden es el cociente entre las dos.
+
+\impl{pipeline/features.py (\texttt{top\_lista}, orden descendente por anualizado) y pipeline/build.py (\texttt{\_anclas\_concentracion}: anclas \texttt{concentracion top 500/800 (\%)}, \texttt{al azar top 500/800 (\%)}, \texttt{ventaja del orden a 500 (x)}). Capacidad declarada \texttt{[500,800]} en el bloque \texttt{meta} (\texttt{capacidad\_contacto}). Es la curva de la vista 9 del tablero y el indicador ``Cobertura de contacto'' de la Parte D, sección 2.1.}
+\valor{con 2.452 en riesgo y $X = $ ARS 94,9 M: contactar 500 cubre 37,0\% de la exposición (al azar 20,4\%; ventaja 1,81$\times$); contactar 800 cubre 52,1\% (ARS 49,5 M; al azar 32,6\%). Lo que queda sin cubrir es la cola de menor anualizado, no un recorte al azar.}
+
+\subsection{Cobertura ejecutable de la lista}
+
+\begin{equation}
+\text{ejecutable}(t) = \frac{|\{i \in \text{top}_{800}(t):\ \text{acepta\_marketing}_i = 1\}|}{800}\times 100
+\label{eq:ejecutable}
+\end{equation}
+
+\impl{pipeline/features.py (\texttt{top\_lista}, columna \texttt{mk} = \texttt{acepta\_marketing} de Clientes.csv sobre los 800); reproducido en entregas/entregable-1/\_build/F/recalc\_e1.py, líneas C11.}
+\valor{568 de los 800 de mayor exposición (71,0\%) se pueden contactar; los 232 restantes no dieron consentimiento y no se contactan sin incumplir la Ley 25.326.}
 
 \subsection{Compra a 7 días sobre contactados}
 
@@ -531,7 +547,7 @@ n \;\ge\; \frac{\Bigl(z_{1-\alpha/2}\sqrt{2\bar p(1-\bar p)} + z_{1-\beta}\sqrt{
 resuelto por bisección sobre $\delta$.
 
 \impl{pipeline/series.py (\texttt{potencia\_experimento}), con $p_0$ igual a la compra a 7 días global de la ecuación~\eqref{eq:compra7d}, \texttt{n\_por\_rama=360}, \texttt{cortes=3}; reproducido en entregas/entregable-1/\_build/F/recalc\_e1.py, líneas C24.}
-\valor{$p_0 = 1{,}21\%$, $n = 1.080$ por rama: MDE $= 1{,}71$ puntos porcentuales, 1,4 veces la tasa base. Con 80 de control por corte (240 en total) el MDE contra una rama de 1.080 es mayor; la vista 13 lo declara: tres cortes sólo detectan un efecto de 1,71 pp entre las dos ramas de mensaje, y el diseño sirve para aprender si el mensaje importa, no todavía para medir el recupero con precisión.}
+\valor{$p_0 = 1{,}21\%$. Entre las dos ramas de mensaje ($n = 1.080$ cada una): MDE $= 1{,}71$ puntos porcentuales, 1,4 veces la tasa base; es el número que titula la vista 13. Contra el control ($n = 240$, los 80 por corte), con la misma fórmula generalizada a ramas de tamaño distinto: MDE $= 2{,}95$ pp entre una rama de mensaje y el control, y $2{,}68$ pp entre las dos ramas juntas (2.160) y el control (fila C24b del registro; reproducido en recalc\_e1.py). El diseño, tal como está, sirve para aprender si el mensaje importa; medir el recupero contra el control con precisión exige un control más grande o más cortes, y el tamaño se acuerda con Marketing antes del piloto (envío 45), que pidió que el control sea una porción menor y no comprometa a los clientes de mayor valor.}
 
 \section{Limitación: la carga parcial del extracto en 2025}
 \label{sec:carga-parcial}
