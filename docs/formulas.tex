@@ -10,6 +10,9 @@
 \usepackage{longtable}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{microtype}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{xcolor}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 
@@ -23,6 +26,17 @@
 \begin{document}
 \shorthandoff{"}
 
+\ifdefined\consolidado
+% variante para el consolidado del Entregable 1 (entregas/entregable-1/_build/F/armar.py, que pasa
+% \def\consolidado{<primera página global>}): título de parte al frente, sin integrantes ni fecha
+% (van en la carátula única), sin numeración propia y con el índice interno en páginas del consolidado
+\pagestyle{empty}
+\setcounter{page}{\consolidado}
+\renewcommand{\contentsname}{Contenido del anexo}
+\noindent{\small\bfseries\color[HTML]{B8433A} ANEXO 1}\\[1mm]
+{\Large\bfseries Formulación del tablero de riesgo de clientes}\\[1mm]
+{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.0 · 15/09/2026}
+\else
 \begin{center}
 {\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
 Materia 82.21 --- Factibilidad de Proyectos Data Driven\\
@@ -36,6 +50,7 @@ Juan Manuel Rilo & 64037 \\
 \end{tabular}\\[3mm]
 15/09/2026 (v1.0: 01/09/2026)
 \end{center}
+\fi
 
 \vspace{4mm}
 \noindent Este documento fija la notación y la trazabilidad de las fórmulas del tablero de riesgo de clientes de Casa Óga. Cada fórmula indica la línea de código que la implementa y el valor que produce sobre el corte de referencia, 31/12/2025. La decisión D4 del proyecto vuelve móvil el mes de corte: por eso cada fórmula lleva el parámetro $t$ explícito en la notación, nunca implícito. El pipeline recalcula todo desde cero en cada corte, usando solo transacciones con \texttt{fecha}~$\le t$ (\texttt{pipeline/features.py:69}). Los valores citados corresponden a la corrida de \texttt{pipeline/build.py}, que verificó 134 anclas del contrato de datos (\texttt{pipeline/CONTRACT.md} sección 5) antes de escribir el payload.
@@ -110,7 +125,7 @@ monto $>$ 0 & \texttt{monto\_neto} $>$ 0 & 27.276 \\
 \impl{pipeline/loader.py:35 (dedupe), :36 (identificado), :37 (monto\_neto\,$>$\,0); los mismos filtros se repiten en \texttt{stage\_counts}, pipeline/loader.py:54-56.}
 \valor{50.250 $\to$ 50.000 $\to$ 27.606 $\to$ 27.276, los cuatro chequeados como anclas en \texttt{pipeline/build.py:213-219}.}
 
-Dos notas de calidad que el pipeline declara en vez de corregir en silencio: las 250 filas que saca el dedupe son exactamente las de \texttt{id\_transaccion} duplicado (\texttt{dup\_ids\_crudo}~=~250, \texttt{dup\_ids\_post}~=~0); y los montos $\le 0$ son 613 en crudo y 608 tras el dedupe, todos estrictamente negativos, ninguno en cero. El canal se normaliza de 4 etiquetas a 2 (\texttt{Tienda}/\texttt{tienda}~$\to$~\texttt{fisico}, \texttt{Online}/\texttt{E-commerce}~$\to$~\texttt{online}), \texttt{pipeline/loader.py:12-17,40}. No se deflacta por IPC. Casa Óga declaró que \texttt{monto\_neto} está en pesos corrientes del día de la venta (relevamiento, envío 54), pero el extracto no tiene deriva de precios (precio unitario implícito −7,6\% de 2022 a 2025, plano en las siete categorías; medición del 27/08/2026): no hay inflación en el dato que corregir. Todo importe de este documento es en pesos del extracto tal como llegan, y la pregunta de si el extracto se normalizó al exportarlo vuelve al negocio en el Entregable 2.
+Dos notas de calidad que el pipeline declara en vez de corregir en silencio: las 250 filas que saca el dedupe son exactamente las de \texttt{id\_transaccion} duplicado (\texttt{dup\_ids\_crudo}~=~250, \texttt{dup\_ids\_post}~=~0); y los montos $\le 0$ son 613 en crudo y 608 tras el dedupe, todos estrictamente negativos, ninguno en cero. El canal se normaliza de 4 etiquetas a 2 (\texttt{Tienda}/\texttt{tienda}~$\to$~\texttt{fisico}, \texttt{Online}/\texttt{E-commerce}~$\to$~\texttt{online}), \texttt{pipeline/loader.py:12-17,40}. No se deflacta por IPC. Casa Óga declaró que \texttt{monto\_neto} está en pesos corrientes del día de la venta (relevamiento, envío 54), pero el extracto no tiene deriva de precios (precio unitario implícito $-$7,6\% de 2022 a 2025, plano en las siete categorías; medición del 27/08/2026): no hay inflación en el dato que corregir. Todo importe de este documento es en pesos del extracto tal como llegan, y la pregunta de si el extracto se normalizó al exportarlo vuelve al negocio en el Entregable 2.
 
 \section{Métricas por cliente}
 
