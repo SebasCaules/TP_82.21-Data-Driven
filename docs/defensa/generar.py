@@ -16,7 +16,7 @@ AQUI = Path(__file__).resolve().parent
 APP = AQUI.parent.parent
 BUNDLE = APP / "dist" / "index.html"
 IMG = AQUI / "img"
-SALIDA = APP.parent / "entregas" / "entregable-1" / "25-08" / "tablero-guia-de-defensa.pdf"
+SALIDA = APP.parent / "entregas" / "entregable-1" / "D-tablero-guia-de-defensa.pdf"
 
 # El orden es el de PANTALLAS en src/pantallas/index.jsx.
 IDS = ["D0", "D1", "D2", "D3", "D4", "D5a", "D5b", "D6", "M0", "M3", "M1", "M2a", "M2b", "D7"]
