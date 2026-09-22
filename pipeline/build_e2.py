@@ -222,7 +222,6 @@ def _pares_antes_despues(ctx: dict) -> dict:
     nps25 = next(f for f in v09["nps_anual"] if f["anio"] == 2025)
     ofertas_antes_n = sum(o["antes"]["n"] for o in v07["ofertas"] if o["antes"])
     n_acciones_catalogo = len(ctx["tabla_dc14"])
-    n_acciones_con_proxy = sum(1 for f in ctx["tabla_dc14"] if f["tasa_exito_proxy_pct"] is not None)
 
     return {
         "DC-01": ((sc["crudo"], "filas"), (sc["dedupe"], "filas")),
@@ -245,7 +244,7 @@ def _pares_antes_despues(ctx: dict) -> dict:
         "DC-12": ((v06["bajas"]["total"], "bajas totales"), (v06["bajas"]["hasta_corte"], "bajas ≤ corte (analisis de comportamiento)")),
         "DC-13": ((ofertas_antes_n, "envíos con oferta única (sin CAMP004/CAMP034)"), (v06["envios"]["despues"], "envíos con oferta (duplicados resueltos)")),
         "DC-14": ((n_acciones_catalogo, "acciones con costo, sin tasa de éxito"),
-                  (n_acciones_con_proxy, "acciones con tasa proxy asignada")),
+                  (n_acciones_catalogo, "acciones con costo vigente, tasa de éxito pendiente del E3")),
         "DC-15": ((None, "sin diccionario"), (None, "sin diccionario")),
     }
 
@@ -680,8 +679,12 @@ def main() -> int:
     v12 = _armar_v12()
 
     # ---- DC-14: tasa proxy por accion (usa la conversion 'despues' de V07) ----
-    # Se calcula ANTES de las decisiones para que DC-14.antes/despues salgan de
-    # esta tabla (len(catalogo)) y no de un literal (ver _pares_antes_despues).
+    # Tabla editorial para la seccion 3 (no viaja en e2.json, ver nota del final
+    # del build): DC-14 queda 'declarada' (el costo se usa vigente al 22/09, la
+    # tasa de exito se construye en el E3), asi que DC-14.antes/despues en
+    # _pares_antes_despues NO toman el conteo de esta tabla como si la tasa ya
+    # estuviera asignada (eso decia 'aplicada' y contradecia el estado 'declarada'
+    # del registro; O3.1 del verificador, hallazgo medio).
     conv_despues = {o["tipo"]: o["despues"] for o in v07["ofertas"]}
     tabla_dc14 = calidad.tasa_exito_proxy_por_accion(catalogo, conv_despues)
 
