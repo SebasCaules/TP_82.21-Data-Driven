@@ -790,21 +790,9 @@ def main() -> int:
           "567 con consentimiento y 549 sin ninguna baja, como fija E02 del registro. La ancla "
           "`contactables 800` (C11 = 568) sigue aparte, pre DC-04, en v02/_contactables_800_e1: no "
           "es la misma cifra ni la misma base, y no se mezclan.")
-    print("- BLOCKED (no resuelto por este build, ver CONTRACT_E2.md DC-14): 'el mapa de la seccion "
-          "4' que cita la decision no existe (grep sobre el contrato: 0 mapas en esa seccion) y "
-          "Catalogo_Acciones_Retencion.csv no trae columna de mapeo a tipo_oferta. No hay una "
-          "lectura del contrato que resuelva la asignacion accion -> tipo_oferta sin una decision "
-          "editorial; _ACCION_OFERTA_MAP en calidad.py es esa decision (cada accion, al mecanismo "
-          "de oferta mas afin por su descripcion), documentada y trazable, pero NO una cita literal "
-          "del contrato: la vuelta anterior la llamo 'ambiguedad, no BLOCKED', lo cual era incorrecto "
-          "contra la regla dura del contrato (ambiguedad = BLOCKED con la pregunta exacta). Pregunta "
-          "para el orquestador: ¿el contrato incorpora un mapa formal accion->tipo_oferta, o DC-14 "
-          "baja de 'aplicada' a 'pendiente del negocio' hasta que exista? decisiones[DC-14].vista "
-          "queda null (no hay Vnn para esta tabla en la seccion 3, y el contrato tipa vista como "
-          "string: tambien queda para que el orquestador lo resuelva). La tabla NO viaja en e2.json "
-          "(el top-level del contrato no tiene lugar para ella, y la propia celda 'Despues' del "
-          "registro dice 'impresa por build_e2.py', no 'en el tablero'); se imprime aca arriba "
-          "('DC-14 tabla proxy').")
+    print("- DC-14 (decision N0-11 del 22/09, CONTRACT_E2.md seccion 1): declarada. El costo se usa "
+          "como vigente al 22/09; la tasa de exito por accion se construye en el E3. La tabla proxy "
+          "de arriba es editorial (_ACCION_OFERTA_MAP) y no viaja en e2.json; vista = V01.")
 
     return 0
 
