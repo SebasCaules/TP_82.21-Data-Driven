@@ -53,6 +53,14 @@ jobs:
 
       - run: npm run build
 
+      # Tablero E2 (calidad de datos): segunda página autocontenida, servida en /e2/ del
+      # mismo sitio. Su payload (e2/src/datos_e2.js) se versiona y se regenera en local con
+      # `python3 pipeline/build_e2.py` (anclas contra el registro de cifras) y
+      # `python3 pipeline/validate_e2.py`; acá solo se compila y se copia dentro de dist/
+      # DESPUÉS del build del E1, porque ese build vacía dist/ entero.
+      - run: npm run build:e2
+      - run: mkdir -p dist/e2 && cp dist-e2/index.html dist/e2/index.html
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
