@@ -22,3 +22,9 @@ export const pesos = (x) => (x == null || Number.isNaN(x) ? '—' : 'ARS ' + fmt
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 export const mesCorto = (ym) => { const [a, m] = ym.split('-'); return `${MESES[+m - 1]}-${a.slice(2)}` }
 export const fechaCorta = (iso) => { const [a, m, d] = iso.split('-'); return `${d}/${m}/${a}` }
+
+/** "ARS 94,9 M" → { pre: "ARS ", num: "94,9", suf: " M" }; null si no es un monto de montoM/pesos. */
+export const partesMonto = (s) => {
+  const m = /^(ARS )([\d.,]+)( M)?$/.exec(s || '')
+  return m ? { pre: m[1], num: m[2], suf: m[3] || '' } : null
+}

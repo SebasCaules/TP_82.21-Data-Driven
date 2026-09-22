@@ -12,7 +12,7 @@
 // marco. Lo que si hay ahora es eje: linea de base, marcas y escala rotulada. Un grafico sin
 // eje no cumple la regla 12, no tiene eje, que es otra cosa.
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { LUCES } from './SemaforoLuz.jsx'
 
 /** Mide la caja y devuelve px reales. El SVG se dibuja al tamano medido en vez de
@@ -21,8 +21,14 @@ import { LUCES } from './SemaforoLuz.jsx'
 export function useMedida() {
   const ref = useRef(null)
   const [caja, setCaja] = useState({ w: 0, h: 0 })
-  useEffect(() => {
+  // useLayoutEffect y una medida inicial sincrónica (23/09, D5-10): al imprimir desde el
+  // menú del navegador, Chrome pagina en cuanto vuelve el listener de beforeprint, y con
+  // useEffect + ResizeObserver las hojas se montaban con los SVG todavía sin medir (vacíos).
+  // Para el E1 es una medición extra con el mismo valor.
+  useLayoutEffect(() => {
     if (!ref.current) return
+    const r0 = ref.current.getBoundingClientRect()
+    setCaja({ w: Math.floor(r0.width), h: Math.floor(r0.height) })
     const ro = new ResizeObserver(([e]) => {
       const r = e.contentRect
       setCaja({ w: Math.floor(r.width), h: Math.floor(r.height) })
@@ -319,7 +325,10 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
   const topes = [...vals, ...(banda || []), ...(banda2 || []),
                  ...(zonas ? zonas.flatMap((z) => [z.desde, z.hasta]).filter((v) => Number.isFinite(v)) : [])]
   const crudo = Math.max(...topes)
-  const { max, ticks } = escalaNice(crudo, 4)
+  // Con menos de 110 px de área útil (los paneles de línea de V08 del E2 a 1152×640) cuatro
+  // pasos dan siete marcas a 10 px que se pisan; dos pasos dan tres o cuatro legibles (D5-07).
+  // En el E1 ninguna <Linea> baja de 225 px de área, así que ahí no cambia nada.
+  const { max, ticks } = escalaNice(crudo, ih < 110 ? 2 : 4)
   const min = 0
   const X = (i) => padL + (i / Math.max(1, serie.length - 1)) * iw
   const Y = (v) => padT + ih - ((v - min) / (max - min)) * ih
@@ -348,7 +357,8 @@ export function Linea({ serie, w, h, formato, banda, banda2, zonas, rotuloBanda 
   const xFin = padL + iw
 
   return (
-    <svg width={w} height={h} role="img" aria-label={tituloEje || 'Serie de tiempo'}
+    <svg width={w} height={h} role="img"
+         aria-label={`${tituloY ? tituloY + ', por ' : ''}${tituloEje || 'serie de tiempo'}: ${serie.filter((p) => p.valor != null).map((p) => `${p.etiqueta} ${formato(p.valor)}`).join(', ')}`}
          style={{ display: 'block' }}>
       {/* Titulo del eje Y en su PUNTA, arriba del todo y a la izquierda: no compite con
           ninguna marca porque queda por encima del primer tick. */}

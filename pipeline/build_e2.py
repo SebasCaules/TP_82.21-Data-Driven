@@ -177,7 +177,7 @@ def _leer_decisiones_wiki() -> list[dict]:
 
 
 _DECISIONES_META = {
-    "DC-01": dict(dimension="unicidad", vista="V02"),
+    "DC-01": dict(dimension="unicidad", vista="V01"),  # 23/09 (D3-12): V02 no muestra DC-01; el par 50.250 → 50.000 se ve en V01
     "DC-02": dict(dimension="exactitud", vista="V05"),
     "DC-03": dict(dimension="consistencia", vista="V01"),
     "DC-04": dict(dimension="unicidad", vista="V04"),
@@ -252,8 +252,53 @@ def _pares_antes_despues(ctx: dict) -> dict:
     }
 
 
+_MESES_ES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+             "septiembre", "octubre", "noviembre", "diciembre"]
+
+
+def _rango_meses(meses: list[str]) -> str:
+    """["2025-09", …, "2025-12"] → "septiembre a diciembre de 2025" (mismo año); si no,
+    la lista completa."""
+    if not meses:
+        return "ningún mes"
+    anios = {m[:4] for m in meses}
+    if len(anios) == 1 and len(meses) > 1:
+        return f"{_MESES_ES[int(meses[0][5:]) - 1]} a {_MESES_ES[int(meses[-1][5:]) - 1]} de {meses[0][:4]}"
+    return ", ".join(f"{_MESES_ES[int(m[5:]) - 1]} de {m[:4]}" for m in meses)
+
+
+def _llano(ctx: dict) -> dict[str, str]:
+    """La decisión dicha para el directorio (23/09, hallazgo D4-10 de la auditoría del
+    tablero): una frase por DC, sin nombres de columna ni jerga, que respeta la celda
+    'decisión' de wiki/sintesis/decisiones-de-calidad-de-datos.md sin agregar nada. Las
+    fechas y los meses salen de las constantes y de la vista V03, no se escriben. Viaja
+    en decisiones[].llano (clave aditiva, CONTRACT_E2.md §2) y la muestra
+    e2/src/TarjetaDecision.jsx como primera línea de cada tarjeta de decisión."""
+    ref = CORTE_REF.strftime("%d/%m/%Y")
+    sens = CORTE_SENS.strftime("%d/%m/%Y")
+    meses = _rango_meses(ctx["v03"]["meses_flag"])
+    return {
+        "DC-01": "Las filas de ventas repetidas se cuentan una sola vez: eran reprocesos de la consolidación mensual.",
+        "DC-02": "Las devoluciones ya restan en las ventas: no se suman otra vez, y cada una se fecha el día en que se devolvió.",
+        "DC-03": "El canal de venta queda con dos valores, tienda y online, aunque cada sistema lo escribía distinto.",
+        "DC-04": "Los números de cliente de una misma persona se unen en uno antes de contar.",
+        "DC-05": "Cada envío de campaña se cuenta una sola vez; los repetidos eran copias idénticas.",
+        "DC-06": "El nivel de socio sale del programa de fidelización, no de la etiqueta de la campaña.",
+        "DC-07": "Las edades imposibles se marcan como sin dato, sin borrar ninguna fila; la corrección en origen se pidió a Sistemas.",
+        "DC-08": f"Todo lo que cruza compras se mide al {ref}, porque después no hay ventas cargadas.",
+        "DC-09": f"{meses[0].upper() + meses[1:]} quedan marcados como cobertura no confirmada; el riesgo se muestra también medido al {sens}.",
+        "DC-10": "Los montos quedan en pesos corrientes, sin ajustar por inflación, y así se aclara.",
+        "DC-11": "Las filas con NPS y sin reclamos ni consultas se conservan marcadas: no se borran ni se completan.",
+        "DC-12": "Las bajas pedidas en 2026 no entran al análisis de compras, pero sí sacan al cliente de la lista de contacto.",
+        "DC-13": "En CAMP004 y CAMP034 queda una oferta por campaña; en CAMP034 hubo empate y Casa Óga tiene que confirmar cuál.",
+        "DC-14": "El costo de cada acción se toma como vigente al 22/09; la tasa de éxito por acción no existe en los datos y se construye en el Entregable 3.",
+        "DC-15": "El diccionario de datos columna por columna no llegó; mientras tanto vale el esquema que el equipo levantó de los archivos.",
+    }
+
+
 def _armar_decisiones(ctx: dict) -> list[dict]:
     pares = _pares_antes_despues(ctx)
+    llano = _llano(ctx)
     salida = []
     for fila in _DECISIONES_FUENTE:
         decision, justificacion = _partir_decision_justificacion(fila["decision_justificacion"])
@@ -274,6 +319,7 @@ def _armar_decisiones(ctx: dict) -> list[dict]:
             "antes": {"valor": valor_antes, "etiqueta": etq_antes},
             "despues": {"valor": valor_despues, "etiqueta": etq_despues},
             "impacto": impacto, "cifras": cifras, "vista": fila["vista"],
+            "llano": llano[fila["id"]],
         })
     return salida
 
@@ -552,14 +598,14 @@ def _armar_v12() -> dict:
         {"id": "DC-09", "que": "explicar la caída de operaciones de septiembre a diciembre de 2025",
          "detalle": "esos meses quedan marcados 'cobertura no confirmada' (menos del 60 % de las operaciones del mismo mes del año anterior).",
          "estado": "pendiente del negocio"},
-        {"id": "D18", "que": "confirmar las 598 bajas sin solicitud registrada",
+        {"id": "D18 (registro)", "que": "confirmar las 598 negativas de marketing sin solicitud registrada",
          "detalle": "598 clientes sin consentimiento no tienen una fila en Historial_Bajas_No_Contacto.csv que lo explique.",
          "estado": "pendiente del negocio"},
         {"id": "DC-07", "que": "corregir en origen 106 edades fuera de rango y 74 filas de fidelización inconsistentes",
-         "detalle": "edades fuera de [15, 100] y puntos_canjeados > puntos_acumulados; pedido a Sistemas.",
+         "detalle": "edades fuera de 15 a 100 años y socios con más puntos canjeados que acumulados; pedido a Sistemas.",
          "estado": "pendiente del negocio"},
-        {"id": "DC-15", "que": "el diccionario de datos columna por columna",
-         "detalle": "no está en el DOCX del 08/09; se pide la versión del campus.",
+        {"id": "DC-15", "que": "enviar el diccionario de datos, columna por columna",
+         "detalle": "no está en el DOCX del 08/09; mientras tanto se usa el esquema que armó el equipo leyendo los archivos.",
          "estado": "pendiente del negocio"},
     ]}
 

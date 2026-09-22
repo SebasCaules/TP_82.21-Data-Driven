@@ -7,7 +7,7 @@
 
 const SELECTORES = [
   '.titulo', '.rotulo', '.lienzo', '.tarjeta', '.ban-track',
-  'table', 'svg', '.lista-tabla', '.cierre', '.kpi',
+  'table', 'svg', '.lista-tabla', '.cierre', '.kpi', '.pie-vista',
 ]
 
 function rects(raiz) {
@@ -41,9 +41,12 @@ export function chequear() {
   // el encabezado real es la barra de controles. Con los selectores viejos, `.pie` y `.enc` no
   // matcheaban nada y los dos chequeos de superposicion comparaban contra el borde de la
   // ventana y contra cero, o sea que no comparaban nada. Las cajas que existen hoy son estas.
-  const barra = document.querySelector('.barra')
+  // El E2 no tiene .barra: su encabezado es .e2-enc (23/09, D5-11). Y el cuerpo puede medir
+  // más que la ventana con overflow:hidden (V07 del E2 a 1152×640 pasaba en verde con el pie
+  // fuera de pantalla): el límite es el menor entre el fondo del cuerpo y la ventana.
+  const barra = document.querySelector('.barra, .e2-enc')
   const cuerpo = document.querySelector('.cuerpo')
-  const pieTop = cuerpo ? cuerpo.getBoundingClientRect().bottom : vh
+  const pieTop = Math.min(vh, cuerpo ? cuerpo.getBoundingClientRect().bottom : vh)
   const encBot = barra ? barra.getBoundingClientRect().bottom : 0
 
   // 1. scroll real, en el documento y en cada contenedor
@@ -110,18 +113,50 @@ export function chequear() {
     }
   }
 
+  // 3c. cifra grande partida en dos renglones ("ARS" arriba, "94,9 M" abajo): se lee, pero
+  //     no es una cifra. Se mide con los rectangulos de linea del texto, no con el alto de
+  //     la caja, para no depender del line-height (23/09, D5-11).
+  for (const el of document.querySelectorAll('.par-val, .kpi-val, .ban-val')) {
+    if (!el.textContent.trim()) continue
+    const rango = document.createRange()
+    rango.selectNodeContents(el)
+    const tops = new Set([...rango.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top)))
+    if (tops.size > 1) {
+      problemas.push({ tipo: 'cifra-partida', detalle: `${clase(el)} "${el.textContent.trim().slice(0, 30)}" en ${tops.size} renglones` })
+    }
+  }
+
+  // 3d. texto de un grafico que sale del SVG (un "2025" que se lee "202" en el eje).
+  for (const svg of document.querySelectorAll('.lienzo svg')) {
+    if (svg.parentElement.closest('svg')) continue
+    const s = svg.getBoundingClientRect()
+    for (const t of svg.querySelectorAll('text')) {
+      const r = t.getBoundingClientRect()
+      if (r.width === 0) continue
+      if (r.left < s.left - 1 || r.right > s.right + 1 || r.top < s.top - 1 || r.bottom > s.bottom + 1) {
+        problemas.push({ tipo: 'svg-texto-fuera', detalle: `"${t.textContent.trim().slice(0, 30)}" sale del svg` })
+      }
+    }
+  }
+
   // 4. un grafico aplastado es ilegible aunque no desborde.
   //    Solo los SVG de grafico: los iconos van DENTRO de un <svg> y miden 13 px a proposito,
   //    asi que un chequeo ingenuo los reportaba a los siete como aplastados.
   for (const svg of document.querySelectorAll('.lienzo svg')) {
     if (svg.parentElement.closest('svg')) continue        // icono anidado
-    if (svg.hasAttribute('data-icono')) continue
+    if (svg.hasAttribute('data-icono') || svg.classList.contains('sem-ico')) continue   // iconos del semaforo
     // Las miniaturas del cierre miden poco a proposito: son la prueba al pie de una cifra,
     // no el grafico de la pantalla.
     if (svg.hasAttribute('data-chispa')) continue
     const r = svg.getBoundingClientRect()
     if (r.height < 90) {
       problemas.push({ tipo: 'grafico-aplastado', detalle: `svg de ${Math.round(r.height)} px de alto` })
+    }
+    // El area donde se dibuja la serie (la zona de captura de <Linea>, un rect con tabindex)
+    // puede medir 62 px dentro de un svg de 144: eso tambien es aplastado (23/09).
+    const zona = svg.querySelector('rect[tabindex][role="img"]')
+    if (zona && zona.getBoundingClientRect().height < 90 && r.height >= 90) {
+      problemas.push({ tipo: 'grafico-aplastado', detalle: `area de dibujo de ${Math.round(zona.getBoundingClientRect().height)} px en un svg de ${Math.round(r.height)}` })
     }
   }
 
