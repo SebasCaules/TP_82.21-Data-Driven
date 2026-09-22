@@ -13,6 +13,9 @@
     "preview": "vite preview",
     "dev:e2": "vite --config vite.e2.config.js",
     "build:e2": "vite build --config vite.e2.config.js",
+    "sitio": "node scripts/armar-sitio.mjs",
+    "build:site": "npm run build && npm run build:e2 && npm run sitio",
+    "preview:site": "vite preview --outDir dist-site",
     "todo": "npm run datos && npm run validar && npm run golden && npm run paridad && npm run build"
   },
   "devDependencies": {

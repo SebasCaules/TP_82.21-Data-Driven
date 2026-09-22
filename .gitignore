@@ -1,6 +1,7 @@
 node_modules/
 dist/
 dist-e2/
+dist-site/
 __pycache__/
 *.pyc
 .DS_Store

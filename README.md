@@ -83,6 +83,22 @@ Un solo HTML autocontenido: datos embebidos, tipografías del sistema, cero CDN,
 `fetch` en runtime. El mismo archivo se sirve por GitHub Pages y se abre con doble clic
 desde el Finder. El aula puede no tener red.
 
+## Sitio publicado
+
+GitHub Pages sirve tres cosas desde un solo sitio: `/` es una landing estática que elige
+entre los dos entregables, `/e1/` es este tablero y `/e2/` es el de calidad de datos. La
+landing vive en `landing/index.html`, sin build propio.
+
+| Comando | Qué hace |
+|---|---|
+| `npm run sitio` | arma `dist-site/` a partir de `landing/`, `dist/` y `dist-e2/` (`scripts/armar-sitio.mjs`) |
+| `npm run build:site` | corre `build`, `build:e2` y `sitio` en orden |
+| `npm run preview:site` | sirve `dist-site/` en local para revisar el sitio completo |
+
+Los archivos que se entregan por doble clic no cambian: `dist/index.html` (E1) y
+`dist-e2/index.html` (E2) siguen siendo exactamente lo que generan `npm run build` y
+`npm run build:e2`. `dist-site/` es solo el empaquetado para Pages y no se versiona.
+
 ## Los datos
 
 Los 6 datasets son sintéticos, provistos por la cátedra. No hay datos personales reales.

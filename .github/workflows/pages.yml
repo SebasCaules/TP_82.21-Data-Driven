@@ -53,17 +53,22 @@ jobs:
 
       - run: npm run build
 
-      # Tablero E2 (calidad de datos): segunda página autocontenida, servida en /e2/ del
-      # mismo sitio. Su payload (e2/src/datos_e2.js) se versiona y se regenera en local con
+      # Tablero E2 (calidad de datos): segunda página autocontenida. Su payload
+      # (e2/src/datos_e2.js) se versiona y se regenera en local con
       # `python3 pipeline/build_e2.py` (anclas contra el registro de cifras) y
-      # `python3 pipeline/validate_e2.py`; acá solo se compila y se copia dentro de dist/
-      # DESPUÉS del build del E1, porque ese build vacía dist/ entero.
+      # `python3 pipeline/validate_e2.py`. Se corre después del build del E1 por orden,
+      # no por dependencia: cada uno escribe en su propia carpeta (dist/ y dist-e2/) y
+      # ninguno toca la del otro.
       - run: npm run build:e2
-      - run: mkdir -p dist/e2 && cp dist-e2/index.html dist/e2/index.html
+
+      # Arma dist-site/: landing estática en /, tablero E1 en /e1/, tablero E2 en /e2/
+      # (scripts/armar-sitio.mjs). dist/ y dist-e2/ quedan intactos: siguen siendo los
+      # archivos que se entregan por doble clic.
+      - run: npm run sitio
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: dist-site
 
   deploy:
     needs: build

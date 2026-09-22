@@ -10,9 +10,9 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 // de escribir. Si el build de E2 escribiera en dist/e2, cualquier 'npm run build' (E1)
 // corrido después lo borra sin aviso, en cualquier orden que alguien los encadene. Con
 // dist-e2 como hermano de dist/, ninguno de los dos build toca el directorio del otro. La
-// unión en un solo sitio de Pages (dist/index.html + dist/e2/index.html) queda para cuando
-// la branch se integre a main (ver N0-1 en wiki/entregables/plan-entregable-2.md): ese paso
-// deberá copiar dist-e2/ a dist/e2/ DESPUES de 'npm run build', nunca antes.
+// unión en un solo sitio de Pages la hace scripts/armar-sitio.mjs en un tercer directorio,
+// dist-site/ (landing en /, dist/index.html en /e1/, dist-e2/index.html en /e2/), después de
+// los dos builds: 'npm run build:site'. Ni dist/ ni dist-e2/ se escriben desde afuera.
 export default defineConfig({
   root: 'e2',
   base: './',
