@@ -18,7 +18,7 @@ import { SIN_FILTRO, corteInfo, cortes, hayFiltro, meta, mesCorte } from './agre
 import Filtros, { DIMENSIONES, etiquetaValor } from './Filtros.jsx'
 import LineaTiempo from './LineaTiempo.jsx'
 import { GRUPOS, PANTALLAS } from './pantallas/index.jsx'
-import VolverInicio from './VolverInicio.jsx'
+import MarcaInicio from './MarcaInicio.jsx'
 
 const CORTE_INICIAL = cortes.length - 1
 const INDICE_LISTA = PANTALLAS.findIndex((p) => p.id === 'M1')
@@ -167,9 +167,8 @@ const Marca = () => (
 function Lateral({ indice, irA }) {
   return (
     <nav className="lat" aria-label="Vistas del tablero">
-      <VolverInicio />
       <div className="lat-marca">
-        <div className="lat-nombre"><Marca /><span className="lat-oga">Casa Óga</span></div>
+        <MarcaInicio><Marca /><span className="lat-oga">Casa Óga</span></MarcaInicio>
         <span className="lat-sub">riesgo de pérdida de clientes</span>
       </div>
 

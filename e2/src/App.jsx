@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { VISTAS } from './vistas/index.jsx'
-import VolverInicio from '../../src/VolverInicio.jsx'
+import MarcaInicio from '../../src/MarcaInicio.jsx'
 
 export default function App() {
   const [indice, setIndice] = useState(0)
@@ -113,9 +113,8 @@ const Marca = () => (
 function Lateral({ indice, irA }) {
   return (
     <nav className="lat" aria-label="Vistas del tablero">
-      <VolverInicio />
       <div className="lat-marca">
-        <div className="lat-nombre"><Marca /><span className="lat-oga">Casa Óga</span></div>
+        <MarcaInicio><Marca /><span className="lat-oga">Casa Óga</span></MarcaInicio>
         <span className="lat-sub">calidad de datos: antes y después</span>
       </div>
 

@@ -168,20 +168,12 @@ body {
   font: 400 9.5px/1.4 var(--mono); color: var(--mut);
 }
 
-/* Vuelta a la landing: solo aparece cuando VolverInicio.jsx decide que corresponde
-   (http(s) + /e1/ o /e2/). .lat ya se oculta entero en @media print, así que no hace
-   falta una regla de impresión aparte. */
-.lat-volver {
-  display: inline-flex; align-items: center; gap: 4px;
-  margin: 0 16px 10px;
-  width: max-content;
-  font: 400 9.5px/1.4 var(--mono);
-  letter-spacing: .1em; text-transform: uppercase;
-  color: var(--mut);
-  text-decoration: none;
-}
-.lat-volver:hover, .lat-volver:focus-visible { color: var(--ink); }
-.lat-volver:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+/* La marca es el enlace a la landing cuando MarcaInicio.jsx decide que corresponde (http(s)
+   en /e1/ o /e2/). Se ve igual que la marca sin enlace; solo el cursor, el subrayado al pasar
+   y el foco visible avisan que se puede volver. .lat ya se oculta entero en @media print. */
+.lat-inicio { color: inherit; text-decoration: none; cursor: pointer; width: max-content; border-radius: 3px; }
+.lat-inicio:hover .lat-oga, .lat-inicio:focus-visible .lat-oga { text-decoration: underline; text-underline-offset: 3px; }
+.lat-inicio:focus-visible { outline: 2px solid var(--acc); outline-offset: 3px; }
 
 /* ---------- barra única: filtros a la izquierda, mes de corte a la derecha ---------- */
 
