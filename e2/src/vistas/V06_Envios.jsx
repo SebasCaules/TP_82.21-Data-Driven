@@ -7,12 +7,21 @@
 // pero con alguna baja registrada; el resto son los contactables_sin_baja de verdad, el
 // único tramo con el que la campaña puede trabajar hoy (DC-05, DC-12).
 //
-// El 568 que cerró el E1 (C11) es un cálculo previo a DC-04 (resolución de identidad); el
-// payload de E2 ya viene con las identidades resueltas, así que contactables_consentimiento
-// da 567. Se usa ese valor, tal como llega en D2, y se deja la nota en el pie: no hay
-// segunda cifra que inventar para "empatar" con el E1.
+// La barra se dibuja a mano con rects propios (no con `BarrasApiladas100`, que emite un solo
+// <title> por FILA y acá hay una sola fila con tres tramos que necesitan el suyo): el tramo
+// "con baja" es apenas 18 de 800 (2,3 %), demasiado angosto para llevar rótulo adentro sin
+// pisar al vecino, así que su identidad queda en su trama propia, en el <title> nativo y en
+// la nota de abajo de la barra con su línea guía; los otros dos sí entran con rótulo directo.
+//
+// El título compara dos cortes de la MISMA lista, no tres valores sueltos: el 568 es
+// D2.anclas["contactables 800"], el cálculo de C11 tal como cerró el E1 (consentimiento
+// sobre la lista sin identidad resuelta); el 549 es lista_800.contactables_sin_baja, la
+// lista de hoy, después de DC-04 (identidad resuelta) y DC-12 (bajas). El 567
+// (contactables_consentimiento, la misma lista ya con DC-04 pero sin filtrar bajas) es el
+// escalón intermedio que explica por qué el título no dice "568 → 567": la tarjeta de la
+// barra lo hace explícito para que nadie lea el 568 → 549 como un solo movimiento.
 
-import { Lienzo, BarrasApiladas100 } from '../../../src/graficos.jsx'
+import { Lienzo, Tramas } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { entero, pct, fechaCorta } from '../formato.js'
 
@@ -30,37 +39,15 @@ const { envios, embudo, bajas, lista_800: lista800 } = v06
 const repetidos = envios.antes - envios.despues
 const bajas2026 = bajas['2026']
 
-// Composición de la lista de 800, tal como pide CONTRACT_E2.md §3.
-const sinConsentimiento = 800 - lista800.contactables_consentimiento
-const conBaja = lista800.contactables_consentimiento - lista800.contactables_sin_baja
+// El 568 del E1 (C11) es una fila del registro de cifras, no un número escrito a mano: sale
+// de D2.anclas, que es donde el pipeline lo deja para que el tablero lo cite sin copiarlo.
+const anclaContactables800 = D2.anclas.find((a) => a.nombre === 'contactables 800').valor
+const conConsentimiento = lista800.contactables_consentimiento
 const sinBaja = lista800.contactables_sin_baja
 
-// Fila única (la lista entera es una sola composición, no hay categorías que comparar entre
-// sí): 18 de 800 es un tramo demasiado angosto para llevar rótulo adentro sin pisar al
-// vecino, así que ese segmento no lleva `texto` y su identidad queda en la leyenda y en el
-// <title> nativo del SVG.
-const filasLista800 = [{
-  etiqueta: 'Lista de 800',
-  segmentos: [
-    {
-      clave: 'Contactables sin baja', valor: sinBaja, tono: 'var(--acc)', tinta: '#fff',
-      enfasis: true, texto: `${entero(sinBaja)} · ${pct((100 * sinBaja) / 800)}`,
-    },
-    { clave: 'Con consentimiento, con baja', valor: conBaja, tono: 'trama' },
-    {
-      clave: 'Sin consentimiento', valor: sinConsentimiento, tono: 'trama-exc', tinta: '#fff',
-      excepcion: true, texto: `${entero(sinConsentimiento)} · ${pct((100 * sinConsentimiento) / 800)}`,
-    },
-  ],
-}]
-
-// Etiquetas cortas: el ancho de la tarjeta es la mitad del lienzo, no el lienzo entero como
-// en M3Consentimiento, y las versiones largas ("sin consentimiento · bloqueante") no entran.
-const leyendaLista800 = [
-  { etiqueta: 'sin baja', tono: 'var(--acc)', enfasis: true },
-  { etiqueta: 'con baja', tono: 'trama' },
-  { etiqueta: 'sin consentimiento', tono: 'trama-exc' },
-]
+// Composición de la lista de 800, tal como pide CONTRACT_E2.md §3.
+const sinConsentimiento = 800 - conConsentimiento
+const conBaja = conConsentimiento - sinBaja
 
 const embudoFilas = [
   { etq: 'Abre', antes: embudo.antes.abre_pct, despues: embudo.despues.abre_pct, dec: 1 },
@@ -69,7 +56,86 @@ const embudoFilas = [
 ]
 
 const TITULO = `${entero(repetidos)} envíos repetidos y ${entero(bajas2026)} bajas 2026 `
-  + `fuera: ${entero(lista800.contactables_consentimiento)} → ${entero(sinBaja)} contactables de 800`
+  + `fuera: ${entero(anclaContactables800)} → ${entero(sinBaja)} contactables de 800`
+
+/** Barra de composición de los 800, con un tramo por estado y un <title> propio en cada uno
+ *  (etiqueta, valor y porcentaje): lo que `BarrasApiladas100` no da porque agrupa toda la
+ *  fila en un solo <title>. El tramo angosto ("con baja") no lleva rótulo adentro: se marca
+ *  con su propia trama y una nota con línea guía debajo de la barra, así su identidad no
+ *  depende solo del color (regla dura 2 del DISENO.md). */
+function BarraContactables800({ w, h }) {
+  if (!w || !h) return null
+  const total = sinBaja + conBaja + sinConsentimiento
+  const tramos = [
+    { clave: 'Contactables sin baja', valor: sinBaja, fill: 'var(--acc)', tinta: '#fff', ancla: 'start' },
+    { clave: 'Con consentimiento, con baja', valor: conBaja, fill: 'url(#trama)', tinta: 'var(--mut2)' },
+    { clave: 'Sin consentimiento', valor: sinConsentimiento, fill: 'url(#trama-exc)', tinta: '#fff', ancla: 'end' },
+  ]
+
+  const padTop = 20
+  const anchoNota = conBaja > 0 ? 30 : 6
+  const alto = Math.max(46, Math.min(h - padTop - anchoNota, 92))
+  const y = padTop
+  let x = 0
+  const segs = tramos.map((t) => {
+    const share = t.valor / total
+    const ws = Math.max(t.valor > 0 ? 3 : 0, share * w)
+    const s = { ...t, x, w: ws, share }
+    x += ws
+    return s
+  })
+  const angosto = segs.find((s) => s.share < 0.06 && s.share > 0)
+
+  return (
+    <svg width={w} height={h} role="img"
+         aria-label={'Composición de los 800, después de DC-05 y DC-04. '
+           + segs.map((s) => `${s.clave} ${entero(s.valor)}, ${pct(s.share * 100)}`).join(' · ')}
+         style={{ display: 'block' }}>
+      <Tramas />
+
+      {segs.map((s) => s.w > 0 && (
+        <g key={s.clave}>
+          <title>{`${s.clave} · ${entero(s.valor)} · ${pct(s.share * 100)} de 800`}</title>
+          <rect x={s.x} y={y} width={Math.max(1, s.w - (s.x + s.w < w ? 2 : 0))} height={alto}
+                fill={s.fill} />
+        </g>
+      ))}
+
+      {segs.map((s) => {
+        if (s.share < 0.06 || s.w <= 0) return null
+        const xRot = s.ancla === 'end' ? s.x + s.w : s.x
+        return (
+          <text key={'r' + s.clave} x={xRot} y={y - 8} fontSize="11.5" fontWeight={600}
+                fill={s.ancla === 'end' ? 'var(--terra)' : 'var(--ink)'}
+                textAnchor={s.ancla === 'end' ? 'end' : 'start'}>{s.clave}</text>
+        )
+      })}
+      {segs.map((s) => {
+        if (s.share < 0.06 || s.w < 46) return null
+        const texto = `${entero(s.valor)} · ${pct(s.share * 100)}`
+        const xTxt = s.ancla === 'end' ? s.x + s.w - 9 : s.x + 9
+        return (
+          <text key={'v' + s.clave} x={xTxt} y={y + alto / 2} fontSize="13.5" fontWeight={700}
+                fill={s.tinta} textAnchor={s.ancla === 'end' ? 'end' : 'start'}
+                dominantBaseline="central" className="tabular">{texto}</text>
+        )
+      })}
+
+      {angosto && (
+        <g>
+          <line x1={angosto.x + angosto.w / 2} x2={angosto.x + angosto.w / 2}
+                y1={y + alto} y2={y + alto + 9} stroke="var(--eje)" strokeWidth="1" />
+          <line x1={angosto.x + angosto.w / 2} x2={w - 2}
+                y1={y + alto + 9} y2={y + alto + 9} stroke="var(--eje)" strokeWidth="1" />
+          <text x={w - 2} y={y + alto + 13} fontSize="10.5" fill="var(--mut2)" fontWeight={600}
+                textAnchor="end" dominantBaseline="hanging">
+            {angosto.clave}: {entero(angosto.valor)} · {pct(angosto.share * 100)}
+          </text>
+        </g>
+      )}
+    </svg>
+  )
+}
 
 export default function V06Envios() {
   return (
@@ -78,20 +144,38 @@ export default function V06Envios() {
 
       <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(8px, 1.3vh, 16px)' }}>
         <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)', flex: '1.4 1 0', minHeight: 0 }}>
-          <div className="tarjeta" style={{ flex: '1.3 1 0', minWidth: 0 }}>
+          <div className="tarjeta" style={{ flex: '1.5 1 0', minWidth: 0 }}>
             <span className="kpi-lbl">A quién se le puede escribir · lista de 800</span>
             <Lienzo>
-              {({ w, h }) => (
-                <BarrasApiladas100
-                  filas={filasLista800} leyenda={leyendaLista800} w={w} h={h}
-                  anchoEtiqueta={104} alturaBarra={104}
-                  tituloEje="Composición de los 800, después de DC-05"
-                />
-              )}
+              {({ w, h }) => <BarraContactables800 w={w} h={h} />}
             </Lienzo>
+            <div className="ban-par" style={{ marginTop: 6, gap: 'clamp(7px, 1vw, 14px)' }}>
+              <div className="par-item par-antes">
+                <span className="par-lbl">E1 · C11</span>
+                <span className="par-val tabular" style={{ fontSize: 'clamp(15px, 1.5vw, 21px)' }}>
+                  {entero(anclaContactables800)}
+                </span>
+              </div>
+              <span className="par-flecha" style={{ fontSize: 13 }}>→</span>
+              <div className="par-item par-antes">
+                <span className="par-lbl">DC-04</span>
+                <span className="par-val tabular" style={{ fontSize: 'clamp(15px, 1.5vw, 21px)' }}>
+                  {entero(conConsentimiento)}
+                </span>
+              </div>
+              <span className="par-flecha" style={{ fontSize: 13 }}>→</span>
+              <div className="par-item par-despues">
+                <span className="par-lbl">DC-12</span>
+                <span className="par-val tabular" style={{ fontSize: 'clamp(15px, 1.5vw, 21px)' }}>
+                  {entero(sinBaja)}
+                </span>
+              </div>
+            </div>
             <span className="kpi-sub">
-              Sobre los 800 clientes de mayor exposición al corte, después de DC-05 (dedupe
-              de envíos) y DC-04 (identidad resuelta).
+              {entero(anclaContactables800)} con consentimiento en el E1, sin identidad
+              resuelta (C11) · {entero(conConsentimiento)} con consentimiento tras resolver
+              identidad (DC-04) · {entero(sinBaja)} sin ninguna baja registrada (DC-12), la
+              lista con la que la campaña trabaja hoy.
             </span>
           </div>
 
@@ -176,7 +260,7 @@ export default function V06Envios() {
 
       <p className="pie-vista">
         corte <b>{fechaCorta(infoMeta.corte_ref)}</b> · base: <b>{entero(envios.despues)}</b> envíos
-        después de DC-05 · fila <b>C11</b> · <b>D15</b> · <b>D18</b> · <b>E02</b>
+        después de DC-05 · fila <b>C11</b> · <b>E02</b> · <b>D15</b> · <b>D18</b>
       </p>
     </section>
   )
@@ -186,5 +270,5 @@ export const meta = {
   id: 'V06',
   corto: 'Envíos y bajas',
   titulo: TITULO,
-  pie: 'C11, D15, D18, E02',
+  pie: 'C11, E02, D15, D18',
 }

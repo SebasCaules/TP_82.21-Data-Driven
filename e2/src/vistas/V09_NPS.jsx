@@ -20,7 +20,7 @@ const NPS_2025 = V09.nps_anual.find((f) => f.anio === 2025)
 
 const TITULO = `NPS sin reclamos ni consultas en ${pct(V09.sin_interaccion.pct)} de las filas: se marca, no se borra`
 
-const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(V09.filas)} filas cliente-mes de soporte · registro D19, D20, D24 · el origen de las ${entero(V09.sin_interaccion.n)} filas sin interacción no está confirmado, ver consulta 4`
+const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(V09.filas)} filas cliente-mes de soporte · registro D19, D20, D24 · riesgo vs. soporte (D20) sobre la base del E1, sin DC-04 · el origen de las ${entero(V09.sin_interaccion.n)} filas sin interacción no está confirmado, ver consulta 4`
 
 export const meta = {
   id: 'V09',
@@ -107,7 +107,7 @@ export default function V09_NPS() {
               </tbody>
             </table>
             <p className="kpi-sub" style={{ marginTop: 8 }}>
-              reclamos y consultas acumulados, y NPS medio mensual, hasta el corte
+              reclamos y consultas acumulados, y NPS medio mensual, hasta el corte · base del E1, sin DC-04: <b>D20</b>
             </p>
           </div>
 
