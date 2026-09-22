@@ -1,0 +1,43 @@
+id_campania,nombre_campania,tipo_oferta,canal_principal,segmento_objetivo,fecha_creacion,fecha_envio,cofinanciado_por_proveedor
+CAMP001,Recompra Silver 2025,Puntos extra,SMS,Silver,2025-01-21,2025-01-26,False
+CAMP002,Recompra Silver 2022,Puntos extra,WhatsApp,Silver,2022-01-31,2022-02-14,False
+CAMP003,Bienvenida Bronze 2025,2x1,Email,Bronze,2025-11-14,2025-11-23,False
+CAMP004,Recompra Silver 2024,2x1,Email,Silver,2024-06-26,2024-07-04,False
+CAMP005,Recompra Silver 2023,2x1,SMS,Silver,2023-05-20,2023-05-26,False
+CAMP006,Recompra Silver 2022,Envio gratis,SMS,Silver,2022-12-10,2022-12-18,False
+CAMP007,VIP Gold 2024,Descuento %,Email,Gold,2024-05-16,2024-05-08,False
+CAMP008,Bienvenida Bronze 2023,Envio gratis,Email,Bronze,2023-07-20,2023-07-31,True
+CAMP009,Bienvenida Bronze 2024,2x1,Email,Bronze,2024-01-28,2024-02-07,False
+CAMP010,Reactivacion 90 dias 2022,PUNTOS EXTRA,SMS,Inactivos 90d,2022-08-02,2022-08-14,False
+CAMP011,Recompra Silver 2023,Descuento %,WhatsApp,Silver,2023-08-25,2023-08-28,False
+CAMP012,Reactivacion 90 dias 2024,Puntos extra,WhatsApp,Inactivos 90d,2024-11-25,2024-12-08,False
+CAMP013,Reactivacion 90 dias 2024,Cupon fijo ARS,Email,Inactivos 90d,2024-07-08,2024-07-16,False
+CAMP014,Recompra Silver 2025,Cupon fijo ARS,SMS,Silver,2025-07-21,2025-07-27,False
+CAMP015,Bienvenida Bronze 2022,Puntos extra,SMS,Bronze,2022-10-19,2022-11-02,False
+CAMP016,Reactivacion 90 dias 2025,Puntos extra,Email,Inactivos 90d,2025-06-16,2025-06-26,False
+CAMP017,Reactivacion 90 dias 2024,Envio gratis,SMS,Inactivos 90d,2024-05-05,2024-05-13,False
+CAMP018,Bienvenida Bronze 2025,Descuento %,SMS,Bronze,2025-11-04,2025-11-12,True
+CAMP019,VIP Gold 2024,Cupon fijo ARS,WhatsApp,Gold,2024-06-06,2024-06-17,True
+CAMP020,VIP Gold 2023,Cupon fijo ARS,SMS,Gold,2023-03-03,2023-03-16,True
+CAMP021,Campania general 2024,Descuento %,WhatsApp,Todos,2024-06-30,2024-07-06,True
+CAMP022,Bienvenida Bronze 2025,Descuento %,WhatsApp,Bronze,2025-10-01,2025-10-18,False
+CAMP023,Reactivacion 90 dias 2024,envio gratis,Email,Inactivos 90d,2024-07-15,2024-07-28,False
+CAMP024,Campania general 2025,Cupon fijo ARS,Email,Todos,2025-06-10,2025-06-17,True
+CAMP025,Recompra Silver 2025,Descuento %,SMS,Silver,2025-03-26,2025-03-30,False
+CAMP026,VIP Gold 2022,Descuento %,SMS,Gold,2022-11-07,2022-11-11,False
+CAMP027,Reactivacion 90 dias 2024,Descuento %,WhatsApp,Inactivos 90d,2024-10-26,2024-11-04,False
+CAMP028,Recompra Silver 2022,2x1,SMS,Silver,2022-07-25,2022-08-02,False
+CAMP029,Campania general 2022,Puntos extra,Email,Todos,2022-05-31,2022-06-13,False
+CAMP030,Recompra Silver 2024,Cupon fijo ARS,SMS,Silver,2024-11-27,2024-12-10,False
+CAMP031,Bienvenida Bronze 2024,2x1,Email,Bronze,2024-07-01,2024-07-13,False
+CAMP032,Campania general 2025,Cupon fijo ARS,Email,Todos,2025-04-27,2025-05-01,False
+CAMP033,VIP Gold 2024,Cupon fijo ARS,WhatsApp,Gold,2024-11-06,2024-11-15,True
+CAMP034,Bienvenida Bronze 2023,Envio gratis,Email,Bronze,2023-06-10,2023-06-21,False
+CAMP035,VIP Gold 2023,Puntos extra,Email,Gold,2023-04-23,2023-05-02,False
+CAMP036,Campania general 2022,2x1,WhatsApp,Todos,2022-09-23,2022-10-06,False
+CAMP037,VIP Gold 2025,2x1,SMS,Gold,2025-11-14,2025-11-18,False
+CAMP038,Recompra Silver 2025,Puntos extra,Email,Silver,2025-01-08,2025-01-28,False
+CAMP039,Campania general 2023,Descuento %,WhatsApp,Todos,2023-11-12,2023-11-16,False
+CAMP040,VIP Gold 2022,CUPON FIJO ARS,SMS,Gold,2022-11-24,2022-11-28,False
+CAMP004,Recompra Silver 2024,Envio gratis,Email,Silver,2024-07-08,2024-07-04,False
+CAMP034,Bienvenida Bronze 2023,Descuento %,Email,Bronze,2023-06-10,2023-06-21,False

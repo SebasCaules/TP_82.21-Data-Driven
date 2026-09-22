@@ -1,0 +1,106 @@
+/* Estilos propios de la SPA E2. Todo lo que ya existe en src/estilos.css (tokens, .app,
+   .lat, .lat-item, .cuerpo, .pant, .titulo, .tarjeta, .lienzo, impresión A4, .chico) se
+   reusa tal cual: acá va SOLO lo nuevo que las 12 vistas de calidad de datos necesitan y
+   que el E1 no tiene. El terracota (--terra, ya definido en estilos.css) queda reservado a
+   la marca de problema (hallazgo, dato objetado); estos tokens nuevos son neutros. */
+
+:root {
+  --antes: #8a8680;    /* gris: la base cruda, tal como llega */
+  --despues: #22456f;  /* azul-700, el mismo --acc del E1: la base con las DC aplicadas */
+}
+
+/* ---------- encabezado: nombre del tablero + corte fijo, sin controles ---------- */
+
+.e2-enc {
+  flex-shrink: 0;
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: clamp(12px, 1.5vw, 22px);
+  padding: 10px var(--pad-x);
+  border-bottom: 1px solid var(--bd);
+  background: var(--papel);
+}
+.e2-enc-nombre {
+  font: 600 13px/1.2 var(--fuente); letter-spacing: -.01em; color: var(--ink);
+}
+.e2-enc-corte {
+  font: 400 10.5px/1.2 var(--mono); letter-spacing: .04em; color: var(--mut);
+}
+
+/* ---------- antes / después: dos columnas iguales, un rótulo por columna ---------- */
+/* El ancho fijo al 50/50 es la idea: ninguna columna pesa más que la otra porque ninguna
+   base pesa más que la otra a los ojos del lector. Lo que cambia adentro es el valor. */
+
+.antes-despues {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 1.8vw, 30px);
+  flex: 1; min-height: 0;
+}
+.antes-despues > .col {
+  display: flex; flex-direction: column; gap: 8px;
+  min-width: 0;
+}
+.antes-despues .col-rotulo {
+  display: inline-flex; align-items: center; gap: 6px;
+  align-self: flex-start;
+  font: 600 10.5px/1 var(--mono);
+  text-transform: uppercase; letter-spacing: .09em;
+}
+.antes-despues .col-rotulo::before { content: ""; width: 9px; height: 9px; border-radius: 1px; }
+.antes-despues .col-antes .col-rotulo { color: var(--mut2); }
+.antes-despues .col-antes .col-rotulo::before { background: var(--antes); }
+.antes-despues .col-despues .col-rotulo { color: var(--acc); }
+.antes-despues .col-despues .col-rotulo::before { background: var(--despues); }
+
+/* ---------- ban-par: un par de números grandes, antes contra después ---------- */
+/* Mismo trazo visual que .kpi-val del E1 (misma tipografía y peso), pero dos cifras una al
+   lado de la otra con su rótulo propio, para leer el desplazamiento de un vistazo sin
+   calcular la diferencia de memoria. */
+
+.ban-par {
+  display: flex; align-items: baseline; gap: clamp(14px, 2vw, 28px);
+}
+.ban-par .par-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ban-par .par-lbl {
+  font: 600 9.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em;
+}
+.ban-par .par-antes .par-lbl { color: var(--mut2); }
+.ban-par .par-despues .par-lbl { color: var(--acc); }
+.ban-par .par-val {
+  font: 600 clamp(21px, 2.2vw, 31px)/1.08 var(--fuente); letter-spacing: -.02em;
+}
+.ban-par .par-antes .par-val { color: var(--mut); }
+.ban-par .par-despues .par-val { color: var(--ink); }
+.ban-par .par-flecha { align-self: center; color: var(--eje); font-size: 16px; }
+
+/* ---------- pie fijo de cada vista: corte, base, fila del registro, salvedad ---------- */
+/* Va al final de la .pant, empujado abajo por margin-top:auto para que el cuerpo de la vista
+   ocupe el alto libre. Misma letra mono y color apagado que el pie impreso del E1. */
+
+.pant .pie-vista {
+  margin-top: auto; padding-top: 6px;
+  border-top: 1px solid var(--bd);
+  font: 400 10px/1.35 var(--mono); color: var(--mut);
+  letter-spacing: .02em;
+}
+.pant .pie-vista b { color: var(--mut2); font-weight: 600; }
+
+/* tabla compacta para V01 y V12 (listas de decisiones y pedidos) */
+.tabla-e2 { width: 100%; border-collapse: collapse; font: 400 11px/1.3 var(--fuente); }
+.tabla-e2 th { text-align: left; font: 600 9.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--mut); padding: 4px 6px; border-bottom: 1px solid var(--bd); }
+.tabla-e2 td { padding: 3px 6px; border-bottom: 1px solid var(--bd); vertical-align: top; }
+.tabla-e2 td.mono { font: 400 10.5px/1.3 var(--mono); white-space: nowrap; }
+
+/* ---------- pastilla de "pendiente del negocio" (V12) ---------- */
+/* No es un estado del semáforo (no compara contra una meta): un pedido abierto, sin
+   respuesta. Círculo hueco (la forma) + el texto del estado, siempre juntos, para que la
+   lectura no dependa solo del terracota (regla dura 2 del DISENO.md). */
+.pastilla-pend {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1.5px solid var(--terra); border-radius: 4px;
+  padding: 5px 9px;
+  background: var(--sup);
+  font: 600 10.5px/1 var(--mono); color: var(--terra);
+  text-transform: uppercase; letter-spacing: .06em;
+  white-space: nowrap;
+}
+.pastilla-pend-forma { font-size: 12px; line-height: 1; }

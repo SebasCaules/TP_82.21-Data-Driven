@@ -33,14 +33,15 @@
 \pagestyle{empty}
 \setcounter{page}{\consolidado}
 \renewcommand{\contentsname}{Contenido del anexo}
+\setcounter{tocdepth}{1}  % en el consolidado el índice interno lista solo secciones: los incisos están en la página de contenido global y en el pie
 \noindent{\small\bfseries\color[HTML]{B8433A} ANEXO 1}\\[1mm]
 {\Large\bfseries Formulación del tablero de riesgo de clientes}\\[1mm]
-{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.0 · 15/09/2026}
+{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.1 · 22/09/2026}
 \else
 \begin{center}
 {\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
 Materia 82.21 --- Factibilidad de Proyectos Data Driven\\
-Entregable 1 --- Grupo 2 --- Anexo de fórmulas, v2.0\\[3mm]
+Entregables 1 y 2 --- Grupo 2 --- Anexo de fórmulas, v2.1\\[3mm]
 \begin{tabular}{ll}
 Sebastián Caules & 64331 \\
 Tomás Ferreccio & 64934 \\
@@ -537,11 +538,11 @@ $B_i(t)$ marca al cliente cuando su recencia \emph{ya superó} su umbral propio:
 La anticipación es trabajo del modelo del Entregable 3, con este target:
 
 \begin{equation}
-Y_i(T) = \mathbb{1}\bigl[\,B_i(T)=0 \ \wedge\ \exists\, t \in (T,\ T+90]:\ B_i(t)=1\,\bigr]
+Y_i(T) = \mathbb{1}\bigl[\,E_i(T)=1 \ \wedge\ B_i(T)=0 \ \wedge\ \exists\, t \in (T,\ T+90]:\ B_i(t)=1\,\bigr]
 \label{eq:target}
 \end{equation}
 
-es decir, entre los clientes que al corte $T$ todavía no cruzaron su umbral, cuáles lo cruzan dentro de los 90 días siguientes. El modelo puntúa en $T$ la probabilidad de $Y_i(T)=1$ con señales que se mueven \emph{antes} del cruce: caída de frecuencia y de ticket respecto del propio historial, y desde el 08/09 reclamos, consultas de soporte y devoluciones. Se valida con holdout temporal (entrenar hasta un corte, evaluar sobre los 90 días siguientes), contra la línea base de ordenar por $\rho_i(T)$.
+es decir, entre los clientes elegibles que al corte $T$ todavía no cruzaron su umbral, cuáles lo cruzan dentro de los 90 días siguientes. La condición $E_i(T)=1$ se agrega en la v2.1 (22/09/2026): un cliente con menos de tres compras no tiene umbral propio y no puede cruzarlo, así que sin esa condición la población del target mezclaría clientes que nunca pueden dar $Y_i(T)=1$ (sección~\ref{sec:proxy-churn}). El modelo puntúa en $T$ la probabilidad de $Y_i(T)=1$ con señales que se mueven \emph{antes} del cruce: caída de frecuencia y de ticket respecto del propio historial, y desde el 08/09 reclamos, consultas de soporte y devoluciones. Se valida con holdout temporal (entrenar hasta un corte, evaluar sobre los 90 días siguientes), contra la línea base de ordenar por $\rho_i(T)$. El dataset de entrenamiento del Entregable 2 materializa esta definición como una fila por cliente elegible y no en riesgo en cada corte mensual $T$, del 31/01/2023 al 30/09/2025, con las features calculadas solo con datos de fecha $\le T$ y el target medido en $(T,\,T+90]$; la partición es por corte (entrenamiento hasta 2024, prueba en 2025), nunca aleatoria.
 
 \textbf{Las ``dos semanas de anticipación'' del alcance} (Parte C, sección 1.2) no son un horizonte de predicción: son el tiempo operativo entre el corte mensual en que se calcula la lista y la salida de la campaña, para que Marketing la reciba antes de que arme el envío del mes. El horizonte de predicción es el de la ecuación~\eqref{eq:target}: 90 días.
 

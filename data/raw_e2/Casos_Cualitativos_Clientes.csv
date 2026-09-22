@@ -1,0 +1,21 @@
+id_caso,id_cliente,tipo_caso,primera_compra,ultima_compra,n_compras_historicas,resumen_corto
+CASO01,CLI03696,Dejo de comprar,2023-03-03,2024-06-06,4,"Compro solo una vez en Hot Sale, sin repetir fuera de esa promo."
+CASO02,CLI03678,Dejo de comprar,2023-04-10,2024-09-10,5,Reclamo de producto defectuoso poco antes de la ultima compra.
+CASO03,CLI00862,Dejo de comprar,2022-10-18,2025-01-16,4,Cliente Bronze con baja frecuencia historica; ultima compra aislada.
+CASO04,CLI04157,Dejo de comprar,2022-05-08,2024-11-12,4,Devolucion registrada en la ultima transaccion.
+CASO05,CLI04050,Dejo de comprar,2023-04-02,2024-09-24,6,Devolucion registrada en la ultima transaccion.
+CASO06,CLI01714,Dejo de comprar,2024-01-18,2024-06-06,3,Devolucion registrada en la ultima transaccion.
+CASO07,CLI00354,Dejo de comprar,2024-01-11,2024-09-24,3,Ultima compra en tienda; sin campanias registradas posteriores.
+CASO08,CLI04591,Dejo de comprar,2023-10-13,2025-02-05,3,Devolucion registrada en la ultima transaccion.
+CASO09,CLI05112,Dejo de comprar,2023-06-24,2024-08-21,5,Reclamo de producto defectuoso poco antes de la ultima compra.
+CASO10,CLI03603,Dejo de comprar,2022-05-14,2023-09-05,3,"Compro solo una vez en Hot Sale, sin repetir fuera de esa promo."
+CASO11,CLI05249,Se fue y volvio,2022-11-21,2025-03-18,6,Volvio a comprar en un canal distinto (paso de tienda a online). (hueco maximo de 320 dias sin comprar).
+CASO12,CLI03308,Se fue y volvio,2023-09-19,2025-05-30,4,Volvio a comprar coincidiendo con Black Friday del anio siguiente. (hueco maximo de 429 dias sin comprar).
+CASO13,CLI00980,Se fue y volvio,2022-08-01,2025-10-31,6,Volvio a comprar en un canal distinto (paso de tienda a online). (hueco maximo de 541 dias sin comprar).
+CASO14,CLI00029,Se fue y volvio,2023-12-29,2025-08-16,5,Volvio a comprar en un canal distinto (paso de tienda a online). (hueco maximo de 318 dias sin comprar).
+CASO15,CLI00800,Se fue y volvio,2023-11-27,2025-07-13,5,Reingreso en otra categoria distinta a la de sus compras iniciales. (hueco maximo de 347 dias sin comprar).
+CASO16,CLI04439,Se fue y volvio,2022-04-28,2025-09-18,5,Reingreso tras campania de reactivacion por SMS. (hueco maximo de 598 dias sin comprar).
+CASO17,CLI04617,Se fue y volvio,2024-12-03,2025-11-15,5,Volvio a comprar coincidiendo con Black Friday del anio siguiente. (hueco maximo de 184 dias sin comprar).
+CASO18,CLI01984,Se fue y volvio,2022-12-01,2025-09-10,6,Reingreso en otra categoria distinta a la de sus compras iniciales. (hueco maximo de 273 dias sin comprar).
+CASO19,CLI04274,Se fue y volvio,2022-03-31,2025-08-13,6,Reingreso tras campania de reactivacion por SMS. (hueco maximo de 530 dias sin comprar).
+CASO20,CLI05651,Se fue y volvio,2022-09-27,2025-08-05,4,Reingreso sin campania asociada visible en el dataset. (hueco maximo de 408 dias sin comprar).

@@ -11,6 +11,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "dev:e2": "vite --config vite.e2.config.js",
+    "build:e2": "vite build --config vite.e2.config.js",
     "todo": "npm run datos && npm run validar && npm run golden && npm run paridad && npm run build"
   },
   "devDependencies": {

@@ -1,0 +1,1212 @@
+id_baja,id_cliente,fecha_solicitud,canal_solicitud,motivo
+BAJA00001,CLI05261,2024-10-21,SMS,Exceso de comunicaciones
+BAJA00002,CLI04186,2026-05-13,Email,Exceso de comunicaciones
+BAJA00003,CLI00487,2025-08-13,Email,No especifica
+BAJA00004,CLI05345,2026-04-09,Email,Ya no es cliente
+BAJA00005,CLI04703,2023-12-28,Email,Exceso de comunicaciones
+BAJA00006,CLI03529,2023-09-28,Email,Pidio no ser contactado en tienda
+BAJA00007,CLI01585,2026-02-16,Tienda,Pidio no ser contactado en tienda
+BAJA00008,CLI00904,2025-01-16,Email,Exceso de comunicaciones
+BAJA00009,CLI01944,2025-05-11,Tienda,Exceso de comunicaciones
+BAJA00010,CLI02100,2026-03-13,Tienda,No especifica
+BAJA00011,CLI02082,2026-06-16,Formulario web,Exceso de comunicaciones
+BAJA00012,CLI02927,2026-02-01,SMS,Exceso de comunicaciones
+BAJA00013,CLI00616,2024-08-13,WhatsApp,Exceso de comunicaciones
+BAJA00014,CLI04937,2026-08-28,Email,Reclamo previo
+BAJA00015,CLI05468,2025-07-10,Email,Exceso de comunicaciones
+BAJA00016,CLI05093,2026-07-29,Formulario web,Exceso de comunicaciones
+BAJA00017,CLI00657,2022-08-18,Formulario web,Exceso de comunicaciones
+BAJA00018,CLI02027,2026-07-06,Email,Ya no es cliente
+BAJA00019,CLI04310,2024-07-09,Tienda,No especifica
+BAJA00020,CLI05939,2024-04-15,Email,No especifica
+BAJA00021,CLI03310,2026-04-17,Tienda,Ya no es cliente
+BAJA00022,CLI04203,2023-10-02,Formulario web,Exceso de comunicaciones
+BAJA00023,CLI02747,2026-08-09,Tienda,No especifica
+BAJA00024,CLI02202,2025-05-23,SMS,Ya no es cliente
+BAJA00025,CLI05663,2024-10-06,Email,No especifica
+BAJA00026,CLI04126,2025-12-09,WhatsApp,No especifica
+BAJA00027,CLI03670,2022-11-15,SMS,Pidio no ser contactado en tienda
+BAJA00028,CLI04697,2023-03-15,Tienda,Reclamo previo
+BAJA00029,CLI04121,2025-08-13,Tienda,No especifica
+BAJA00030,CLI03535,2026-02-28,WhatsApp,Exceso de comunicaciones
+BAJA00031,CLI04292,2022-03-18,Email,Reclamo previo
+BAJA00032,CLI00821,2025-06-24,Email,Ya no es cliente
+BAJA00033,CLI05057,2023-12-13,Email,Exceso de comunicaciones
+BAJA00034,CLI00770,2026-01-01,Email,Pidio no ser contactado en tienda
+BAJA00035,CLI04514,2026-02-21,Formulario web,No especifica
+BAJA00036,CLI04329,2023-10-10,Tienda,No especifica
+BAJA00037,CLI01428,2025-06-17,SMS,Exceso de comunicaciones
+BAJA00038,CLI00488,2023-12-23,WhatsApp,Exceso de comunicaciones
+BAJA00039,CLI02426,2026-08-25,Tienda,Ya no es cliente
+BAJA00040,CLI05767,2025-01-04,Email,Pidio no ser contactado en tienda
+BAJA00041,CLI00054,2026-01-20,Tienda,No especifica
+BAJA00042,CLI05112,2025-07-18,Formulario web,Pidio no ser contactado en tienda
+BAJA00043,CLI01073,2026-02-22,SMS,Ya no es cliente
+BAJA00044,CLI04743,2023-08-27,Email,Pidio no ser contactado en tienda
+BAJA00045,CLI03322,2026-05-25,Tienda,Exceso de comunicaciones
+BAJA00046,CLI04084,2026-02-11,Email,Exceso de comunicaciones
+BAJA00047,CLI04831,2025-02-25,Email,Exceso de comunicaciones
+BAJA00048,CLI01164,2025-08-05,Tienda,Reclamo previo
+BAJA00049,CLI04784,2024-06-17,Tienda,Reclamo previo
+BAJA00050,CLI02871,2025-08-18,Email,Pidio no ser contactado en tienda
+BAJA00051,CLI03956,2026-07-13,Email,Ya no es cliente
+BAJA00052,CLI03238,2026-05-18,SMS,Ya no es cliente
+BAJA00053,CLI00471,2026-03-04,Email,Exceso de comunicaciones
+BAJA00054,CLI04117,2026-01-05,Email,Exceso de comunicaciones
+BAJA00055,CLI02122,2026-05-28,SMS,Ya no es cliente
+BAJA00056,CLI00379,2026-07-30,Tienda,Exceso de comunicaciones
+BAJA00057,CLI04942,2026-05-28,SMS,Pidio no ser contactado en tienda
+BAJA00058,CLI00100,2025-10-10,Email,No especifica
+BAJA00059,CLI00999,2026-03-07,Email,Exceso de comunicaciones
+BAJA00060,CLI02216,2026-05-31,Tienda,Pidio no ser contactado en tienda
+BAJA00061,CLI04254,2026-01-24,Formulario web,Exceso de comunicaciones
+BAJA00062,CLI03822,2024-12-13,Email,Ya no es cliente
+BAJA00063,CLI00430,2026-03-22,Email,Exceso de comunicaciones
+BAJA00064,CLI00395,2025-02-05,SMS,Ya no es cliente
+BAJA00065,CLI03328,2026-08-21,SMS,Reclamo previo
+BAJA00066,CLI05264,2023-09-21,SMS,Exceso de comunicaciones
+BAJA00067,CLI05963,2023-11-29,SMS,No especifica
+BAJA00068,CLI03173,2026-08-18,SMS,Ya no es cliente
+BAJA00069,CLI04326,2026-04-15,Tienda,No especifica
+BAJA00070,CLI02018,2025-07-06,Tienda,Exceso de comunicaciones
+BAJA00071,CLI01887,2024-03-09,Tienda,Exceso de comunicaciones
+BAJA00072,CLI04827,2024-11-28,Email,No especifica
+BAJA00073,CLI03006,2023-12-22,WhatsApp,Exceso de comunicaciones
+BAJA00074,CLI05004,2025-06-05,WhatsApp,Exceso de comunicaciones
+BAJA00075,CLI04790,2025-01-17,Email,Ya no es cliente
+BAJA00076,CLI02804,2025-06-28,Formulario web,Ya no es cliente
+BAJA00077,CLI05829,2025-10-31,Formulario web,Exceso de comunicaciones
+BAJA00078,CLI04307,2026-04-14,Tienda,No especifica
+BAJA00079,CLI03582,2026-04-23,Tienda,Exceso de comunicaciones
+BAJA00080,CLI05070,2026-07-20,WhatsApp,No especifica
+BAJA00081,CLI04332,2024-07-23,Email,Ya no es cliente
+BAJA00082,CLI00927,2025-07-21,Tienda,Pidio no ser contactado en tienda
+BAJA00083,CLI05631,2026-01-30,Tienda,Exceso de comunicaciones
+BAJA00084,CLI05700,2026-02-26,WhatsApp,Reclamo previo
+BAJA00085,CLI04387,2026-02-28,SMS,Exceso de comunicaciones
+BAJA00086,CLI00042,2026-03-07,WhatsApp,Ya no es cliente
+BAJA00087,CLI05844,2023-09-12,SMS,No especifica
+BAJA00088,CLI04984,2025-05-25,Formulario web,No especifica
+BAJA00089,CLI05428,2026-07-09,Email,Exceso de comunicaciones
+BAJA00090,CLI01879,2026-02-04,Email,Exceso de comunicaciones
+BAJA00091,CLI05486,2023-12-15,WhatsApp,Exceso de comunicaciones
+BAJA00092,CLI03039,2026-06-13,Email,Exceso de comunicaciones
+BAJA00093,CLI03854,2026-06-02,WhatsApp,Ya no es cliente
+BAJA00094,CLI04602,2023-10-16,WhatsApp,Exceso de comunicaciones
+BAJA00095,CLI03961,2025-09-29,Email,Exceso de comunicaciones
+BAJA00096,CLI00247,2022-10-11,Tienda,Pidio no ser contactado en tienda
+BAJA00097,CLI01066,2025-06-13,SMS,Ya no es cliente
+BAJA00098,CLI01526,2024-09-27,SMS,Ya no es cliente
+BAJA00099,CLI00684,2023-11-09,SMS,Pidio no ser contactado en tienda
+BAJA00100,CLI01025,2023-03-12,SMS,No especifica
+BAJA00101,CLI05324,2023-10-05,Tienda,Pidio no ser contactado en tienda
+BAJA00102,CLI00375,2023-04-16,SMS,Ya no es cliente
+BAJA00103,CLI05587,2026-01-06,Email,No especifica
+BAJA00104,CLI06011,2025-09-29,Tienda,Ya no es cliente
+BAJA00105,CLI00499,2022-04-25,Tienda,Exceso de comunicaciones
+BAJA00106,CLI05101,2025-08-23,Email,No especifica
+BAJA00107,CLI01057,2025-12-23,Formulario web,Ya no es cliente
+BAJA00108,CLI05326,2025-09-09,WhatsApp,No especifica
+BAJA00109,CLI04156,2024-05-29,Tienda,Pidio no ser contactado en tienda
+BAJA00110,CLI04871,2026-08-04,Email,No especifica
+BAJA00111,CLI02411,2026-02-10,Tienda,Exceso de comunicaciones
+BAJA00112,CLI01386,2025-08-06,Formulario web,No especifica
+BAJA00113,CLI02585,2025-07-01,Formulario web,Pidio no ser contactado en tienda
+BAJA00114,CLI03085,2026-07-30,Email,Exceso de comunicaciones
+BAJA00115,CLI05005,2023-12-02,Tienda,Exceso de comunicaciones
+BAJA00116,CLI04836,2026-07-31,SMS,Exceso de comunicaciones
+BAJA00117,CLI04032,2025-06-28,Email,No especifica
+BAJA00118,CLI02455,2023-11-29,Email,Exceso de comunicaciones
+BAJA00119,CLI02549,2026-05-11,Email,No especifica
+BAJA00120,CLI05121,2024-08-22,Formulario web,Ya no es cliente
+BAJA00121,CLI01171,2026-04-06,Tienda,Ya no es cliente
+BAJA00122,CLI02185,2025-10-31,Email,Pidio no ser contactado en tienda
+BAJA00123,CLI00461,2025-11-01,SMS,No especifica
+BAJA00124,CLI00738,2026-06-29,SMS,Exceso de comunicaciones
+BAJA00125,CLI01297,2026-02-20,Email,Pidio no ser contactado en tienda
+BAJA00126,CLI05597,2025-03-17,Email,No especifica
+BAJA00127,CLI02272,2025-05-28,Tienda,Ya no es cliente
+BAJA00128,CLI02705,2026-06-20,Email,Ya no es cliente
+BAJA00129,CLI04980,2025-10-22,Email,Ya no es cliente
+BAJA00130,CLI02393,2026-08-20,Email,No especifica
+BAJA00131,CLI01091,2026-06-30,Tienda,Pidio no ser contactado en tienda
+BAJA00132,CLI00096,2025-06-17,SMS,Exceso de comunicaciones
+BAJA00133,CLI05886,2026-05-17,Formulario web,Ya no es cliente
+BAJA00134,CLI05403,2023-07-15,Email,Ya no es cliente
+BAJA00135,CLI00709,2024-12-24,WhatsApp,No especifica
+BAJA00136,CLI00420,2025-08-30,SMS,No especifica
+BAJA00137,CLI03789,2026-07-06,Email,Pidio no ser contactado en tienda
+BAJA00138,CLI00145,2025-02-04,Formulario web,Exceso de comunicaciones
+BAJA00139,CLI05714,2024-07-10,Tienda,No especifica
+BAJA00140,CLI03339,2024-07-12,Email,No especifica
+BAJA00141,CLI00585,2026-06-26,Email,Exceso de comunicaciones
+BAJA00142,CLI01306,2025-05-16,SMS,Exceso de comunicaciones
+BAJA00143,CLI03338,2026-06-05,SMS,Exceso de comunicaciones
+BAJA00144,CLI01257,2025-11-05,SMS,Exceso de comunicaciones
+BAJA00145,CLI00498,2025-04-27,Email,No especifica
+BAJA00146,CLI03835,2026-07-08,WhatsApp,Exceso de comunicaciones
+BAJA00147,CLI02370,2022-07-22,Email,No especifica
+BAJA00148,CLI00105,2025-12-28,Tienda,Ya no es cliente
+BAJA00149,CLI01273,2026-06-23,Tienda,Ya no es cliente
+BAJA00150,CLI02506,2023-10-06,Tienda,Ya no es cliente
+BAJA00151,CLI00720,2026-07-13,SMS,Exceso de comunicaciones
+BAJA00152,CLI04990,2025-02-04,Tienda,Exceso de comunicaciones
+BAJA00153,CLI02073,2025-06-04,WhatsApp,Pidio no ser contactado en tienda
+BAJA00154,CLI00505,2026-06-18,Tienda,Pidio no ser contactado en tienda
+BAJA00155,CLI00514,2026-03-04,Tienda,Exceso de comunicaciones
+BAJA00156,CLI02097,2025-07-30,WhatsApp,No especifica
+BAJA00157,CLI02501,2025-05-27,Email,No especifica
+BAJA00158,CLI03209,2026-04-08,SMS,No especifica
+BAJA00159,CLI02742,2024-07-12,Formulario web,Exceso de comunicaciones
+BAJA00160,CLI00113,2025-12-02,Tienda,No especifica
+BAJA00161,CLI02995,2025-12-10,Tienda,Ya no es cliente
+BAJA00162,CLI00765,2024-09-17,Tienda,Exceso de comunicaciones
+BAJA00163,CLI03373,2024-09-27,WhatsApp,Pidio no ser contactado en tienda
+BAJA00164,CLI02356,2022-10-13,Email,No especifica
+BAJA00165,CLI02329,2025-03-10,SMS,Pidio no ser contactado en tienda
+BAJA00166,CLI03713,2025-11-20,Email,Exceso de comunicaciones
+BAJA00167,CLI05162,2026-06-12,Email,Exceso de comunicaciones
+BAJA00168,CLI00242,2026-07-27,SMS,Reclamo previo
+BAJA00169,CLI02948,2026-03-07,Email,No especifica
+BAJA00170,CLI05011,2025-09-16,Tienda,Pidio no ser contactado en tienda
+BAJA00171,CLI04581,2025-11-18,Tienda,Exceso de comunicaciones
+BAJA00172,CLI01503,2023-06-18,WhatsApp,Ya no es cliente
+BAJA00173,CLI02196,2026-07-12,SMS,Exceso de comunicaciones
+BAJA00174,CLI01200,2025-07-26,Email,Pidio no ser contactado en tienda
+BAJA00175,CLI01481,2025-08-22,Email,No especifica
+BAJA00176,CLI01486,2025-08-09,WhatsApp,No especifica
+BAJA00177,CLI02443,2024-11-05,WhatsApp,Exceso de comunicaciones
+BAJA00178,CLI01785,2024-06-21,Email,No especifica
+BAJA00179,CLI01791,2025-05-22,WhatsApp,Ya no es cliente
+BAJA00180,CLI04378,2025-11-07,Email,Exceso de comunicaciones
+BAJA00181,CLI04321,2026-01-08,Tienda,No especifica
+BAJA00182,CLI02604,2025-07-31,WhatsApp,No especifica
+BAJA00183,CLI02040,2024-06-21,Tienda,Ya no es cliente
+BAJA00184,CLI03430,2026-05-18,Tienda,Exceso de comunicaciones
+BAJA00185,CLI02213,2024-08-04,Tienda,Ya no es cliente
+BAJA00186,CLI01381,2026-07-29,Email,Ya no es cliente
+BAJA00187,CLI02754,2025-03-30,Formulario web,No especifica
+BAJA00188,CLI01981,2024-12-24,Formulario web,Ya no es cliente
+BAJA00189,CLI00007,2026-06-23,Email,Reclamo previo
+BAJA00190,CLI02177,2025-10-20,Tienda,Ya no es cliente
+BAJA00191,CLI02088,2023-01-11,Email,No especifica
+BAJA00192,CLI04638,2023-09-22,Email,No especifica
+BAJA00193,CLI05380,2024-12-19,Email,Exceso de comunicaciones
+BAJA00194,CLI01311,2025-04-25,Email,Pidio no ser contactado en tienda
+BAJA00195,CLI05295,2024-11-14,Tienda,Exceso de comunicaciones
+BAJA00196,CLI01380,2026-03-03,Formulario web,Ya no es cliente
+BAJA00197,CLI03413,2025-07-11,Email,Pidio no ser contactado en tienda
+BAJA00198,CLI04101,2026-05-29,WhatsApp,No especifica
+BAJA00199,CLI02851,2026-06-06,Email,No especifica
+BAJA00200,CLI05178,2025-07-16,Email,Exceso de comunicaciones
+BAJA00201,CLI05772,2023-11-07,Formulario web,No especifica
+BAJA00202,CLI00634,2026-04-04,Email,Ya no es cliente
+BAJA00203,CLI04122,2026-05-20,SMS,Exceso de comunicaciones
+BAJA00204,CLI01215,2025-08-05,Tienda,Pidio no ser contactado en tienda
+BAJA00205,CLI02977,2025-02-18,Email,No especifica
+BAJA00206,CLI01153,2024-05-19,WhatsApp,No especifica
+BAJA00207,CLI03466,2025-09-17,Email,Reclamo previo
+BAJA00208,CLI04965,2026-03-14,Email,Ya no es cliente
+BAJA00209,CLI00553,2024-09-28,WhatsApp,Pidio no ser contactado en tienda
+BAJA00210,CLI02171,2025-04-01,Tienda,Exceso de comunicaciones
+BAJA00211,CLI03329,2026-01-30,WhatsApp,No especifica
+BAJA00212,CLI01665,2024-02-08,Email,Exceso de comunicaciones
+BAJA00213,CLI01873,2024-08-16,Tienda,No especifica
+BAJA00214,CLI02584,2025-10-20,Tienda,Exceso de comunicaciones
+BAJA00215,CLI02119,2025-12-20,WhatsApp,Exceso de comunicaciones
+BAJA00216,CLI03773,2025-09-08,Formulario web,Exceso de comunicaciones
+BAJA00217,CLI04108,2026-07-29,Email,Reclamo previo
+BAJA00218,CLI04489,2025-07-31,Email,No especifica
+BAJA00219,CLI00386,2025-02-07,SMS,Ya no es cliente
+BAJA00220,CLI00329,2025-01-13,WhatsApp,Pidio no ser contactado en tienda
+BAJA00221,CLI02904,2025-11-08,Formulario web,No especifica
+BAJA00222,CLI03164,2025-04-10,Tienda,Reclamo previo
+BAJA00223,CLI02583,2024-05-21,WhatsApp,Exceso de comunicaciones
+BAJA00224,CLI00212,2024-07-08,Email,Ya no es cliente
+BAJA00225,CLI01305,2026-01-13,Tienda,No especifica
+BAJA00226,CLI04826,2022-08-17,Tienda,No especifica
+BAJA00227,CLI03072,2025-01-25,Email,Pidio no ser contactado en tienda
+BAJA00228,CLI01936,2025-03-06,Email,Exceso de comunicaciones
+BAJA00229,CLI02286,2024-09-03,Tienda,Exceso de comunicaciones
+BAJA00230,CLI05290,2026-02-18,Email,No especifica
+BAJA00231,CLI00400,2026-06-09,SMS,Reclamo previo
+BAJA00232,CLI03987,2025-08-08,Email,No especifica
+BAJA00233,CLI04565,2025-04-11,Tienda,Pidio no ser contactado en tienda
+BAJA00234,CLI03364,2026-01-08,Email,No especifica
+BAJA00235,CLI01473,2025-11-13,SMS,Exceso de comunicaciones
+BAJA00236,CLI00704,2024-09-20,Formulario web,Pidio no ser contactado en tienda
+BAJA00237,CLI04482,2024-11-03,Email,No especifica
+BAJA00238,CLI05199,2023-08-15,SMS,Pidio no ser contactado en tienda
+BAJA00239,CLI00712,2026-01-30,Email,No especifica
+BAJA00240,CLI00460,2024-06-02,SMS,No especifica
+BAJA00241,CLI04465,2026-02-10,Tienda,Pidio no ser contactado en tienda
+BAJA00242,CLI03141,2026-01-11,Formulario web,Reclamo previo
+BAJA00243,CLI01574,2025-12-25,Email,Exceso de comunicaciones
+BAJA00244,CLI02203,2024-04-16,Email,Exceso de comunicaciones
+BAJA00245,CLI02399,2026-08-16,Email,No especifica
+BAJA00246,CLI02610,2023-04-26,Formulario web,No especifica
+BAJA00247,CLI05327,2025-02-06,Email,Pidio no ser contactado en tienda
+BAJA00248,CLI04545,2025-10-08,Email,Ya no es cliente
+BAJA00249,CLI05347,2026-04-06,WhatsApp,Exceso de comunicaciones
+BAJA00250,CLI03922,2026-01-12,Formulario web,Reclamo previo
+BAJA00251,CLI00769,2026-01-27,Formulario web,Pidio no ser contactado en tienda
+BAJA00252,CLI02903,2025-11-05,WhatsApp,Reclamo previo
+BAJA00253,CLI06013,2025-12-23,SMS,Reclamo previo
+BAJA00254,CLI05678,2023-10-08,Tienda,Reclamo previo
+BAJA00255,CLI02739,2026-07-25,Tienda,Exceso de comunicaciones
+BAJA00256,CLI04071,2024-09-25,Email,Exceso de comunicaciones
+BAJA00257,CLI03325,2025-12-24,WhatsApp,Exceso de comunicaciones
+BAJA00258,CLI03084,2026-05-14,Email,Reclamo previo
+BAJA00259,CLI05450,2026-01-09,Formulario web,Exceso de comunicaciones
+BAJA00260,CLI05096,2025-01-27,WhatsApp,No especifica
+BAJA00261,CLI04702,2025-07-14,Tienda,Reclamo previo
+BAJA00262,CLI00782,2025-12-15,Email,Reclamo previo
+BAJA00263,CLI05226,2025-07-20,SMS,Ya no es cliente
+BAJA00264,CLI00154,2024-11-29,Tienda,No especifica
+BAJA00265,CLI05711,2023-11-01,Email,No especifica
+BAJA00266,CLI05344,2024-05-11,WhatsApp,Exceso de comunicaciones
+BAJA00267,CLI03601,2026-07-10,Tienda,Pidio no ser contactado en tienda
+BAJA00268,CLI04778,2024-11-22,SMS,Ya no es cliente
+BAJA00269,CLI02755,2025-05-01,Email,Reclamo previo
+BAJA00270,CLI02058,2025-03-29,Email,Ya no es cliente
+BAJA00271,CLI02231,2025-05-05,Email,Pidio no ser contactado en tienda
+BAJA00272,CLI02759,2026-01-19,Tienda,No especifica
+BAJA00273,CLI02450,2024-12-28,Email,Exceso de comunicaciones
+BAJA00274,CLI04058,2025-03-05,Tienda,Ya no es cliente
+BAJA00275,CLI05469,2025-10-25,WhatsApp,No especifica
+BAJA00276,CLI03548,2025-06-12,Tienda,Pidio no ser contactado en tienda
+BAJA00277,CLI00511,2025-05-27,Tienda,Exceso de comunicaciones
+BAJA00278,CLI01105,2025-05-27,Email,Pidio no ser contactado en tienda
+BAJA00279,CLI01081,2024-11-25,Tienda,Ya no es cliente
+BAJA00280,CLI05071,2023-04-15,Formulario web,Exceso de comunicaciones
+BAJA00281,CLI04382,2026-07-08,SMS,Ya no es cliente
+BAJA00282,CLI01674,2026-06-23,WhatsApp,Ya no es cliente
+BAJA00283,CLI05548,2025-03-25,SMS,No especifica
+BAJA00284,CLI04492,2025-12-12,Tienda,No especifica
+BAJA00285,CLI00707,2026-02-18,Formulario web,No especifica
+BAJA00286,CLI00063,2026-02-27,Email,Ya no es cliente
+BAJA00287,CLI00326,2025-11-05,Tienda,Ya no es cliente
+BAJA00288,CLI05243,2026-08-16,SMS,Pidio no ser contactado en tienda
+BAJA00289,CLI00748,2025-05-10,Tienda,Ya no es cliente
+BAJA00290,CLI00271,2024-05-26,SMS,Pidio no ser contactado en tienda
+BAJA00291,CLI02001,2026-01-16,Formulario web,Exceso de comunicaciones
+BAJA00292,CLI03860,2025-04-26,Email,Exceso de comunicaciones
+BAJA00293,CLI03349,2025-02-04,Email,Reclamo previo
+BAJA00294,CLI03317,2025-10-02,Tienda,Reclamo previo
+BAJA00295,CLI03180,2026-01-07,Tienda,Exceso de comunicaciones
+BAJA00296,CLI03785,2025-10-12,SMS,Ya no es cliente
+BAJA00297,CLI04475,2026-06-17,Tienda,Exceso de comunicaciones
+BAJA00298,CLI04345,2026-07-16,Email,Reclamo previo
+BAJA00299,CLI02920,2022-10-30,SMS,Exceso de comunicaciones
+BAJA00300,CLI03304,2026-07-16,WhatsApp,Pidio no ser contactado en tienda
+BAJA00301,CLI01280,2024-09-19,WhatsApp,Exceso de comunicaciones
+BAJA00302,CLI05872,2023-09-06,SMS,No especifica
+BAJA00303,CLI04256,2025-07-05,Email,Exceso de comunicaciones
+BAJA00304,CLI05734,2023-05-19,Tienda,Pidio no ser contactado en tienda
+BAJA00305,CLI05143,2026-01-22,Tienda,Ya no es cliente
+BAJA00306,CLI05008,2025-09-16,SMS,Exceso de comunicaciones
+BAJA00307,CLI00470,2026-05-11,Email,Exceso de comunicaciones
+BAJA00308,CLI00288,2025-11-06,Email,Pidio no ser contactado en tienda
+BAJA00309,CLI02314,2023-09-20,Email,No especifica
+BAJA00310,CLI04813,2023-12-14,Email,No especifica
+BAJA00311,CLI01456,2023-11-26,Email,Exceso de comunicaciones
+BAJA00312,CLI05842,2024-04-07,Tienda,Ya no es cliente
+BAJA00313,CLI02407,2026-07-13,Email,Reclamo previo
+BAJA00314,CLI03666,2026-02-27,Email,Exceso de comunicaciones
+BAJA00315,CLI05693,2025-03-12,Tienda,Pidio no ser contactado en tienda
+BAJA00316,CLI01441,2026-05-26,WhatsApp,Ya no es cliente
+BAJA00317,CLI02878,2025-09-23,Email,Exceso de comunicaciones
+BAJA00318,CLI01903,2026-04-20,Email,Reclamo previo
+BAJA00319,CLI01223,2024-06-12,Email,Exceso de comunicaciones
+BAJA00320,CLI05692,2024-03-28,Email,Exceso de comunicaciones
+BAJA00321,CLI02254,2025-08-21,SMS,Exceso de comunicaciones
+BAJA00322,CLI04678,2025-04-16,WhatsApp,Exceso de comunicaciones
+BAJA00323,CLI01395,2026-07-05,Tienda,Exceso de comunicaciones
+BAJA00324,CLI03888,2025-05-29,WhatsApp,Pidio no ser contactado en tienda
+BAJA00325,CLI05614,2024-10-24,Email,Exceso de comunicaciones
+BAJA00326,CLI00173,2026-04-06,Formulario web,Exceso de comunicaciones
+BAJA00327,CLI00494,2026-05-07,SMS,No especifica
+BAJA00328,CLI01525,2026-02-03,Email,Pidio no ser contactado en tienda
+BAJA00329,CLI00156,2025-10-27,Formulario web,Pidio no ser contactado en tienda
+BAJA00330,CLI04352,2026-06-04,Tienda,No especifica
+BAJA00331,CLI04052,2026-05-14,WhatsApp,Exceso de comunicaciones
+BAJA00332,CLI00877,2024-12-02,Formulario web,No especifica
+BAJA00333,CLI00340,2026-06-19,Tienda,Reclamo previo
+BAJA00334,CLI01963,2025-09-19,Tienda,Reclamo previo
+BAJA00335,CLI02852,2026-04-08,Tienda,No especifica
+BAJA00336,CLI01937,2024-04-14,Tienda,Exceso de comunicaciones
+BAJA00337,CLI05973,2024-08-23,Tienda,No especifica
+BAJA00338,CLI03229,2026-07-30,Tienda,Ya no es cliente
+BAJA00339,CLI00496,2025-04-29,Formulario web,No especifica
+BAJA00340,CLI05184,2025-03-05,Tienda,Pidio no ser contactado en tienda
+BAJA00341,CLI00462,2026-04-20,Email,Reclamo previo
+BAJA00342,CLI05037,2025-06-12,Email,Exceso de comunicaciones
+BAJA00343,CLI01279,2026-02-04,Email,Exceso de comunicaciones
+BAJA00344,CLI04579,2023-10-23,Email,Exceso de comunicaciones
+BAJA00345,CLI05353,2026-01-31,SMS,Reclamo previo
+BAJA00346,CLI05640,2023-12-05,SMS,Exceso de comunicaciones
+BAJA00347,CLI05580,2026-04-04,Tienda,Reclamo previo
+BAJA00348,CLI00840,2024-08-21,WhatsApp,Exceso de comunicaciones
+BAJA00349,CLI00901,2026-07-17,SMS,Ya no es cliente
+BAJA00350,CLI00322,2024-05-07,Tienda,Ya no es cliente
+BAJA00351,CLI05534,2026-04-14,WhatsApp,Exceso de comunicaciones
+BAJA00352,CLI01650,2025-07-31,Formulario web,Exceso de comunicaciones
+BAJA00353,CLI00839,2026-01-12,Tienda,No especifica
+BAJA00354,CLI00730,2025-07-29,Formulario web,Exceso de comunicaciones
+BAJA00355,CLI00625,2025-12-23,SMS,Ya no es cliente
+BAJA00356,CLI01115,2024-12-03,Email,No especifica
+BAJA00357,CLI02557,2025-01-15,WhatsApp,Exceso de comunicaciones
+BAJA00358,CLI00759,2024-09-13,Formulario web,Pidio no ser contactado en tienda
+BAJA00359,CLI01123,2025-04-27,Email,No especifica
+BAJA00360,CLI00852,2025-01-07,Tienda,Pidio no ser contactado en tienda
+BAJA00361,CLI02451,2026-04-10,Tienda,Exceso de comunicaciones
+BAJA00362,CLI01252,2024-10-14,Tienda,No especifica
+BAJA00363,CLI05501,2024-03-15,Formulario web,No especifica
+BAJA00364,CLI03798,2024-02-23,SMS,No especifica
+BAJA00365,CLI00046,2025-04-04,Email,Exceso de comunicaciones
+BAJA00366,CLI03345,2025-05-27,Email,Pidio no ser contactado en tienda
+BAJA00367,CLI01497,2023-03-28,Tienda,No especifica
+BAJA00368,CLI02313,2023-04-07,Email,Ya no es cliente
+BAJA00369,CLI05644,2025-11-17,Tienda,No especifica
+BAJA00370,CLI04304,2023-01-27,WhatsApp,Ya no es cliente
+BAJA00371,CLI01067,2026-07-23,Tienda,Exceso de comunicaciones
+BAJA00372,CLI00376,2024-07-26,Tienda,Ya no es cliente
+BAJA00373,CLI01233,2026-04-16,Email,Ya no es cliente
+BAJA00374,CLI05753,2024-04-05,Email,Ya no es cliente
+BAJA00375,CLI01793,2024-12-25,WhatsApp,Exceso de comunicaciones
+BAJA00376,CLI02323,2025-06-01,Tienda,Exceso de comunicaciones
+BAJA00377,CLI00141,2025-10-20,WhatsApp,Pidio no ser contactado en tienda
+BAJA00378,CLI05192,2026-08-04,Formulario web,Ya no es cliente
+BAJA00379,CLI02671,2025-02-09,WhatsApp,Reclamo previo
+BAJA00380,CLI02626,2026-07-02,Formulario web,Pidio no ser contactado en tienda
+BAJA00381,CLI02460,2023-11-28,Tienda,Pidio no ser contactado en tienda
+BAJA00382,CLI04660,2024-04-29,Email,No especifica
+BAJA00383,CLI01765,2025-07-27,SMS,Exceso de comunicaciones
+BAJA00384,CLI05179,2024-08-12,SMS,Ya no es cliente
+BAJA00385,CLI05817,2026-01-17,SMS,Reclamo previo
+BAJA00386,CLI01374,2025-06-25,Email,Exceso de comunicaciones
+BAJA00387,CLI00468,2026-01-30,SMS,Exceso de comunicaciones
+BAJA00388,CLI03606,2026-04-03,SMS,Ya no es cliente
+BAJA00389,CLI03286,2025-07-14,Email,Ya no es cliente
+BAJA00390,CLI02134,2023-12-11,Email,Exceso de comunicaciones
+BAJA00391,CLI02128,2024-01-25,SMS,Pidio no ser contactado en tienda
+BAJA00392,CLI05913,2026-07-28,Tienda,Exceso de comunicaciones
+BAJA00393,CLI04281,2025-02-22,Formulario web,No especifica
+BAJA00394,CLI04176,2024-10-08,Tienda,Exceso de comunicaciones
+BAJA00395,CLI03986,2023-06-08,Tienda,Ya no es cliente
+BAJA00396,CLI04799,2026-05-29,Email,No especifica
+BAJA00397,CLI02179,2024-10-26,WhatsApp,Exceso de comunicaciones
+BAJA00398,CLI03125,2025-01-02,Email,Ya no es cliente
+BAJA00399,CLI02984,2025-09-19,Email,Exceso de comunicaciones
+BAJA00400,CLI03463,2026-04-16,Email,No especifica
+BAJA00401,CLI00678,2024-06-14,Email,Exceso de comunicaciones
+BAJA00402,CLI04065,2024-05-23,Tienda,Reclamo previo
+BAJA00403,CLI03469,2024-05-07,WhatsApp,No especifica
+BAJA00404,CLI02235,2023-12-12,Email,Exceso de comunicaciones
+BAJA00405,CLI05215,2025-06-17,Formulario web,No especifica
+BAJA00406,CLI02222,2024-12-02,Tienda,Exceso de comunicaciones
+BAJA00407,CLI03343,2025-07-04,Email,Exceso de comunicaciones
+BAJA00408,CLI02655,2024-04-08,Email,Exceso de comunicaciones
+BAJA00409,CLI04898,2026-04-08,Tienda,Exceso de comunicaciones
+BAJA00410,CLI03575,2025-07-07,Email,Pidio no ser contactado en tienda
+BAJA00411,CLI02630,2024-10-10,SMS,Exceso de comunicaciones
+BAJA00412,CLI05481,2025-09-18,Tienda,Reclamo previo
+BAJA00413,CLI05970,2026-01-08,Tienda,Pidio no ser contactado en tienda
+BAJA00414,CLI01909,2024-03-30,Formulario web,Exceso de comunicaciones
+BAJA00415,CLI03953,2026-05-04,WhatsApp,Exceso de comunicaciones
+BAJA00416,CLI05857,2026-05-19,Email,Exceso de comunicaciones
+BAJA00417,CLI00662,2025-04-10,Email,Exceso de comunicaciones
+BAJA00418,CLI04290,2025-05-06,SMS,Ya no es cliente
+BAJA00419,CLI00185,2026-05-21,WhatsApp,Pidio no ser contactado en tienda
+BAJA00420,CLI02781,2024-06-22,SMS,Exceso de comunicaciones
+BAJA00421,CLI05252,2026-04-20,Tienda,Exceso de comunicaciones
+BAJA00422,CLI05626,2026-03-27,Email,No especifica
+BAJA00423,CLI05578,2024-11-18,Tienda,Exceso de comunicaciones
+BAJA00424,CLI03970,2024-09-30,Tienda,Ya no es cliente
+BAJA00425,CLI03511,2025-05-28,Email,Ya no es cliente
+BAJA00426,CLI00743,2024-12-25,Tienda,Ya no es cliente
+BAJA00427,CLI03704,2023-06-01,SMS,Exceso de comunicaciones
+BAJA00428,CLI04094,2024-02-07,Formulario web,Ya no es cliente
+BAJA00429,CLI04946,2024-09-12,Formulario web,Pidio no ser contactado en tienda
+BAJA00430,CLI00651,2025-07-18,WhatsApp,No especifica
+BAJA00431,CLI01733,2023-10-24,Email,Ya no es cliente
+BAJA00432,CLI05439,2024-06-14,SMS,Reclamo previo
+BAJA00433,CLI02110,2026-05-15,Tienda,Reclamo previo
+BAJA00434,CLI02306,2026-08-27,SMS,Ya no es cliente
+BAJA00435,CLI00555,2026-01-17,Email,Exceso de comunicaciones
+BAJA00436,CLI01580,2022-12-27,SMS,Exceso de comunicaciones
+BAJA00437,CLI05235,2026-08-21,WhatsApp,Exceso de comunicaciones
+BAJA00438,CLI03420,2026-04-29,Tienda,Ya no es cliente
+BAJA00439,CLI01008,2025-05-01,Tienda,Reclamo previo
+BAJA00440,CLI01836,2025-05-23,WhatsApp,Ya no es cliente
+BAJA00441,CLI02291,2024-11-13,Email,Exceso de comunicaciones
+BAJA00442,CLI05067,2025-08-28,WhatsApp,Pidio no ser contactado en tienda
+BAJA00443,CLI04633,2026-06-18,Email,Pidio no ser contactado en tienda
+BAJA00444,CLI04267,2025-04-10,Email,Exceso de comunicaciones
+BAJA00445,CLI03445,2026-01-14,WhatsApp,Reclamo previo
+BAJA00446,CLI01709,2026-04-02,Tienda,Exceso de comunicaciones
+BAJA00447,CLI03442,2026-07-10,Tienda,Exceso de comunicaciones
+BAJA00448,CLI05461,2024-03-28,Tienda,Ya no es cliente
+BAJA00449,CLI05312,2025-11-11,Tienda,Exceso de comunicaciones
+BAJA00450,CLI01494,2026-03-21,Tienda,No especifica
+BAJA00451,CLI00942,2025-12-24,SMS,No especifica
+BAJA00452,CLI03381,2025-08-02,WhatsApp,Ya no es cliente
+BAJA00453,CLI01248,2024-04-10,WhatsApp,Pidio no ser contactado en tienda
+BAJA00454,CLI01966,2024-12-25,WhatsApp,Ya no es cliente
+BAJA00455,CLI00262,2026-02-16,Email,Ya no es cliente
+BAJA00456,CLI01975,2025-07-14,SMS,Exceso de comunicaciones
+BAJA00457,CLI01028,2025-10-24,SMS,Pidio no ser contactado en tienda
+BAJA00458,CLI05771,2025-08-25,Email,No especifica
+BAJA00459,CLI00630,2022-12-15,WhatsApp,Ya no es cliente
+BAJA00460,CLI05843,2025-05-23,Tienda,Pidio no ser contactado en tienda
+BAJA00461,CLI01908,2024-09-13,Formulario web,Pidio no ser contactado en tienda
+BAJA00462,CLI04259,2026-01-28,SMS,Pidio no ser contactado en tienda
+BAJA00463,CLI03103,2026-08-29,Formulario web,Ya no es cliente
+BAJA00464,CLI00519,2024-07-28,Email,No especifica
+BAJA00465,CLI02224,2026-07-29,Formulario web,No especifica
+BAJA00466,CLI00888,2024-05-12,WhatsApp,Exceso de comunicaciones
+BAJA00467,CLI00190,2026-04-13,Email,Exceso de comunicaciones
+BAJA00468,CLI04020,2025-09-09,WhatsApp,Exceso de comunicaciones
+BAJA00469,CLI01941,2026-06-09,Tienda,Exceso de comunicaciones
+BAJA00470,CLI04323,2026-05-02,WhatsApp,No especifica
+BAJA00471,CLI05845,2026-02-28,Tienda,No especifica
+BAJA00472,CLI04879,2023-01-01,SMS,Pidio no ser contactado en tienda
+BAJA00473,CLI01997,2026-01-31,Email,Exceso de comunicaciones
+BAJA00474,CLI01136,2025-06-23,Tienda,Exceso de comunicaciones
+BAJA00475,CLI03437,2026-04-13,Formulario web,No especifica
+BAJA00476,CLI04252,2026-03-15,Formulario web,Ya no es cliente
+BAJA00477,CLI04622,2024-05-08,Formulario web,Ya no es cliente
+BAJA00478,CLI05082,2024-09-23,Email,Exceso de comunicaciones
+BAJA00479,CLI04474,2023-09-08,Formulario web,Exceso de comunicaciones
+BAJA00480,CLI02865,2025-08-16,Email,No especifica
+BAJA00481,CLI05316,2025-05-04,Formulario web,No especifica
+BAJA00482,CLI03410,2025-08-03,WhatsApp,Pidio no ser contactado en tienda
+BAJA00483,CLI05628,2024-11-21,Email,Reclamo previo
+BAJA00484,CLI05673,2024-09-26,Email,Reclamo previo
+BAJA00485,CLI04148,2026-05-23,Email,Pidio no ser contactado en tienda
+BAJA00486,CLI01436,2024-12-01,Tienda,No especifica
+BAJA00487,CLI01988,2025-10-26,SMS,Reclamo previo
+BAJA00488,CLI05154,2024-05-29,Email,Exceso de comunicaciones
+BAJA00489,CLI02663,2022-11-10,WhatsApp,No especifica
+BAJA00490,CLI01367,2026-05-09,Formulario web,Pidio no ser contactado en tienda
+BAJA00491,CLI02907,2026-01-11,Tienda,Reclamo previo
+BAJA00492,CLI04401,2024-03-11,Email,Reclamo previo
+BAJA00493,CLI03762,2026-07-31,Formulario web,No especifica
+BAJA00494,CLI00570,2024-04-21,Email,Pidio no ser contactado en tienda
+BAJA00495,CLI04436,2025-08-26,WhatsApp,Ya no es cliente
+BAJA00496,CLI05092,2025-05-27,Tienda,No especifica
+BAJA00497,CLI02481,2025-09-14,Email,Reclamo previo
+BAJA00498,CLI00554,2025-08-08,WhatsApp,No especifica
+BAJA00499,CLI04749,2026-02-20,SMS,No especifica
+BAJA00500,CLI04152,2026-04-15,Email,Ya no es cliente
+BAJA00501,CLI05382,2025-05-30,Email,Exceso de comunicaciones
+BAJA00502,CLI01026,2023-01-14,Tienda,Pidio no ser contactado en tienda
+BAJA00503,CLI04956,2025-08-25,SMS,Exceso de comunicaciones
+BAJA00504,CLI05533,2025-01-23,WhatsApp,Ya no es cliente
+BAJA00505,CLI02934,2025-08-25,SMS,Pidio no ser contactado en tienda
+BAJA00506,CLI06025,2026-04-08,Tienda,Reclamo previo
+BAJA00507,CLI01253,2026-04-08,Email,No especifica
+BAJA00508,CLI04324,2025-09-12,Formulario web,No especifica
+BAJA00509,CLI02226,2026-03-09,WhatsApp,Exceso de comunicaciones
+BAJA00510,CLI01813,2025-06-10,Email,Reclamo previo
+BAJA00511,CLI04443,2025-04-19,Tienda,Reclamo previo
+BAJA00512,CLI03453,2025-02-14,Tienda,Pidio no ser contactado en tienda
+BAJA00513,CLI05307,2025-04-25,Email,Exceso de comunicaciones
+BAJA00514,CLI04204,2026-06-16,Email,Exceso de comunicaciones
+BAJA00515,CLI02722,2025-05-08,Formulario web,Exceso de comunicaciones
+BAJA00516,CLI04986,2025-09-29,Tienda,No especifica
+BAJA00517,CLI05522,2023-03-27,Tienda,Ya no es cliente
+BAJA00518,CLI01283,2026-05-10,Email,Reclamo previo
+BAJA00519,CLI03729,2022-09-01,Email,Ya no es cliente
+BAJA00520,CLI01118,2026-02-08,WhatsApp,No especifica
+BAJA00521,CLI05169,2023-10-03,Email,No especifica
+BAJA00522,CLI01924,2026-01-05,Email,Reclamo previo
+BAJA00523,CLI00033,2026-06-05,Email,No especifica
+BAJA00524,CLI03351,2025-08-14,WhatsApp,Ya no es cliente
+BAJA00525,CLI00369,2026-03-22,SMS,Exceso de comunicaciones
+BAJA00526,CLI03779,2024-01-01,Formulario web,Exceso de comunicaciones
+BAJA00527,CLI04046,2025-06-02,WhatsApp,No especifica
+BAJA00528,CLI02257,2025-12-20,Email,Exceso de comunicaciones
+BAJA00529,CLI02620,2026-02-07,Tienda,Ya no es cliente
+BAJA00530,CLI01917,2024-08-09,WhatsApp,No especifica
+BAJA00531,CLI03314,2025-08-22,WhatsApp,Exceso de comunicaciones
+BAJA00532,CLI01656,2025-08-19,Email,No especifica
+BAJA00533,CLI00222,2026-06-18,Email,No especifica
+BAJA00534,CLI01845,2025-05-22,Email,No especifica
+BAJA00535,CLI03337,2026-02-04,Email,Ya no es cliente
+BAJA00536,CLI04251,2023-04-28,Email,Exceso de comunicaciones
+BAJA00537,CLI00176,2025-08-20,Tienda,Ya no es cliente
+BAJA00538,CLI05269,2026-02-10,Email,Exceso de comunicaciones
+BAJA00539,CLI04523,2026-04-01,Tienda,Exceso de comunicaciones
+BAJA00540,CLI00101,2026-01-27,Email,Exceso de comunicaciones
+BAJA00541,CLI04011,2024-09-10,WhatsApp,Exceso de comunicaciones
+BAJA00542,CLI02653,2026-02-04,WhatsApp,Exceso de comunicaciones
+BAJA00543,CLI04447,2023-04-30,WhatsApp,Reclamo previo
+BAJA00544,CLI03553,2023-12-04,Email,No especifica
+BAJA00545,CLI05607,2025-11-24,Email,No especifica
+BAJA00546,CLI02438,2024-11-21,Tienda,Pidio no ser contactado en tienda
+BAJA00547,CLI00241,2026-01-19,Email,No especifica
+BAJA00548,CLI03021,2024-11-28,Email,No especifica
+BAJA00549,CLI02664,2026-01-14,Formulario web,Exceso de comunicaciones
+BAJA00550,CLI01373,2026-03-24,Tienda,Ya no es cliente
+BAJA00551,CLI05176,2024-03-24,Tienda,Exceso de comunicaciones
+BAJA00552,CLI03069,2024-12-11,Tienda,Pidio no ser contactado en tienda
+BAJA00553,CLI04650,2026-04-22,Email,No especifica
+BAJA00554,CLI04878,2026-04-14,Email,Ya no es cliente
+BAJA00555,CLI01762,2026-02-16,Formulario web,Pidio no ser contactado en tienda
+BAJA00556,CLI05834,2026-05-21,WhatsApp,No especifica
+BAJA00557,CLI05356,2024-07-15,Tienda,Ya no es cliente
+BAJA00558,CLI02990,2025-02-01,Tienda,Exceso de comunicaciones
+BAJA00559,CLI02382,2026-06-02,Tienda,No especifica
+BAJA00560,CLI01781,2022-05-15,SMS,No especifica
+BAJA00561,CLI02419,2025-12-30,WhatsApp,Pidio no ser contactado en tienda
+BAJA00562,CLI03850,2025-10-19,Email,Exceso de comunicaciones
+BAJA00563,CLI05826,2025-12-12,WhatsApp,Pidio no ser contactado en tienda
+BAJA00564,CLI06028,2023-01-07,WhatsApp,Ya no es cliente
+BAJA00565,CLI02598,2024-03-22,Tienda,Exceso de comunicaciones
+BAJA00566,CLI03786,2025-12-29,Tienda,Ya no es cliente
+BAJA00567,CLI00356,2024-06-18,Email,Exceso de comunicaciones
+BAJA00568,CLI00364,2023-06-27,Email,Exceso de comunicaciones
+BAJA00569,CLI00252,2024-03-20,Email,No especifica
+BAJA00570,CLI05593,2022-11-26,Tienda,Exceso de comunicaciones
+BAJA00571,CLI03683,2025-12-01,Email,Pidio no ser contactado en tienda
+BAJA00572,CLI05225,2024-12-09,Tienda,Reclamo previo
+BAJA00573,CLI03353,2023-12-16,Tienda,Exceso de comunicaciones
+BAJA00574,CLI04674,2025-09-25,SMS,Ya no es cliente
+BAJA00575,CLI05017,2023-03-20,SMS,No especifica
+BAJA00576,CLI01770,2025-12-20,Email,Exceso de comunicaciones
+BAJA00577,CLI02793,2026-01-29,Tienda,Exceso de comunicaciones
+BAJA00578,CLI05430,2025-07-26,Tienda,Exceso de comunicaciones
+BAJA00579,CLI00937,2022-11-24,Tienda,Exceso de comunicaciones
+BAJA00580,CLI05915,2025-06-08,SMS,Pidio no ser contactado en tienda
+BAJA00581,CLI03142,2025-01-22,Tienda,Exceso de comunicaciones
+BAJA00582,CLI05443,2023-10-08,WhatsApp,No especifica
+BAJA00583,CLI01711,2026-05-12,Email,Ya no es cliente
+BAJA00584,CLI05618,2025-10-13,Tienda,Pidio no ser contactado en tienda
+BAJA00585,CLI03740,2025-07-17,Tienda,Ya no es cliente
+BAJA00586,CLI05390,2026-05-22,SMS,Exceso de comunicaciones
+BAJA00587,CLI05539,2022-03-31,Email,Exceso de comunicaciones
+BAJA00588,CLI01237,2023-04-24,Email,Exceso de comunicaciones
+BAJA00589,CLI00623,2026-03-13,WhatsApp,No especifica
+BAJA00590,CLI01440,2025-07-03,Formulario web,Ya no es cliente
+BAJA00591,CLI06017,2026-03-25,SMS,Exceso de comunicaciones
+BAJA00592,CLI02828,2025-08-19,Tienda,No especifica
+BAJA00593,CLI05033,2022-07-29,Email,Exceso de comunicaciones
+BAJA00594,CLI01398,2025-10-30,Email,Exceso de comunicaciones
+BAJA00595,CLI02826,2025-02-22,SMS,Pidio no ser contactado en tienda
+BAJA00596,CLI01290,2025-10-23,Email,Exceso de comunicaciones
+BAJA00597,CLI04793,2026-05-05,Tienda,Pidio no ser contactado en tienda
+BAJA00598,CLI03690,2026-07-09,Email,Reclamo previo
+BAJA00599,CLI01654,2024-12-19,Tienda,Ya no es cliente
+BAJA00600,CLI05452,2024-08-18,Tienda,Exceso de comunicaciones
+BAJA00601,CLI02413,2024-10-10,Tienda,Exceso de comunicaciones
+BAJA00602,CLI00389,2026-04-25,Formulario web,Exceso de comunicaciones
+BAJA00603,CLI04403,2025-10-19,Tienda,Ya no es cliente
+BAJA00604,CLI05354,2022-08-10,Formulario web,Pidio no ser contactado en tienda
+BAJA00605,CLI02745,2026-07-31,WhatsApp,Pidio no ser contactado en tienda
+BAJA00606,CLI01783,2026-06-11,Email,No especifica
+BAJA00607,CLI05292,2025-07-16,Formulario web,Reclamo previo
+BAJA00608,CLI03863,2025-07-16,Email,Exceso de comunicaciones
+BAJA00609,CLI01396,2025-11-16,Email,No especifica
+BAJA00610,CLI05561,2025-08-07,SMS,Exceso de comunicaciones
+BAJA00611,CLI01461,2022-09-06,SMS,Reclamo previo
+BAJA00612,CLI05563,2025-01-07,SMS,Exceso de comunicaciones
+BAJA00613,CLI04397,2023-05-25,Email,Exceso de comunicaciones
+BAJA00614,CLI00187,2026-08-08,Email,Exceso de comunicaciones
+BAJA00615,CLI05453,2026-02-01,Tienda,Reclamo previo
+BAJA00616,CLI00441,2025-09-10,Tienda,Exceso de comunicaciones
+BAJA00617,CLI03073,2025-04-23,Formulario web,Ya no es cliente
+BAJA00618,CLI04851,2025-08-13,Formulario web,No especifica
+BAJA00619,CLI04276,2025-11-08,Formulario web,Ya no es cliente
+BAJA00620,CLI02153,2024-02-25,Formulario web,Exceso de comunicaciones
+BAJA00621,CLI02427,2024-11-27,Email,Pidio no ser contactado en tienda
+BAJA00622,CLI02527,2026-02-12,Email,Exceso de comunicaciones
+BAJA00623,CLI01528,2024-06-03,Email,Ya no es cliente
+BAJA00624,CLI03276,2024-08-09,Formulario web,No especifica
+BAJA00625,CLI03982,2023-04-08,Email,Pidio no ser contactado en tienda
+BAJA00626,CLI00414,2026-01-03,Formulario web,No especifica
+BAJA00627,CLI01581,2026-02-20,WhatsApp,Pidio no ser contactado en tienda
+BAJA00628,CLI05296,2025-05-25,WhatsApp,Pidio no ser contactado en tienda
+BAJA00629,CLI00210,2025-12-30,Formulario web,No especifica
+BAJA00630,CLI05014,2024-07-16,WhatsApp,Ya no es cliente
+BAJA00631,CLI02710,2026-01-25,SMS,Pidio no ser contactado en tienda
+BAJA00632,CLI00956,2025-10-24,Formulario web,Ya no es cliente
+BAJA00633,CLI03638,2025-11-18,Formulario web,Ya no es cliente
+BAJA00634,CLI03096,2024-12-14,SMS,Reclamo previo
+BAJA00635,CLI05373,2025-04-15,Tienda,Reclamo previo
+BAJA00636,CLI00997,2024-05-17,Formulario web,Exceso de comunicaciones
+BAJA00637,CLI05262,2025-04-05,Email,Exceso de comunicaciones
+BAJA00638,CLI05015,2026-03-22,Tienda,No especifica
+BAJA00639,CLI05098,2024-11-17,Email,Ya no es cliente
+BAJA00640,CLI02312,2024-08-29,Email,Pidio no ser contactado en tienda
+BAJA00641,CLI01132,2026-01-15,Tienda,No especifica
+BAJA00642,CLI00638,2025-09-28,Email,No especifica
+BAJA00643,CLI03676,2024-11-08,Email,No especifica
+BAJA00644,CLI04299,2024-07-29,Tienda,Ya no es cliente
+BAJA00645,CLI03926,2025-10-17,Email,No especifica
+BAJA00646,CLI04513,2023-03-12,Tienda,Pidio no ser contactado en tienda
+BAJA00647,CLI01135,2026-01-19,WhatsApp,Exceso de comunicaciones
+BAJA00648,CLI03004,2025-01-30,Tienda,Exceso de comunicaciones
+BAJA00649,CLI00438,2024-06-13,Tienda,No especifica
+BAJA00650,CLI00229,2026-04-05,Email,Exceso de comunicaciones
+BAJA00651,CLI04716,2024-09-14,Formulario web,Ya no es cliente
+BAJA00652,CLI02694,2024-09-23,Tienda,No especifica
+BAJA00653,CLI05410,2026-02-20,Formulario web,No especifica
+BAJA00654,CLI04853,2025-12-17,Tienda,Ya no es cliente
+BAJA00655,CLI03741,2022-11-20,Formulario web,Pidio no ser contactado en tienda
+BAJA00656,CLI05609,2026-01-31,Email,No especifica
+BAJA00657,CLI01861,2024-12-10,SMS,Exceso de comunicaciones
+BAJA00658,CLI01744,2024-09-07,Email,Pidio no ser contactado en tienda
+BAJA00659,CLI05140,2025-12-28,SMS,Exceso de comunicaciones
+BAJA00660,CLI00693,2024-03-23,WhatsApp,Exceso de comunicaciones
+BAJA00661,CLI03049,2025-09-12,Tienda,Reclamo previo
+BAJA00662,CLI05938,2025-11-21,Tienda,Exceso de comunicaciones
+BAJA00663,CLI05659,2022-11-14,Email,Exceso de comunicaciones
+BAJA00664,CLI00529,2025-06-10,Formulario web,Pidio no ser contactado en tienda
+BAJA00665,CLI01144,2026-08-16,SMS,Ya no es cliente
+BAJA00666,CLI06004,2024-12-19,Email,Exceso de comunicaciones
+BAJA00667,CLI03969,2025-03-27,Email,No especifica
+BAJA00668,CLI02978,2024-11-23,Email,Reclamo previo
+BAJA00669,CLI00079,2024-10-03,SMS,Ya no es cliente
+BAJA00670,CLI04496,2024-11-22,Tienda,Ya no es cliente
+BAJA00671,CLI03515,2026-08-23,SMS,Exceso de comunicaciones
+BAJA00672,CLI05030,2026-06-20,SMS,Ya no es cliente
+BAJA00673,CLI03861,2023-02-06,Tienda,Ya no es cliente
+BAJA00674,CLI05981,2024-10-04,Email,Ya no es cliente
+BAJA00675,CLI04484,2026-08-13,Email,Pidio no ser contactado en tienda
+BAJA00676,CLI01099,2026-07-16,WhatsApp,No especifica
+BAJA00677,CLI01050,2025-01-11,Formulario web,No especifica
+BAJA00678,CLI01693,2023-06-24,WhatsApp,Exceso de comunicaciones
+BAJA00679,CLI03521,2026-01-17,Email,Ya no es cliente
+BAJA00680,CLI03583,2025-09-20,WhatsApp,Ya no es cliente
+BAJA00681,CLI01379,2025-02-16,Tienda,Exceso de comunicaciones
+BAJA00682,CLI03294,2026-06-24,WhatsApp,Pidio no ser contactado en tienda
+BAJA00683,CLI05174,2026-03-06,Formulario web,Ya no es cliente
+BAJA00684,CLI04074,2025-12-20,Tienda,No especifica
+BAJA00685,CLI04110,2026-02-01,SMS,Pidio no ser contactado en tienda
+BAJA00686,CLI01653,2026-08-12,WhatsApp,No especifica
+BAJA00687,CLI02188,2026-05-29,WhatsApp,Exceso de comunicaciones
+BAJA00688,CLI03201,2025-02-15,WhatsApp,Exceso de comunicaciones
+BAJA00689,CLI01100,2025-09-21,Email,Ya no es cliente
+BAJA00690,CLI00832,2025-07-06,WhatsApp,Ya no es cliente
+BAJA00691,CLI05831,2024-07-03,SMS,No especifica
+BAJA00692,CLI03283,2026-06-10,Tienda,Ya no es cliente
+BAJA00693,CLI03919,2026-06-13,Email,Ya no es cliente
+BAJA00694,CLI05329,2025-08-06,Email,No especifica
+BAJA00695,CLI00215,2026-02-04,Email,Ya no es cliente
+BAJA00696,CLI01245,2023-08-12,Email,Pidio no ser contactado en tienda
+BAJA00697,CLI02158,2026-07-11,Tienda,No especifica
+BAJA00698,CLI05388,2026-05-29,WhatsApp,Pidio no ser contactado en tienda
+BAJA00699,CLI01035,2023-11-15,Tienda,Pidio no ser contactado en tienda
+BAJA00700,CLI02727,2025-12-28,Tienda,No especifica
+BAJA00701,CLI04008,2023-06-25,Email,Exceso de comunicaciones
+BAJA00702,CLI00218,2025-03-03,WhatsApp,No especifica
+BAJA00703,CLI00908,2025-08-08,WhatsApp,No especifica
+BAJA00704,CLI03728,2026-03-29,Tienda,Ya no es cliente
+BAJA00705,CLI04409,2025-06-16,SMS,Ya no es cliente
+BAJA00706,CLI01717,2025-12-22,WhatsApp,Ya no es cliente
+BAJA00707,CLI01651,2026-05-20,Tienda,Reclamo previo
+BAJA00708,CLI03679,2024-08-01,WhatsApp,No especifica
+BAJA00709,CLI03030,2023-04-06,Email,No especifica
+BAJA00710,CLI01834,2026-01-04,Tienda,Pidio no ser contactado en tienda
+BAJA00711,CLI01037,2025-07-26,Tienda,No especifica
+BAJA00712,CLI01662,2023-01-10,Formulario web,No especifica
+BAJA00713,CLI00313,2025-08-22,Email,Exceso de comunicaciones
+BAJA00714,CLI05594,2025-01-09,Tienda,Ya no es cliente
+BAJA00715,CLI02574,2025-11-08,Tienda,Exceso de comunicaciones
+BAJA00716,CLI04356,2025-05-13,Formulario web,No especifica
+BAJA00717,CLI01198,2026-03-25,Formulario web,Ya no es cliente
+BAJA00718,CLI02421,2024-05-15,Formulario web,No especifica
+BAJA00719,CLI02118,2024-03-08,Tienda,No especifica
+BAJA00720,CLI00188,2022-10-29,Email,Ya no es cliente
+BAJA00721,CLI02434,2024-02-04,Email,No especifica
+BAJA00722,CLI02251,2025-08-15,WhatsApp,Reclamo previo
+BAJA00723,CLI04014,2026-04-30,Email,Ya no es cliente
+BAJA00724,CLI00366,2026-01-23,Email,Exceso de comunicaciones
+BAJA00725,CLI05420,2023-05-11,SMS,No especifica
+BAJA00726,CLI05968,2026-03-07,Email,No especifica
+BAJA00727,CLI00406,2025-01-10,Tienda,Exceso de comunicaciones
+BAJA00728,CLI04889,2025-01-31,Tienda,Exceso de comunicaciones
+BAJA00729,CLI05803,2025-12-06,SMS,No especifica
+BAJA00730,CLI03996,2024-11-17,Email,Ya no es cliente
+BAJA00731,CLI02208,2022-12-14,Tienda,No especifica
+BAJA00732,CLI04632,2025-08-25,Email,Ya no es cliente
+BAJA00733,CLI04529,2026-06-07,Tienda,Exceso de comunicaciones
+BAJA00734,CLI05244,2025-09-30,Tienda,Exceso de comunicaciones
+BAJA00735,CLI01707,2023-06-08,Tienda,No especifica
+BAJA00736,CLI01536,2025-09-16,Tienda,Reclamo previo
+BAJA00737,CLI04998,2024-11-27,Email,No especifica
+BAJA00738,CLI02580,2024-11-07,WhatsApp,Exceso de comunicaciones
+BAJA00739,CLI05624,2024-10-02,Tienda,Exceso de comunicaciones
+BAJA00740,CLI04912,2026-04-19,Tienda,Ya no es cliente
+BAJA00741,CLI04361,2026-02-22,Tienda,Exceso de comunicaciones
+BAJA00742,CLI01562,2025-04-16,Email,Reclamo previo
+BAJA00743,CLI03541,2025-06-14,SMS,Reclamo previo
+BAJA00744,CLI01938,2026-07-10,Formulario web,Exceso de comunicaciones
+BAJA00745,CLI02138,2026-04-28,Formulario web,Ya no es cliente
+BAJA00746,CLI05568,2025-07-01,Email,No especifica
+BAJA00747,CLI01116,2026-07-15,Email,Ya no es cliente
+BAJA00748,CLI05741,2026-03-07,WhatsApp,Exceso de comunicaciones
+BAJA00749,CLI05160,2026-01-21,Email,Pidio no ser contactado en tienda
+BAJA00750,CLI00729,2022-04-27,Tienda,Pidio no ser contactado en tienda
+BAJA00751,CLI03292,2023-09-24,Tienda,Ya no es cliente
+BAJA00752,CLI00277,2025-03-21,WhatsApp,Exceso de comunicaciones
+BAJA00753,CLI03471,2023-10-31,Formulario web,No especifica
+BAJA00754,CLI05387,2026-07-03,SMS,Ya no es cliente
+BAJA00755,CLI04709,2024-11-09,Email,Reclamo previo
+BAJA00756,CLI02896,2024-12-31,Formulario web,Ya no es cliente
+BAJA00757,CLI05836,2025-03-18,WhatsApp,Exceso de comunicaciones
+BAJA00758,CLI05620,2026-05-19,Email,Pidio no ser contactado en tienda
+BAJA00759,CLI05643,2025-07-08,Email,No especifica
+BAJA00760,CLI02295,2025-10-15,Tienda,Exceso de comunicaciones
+BAJA00761,CLI02841,2025-07-11,WhatsApp,No especifica
+BAJA00762,CLI02567,2026-05-31,Tienda,No especifica
+BAJA00763,CLI05991,2026-01-21,Email,No especifica
+BAJA00764,CLI00970,2025-11-15,Tienda,Reclamo previo
+BAJA00765,CLI03634,2024-12-07,Email,Exceso de comunicaciones
+BAJA00766,CLI02783,2023-07-17,Email,Exceso de comunicaciones
+BAJA00767,CLI03754,2025-04-15,Tienda,No especifica
+BAJA00768,CLI00715,2026-04-12,Tienda,Ya no es cliente
+BAJA00769,CLI04456,2026-02-10,WhatsApp,Exceso de comunicaciones
+BAJA00770,CLI04766,2026-08-09,SMS,Reclamo previo
+BAJA00771,CLI05300,2024-05-29,WhatsApp,Ya no es cliente
+BAJA00772,CLI02045,2025-06-04,Email,No especifica
+BAJA00773,CLI01433,2022-07-04,Email,Exceso de comunicaciones
+BAJA00774,CLI01925,2026-04-26,Tienda,No especifica
+BAJA00775,CLI04967,2026-04-02,Email,Reclamo previo
+BAJA00776,CLI01764,2024-05-22,Tienda,No especifica
+BAJA00777,CLI05574,2026-08-29,Email,No especifica
+BAJA00778,CLI03235,2026-02-02,SMS,No especifica
+BAJA00779,CLI04881,2025-08-15,WhatsApp,Pidio no ser contactado en tienda
+BAJA00780,CLI04112,2024-08-13,Formulario web,Exceso de comunicaciones
+BAJA00781,CLI02648,2025-09-08,Email,Ya no es cliente
+BAJA00782,CLI06037,2025-04-10,SMS,Pidio no ser contactado en tienda
+BAJA00783,CLI00331,2026-06-10,SMS,No especifica
+BAJA00784,CLI03075,2025-12-01,Email,Reclamo previo
+BAJA00785,CLI00905,2026-07-13,Formulario web,Ya no es cliente
+BAJA00786,CLI02666,2025-12-16,Email,No especifica
+BAJA00787,CLI05475,2024-08-29,Email,Ya no es cliente
+BAJA00788,CLI05690,2026-02-17,SMS,Exceso de comunicaciones
+BAJA00789,CLI03170,2023-11-05,Email,Exceso de comunicaciones
+BAJA00790,CLI05047,2025-09-24,Email,Ya no es cliente
+BAJA00791,CLI02564,2026-05-23,WhatsApp,Exceso de comunicaciones
+BAJA00792,CLI00865,2025-10-22,Email,Ya no es cliente
+BAJA00793,CLI01281,2025-12-05,Email,No especifica
+BAJA00794,CLI02492,2025-10-25,Email,Reclamo previo
+BAJA00795,CLI02101,2025-03-27,Email,Exceso de comunicaciones
+BAJA00796,CLI03263,2026-05-29,Tienda,No especifica
+BAJA00797,CLI01874,2025-05-29,SMS,Exceso de comunicaciones
+BAJA00798,CLI04626,2026-04-12,Formulario web,Exceso de comunicaciones
+BAJA00799,CLI05421,2026-01-09,Tienda,Exceso de comunicaciones
+BAJA00800,CLI04114,2025-12-11,SMS,Ya no es cliente
+BAJA00801,CLI03721,2026-04-21,Tienda,Exceso de comunicaciones
+BAJA00802,CLI05538,2026-06-28,SMS,No especifica
+BAJA00803,CLI05547,2025-09-10,Formulario web,Pidio no ser contactado en tienda
+BAJA00804,CLI05679,2024-12-12,Email,Ya no es cliente
+BAJA00805,CLI00779,2025-08-15,Email,No especifica
+BAJA00806,CLI01194,2024-11-05,Email,No especifica
+BAJA00807,CLI05964,2024-07-19,SMS,Exceso de comunicaciones
+BAJA00808,CLI02505,2024-06-16,SMS,Reclamo previo
+BAJA00809,CLI05536,2025-05-18,Formulario web,Pidio no ser contactado en tienda
+BAJA00810,CLI02047,2025-07-30,Formulario web,No especifica
+BAJA00811,CLI03671,2026-07-15,Email,No especifica
+BAJA00812,CLI02923,2025-02-23,SMS,No especifica
+BAJA00813,CLI00517,2024-08-18,Tienda,Exceso de comunicaciones
+BAJA00814,CLI02352,2025-11-02,SMS,No especifica
+BAJA00815,CLI04437,2026-03-15,Email,No especifica
+BAJA00816,CLI05718,2026-05-31,Tienda,No especifica
+BAJA00817,CLI05686,2025-12-15,SMS,Exceso de comunicaciones
+BAJA00818,CLI05438,2025-01-07,Email,Pidio no ser contactado en tienda
+BAJA00819,CLI04619,2024-01-10,Email,Ya no es cliente
+BAJA00820,CLI01979,2026-08-01,SMS,Ya no es cliente
+BAJA00821,CLI01578,2023-06-10,Email,No especifica
+BAJA00822,CLI00556,2024-09-20,Email,Exceso de comunicaciones
+BAJA00823,CLI04585,2023-12-28,SMS,Exceso de comunicaciones
+BAJA00824,CLI00221,2023-07-20,SMS,Pidio no ser contactado en tienda
+BAJA00825,CLI02209,2024-05-27,Email,No especifica
+BAJA00826,CLI02340,2025-08-05,SMS,Ya no es cliente
+BAJA00827,CLI00206,2026-05-02,Tienda,No especifica
+BAJA00828,CLI00346,2026-06-29,Tienda,No especifica
+BAJA00829,CLI01692,2026-06-09,Formulario web,Exceso de comunicaciones
+BAJA00830,CLI04234,2026-03-26,Tienda,No especifica
+BAJA00831,CLI01012,2025-11-20,Formulario web,Ya no es cliente
+BAJA00832,CLI05648,2023-12-30,Tienda,Ya no es cliente
+BAJA00833,CLI03202,2022-11-15,Tienda,No especifica
+BAJA00834,CLI04132,2026-07-05,WhatsApp,No especifica
+BAJA00835,CLI05350,2025-08-02,Formulario web,Exceso de comunicaciones
+BAJA00836,CLI04219,2024-11-17,Email,No especifica
+BAJA00837,CLI01031,2024-06-09,Email,Ya no es cliente
+BAJA00838,CLI03293,2025-06-02,Email,Exceso de comunicaciones
+BAJA00839,CLI05995,2026-02-25,Tienda,Ya no es cliente
+BAJA00840,CLI02362,2022-10-15,Email,Exceso de comunicaciones
+BAJA00841,CLI02486,2026-05-30,Formulario web,Ya no es cliente
+BAJA00842,CLI03370,2026-05-20,Email,Ya no es cliente
+BAJA00843,CLI05308,2026-04-16,WhatsApp,Reclamo previo
+BAJA00844,CLI01749,2025-12-20,Tienda,Ya no es cliente
+BAJA00845,CLI05520,2023-11-25,Email,Reclamo previo
+BAJA00846,CLI04009,2025-10-31,Email,No especifica
+BAJA00847,CLI03243,2026-08-20,Tienda,Ya no es cliente
+BAJA00848,CLI03398,2025-11-11,SMS,Exceso de comunicaciones
+BAJA00849,CLI04064,2026-01-09,WhatsApp,Ya no es cliente
+BAJA00850,CLI02132,2026-05-06,SMS,No especifica
+BAJA00851,CLI01174,2026-02-04,Formulario web,Exceso de comunicaciones
+BAJA00852,CLI00442,2026-01-14,SMS,Pidio no ser contactado en tienda
+BAJA00853,CLI00459,2024-12-11,Email,Pidio no ser contactado en tienda
+BAJA00854,CLI02061,2025-05-17,SMS,No especifica
+BAJA00855,CLI00710,2026-07-06,SMS,Ya no es cliente
+BAJA00856,CLI05370,2025-03-16,WhatsApp,Exceso de comunicaciones
+BAJA00857,CLI00522,2024-02-29,Email,Ya no es cliente
+BAJA00858,CLI04037,2024-11-21,Email,Exceso de comunicaciones
+BAJA00859,CLI00269,2023-03-12,Tienda,Ya no es cliente
+BAJA00860,CLI03928,2026-06-17,Tienda,No especifica
+BAJA00861,CLI04322,2025-08-28,Formulario web,Exceso de comunicaciones
+BAJA00862,CLI00601,2025-11-20,Tienda,Ya no es cliente
+BAJA00863,CLI01062,2026-01-10,SMS,Pidio no ser contactado en tienda
+BAJA00864,CLI01549,2026-03-30,Email,Pidio no ser contactado en tienda
+BAJA00865,CLI01053,2026-03-24,Tienda,Exceso de comunicaciones
+BAJA00866,CLI00220,2025-02-02,Email,No especifica
+BAJA00867,CLI01495,2026-07-26,Tienda,No especifica
+BAJA00868,CLI01161,2023-01-19,Formulario web,Ya no es cliente
+BAJA00869,CLI04277,2025-12-04,WhatsApp,Reclamo previo
+BAJA00870,CLI04184,2026-01-21,Email,Reclamo previo
+BAJA00871,CLI05394,2024-09-22,SMS,Ya no es cliente
+BAJA00872,CLI05855,2025-08-10,Email,Ya no es cliente
+BAJA00873,CLI02318,2025-03-23,Tienda,Reclamo previo
+BAJA00874,CLI00203,2026-06-23,SMS,Exceso de comunicaciones
+BAJA00875,CLI01300,2025-12-31,WhatsApp,Exceso de comunicaciones
+BAJA00876,CLI01977,2026-02-21,SMS,No especifica
+BAJA00877,CLI00816,2022-11-03,Email,Ya no es cliente
+BAJA00878,CLI04822,2024-01-23,WhatsApp,No especifica
+BAJA00879,CLI03303,2025-05-12,Email,No especifica
+BAJA00880,CLI05918,2024-03-29,Tienda,Exceso de comunicaciones
+BAJA00881,CLI03438,2026-02-13,Formulario web,No especifica
+BAJA00882,CLI00304,2024-08-31,Formulario web,Exceso de comunicaciones
+BAJA00883,CLI01685,2023-05-04,WhatsApp,Exceso de comunicaciones
+BAJA00884,CLI00983,2025-08-20,Email,No especifica
+BAJA00885,CLI03843,2025-11-21,Email,Pidio no ser contactado en tienda
+BAJA00886,CLI04102,2024-07-25,Tienda,Exceso de comunicaciones
+BAJA00887,CLI02718,2024-05-13,Tienda,Exceso de comunicaciones
+BAJA00888,CLI01592,2024-02-21,SMS,No especifica
+BAJA00889,CLI01400,2026-08-04,Email,Reclamo previo
+BAJA00890,CLI00936,2024-07-16,SMS,No especifica
+BAJA00891,CLI02189,2026-01-14,Email,Ya no es cliente
+BAJA00892,CLI04823,2025-12-25,Email,No especifica
+BAJA00893,CLI02736,2024-03-28,Tienda,No especifica
+BAJA00894,CLI03965,2024-07-04,SMS,Reclamo previo
+BAJA00895,CLI01575,2023-09-02,WhatsApp,Exceso de comunicaciones
+BAJA00896,CLI02365,2026-04-18,SMS,No especifica
+BAJA00897,CLI00755,2025-08-08,Email,Ya no es cliente
+BAJA00898,CLI00307,2025-09-29,Tienda,No especifica
+BAJA00899,CLI00466,2025-09-22,Email,No especifica
+BAJA00900,CLI05232,2023-11-06,Tienda,No especifica
+BAJA00901,CLI04255,2026-05-15,SMS,No especifica
+BAJA00902,CLI01720,2023-07-16,WhatsApp,Exceso de comunicaciones
+BAJA00903,CLI05766,2026-03-17,Email,Reclamo previo
+BAJA00904,CLI03383,2026-03-10,Email,Ya no es cliente
+BAJA00905,CLI05957,2026-05-10,Email,Exceso de comunicaciones
+BAJA00906,CLI02133,2023-05-12,SMS,No especifica
+BAJA00907,CLI02154,2026-05-23,Tienda,No especifica
+BAJA00908,CLI04670,2026-03-28,Formulario web,Reclamo previo
+BAJA00909,CLI04080,2026-01-09,Email,Exceso de comunicaciones
+BAJA00910,CLI00652,2025-05-11,WhatsApp,Exceso de comunicaciones
+BAJA00911,CLI01757,2023-03-29,WhatsApp,Exceso de comunicaciones
+BAJA00912,CLI02757,2022-11-17,Email,No especifica
+BAJA00913,CLI02022,2025-01-28,SMS,Exceso de comunicaciones
+BAJA00914,CLI00480,2025-05-12,Email,Exceso de comunicaciones
+BAJA00915,CLI02307,2025-02-27,WhatsApp,Exceso de comunicaciones
+BAJA00916,CLI05301,2024-12-23,Tienda,Exceso de comunicaciones
+BAJA00917,CLI01018,2024-12-09,SMS,No especifica
+BAJA00918,CLI03687,2023-07-06,Tienda,No especifica
+BAJA00919,CLI00774,2026-02-07,Email,Exceso de comunicaciones
+BAJA00920,CLI00337,2026-08-28,Tienda,No especifica
+BAJA00921,CLI05041,2026-03-06,SMS,Ya no es cliente
+BAJA00922,CLI04558,2026-03-14,WhatsApp,Exceso de comunicaciones
+BAJA00923,CLI00951,2026-02-20,Email,No especifica
+BAJA00924,CLI00523,2024-11-23,Formulario web,Exceso de comunicaciones
+BAJA00925,CLI04087,2025-05-31,Email,Reclamo previo
+BAJA00926,CLI01335,2024-06-03,Email,Exceso de comunicaciones
+BAJA00927,CLI03795,2026-03-26,WhatsApp,Reclamo previo
+BAJA00928,CLI03001,2026-02-06,WhatsApp,Ya no es cliente
+BAJA00929,CLI03017,2026-05-01,Email,No especifica
+BAJA00930,CLI05656,2024-01-28,Email,No especifica
+BAJA00931,CLI04517,2025-02-22,Email,Reclamo previo
+BAJA00932,CLI04271,2026-08-03,Email,Exceso de comunicaciones
+BAJA00933,CLI03682,2022-10-30,WhatsApp,Exceso de comunicaciones
+BAJA00934,CLI02076,2025-10-18,Tienda,No especifica
+BAJA00935,CLI04955,2024-07-18,Formulario web,No especifica
+BAJA00936,CLI03108,2023-03-06,SMS,Exceso de comunicaciones
+BAJA00937,CLI00297,2023-07-09,Formulario web,Pidio no ser contactado en tienda
+BAJA00938,CLI00405,2023-10-15,Email,No especifica
+BAJA00939,CLI01609,2025-07-28,Email,No especifica
+BAJA00940,CLI03414,2025-08-30,Email,Ya no es cliente
+BAJA00941,CLI05397,2024-06-18,SMS,Pidio no ser contactado en tienda
+BAJA00942,CLI01216,2025-10-25,WhatsApp,No especifica
+BAJA00943,CLI04242,2025-11-17,Tienda,Reclamo previo
+BAJA00944,CLI00323,2024-10-12,Tienda,Exceso de comunicaciones
+BAJA00945,CLI00199,2024-11-03,Tienda,Ya no es cliente
+BAJA00946,CLI04745,2022-11-21,Tienda,Ya no es cliente
+BAJA00947,CLI03809,2023-04-28,Formulario web,Exceso de comunicaciones
+BAJA00948,CLI04712,2025-03-05,Tienda,No especifica
+BAJA00949,CLI00955,2026-03-10,Tienda,Exceso de comunicaciones
+BAJA00950,CLI00149,2024-09-15,Tienda,Exceso de comunicaciones
+BAJA00951,CLI05747,2025-08-12,Tienda,Exceso de comunicaciones
+BAJA00952,CLI03532,2026-05-20,Tienda,No especifica
+BAJA00953,CLI00689,2025-05-08,SMS,Ya no es cliente
+BAJA00954,CLI00921,2025-12-16,Email,Exceso de comunicaciones
+BAJA00955,CLI00622,2025-02-19,Email,Exceso de comunicaciones
+BAJA00956,CLI01228,2025-03-15,WhatsApp,Exceso de comunicaciones
+BAJA00957,CLI02868,2024-12-10,Formulario web,Exceso de comunicaciones
+BAJA00958,CLI03610,2026-08-22,WhatsApp,No especifica
+BAJA00959,CLI04925,2024-07-23,Email,Exceso de comunicaciones
+BAJA00960,CLI03057,2025-09-29,WhatsApp,No especifica
+BAJA00961,CLI05906,2026-03-14,Email,Ya no es cliente
+BAJA00962,CLI02901,2025-10-03,Email,Exceso de comunicaciones
+BAJA00963,CLI05586,2026-07-30,SMS,Ya no es cliente
+BAJA00964,CLI00918,2026-05-29,Email,No especifica
+BAJA00965,CLI04033,2026-04-19,Tienda,No especifica
+BAJA00966,CLI02991,2025-10-08,Email,Ya no es cliente
+BAJA00967,CLI01199,2024-12-02,Email,Exceso de comunicaciones
+BAJA00968,CLI00644,2026-04-15,WhatsApp,No especifica
+BAJA00969,CLI01691,2026-02-12,Formulario web,Pidio no ser contactado en tienda
+BAJA00970,CLI00825,2022-05-23,Formulario web,Ya no es cliente
+BAJA00971,CLI01427,2025-01-07,Tienda,Exceso de comunicaciones
+BAJA00972,CLI01150,2026-07-18,Email,Exceso de comunicaciones
+BAJA00973,CLI03777,2024-08-03,Email,Ya no es cliente
+BAJA00974,CLI05254,2024-01-14,SMS,Ya no es cliente
+BAJA00975,CLI01206,2023-12-27,SMS,Exceso de comunicaciones
+BAJA00976,CLI05186,2026-04-18,Formulario web,Exceso de comunicaciones
+BAJA00977,CLI01346,2026-02-24,Email,Exceso de comunicaciones
+BAJA00978,CLI03700,2026-03-05,WhatsApp,Ya no es cliente
+BAJA00979,CLI01554,2026-01-01,Tienda,Pidio no ser contactado en tienda
+BAJA00980,CLI06009,2025-09-17,Email,Pidio no ser contactado en tienda
+BAJA00981,CLI01269,2025-08-10,Tienda,Pidio no ser contactado en tienda
+BAJA00982,CLI01244,2026-08-27,Email,Reclamo previo
+BAJA00983,CLI03014,2026-01-04,WhatsApp,Pidio no ser contactado en tienda
+BAJA00984,CLI00316,2023-06-18,SMS,Ya no es cliente
+BAJA00985,CLI02471,2026-05-14,SMS,Reclamo previo
+BAJA00986,CLI04050,2025-08-03,Tienda,No especifica
+BAJA00987,CLI03805,2026-03-21,SMS,Ya no es cliente
+BAJA00988,CLI02038,2026-04-30,Tienda,Pidio no ser contactado en tienda
+BAJA00989,CLI05177,2024-11-07,Email,Exceso de comunicaciones
+BAJA00990,CLI03593,2024-06-13,Tienda,No especifica
+BAJA00991,CLI01117,2026-04-01,Email,No especifica
+BAJA00992,CLI02085,2024-12-17,Tienda,Reclamo previo
+BAJA00993,CLI04928,2025-01-12,WhatsApp,Pidio no ser contactado en tienda
+BAJA00994,CLI02996,2024-03-17,Tienda,Exceso de comunicaciones
+BAJA00995,CLI05954,2026-07-07,Tienda,Ya no es cliente
+BAJA00996,CLI04024,2024-12-16,Tienda,Ya no es cliente
+BAJA00997,CLI02084,2026-06-17,WhatsApp,Pidio no ser contactado en tienda
+BAJA00998,CLI02405,2024-05-13,Tienda,Pidio no ser contactado en tienda
+BAJA00999,CLI00289,2025-11-11,Tienda,No especifica
+BAJA01000,CLI01889,2023-11-05,Email,Exceso de comunicaciones
+BAJA01001,CLI00596,2025-02-28,Formulario web,Pidio no ser contactado en tienda
+BAJA01002,CLI01790,2026-07-21,Email,Ya no es cliente
+BAJA01003,CLI00445,2025-11-10,Email,No especifica
+BAJA01004,CLI04478,2026-04-29,SMS,Exceso de comunicaciones
+BAJA01005,CLI03875,2024-09-12,Email,Pidio no ser contactado en tienda
+BAJA01006,CLI05838,2025-02-11,SMS,Ya no es cliente
+BAJA01007,CLI02714,2025-10-31,Formulario web,No especifica
+BAJA01008,CLI04063,2024-06-08,Formulario web,Ya no es cliente
+BAJA01009,CLI02167,2023-04-17,Tienda,Reclamo previo
+BAJA01010,CLI04592,2025-12-11,Formulario web,Ya no es cliente
+BAJA01011,CLI00482,2026-03-03,Tienda,No especifica
+BAJA01012,CLI01172,2026-05-16,Email,Exceso de comunicaciones
+BAJA01013,CLI04077,2023-12-22,Email,Pidio no ser contactado en tienda
+BAJA01014,CLI03735,2024-09-30,Email,Reclamo previo
+BAJA01015,CLI03665,2025-12-14,Email,No especifica
+BAJA01016,CLI00061,2025-03-03,Formulario web,Ya no es cliente
+BAJA01017,CLI01786,2023-08-11,WhatsApp,Exceso de comunicaciones
+BAJA01018,CLI05419,2025-11-05,Tienda,Exceso de comunicaciones
+BAJA01019,CLI00611,2025-06-20,SMS,Exceso de comunicaciones
+BAJA01020,CLI03401,2025-12-16,Email,Ya no es cliente
+BAJA01021,CLI00180,2026-06-28,Email,No especifica
+BAJA01022,CLI04007,2024-09-26,Formulario web,Exceso de comunicaciones
+BAJA01023,CLI04031,2024-05-26,Email,No especifica
+BAJA01024,CLI02900,2025-01-23,Tienda,Exceso de comunicaciones
+BAJA01025,CLI04408,2025-08-12,Email,Exceso de comunicaciones
+BAJA01026,CLI04994,2026-05-05,Email,Exceso de comunicaciones
+BAJA01027,CLI04371,2025-06-07,Formulario web,Ya no es cliente
+BAJA01028,CLI00232,2025-01-20,Formulario web,Ya no es cliente
+BAJA01029,CLI05218,2026-03-26,Formulario web,No especifica
+BAJA01030,CLI02507,2026-01-24,WhatsApp,Exceso de comunicaciones
+BAJA01031,CLI05801,2023-04-06,Tienda,Exceso de comunicaciones
+BAJA01032,CLI04890,2025-11-15,SMS,Exceso de comunicaciones
+BAJA01033,CLI04379,2025-08-24,SMS,Exceso de comunicaciones
+BAJA01034,CLI03781,2026-02-20,Email,Ya no es cliente
+BAJA01035,CLI01181,2026-01-17,Formulario web,Ya no es cliente
+BAJA01036,CLI04780,2025-01-29,SMS,No especifica
+BAJA01037,CLI05544,2024-11-08,Email,Pidio no ser contactado en tienda
+BAJA01038,CLI05478,2022-06-20,SMS,Ya no es cliente
+BAJA01039,CLI01510,2022-12-11,SMS,No especifica
+BAJA01040,CLI01901,2025-05-03,Tienda,Pidio no ser contactado en tienda
+BAJA01041,CLI00939,2026-08-23,Tienda,Ya no es cliente
+BAJA01042,CLI01165,2026-04-20,WhatsApp,Reclamo previo
+BAJA01043,CLI01661,2026-04-24,Email,Pidio no ser contactado en tienda
+BAJA01044,CLI01077,2023-06-14,Tienda,No especifica
+BAJA01045,CLI04896,2024-12-28,SMS,No especifica
+BAJA01046,CLI00972,2026-04-06,Formulario web,Exceso de comunicaciones
+BAJA01047,CLI04067,2023-11-01,SMS,No especifica
+BAJA01048,CLI02275,2025-04-04,SMS,Exceso de comunicaciones
+BAJA01049,CLI00031,2026-05-12,WhatsApp,No especifica
+BAJA01050,CLI01129,2026-01-06,Email,Exceso de comunicaciones
+BAJA01051,CLI03818,2025-08-12,Email,No especifica
+BAJA01052,CLI00183,2025-09-29,WhatsApp,No especifica
+BAJA01053,CLI01617,2025-11-19,Tienda,Pidio no ser contactado en tienda
+BAJA01054,CLI03240,2024-03-04,Tienda,Pidio no ser contactado en tienda
+BAJA01055,CLI00792,2023-10-01,SMS,No especifica
+BAJA01056,CLI01543,2026-05-17,SMS,Exceso de comunicaciones
+BAJA01057,CLI04314,2026-05-26,WhatsApp,No especifica
+BAJA01058,CLI01823,2026-02-08,Email,No especifica
+BAJA01059,CLI02044,2024-10-19,Email,Exceso de comunicaciones
+BAJA01060,CLI05545,2024-04-18,Tienda,Reclamo previo
+BAJA01061,CLI02262,2026-03-15,Email,No especifica
+BAJA01062,CLI02174,2023-04-11,Email,Ya no es cliente
+BAJA01063,CLI02576,2025-07-11,SMS,Reclamo previo
+BAJA01064,CLI02869,2025-06-19,Tienda,Exceso de comunicaciones
+BAJA01065,CLI03071,2024-09-14,Email,Exceso de comunicaciones
+BAJA01066,CLI02553,2024-06-13,SMS,Exceso de comunicaciones
+BAJA01067,CLI01430,2025-10-20,Tienda,Pidio no ser contactado en tienda
+BAJA01068,CLI05729,2025-09-14,Email,No especifica
+BAJA01069,CLI00089,2025-06-15,Tienda,No especifica
+BAJA01070,CLI05756,2025-11-13,WhatsApp,Ya no es cliente
+BAJA01071,CLI05757,2024-10-23,SMS,No especifica
+BAJA01072,CLI04531,2026-02-28,Email,No especifica
+BAJA01073,CLI01898,2024-05-11,Tienda,Exceso de comunicaciones
+BAJA01074,CLI05330,2023-09-20,WhatsApp,Ya no es cliente
+BAJA01075,CLI01350,2026-04-14,Formulario web,Exceso de comunicaciones
+BAJA01076,CLI05198,2025-03-24,Email,No especifica
+BAJA01077,CLI01569,2026-08-08,Tienda,Reclamo previo
+BAJA01078,CLI02724,2025-12-05,Tienda,Ya no es cliente
+BAJA01079,CLI03199,2026-07-09,Email,Exceso de comunicaciones
+BAJA01080,CLI02760,2025-07-14,Tienda,Ya no es cliente
+BAJA01081,CLI04963,2025-06-28,Tienda,Ya no es cliente
+BAJA01082,CLI02395,2024-11-10,WhatsApp,No especifica
+BAJA01083,CLI03988,2024-12-22,Email,Exceso de comunicaciones
+BAJA01084,CLI03807,2025-08-09,WhatsApp,Ya no es cliente
+BAJA01085,CLI05763,2026-02-02,Email,Exceso de comunicaciones
+BAJA01086,CLI04888,2025-09-19,Email,Exceso de comunicaciones
+BAJA01087,CLI03901,2024-01-04,Email,Exceso de comunicaciones
+BAJA01088,CLI01587,2025-12-10,Tienda,Exceso de comunicaciones
+BAJA01089,CLI01389,2026-08-30,Tienda,Ya no es cliente
+BAJA01090,CLI04829,2025-03-12,SMS,Exceso de comunicaciones
+BAJA01091,CLI01259,2026-05-20,SMS,Pidio no ser contactado en tienda
+BAJA01092,CLI03587,2025-07-09,SMS,Exceso de comunicaciones
+BAJA01093,CLI03044,2024-11-28,Email,Ya no es cliente
+BAJA01094,CLI05927,2023-12-01,WhatsApp,Exceso de comunicaciones
+BAJA01095,CLI05282,2023-07-31,Tienda,No especifica
+BAJA01096,CLI02876,2024-07-20,Email,Exceso de comunicaciones
+BAJA01097,CLI02982,2026-01-20,Tienda,Exceso de comunicaciones
+BAJA01098,CLI01968,2022-10-19,Formulario web,No especifica
+BAJA01099,CLI05506,2024-05-04,Email,Exceso de comunicaciones
+BAJA01100,CLI02524,2026-02-04,SMS,Pidio no ser contactado en tienda
+BAJA01101,CLI04977,2026-03-01,Email,No especifica
+BAJA01102,CLI00306,2026-08-27,Email,Exceso de comunicaciones
+BAJA01103,CLI01022,2026-07-30,SMS,No especifica
+BAJA01104,CLI02418,2024-12-09,Email,Pidio no ser contactado en tienda
+BAJA01105,CLI02335,2025-02-27,Tienda,Exceso de comunicaciones
+BAJA01106,CLI03573,2025-03-12,SMS,No especifica
+BAJA01107,CLI00669,2026-01-23,Formulario web,Exceso de comunicaciones
+BAJA01108,CLI03284,2025-10-08,Tienda,Exceso de comunicaciones
+BAJA01109,CLI05144,2024-06-07,WhatsApp,Exceso de comunicaciones
+BAJA01110,CLI02606,2024-03-06,Email,Exceso de comunicaciones
+BAJA01111,CLI03166,2024-07-03,Email,Exceso de comunicaciones
+BAJA01112,CLI00044,2024-06-14,Tienda,Ya no es cliente
+BAJA01113,CLI05955,2026-08-10,WhatsApp,Ya no es cliente
+BAJA01114,CLI05116,2025-12-13,SMS,No especifica
+BAJA01115,CLI05220,2023-08-29,Email,Pidio no ser contactado en tienda
+BAJA01116,CLI03530,2024-06-30,Email,No especifica
+BAJA01117,CLI02787,2023-05-18,Email,Pidio no ser contactado en tienda
+BAJA01118,CLI03924,2026-02-20,Tienda,Exceso de comunicaciones
+BAJA01119,CLI01967,2025-07-29,Formulario web,Pidio no ser contactado en tienda
+BAJA01120,CLI01996,2025-04-22,Email,Exceso de comunicaciones
+BAJA01121,CLI01935,2026-06-20,WhatsApp,Ya no es cliente
+BAJA01122,CLI03549,2023-10-30,Email,Exceso de comunicaciones
+BAJA01123,CLI05270,2023-03-25,Tienda,Reclamo previo
+BAJA01124,CLI05527,2025-05-27,SMS,Ya no es cliente
+BAJA01125,CLI03347,2024-11-19,Email,Ya no es cliente
+BAJA01126,CLI03214,2025-03-30,Tienda,Exceso de comunicaciones
+BAJA01127,CLI02155,2025-09-28,Email,Pidio no ser contactado en tienda
+BAJA01128,CLI04985,2026-03-04,WhatsApp,Exceso de comunicaciones
+BAJA01129,CLI05749,2024-10-22,Email,Pidio no ser contactado en tienda
+BAJA01130,CLI04098,2025-05-02,Formulario web,No especifica
+BAJA01131,CLI02515,2025-01-05,Tienda,Pidio no ser contactado en tienda
+BAJA01132,CLI04162,2026-07-26,Tienda,Ya no es cliente
+BAJA01133,CLI01529,2025-08-24,WhatsApp,Ya no es cliente
+BAJA01134,CLI02568,2025-11-15,Email,Exceso de comunicaciones
+BAJA01135,CLI05238,2025-01-04,Formulario web,Pidio no ser contactado en tienda
+BAJA01136,CLI04212,2025-10-13,Email,No especifica
+BAJA01137,CLI05785,2025-10-15,Tienda,Reclamo previo
+BAJA01138,CLI06019,2025-12-24,Email,Pidio no ser contactado en tienda
+BAJA01139,CLI02341,2024-10-04,Tienda,Reclamo previo
+BAJA01140,CLI04893,2025-11-11,Email,Exceso de comunicaciones
+BAJA01141,CLI00339,2026-06-15,Tienda,Exceso de comunicaciones
+BAJA01142,CLI03946,2025-07-31,WhatsApp,Exceso de comunicaciones
+BAJA01143,CLI02595,2026-07-29,WhatsApp,Reclamo previo
+BAJA01144,CLI04480,2024-07-11,Tienda,No especifica
+BAJA01145,CLI03599,2026-06-03,Formulario web,No especifica
+BAJA01146,CLI03136,2026-08-09,WhatsApp,Pidio no ser contactado en tienda
+BAJA01147,CLI00739,2025-07-15,WhatsApp,Pidio no ser contactado en tienda
+BAJA01148,CLI03152,2026-01-04,WhatsApp,Pidio no ser contactado en tienda
+BAJA01149,CLI03070,2024-10-28,WhatsApp,Ya no es cliente
+BAJA01150,CLI03703,2024-04-26,Email,Ya no es cliente
+BAJA01151,CLI02695,2025-06-06,Email,Exceso de comunicaciones
+BAJA01152,CLI00565,2025-11-23,Email,Exceso de comunicaciones
+BAJA01153,CLI05429,2025-08-13,Tienda,Pidio no ser contactado en tienda
+BAJA01154,CLI00015,2025-03-24,Tienda,Exceso de comunicaciones
+BAJA01155,CLI04457,2024-05-17,Email,Ya no es cliente
+BAJA01156,CLI03008,2026-03-12,Tienda,Ya no es cliente
+BAJA01157,CLI00111,2024-04-30,Email,Ya no es cliente
+BAJA01158,CLI03959,2024-11-24,SMS,Exceso de comunicaciones
+BAJA01159,CLI03870,2024-12-04,SMS,Pidio no ser contactado en tienda
+BAJA01160,CLI04105,2025-02-16,SMS,Exceso de comunicaciones
+BAJA01161,CLI04534,2025-12-23,Tienda,Exceso de comunicaciones
+BAJA01162,CLI01382,2024-02-03,Email,Exceso de comunicaciones
+BAJA01163,CLI01625,2025-01-02,Email,Ya no es cliente
+BAJA01164,CLI05936,2024-11-26,WhatsApp,Reclamo previo
+BAJA01165,CLI00409,2026-02-03,Tienda,Ya no es cliente
+BAJA01166,CLI02615,2026-05-18,Formulario web,Exceso de comunicaciones
+BAJA01167,CLI05635,2024-11-13,Tienda,Exceso de comunicaciones
+BAJA01168,CLI05661,2026-02-21,Email,No especifica
+BAJA01169,CLI00095,2024-02-29,Email,No especifica
+BAJA01170,CLI04111,2024-08-25,Email,Exceso de comunicaciones
+BAJA01171,CLI02385,2025-02-25,Email,Ya no es cliente
+BAJA01172,CLI03831,2025-08-30,WhatsApp,Reclamo previo
+BAJA01173,CLI02424,2026-02-05,Email,Reclamo previo
+BAJA01174,CLI03742,2025-01-18,WhatsApp,Ya no es cliente
+BAJA01175,CLI03320,2025-06-29,Email,Exceso de comunicaciones
+BAJA01176,CLI03656,2024-09-08,WhatsApp,Pidio no ser contactado en tienda
+BAJA01177,CLI05234,2024-03-14,Email,Exceso de comunicaciones
+BAJA01178,CLI01126,2024-10-02,WhatsApp,Reclamo previo
+BAJA01179,CLI02611,2026-08-20,SMS,Exceso de comunicaciones
+BAJA01180,CLI01068,2024-11-23,SMS,No especifica
+BAJA01181,CLI03966,2024-05-13,Tienda,Exceso de comunicaciones
+BAJA01182,CLI02913,2022-08-03,SMS,Exceso de comunicaciones
+BAJA01183,CLI05877,2023-11-05,Tienda,Exceso de comunicaciones
+BAJA01184,CLI01994,2026-01-15,Email,Ya no es cliente
+BAJA01185,CLI01647,2024-11-06,SMS,Reclamo previo
+BAJA01186,CLI04265,2026-01-31,Formulario web,Ya no es cliente
+BAJA01187,CLI02444,2026-07-04,Email,Ya no es cliente
+BAJA01188,CLI05570,2024-07-19,Email,No especifica
+BAJA01189,CLI04494,2022-11-10,Formulario web,Exceso de comunicaciones
+BAJA01190,CLI02168,2025-10-21,Formulario web,Pidio no ser contactado en tienda
+BAJA01191,CLI05706,2026-07-02,Tienda,Pidio no ser contactado en tienda
+BAJA01192,CLI01276,2026-07-11,WhatsApp,Pidio no ser contactado en tienda
+BAJA01193,CLI04175,2025-09-28,Email,Ya no es cliente
+BAJA01194,CLI00402,2026-02-02,WhatsApp,Exceso de comunicaciones
+BAJA01195,CLI04107,2023-07-19,WhatsApp,Exceso de comunicaciones
+BAJA01196,CLI00805,2026-04-04,Email,No especifica
+BAJA01197,CLI02190,2025-09-20,Email,Ya no es cliente
+BAJA01198,CLI03288,2023-10-26,SMS,Exceso de comunicaciones
+BAJA01199,CLI05559,2025-11-22,Formulario web,Exceso de comunicaciones
+BAJA01200,CLI05159,2025-06-23,Email,Pidio no ser contactado en tienda
+BAJA01201,CLI05221,2024-07-08,Email,Reclamo previo
+BAJA01202,CLI01030,2024-03-22,Tienda,Ya no es cliente
+BAJA01203,CLI02696,2023-02-03,Email,No especifica
+BAJA01204,CLI00041,2024-04-05,WhatsApp,Exceso de comunicaciones
+BAJA01205,CLI02142,2026-04-15,WhatsApp,No especifica
+BAJA01206,CLI03457,2024-12-15,Email,Pidio no ser contactado en tienda
+BAJA01207,CLI05732,2025-05-29,WhatsApp,Pidio no ser contactado en tienda
+BAJA01208,CLI02997,2025-01-04,Email,Exceso de comunicaciones
+BAJA01209,CLI03188,2025-10-04,Email,Exceso de comunicaciones
+BAJA01210,CLI05898,2026-07-30,WhatsApp,Exceso de comunicaciones
+BAJA01211,CLI04899,2024-03-19,WhatsApp,Reclamo previo

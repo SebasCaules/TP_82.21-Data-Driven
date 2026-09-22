@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-e2/
 __pycache__/
 *.pyc
 .DS_Store
@@ -18,3 +19,5 @@ ds-bundle/
 *.out
 *.fdb_latexmk
 docs/formulas.log
+e2/capturas/
+e2/capturas-verif/

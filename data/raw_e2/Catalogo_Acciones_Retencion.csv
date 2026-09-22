@@ -1,0 +1,6 @@
+id_accion,accion,canal,costo_unitario_ars,descripcion
+ACC01,Email con descuento,Email,8.0,Envio de email con cupon de descuento sobre la proxima compra.
+ACC02,SMS con puntos extra,SMS,45.0,SMS ofreciendo puntos extra de fidelizacion por volver a comprar.
+ACC03,WhatsApp con oferta personalizada,WhatsApp,25.0,Mensaje de WhatsApp (via proveedor de fidelizacion) con oferta segun categoria habitual del cliente.
+ACC04,Llamado de vendedor,Telefono,350.0,Contacto personal de un vendedor de tienda a clientes de alto valor en riesgo.
+ACC05,Envio gratis (canal online),Online,900.0,"Beneficio de envio sin cargo en la proxima compra online, como incentivo de recompra."
