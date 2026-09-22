@@ -142,15 +142,18 @@ function Gantt({ archivos, corteRef, w, h }) {
             style={{ textTransform: 'uppercase' }}>Ventana declarada por archivo</text>
 
       {(() => {
+        // La línea del corte común marca la decisión (DC-08), no el problema: va en
+        // --despues (azul, la base con las DC aplicadas), igual que el resto del tablero.
+        // El terracota queda solo para lo que el corte deja afuera (T-13).
         const xc = xDe(corteRef)
         const rotulo = `corte común ${fechaCorta(corteRef)}`
         return (
           <g>
             <title>{rotulo}</title>
-            <line x1={xc} x2={xc} y1={padTop} y2={yBase} stroke="var(--terra)" strokeWidth="1.5"
+            <line x1={xc} x2={xc} y1={padTop} y2={yBase} stroke="var(--despues)" strokeWidth="1.5"
                   strokeDasharray="4 2" />
             <Plaqueta x={xc} y={padTop + 9} texto={rotulo} fuente={10} peso={700}
-                      color="var(--terra)" anclaje="middle" />
+                      color="var(--despues)" anclaje="middle" />
           </g>
         )
       })()}

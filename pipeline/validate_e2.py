@@ -279,7 +279,7 @@ def main() -> int:
         "V01": {"n_archivos", "n_decisiones", "por_estado", "por_archivo"},
         "V02": {"archivos", "corte_ref", "riesgo"},
         "V03": {"serie", "meses_flag", "sensibilidad"},
-        "V04": {"antes", "despues", "personas_por_n_ids", "duplicados_con_actividad"},
+        "V04": {"antes", "despues", "personas_por_n_ids", "duplicados_con_actividad", "canonicos_sin_compra_propia"},
         "V05": {"unidades", "devoluciones", "serie", "desfase_dias", "motivos"},
         "V06": {"envios", "embudo", "sin_consentimiento", "bajas", "lista_800"},
         "V07": {"casos", "ofertas", "envios_duplicados_por_join", "gold"},

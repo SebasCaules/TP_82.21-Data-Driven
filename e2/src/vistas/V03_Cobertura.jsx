@@ -29,6 +29,11 @@ const capitalizar = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 const CREF = V03.sensibilidad.corte_ref
 const CSENS = V03.sensibilidad.corte_sens
 
+// Auditoría T-03: el corte de referencia (CREF.pct) ya incorpora DC-04 (unión de
+// duplicados, V04): por eso salta de los 49,6 % con que cierra V02 a 50,4 % acá. El rótulo
+// del par lo dice, no solo el pie, porque es lo primero que el lector compara contra V02.
+const ETQ_CREF = `corte ${fechaCorta(D2.meta.corte_ref)} · después de DC-04, en revisión (ver V04)`
+
 // El titulo dice el hallazgo con la cifra: cuantos meses bajan del umbral y el rango de
 // riesgo segun que corte se use. Todo sale de D2 (meses_flag.length, sensibilidad.*.pct).
 const TITULO = `${capitalizar(N_PALABRA[N_FLAG] ?? N_FLAG)} meses de 2025 bajan del 60 %: ` +
@@ -50,14 +55,14 @@ export default function V03Cobertura() {
         <div style={{ display: 'flex', gap: 'clamp(16px, 2.4vw, 34px)', flex: '0 0 auto' }}>
           <ParDoble
             grupo="Riesgo en el corte"
-            etqAntes={`corte ${fechaCorta(D2.meta.corte_ref)} (en revisión)`}
+            etqAntes={ETQ_CREF}
             valAntes={pct(CREF.pct)}
             etqDespues={`sensibilidad ${fechaCorta(D2.meta.corte_sens)}`}
             valDespues={pct(CSENS.pct)}
           />
           <ParDoble
             grupo="Exposición anual"
-            etqAntes={`corte ${fechaCorta(D2.meta.corte_ref)} (en revisión)`}
+            etqAntes={ETQ_CREF}
             valAntes={montoM(CREF.exposicion_M)}
             etqDespues={`sensibilidad ${fechaCorta(D2.meta.corte_sens)}`}
             valDespues={montoM(CSENS.exposicion_M)}

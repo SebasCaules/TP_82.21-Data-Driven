@@ -49,41 +49,61 @@ const aplicada = porEstado.aplicada ?? 0
 const declarada = porEstado.declarada ?? 0
 const pendiente = porEstado['pendiente del negocio'] ?? 0
 
+// DC-03 y DC-07 son las dos decisiones que la auditoría marcó sin cuánto cambia (T-04):
+// esta vista las cita en la tabla pero no mostraba el desplazamiento. Los dos pares de
+// abajo lo agregan, con valor y etiqueta tal como vienen en D2.decisiones (nada inventado).
+const DC03 = decisiones.find((d) => d.id === 'DC-03')
+const DC07 = decisiones.find((d) => d.id === 'DC-07')
+
 const TITULO = `${v01.n_decisiones} decisiones: ` +
   `${aplicada} ${aplicada === 1 ? 'cambia' : 'cambian'} el dato, ` +
   `${declarada} se ${declarada === 1 ? 'declara' : 'declaran'} y ` +
   `${pendiente} ${pendiente === 1 ? 'espera' : 'esperan'} al negocio`
 
+// La frase de cierre (T-02) separa lo que ya está resuelto de lo que sigue abierto: N sale
+// de por_estado.aplicada, nunca escrito a mano.
+const FRASE_CIERRE = `Las ${aplicada} aplicadas cierran el dato. Los pedidos abiertos al `
+  + `negocio están en la vista 12.`
+
+// T-10: el pie citaba la base pero no las filas del registro que estas dos decisiones
+// alimentan (C26, canal; D24, edades) ni el rango de ids de la tabla.
 const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${v01.n_archivos} archivos de origen, ` +
-  `${v01.n_decisiones} decisiones de calidad · fuente: payload e2.json, vistas.V01 y decisiones (pipeline/build_e2.py)`
+  `${v01.n_decisiones} decisiones de calidad, DC-01 a DC-15 · filas C26 (canal) y D24 (edades) ` +
+  `· fuente: payload e2.json, vistas.V01 y decisiones (pipeline/build_e2.py)`
 
 export default function V01() {
   return (
-    <section className="pant v01q">
+    <section className="pant v01q" style={{ gap: 'clamp(4px, 0.6vh, 10px)' }}>
       <h1 className="titulo">{TITULO}</h1>
 
-      <div style={{ display: 'flex', gap: '14px', flexShrink: 0 }}>
-        <div className="tarjeta" style={{ flex: 1, padding: '10px 14px' }}>
+      <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
+        <div className="tarjeta" style={{ flex: 1, padding: '7px 12px' }}>
           <span className="kpi-lbl">Archivos con al menos una decisión</span>
-          <span className="kpi-val tabular" style={{ fontSize: '24px', marginTop: '4px' }}>
+          <span className="kpi-val tabular" style={{ fontSize: '19px', marginTop: '2px' }}>
             {entero(v01.n_archivos)}
           </span>
         </div>
-        <div className="tarjeta" style={{ flex: 1, padding: '10px 14px' }}>
+        <div className="tarjeta" style={{ flex: 1, padding: '7px 12px' }}>
           <span className="kpi-lbl">Decisiones de calidad tomadas</span>
-          <span className="kpi-val tabular" style={{ fontSize: '24px', marginTop: '4px' }}>
+          <span className="kpi-val tabular" style={{ fontSize: '19px', marginTop: '2px' }}>
             {entero(v01.n_decisiones)}
           </span>
         </div>
-        <div className="tarjeta" style={{ flex: 1.3, padding: '10px 14px' }}>
+        <div className="tarjeta" style={{ flex: 1.3, padding: '7px 12px' }}>
           <span className="kpi-lbl">Desglose por estado</span>
-          <div style={{ display: 'flex', gap: '16px', marginTop: '9px', flexWrap: 'nowrap' }}>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '5px', flexWrap: 'nowrap' }}>
             <MiniEstado estado="aplicada" n={aplicada} />
             <MiniEstado estado="declarada" n={declarada} />
             <MiniEstado estado="pendiente del negocio" n={pendiente} />
           </div>
         </div>
       </div>
+
+      <p style={{
+        flexShrink: 0, margin: 0, fontSize: '10.5px', lineHeight: 1.2, color: 'var(--mut2)',
+      }}>
+        {FRASE_CIERRE}
+      </p>
 
       <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '11px' }}>
@@ -132,9 +152,14 @@ export default function V01() {
         </table>
       </div>
 
+      <div style={{ display: 'flex', gap: 'clamp(8px, 1vw, 14px)', flexShrink: 0 }}>
+        <ParChico dc={DC03} />
+        <ParChico dc={DC07} />
+      </div>
+
       <p className="pie-vista" style={{
-        flexShrink: 0, borderTop: '1px solid var(--bd)', paddingTop: '6px',
-        margin: 0, font: '400 10px/1.35 var(--mono)', color: 'var(--mut2)',
+        flexShrink: 0, borderTop: '1px solid var(--bd)', paddingTop: '3px',
+        margin: 0, font: '400 9px/1.25 var(--mono)', color: 'var(--mut2)',
       }}>
         {PIE}
       </p>
@@ -168,6 +193,46 @@ function MiniEstado({ estado, n }) {
   )
 }
 
+/** Par chico antes/después con su id de decisión visible (DISENO.md regla 3). Cada lado
+ *  lleva valor y etiqueta tal como salen de `dc.antes`/`dc.despues`: para DC-03 son las
+ *  grafías de canal, para DC-07 las edades fuera de rango. Más chico que <ParAntesDespues>
+ *  (V04, V06…) porque acá el par es un anexo de la tabla, no el contenido principal. */
+function ParChico({ dc }) {
+  return (
+    <div style={{
+      flex: '1 1 0', minWidth: 0, display: 'flex', alignItems: 'center', gap: '9px',
+      border: '1px solid var(--bd)', borderRadius: '3px', padding: '4px 10px',
+    }}>
+      <span className="tabular" style={{
+        flexShrink: 0, font: '600 9px/1.15 var(--mono)', color: 'var(--mut2)',
+      }}>{dc.id}</span>
+      <span style={{
+        flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap', fontSize: '9.5px', color: 'var(--mut)',
+      }} title={dc.archivo}>
+        {dc.archivo}
+      </span>
+      <div className="ban-par" style={{ marginLeft: 'auto', flexShrink: 0, minWidth: 0 }}>
+        <div className="par-item par-antes" style={{ maxWidth: '116px' }}>
+          <span className="par-lbl">Antes</span>
+          <span className="par-val tabular" style={{ fontSize: '12px' }}>{entero(dc.antes.valor)}</span>
+          <span style={{ fontSize: '8px', lineHeight: 1.1, color: 'var(--mut)' }} title={dc.antes.etiqueta}>
+            {recortar(dc.antes.etiqueta, 32)}
+          </span>
+        </div>
+        <span className="par-flecha" aria-hidden="true" style={{ fontSize: '12px' }}>→</span>
+        <div className="par-item par-despues" style={{ maxWidth: '116px' }}>
+          <span className="par-lbl">Después</span>
+          <span className="par-val tabular" style={{ fontSize: '12px' }}>{entero(dc.despues.valor)}</span>
+          <span style={{ fontSize: '8px', lineHeight: 1.1, color: 'var(--mut2)' }} title={dc.despues.etiqueta}>
+            {recortar(dc.despues.etiqueta, 32)}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /** Pastilla de estado propia de V01: símbolo (forma) + texto + color, ninguno solo. No
  *  reusa <Semaforo> ni SemaforoLuz.jsx (ver comentario del import de arriba): sus rótulos
  *  "EN META / POR DEBAJO / FUERA DE META" son de otra vista y confunden acá. Estilo
@@ -180,9 +245,9 @@ function Pastilla({ estado }) {
       aria-label={`Estado: ${e.texto}`}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: '5px',
-        padding: '2px 8px', borderRadius: '3px',
+        padding: '1px 7px', borderRadius: '3px',
         border: `1px solid ${e.color}`, color: e.color,
-        font: '600 10.5px/1.2 var(--mono)', whiteSpace: 'nowrap',
+        font: '600 9.5px/1.15 var(--mono)', whiteSpace: 'nowrap',
       }}
     >
       <span aria-hidden="true" style={{ fontSize: '11px', lineHeight: 1 }}>{e.simbolo}</span>

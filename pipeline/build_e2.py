@@ -57,8 +57,6 @@ _ARCHIVOS_CFG = [
      "programa de fidelización (sin linaje documentado)", "socio"),
     ("Tiendas.csv", DATA_E1, "fecha_apertura",
      "maestro de tiendas", "tienda"),
-    ("Calendario.csv", DATA_E1, "fecha",
-     "calendario operativo (origen no declarado)", "día"),
     ("Calendario.csv", DATA_E2, "fecha",
      "calendario operativo, extendido a 2026-08-31 (origen no declarado)", "día"),
     ("Catalogo_Acciones_Retencion.csv", DATA_E2, None,
@@ -73,6 +71,8 @@ _ARCHIVOS_CFG = [
      "trabajo analítico propio (no es un sistema fuente)", "alias de cliente"),
     ("Interacciones_soporte_mensual.csv", DATA_E2, "mes",
      "sistema de atención al cliente", "cliente-mes"),
+    ("Casos_Cualitativos_Clientes.csv", DATA_E2, ("primera_compra", "ultima_compra"),
+     "entrevistas de Marketing (sin fecha de corte declarada)", "caso"),
 ]
 
 
@@ -90,7 +90,10 @@ def _armar_meta_archivos() -> list[dict]:
             # desambiguar cualquier lookup por nombre en el tablero.
             "ruta": f"{origen_dir}/{nombre}",
         }
-        if col_fecha:
+        if isinstance(col_fecha, tuple):
+            entrada["desde"] = pd.to_datetime(df[col_fecha[0]]).min().strftime("%Y-%m-%d")
+            entrada["hasta"] = pd.to_datetime(df[col_fecha[1]]).max().strftime("%Y-%m-%d")
+        elif col_fecha:
             fechas = pd.to_datetime(df[col_fecha])
             entrada["desde"] = fechas.min().strftime("%Y-%m-%d")
             entrada["hasta"] = fechas.max().strftime("%Y-%m-%d")
@@ -232,10 +235,10 @@ def _pares_antes_despues(ctx: dict) -> dict:
         "DC-05": ((v06["envios"]["antes"], "envíos"), (v06["envios"]["despues"], "envíos")),
         "DC-06": ((v07["gold"]["envios"], "envíos 'Gold' (segmento)"), (v07["gold"]["socios"], "socios Gold (nivel real)")),
         "DC-07": ((sc["edades_fuera_de_rango"], "edades fuera de [15,100]"),
-                  (sc["edades_fuera_de_rango"] + sc["edades_nulas"], "edades a nulo con bandera")),
+                  (sc["edades_fuera_de_rango"] + sc["edades_nulas"], "edades sin valor (106 marcadas con bandera + 524 nulas de origen)")),
         "DC-08": ((al2026["pct"], "% en riesgo (calendario extendido, 31/08/2026)"),
                   (e1["pct"], "% en riesgo (corte 31/12/2025)")),
-        "DC-09": ((e1["pct"], "% riesgo al 31/12/2025 (en revisión)"),
+        "DC-09": ((despues["pct"], "% riesgo al 31/12/2025 con DC-04 (en revisión)"),
                   (sens["corte_sens"]["pct"], "% riesgo al 31/08/2025 (sensibilidad)")),
         "DC-10": ((v08["variacion_pct"], "% variación precio unitario 2022-2025"),
                   (v08["variacion_pct"], "% variación (sin deflactar, limitación declarada)")),
@@ -368,6 +371,9 @@ def _armar_v04(tx_e1: pd.DataFrame, tx_e2: pd.DataFrame, idr: pd.DataFrame) -> d
         },
         "personas_por_n_ids": personas_por_n_ids,
         "duplicados_con_actividad": dup_con_actividad,
+        # ids canónicos sin compras propias que reciben la actividad de sus alias:
+        # explica por qué 5.978 − 348 no da 5.634 (auditoría CX-04)
+        "canonicos_sin_compra_propia": int(len(set(F_despues.index) - set(F_antes.index))),
     }
 
 

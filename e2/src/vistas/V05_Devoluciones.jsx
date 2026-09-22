@@ -68,6 +68,11 @@ export default function V05_Devoluciones() {
                 {DC02.justificacion}
               </p>
             )}
+            <p style={{ margin: '5px 0 0', font: '400 10.5px/1.4 var(--mono)', color: 'var(--mut)' }}>
+              <span className="tabular">{entero(V05.devoluciones.crudas)}</span> filas,{' '}
+              <span className="tabular">{entero(V05.devoluciones.unicas)}</span> devoluciones únicas{' '}
+              (<span className="tabular">{entero(V05.devoluciones.crudas - V05.devoluciones.unicas)}</span> duplicadas · D02)
+            </p>
             <div className="kpi-base" style={{ marginTop: 'auto' }}>
               <b>Desfase mediano</b>{' '}
               <span className="tabular">{entero(V05.desfase_dias.mediana)} días</span>{' '}

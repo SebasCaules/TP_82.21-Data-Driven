@@ -18,6 +18,18 @@ const DC04 = D2.decisiones.find((d) => d.id === 'DC-04')
 const TOTAL_PERSONAS = V.personas_por_n_ids.reduce((s, p) => s + p.personas, 0)
 const TOTAL_IDS = V.personas_por_n_ids.reduce((s, p) => s + p.n_ids * p.personas, 0)
 
+// 5.978 − 348 ≠ 5.634 (auditoría T-08, CX-04): el mapeo a id_cliente_canonico no solo funde
+// ids con actividad propia en otro cliente, también suma a la base ids canónicos que no
+// tenían compra propia y antes no contaban como cliente. N sale de D2 cuando el payload ya
+// trae la clave; si todavía no la trae, se despeja de la misma identidad contable.
+const CANONICOS_SIN_COMPRA = V.canonicos_sin_compra_propia
+  ?? (V.despues.clientes - V.antes.clientes + V.duplicados_con_actividad)
+
+const NOTA_CLIENTES = `${entero(V.duplicados_con_actividad)} ids con compras se funden en otros `
+  + `clientes; ${entero(CANONICOS_SIN_COMPRA)} ids canónicos que no compraban entran a la base: `
+  + `${entero(V.antes.clientes)} − ${entero(V.duplicados_con_actividad)} + `
+  + `${entero(CANONICOS_SIN_COMPRA)} = ${entero(V.despues.clientes)}`
+
 // El título dice el hallazgo con la cifra (duplicados_con_actividad) y el corrimiento del
 // riesgo (antes.pct → despues.pct), calculados desde D2: si el payload cambia, el título
 // cambia solo.
@@ -35,7 +47,7 @@ export const meta = {
 }
 
 /** Un par grande antes/después, para la fila de tres métricas de arriba. */
-function ParAntesDespues({ etiqueta, antes, despues }) {
+function ParAntesDespues({ etiqueta, antes, despues, nota }) {
   return (
     <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
       <span className="kpi-lbl">{etiqueta}</span>
@@ -50,6 +62,7 @@ function ParAntesDespues({ etiqueta, antes, despues }) {
           <span className="par-val tabular">{despues}</span>
         </div>
       </div>
+      {nota && <span className="kpi-sub" style={{ minHeight: 0 }}>{nota}</span>}
     </div>
   )
 }
@@ -65,7 +78,7 @@ export default function V04Duplicados() {
       <h1 className="titulo">{TITULO}</h1>
 
       <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)' }}>
-        <ParAntesDespues etiqueta="Clientes"
+        <ParAntesDespues etiqueta="Clientes" nota={NOTA_CLIENTES}
                           antes={entero(V.antes.clientes)} despues={entero(V.despues.clientes)} />
         <ParAntesDespues etiqueta="Riesgo"
                           antes={pct(V.antes.pct)} despues={pct(V.despues.pct)} />

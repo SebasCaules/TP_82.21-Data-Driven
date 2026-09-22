@@ -4,6 +4,9 @@
 // armado). El dedupe deja 23.529 envíos con oferta contra 22.614 de la base vieja, y con esa
 // base corregida la tasa de conversión a 7 días por tipo de oferta se puede medir de nuevo:
 // el gráfico muestra que las cinco ofertas caen en el mismo intervalo, ninguna se distingue.
+// CAMP034 no tiene ganador: fecha_envio y fecha_creacion empatan entre las dos filas, así que
+// el criterio de DC-13 no decide (ver `casos[i].desempate` en el payload) y se muestra el
+// empate y la fila que queda mientras se espera la confirmación de Casa Óga (V12).
 //
 // DC-06: el segmento "Gold" que manda Marketing en las campañas no es el nivel del programa
 // de fidelización. De 5.066 envíos etiquetados "Gold", solo 3 socios son Gold de verdad
@@ -13,10 +16,16 @@ import { Lienzo, PuntosIC } from '../../../src/graficos.jsx'
 import { entero, fechaCorta, pct } from '../formato.js'
 import { D2 } from '../datos_e2.js'
 
+// El título y `meta.titulo` (≤ 74 caracteres) comparten la misma cifra, calculada acá afuera
+// a nivel de módulo para que ninguna de las dos copias la escriba a mano.
+const V = D2.vistas.V07
+const BASE_DESPUES = V.ofertas.reduce((s, o) => s + o.despues.n, 0)
+const TITULO = `Con el join arreglado, ${entero(BASE_DESPUES)} envíos y ninguna oferta convierte distinto`
+
 export const meta = {
   id: 'V07',
   corto: 'Campañas: join y Gold',
-  titulo: 'Con el join arreglado se miden 23.529 envíos y ninguna oferta convierte distinto',
+  titulo: TITULO,
   pie: 'join y Gold de campañas',
 }
 
@@ -27,7 +36,7 @@ export default function V07Campanias() {
 
   // La cifra del título sale de sumar la base "después" de cada oferta, no del campo suelto
   // de la decisión: así el número que se lee arriba es el mismo que suman las barras de abajo.
-  const baseDespues = v.ofertas.reduce((s, o) => s + o.despues.n, 0)
+  const baseDespues = BASE_DESPUES
 
   // Dos filas por oferta (antes/después) para que la comparación quede en el mismo renglón:
   // "antes" tenue y sin énfasis (gris, más fino), "después" con énfasis (azul, el color de
@@ -51,9 +60,7 @@ export default function V07Campanias() {
 
   return (
     <section className="pant v07">
-      <h1 className="titulo">
-        Con el join arreglado se miden {entero(baseDespues)} envíos y ninguna oferta convierte distinto
-      </h1>
+      <h1 className="titulo">{TITULO}</h1>
 
       <div className="lienzo v07-cuerpo">
         {/* Columna izquierda: el gráfico, con el antes/después de DC-13 como encabezado */}
@@ -101,7 +108,9 @@ export default function V07Campanias() {
                     {c.elegida.tipo_oferta} · {fechaCorta(c.elegida.fecha_creacion)}
                   </div>
                   <div style={{ fontSize: 10.5, color: 'var(--mut)', marginTop: 1, lineHeight: 1.25 }}>
-                    {c.criterio}
+                    {c.desempate
+                      ? 'empate total: se conserva la primera fila del archivo, pendiente de confirmación de Casa Óga (vista 12)'
+                      : c.criterio}
                   </div>
                 </div>
               ))}

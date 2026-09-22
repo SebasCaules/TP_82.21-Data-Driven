@@ -5,6 +5,11 @@
 // nada se escribe a mano salvo la frase de contrato sobre qué es la exposición, que no
 // es un dato sino una regla del proyecto (DISEÑO.md: "no afirma recupero").
 //
+// La tarjeta de decisión es DC-04 (auditoría T-09/T-05): es la única fila de V.cambios, la
+// única decisión que mueve la cifra, y decisión + justificación salen de D2.decisiones (regla
+// 3 de DISEÑO.md). DC-09 no mueve esta cifra, solo pone la sensibilidad y el estado "en
+// revisión" en duda: por eso va al pie junto con la salvedad de recupero, no en la tarjeta.
+//
 // Las tres columnas grandes usan la semántica compartida del tablero (estilos_e2.css): el
 // par E1 → después es un único `.ban-par` (`.par-antes` gris, `.par-despues` azul), como en
 // V04 y V06. La sensibilidad no es un "después" más, es la misma cifra leída con otro corte,
@@ -16,15 +21,15 @@ import { D2 } from '../datos_e2.js'
 import { entero, pct, montoM, decimal, fechaCorta } from '../formato.js'
 
 const V = D2.vistas.V10
-const DC09 = D2.decisiones.find((d) => d.id === 'DC-09')
+const DC04 = D2.decisiones.find((d) => d.id === 'DC-04')
 
-// El título dice el hallazgo con la cifra (después de las decisiones), calculado desde D2:
-// si el payload cambia, el título cambia solo.
-const TITULO = `Tras las decisiones, riesgo ${pct(V.despues.pct)} de elegibles y `
-  + `exposición ${montoM(V.despues.exposicion_M)}/año`
+// El título dice el hallazgo con la cifra (DC-04, la única decisión que mueve el par
+// E1 → después), calculado desde D2: si el payload cambia, el título cambia solo.
+const TITULO = `DC-04 es la única decisión que mueve la cifra: ${pct(V.e1.pct)} → ${pct(V.despues.pct)}`
 
 const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · sensibilidad ${fechaCorta(V.sens.corte)} `
-  + `· filas C03, C04, D22, E01 · riesgo y exposición en revisión por DC-09`
+  + `· filas C03, C04, D22, E01 · la exposición es facturación proyectada de clientes en `
+  + `riesgo, no recupero · en revisión por DC-09 (ver V03)`
 
 export const meta = {
   id: 'V10',
@@ -128,19 +133,23 @@ export default function V10CifraCentral() {
         </div>
 
         <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
-          <span className="kpi-lbl">DC-09 <b>{DC09.estado}</b></span>
+          <span className="kpi-lbl">DC-04 <b>{DC04.estado}</b></span>
+          <span className="kpi-sub">{DC04.archivo} · {DC04.hallazgo}</span>
           <p style={{ margin: '9px 0 0', fontSize: 12, lineHeight: 1.4, color: 'var(--ink)' }}>
-            La exposición es facturación proyectada de clientes en riesgo, no recupero.
+            {DC04.decision}
           </p>
-          <p style={{ margin: '8px 0 0', fontSize: 11, lineHeight: 1.38, color: 'var(--mut)' }}>
-            {DC09.decision}
-          </p>
+          {DC04.justificacion && (
+            <p style={{ margin: '8px 0 0', fontSize: 11, lineHeight: 1.38, color: 'var(--mut)' }}>
+              <b style={{ color: 'var(--mut2)' }}>Justificación.</b> {DC04.justificacion}
+            </p>
+          )}
         </div>
       </div>
 
       <p className="pie-vista">
         corte <b>{fechaCorta(D2.meta.corte_ref)}</b> · sensibilidad <b>{fechaCorta(V.sens.corte)}</b>{' '}
-        · filas <b>C03, C04, D22, E01</b> · riesgo y exposición en revisión por <b>DC-09</b>
+        · filas <b>C03, C04, D22, E01</b> · la exposición es facturación proyectada de clientes
+        en riesgo, no recupero · en revisión por <b>DC-09</b> (ver V03)
       </p>
     </section>
   )

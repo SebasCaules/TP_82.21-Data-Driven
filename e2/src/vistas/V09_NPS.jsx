@@ -18,7 +18,7 @@ const V09 = D2.vistas.V09
 const DC11 = D2.decisiones.find((d) => d.id === 'DC-11')
 const NPS_2025 = V09.nps_anual.find((f) => f.anio === 2025)
 
-const TITULO = `NPS sin reclamos ni consultas en ${pct(V09.sin_interaccion.pct)} de las filas: se marca, no se borra`
+const TITULO = `${pct(V09.sin_interaccion.pct)} de filas de soporte trae NPS sin interacción: se marca, no se borra`
 
 const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(V09.filas)} filas cliente-mes de soporte · registro D19, D20, D24 · riesgo vs. soporte (D20) sobre la base del E1, sin DC-04 · el origen de las ${entero(V09.sin_interaccion.n)} filas sin interacción no está confirmado, ver consulta 4`
 
@@ -37,18 +37,18 @@ export default function V09_NPS() {
       <div className="lienzo v09-cuerpo">
         <div className="tarjeta">
           <div className="kpi-lbl">
-            <span>NPS medio anual, con todo vs. solo con interacción</span>
+            <span>NPS medio anual, en puntos, con todo vs. solo con interacción</span>
           </div>
 
           <div className="ban-par" style={{ marginTop: 6 }}>
             <div className="par-item par-antes">
               <span className="par-lbl">Con todo, 2025</span>
-              <span className="par-val tabular">{pct(DC11.antes.valor)}</span>
+              <span className="par-val tabular">{decimal(DC11.antes.valor, 1)}</span>
             </div>
             <span className="par-flecha">→</span>
             <div className="par-item par-despues">
               <span className="par-lbl">Solo con interacción</span>
-              <span className="par-val tabular">{pct(DC11.despues.valor)}</span>
+              <span className="par-val tabular">{decimal(DC11.despues.valor, 1)}</span>
             </div>
           </div>
 
@@ -90,24 +90,24 @@ export default function V09_NPS() {
                 <tr>
                   <th></th>
                   <th style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>Reclamos</th>
-                  <th style={{ textAlign: 'right' }}>NPS</th>
+                  <th style={{ textAlign: 'right' }}>NPS (pts)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td style={{ color: 'var(--terra)', fontWeight: 600, whiteSpace: 'nowrap' }}>En riesgo</td>
                   <td className="mono tabular" style={{ textAlign: 'right' }}>{decimal(V09.riesgo_vs_soporte.en_riesgo.reclamos_acum, 2)}</td>
-                  <td className="mono tabular" style={{ textAlign: 'right' }}>{pct(V09.riesgo_vs_soporte.en_riesgo.nps)}</td>
+                  <td className="mono tabular" style={{ textAlign: 'right' }}>{decimal(V09.riesgo_vs_soporte.en_riesgo.nps, 1)}</td>
                 </tr>
                 <tr>
                   <td style={{ color: 'var(--mut2)', fontWeight: 600, whiteSpace: 'nowrap' }}>Sin riesgo</td>
                   <td className="mono tabular" style={{ textAlign: 'right' }}>{decimal(V09.riesgo_vs_soporte.sin_riesgo.reclamos_acum, 2)}</td>
-                  <td className="mono tabular" style={{ textAlign: 'right' }}>{pct(V09.riesgo_vs_soporte.sin_riesgo.nps)}</td>
+                  <td className="mono tabular" style={{ textAlign: 'right' }}>{decimal(V09.riesgo_vs_soporte.sin_riesgo.nps, 1)}</td>
                 </tr>
               </tbody>
             </table>
             <p className="kpi-sub" style={{ marginTop: 8 }}>
-              reclamos y consultas acumulados, y NPS medio mensual, hasta el corte · base del E1, sin DC-04: <b>D20</b>
+              reclamos y consultas acumulados, y NPS medio mensual en puntos, hasta el corte · base del E1, sin DC-04: <b>D20</b>
             </p>
           </div>
 
@@ -160,7 +160,7 @@ function LeyendaLinea() {
  * cantidad de filas cliente-mes detrás de ese punto). Solo el último punto de cada serie
  * lleva rótulo directo sobre el trazo (regla 14): con cuatro años muy juntos, rotular los
  * cuatro puntos de las dos series los superponía, sobre todo en 2022 donde las dos casi
- * coinciden (41,8 % vs. 41,3 %); el BAN de arriba ya da las dos cifras de 2025 exactas.
+ * coinciden (41,8 vs. 41,3 puntos); el BAN de arriba ya da las dos cifras de 2025 exactas.
  */
 function GraficoNPS({ serie, w, h }) {
   if (!serie.length) return null
@@ -187,17 +187,17 @@ function GraficoNPS({ serie, w, h }) {
 
   return (
     <svg width={w} height={h} role="img"
-         aria-label={'NPS anual: ' + serie.map((f) => `${f.anio} con todo ${pct(f.con_todo)}, solo con interacción ${pct(f.solo_con_interaccion)}`).join('; ')}
+         aria-label={'NPS anual, en puntos: ' + serie.map((f) => `${f.anio} con todo ${decimal(f.con_todo, 1)}, solo con interacción ${decimal(f.solo_con_interaccion, 1)}`).join('; ')}
          style={{ display: 'block' }}>
       <text fontFamily="var(--mono)" x={2} y={9} fontSize="10" fontWeight={600} fill="var(--mut2)"
-            letterSpacing=".08em" style={{ textTransform: 'uppercase' }}>NPS</text>
+            letterSpacing=".08em" style={{ textTransform: 'uppercase' }}>NPS (puntos)</text>
 
       <line x1={padL} x2={padL} y1={padT} y2={yBase} stroke="var(--eje)" strokeWidth="1" />
       {ticks.map((t) => (
         <g key={t}>
           <line x1={padL - 4} x2={padL} y1={Y(t)} y2={Y(t)} stroke="var(--eje)" strokeWidth="1" />
           <text x={padL - 7} y={Y(t)} fontSize="9.5" fill="var(--mut)" textAnchor="end"
-                dominantBaseline="central" className="tabular">{pct(t, 0)}</text>
+                dominantBaseline="central" className="tabular">{decimal(t, 0)}</text>
         </g>
       ))}
       <line x1={padL} x2={padL + iw} y1={yBase} y2={yBase} stroke="var(--eje)" strokeWidth="1" />
@@ -212,7 +212,7 @@ function GraficoNPS({ serie, w, h }) {
                       strokeDasharray={campo === 'con_todo' ? '5 3' : undefined} />
             {pts.map(([x, y], i) => (
               <g key={i}>
-                <title>{lectura(String(serie[i].anio), nombreSerie[campo], pct(serie[i][campo]), `base ${entero(base(serie[i], campo))} filas`)}</title>
+                <title>{lectura(String(serie[i].anio), nombreSerie[campo], decimal(serie[i][campo], 1) + ' pts', `base ${entero(base(serie[i], campo))} filas`)}</title>
                 {campo === 'con_todo'
                   ? <rect x={x - 3} y={y - 3} width={6} height={6} fill="var(--sup)" stroke={color} strokeWidth="1.5" />
                   : <circle cx={x} cy={y} r={3.5} fill={color} stroke="var(--sup)" strokeWidth="1.5" />}
@@ -220,7 +220,7 @@ function GraficoNPS({ serie, w, h }) {
             ))}
             <text x={pts[ultimo][0]} y={pts[ultimo][1] + (campo === 'con_todo' ? -9 : 15)}
                   fontSize="11" fontWeight={700} fill={color} textAnchor="end" className="tabular">
-              {pct(serie[ultimo][campo])}
+              {decimal(serie[ultimo][campo], 1)}
             </text>
           </g>
         )

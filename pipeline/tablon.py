@@ -117,7 +117,7 @@ def _tienda_dominante(tx_hasta_t: pd.DataFrame) -> pd.Series:
 
 def _fila_por_corte(t: pd.Timestamp, base: dict) -> pd.DataFrame:
     """Las features de todos los clientes elegibles y no en riesgo en el corte T,
-    mas el target y_churn_90 evaluado en T+90 (client_facts, misma regla del E1)."""
+    mas el target y_churn_90 evaluado en T+30, T+60 y T+90 (client_facts, misma regla del E1)."""
     tx, clientes, fidelizacion = base["tx"], base["clientes"], base["fidelizacion"]
     campanias, soporte = base["campanias"], base["soporte"]
     devoluciones, bajas = base["devoluciones"], base["bajas"]
@@ -129,9 +129,14 @@ def _fila_por_corte(t: pd.Timestamp, base: dict) -> pd.DataFrame:
         return pd.DataFrame(columns=COLUMNAS)
     ids = elegibles.index
 
-    t90 = t + _D90
-    facts_t90 = features.client_facts(tx, t90)
-    y = facts_t90["en_riesgo"].reindex(ids, fill_value=False).astype(int)
+    # Target: existencia de B_i(t)=1 en (T, T+90] (Anexo 1, seccion 10), evaluada en tres
+    # puntos de la ventana: T+30, T+60 y T+90 dias. Quien cruza y vuelve a comprar entre dos
+    # evaluaciones queda en 0; la v0.2 evaluara cada dia.
+    y = pd.Series(False, index=ids)
+    for dias in (30, 60, 90):
+        f = features.client_facts(tx, t + pd.Timedelta(days=dias))
+        y = y | f["en_riesgo"].reindex(ids, fill_value=False)
+    y = y.astype(int)
 
     tx_hasta_t = tx[tx["fecha"] <= t]
     tx_90 = tx[(tx["fecha"] > t - _D90) & (tx["fecha"] <= t)]
@@ -281,12 +286,13 @@ def construir(data_dir_e1: Path, data_dir_e2: Path) -> tuple[pd.DataFrame, dict]
         "por_particion": por_particion,
         "tasa_global_pct": round(float(df["y_churn_90"].mean()) * 100, 2) if len(df) else None,
         "positivos": int(df["y_churn_90"].sum()),
+        "evaluacion_target": "existencia en (T, T+90] evaluada en T+30, T+60 y T+90 dias",
         "notas": [
-            "y_churn_90 se evalua con features.client_facts en T+90 (misma regla de en_riesgo "
-            "que el E1), no con el historial completo de (T, T+90]: si el cliente cruza su "
-            "umbral y vuelve a comprar dentro de la ventana, la fila queda en 0 (no cruzo al "
-            "cierre de la ventana, aunque haya cruzado un dia intermedio). Documentado en "
-            "CONTRACT_E2.md seccion 4.",
+            "y_churn_90 evalua la regla de en_riesgo del E1 (features.client_facts) en tres "
+            "puntos de la ventana, T+30, T+60 y T+90 dias, y vale 1 si en alguno el cliente esta "
+            "en riesgo: es la existencia en (T, T+90] del Anexo 1 (seccion 10) discretizada a "
+            "tres evaluaciones; quien cruza y vuelve a comprar entre dos evaluaciones queda en "
+            "0. Documentado en CONTRACT_E2.md seccion 4.",
             "Los cortes 2024-10-31 a 2024-12-31 quedan marcados 'gap': su ventana de target cae "
             "en 2025-01 a 2025-03 (con cobertura confirmada), pero se excluyen de train/dev/test "
             "para no mezclar corte de features de 2024 con separacion arbitraria.",
