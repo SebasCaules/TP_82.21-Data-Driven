@@ -24,6 +24,7 @@
 import { Lienzo, Tramas } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { entero, pct, fechaCorta } from '../formato.js'
+import TarjetaDecision from '../TarjetaDecision.jsx'
 
 // Todo lo que el h1 y `meta.titulo` necesitan se calcula acá afuera, a nivel de módulo: son
 // el mismo texto (regla dura del contrato de vistas) y D2 es estático, así que no hace falta
@@ -55,8 +56,9 @@ const embudoFilas = [
   { etq: 'Compra a 7 días', antes: embudo.antes.compra_pct, despues: embudo.despues.compra_pct, dec: 2 },
 ]
 
-const TITULO = `${entero(repetidos)} envíos repetidos y ${entero(bajas2026)} bajas 2026 `
-  + `fuera: ${entero(anclaContactables800)} → ${entero(sinBaja)} contactables de 800`
+// El 200 y las 399 bajas quedan en sus tarjetas: el título dice solo lo que cambia la campaña.
+const TITULO = `De la lista de 800 se puede escribir a ${entero(sinBaja)}, `
+  + `no a los ${entero(anclaContactables800)} del E1`
 
 /** Barra de composición de los 800, con un tramo por estado y un <title> propio en cada uno
  *  (etiqueta, valor y porcentaje): lo que `BarrasApiladas100` no da porque agrupa toda la
@@ -146,26 +148,30 @@ export default function V06Envios() {
         <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)', flex: '1.4 1 0', minHeight: 0 }}>
           <div className="tarjeta" style={{ flex: '1.5 1 0', minWidth: 0 }}>
             <span className="kpi-lbl">A quién se le puede escribir · lista de 800</span>
-            <Lienzo>
-              {({ w, h }) => <BarraContactables800 w={w} h={h} />}
-            </Lienzo>
+            {/* Alto acotado al que usa la barra (20 + 92 + 30 px): con mas, a 1920 la cadena
+                568 -> 567 -> 549 queda separada de la barra por aire vacío del svg */}
+            <div style={{ flex: '0 0 auto', height: 150, display: 'flex' }}>
+              <Lienzo>
+                {({ w, h }) => <BarraContactables800 w={w} h={h} />}
+              </Lienzo>
+            </div>
             <div className="ban-par" style={{ marginTop: 6, gap: 'clamp(7px, 1vw, 14px)' }}>
               <div className="par-item par-antes">
-                <span className="par-lbl">E1 · C11</span>
+                <span className="par-lbl">E1 (C11)</span>
                 <span className="par-val tabular" style={{ fontSize: 'clamp(15px, 1.5vw, 21px)' }}>
                   {entero(anclaContactables800)}
                 </span>
               </div>
               <span className="par-flecha" style={{ fontSize: 13 }}>→</span>
               <div className="par-item par-antes">
-                <span className="par-lbl">DC-04</span>
+                <span className="par-lbl">identidad unida (DC-04)</span>
                 <span className="par-val tabular" style={{ fontSize: 'clamp(15px, 1.5vw, 21px)' }}>
                   {entero(conConsentimiento)}
                 </span>
               </div>
               <span className="par-flecha" style={{ fontSize: 13 }}>→</span>
               <div className="par-item par-despues">
-                <span className="par-lbl">DC-12</span>
+                <span className="par-lbl">sin bajas (DC-12)</span>
                 <span className="par-val tabular" style={{ fontSize: 'clamp(15px, 1.5vw, 21px)' }}>
                   {entero(sinBaja)}
                 </span>
@@ -180,7 +186,7 @@ export default function V06Envios() {
           </div>
 
           <div style={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', gap: 'clamp(10px, 1.4vh, 18px)', minWidth: 0 }}>
-            <div className="tarjeta" style={{ flex: '1 1 0', justifyContent: 'center' }}>
+            <div className="tarjeta" style={{ flex: '1 1 0', justifyContent: 'flex-start' }}>
               <span className="kpi-lbl">Envíos de campañas: antes → después</span>
               <div className="ban-par">
                 <div className="par-item par-antes">
@@ -194,20 +200,20 @@ export default function V06Envios() {
                 </div>
               </div>
               <span className="kpi-sub">
-                {entero(repetidos)} id_envio repetidos, fuera del envío por el dedupe (DC-05).
+                {entero(repetidos)} envíos repetidos se cuentan una sola vez (DC-05).
               </span>
             </div>
 
-            <div className="tarjeta" style={{ flex: '1 1 0', justifyContent: 'center' }}>
+            <div className="tarjeta" style={{ flex: '1 1 0', justifyContent: 'flex-start' }}>
               <span className="kpi-lbl">Bajas: total → hasta el corte</span>
               <div className="ban-par">
                 <div className="par-item par-antes">
-                  <span className="par-lbl">Total</span>
+                  <span className="par-lbl">Total, filtro de contacto</span>
                   <span className="par-val tabular">{entero(bajas.total)}</span>
                 </div>
                 <span className="par-flecha">→</span>
                 <div className="par-item par-despues">
-                  <span className="par-lbl">Hasta el corte</span>
+                  <span className="par-lbl">Hasta el corte, análisis de compras</span>
                   <span className="par-val tabular">{entero(bajas.hasta_corte)}</span>
                 </div>
               </div>
@@ -221,46 +227,40 @@ export default function V06Envios() {
 
         <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)', flex: '1 1 0', minHeight: 0 }}>
           <div className="tarjeta" style={{ flex: '1.3 1 0', minWidth: 0 }}>
-            <span className="kpi-lbl">Embudo de campañas: antes → después del dedupe</span>
-            <div className="antes-despues">
-              <div className="col col-antes">
-                <span className="col-rotulo">Antes</span>
+            <span className="kpi-lbl"><span>Embudo de campañas</span><b>DC-05</b></span>
+            <table className="tabla-e2" style={{ marginTop: 8, fontSize: 12.5 }}>
+              <thead>
+                <tr>
+                  {/* th a 10,5 px: el 9,5 px de .tabla-e2 th quedaba bajo el mínimo legible */}
+                  <th style={{ fontSize: 10.5 }}>Etapa</th>
+                  <th className="th-antes" style={{ textAlign: 'right', fontSize: 10.5 }}>Antes</th>
+                  <th className="th-despues" style={{ textAlign: 'right', fontSize: 10.5 }}>Después</th>
+                </tr>
+              </thead>
+              <tbody>
                 {embudoFilas.map((f) => (
-                  <div key={f.etq} style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                    <span>{f.etq}</span>
-                    <span className="tabular">{pct(f.antes, f.dec)}</span>
-                  </div>
+                  <tr key={f.etq}>
+                    <td>{f.etq}</td>
+                    <td className="tabular" style={{ textAlign: 'right', whiteSpace: 'nowrap', color: 'var(--antes)' }}>
+                      {pct(f.antes, f.dec)}
+                    </td>
+                    <td className="tabular" style={{ textAlign: 'right', whiteSpace: 'nowrap', color: 'var(--despues)', fontWeight: 600 }}>
+                      {pct(f.despues, f.dec)}
+                    </td>
+                  </tr>
                 ))}
-              </div>
-              <div className="col col-despues">
-                <span className="col-rotulo">Después</span>
-                {embudoFilas.map((f) => (
-                  <div key={f.etq} style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                    <span>{f.etq}</span>
-                    <span className="tabular">{pct(f.despues, f.dec)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
 
-          <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
-            <span className="kpi-lbl">DC-05 · decisión</span>
-            <span className="kpi-sub" style={{ marginTop: 6 }}>{dc05.decision}</span>
-            {dc05.justificacion && <span className="kpi-sub">{dc05.justificacion}</span>}
-          </div>
-
-          <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
-            <span className="kpi-lbl">DC-12 · decisión</span>
-            <span className="kpi-sub" style={{ marginTop: 6 }}>{dc12.decision}</span>
-            {dc12.justificacion && <span className="kpi-sub">{dc12.justificacion}</span>}
-          </div>
+          <TarjetaDecision dc={dc05} style={{ flex: '1 1 0', minWidth: 0 }} />
+          <TarjetaDecision dc={dc12} style={{ flex: '1 1 0', minWidth: 0 }} />
         </div>
       </div>
 
       <p className="pie-vista">
         corte <b>{fechaCorta(infoMeta.corte_ref)}</b> · base: <b>{entero(envios.despues)}</b> envíos
-        después de DC-05 · fila <b>C11</b> · <b>E02</b> · <b>D15</b> · <b>D18</b>
+        después de DC-05 · fila <b>C11</b> · <b>E02</b> · <b>D15</b> · <b>D03</b> (bajas)
       </p>
     </section>
   )
@@ -270,5 +270,5 @@ export const meta = {
   id: 'V06',
   corto: 'Envíos y bajas',
   titulo: TITULO,
-  pie: 'C11, E02, D15, D18',
+  pie: 'C11, E02, D15, D03 (bajas)',
 }

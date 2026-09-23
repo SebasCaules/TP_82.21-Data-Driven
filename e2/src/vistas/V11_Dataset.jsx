@@ -6,8 +6,8 @@
 //
 // El gráfico principal es propio: BarrasH es horizontal y acá la pregunta es una serie de
 // 33 cortes mensuales, así que la primitiva no alcanza (mismo motivo que el gráfico propio de
-// V03). Las barras van coloreadas por partición con el esquema que fija DISENO.md: train y
-// test en tinta sólida (dos tonos distintos, --despues y --ink), gap en --antes (gris, la
+// V03). Las barras van coloreadas por partición con el esquema que fija DISENO.md: train en
+// --despues sólido, test en --ink con trama clara (se confundía con train), gap en --antes (gris, la
 // misma semántica que "antes de la decisión" en el resto del tablero), y las dos particiones
 // que necesitan distinguirse por algo más que el color llevan trama: dev (azul claro) y
 // test_flag, la partición cuya ventana de target cae en los meses que DC-09 marcó "cobertura
@@ -54,28 +54,26 @@ const TITULO = hayDatos
     + `${pct(TASA_GLOBAL, 2)} de churn a 90 días`
   : 'Dataset de entrenamiento'
 
-// Qué evalúa el target: la nota de D2 (fila 1 de vistas.V11.notas, la que documenta la regla
-// de y_churn_90) si el payload la trae; si el payload todavía no la incluye, el texto fijo
-// que describe la misma regla declarada en CONTRACT_E2.md §4.
-const NOTA_TARGET = hayDatos && Array.isArray(V.notas) && V.notas[0]
-  ? V.notas[0]
-  : 'y_churn_90 se evalúa en tres puntos de la ventana: T+30, T+60 y T+90 días '
-    + '(aproximación de la existencia en (T, T+90] del Anexo 1).'
+// Qué evalúa el target, en llano para el directorio: la nota técnica de D2 (notas[0], con
+// nombres de función y sin tildes) no se lee en segundos. La referencia técnica queda en el pie.
+const NOTA_TARGET = 'Cada fila es un cliente con 3 compras o más que no está en riesgo a fin de '
+  + 'un mes. Se revisa si está en riesgo 30, 60 y 90 días después: si lo está en alguna de las '
+  + 'tres fechas, la fila cuenta como churn.'
 
 // El pie repite lo que todo pie del tablero trae (corte y base, regla transversal 4): acá la
 // base es la unidad de fila del tablón, no filas crudas, así que se arma con los mismos datos
 // del payload (cortes, primero y último) en vez de escribir la cuenta a mano.
 const PIE = hayDatos
-  ? `corte ${fechaCorta(D2.meta.corte_ref)} · base: cliente × corte, ${V.cortes.length} cortes `
-    + `${fechaCorta(V.cortes[0].corte)} a ${fechaCorta(V.cortes[V.cortes.length - 1].corte)} · `
-    + 'fila E08 del registro; target Y_i(T) del Anexo 1 v2.1; partición temporal por corte, '
-    + 'sin split aleatorio; el script es pipeline/tablon.py'
-  : 'fila E08 del registro; target Y_i(T) del Anexo 1 v2.1; partición temporal por corte, '
-    + 'sin split aleatorio; el script es pipeline/tablon.py'
+  ? 'Una fila por cliente con 3 compras o más y sin riesgo a cada fin de mes, '
+    + `${V.cortes.length} cortes del ${fechaCorta(V.cortes[0].corte)} al `
+    + `${fechaCorta(V.cortes[V.cortes.length - 1].corte)}; los datos se separan por fecha, `
+    + `no al azar · datos hasta ${fechaCorta(D2.meta.corte_ref)} · registro: E08; `
+    + 'target Y_i(T) del Anexo 1 v2.1; pipeline/tablon.py'
+  : 'registro: E08; target Y_i(T) del Anexo 1 v2.1; pipeline/tablon.py'
 
 export const meta = {
   id: 'V11',
-  corto: 'Dataset de entrenamiento',
+  corto: 'Datos para el modelo',
   titulo: TITULO,
   pie: PIE,
 }
@@ -90,6 +88,15 @@ const ETQ_PARTICION = {
   test: 'test',
   test_flag: 'test_flag · DC-09',
 }
+// Solo la leyenda del gráfico lleva el nombre en llano; la tarjeta de rangos conserva el
+// rótulo corto para no envolver.
+const ETQ_LEYENDA = {
+  train: 'train · entrenamiento',
+  dev: 'dev · ajuste',
+  gap: 'gap · separación',
+  test: 'test · prueba',
+  test_flag: 'test_flag · prueba sin cobertura confirmada (DC-09)',
+}
 // Mismo esquema de color en la leyenda, en la tarjeta de rangos y en las barras del gráfico:
 // una sola paleta, tres lugares. dev y test_flag llevan trama además de color (forma propia,
 // no solo tinte) porque son las dos particiones que DC-09 obliga a distinguir de sus vecinas
@@ -101,7 +108,10 @@ const ESTILO_PARTICION = {
     relleno: 'url(#v11-trama-dev)',
   },
   gap: { swatch: { background: 'var(--antes)' }, relleno: 'var(--antes)' },
-  test: { swatch: { background: 'var(--ink)' }, relleno: 'var(--ink)' },
+  test: {
+    swatch: { backgroundImage: 'repeating-linear-gradient(-45deg, var(--ink), var(--ink) 2px, var(--sup) 2px, var(--sup) 3px)' },
+    relleno: 'url(#v11-trama-test)',
+  },
   test_flag: {
     swatch: { backgroundImage: 'repeating-linear-gradient(45deg, var(--terra), var(--terra) 2px, var(--terra-osc) 2px, var(--terra-osc) 3px)' },
     relleno: 'url(#v11-trama-testflag)',
@@ -128,7 +138,7 @@ function LeyendaParticion() {
         }}
         >
           <SwatchParticion particion={p} />
-          {ETQ_PARTICION[p]}
+          {ETQ_LEYENDA[p]}
         </span>
       ))}
     </div>
@@ -162,7 +172,8 @@ const MUT2 = 'var(--mut2)'
 function GraficoFilasPorCorte({ w, h, cortes }) {
   if (!cortes.length) return null
   const padL = 46
-  const padT = 10
+  // 24: deja aire entre el título del eje (y=11) y la marca superior y los rótulos de partición
+  const padT = 24
   const padB = 40
   const padR = 8
   const iw = Math.max(20, w - padL - padR)
@@ -177,6 +188,22 @@ function GraficoFilasPorCorte({ w, h, cortes }) {
   const yBase = Y(0)
   const X = (i) => padL + i * paso + paso / 2
   const xFin = padL + iw
+
+  // Rótulo directo de cada partición, centrado sobre su grupo y apenas arriba de la barra más
+  // alta que queda debajo del texto (no del grupo entero: train es largo y su rótulo flotaba).
+  // Si dos rótulos vecinos se pisan (ancho estimado a 10,5 px), quedan solo train, test y
+  // test_flag; la leyenda sigue como apoyo.
+  const todos = ORDEN_PARTICION.map((p) => {
+    const idx = cortes.map((c, i) => (c.particion === p ? i : -1)).filter((i) => i >= 0)
+    if (!idx.length) return null
+    const x = (X(idx[0]) + X(idx[idx.length - 1])) / 2
+    const medio = p.length * 3.3
+    const debajo = cortes.filter((c, i) => Math.abs(X(i) - x) <= medio + anchoBarra / 2)
+    const alto = Math.max(...(debajo.length ? debajo : idx.map((i) => cortes[i])).map((c) => c.filas))
+    return { particion: p, x, y: Y(alto) - 5, medio }
+  }).filter(Boolean)
+  const sePisan = todos.some((g, k) => k > 0 && todos[k - 1].x + todos[k - 1].medio + 4 > g.x - g.medio)
+  const grupos = sePisan ? todos.filter((g) => ['train', 'test', 'test_flag'].includes(g.particion)) : todos
 
   return (
     <svg width={w} height={h} role="img"
@@ -196,6 +223,13 @@ function GraficoFilasPorCorte({ w, h, cortes }) {
         {/* test_flag: terracota con trama, misma paleta que la excepción del resto del
             tablero (--terra / --terra-osc), para que la partición que DC-09 aisló se lea
             como lo que es: la excepción, no una categoría más. */}
+        {/* test: tinta con trama clara en sentido contrario a dev, para que no se confunda
+            con train cuando la tinta y el azul oscuro se acercan en el proyector. */}
+        <pattern id="v11-trama-test" width="6" height="6" patternUnits="userSpaceOnUse"
+                 patternTransform="rotate(-45)">
+          <rect width="6" height="6" fill="var(--ink)" />
+          <line x1="0" y1="0" x2="0" y2="6" stroke="var(--sup)" strokeWidth="2" opacity=".45" />
+        </pattern>
         <pattern id="v11-trama-testflag" width="6" height="6" patternUnits="userSpaceOnUse"
                  patternTransform="rotate(45)">
           <rect width="6" height="6" fill="var(--terra)" />
@@ -205,7 +239,7 @@ function GraficoFilasPorCorte({ w, h, cortes }) {
 
       <text fontFamily="var(--mono)" x={padL} y={11} fontSize="11" fill={MUT2}
             letterSpacing=".09em" fontWeight={600} style={{ textTransform: 'uppercase' }}>
-        filas por corte
+        filas
       </text>
 
       <line x1={padL} x2={padL} y1={padT} y2={yBase} stroke={EJE} strokeWidth="1" />
@@ -232,6 +266,11 @@ function GraficoFilasPorCorte({ w, h, cortes }) {
           </g>
         )
       })}
+
+      {grupos.map((g) => (
+        <text key={`g${g.particion}`} x={g.x} y={g.y} fontSize="10.5" fill={MUT2}
+              textAnchor="middle" fontWeight={600}>{g.particion}</text>
+      ))}
 
       {/* eje X: mesCorto cada 3 meses (regla del DISEÑO para esta vista), nada en diagonal */}
       {cortes.map((c, i) => {
@@ -298,7 +337,14 @@ function GraficoTasaPorCorte({ w, h, cortes }) {
   const xFin = padL + iw
 
   const puntos = cortes.map((c, i) => [X(i), Y(c.tasa_pct)])
-  const linea = puntos.map((p) => p.join(',')).join(' ')
+  // test_flag (DC-09): franja terracota desde medio paso antes de su primer corte y tramo
+  // punteado desde el último punto anterior, porque su target cae en meses sin cobertura
+  // confirmada. Si el payload no trae test_flag, la línea queda entera sólida.
+  const iFlag = cortes.findIndex((c) => c.particion === 'test_flag')
+  const paso = n > 1 ? iw / (n - 1) : iw
+  const corteSolido = iFlag > 0 ? iFlag - 1 : iFlag === 0 ? 0 : n - 1
+  const linea = puntos.slice(0, corteSolido + 1).map((p) => p.join(',')).join(' ')
+  const lineaFlag = iFlag >= 0 ? puntos.slice(corteSolido).map((p) => p.join(',')).join(' ') : ''
 
   // Punto de valor más alto: siempre el primer corte en esta serie (el churn a 90 días baja
   // con el tiempo), pero se calcula igual por si el payload cambia. Se ancla hacia ADENTRO
@@ -316,10 +362,20 @@ function GraficoTasaPorCorte({ w, h, cortes }) {
            + cortes.map((c) => `${mesCorto(c.corte)} ${pct(c.tasa_pct)} partición ${c.particion}`).join(', ')}
          style={{ display: 'block' }}
     >
-      <text fontFamily="var(--mono)" x={padL} y={11} fontSize="11" fill={MUT2}
+      {iFlag >= 0 && (
+        <rect x={X(iFlag) - paso / 2} y={padT} width={xFin - (X(iFlag) - paso / 2)}
+              height={ih} fill="var(--terra)" opacity=".07" />
+      )}
+
+      <text fontFamily="var(--mono)" x={padL + 6} y={11} fontSize="11" fill={MUT2}
             letterSpacing=".09em" fontWeight={600} style={{ textTransform: 'uppercase' }}>
         % churn a 90 días
       </text>
+      {iFlag >= 0 && (
+        <text x={xFin} y={11} fontSize="10" fill="var(--terra)" fontWeight={600} textAnchor="end">
+          test_flag · cobertura no confirmada (DC-09)
+        </text>
+      )}
 
       <line x1={padL} x2={padL} y1={padT} y2={yBase} stroke={EJE} strokeWidth="1" />
       {ticks.map((t) => (
@@ -333,6 +389,10 @@ function GraficoTasaPorCorte({ w, h, cortes }) {
 
       <polyline points={linea} fill="none" stroke="var(--acc)" strokeWidth="2.25"
                 strokeLinejoin="round" strokeLinecap="round" />
+      {lineaFlag && (
+        <polyline points={lineaFlag} fill="none" stroke="var(--acc)" strokeWidth="2.25"
+                  strokeDasharray="4 3" strokeLinejoin="round" />
+      )}
 
       {cortes.map((c, i) => (
         <g key={c.corte}>
@@ -405,7 +465,7 @@ export default function V11Dataset() {
           </span>
         </div>
         <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
-          <span className="kpi-lbl">Positivos, churn a 90 días</span>
+          <span className="kpi-lbl">Filas con churn a 90 días</span>
           <span className="kpi-val tabular">{entero(V.positivos)}</span>
           <span className="kpi-base">{pct(TASA_GLOBAL, 2)} sobre el total de filas</span>
         </div>
@@ -438,7 +498,7 @@ export default function V11Dataset() {
           gap: 'clamp(10px, 1.5vh, 16px)',
         }}
         >
-          <div className="tarjeta" style={{ flex: '1.35 1 0', minHeight: 0 }}>
+          <div className="tarjeta" style={{ flex: '1.6 1 0', minHeight: 0 }}>
             {/* Sin kpi-sub: filas/columnas/features ya están en la primera tarjeta de arriba
                 ("Filas × columnas") y repetirlas acá le sacaba a la lista de particiones el
                 alto que necesita para no desbordar la tarjeta (ver nota más abajo). */}
@@ -468,7 +528,7 @@ export default function V11Dataset() {
                       {entero(r.filas)} filas
                     </span>
                   </div>
-                  <div className="tabular" style={{ fontSize: 9.5, lineHeight: 1.2, color: 'var(--mut)', paddingLeft: 18 }}>
+                  <div className="tabular" style={{ fontSize: 10.5, lineHeight: 1.2, color: 'var(--mut)', paddingLeft: 18 }}>
                     {fechaCorta(r.desde)}–{fechaCorta(r.hasta)}
                   </div>
                 </div>
@@ -478,14 +538,14 @@ export default function V11Dataset() {
                 (decisión + justificación de DC-09) ya está en la vista 03, que es donde se
                 decide la cobertura no confirmada. Repetirlo entero acá era la misma tarjeta
                 dos veces en el tablero. */}
-            <p style={{ margin: '5px 0 0', fontSize: 9.5, lineHeight: 1.2, color: 'var(--mut)' }}>
+            <p style={{ margin: '5px 0 0', fontSize: 10.5, lineHeight: 1.2, color: 'var(--mut)' }}>
               test_flag aislado por <b style={{ color: 'var(--mut2)' }}>DC-09</b> (ver vista 03)
             </p>
           </div>
 
           <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
             <span className="kpi-lbl">Cómo se mide el target</span>
-            <p style={{ margin: '6px 0 0', fontSize: 11, lineHeight: 1.3, color: 'var(--ink)' }}>
+            <p style={{ margin: '6px 0 0', fontSize: 'var(--e2-txt2)', lineHeight: 1.35, color: 'var(--ink)' }}>
               {NOTA_TARGET}
             </p>
           </div>

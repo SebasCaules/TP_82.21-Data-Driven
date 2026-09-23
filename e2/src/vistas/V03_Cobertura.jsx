@@ -15,6 +15,8 @@
 import { Lienzo } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { entero, fechaCorta, mesCorto, montoM, pct } from '../formato.js'
+import TarjetaDecision from '../TarjetaDecision.jsx'
+import ValorMonto from '../ValorMonto.jsx'
 
 const V03 = D2.vistas.V03
 const DC09 = D2.decisiones.find((d) => d.id === 'DC-09')
@@ -29,20 +31,23 @@ const capitalizar = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 const CREF = V03.sensibilidad.corte_ref
 const CSENS = V03.sensibilidad.corte_sens
 
-// Auditoría T-03: el corte de referencia (CREF.pct) ya incorpora DC-04 (unión de
-// duplicados, V04): por eso salta de los 49,6 % con que cierra V02 a 50,4 % acá. El rótulo
-// del par lo dice, no solo el pie, porque es lo primero que el lector compara contra V02.
-const ETQ_CREF = `corte ${fechaCorta(D2.meta.corte_ref)} · después de DC-04, en revisión (ver V04)`
+// El umbral sale del payload (D5-15): titulo, linea y rotulo lo leen de aca.
+const UMBRAL = D2.meta.umbral_cobertura
 
-// El titulo dice el hallazgo con la cifra: cuantos meses bajan del umbral y el rango de
-// riesgo segun que corte se use. Todo sale de D2 (meses_flag.length, sensibilidad.*.pct).
-const TITULO = `${capitalizar(N_PALABRA[N_FLAG] ?? N_FLAG)} meses de 2025 bajan del 60 %: ` +
-  `riesgo ${pct(CREF.pct)} o ${pct(CSENS.pct)} según el corte`
+// Auditoría T-03: el corte de referencia (CREF.pct) ya incorpora DC-04 (unión de
+// duplicados, vista 4): por eso salta de los 49,6 % con que cierra V02 a 50,4 % acá. El
+// rótulo del par lo dice, porque es lo primero que el lector compara contra V02.
+const ETQ_CREF = `al ${fechaCorta(D2.meta.corte_ref)}, con duplicados unidos, en revisión`
+const ETQ_SENS = `al ${fechaCorta(D2.meta.corte_sens)}, último mes confirmado`
+
+// El titulo dice el hallazgo: cuantos meses de 2025 quedan bajo el umbral (D4-15).
+const TITULO = `${capitalizar(N_PALABRA[N_FLAG] ?? String(N_FLAG))} meses de 2025 con menos del ` +
+  `${Math.round(UMBRAL * 100)} % de las operaciones de un año antes`
 
 const PIE = `corte de referencia ${fechaCorta(D2.meta.corte_ref)} · serie de filas únicas ` +
   `con monto positivo, antes de DC-04 · sensibilidad después de DC-04, corte ` +
-  `${fechaCorta(D2.meta.corte_sens)} · fila E01 (sensibilidad); C03 y C04 en revisión al ` +
-  `corte de referencia · ${DC09.hallazgo}`
+  `${fechaCorta(D2.meta.corte_sens)} · fila E01 (sensibilidad); D22 en revisión al ` +
+  `corte de referencia (hereda C03 y C04) · ${DC09.hallazgo}`
 
 export const meta = { id: 'V03', corto: 'Cobertura 2025', titulo: TITULO, pie: PIE }
 
@@ -54,24 +59,20 @@ export default function V03Cobertura() {
       <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(10px, 1.5vh, 16px)' }}>
         <div style={{ display: 'flex', gap: 'clamp(16px, 2.4vw, 34px)', flex: '0 0 auto' }}>
           <ParDoble
-            grupo="Riesgo en el corte"
-            etqAntes={ETQ_CREF}
-            valAntes={pct(CREF.pct)}
-            etqDespues={`sensibilidad ${fechaCorta(D2.meta.corte_sens)}`}
-            valDespues={pct(CSENS.pct)}
+            grupo="Clientes en riesgo, según la fecha de medición"
+            valRef={<span className="par-val tabular" style={{ color: 'var(--ink)' }}>{pct(CREF.pct)}</span>}
+            valSens={<span className="par-val tabular" style={{ color: 'var(--ink)' }}>{pct(CSENS.pct)}</span>}
           />
           <ParDoble
-            grupo="Exposición anual"
-            etqAntes={ETQ_CREF}
-            valAntes={montoM(CREF.exposicion_M)}
-            etqDespues={`sensibilidad ${fechaCorta(D2.meta.corte_sens)}`}
-            valDespues={montoM(CSENS.exposicion_M)}
+            grupo="Exposición anual, según la fecha de medición"
+            valRef={<ValorMonto texto={montoM(CREF.exposicion_M)} />}
+            valSens={<ValorMonto texto={montoM(CSENS.exposicion_M)} />}
           />
         </div>
 
         <div className="tarjeta" style={{ flex: '1', minHeight: 0 }}>
           <span className="kpi-lbl">
-            <span>Ventas del mes vs. mismo mes del año anterior</span>
+            <span>Operaciones del mes contra el mismo mes del año anterior</span>
             <b className="tabular">{entero(V03.serie.length)} meses</b>
           </span>
           <Lienzo>
@@ -79,17 +80,7 @@ export default function V03Cobertura() {
           </Lienzo>
         </div>
 
-        <div className="tarjeta" style={{ flex: '0 0 auto', padding: '10px 15px' }}>
-          <span className="kpi-lbl"><span>Decisión</span><b>DC-09</b></span>
-          <p style={{ margin: '5px 0 0', fontSize: 12, lineHeight: 1.45, color: 'var(--ink)' }}>
-            {DC09.decision}
-          </p>
-          {DC09.justificacion && (
-            <p style={{ margin: '6px 0 0', fontSize: 11, lineHeight: 1.4, color: 'var(--mut)' }}>
-              <b style={{ color: 'var(--mut2)' }}>Justificación.</b> {DC09.justificacion}
-            </p>
-          )}
-        </div>
+        <TarjetaDecision dc={DC09} style={{ flex: '0 0 auto' }} />
       </div>
 
       <p className="pie-vista">{PIE}</p>
@@ -97,28 +88,36 @@ export default function V03Cobertura() {
   )
 }
 
-/** Un par de números grandes, antes (gris) contra después (azul). Dos instancias, una por
- *  métrica (riesgo, exposición): es el ".ban-par doble" que pide el contrato de la vista. */
-function ParDoble({ grupo, etqAntes, valAntes, etqDespues, valDespues }) {
+/** La misma cifra medida en dos fechas (D1-12): no es un antes y un después, así que no
+ *  lleva flecha ni el gris/azul del par; las dos cifras en tinta y la sensibilidad con la
+ *  marca punteada de V10 (forma, no color). Una instancia por métrica. */
+function ParDoble({ grupo, valRef, valSens }) {
+  const lbl = { color: 'var(--mut2)', lineHeight: 1.25 }
+  // Rótulo arriba, cifra abajo: con rótulos de largo distinto las dos cifras quedan a la par.
+  const item = { flex: '1 1 0', color: 'var(--ink)', justifyContent: 'space-between', gap: 4, paddingTop: 5 }
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: '1 1 0', minWidth: 0 }}>
       <span className="kpi-lbl" style={{ marginBottom: 0 }}>{grupo}</span>
-      <div className="ban-par">
-        <div className="par-item par-antes">
-          <span className="par-lbl">{etqAntes}</span>
-          <span className="par-val tabular">{valAntes}</span>
+      <div className="ban-par" style={{ alignItems: 'stretch' }}>
+        <div className="par-item" style={{ ...item, borderTop: '2px solid transparent' }}>
+          <span className="par-lbl" style={lbl}>{ETQ_CREF}</span>
+          {valRef}
         </div>
-        <span className="par-flecha" aria-hidden="true">→</span>
-        <div className="par-item par-despues">
-          <span className="par-lbl">{etqDespues}</span>
-          <span className="par-val tabular">{valDespues}</span>
+        <div className="par-item" style={{ ...item, borderTop: '2px dashed var(--mut2)' }}>
+          <span className="par-lbl" style={{ ...lbl, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+            <span
+              aria-hidden="true"
+              style={{ width: 9, height: 9, borderRadius: '50%', border: '1.5px dashed var(--mut2)', flexShrink: 0, boxSizing: 'border-box' }}
+            />
+            <span>{ETQ_SENS}</span>
+          </span>
+          {valSens}
         </div>
       </div>
     </div>
   )
 }
 
-const UMBRAL = 0.6
 const TOPE = 3   // 300 %: techo de lectura, no de dato. Ver comentario de cabecera.
 const EJE = 'var(--eje)'
 const MUT = 'var(--mut)'
@@ -158,7 +157,13 @@ function GraficoCobertura({ w, h, serie }) {
   const offscale = puntos.filter((p) => p.pctv > TOPE * 100)
   const flags = puntos.filter((p) => MESES_FLAG.has(p.mes))
 
-  const linea = puntos.map((p) => `${X(p.i)},${Y(p.pctv)}`).join(' ')
+  // D2-20: la linea arranca en el primer punto en escala; los meses sobre el techo quedan
+  // como circulos sueltos y un tramo punteado los une a la serie.
+  const enEscala = puntos.findIndex((p) => p.pctv <= TOPE * 100)
+  const linea = (enEscala < 0 ? [] : puntos.slice(enEscala))
+    .map((p) => `${X(p.i)},${Y(p.pctv)}`).join(' ')
+  const ultOff = enEscala > 0 ? puntos[enEscala - 1] : null
+  const priEsc = enEscala >= 0 ? puntos[enEscala] : null
 
   const iPrimerOff = offscale.length ? offscale[0].i : null
   const iUltimoOff = offscale.length ? offscale[offscale.length - 1].i : null
@@ -171,7 +176,7 @@ function GraficoCobertura({ w, h, serie }) {
 
   return (
     <svg width={w} height={h} role="img"
-         aria-label={`Razón de ventas contra el mismo mes del año anterior, ${serie.length} meses. Umbral 60 %. ${N_FLAG} meses de 2025 por debajo.`}
+         aria-label={`Razón de operaciones contra el mismo mes del año anterior, ${serie.length} meses. Umbral ${pct(UMBRAL * 100, 0)}. ${N_FLAG} meses de 2025 por debajo.`}
          style={{ display: 'block' }}>
       <text fontFamily="var(--mono)" x={padL} y={14} fontSize="11" fill={MUT2}
             letterSpacing=".09em" fontWeight={600} style={{ textTransform: 'uppercase' }}>
@@ -194,7 +199,7 @@ function GraficoCobertura({ w, h, serie }) {
       <line x1={padL} x2={xFin} y1={Y(UMBRAL * 100)} y2={Y(UMBRAL * 100)}
             stroke={TERRA} strokeWidth="1.25" strokeDasharray="4 3" opacity=".75" />
       <text x={xFin + 7} y={Y(UMBRAL * 100)} fontSize="11" fontWeight={600} fill={TERRA}
-            dominantBaseline="central">umbral 60 %</text>
+            dominantBaseline="central">umbral {pct(UMBRAL * 100, 0)}</text>
 
       {/* Franja de cola 2025: los meses_flag, mismo tratamiento que la franja de arranque
           pero en terracota, porque acá el color SÍ es la excepción del dato. */}
@@ -216,14 +221,25 @@ function GraficoCobertura({ w, h, serie }) {
       ))}
       <line x1={padL} x2={xFin} y1={yBase} y2={yBase} stroke={EJE} strokeWidth="1" />
 
+      {/* Grilla del 100 %: la referencia que da sentido al umbral (D3-19). */}
+      <line x1={padL} x2={xFin} y1={Y(100)} y2={Y(100)} stroke={EJE} strokeWidth="1"
+            strokeDasharray="1 3" />
+      <text x={padL + 6} y={Y(100) - 4} fontSize="10" fill={MUT}>
+        {fmtPct0(100)} = igual que un año antes
+      </text>
+
       {/* línea de la serie, con los puntos por encima del techo aplanados en el borde
           superior: su franja de arriba y su <title> dicen que ahí el dato sigue subiendo. */}
       <polyline points={linea} fill="none" stroke="var(--acc)" strokeWidth="2"
                 strokeLinejoin="round" strokeLinecap="round" opacity=".9" />
+      {ultOff && priEsc && (
+        <line x1={X(ultOff.i)} y1={Y(ultOff.pctv)} x2={X(priEsc.i)} y2={Y(priEsc.pctv)}
+              stroke="var(--acc)" strokeWidth="1.5" strokeDasharray="2 3" opacity=".9" />
+      )}
 
       {offscale.map((p) => (
         <g key={p.mes}>
-          <title>{`${mesCorto(p.mes)} · ${fmtRatio(p.ratio)} del mismo mes de 2022 · ${entero(p.n)} operaciones sobre ${entero(p.n_prev)}`}</title>
+          <title>{`${mesCorto(p.mes)} · ${fmtRatio(p.ratio)} del mismo mes de ${Number(p.mes.slice(0, 4)) - 1} · ${entero(p.n)} operaciones sobre ${entero(p.n_prev)}`}</title>
           <circle cx={X(p.i)} cy={Y(TOPE * 100)} r="3" fill="var(--sup)" stroke={GRIS} strokeWidth="1.5" />
         </g>
       ))}
@@ -232,6 +248,15 @@ function GraficoCobertura({ w, h, serie }) {
         <g key={p.mes}>
           <title>{`${mesCorto(p.mes)} · ${fmtPct0(p.pctv)} del mismo mes del año anterior · cobertura no confirmada · ${entero(p.n)} operaciones sobre ${entero(p.n_prev)}`}</title>
           <circle cx={X(p.i)} cy={Y(p.pctv)} r="3.5" fill={TERRA} stroke="var(--sup)" strokeWidth="1.5" />
+          {/* Valor escrito solo en el primero y el último: los del medio van en el <title>. */}
+          {/* Si debajo del punto no hay lugar antes del eje X, el valor va a su derecha. */}
+          {(p.i === iPrimerFlag || p.i === iUltimoFlag) && (
+            Y(p.pctv) + 16 <= yBase
+              ? <text x={p.i === iPrimerFlag ? X(p.i) - 5 : X(p.i)} y={Y(p.pctv) + 14} fontSize="10" fontWeight={600} fill={TERRA}
+                      textAnchor={p.i === iPrimerFlag ? 'end' : 'middle'} className="tabular">{fmtPct0(p.pctv)}</text>
+              : <text x={X(p.i) + 7} y={Y(p.pctv)} fontSize="10" fontWeight={600} fill={TERRA}
+                      textAnchor="start" dominantBaseline="central" className="tabular">{fmtPct0(p.pctv)}</text>
+          )}
         </g>
       ))}
 
@@ -253,7 +278,7 @@ function GraficoCobertura({ w, h, serie }) {
       ))}
       <text fontFamily="var(--mono)" x={xFin} y={yBase + 34} fontSize="11" fill={MUT2}
             textAnchor="end" letterSpacing=".09em" fontWeight={600}
-            style={{ textTransform: 'uppercase' }}>mes, ene-23 a dic-25</text>
+            style={{ textTransform: 'uppercase' }}>mes, {mesCorto(serie[0].mes)} a {mesCorto(serie[n - 1].mes)}</text>
     </svg>
   )
 }

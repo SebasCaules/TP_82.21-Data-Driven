@@ -7,9 +7,9 @@
 //
 // DC-10 es una decisión DECLARADA, no aplicada: antes y después son el mismo -7,6 %, porque
 // lo que cambia no es el número sino la salvedad que lo acompaña (CONTRACT_E2.md, DC-10).
-// Auditoría T-05: sin un .ban-par explícito esa declaración no se veía en ningún lado, así
-// que la primera tarjeta ahora es un .ban-par (antes: lectura nominal; después: mismo valor,
-// marcado como sin cambio) en vez del kpi suelto que tenía antes.
+// Auditoría del 22/09 (D1-14, D4-16): el par antes/después repetía la misma cifra a los dos
+// lados, así que la primera tarjeta muestra un solo valor (mediana inicial → final) y la
+// salvedad va en el kpi-sub. La declaración la lleva la TarjetaDecision.
 //
 // Auditoría T-11: Linea no pone <title> en cada punto, solo en el pico y en el punto bajo el
 // cursor. Como esta vista no puede tocar graficos.jsx, puntosDeLinea() recalcula la misma
@@ -22,6 +22,7 @@
 import { Lienzo, Linea, BarrasDivergentes, escalaNice } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { entero, pct, pesos, decimal, fechaCorta } from '../formato.js'
+import TarjetaDecision from '../TarjetaDecision.jsx'
 
 const V = D2.vistas.V08
 const DC10 = D2.decisiones.find((d) => d.id === 'DC-10')
@@ -34,7 +35,11 @@ const ipcUltimo = V.ipc[V.ipc.length - 1]?.acumulado ?? null
 const verboPrecio = V.variacion_pct < 0 ? 'bajó' : 'subió'
 
 const TITULO = `Precio unitario ${verboPrecio} ${pct(Math.abs(V.variacion_pct))} en pesos ` +
-  `corrientes; IPC multiplicó ×${entero(ipcUltimo)}`
+  `corrientes; IPC acumulado ${decimal(ipcUltimo, 1)}×`
+// A 1152x640 cada px vertical va al area de dibujo: el piso de fit.js es 90 px.
+const PAD_GRAF = { paddingTop: 6, paddingBottom: 6 }
+const m0 = V.mediana_unitaria[0]?.valor ?? null
+const mN = V.mediana_unitaria[V.mediana_unitaria.length - 1]?.valor ?? null
 
 export const meta = {
   id: 'V08',
@@ -91,7 +96,8 @@ export default function V08Precios() {
   const datosCategorias = categorias.map((c) => ({
     etiqueta: c.categoria,
     valor: c.pct,
-    enfasis: c.categoria === categorias[0].categoria,
+    // Sin énfasis (D2-11): el orden ya dice cuál baja más; el azul se lee como "corregido".
+    enfasis: false,
     nota: `${pesos(c.v2022)} → ${pesos(c.v2025)}`,
   }))
 
@@ -101,45 +107,29 @@ export default function V08Precios() {
 
       <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)', flex: '0 0 auto' }}>
         <div className="tarjeta" style={{ flex: '1 1 280px', minWidth: 0 }}>
-          <span className="kpi-lbl">Precio unitario {anioPrecioIni}→{anioPrecioFin} — <b className="tabular">DC-10</b></span>
-          <div className="ban-par" style={{ marginTop: 6, flexWrap: 'wrap' }}>
-            <div className="par-item par-antes">
-              <span className="par-lbl">Antes</span>
-              <span className="par-val" style={{ fontSize: 15.5, lineHeight: 1.32 }}>
-                {pct(V.variacion_pct)} nominal ({anioPrecioIni} → {anioPrecioFin})
-              </span>
-            </div>
-            <span className="par-flecha">→</span>
-            <div className="par-item par-despues">
-              <span className="par-lbl">Después</span>
-              <span className="par-val" style={{ fontSize: 15.5, lineHeight: 1.32 }}>
-                {pct(V.variacion_pct)}, sin deflactar: sin cambio (DC-10 declarada)
-              </span>
-            </div>
-          </div>
+          <span className="kpi-lbl"><span>Mediana del precio unitario, pesos corrientes</span><b>DC-10</b></span>
+          <span className="kpi-val tabular"
+                style={{ fontSize: 'clamp(17px, 1.75vw, 30px)', whiteSpace: 'nowrap' }}>
+            {pesos(m0)} ({anioPrecioIni}) → {pesos(mN)} ({anioPrecioFin})
+          </span>
+          <span className="kpi-sub" style={{ minHeight: 0 }}>{pct(V.variacion_pct)}, sin ajustar por inflación (DC-10 declarada)</span>
         </div>
 
-        <div className="tarjeta" style={{ flex: '0 0 auto', minWidth: 130 }}>
-          <span className="kpi-lbl">IPC acumulado {anioIpcIni}→{anioIpcFin}</span>
-          <span className="kpi-val tabular">{decimal(ipcUltimo, 1)}x</span>
-          <span className="kpi-base">base {anioIpcIni} = 1</span>
+        <div className="tarjeta" style={{ flex: '0 1 300px', minWidth: 150 }}>
+          <span className="kpi-lbl">IPC acumulado, inflación {anioIpcIni} a {anioIpcFin - 1}</span>
+          <span className="kpi-val tabular">{decimal(ipcUltimo, 1)}×</span>
+          <span className="kpi-base" style={{ minHeight: 0, paddingTop: 3 }}>INDEC, {anioIpcFin} no se cuenta (D09)</span>
         </div>
 
-        <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
-          <span className="kpi-lbl">Decisión <b className="tabular">DC-10</b></span>
-          <p style={{ font: '600 13px/1.35 var(--fuente)', color: 'var(--ink)', margin: '6px 0 0' }}>
-            {DC10.decision}
-          </p>
-          <p style={{ fontSize: 11.5, lineHeight: 1.35, color: 'var(--mut2)', margin: '5px 0 0' }}>
-            {DC10.justificacion}
-          </p>
-        </div>
       </div>
 
-      <div className="lienzo" style={{ flex: '1 1 0' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-          <span className="kpi-lbl" style={{ display: 'inline', flex: '0 0 auto', marginBottom: 4 }}>
-            Precio unitario, mediana anual
+      {/* La decisión va como tercera columna de la fila de líneas y no en la fila de arriba:
+          con regla y justificación mide unos 190 px de alto y arriba aplastaba los gráficos a
+          1152x640; junto a las barras les quitaba el ancho que necesita el eje de ±15 %. */}
+      <div className="lienzo" style={{ flex: '1.35 1 0' }}>
+        <div className="tarjeta" style={{ minWidth: 0, flex: '1.35 1 0', ...PAD_GRAF }}>
+          <span className="kpi-lbl" style={{ flex: '0 0 auto' }}>
+            <span>Precio unitario mediano · <span style={{ whiteSpace: 'nowrap' }}>{pesos(m0)} → {pesos(mN)}</span></span>
           </span>
           <Lienzo className="lienzo">
             {({ w, h }) => {
@@ -154,9 +144,9 @@ export default function V08Precios() {
                       sobre el eje Y (el punto cae en x = padL, fijo por la primitiva). Con un
                       decimal la etiqueta ("8,9") seguía tapando el último dígito de la marca
                       del eje ("10,0"): no hay formatoEje aparte en esta primitiva, un solo
-                      formato vale para las dos. Los pesos exactos ya están en el par de
-                      arriba y en la tabla de categorías; el <title> de cada punto los repite
-                      sin redondear. */}
+                      formato vale para las dos. Los pesos exactos ya están en el rótulo y
+                      en la tabla de categorías; el <title> de cada punto los repite sin
+                      redondear. */}
                   <Linea serie={seriePrecio} w={w} h={h} formato={(v) => entero(v / 1000)}
                          tituloY="miles de pesos corrientes, mediana" tituloEje="año" />
                   <PuntosTitulo puntos={puntos} w={w} h={h} />
@@ -166,39 +156,49 @@ export default function V08Precios() {
           </Lienzo>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-          <span className="kpi-lbl" style={{ display: 'inline', flex: '0 0 auto', marginBottom: 4 }}>
-            IPC acumulado, base 2022 = 1
+        <div className="tarjeta" style={{ minWidth: 0, flex: '1.2 1 0', ...PAD_GRAF }}>
+          <span className="kpi-lbl" style={{ flex: '0 0 auto' }}>
+            <span>IPC acumulado al inicio de cada año, base inicio {anioIpcIni} = 1</span>
           </span>
           <Lienzo className="lienzo">
             {({ w, h }) => {
+              // "inicio de": el acumulado de cada fila es la inflación hasta diciembre del
+              // año anterior (el de la última fila no cuenta su propio año, D09).
               const puntos = puntosDeLinea(serieIpc, w, h, {
-                tituloY: true,
-                titulo: (p) => `${p.etiqueta}: ${decimal(p.valor, 1)}x acumulado (base ${anioIpcIni} = 1)`,
+                tituloY: false,
+                titulo: (p) => `inicio de ${p.etiqueta}: ${decimal(p.valor, 1)}× acumulado`,
               })
               return (
                 <div style={{ position: 'relative', width: w, height: h }}>
-                  <Linea serie={serieIpc} w={w} h={h} formato={(v) => `${decimal(v, 1)}x`}
-                         tituloY="índice acumulado" tituloEje="año" />
+                  {/* Sin tituloY: el rótulo del panel ya dice qué índice es, y esos 12 px
+                      son los que le faltaban al área de dibujo a 1152x640. */}
+                  <Linea serie={serieIpc} w={w} h={h} formato={(v) => `${decimal(v, 1)}×`}
+                         tituloEje="año" />
                   <PuntosTitulo puntos={puntos} w={w} h={h} />
                 </div>
               )
             }}
           </Lienzo>
         </div>
+
+        <TarjetaDecision dc={DC10} style={{ minWidth: 0 }} />
       </div>
 
-      <div className="lienzo" style={{ flex: '1 1 0' }}>
-        <Lienzo className="lienzo">
-          {({ w, h }) => (
-            <BarrasDivergentes
-              datos={datosCategorias} w={w} h={h} formato={pct}
-              tituloEje="variación 2022 → 2025" anchoEtiqueta={118}
-              encabezadoNota="mediana 2022 → 2025"
-              rotuloPos="sube" rotuloNeg="baja"
-            />
-          )}
-        </Lienzo>
+      {/* Piso de alto: por debajo de ~180 px las siete filas bajan de 13 px y las etiquetas
+          se pisan (1152x640). Encima de eso manda el reparto 1,35 / 1 con la fila de líneas. */}
+      <div className="lienzo" style={{ flex: '1 1 0', minHeight: 180 }}>
+        <div className="tarjeta" style={{ minWidth: 0, ...PAD_GRAF }}>
+          <Lienzo className="lienzo">
+            {({ w, h }) => (
+              <BarrasDivergentes
+                datos={datosCategorias} w={w} h={h} formato={pct}
+                tituloEje={`variación ${anioPrecioIni} → ${anioPrecioFin}`} anchoEtiqueta={118}
+                encabezadoNota={`mediana ${anioPrecioIni} → ${anioPrecioFin}`}
+                rotuloPos="sube" rotuloNeg="baja"
+              />
+            )}
+          </Lienzo>
+        </div>
       </div>
 
       <p className="pie-vista">

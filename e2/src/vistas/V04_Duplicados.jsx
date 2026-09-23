@@ -11,6 +11,8 @@
 import { Lienzo, BarrasH } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { entero, pct, montoM, fechaCorta } from '../formato.js'
+import TarjetaDecision from '../TarjetaDecision.jsx'
+import ValorMonto from '../ValorMonto.jsx'
 
 const V = D2.vistas.V04
 const DC04 = D2.decisiones.find((d) => d.id === 'DC-04')
@@ -25,10 +27,11 @@ const TOTAL_IDS = V.personas_por_n_ids.reduce((s, p) => s + p.n_ids * p.personas
 const CANONICOS_SIN_COMPRA = V.canonicos_sin_compra_propia
   ?? (V.despues.clientes - V.antes.clientes + V.duplicados_con_actividad)
 
-const NOTA_CLIENTES = `${entero(V.duplicados_con_actividad)} ids con compras se funden en otros `
-  + `clientes; ${entero(CANONICOS_SIN_COMPRA)} ids canónicos que no compraban entran a la base: `
-  + `${entero(V.antes.clientes)} − ${entero(V.duplicados_con_actividad)} + `
-  + `${entero(CANONICOS_SIN_COMPRA)} = ${entero(V.despues.clientes)}`
+const NOTA_CLIENTES = `${entero(V.duplicados_con_actividad)} números de cliente con compras se `
+  + `suman a la persona a la que pertenecen; ${entero(CANONICOS_SIN_COMPRA)} personas entran porque `
+  + `solo compraban con otro número: ${entero(V.antes.clientes)} − `
+  + `${entero(V.duplicados_con_actividad)} + ${entero(CANONICOS_SIN_COMPRA)} = `
+  + `${entero(V.despues.clientes)}`
 
 // El título dice el hallazgo con la cifra (duplicados_con_actividad) y el corrimiento del
 // riesgo (antes.pct → despues.pct), calculados desde D2: si el payload cambia, el título
@@ -36,8 +39,9 @@ const NOTA_CLIENTES = `${entero(V.duplicados_con_actividad)} ids con compras se 
 const TITULO = `Resolver ${entero(V.duplicados_con_actividad)} clientes duplicados sube el `
   + `riesgo de ${pct(V.antes.pct)} a ${pct(V.despues.pct)}`
 
-const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(V.antes.clientes)} clientes `
-  + `· fila D22 · riesgo y exposición en revisión por DC-09`
+const PIE = `riesgo y exposición en revisión por los meses de 2025 sin cobertura confirmada `
+  + `(vista 3) · corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(V.antes.clientes)} clientes `
+  + `· registro: D22, E10 (personas por cantidad de números de cliente); DC-09`
 
 export const meta = {
   id: 'V04',
@@ -47,19 +51,20 @@ export const meta = {
 }
 
 /** Un par grande antes/después, para la fila de tres métricas de arriba. */
-function ParAntesDespues({ etiqueta, antes, despues, nota }) {
+// flex por tarjeta: la de montos necesita mas ancho porque .par-val no parte la cifra.
+function ParAntesDespues({ etiqueta, antes, despues, nota, flex = '1 1 0' }) {
   return (
-    <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
+    <div className="tarjeta" style={{ flex, minWidth: 0 }}>
       <span className="kpi-lbl">{etiqueta}</span>
       <div className="ban-par" style={{ marginTop: 7 }}>
         <div className="par-item par-antes">
           <span className="par-lbl">Antes</span>
-          <span className="par-val tabular">{antes}</span>
+          {typeof antes === 'string' ? <span className="par-val tabular">{antes}</span> : antes}
         </div>
         <span className="par-flecha" aria-hidden="true">→</span>
         <div className="par-item par-despues">
           <span className="par-lbl">Después</span>
-          <span className="par-val tabular">{despues}</span>
+          {typeof despues === 'string' ? <span className="par-val tabular">{despues}</span> : despues}
         </div>
       </div>
       {nota && <span className="kpi-sub" style={{ minHeight: 0 }}>{nota}</span>}
@@ -78,49 +83,49 @@ export default function V04Duplicados() {
       <h1 className="titulo">{TITULO}</h1>
 
       <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)' }}>
-        <ParAntesDespues etiqueta="Clientes" nota={NOTA_CLIENTES}
+        <ParAntesDespues etiqueta="Clientes" nota={NOTA_CLIENTES} flex="0.85 1 0"
                           antes={entero(V.antes.clientes)} despues={entero(V.despues.clientes)} />
-        <ParAntesDespues etiqueta="Riesgo"
+        <ParAntesDespues etiqueta="Riesgo" flex="0.85 1 0"
                           antes={pct(V.antes.pct)} despues={pct(V.despues.pct)} />
-        <ParAntesDespues etiqueta="Exposición anual"
-                          antes={montoM(V.antes.exposicion_M)} despues={montoM(V.despues.exposicion_M)} />
+        <ParAntesDespues etiqueta="Exposición anual" flex="1.3 1 0"
+                          antes={<ValorMonto texto={montoM(V.antes.exposicion_M)} />}
+                          despues={<ValorMonto texto={montoM(V.despues.exposicion_M)} />} />
       </div>
 
       <div className="lienzo">
         <div className="tarjeta" style={{ flex: '3 1 0', minWidth: 0 }}>
-          <span className="kpi-lbl">Personas con más de un id activo</span>
+          <span className="kpi-lbl">Personas registradas con más de un número de cliente</span>
           <span className="kpi-sub">
-            {entero(TOTAL_IDS)} ids se funden en {entero(TOTAL_PERSONAS)} personas
+            {entero(TOTAL_IDS)} números de cliente son {entero(TOTAL_PERSONAS)} personas: sobran{' '}
+            {entero(TOTAL_IDS - TOTAL_PERSONAS)}, y {entero(V.duplicados_con_actividad)} de ellos
+            tenían compras (E10)
           </span>
-          <Lienzo className="lienzo">
-            {({ w, h }) => (
-              <BarrasH
-                datos={datosBarras} w={w} h={h}
-                formato={entero}
-                anchoEtiqueta={62}
-                tituloEje="Personas"
-              />
-            )}
-          </Lienzo>
+          {/* tope de alto: a 1920 las tres barras quedaban de 128 px cada una */}
+          <div style={{ flex: '1 1 0', minHeight: 0, maxHeight: 3 * 64 + 56, display: 'flex',
+                        flexDirection: 'column', justifyContent: 'center' }}>
+            <Lienzo className="lienzo">
+              {({ w, h }) => (
+                <BarrasH
+                  datos={datosBarras} w={w} h={h}
+                  formato={entero}
+                  anchoEtiqueta={62}
+                  tituloEje="Personas"
+                />
+              )}
+            </Lienzo>
+          </div>
         </div>
 
-        <div className="tarjeta" style={{ flex: '2 1 0', minWidth: 0 }}>
-          <span className="kpi-lbl">DC-04 <b>{DC04.estado}</b></span>
-          <span className="kpi-sub">{DC04.archivo} · {DC04.hallazgo}</span>
-          <p style={{ margin: '9px 0 0', fontSize: 12.5, lineHeight: 1.42, color: 'var(--ink)' }}>
-            {DC04.decision}
-          </p>
-          {DC04.justificacion && (
-            <p style={{ margin: '8px 0 0', fontSize: 11.5, lineHeight: 1.4, color: 'var(--mut)' }}>
-              <b style={{ color: 'var(--mut2)' }}>Justificación.</b> {DC04.justificacion}
-            </p>
-          )}
-        </div>
+        <TarjetaDecision dc={DC04} style={{ flex: '2 1 0', minWidth: 0 }}>
+          <span className="kpi-sub" style={{ marginTop: 8 }}>{DC04.archivo} · {DC04.hallazgo}</span>
+        </TarjetaDecision>
       </div>
 
       <p className="pie-vista">
-        corte <b>{fechaCorta(D2.meta.corte_ref)}</b> · base: <b>{entero(V.antes.clientes)}</b>{' '}
-        clientes · fila <b>D22</b> · riesgo y exposición en revisión por <b>DC-09</b>
+        riesgo y exposición en revisión por los meses de 2025 sin cobertura confirmada (vista 3)
+        {' '}· corte <b>{fechaCorta(D2.meta.corte_ref)}</b> · base: <b>{entero(V.antes.clientes)}</b>{' '}
+        clientes · registro: <b>D22</b>, <b>E10</b> (personas por cantidad de números de cliente);{' '}
+        <b>DC-09</b>
       </p>
     </section>
   )

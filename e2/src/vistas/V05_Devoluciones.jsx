@@ -14,6 +14,7 @@
 import { D2 } from '../datos_e2.js'
 import { Lienzo, BarrasH, escalaNice } from '../../../src/graficos.jsx'
 import { entero, pct, mesCorto, fechaCorta } from '../formato.js'
+import TarjetaDecision from '../TarjetaDecision.jsx'
 
 const V05 = D2.vistas.V05
 const DC02 = D2.decisiones.find((d) => d.id === 'DC-02')
@@ -22,14 +23,12 @@ const unidadesAntes = V05.unidades.antes
 const unidadesDespues = V05.unidades.despues
 const pctInfla = (unidadesAntes / unidadesDespues - 1) * 100
 
-// 92 caracteres con "sumarlas dos veces inflaba" y "en las ventas": se acorta a "en ventas" e
-// "infla" en presente (regla de redacción: hechos en presente) para entrar en el límite de
-// 88 caracteres a 1152 px sin perder la cifra ni el mecanismo.
-const TITULO = `${entero(V05.devoluciones.crudas)} devoluciones ya netadas: ` +
+// "restadas" en vez de "netadas": el directorio no usa la jerga contable (COMPRENSION-OM-4).
+const TITULO = `${entero(V05.devoluciones.crudas)} devoluciones ya restadas: ` +
   `sumarlas otra vez infla ${pct(pctInfla)} las unidades`
 
 const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(unidadesDespues)} unidades vendidas · ` +
-  `D02 · fecha_devolucion manda (consulta 6)`
+  `D02 · E05 (desfase) · fecha de devolución manda (consulta 6)`
 
 export const meta = { id: 'V05', corto: 'Devoluciones', titulo: TITULO, pie: PIE }
 
@@ -58,28 +57,19 @@ export default function V05_Devoluciones() {
             </div>
           </div>
 
-          <div className="tarjeta" style={{ flex: 1, minWidth: 0 }}>
-            <span className="kpi-lbl">Decisión <b>DC-02</b></span>
-            <p style={{ margin: '7px 0 0', fontSize: '12.5px', lineHeight: 1.4, color: 'var(--ink)' }}>
-              {DC02.decision}
-            </p>
-            {DC02.justificacion && (
-              <p style={{ margin: '5px 0 0', fontSize: '11.5px', lineHeight: 1.35, color: 'var(--mut2)' }}>
-                {DC02.justificacion}
-              </p>
-            )}
-            <p style={{ margin: '5px 0 0', font: '400 10.5px/1.4 var(--mono)', color: 'var(--mut)' }}>
-              <span className="tabular">{entero(V05.devoluciones.crudas)}</span> filas,{' '}
-              <span className="tabular">{entero(V05.devoluciones.unicas)}</span> devoluciones únicas{' '}
-              (<span className="tabular">{entero(V05.devoluciones.crudas - V05.devoluciones.unicas)}</span> duplicadas · D02)
+          <TarjetaDecision dc={DC02} style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ margin: '6px 0 0', font: '400 11px/1.4 var(--mono)', color: 'var(--mut)' }}>
+              <span className="tabular">{entero(V05.devoluciones.crudas)}</span> filas negativas,{' '}
+              <span className="tabular">{entero(V05.devoluciones.unicas)}</span> devoluciones distintas{' '}
+              (<span className="tabular">{entero(V05.devoluciones.crudas - V05.devoluciones.unicas)}</span> repetidas · D02)
             </p>
             <div className="kpi-base" style={{ marginTop: 'auto' }}>
-              <b>Desfase mediano</b>{' '}
-              <span className="tabular">{entero(V05.desfase_dias.mediana)} días</span>{' '}
-              entre la fila negativa y <b>fecha_devolucion</b>{' '}
-              <span className="tabular">(rango {entero(V05.desfase_dias.min)}–{entero(V05.desfase_dias.max)})</span>
+              La fecha de devolución cae una mediana de{' '}
+              <span className="tabular">{entero(V05.desfase_dias.mediana)}</span> días después de la fila negativa{' '}
+              (entre <span className="tabular">{entero(V05.desfase_dias.min)}</span> y{' '}
+              <span className="tabular">{entero(V05.desfase_dias.max)}</span> días)
             </div>
-          </div>
+          </TarjetaDecision>
         </div>
 
         {/* fila 2: la serie mensual con las dos formas de contar, y los motivos declarados */}
@@ -95,29 +85,33 @@ export default function V05_Devoluciones() {
                   display: 'inline-block', width: '15px', height: '0',
                   borderTop: '2px dashed var(--antes)',
                 }} aria-hidden="true" />
-                fila negativa (venta original)
+                fecha de la fila negativa (antes)
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--acc)' }}>
                 <i style={{ display: 'inline-block', width: '15px', height: '2px', background: 'var(--despues)' }}
                    aria-hidden="true" />
-                fecha_devolucion (DC-02)
+                fecha de devolución (después, DC-02) · {entero(V05.devoluciones.crudas)} filas
               </span>
             </div>
             <Lienzo className="lienzo">
               {({ w, h }) => (
-                <LineaDoble serie={V05.serie} w={w} h={h} formato={entero} tituloEje="devoluciones / mes" />
+                <LineaDoble serie={V05.serie} w={w} h={h} formato={entero}
+                            tituloEje={`mes, ${mesCorto(V05.serie[0].mes)} a ${mesCorto(V05.serie.at(-1).mes)}`} />
               )}
             </Lienzo>
           </div>
 
           <div className="tarjeta" style={{ flex: 1.15, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-            <span className="kpi-lbl">Motivos declarados</span>
-            <Lienzo className="lienzo">
-              {({ w, h }) => (
-                <BarrasH datos={motivos} w={w} h={h} formato={entero} tituloEje="devoluciones"
-                         anchoEtiqueta={Math.min(210, Math.max(150, w * 0.52))} />
-              )}
-            </Lienzo>
+            <span className="kpi-lbl">Motivos declarados, {entero(V05.devoluciones.crudas)} filas</span>
+            {/* tope de alto: con pocas barras a 1920 no se estiran hasta el piso (D1-11) */}
+            <div style={{ flex: '1 1 0', minHeight: 0, maxHeight: 5 * 64 + 56, margin: 'auto 0', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <Lienzo className="lienzo">
+                {({ w, h }) => (
+                  <BarrasH datos={motivos} w={w} h={h} formato={entero} tituloEje="devoluciones"
+                           anchoEtiqueta={Math.min(210, Math.max(150, w * 0.52))} />
+                )}
+              </Lienzo>
+            </div>
           </div>
         </div>
       </div>
@@ -136,7 +130,7 @@ export default function V05_Devoluciones() {
  */
 function LineaDoble({ serie, w, h, formato, tituloEje }) {
   const padL = 32
-  const padT = 10
+  const padT = 24   // lugar para el título del eje Y arriba del primer tick
   const padB = 40
   const padR = 22   // mitad del ancho del último rótulo de mes ("dic-25"), que se centra en xFin
   const iw = Math.max(20, w - padL - padR)
@@ -162,6 +156,10 @@ function LineaDoble({ serie, w, h, formato, tituloEje }) {
            serie.map((p) => `${mesCorto(p.mes)} fila negativa ${formato(p.por_fila_negativa)}, ` +
              `fecha de devolución ${formato(p.por_fecha_devolucion)}`).join(', ')}
          style={{ display: 'block' }}>
+      <text fontFamily="var(--mono)" x={padL} y={11} fontSize="11" fill="var(--mut2)"
+            letterSpacing=".09em" fontWeight={600} style={{ textTransform: 'uppercase' }}>
+        devoluciones por mes
+      </text>
       <line x1={padL} x2={padL} y1={padT} y2={yBase} stroke="var(--eje)" strokeWidth="1" />
       {ticks.map((t) => (
         <g key={t}>
@@ -179,17 +177,18 @@ function LineaDoble({ serie, w, h, formato, tituloEje }) {
 
       {serie.map((p, i) => (
         <circle key={'a' + p.mes} cx={X(i)} cy={Y(p.por_fila_negativa)} r="2" fill="var(--antes)">
-          <title>{`${mesCorto(p.mes)} · fila negativa (venta original) · ${formato(p.por_fila_negativa)} devoluciones`}</title>
+          <title>{`${mesCorto(p.mes)} · fecha de la fila negativa (antes) · ${formato(p.por_fila_negativa)} devoluciones`}</title>
         </circle>
       ))}
       {serie.map((p, i) => (
         <circle key={'b' + p.mes} cx={X(i)} cy={Y(p.por_fecha_devolucion)} r="2.25" fill="var(--despues)">
-          <title>{`${mesCorto(p.mes)} · fecha_devolucion (DC-02) · ${formato(p.por_fecha_devolucion)} devoluciones`}</title>
+          <title>{`${mesCorto(p.mes)} · fecha de devolución (después, DC-02) · ${formato(p.por_fecha_devolucion)} devoluciones`}</title>
         </circle>
       ))}
 
       {serie.map((p, i) => {
-        if (i % cada !== 0 && i !== serie.length - 1) return null
+        // la marca regular a menos de `cada` meses del último se omite: si no, pisa a "dic-25"
+        if ((i % cada !== 0 || serie.length - 1 - i < cada) && i !== serie.length - 1) return null
         return (
           <g key={'x' + p.mes}>
             <line x1={X(i)} x2={X(i)} y1={yBase} y2={yBase + 4} stroke="var(--eje)" strokeWidth="1" />

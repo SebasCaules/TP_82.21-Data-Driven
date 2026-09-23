@@ -5,7 +5,10 @@
 // directamente no existen.
 
 import { useCallback, useEffect, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { VISTAS } from './vistas/index.jsx'
+import { D2 } from './datos_e2.js'
+import { fechaCorta } from './formato.js'
 import MarcaInicio from '../../src/MarcaInicio.jsx'
 
 export default function App() {
@@ -30,9 +33,21 @@ export default function App() {
     }))
   }, [])
 
+  // Si el foco ya está en el riel (Tab y después flechas), sigue a la vista activa: si no,
+  // el anillo de foco queda en el botón anterior y el activo se ve sin foco. No roba el foco
+  // desde ningún otro control.
+  useEffect(() => {
+    const activo = document.activeElement
+    if (activo && activo.classList && activo.classList.contains('lat-item')) {
+      document.querySelector('.lat-item.on')?.focus()
+    }
+  }, [indice])
+
   // Imprimir desde el menú del navegador tiene que dar todas las hojas, no la vista activa.
   useEffect(() => {
-    const antes = () => setImprimiendo(true)
+    // flushSync: el navegador toma la instantánea al volver de beforeprint; sin esto
+    // imprimiría la vista activa porque React aún no montó las hojas.
+    const antes = () => flushSync(() => setImprimiendo(true))
     const despues = () => setImprimiendo(false)
     window.addEventListener('beforeprint', antes)
     window.addEventListener('afterprint', despues)
@@ -50,7 +65,10 @@ export default function App() {
       if (t.tagName === 'SELECT' || t.tagName === 'INPUT' || t.isContentEditable) return
       if (t.getAttribute && t.getAttribute('role') === 'slider') return
       if (e.metaKey || e.ctrlKey || e.altKey) return
-      const suelto = t === document.body || t === document.documentElement
+      // Un botón del riel cuenta como suelto: tras elegir una vista con el mouse el foco
+      // queda ahí, y F e I tienen que seguir funcionando.
+      const suelto = t === document.body || t === document.documentElement ||
+        (t.classList && t.classList.contains('lat-item'))
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { irA(indice + 1); e.preventDefault() }
       else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { irA(indice - 1); e.preventDefault() }
       else if (e.key === 'Home') { irA(0); e.preventDefault() }
@@ -69,8 +87,8 @@ export default function App() {
       <div className="chico">
         <h1>Este tablero necesita una pantalla más grande</h1>
         <p>
-          Está diseñado para resolverse <b>sin scroll</b> en proyector y en laptop, de
-          1152&nbsp;×&nbsp;640 a 1920&nbsp;×&nbsp;1080. Agrandá la ventana o abrilo en una
+          Está hecho para leerse sin desplazar la página, en proyector y en laptop, de
+          1152&nbsp;×&nbsp;640 a 1920&nbsp;×&nbsp;1080. Amplíe la ventana o ábralo en una
           pantalla más grande.
         </p>
       </div>
@@ -78,6 +96,7 @@ export default function App() {
       <Lateral indice={indice} irA={irA} />
 
       <div className="principal">
+        <p className="solo-lector" aria-live="polite">{`Vista ${indice + 1} de ${VISTAS.length}: ${vista.titulo}`}</p>
         <Encabezado />
 
         <main className="cuerpo">
@@ -95,7 +114,7 @@ function Encabezado() {
   return (
     <header className="e2-enc">
       <span className="e2-enc-nombre">Casa Óga · Calidad de datos</span>
-      <span className="e2-enc-corte">corte 31/12/2025 · datos de 13 archivos</span>
+      <span className="e2-enc-corte">{`corte ${fechaCorta(D2.meta.corte_ref)} · datos de ${D2.meta.archivos.length} archivos`}</span>
     </header>
   )
 }
@@ -132,8 +151,12 @@ function Lateral({ indice, irA }) {
       </ol>
 
       <div className="lat-pie">
-        <span>↑ ↓ cambia de vista · Inicio Fin a los extremos</span>
-        <span>F pantalla completa · I imprime</span>
+        <span>↑ ↓ cambiar de vista</span>
+        {/* A 1152 px el riel no alcanza para este atajo en un renglón: se deja partir
+            solo tras los dos puntos (los demás espacios son duros). */}
+        <span style={{ whiteSpace: 'normal' }}>Inicio&nbsp;·&nbsp;Fin: primera&nbsp;y&nbsp;última</span>
+        <span>F: pantalla completa</span>
+        <span>I: imprimir</span>
       </div>
     </nav>
   )

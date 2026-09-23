@@ -7,7 +7,7 @@
 //
 // No hay una primitiva de Gantt en graficos.jsx (regla del contrato: "rectángulos con
 // <title>"), así que el eje de tiempo y las barras se arman a mano en SVG dentro de un solo
-// <Lienzo>. Los archivos transaccionales van en --despues (la base que usa el resto del
+// <Lienzo>. Los archivos del análisis van en --despues (la base que usa el resto del
 // tablero); Calendario y Bajas quedan marcados como contexto: no acotan comportamiento, así
 // que se dibujan con relleno hueco y borde punteado en --antes, no solo un color distinto.
 // Clientes.csv declara altas hasta 2026-10-01, después del propio eje, y Tiendas.csv declara
@@ -17,7 +17,8 @@
 
 import { Lienzo, Plaqueta } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
-import { entero, pct, fechaCorta } from '../formato.js'
+import { entero, pct, fechaCorta, mesCorto } from '../formato.js'
+import TarjetaDecision from '../TarjetaDecision.jsx'
 
 const V = D2.vistas.V02
 const DC08 = D2.decisiones.find((d) => d.id === 'DC-08')
@@ -38,14 +39,21 @@ function aDias(iso) {
 // El eje pedido va de enero de 2022 a septiembre de 2026: cubre la ventana más corta
 // (Tiendas, hasta 2025-02) y la más larga declarada por el equipo (Bajas, hasta 2026-08),
 // con aire a los dos lados.
-const EJE_DESDE = aDias('2022-01-01')
-const EJE_HASTA = aDias('2026-09-30')
+const EJE_DESDE_ISO = '2022-01-01'
+const EJE_HASTA_ISO = '2026-09-30'
+const EJE_DESDE = aDias(EJE_DESDE_ISO)
+const EJE_HASTA = aDias(EJE_HASTA_ISO)
 const EJE_TOTAL = EJE_HASTA - EJE_DESDE
+
+// "2022-01-01" -> "ene-2022": mesCorto abrevia el año a dos cifras, y el eje lo pide entero.
+const mesAnio = (iso) => `${mesCorto(iso.slice(0, 7)).split('-')[0]}-${iso.slice(0, 4)}`
+const TITULO_EJE = `año, ${mesAnio(EJE_DESDE_ISO)} a ${mesAnio(EJE_HASTA_ISO)}`
 
 /** La línea de tiempo por archivo, dibujada a mano: una fila por archivo, una barra desde
  *  `desde` hasta `hasta`, sobre el eje fijo 2022-01 a 2026-09. `w`/`h` los mide <Lienzo>. */
-function Gantt({ archivos, corteRef, w, h }) {
-  const padTop = 6
+function Gantt({ archivos, corteRef, riesgo, w, h }) {
+  // Franja propia arriba de la primera fila para las dos plaquetas de riesgo.
+  const padTop = 40
   const padLabel = 205
   const padRight = 16
   const altoEje = 36
@@ -54,7 +62,7 @@ function Gantt({ archivos, corteRef, w, h }) {
   const alto = Math.max(7, Math.min(paso * 0.6, 20))
   const anchoDisp = Math.max(60, w - padLabel - padRight)
   const fuenteEtq = Math.max(9.5, Math.min(10.5, paso * 0.42))
-  const fuenteNota = Math.max(8.5, fuenteEtq - 1)
+  const fuenteNota = Math.max(10, fuenteEtq - 1)
   const yBase = padTop + disponible
 
   const xDe = (iso) => {
@@ -103,7 +111,7 @@ function Gantt({ archivos, corteRef, w, h }) {
           <g key={`${a.nombre}-${i}`}>
             <title>
               {`${a.nombre} · ${fechaCorta(a.desde)} a ${fechaCorta(a.hasta)} · ` +
-                `${entero(a.filas)} filas · ${esContexto ? 'contexto' : 'transaccional'}` +
+                `${entero(a.filas)} filas · ${esContexto ? 'contexto' : 'análisis'}` +
                 `${excedeIzq ? ` · desde ${fechaCorta(a.desde)}, antes del eje` : ''}` +
                 `${excedeDer ? ` · hasta ${fechaCorta(a.hasta)}, después del eje` : ''}`}
             </title>
@@ -139,21 +147,35 @@ function Gantt({ archivos, corteRef, w, h }) {
       })}
       <text fontFamily="var(--mono)" x={padLabel + anchoDisp} y={yBase + 32} fontSize="10.5"
             fill="var(--mut2)" textAnchor="end" letterSpacing=".09em" fontWeight={600}
-            style={{ textTransform: 'uppercase' }}>Ventana declarada por archivo</text>
+            style={{ textTransform: 'uppercase' }}>{TITULO_EJE}</text>
 
       {(() => {
         // La línea del corte común marca la decisión (DC-08), no el problema: va en
         // --despues (azul, la base con las DC aplicadas), igual que el resto del tablero.
         // El terracota queda solo para lo que el corte deja afuera (T-13).
+        // Las plaquetas se anclan al final de su línea; si no entran, al borde derecho
+        // del svg (a 1152 px el lienzo mide ~590 px).
         const xc = xDe(corteRef)
-        const rotulo = `corte común ${fechaCorta(corteRef)}`
+        const xl = xDe(riesgo.al_2026_08_31.corte)
+        const xMax = w - 7
+        const rotulo = `corte común ${fechaCorta(corteRef)} · riesgo ${pct(riesgo.al_corte_ref.pct)}`
+        const rotuloLargo = `${fechaCorta(riesgo.al_2026_08_31.corte)} · riesgo ${pct(riesgo.al_2026_08_31.pct)}`
         return (
           <g>
-            <title>{rotulo}</title>
-            <line x1={xc} x2={xc} y1={padTop} y2={yBase} stroke="var(--despues)" strokeWidth="1.5"
-                  strokeDasharray="4 2" />
-            <Plaqueta x={xc} y={padTop + 9} texto={rotulo} fuente={10} peso={700}
-                      color="var(--despues)" anclaje="middle" />
+            <g>
+              <title>{rotuloLargo}</title>
+              <line x1={xl} x2={xl} y1={padTop} y2={yBase} stroke="var(--antes)" strokeWidth="1.5"
+                    strokeDasharray="2 3" />
+            </g>
+            <g>
+              <title>{rotulo}</title>
+              <line x1={xc} x2={xc} y1={padTop} y2={yBase} stroke="var(--despues)" strokeWidth="1.5"
+                    strokeDasharray="4 2" />
+            </g>
+            <Plaqueta x={Math.min(xc, xMax)} y={10} texto={rotulo} fuente={10} peso={700}
+                      color="var(--despues)" anclaje="end" />
+            <Plaqueta x={Math.min(xl, xMax)} y={28} texto={rotuloLargo} fuente={10} peso={700}
+                      color="var(--mut2)" anclaje="end" />
           </g>
         )
       })()}
@@ -168,12 +190,15 @@ export default function V02Ventana() {
 
       <div className="ban-par">
         <div className="par-item par-antes">
-          <span className="par-lbl">Riesgo al 31/08/2026</span>
+          <span className="par-lbl">
+            Riesgo si se mide al {fechaCorta(V.riesgo.al_2026_08_31.corte)}, sin ventas cargadas
+            después del {fechaCorta(D2.meta.ultima_venta)}
+          </span>
           <span className="par-val tabular">{pct(RIESGO_ANTES)}</span>
         </div>
         <span className="par-flecha" aria-hidden="true">→</span>
         <div className="par-item par-despues">
-          <span className="par-lbl">Riesgo al {fechaCorta(CORTE_REF)} · corte común</span>
+          <span className="par-lbl">Riesgo al {fechaCorta(D2.meta.corte_ref)}, corte común</span>
           <span className="par-val tabular">{pct(RIESGO_DESPUES)}</span>
         </div>
       </div>
@@ -184,7 +209,7 @@ export default function V02Ventana() {
           <div style={{ display: 'flex', gap: 14, fontSize: 10, color: 'var(--mut2)', marginTop: 3 }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <span style={{ width: 12, height: 8, background: 'var(--despues)', borderRadius: 2, display: 'inline-block' }} />
-              transaccional
+              archivos del análisis
             </span>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <span style={{ width: 12, height: 8, border: '1.5px dashed var(--antes)', borderRadius: 2, display: 'inline-block' }} />
@@ -192,30 +217,17 @@ export default function V02Ventana() {
             </span>
           </div>
           <Lienzo className="lienzo">
-            {({ w, h }) => <Gantt archivos={V.archivos} corteRef={CORTE_REF} w={w} h={h} />}
+            {({ w, h }) => <Gantt archivos={V.archivos} corteRef={CORTE_REF} riesgo={V.riesgo} w={w} h={h} />}
           </Lienzo>
         </div>
 
-        <div className="tarjeta" style={{ flex: '1 1 0' }}>
-          <span className="kpi-lbl">
-            <span>Decisión</span>
-            <b className="tabular">DC-08</b>
-          </span>
-          <p style={{ margin: '8px 0 0', fontSize: 12.5, lineHeight: 1.42, color: 'var(--ink)' }}>
-            {DC08.decision}
-          </p>
-          {DC08.justificacion && (
-            <p style={{ margin: '10px 0 0', fontSize: 11.5, lineHeight: 1.4, color: 'var(--mut)' }}>
-              {DC08.justificacion}
-            </p>
-          )}
-        </div>
+        <TarjetaDecision dc={DC08} style={{ flex: '1 1 0' }} />
       </div>
 
       <p className="pie-vista">
-        Corte {fechaCorta(CORTE_REF)} · base: {entero(V.archivos.length)} archivos declarados por el equipo ·
+        corte {fechaCorta(CORTE_REF)} · base: {entero(V.archivos.length)} archivos declarados por el equipo ·
         fila <b>D05</b> del registro de cifras · riesgo y exposición en revisión por DC-09
-        (cobertura de operaciones 2025, ver V03).
+        (cobertura de operaciones 2025, vista 3).
       </p>
     </section>
   )
@@ -223,7 +235,7 @@ export default function V02Ventana() {
 
 export const meta = {
   id: 'V02',
-  corto: 'Ventana de extracción',
+  corto: 'Fecha de corte',
   titulo: TITULO,
   pie: 'en revisión por DC-09',
 }

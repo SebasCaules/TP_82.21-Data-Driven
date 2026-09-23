@@ -120,9 +120,15 @@ export function chequear() {
     if (!el.textContent.trim()) continue
     const rango = document.createRange()
     rango.selectNodeContents(el)
-    const tops = new Set([...rango.getClientRects()].filter((r) => r.width > 0).map((r) => Math.round(r.top)))
-    if (tops.size > 1) {
-      problemas.push({ tipo: 'cifra-partida', detalle: `${clase(el)} "${el.textContent.trim().slice(0, 30)}" en ${tops.size} renglones` })
+    // Los rects se agrupan por solapamiento vertical, no por top: la unidad de un monto va
+    // un escalon mas chica (ValorMonto) y su rect arranca mas abajo en el mismo renglon.
+    const rs = [...rango.getClientRects()].filter((r) => r.width > 0).sort((a, b) => a.top - b.top)
+    let renglones = 0, fondo = -Infinity
+    for (const r of rs) {
+      if (r.top >= fondo - 1) { renglones++; fondo = r.bottom } else fondo = Math.max(fondo, r.bottom)
+    }
+    if (renglones > 1) {
+      problemas.push({ tipo: 'cifra-partida', detalle: `${clase(el)} "${el.textContent.trim().slice(0, 30)}" en ${renglones} renglones` })
     }
   }
 

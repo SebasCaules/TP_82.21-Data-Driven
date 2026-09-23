@@ -24,20 +24,13 @@ const ESTADO_PASTILLA = {
   'pendiente del negocio': { simbolo: '○', texto: 'pendiente', color: 'var(--terra)' },
 }
 
-/** Recorta a `n` caracteres en el último espacio antes del límite, para no partir una
- *  palabra a la mitad. El texto completo queda en `title` para quien lo necesite entero. */
-function recortar(texto, n) {
-  if (!texto) return '—'
-  if (texto.length <= n) return texto
-  const corte = texto.slice(0, n)
-  const ultimoEspacio = corte.lastIndexOf(' ')
-  return `${corte.slice(0, ultimoEspacio > n * 0.6 ? ultimoEspacio : n)}…`
-}
-
 const celda = {
   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-  padding: '3px 10px 3px 0', verticalAlign: 'middle',
+  padding: '2px 10px 2px 0', verticalAlign: 'middle',
 }
+// Hallazgo y decision: el recorte (o los dos renglones desde 1440x860) lo hace .v01q td.txt,
+// asi que la celda no lleva whiteSpace, overflow ni padding vertical inline que lo pisen.
+const celdaTxt = { paddingRight: '10px', verticalAlign: 'middle' }
 
 // Todo lo que el h1 y `meta.titulo` necesitan se calcula acá afuera, a nivel de módulo:
 // son el mismo texto (regla dura del contrato de vistas) y D2 es estático, así que no
@@ -52,33 +45,35 @@ const pendiente = porEstado['pendiente del negocio'] ?? 0
 // DC-03 y DC-07 son las dos decisiones que la auditoría marcó sin cuánto cambia (T-04):
 // esta vista las cita en la tabla pero no mostraba el desplazamiento. Los dos pares de
 // abajo lo agregan, con valor y etiqueta tal como vienen en D2.decisiones (nada inventado).
+// Un tercer par (DC-01) no entra a 1152x640: la fila de pares pasa el ancho de la vista.
 const DC03 = decisiones.find((d) => d.id === 'DC-03')
 const DC07 = decisiones.find((d) => d.id === 'DC-07')
 
 const TITULO = `${v01.n_decisiones} decisiones: ` +
-  `${aplicada} ${aplicada === 1 ? 'cambia' : 'cambian'} el dato, ` +
-  `${declarada} se ${declarada === 1 ? 'declara' : 'declaran'} y ` +
-  `${pendiente} ${pendiente === 1 ? 'espera' : 'esperan'} al negocio`
+  `${aplicada} ${aplicada === 1 ? 'aplicada' : 'aplicadas'}, ` +
+  `${declarada} ${declarada === 1 ? 'declarada' : 'declaradas'} y ` +
+  `${pendiente} a la espera del negocio`
 
-// La frase de cierre (T-02) separa lo que ya está resuelto de lo que sigue abierto: N sale
-// de por_estado.aplicada, nunca escrito a mano.
-const FRASE_CIERRE = `Las ${aplicada} aplicadas cierran el dato. Los pedidos abiertos al `
-  + `negocio están en la vista 12.`
+// La frase de cierre (T-02) define los tres estados de la pastilla y remite a los pedidos
+// abiertos; el conteo sale de vistas.V12.pedidos, nunca escrito a mano.
+const FRASE_CIERRE = 'Aplicada: el cálculo ya la usa. Declarada: el dato no cambia y se aclara. '
+  + 'Pendiente: falta una respuesta de Casa Óga. Además, '
+  + `${D2.vistas.V12.pedidos.length} pedidos a Casa Óga siguen abiertos (vista 12).`
 
 // T-10: el pie citaba la base pero no las filas del registro que estas dos decisiones
 // alimentan (C26, canal; D24, edades) ni el rango de ids de la tabla.
-const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${v01.n_archivos} archivos de origen, ` +
-  `${v01.n_decisiones} decisiones de calidad, DC-01 a DC-15 · filas C26 (canal) y D24 (edades) ` +
-  `· fuente: payload e2.json, vistas.V01 y decisiones (pipeline/build_e2.py)`
+const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · ${D2.meta.archivos.length} archivos de origen, ` +
+  `${D2.decisiones.length} decisiones (DC-01 a DC-15) · registro: C26 (canal), D24 (edades) ` +
+  `· fuente: e2.json, pipeline/build_e2.py`
 
 export default function V01() {
   return (
-    <section className="pant v01q" style={{ gap: 'clamp(4px, 0.6vh, 10px)' }}>
+    <section className="pant v01 v01q" style={{ gap: 'clamp(4px, 0.6vh, 10px)' }}>
       <h1 className="titulo">{TITULO}</h1>
 
       <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
         <div className="tarjeta" style={{ flex: 1, padding: '7px 12px' }}>
-          <span className="kpi-lbl">Archivos con al menos una decisión</span>
+          <span className="kpi-lbl">Archivos de origen revisados</span>
           <span className="kpi-val tabular" style={{ fontSize: '19px', marginTop: '2px' }}>
             {entero(v01.n_archivos)}
           </span>
@@ -106,14 +101,18 @@ export default function V01() {
       </p>
 
       <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '11px' }}>
+        {/* height 100%: a 1920x1080 las filas reparten el alto libre en vez de dejar un hueco
+            bajo la tabla; a 1152x640 la tabla ya ocupa todo y no cambia nada. */}
+        <table style={{
+          width: '100%', height: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '11.5px',
+        }}>
           <colgroup>
-            <col style={{ width: '7%' }} />
-            <col style={{ width: '13.5%' }} />
-            <col style={{ width: '18%' }} />
-            <col style={{ width: '39.5%' }} />
-            <col style={{ width: '16.5%' }} />
-            <col style={{ width: '5.5%' }} />
+            <col style={{ width: '6%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '30%' }} />
+            <col style={{ width: '33%' }} />
+            <col style={{ width: '11%' }} />
+            <col style={{ width: '6%' }} />
           </colgroup>
           <thead>
             <tr style={{ borderBottom: '1.5px solid var(--ink)' }}>
@@ -134,11 +133,11 @@ export default function V01() {
                 <td style={{ ...celda, color: 'var(--ink)' }} title={dec.archivo}>
                   {dec.archivo}
                 </td>
-                <td style={{ ...celda, color: 'var(--mut2)' }} title={dec.hallazgo}>
-                  {recortar(dec.hallazgo, 60)}
+                <td className="txt" style={{ ...celdaTxt, color: 'var(--mut2)' }} title={dec.hallazgo}>
+                  {dec.hallazgo}
                 </td>
-                <td style={{ ...celda, color: 'var(--ink)' }} title={dec.decision}>
-                  {recortar(dec.decision, 88)}
+                <td className="txt" style={{ ...celdaTxt, color: 'var(--ink)' }} title={dec.decision}>
+                  {dec.decision}
                 </td>
                 <td style={{ padding: '1px 10px 1px 0', verticalAlign: 'middle' }}>
                   <Pastilla estado={dec.estado} />
@@ -157,10 +156,7 @@ export default function V01() {
         <ParChico dc={DC07} />
       </div>
 
-      <p className="pie-vista" style={{
-        flexShrink: 0, borderTop: '1px solid var(--bd)', paddingTop: '3px',
-        margin: 0, font: '400 9px/1.25 var(--mono)', color: 'var(--mut2)',
-      }}>
+      <p className="pie-vista" style={{ flexShrink: 0, margin: 0 }}>
         {PIE}
       </p>
     </section>
@@ -170,9 +166,10 @@ export default function V01() {
 function Th({ children, align = 'left' }) {
   return (
     <th style={{
-      textAlign: align, padding: '0 10px 3px 0',
-      font: '600 10px/1.2 var(--mono)', textTransform: 'uppercase', letterSpacing: '.06em',
-      color: 'var(--mut2)',
+      // lineHeight 1.35: con 1.2 la tilde de DECISIÓN quedaba recortada arriba
+      textAlign: align, padding: '3px 10px 3px 0',
+      fontFamily: 'var(--mono)', fontSize: '10px', fontWeight: 500, lineHeight: 1.35,
+      textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--mut2)',
     }}>
       {children}
     </th>
@@ -204,28 +201,28 @@ function ParChico({ dc }) {
       border: '1px solid var(--bd)', borderRadius: '3px', padding: '4px 10px',
     }}>
       <span className="tabular" style={{
-        flexShrink: 0, font: '600 9px/1.15 var(--mono)', color: 'var(--mut2)',
+        flexShrink: 0, font: '600 10px/1.15 var(--mono)', color: 'var(--mut2)',
       }}>{dc.id}</span>
       <span style={{
         flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap', fontSize: '9.5px', color: 'var(--mut)',
+        whiteSpace: 'nowrap', fontSize: '11px', color: 'var(--mut)',
       }} title={dc.archivo}>
         {dc.archivo}
       </span>
       <div className="ban-par" style={{ marginLeft: 'auto', flexShrink: 0, minWidth: 0 }}>
-        <div className="par-item par-antes" style={{ maxWidth: '116px' }}>
+        <div className="par-item par-antes" style={{ maxWidth: '150px' }}>
           <span className="par-lbl">Antes</span>
           <span className="par-val tabular" style={{ fontSize: '12px' }}>{entero(dc.antes.valor)}</span>
-          <span style={{ fontSize: '8px', lineHeight: 1.1, color: 'var(--mut)' }} title={dc.antes.etiqueta}>
-            {recortar(dc.antes.etiqueta, 32)}
+          <span style={{ fontSize: '10px', lineHeight: 1.2, whiteSpace: 'normal', color: 'var(--mut)' }}>
+            {dc.antes.etiqueta}
           </span>
         </div>
         <span className="par-flecha" aria-hidden="true" style={{ fontSize: '12px' }}>→</span>
-        <div className="par-item par-despues" style={{ maxWidth: '116px' }}>
+        <div className="par-item par-despues" style={{ maxWidth: '150px' }}>
           <span className="par-lbl">Después</span>
           <span className="par-val tabular" style={{ fontSize: '12px' }}>{entero(dc.despues.valor)}</span>
-          <span style={{ fontSize: '8px', lineHeight: 1.1, color: 'var(--mut2)' }} title={dc.despues.etiqueta}>
-            {recortar(dc.despues.etiqueta, 32)}
+          <span style={{ fontSize: '10px', lineHeight: 1.2, whiteSpace: 'normal', color: 'var(--mut2)' }}>
+            {dc.despues.etiqueta}
           </span>
         </div>
       </div>
@@ -246,8 +243,8 @@ function Pastilla({ estado }) {
       style={{
         display: 'inline-flex', alignItems: 'center', gap: '5px',
         padding: '1px 7px', borderRadius: '3px',
-        border: `1px solid ${e.color}`, color: e.color,
-        font: '600 9.5px/1.15 var(--mono)', whiteSpace: 'nowrap',
+        border: `1px solid ${e.color}`, color: e.color, background: 'var(--sup)',
+        font: '600 10.5px/1.15 var(--mono)', whiteSpace: 'nowrap',
       }}
     >
       <span aria-hidden="true" style={{ fontSize: '11px', lineHeight: 1 }}>{e.simbolo}</span>

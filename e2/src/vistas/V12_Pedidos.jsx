@@ -35,17 +35,17 @@ const N = PEDIDOS.length
 const TITULO = `${numeroEnLetras(N)} cosas quedan en manos de Casa Óga`
 
 // La frase aclara lo que la pastilla ya no dice sola: el pedido abierto no es una decisión
-// pendiente, las quince ya están tomadas (12 aplicadas, 2 declaradas, 1 pendiente del
-// negocio, D2.vistas.V01.por_estado). Lo que sigue abierto es la respuesta de Casa Óga.
-const N_PALABRA = numeroEnLetras(N).toLowerCase()
-const SUJETO = N === 1 ? 'pedido sigue' : `${N_PALABRA} pedidos siguen`
-const FRASE_ABIERTOS = `las decisiones ya están tomadas; estos ${SUJETO} abiertos del lado de Casa Óga.`
+// pendiente, las quince ya están tomadas (D2.vistas.V01.por_estado). Lo que sigue abierto es
+// la respuesta de Casa Óga. El conteo en letras solo para cinco (texto del brief D4-20).
+const FRASE_ABIERTOS = `Las decisiones ya están tomadas; estos ${N === 5 ? 'cinco' : N} `
+  + 'pedidos siguen abiertos del lado de Casa Óga.'
 
 // D2.meta no trae la numeración de la consigna ni la fecha de las respuestas (son metadatos
 // del envío a la cátedra, no una cifra del payload): se escriben tal como los dio la tarea,
 // igual que hace <TAG>-consignas.md con la fecha de un anuncio. El corte sí sale de D2.meta.
-const PIE = 'consultas 1 a 9 de la Parte A, 3.4 · respuestas del 22/09 · '
-  + `corte ${fechaCorta(D2.meta.corte_ref)} · fuente vistas.V12`
+// El corte va primero, como en el resto de las vistas (D1-18).
+const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · consultas 1 a 9 de la Parte A, 3.4 · `
+  + 'respuestas del 22/09 · fuente vistas.V12'
 
 export const meta = {
   id: 'V12',
@@ -89,13 +89,13 @@ export default function V12Pedidos() {
                 }}>
                   {p.id}
                 </td>
-                <td style={{ ...celda, color: 'var(--ink)', fontWeight: 600 }} title={p.que}>
-                  <span style={clamp2}>{p.que}</span>
+                <td style={{ ...celda, color: 'var(--ink)', fontWeight: 600 }}>
+                  {p.que}
                 </td>
-                <td style={{ ...celda, color: 'var(--mut)' }} title={p.detalle}>
-                  <span style={clamp2}>{p.detalle}</span>
+                <td style={{ ...celda, color: 'var(--mut)' }}>
+                  {p.detalle}
                 </td>
-                <td style={{ padding: '6px 10px 6px 0', verticalAlign: 'top' }}>
+                <td style={celda}>
                   <PastillaAbierto />
                 </td>
               </tr>
@@ -109,15 +109,11 @@ export default function V12Pedidos() {
   )
 }
 
+// Texto entero (sin recorte). El padding crece con el alto: con 1.4vh la tabla llegaba a
+// la mitad de la pantalla a 1920x1080; con 3vh baja mas y a 1152x640 sigue entrando.
 const celda = {
-  padding: '7px 10px 7px 0', verticalAlign: 'top', fontSize: 12.5, lineHeight: 1.32,
-}
-
-// Dos renglones como máximo por celda: con cinco filas y detalles de hasta ~130 caracteres,
-// una sola línea no entra sin agrandar la fila más de lo que el lienzo tiene a 1152×640
-// (regla dura 8). El texto completo queda en `title` para quien pase el mouse.
-const clamp2 = {
-  display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden',
+  padding: 'clamp(7px, 3vh, 36px) 10px clamp(7px, 3vh, 36px) 0', verticalAlign: 'top',
+  fontSize: 'clamp(12.5px, 0.95vw, 16px)', lineHeight: 1.32,
 }
 
 function Th({ children }) {
