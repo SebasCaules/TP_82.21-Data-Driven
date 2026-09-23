@@ -41,7 +41,7 @@ export function chequear() {
   // el encabezado real es la barra de controles. Con los selectores viejos, `.pie` y `.enc` no
   // matcheaban nada y los dos chequeos de superposicion comparaban contra el borde de la
   // ventana y contra cero, o sea que no comparaban nada. Las cajas que existen hoy son estas.
-  // El E2 no tiene .barra: su encabezado es .e2-enc (23/09, D5-11). Y el cuerpo puede medir
+  // El E2 no tiene .barra: su encabezado es .e2-enc (22/09, D5-11). Y el cuerpo puede medir
   // más que la ventana con overflow:hidden (V07 del E2 a 1152×640 pasaba en verde con el pie
   // fuera de pantalla): el límite es el menor entre el fondo del cuerpo y la ventana.
   const barra = document.querySelector('.barra, .e2-enc')
@@ -115,7 +115,7 @@ export function chequear() {
 
   // 3c. cifra grande partida en dos renglones ("ARS" arriba, "94,9 M" abajo): se lee, pero
   //     no es una cifra. Se mide con los rectangulos de linea del texto, no con el alto de
-  //     la caja, para no depender del line-height (23/09, D5-11).
+  //     la caja, para no depender del line-height (22/09, D5-11).
   for (const el of document.querySelectorAll('.par-val, .kpi-val, .ban-val')) {
     if (!el.textContent.trim()) continue
     const rango = document.createRange()
@@ -159,7 +159,7 @@ export function chequear() {
       problemas.push({ tipo: 'grafico-aplastado', detalle: `svg de ${Math.round(r.height)} px de alto` })
     }
     // El area donde se dibuja la serie (la zona de captura de <Linea>, un rect con tabindex)
-    // puede medir 62 px dentro de un svg de 144: eso tambien es aplastado (23/09).
+    // puede medir 62 px dentro de un svg de 144: eso tambien es aplastado (22/09).
     const zona = svg.querySelector('rect[tabindex][role="img"]')
     if (zona && zona.getBoundingClientRect().height < 90 && r.height >= 90) {
       problemas.push({ tipo: 'grafico-aplastado', detalle: `area de dibujo de ${Math.round(zona.getBoundingClientRect().height)} px en un svg de ${Math.round(r.height)}` })

@@ -69,7 +69,7 @@ DC-09, DC-10, DC-11 y DC-14 son lecturas sobre la base ya corregida.
       "despues": {"valor": 50000, "etiqueta": "filas"},
       "impacto": "…una frase con la cifra…", "cifras": ["D01"], "vista": "V04" }
   ],   // 15 objetos, DC-01 a DC-15; los textos salen de wiki/sintesis/decisiones-de-calidad-de-datos.md (celdas), no se inventan
-  // Claves aditivas admitidas (22/09): meta.archivos[].origen_dir y .ruta; V02.riesgo.*.exposicion_M; V07.casos[].desempate; V11.positivos y V11.features; stage_counts.ventas_M, .edades_fuera_de_rango, .edades_nulas. (23/09): decisiones[].llano, la decisión dicha para el directorio (build_e2._llano, una frase por DC fiel a la celda del wiki). Ninguna clave del contrato puede faltar.
+  // Claves aditivas admitidas (22/09): meta.archivos[].origen_dir y .ruta; V02.riesgo.*.exposicion_M; V07.casos[].desempate; V11.positivos y V11.features; stage_counts.ventas_M, .edades_fuera_de_rango, .edades_nulas. (22/09): decisiones[].llano, la decisión dicha para el directorio (build_e2._llano, una frase por DC fiel a la celda del wiki). Ninguna clave del contrato puede faltar.
   "vistas": { …una clave por vista, sección 3… },
   "anclas": [ {"nombre": "…", "valor": …, "esperado": …, "ok": true} ],   // sección 5
   "stage_counts": { "crudo": 50250, "dedupe": 50000, "identificado": 27606, "monto_pos": 27276 }

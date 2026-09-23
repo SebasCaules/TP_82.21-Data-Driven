@@ -7,7 +7,7 @@
 :root {
   --antes: #8a8680;    /* gris: la base cruda, tal como llega */
   --despues: #22456f;  /* azul-700, el mismo --acc del E1: la base con las DC aplicadas */
-  /* Escala fluida del texto de lectura (23/09, D1-09): a 1152 da lo mismo que antes
+  /* Escala fluida del texto de lectura (22/09, D1-09): a 1152 da lo mismo que antes
      (11,5 px) y a 1920 crece con el título, para que la decisión no quede en letra chica
      dentro de una tarjeta vacía. */
   --e2-txt: clamp(11.5px, 0.8vw, 15px);
@@ -111,7 +111,7 @@
 }
 .pastilla-pend-forma { font-size: 12px; line-height: 1; }
 
-/* ---------- 23/09: pasada de diseño y datos (wiki/entregables/auditoria-tablero-e2.md) ---------- */
+/* ---------- 22/09: pasada de diseño y datos (wiki/entregables/auditoria-tablero-e2.md) ---------- */
 
 /* Texto de lectura con la escala fluida del E2 (D1-09). Solo el E2 carga este archivo. */
 .pant .kpi-sub, .pant .kpi-base { font-size: var(--e2-txt2); }

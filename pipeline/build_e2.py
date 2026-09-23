@@ -177,7 +177,7 @@ def _leer_decisiones_wiki() -> list[dict]:
 
 
 _DECISIONES_META = {
-    "DC-01": dict(dimension="unicidad", vista="V01"),  # 23/09 (D3-12): V02 no muestra DC-01; el par 50.250 → 50.000 se ve en V01
+    "DC-01": dict(dimension="unicidad", vista="V01"),  # 22/09 (D3-12): V02 no muestra DC-01; el par 50.250 → 50.000 se ve en V01
     "DC-02": dict(dimension="exactitud", vista="V05"),
     "DC-03": dict(dimension="consistencia", vista="V01"),
     "DC-04": dict(dimension="unicidad", vista="V04"),
@@ -268,7 +268,7 @@ def _rango_meses(meses: list[str]) -> str:
 
 
 def _llano(ctx: dict) -> dict[str, str]:
-    """La decisión dicha para el directorio (23/09, hallazgo D4-10 de la auditoría del
+    """La decisión dicha para el directorio (22/09, hallazgo D4-10 de la auditoría del
     tablero): una frase por DC, sin nombres de columna ni jerga, que respeta la celda
     'decisión' de wiki/sintesis/decisiones-de-calidad-de-datos.md sin agregar nada. Las
     fechas y los meses salen de las constantes y de la vista V03, no se escriben. Viaja

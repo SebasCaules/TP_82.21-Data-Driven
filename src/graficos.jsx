@@ -21,7 +21,7 @@ import { LUCES } from './SemaforoLuz.jsx'
 export function useMedida() {
   const ref = useRef(null)
   const [caja, setCaja] = useState({ w: 0, h: 0 })
-  // useLayoutEffect y una medida inicial sincrónica (23/09, D5-10): al imprimir desde el
+  // useLayoutEffect y una medida inicial sincrónica (22/09, D5-10): al imprimir desde el
   // menú del navegador, Chrome pagina en cuanto vuelve el listener de beforeprint, y con
   // useEffect + ResizeObserver las hojas se montaban con los SVG todavía sin medir (vacíos).
   // Para el E1 es una medición extra con el mismo valor.
