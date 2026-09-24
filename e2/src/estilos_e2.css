@@ -105,27 +105,6 @@
 }
 .pant .pie-vista b { color: var(--mut2); font-weight: 600; }
 
-/* tabla compacta (V06 embudo, V09 riesgo vs. soporte; V01 y V12 llevan la suya inline) */
-.tabla-e2 { width: 100%; border-collapse: collapse; font: 400 11px/1.3 var(--fuente); }
-.tabla-e2 th { text-align: left; font: 600 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--mut); padding: 4px 6px; border-bottom: 1px solid var(--bd); }
-.tabla-e2 td { padding: 3px 6px; border-bottom: 1px solid var(--bd); vertical-align: top; }
-.tabla-e2 td.mono { font: 400 10.5px/1.3 var(--mono); white-space: nowrap; }
-
-/* ---------- pastilla de "pendiente del negocio" (V12) ---------- */
-/* No es un estado del semáforo (no compara contra una meta): un pedido abierto, sin
-   respuesta. Círculo hueco (la forma) + el texto del estado, siempre juntos, para que la
-   lectura no dependa solo del terracota (regla dura 2 del DISENO.md). */
-.pastilla-pend {
-  display: inline-flex; align-items: center; gap: 6px;
-  border: 1.5px solid var(--terra); border-radius: 4px;
-  padding: 5px 9px;
-  background: var(--sup);
-  font: 600 10.5px/1 var(--mono); color: var(--terra);
-  text-transform: uppercase; letter-spacing: .06em;
-  white-space: nowrap;
-}
-.pastilla-pend-forma { font-size: 12px; line-height: 1; }
-
 /* ---------- 22/09: pasada de diseño y datos (wiki/entregables/auditoria-tablero-e2.md) ---------- */
 
 /* Texto de lectura con la escala fluida del E2 (D1-09). Solo el E2 carga este archivo.
@@ -175,9 +154,6 @@
 .v01-ir { border: 0; background: none; padding: 0; font: inherit; font-weight: 600; color: var(--acc); cursor: pointer; }
 .v01-ir:hover { text-decoration: underline; }
 .v01-ir:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
-/* V06: cabeceras del embudo con la semántica antes (gris) / después (azul) de DISENO.md regla 2. */
-.tabla-e2 th.th-antes { color: var(--mut2); }
-.tabla-e2 th.th-despues { color: var(--acc); }
 
 /* Fuera del rango 1152-1920: la vista crece y el cuerpo scrollea, en vez de aplastarse (D5-21). */
 @media screen and (max-width: 1151px), screen and (max-height: 560px) {

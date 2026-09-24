@@ -7,6 +7,8 @@
 // tarjeta la decide el layout de cada vista. (24/09) En pantalla la regla técnica no se ve
 // (estilos_e2.css, @media screen): repetía el llano en jerga. La hoja impresa la conserva.
 
+import { estadoVisible } from './estados.js'
+
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s)
 
 export default function TarjetaDecision({
@@ -15,7 +17,8 @@ export default function TarjetaDecision({
   if (!dc) return null
   return (
     <div className="tarjeta tarjeta-dec" style={style}>
-      <span className="kpi-lbl"><span>{rotulo}</span><b>{dc.id} · {dc.estado}</b></span>
+      {/* (24/09) «a confirmar» si la decisión tiene un pedido abierto en V12, como en V01 */}
+      <span className="kpi-lbl"><span>{rotulo}</span><b>{dc.id} · {estadoVisible(dc)}</b></span>
       <p className="dec-llano">{dc.llano ? dc.llano : cap(dc.decision)}</p>
       {dc.llano && !sinRegla && (
         <p className="dec-regla"><b>Regla.</b> {cap(dc.decision)}</p>
