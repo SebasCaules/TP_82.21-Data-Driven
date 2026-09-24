@@ -4,6 +4,8 @@ Pasada completa sobre el tablero E2 («Calidad de datos: decisiones antes y desp
 días de presentarlo al directorio. Se revisó solo el diseño: cómo se presentan los datos, si la
 forma de cada gráfico sirve para su dato, qué es relevante y qué es ruido. No se revisó el
 pipeline. Los fixes están en la rama `claude/lucid-davinci-w8ns22`.
+Las capturas de antes y después de cada vista, con cada cambio marcado, están en
+[`auditoria-diseno-e2-antes-despues.pdf`](auditoria-diseno-e2-antes-despues.pdf).
 
 ## Cómo se hizo
 
