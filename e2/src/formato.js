@@ -28,3 +28,8 @@ export const partesMonto = (s) => {
   const m = /^(ARS )([\d.,]+)( M)?$/.exec(s || '')
   return m ? { pre: m[1], num: m[2], suf: m[3] || '' } : null
 }
+
+/** Categorías del catálogo con la tilde que el CSV no trae (24/09). La misma corrección que
+ *  el E1 hace en src/agregacion.js, en la capa de display: el dato no se toca. */
+const TILDES = { Decoracion: 'Decoración', Iluminacion: 'Iluminación', Organizacion: 'Organización' }
+export const categoria = (c) => TILDES[c] ?? c

@@ -1357,7 +1357,7 @@ export function Chispa({ serie, w, h, banda, tonoBanda = 'var(--acc)', rotulo, r
  * blanco y negro.
  */
 export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion = false,
-                            rotulo, pie }) {
+                            rotulo, pie, tramaEn = 'resto' }) {
   if (w < 20) return null
   // Recorte vacio: 0 sobre 0 no es una proporcion. Se dibuja el marco sin relleno y con la
   // leyenda que corresponde, en vez de devolver null y dejar la caja en blanco.
@@ -1384,8 +1384,19 @@ export function BarraMini({ parte, total, w, h = 14, alturaBarra = 14, excepcion
     <svg width={w} height={h} aria-hidden="true" data-chispa="" style={{ display: 'block' }}>
       <title>{lectura(rotulo, `${((parte / total) * 100).toFixed(1).replace('.', ',')} % del total`, pie)}</title>
       <Tramas />
-      <rect x={0} y={y} width={w} height={alto} fill="url(#trama)" stroke={GRIS} strokeWidth="1" />
-      <rect x={0} y={y} width={ancho} height={alto} fill={tono} />
+      {/* tramaEn='parte' (E2, V09): la trama marca la parte que queda afuera o sin confirmar
+          y el resto va liso. Por defecto, 'resto', como siempre en el E1. */}
+      {tramaEn === 'parte' ? (
+        <>
+          <rect x={0} y={y} width={w} height={alto} fill={GRIS} />
+          <rect x={0} y={y} width={ancho} height={alto} fill={excepcion ? 'url(#trama-exc)' : tono} />
+        </>
+      ) : (
+        <>
+          <rect x={0} y={y} width={w} height={alto} fill="url(#trama)" stroke={GRIS} strokeWidth="1" />
+          <rect x={0} y={y} width={ancho} height={alto} fill={tono} />
+        </>
+      )}
       {rotulo && (
         <text x={dentro ? 10 : ancho + 8} y={y + alto / 2} fontSize="15" fontWeight={700}
               fill={dentro ? '#fff' : tono} dominantBaseline="central" className="tabular">

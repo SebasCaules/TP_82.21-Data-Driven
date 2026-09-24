@@ -4,7 +4,8 @@
 // directorio (D2.decisiones[].llano, escrita en pipeline/build_e2.py contra la tabla del
 // wiki); debajo la regla técnica tal como la tiene el wiki (decision) y, si hay, la
 // justificación. Ningún texto se escribe acá: todo sale del payload. La posición de la
-// tarjeta la decide el layout de cada vista.
+// tarjeta la decide el layout de cada vista. (24/09) En pantalla la regla técnica no se ve
+// (estilos_e2.css, @media screen): repetía el llano en jerga. La hoja impresa la conserva.
 
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s)
 

@@ -7,11 +7,13 @@
 :root {
   --antes: #8a8680;    /* gris: la base cruda, tal como llega */
   --despues: #22456f;  /* azul-700, el mismo --acc del E1: la base con las DC aplicadas */
-  /* Escala fluida del texto de lectura (22/09, D1-09): a 1152 da lo mismo que antes
-     (11,5 px) y a 1920 crece con el título, para que la decisión no quede en letra chica
-     dentro de una tarjeta vacía. */
-  --e2-txt: clamp(11.5px, 0.8vw, 15px);
-  --e2-txt2: clamp(11.5px, 0.72vw, 13.5px);
+  /* Escala fluida del texto de lectura (22/09, D1-09). (24/09) La de antes daba 11,5 px
+     tanto a 1152 como a 1440: la pendiente arrancaba recién arriba de 1440. Ahora crece
+     desde 1152 (12 → 13 → 14,7 px) para que en proyector la decisión se lea desde la mesa. */
+  --e2-txt: clamp(12px, 0.35vw + 8px, 16px);
+  --e2-txt2: clamp(11.5px, 0.3vw + 8px, 14.5px);
+  /* Rótulos cortos en mono (kpi-lbl, par-lbl): 10,5 px a 1152, 12,4 a 1920 (24/09). */
+  --e2-rot: clamp(10.5px, 0.25vw + 7.6px, 13px);
 }
 
 /* ---------- encabezado: nombre del tablero + corte fijo, sin controles ---------- */
@@ -27,6 +29,13 @@
 .e2-enc-nombre {
   font: 600 13px/1.2 var(--fuente); letter-spacing: -.01em; color: var(--ink);
 }
+/* (24/09) El encabezado dice qué pregunta responde la vista, en vez de repetir la marca
+   que ya está en el riel. */
+.e2-enc-preg {
+  font: 400 var(--e2-txt2)/1.2 var(--fuente); color: var(--mut2);
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.e2-enc-preg b { font-weight: 600; color: var(--ink); }
 .e2-enc-corte {
   font: 400 10.5px/1.2 var(--mono); letter-spacing: .04em; color: var(--mut);
 }
@@ -65,9 +74,14 @@
   display: flex; align-items: baseline; gap: clamp(10px, 1.3vw, 28px);
 }
 .ban-par .par-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+/* (24/09) Interlineado 1,25: con 1 los rótulos de dos renglones se pisaban y la cifra de al
+   lado quedaba a otra altura. .dos-renglones reserva el alto en los pares donde un rótulo
+   parte y el otro no, para que las dos cifras queden a la par. */
 .ban-par .par-lbl {
-  font: 600 10.5px/1 var(--mono); text-transform: uppercase; letter-spacing: .08em;
+  font: 600 var(--e2-rot)/1.25 var(--mono); text-transform: uppercase; letter-spacing: .08em;
 }
+.ban-par.dos-renglones .par-lbl { min-height: 2.5em; display: flex; align-items: flex-end; }
+.kpi-lbl + .ban-par, .tarjeta > .ban-par { margin-top: 8px; }
 .ban-par .par-antes .par-lbl { color: var(--mut2); }
 .ban-par .par-despues .par-lbl { color: var(--acc); }
 .ban-par .par-val {
@@ -76,7 +90,8 @@
 }
 .ban-par .par-antes .par-val { color: var(--mut); }
 .ban-par .par-despues .par-val { color: var(--ink); }
-.ban-par .par-flecha { align-self: center; color: var(--eje); font-size: 16px; }
+/* (24/09) La flecha es lo que dice «cambió»: en --eje y a 16 px se perdía en proyector. */
+.ban-par .par-flecha { align-self: center; color: var(--mut2); font-size: clamp(16px, 1.4vw, 22px); font-weight: 600; }
 
 /* ---------- pie fijo de cada vista: corte, base, fila del registro, salvedad ---------- */
 /* Va al final de la .pant, empujado abajo por margin-top:auto para que el cuerpo de la vista
@@ -85,7 +100,7 @@
 .pant .pie-vista {
   margin-top: auto; padding-top: 6px;
   border-top: 1px solid var(--bd);
-  font: 400 10px/1.35 var(--mono); color: var(--mut);
+  font: 400 clamp(10px, 0.2vw + 7.7px, 11.5px)/1.35 var(--mono); color: var(--mut);
   letter-spacing: .02em;
 }
 .pant .pie-vista b { color: var(--mut2); font-weight: 600; }
@@ -113,15 +128,28 @@
 
 /* ---------- 22/09: pasada de diseño y datos (wiki/entregables/auditoria-tablero-e2.md) ---------- */
 
-/* Texto de lectura con la escala fluida del E2 (D1-09). Solo el E2 carga este archivo. */
+/* Texto de lectura con la escala fluida del E2 (D1-09). Solo el E2 carga este archivo.
+   (24/09) kpi-base en sans: es una frase, no un rótulo; y los rótulos mono crecen con --e2-rot. */
 .pant .kpi-sub, .pant .kpi-base { font-size: var(--e2-txt2); }
+.pant .kpi-base { font-family: var(--fuente); }
+.pant .kpi-lbl { font-size: var(--e2-rot); }
+/* (24/09) Mono mayúscula solo para rótulos cortos. Un rótulo que es una frase va en sans,
+   sin versalitas: «Al unir números solo cambia el riesgo de las 312 personas…». */
+.pant .kpi-lbl.frase { font: 600 var(--e2-txt2)/1.25 var(--fuente); text-transform: none; letter-spacing: 0; color: var(--ink); }
+/* Nota de lectura bajo un gráfico o un par: una o dos frases en sans. */
+.pant .e2-nota { margin: 4px 0 0; font: 400 var(--e2-txt2)/1.3 var(--fuente); color: var(--mut2); }
 /* El id de decisión del rótulo no se parte en "DC- / 06" (D1-02). */
 .kpi-lbl b { white-space: nowrap; }
 /* La moneda y la unidad de un monto grande, un escalón más chicas que la cifra (D5-04). */
 .par-val .par-unidad { font-size: .6em; font-weight: 500; letter-spacing: 0; }
 
 /* Tarjeta de decisión única (e2/src/TarjetaDecision.jsx, D1-10): primero la decisión en
-   llano para el directorio, debajo la regla tal como está en el wiki y la justificación. */
+   llano para el directorio, debajo la regla tal como está en el wiki y la justificación.
+   (24/09) En pantalla la regla técnica se oculta: repetía el llano en jerga
+   («mapeo a id_cliente_canonico…»). La hoja impresa la conserva. Y la tarjeta que es hija
+   directa del lienzo mide lo que su texto, en vez de estirarse a un bloque blanco. */
+@media screen { .tarjeta-dec .dec-regla { display: none; } }
+.pant .lienzo > .tarjeta-dec { align-self: flex-start; }
 .tarjeta-dec .dec-llano { margin: 8px 0 0; font: 600 var(--e2-txt)/1.4 var(--fuente); color: var(--ink); }
 .tarjeta-dec .dec-regla, .tarjeta-dec .dec-just { margin: 6px 0 0; font: 400 var(--e2-txt2)/1.4 var(--fuente); color: var(--mut); }
 .tarjeta-dec .dec-just { color: var(--mut2); }
@@ -137,12 +165,16 @@
 /* Anuncio para lectores de pantalla al cambiar de vista (D5-23): fuera de la pantalla. */
 .solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* V01: las celdas de texto se recortan con puntos suspensivos donde no entran y pasan a dos
-   renglones cuando la pantalla lo permite (D5-06, D1-07). */
-.v01q td.txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@media (min-width: 1440px) and (min-height: 860px) {
-  .v01q td.txt { white-space: normal; font-size: 12.5px; line-height: 1.3; padding-top: 5px; padding-bottom: 5px; }
-}
+/* V01 (24/09): la tabla escala con la pantalla y cada celda de texto entra en hasta dos
+   renglones (.clamp2), en pantalla y en la hoja impresa. Antes, a 1152×640 y en el PDF, el
+   hallazgo y la decisión se cortaban con «…» a mitad de frase (D5-06, D1-07). */
+.v01q table { font-size: clamp(11.5px, calc(0.55vw + 5px), 16px); }
+.v01q td.txt { white-space: normal; overflow: visible; line-height: 1.2; padding-top: 2px; padding-bottom: 2px; font-size: inherit; }
+.v01q .clamp2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+/* Número de vista de la tabla: botón que lleva a la vista, con el mismo «05» del riel. */
+.v01-ir { border: 0; background: none; padding: 0; font: inherit; font-weight: 600; color: var(--acc); cursor: pointer; }
+.v01-ir:hover { text-decoration: underline; }
+.v01-ir:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
 /* V06: cabeceras del embudo con la semántica antes (gris) / después (azul) de DISENO.md regla 2. */
 .tabla-e2 th.th-antes { color: var(--mut2); }
 .tabla-e2 th.th-despues { color: var(--acc); }

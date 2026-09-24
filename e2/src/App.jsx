@@ -10,6 +10,7 @@ import { VISTAS } from './vistas/index.jsx'
 import { D2 } from './datos_e2.js'
 import { fechaCorta } from './formato.js'
 import MarcaInicio from '../../src/MarcaInicio.jsx'
+import { ImpresionCtx } from './escala.js'
 
 export default function App() {
   const [indice, setIndice] = useState(0)
@@ -97,23 +98,26 @@ export default function App() {
 
       <div className="principal">
         <p className="solo-lector" aria-live="polite">{`Vista ${indice + 1} de ${VISTAS.length}: ${vista.titulo}`}</p>
-        <Encabezado />
+        <Encabezado indice={indice} vista={vista} />
 
         <main className="cuerpo">
-          {imprimiendo ? <Impresion /> : <vista.Componente />}
+          {/* irA: V01 lleva a cada vista desde su tabla (24/09). En la hoja impresa no va. */}
+          {imprimiendo ? <Impresion /> : <vista.Componente irA={irA} />}
         </main>
       </div>
     </div>
   )
 }
 
-/** Sin barra de filtros ni corte: solo el nombre del tablero y el corte fijo con el que
- *  trabaja toda la SPA. Ver CONTRACT_E2.md §0: cada vista muestra "antes" y "después" sobre
- *  el mismo corte, no un corte que se elige. */
-function Encabezado() {
+/** Sin barra de filtros ni corte: qué vista es y qué pregunta responde, y el corte fijo con
+ *  el que trabaja toda la SPA. Ver CONTRACT_E2.md §0: cada vista muestra "antes" y "después"
+ *  sobre el mismo corte, no un corte que se elige. (24/09) Antes repetía la marca del riel. */
+function Encabezado({ indice, vista }) {
   return (
     <header className="e2-enc">
-      <span className="e2-enc-nombre">Casa Óga · Calidad de datos</span>
+      <span className="e2-enc-preg">
+        <b>{`Vista ${indice + 1} de ${VISTAS.length}`}</b>{vista.pregunta ? ` · ${vista.pregunta}` : ''}
+      </span>
       <span className="e2-enc-corte">{`corte ${fechaCorta(D2.meta.corte_ref)} · datos de ${D2.meta.archivos.length} archivos`}</span>
     </header>
   )
@@ -150,11 +154,10 @@ function Lateral({ indice, irA }) {
         ))}
       </ol>
 
-      <div className="lat-pie">
+      {/* (24/09) Tres renglones en vez de cuatro: los atajos son para quien presenta, no para
+          el directorio. Inicio y Fin quedan en el title. */}
+      <div className="lat-pie" title="↑ ↓ cambiar de vista · Inicio / Fin: primera y última · F: pantalla completa · I: imprimir">
         <span>↑ ↓ cambiar de vista</span>
-        {/* A 1152 px el riel no alcanza para este atajo en un renglón: se deja partir
-            solo tras los dos puntos (los demás espacios son duros). */}
-        <span style={{ whiteSpace: 'normal' }}>Inicio&nbsp;·&nbsp;Fin: primera&nbsp;y&nbsp;última</span>
         <span>F: pantalla completa</span>
         <span>I: imprimir</span>
       </div>
@@ -165,13 +168,17 @@ function Lateral({ indice, irA }) {
 /** Flujo de impresión: una hoja A4 apaisada por vista, en flujo normal (nunca display:none),
  *  igual patrón que Impresion en src/App.jsx del E1. */
 function Impresion() {
+  // ImpresionCtx: los SVG propios del E2 escalan la letra con la ventana (escala.js); en la
+  // hoja el factor vuelve a 1, porque el ancho de la ventana no dice nada del papel.
   return (
-    <div className="impresion-flujo">
-      {VISTAS.map((v) => (
-        <div className="hoja" key={v.id}>
-          <v.Componente />
-        </div>
-      ))}
-    </div>
+    <ImpresionCtx.Provider value={true}>
+      <div className="impresion-flujo">
+        {VISTAS.map((v) => (
+          <div className="hoja" key={v.id}>
+            <v.Componente />
+          </div>
+        ))}
+      </div>
+    </ImpresionCtx.Provider>
   )
 }
