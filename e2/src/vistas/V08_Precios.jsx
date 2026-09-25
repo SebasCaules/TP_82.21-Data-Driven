@@ -100,9 +100,9 @@ export default function V08Precios() {
   const series = [
     {
       id: 'ipc',
-      tono: 'var(--mut2)',
+      tono: 'var(--gris)',
       punteado: true,
-      grosor: 2,
+      grosor: 1.75,
       rotuloFinal: `IPC ${decimal(ipcUltimo, 1)}× (a ${eneDe(anioIpcFin)})`,
       puntos: V.ipc.map((d) => ({
         t: d.anio,
@@ -115,7 +115,7 @@ export default function V08Precios() {
     {
       id: 'precio',
       tono: 'var(--acc)',
-      grosor: 2.5,
+      grosor: 4,
       rotuloFinal: `precio ${decimal(mN / m0, 2)}×`,
       puntos: V.mediana_unitaria.map((d) => {
         const flag = flagDe(d.anio)
@@ -137,7 +137,8 @@ export default function V08Precios() {
   const datosCategorias = categorias.map((c) => ({
     etiqueta: categoria(c.categoria),
     valor: c.pct,
-    nota: `${pesos(c.v2022)} → ${pesos(c.v2025)}`,
+    // (25/09) Las medianas en pesos pasan al title de cada barra: sumaban una columna de cifras.
+    detalle: `${pesos(c.v2022)} → ${pesos(c.v2025)}`,
   }))
   const nBaja = categorias.filter((c) => c.pct < 0).length
   const nSube = categorias.filter((c) => c.pct > 0).length
@@ -157,8 +158,6 @@ export default function V08Precios() {
     `${variacionReal < 0 ? 'baja' : 'suba'} real de ${pct(Math.abs(variacionReal))}, una anomalía encima de otra.`
   return (
     <section className="pant v08">
-      <h1 className="titulo">{TITULO}</h1>
-
       <Banda dcs={[DC10]}>
         <div className="tarjeta" title="IPC acumulado al 1 de enero de cada año · INDEC">
           <span className="kpi-lbl"><span>IPC acumulado</span></span>
@@ -191,7 +190,7 @@ export default function V08Precios() {
           </span>
           <Lienzo className="lienzo">
             {({ w, h }) => (
-              <LineaIndice series={series} anios={anios} w={w} h={h} tituloX="año"
+              <LineaIndice series={series} anios={anios} w={w} h={h} tituloX="año" escalaRotulo={1.3}
                            referencia={{ v: 1, texto: `nivel ${anioPrecioIni}` }} />
             )}
           </Lienzo>
@@ -207,7 +206,6 @@ export default function V08Precios() {
               <Divergentes
                 datos={datosCategorias} w={w} h={h} dominio={dominio}
                 tituloEje={`variación ${anioPrecioIni} → ${anioPrecioFin}`}
-                encabezadoNota={`mediana ${anioPrecioIni} → ${anioPrecioFin}`}
                 rotuloNeg={nBaja ? `baja en ${nBaja} de ${categorias.length}` : null}
                 rotuloPos={nSube ? `sube en ${nSube}` : null}
               />
@@ -216,7 +214,6 @@ export default function V08Precios() {
         </div>
       </div>
 
-      <p className="pie-vista">{PIE}</p>
     </section>
   )
 }
@@ -268,8 +265,8 @@ function Divergentes({ datos, w, h, dominio, tituloEje, encabezadoNota, rotuloNe
     <svg width={w} height={h} role="img" style={{ display: 'block' }}
          aria-label={`${tituloEje}: ` + datos.map((d) => `${d.etiqueta} ${pct(d.valor)}`).join(', ')}>
       <Tramas />
-      {/* El lado negativo va sobre un lavado neutro: la zona se ve antes que las barras. */}
-      <rect x={x0} y={padTop} width={Math.max(0, xc - x0)} height={disponible} fill="var(--zona)" />
+      {/* (25/09, pedido del usuario: menos ruido) Sin lavado ni trama: las barras que bajan en
+          --acc, sólidas, y la que sube en gris; los valores en tinta. */}
       {rotuloNeg && (
         <text x={xc - 10} y={yCab} fontSize={fCab} fontWeight={600} fill="var(--mut2)"
               textAnchor="end" dominantBaseline="central">{rotuloNeg}</text>
@@ -291,16 +288,15 @@ function Divergentes({ datos, w, h, dominio, tituloEje, encabezadoNota, rotuloNe
         return (
           <g key={d.etiqueta}>
             <title>{`${d.etiqueta} · ${pct(d.valor)} · ${tituloEje}` +
-              (d.nota ? ` · ${encabezadoNota}: ${d.nota}` : '')}</title>
-            <text x={anchoEtiqueta - 9} y={y + alto / 2} fontSize={fuenteEtq} fill="var(--mut2)"
+              (d.detalle ? ` · mediana: ${d.detalle}` : '')}</title>
+            <text x={anchoEtiqueta - 9} y={y + alto / 2} fontSize={fuenteEtq} fill="var(--ink)"
                   textAnchor="end" dominantBaseline="central">{d.etiqueta}</text>
             {d.valor !== 0 && (
               <rect x={x1} y={y} width={Math.max(2, x2 - x1)} height={alto}
-                    fill={neg ? 'url(#trama)' : 'var(--gris)'}
-                    stroke={neg ? 'var(--gris)' : 'none'} strokeWidth="1" />
+                    fill={neg ? 'var(--acc)' : 'var(--gris)'} />
             )}
-            <text x={neg ? x1 - 6 : x2 + 6} y={y + alto / 2} fontSize={fuente} fill="var(--mut2)"
-                  fontWeight={500} textAnchor={neg ? 'end' : 'start'} dominantBaseline="central"
+            <text x={neg ? x1 - 6 : x2 + 6} y={y + alto / 2} fontSize={fuente} fill="var(--ink)"
+                  fontWeight={600} textAnchor={neg ? 'end' : 'start'} dominantBaseline="central"
                   className="tabular">{pct(d.valor)}</text>
             {d.nota && (
               <text x={w} y={y + alto / 2} fontSize={fuente} fill="var(--mut)" fontWeight={400}

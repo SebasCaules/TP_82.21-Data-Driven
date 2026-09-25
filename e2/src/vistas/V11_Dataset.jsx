@@ -31,11 +31,10 @@
 // (NAR-V11-2). Una nota en el gráfico avisa que la rampa de filas es la regla de 3 compras o
 // más acumulándose desde el comienzo del extracto, no la cartera creciendo (OMI-V11-1).
 
-import { useContext, useLayoutEffect, useRef, useState } from 'react'
-import { Lienzo, escalaNice, useMedida } from '../../../src/graficos.jsx'
+import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { entero, pct, fechaCorta, mesCorto } from '../formato.js'
-import { useEscalaTexto, ImpresionCtx } from '../escala.js'
+import { useEscalaTexto } from '../escala.js'
 
 const V = D2.vistas.V11
 
@@ -379,13 +378,6 @@ function GraficoFilasPorCorte({ w, h, cortes, k }) {
               textAnchor="middle" fontWeight={600}>{NOMBRE[g.particion]}</text>
       ))}
 
-      {lineasNota.length > 0 && (
-        <text x={xNota} y={yNota0} fontSize={fNota} fill={MUT}>
-          {lineasNota.map((l, i) => (
-            <tspan key={i} x={xNota} dy={i === 0 ? 0 : lhNota}>{l}</tspan>
-          ))}
-        </text>
-      )}
 
       {/* eje X: mesCorto cada 3 meses (regla del DISEÑO para esta vista), nada en diagonal.
           El último mes siempre va; la marca de cada 3 que le queda pegada se omite (a 1152
@@ -410,171 +402,127 @@ function GraficoFilasPorCorte({ w, h, cortes, k }) {
   )
 }
 
-/** ¿Algo de la columna desborda su caja? (la columna o alguna de sus tarjetas) */
-function desborda(el) {
-  return !!el && [el, ...el.children].some((c) => c.scrollHeight > c.clientHeight + 1)
+// (25/09, pedido del usuario) Menos texto sobre qué se predice y más sobre cómo se trabaja: cómo
+// se dividen los datos y cómo se elige el modelo. Arriba, tres tarjetas: el tamaño del dataset,
+// la tasa que el modelo tiene que anticipar y la meta (lift del decil superior contra la regla
+// de recency, C22). A la izquierda, la partición temporal con el uso de cada tramo. A la derecha,
+// la escalera de modelos del plan del E2 (resumen de lectura, sección «Qué modelo»): de la regla
+// al boosting, cada escalón más caro de explicar y de mantener, y la regla de elección: gana el
+// más simple que cumpla la meta dentro de la capacidad de contacto del mes (C08). Las cifras de
+// la meta y la capacidad salen de D2.meta.plan_modelo.
+const PLAN = D2.meta.plan_modelo ?? {}
+const K = PLAN.capacidad ?? []
+const META = PLAN.meta_lift
+const coma = (x, d = 2) => x.toFixed(d).replace('.', ',')
+const USO_LARGO = {
+  train: 'aprende',
+  dev: 'elige la configuración',
+  gap: 'no se usa: evita fugas',
+  test: 'medición final, una vez',
+  test_flag: 'chequeo: toca sep–dic',
+}
+// La escalera: cada escalón suma costo (legibilidad, mantenimiento, riesgo de sobreajuste). El
+// ancho de la barrita dice cuánto, en cinco pasos; no es una medición.
+const ESCALERA = [
+  { id: 'B0', nombre: 'Azar', rol: 'el piso', costo: 1 },
+  { id: 'B1', nombre: 'Regla de recency', rol: 'la vara de hoy', costo: 1 },
+  { id: 'B2', nombre: 'Exposición', rol: 'plata en juego, no riesgo', costo: 1 },
+  { id: 'M1', nombre: 'Logística', rol: 'referencia: se explica', costo: 3, ref: true },
+  { id: 'M2', nombre: 'Boosting', rol: 'solo si paga su costo', costo: 5 },
+]
+
+// El detalle de cada escalón, para el title (resumen de lectura del E2, «Qué modelo»).
+const DETALLE = {
+  B0: 'Lista al azar: el piso.',
+  B1: 'Ordenar por días sin comprar, la línea base del E1: es la vara real.',
+  B2: 'El criterio del E1, ordenar por facturación anualizada: compite en dinero, no en riesgo.',
+  M1: 'Regresión logística: un peso con signo por variable; montos en log, categorías en one-hot, escalado. Se queda si le gana a B1.',
+  M2: 'Gradient boosting (HistGradientBoosting o LightGBM): entra solo si le gana a M1 por un margen claro, que pague la pérdida de legibilidad y el mantenimiento. Redes neuronales, no: datos tabulares y 4.627 clientes.',
 }
 
 export default function V11Dataset() {
   const k = useEscalaTexto()
-  const imprimiendo = useContext(ImpresionCtx)
-  // (24/09) La tarjeta del target va a la derecha, debajo de la de usos, cuando el alto
-  // alcanza para las dos; si la columna desborda (a 1152×640 le faltan ~50 px) baja a la
-  // izquierda, debajo del gráfico. Se decide midiendo, no con un umbral fijo: la letra crece
-  // con la pantalla y la hoja impresa tiene otro alto. Se vuelve a probar con cada medida
-  // nueva del lienzo, cuyo tamaño no depende de dónde quede la tarjeta.
-  const [refLienzo, caja] = useMedida()
-  const refDer = useRef(null)
-  const [sinLugar, setSinLugar] = useState('')
-  const clave = `${caja.w}x${caja.h}`
-  // En la hoja impresa no se mide: la tarjeta va abajo a la izquierda desde el primer render.
-  // Si se movía después de medir, el Lienzo quedaba con la caja vieja (SVG de 411 px en una
-  // caja de 274) y la hoja salía sin eje X ni base, porque la medida nueva llegaba tarde
-  // para la instantánea de impresión.
-  const targetDerecha = !imprimiendo && sinLugar !== clave
-  useLayoutEffect(() => {
-    if (targetDerecha && desborda(refDer.current)) setSinLugar(clave)
-  })
-
-  if (!hayDatos) {
-    return (
-      <section className="pant v11">
-        <h1 className="titulo">{TITULO}</h1>
-        <p className="pie-vista">sin datos en el payload</p>
-      </section>
-    )
-  }
-
-  const tarjetaTarget = (
-    <div className="tarjeta" style={{ flex: '0 0 auto' }}>
-      <span className="kpi-lbl frase">Qué va a predecir el modelo</span>
-      <p style={{ margin: '4px 0 0', fontSize: LETRA, lineHeight: 1.35, color: 'var(--ink)' }}>
-        {NOTA_TARGET}
-      </p>
-      {NOTA_STOCK && <p className="e2-nota">{NOTA_STOCK}</p>}
-    </div>
-  )
-  const GAP = 'clamp(10px, 1.5vh, 16px)'
+  if (!hayDatos) return <section className="pant v11" />
 
   return (
     <section className="pant v11">
-      <h1 className="titulo">{TITULO}</h1>
-
-      {/* (24/09) KPI sin jerga (REL-V11-1, NAR-V11-1): cuántas filas y variables, cuántos
-          clientes y la tasa, que dice «entran en riesgo» y no «churn». La tasa conserva los
-          dos decimales de la fila E08. Los rótulos van en frase (sans): el tercero pasa de
-          cuatro palabras y los tres se leen parejos. */}
-      <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)', flex: '0 0 auto' }}>
-        <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
-          <span className="kpi-lbl frase">Filas para el modelo</span>
-          <span className="kpi-val tabular">{entero(V.filas)}</span>
-          <span className="kpi-base">{V.n_features} variables por fila</span>
-        </div>
-        <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
-          <span className="kpi-lbl frase">Clientes distintos</span>
-          <span className="kpi-val tabular">{entero(V.clientes_distintos)}</span>
-          <span className="kpi-base">
-            en {V.cortes.length} fines de mes, {mesCorto(PRIMERO)} a {mesCorto(ULTIMO)}
-          </span>
-        </div>
-        <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
-          <span className="kpi-lbl frase">{`Entran en riesgo a ${H} días`}</span>
-          <span className="kpi-val tabular">{pct(TASA_GLOBAL, 2)}</span>
-          <span className="kpi-base">
-            {entero(V.positivos)} de {entero(V.filas)} filas sin riesgo al cierre del mes
-          </span>
-        </div>
-      </div>
-
-      <div className="lienzo" ref={refLienzo}>
-        {/* (24/09) Columna izquierda: el gráfico de filas, con todo el alto que dejó la serie
-            de tasa (y debajo la tarjeta del target cuando a la derecha no entra). Columna
-            derecha: la tarjeta de usos y, si hay alto, la del target. */}
-        <div style={{
-          flex: '1.6 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: GAP,
-        }}
-        >
-          <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
-            <span className="kpi-lbl frase">
-              Filas por fin de mes: clientes con 3 compras o más y sin riesgo
-            </span>
-            <Lienzo className="lienzo">
-              {({ w, h }) => <GraficoFilasPorCorte w={w} h={h} cortes={V.cortes} k={k} />}
-            </Lienzo>
-          </div>
-          {!targetDerecha && tarjetaTarget}
-        </div>
-
-        {/* contain: size — la columna mide lo que le da el lienzo y no lo que pide su
-            contenido: si no, el contenido de más estiraba el cuerpo entero y empujaba el pie
-            fuera de la pantalla en vez de desbordar la columna, que es lo que se mide. */}
-        <div ref={refDer} style={{
-          flex: '1 1 0', minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', gap: GAP,
-          justifyContent: 'space-between', contain: 'size',
-        }}
-        >
-          {/* Con las dos tarjetas a la derecha, cada una mide lo que su texto (la de usos
-              arriba, a la par del gráfico; la del target abajo, a la par de su base) en vez
-              de estirarse a un bloque blanco; sola, la de usos ocupa la columna. */}
-          <div className="tarjeta" style={{ flex: targetDerecha ? '0 0 auto' : '1 1 auto', minHeight: 0 }}>
-            <span className="kpi-lbl frase">Cómo se usan las filas</span>
-            {/* Fila en DOS renglones: nombre en llano, uso y filas arriba; meses y tasa abajo.
-                Con todo en una sola línea el rango de meses envolvía y desbordaba la tarjeta. */}
-            {/* La letra (LETRA) y el aire entre filas crecen con la pantalla. */}
-            <div style={{
-              marginTop: 6, paddingTop: 6, borderTop: '1px dotted var(--bd)',
-              display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 3vh - 15px, 20px)',
-              fontSize: LETRA, lineHeight: 1.25,
-            }}
-            >
-              {RANGOS.map((r) => (
-                <div key={r.particion} style={{ minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <SwatchParticion particion={r.particion} />
-                    <span style={{ minWidth: 0 }}>
-                      <b style={{ fontWeight: 600, color: 'var(--ink)' }}>{NOMBRE[r.particion]}</b>
-                      <span style={{ color: 'var(--mut2)' }}> · {USO[r.particion]}</span>
-                    </span>
-                    <span className="tabular" style={{ marginLeft: 'auto', color: 'var(--ink)', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                      {entero(r.filas)} filas
-                    </span>
-                  </div>
-                  {r.desde && (
-                    <div className="tabular" style={{ color: 'var(--mut)', paddingLeft: 'calc(0.85em + 7px)' }}>
-                      {mesCorto(r.desde)} a {mesCorto(r.hasta)} · {pct(r.tasa)} entra en riesgo
-                    </div>
-                  )}
-                </div>
-              ))}
+      <div className="e2-kpis">
+        <div className="tarjeta" title={`dataset ${V.nombre} · ${V.cortes.length} fines de mes, ${mesCorto(PRIMERO)} a ${mesCorto(ULTIMO)} · registro E08`}>
+          <span className="kpi-lbl"><span>Dataset</span></span>
+          <div className="ban-par">
+            <div className="par-item">
+              <span className="par-lbl">Filas cliente-mes</span>
+              <span className="par-val tabular e2-cifra">{entero(V.filas)}</span>
             </div>
-            {/* (24/09) Por qué la prueba aparte va aparte, sin decir que sus meses no están
-                confirmados (lo que no está confirmado es su ventana de 90 días). El detalle de
-                DC-09 está en la vista de cobertura (NAR-V11-2). */}
-            {MESES_FLAG && R.test_flag?.desde && (
-              <p className="e2-nota" style={{ marginTop: 8 }}>
-                <b style={{ fontWeight: 600, color: 'var(--ink)' }}>Prueba aparte:</b> sus {H} días
-                hacia adelante tocan {MESES_FLAG}, meses con cobertura no confirmada ({DC09.id}, vista{' '}
-                {VISTA_COB}).
-                {FLAG_CONFIRMADOS.length > 0 && (
-                  ` Los meses ${mesCorto(FLAG_CONFIRMADOS[0].corte)} a `
-                  + `${mesCorto(FLAG_CONFIRMADOS[FLAG_CONFIRMADOS.length - 1].corte)} sí están confirmados.`
-                )}
-              </p>
-            )}
-            {/* Nombre y versión del dataset (fila V11 del DISEÑO), en un renglón chico al pie. */}
-            <p style={{
-              margin: 'auto 0 0', paddingTop: 10,
-              font: '400 var(--e2-rot)/1.3 var(--mono)', color: 'var(--mut)',
-            }}
-            >
-              dataset {V.nombre}
-            </p>
           </div>
-          {targetDerecha && tarjetaTarget}
+          <p className="e2-linea">{V.n_features} variables · {entero(V.clientes_distintos)} clientes</p>
+        </div>
+        <div className="tarjeta" title={NOTA_TARGET}>
+          <span className="kpi-lbl"><span>Qué predice</span></span>
+          <div className="ban-par">
+            <div className="par-item">
+              <span className="par-lbl">Entran en riesgo a {H} días</span>
+              <span className="par-val tabular e2-cifra">{pct(TASA_GLOBAL, 2)}</span>
+            </div>
+          </div>
+          <p className="e2-linea">{entero(V.positivos)} de {entero(V.filas)} filas</p>
+        </div>
+        <div className="tarjeta e2-central" title="Lift del decil superior del modelo contra la regla de recency (fila C22): es una meta del E1, no una medición.">
+          <span className="kpi-lbl"><span>Meta del modelo</span><b className="e2-tag">{PLAN.fila_meta ?? 'C22'}</b></span>
+          <div className="ban-par">
+            <div className="par-item par-unico">
+              <span className="par-lbl">Lift contra la regla de hoy</span>
+              <span className="par-val tabular e2-cifra">{META != null ? `${coma(META)}×` : '—'}</span>
+            </div>
+          </div>
+          <p className="e2-linea">en el 10 % de la lista con más riesgo</p>
         </div>
       </div>
 
-      <p className="pie-vista">{PIE}{imprimiendo ? ` · ${PIE_TECNICO}` : ''}</p>
+      <div className="v11-cuerpo">
+        <div className="tarjeta v11-datos">
+          <span className="kpi-lbl frase">Cómo se dividen los datos: por fecha, nunca al azar</span>
+          <p className="v11-porque">Un cliente aparece en varios meses: mezclados al azar, el modelo vería su futuro.</p>
+          <Lienzo className="lienzo">
+            {({ w, h }) => <GraficoFilasPorCorte w={w} h={h} cortes={V.cortes} k={k} />}
+          </Lienzo>
+          <div className="v11-particiones">
+            {RANGOS.map((r) => (
+              <div key={r.particion} className="v11-part" title={`${pct(r.tasa)} entra en riesgo`}>
+                <span className="v11-part-nombre"><SwatchParticion particion={r.particion} />{NOMBRE[r.particion]}</span>
+                <span className="v11-part-meses tabular">{r.desde ? `${mesCorto(r.desde)} a ${mesCorto(r.hasta)}` : '—'}</span>
+                <span className="v11-part-filas tabular">{entero(r.filas)} filas</span>
+                <span className="v11-part-uso">{USO_LARGO[r.particion]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="tarjeta v11-modelo">
+          <span className="kpi-lbl frase">Cómo se elige el modelo</span>
+          <ol className="v11-escalera">
+            {ESCALERA.map((e) => (
+              <li key={e.id} className={e.ref ? 'ref' : undefined} title={DETALLE[e.id]}>
+                <b className="v11-id">{e.id}</b>
+                <span className="v11-paso"><b>{e.nombre}</b> · {e.rol}</span>
+                <span className="v11-costo" aria-label={`costo ${e.costo} de 5`}>
+                  <span style={{ width: `${e.costo * 20}%` }} />
+                </span>
+              </li>
+            ))}
+          </ol>
+          <div className="v11-mide">
+            <span className="v11-sub">Se mide en la prueba</span>
+            <p>Lift en el 10 % de arriba: {META != null ? `${coma(META)}×` : 'la meta'} o más.</p>
+            {K.length === 2 && <p>Aciertos en los primeros {entero(K[0])} y {entero(K[1])} del mes.</p>}
+            <p>Valor de un contacto: probabilidad × exposición − costo.</p>
+          </div>
+          <p className="v11-regla">
+            Gana el más simple que cumpla la meta: un escalón más solo entra si mejora la lista del
+            mes más de lo que cuesta explicarlo y mantenerlo.
+          </p>
+        </div>
+      </div>
     </section>
   )
 }

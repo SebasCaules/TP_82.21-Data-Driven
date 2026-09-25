@@ -89,8 +89,6 @@ export const meta = { id: 'V05', corto: 'Devoluciones', titulo: TITULO, pie: PIE
 export default function V05_Devoluciones() {
   return (
     <section className="pant v05">
-      <h1 className="titulo">{TITULO}</h1>
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, minHeight: 0 }}>
         {/* (25/09, regla del usuario) Banda de cifras: el par de unidades y, a la derecha, DC-02
             solo en llano. Sale el «Por qué» propio; el conteo de filas del archivo y el desfase de
@@ -114,7 +112,7 @@ export default function V05_Devoluciones() {
         </Banda>
 
         {/* fila 2: la serie mensual con las dos formas de contar, a todo el ancho (24/09) */}
-        <div className="tarjeta" style={{ flex: 1, minHeight: 0, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+        <div className="tarjeta" title={LECTURA} style={{ flex: 1, minHeight: 0, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <div style={{
             display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between',
             gap: '4px 18px', flexShrink: 0,
@@ -122,17 +120,15 @@ export default function V05_Devoluciones() {
             <span className="kpi-lbl frase">Devoluciones por mes: qué fecha cuenta</span>
             <Leyenda />
           </div>
-          <p className="e2-nota" style={{ color: 'var(--ink)', flexShrink: 0 }}>{LECTURA}</p>
           <Lienzo className="lienzo">
             {({ w, h }) => (
               <LineaDoble serie={V05.serie} w={w} h={h} formato={entero} flag={FLAG}
-                          rotuloFlag={`${MESES_FLAG}: cobertura no confirmada (vista ${VISTA_COB})`} />
+                          rotuloFlag="cobertura no confirmada" />
             )}
           </Lienzo>
         </div>
       </div>
 
-      <p className="pie-vista">{PIE}</p>
     </section>
   )
 }

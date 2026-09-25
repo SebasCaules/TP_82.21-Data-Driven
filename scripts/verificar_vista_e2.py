@@ -3,8 +3,8 @@
     python3 verificar_vista.py N [carpeta_de_capturas]
 
 Para cada resolución del rango (1152×640, 1280×720, 1366×768, 1440×900, 1920×1080):
-window.__fit() (desborde, cifra partida, texto fuera del svg, gráfico aplastado), título de una
-línea y ≤ 74 caracteres, .pant y cada .tarjeta sin scroll horizontal, pie dentro de la ventana,
+window.__fit() (desborde, cifra partida, texto fuera del svg, gráfico aplastado), pregunta en un
+renglón, .pant y cada .tarjeta sin scroll horizontal, pie dentro de la ventana,
 errores de consola. Guarda capturas a 1152, 1440 y 1920 en la carpeta (default: ./cap_VNN).
 Imprime un JSON con los problemas y termina con 'VISTA OK' o 'VISTA CON PROBLEMAS'.
 """
@@ -20,18 +20,17 @@ CAPTURAR = {(1152, 640), (1440, 900), (1920, 1080)}
 JS = """() => {
   const q = (s) => [...document.querySelectorAll(s)]
   const p = []
-  const t = document.querySelector('h1.titulo')
+  // (25/09) El encabezado de la vista es la pregunta (h1.e2-preg, App.jsx), en un renglón.
+  const t = document.querySelector('h1.e2-preg')
   const txt = t ? t.textContent.trim() : ''
-  if (!t) p.push('sin h1.titulo')
-  if (txt.length > 74) p.push('titulo de ' + txt.length + ' caracteres: ' + txt)
-  if (t && t.scrollHeight > t.clientHeight + 2) p.push('titulo en dos renglones')
+  if (!t) p.push('sin h1.e2-preg')
+  if (t && t.getBoundingClientRect().height > parseFloat(getComputedStyle(t).lineHeight) * 1.5) p.push('pregunta en dos renglones')
   const pant = document.querySelector('.cuerpo .pant')
   if (!pant) p.push('sin .pant')
   else if (pant.scrollWidth > pant.clientWidth + 1) p.push('.pant desborda a lo ancho ' + pant.scrollWidth + '>' + pant.clientWidth)
   for (const c of q('.cuerpo .tarjeta')) if (c.scrollWidth > c.clientWidth + 1) p.push('tarjeta desborda a lo ancho: ' + (c.querySelector('.kpi-lbl')?.textContent || '').trim().slice(0, 40))
-  const pie = document.querySelector('.cuerpo .pie-vista')
-  if (!pie) p.push('sin .pie-vista')
-  else if (pie.getBoundingClientRect().bottom > window.innerHeight + 0.5) p.push('pie fuera de la ventana: ' + Math.round(pie.getBoundingClientRect().bottom) + '>' + window.innerHeight)
+  // (25/09) Sin pie: se mira que la vista entera quede dentro de la ventana.
+  if (pant && pant.getBoundingClientRect().bottom > window.innerHeight + 0.5) p.push('vista fuera de la ventana: ' + Math.round(pant.getBoundingClientRect().bottom) + '>' + window.innerHeight)
   const fit = window.__fit ? window.__fit() : { ok: false, problemas: [{ tipo: 'sin __fit' }] }
   if (!fit.ok) p.push(...fit.problemas.map((x) => x.tipo + ': ' + (x.detalle || '')))
   const chicos = []

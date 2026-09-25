@@ -97,16 +97,20 @@ export const meta = {
 // muestra con su salvedad.
 export default function V04Duplicados() {
   // Tope de alto del gráfico: crece con la pantalla (k entero, hasta 1,4; ver abajo).
-  const tope = Math.round((3 * 80 + 56) * useEscalaTexto())
+  const k = useEscalaTexto()
+  const tope = Math.round((3 * 80 + 56) * k)
+  // (25/09, pedido del usuario: no se entendía qué mirar) La barra que manda, la de las personas
+  // con dos números (el grueso de los duplicados), va en --acc y con «personas»; las otras en gris.
+  const mayor = Math.max(...V.personas_por_n_ids.map((p) => p.personas))
   const datosBarras = V.personas_por_n_ids.map((p) => ({
-    etiqueta: `${p.n_ids} números`,
+    etiqueta: `con ${p.n_ids} números`,
     valor: p.personas,
+    enfasis: p.personas === mayor,
+    sufijo: p.personas === mayor ? 'personas' : undefined,
   }))
 
   return (
     <section className="pant v04">
-      <h1 className="titulo">{TITULO}</h1>
-
       <Banda dcs={[DC04]}>
         <div className="tarjeta e2-central" title={`${NOTA_RIESGO}. ${NOTA_EXPOSICION}.`}>
           <span className="kpi-lbl"><span>Clientes en riesgo</span><b className="e2-tag">en revisión</b></span>
@@ -131,12 +135,9 @@ export default function V04Duplicados() {
       <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
         <span className="kpi-lbl frase">
           <span>Personas con más de un número de cliente</span>
-          <b className="tabular" title={NOTA_CLIENTES}>
+          <b className="tabular" title={`${NOTA_CLIENTES}. ${entero(TOTAL_IDS)} números de cliente son ${entero(TOTAL_PERSONAS)} personas: ${REPARTO}`}>
             {entero(V.antes.clientes)} números → {entero(V.despues.clientes)} personas
           </b>
-        </span>
-        <span className="kpi-sub">
-          {entero(TOTAL_IDS)} números de cliente son {entero(TOTAL_PERSONAS)} personas: {REPARTO}
         </span>
         {/* tope de alto: a 1920 las tres barras quedaban de 128 px cada una. (24/09) El tope
             crece con la pantalla (k entero), para que el gráfico llene más la tarjeta, y el
@@ -149,7 +150,7 @@ export default function V04Duplicados() {
               <BarrasH
                 datos={datosBarras} w={w} h={h}
                 formato={entero}
-                anchoEtiqueta={92}
+                anchoEtiqueta={Math.round(150 * k)}
                 tituloEje="Personas"
               />
             )}
@@ -157,7 +158,6 @@ export default function V04Duplicados() {
         </div>
       </div>
 
-      <p className="pie-vista">{PIE}</p>
     </section>
   )
 }

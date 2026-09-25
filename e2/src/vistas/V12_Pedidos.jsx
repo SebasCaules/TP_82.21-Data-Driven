@@ -121,18 +121,10 @@ export const meta = {
 export default function V12Pedidos() {
   return (
     <section className="pant v12">
-      <h1 className="titulo">{TITULO}</h1>
-
-      {/* (24/09) La frase es el mensaje de la vista: crece con la pantalla (13 → 20 px) y
-          ya no queda más chica que las celdas de la tabla. */}
-      <p style={{
-        margin: 0, flexShrink: 0, fontSize: 'clamp(13px, 1.15vw, 20px)', lineHeight: 1.4,
-        color: 'var(--ink)', textWrap: 'pretty',
-      }}>
-        {FRASE_ABIERTOS}
-      </p>
-
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+      {/* (25/09, pedido del usuario: sin comentarios auxiliares) La frase que contaba cuántas
+          decisiones esperan pasa al title de la tabla; el primer pedido, marcado, dice qué
+          depende de su respuesta. */}
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }} title={FRASE_ABIERTOS}>
         <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
           <colgroup>
             <col style={{ width: '10%' }} />
@@ -180,7 +172,6 @@ export default function V12Pedidos() {
         </table>
       </div>
 
-      <p className="pie-vista" title={PIE_TITLE}>{PIE}</p>
     </section>
   )
 }

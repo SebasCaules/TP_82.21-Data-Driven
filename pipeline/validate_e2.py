@@ -326,6 +326,19 @@ def main() -> int:
                       f"({v11['filas']} filas, {v11['clientes_distintos']} clientes, "
                       f"{v11['tasa_global_pct']}% tasa global)")
 
+    # (25/09) decisiones[].llano_corto: una frase de 60 caracteres como mucho por decisión.
+    for d in payload["decisiones"]:
+        corto = d.get("llano_corto", "")
+        if not corto or len(corto) > 60:
+            _FALLAS.append(f"{d['id']}: llano_corto vacío o de más de 60 caracteres ({len(corto)})")
+            print(f"FALLA {d['id']}: llano_corto de {len(corto)} caracteres")
+    print(f"OK    llano_corto: {sum(1 for d in payload["decisiones"] if 0 < len(d.get("llano_corto", "")) <= 60)} de {len(payload["decisiones"])} con 60 caracteres o menos")
+    pm = payload["meta"].get("plan_modelo", {})
+    if pm.get("capacidad") != [500, 800] or pm.get("meta_lift") != 1.3:
+        _FALLAS.append(f"meta.plan_modelo: {pm} != capacidad [500, 800] (C08) y meta_lift 1.3 (C22)")
+        print(f"FALLA meta.plan_modelo: {pm}")
+    else:
+        print("OK    meta.plan_modelo: capacidad [500, 800] (C08), meta de lift 1,30 (C22)")
     claves_top = {"meta", "decisiones", "vistas", "anclas", "stage_counts"}
     real_top = set(payload.keys())
     if real_top != claves_top:

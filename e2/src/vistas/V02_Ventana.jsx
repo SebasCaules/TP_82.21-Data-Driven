@@ -307,8 +307,6 @@ export default function V02Ventana() {
   const k = useEscalaTexto()
   return (
     <section className="pant v02">
-      <h1 className="titulo">{TITULO}</h1>
-
       <Banda dcs={[DC08]}>
         <div className="tarjeta e2-central"
              title={`${entero(R_CORTE.en_riesgo)} de ${entero(R_CORTE.elegibles)} clientes elegibles; ` +
@@ -359,7 +357,6 @@ export default function V02Ventana() {
         </Lienzo>
       </div>
 
-      <p className="pie-vista" title={PIE_TITLE}>{PIE}</p>
     </section>
   )
 }

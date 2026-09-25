@@ -23,6 +23,10 @@ import loader  # noqa: E402
 import series  # noqa: E402
 import tablon  # noqa: E402
 from pack import _jsonify  # noqa: E402
+from build import CAPACIDAD  # noqa: E402  (C08: 500 a 800 clientes por mes, la del E1)
+
+# C22: meta de lift del decil superior del modelo contra la regla de recency (E1, Parte C 1.3).
+META_LIFT = 1.30
 
 APP_DIR = Path(__file__).resolve().parents[1]
 DATA_E1 = APP_DIR / "data" / "raw"
@@ -296,9 +300,40 @@ def _llano(ctx: dict) -> dict[str, str]:
     }
 
 
+def _llano_corto(ctx: dict) -> dict[str, str]:
+    """La decisión en una frase corta (25/09, pedido del usuario: la tarjeta de decisión de V03
+    era muy verbosa y en V06 y V07 las decisiones no se notaban). La muestra
+    e2/src/TarjetaDecision.jsx; el llano completo queda en su title. Mismo contenido que
+    _llano, sin la explicación: una sola idea por decisión, de 60 caracteres como mucho
+    (validate_e2 lo controla). Las fechas salen de las constantes y de V03."""
+    ref = CORTE_REF.strftime("%d/%m/%Y")
+    flag = ctx["v03"]["meses_flag"]
+    abrev = lambda m: _MESES_ES[int(m[5:]) - 1][:3]
+    meses = f"{abrev(flag[0]).capitalize()}–{abrev(flag[-1])} {flag[-1][:4]}" if flag else "Los meses marcados"
+    anio_bajas = str(CORTE_REF.year + 1)
+    return {
+        "DC-01": "Las ventas repetidas se cuentan una sola vez.",
+        "DC-02": "Cada devolución resta una vez, en su fecha real.",
+        "DC-03": "El canal queda en dos valores: tienda y online.",
+        "DC-04": "Los números de una misma persona se unen en uno.",
+        "DC-05": "Cada envío de campaña se cuenta una sola vez.",
+        "DC-06": "El nivel de socio sale del programa, no de la campaña.",
+        "DC-07": "Las edades imposibles quedan sin dato, sin borrar filas.",
+        "DC-08": f"Todo se mide al {ref}: después no hay ventas.",
+        "DC-09": f"{meses} queda marcado como no confirmado.",
+        "DC-10": "Los montos no se ajustan por inflación.",
+        "DC-11": "Las filas de NPS sin contacto se marcan, no se borran.",
+        "DC-12": f"Las bajas de {anio_bajas} solo sacan clientes de la lista.",
+        "DC-13": "Queda una oferta por campaña; CAMP034, a confirmar.",
+        "DC-14": "El costo de cada acción se toma vigente al 22/09.",
+        "DC-15": "Sin diccionario, vale el esquema del equipo.",
+    }
+
+
 def _armar_decisiones(ctx: dict) -> list[dict]:
     pares = _pares_antes_despues(ctx)
     llano = _llano(ctx)
+    corto = _llano_corto(ctx)
     salida = []
     for fila in _DECISIONES_FUENTE:
         decision, justificacion = _partir_decision_justificacion(fila["decision_justificacion"])
@@ -320,6 +355,7 @@ def _armar_decisiones(ctx: dict) -> list[dict]:
             "despues": {"valor": valor_despues, "etiqueta": etq_despues},
             "impacto": impacto, "cifras": cifras, "vista": fila["vista"],
             "llano": llano[fila["id"]],
+            "llano_corto": corto[fila["id"]],
         })
     return salida
 
@@ -765,6 +801,14 @@ def main() -> int:
             "version": "e2-1.0", "corte_ref": CORTE_REF.strftime("%Y-%m-%d"),
             "corte_sens": CORTE_SENS.strftime("%Y-%m-%d"), "ultima_venta": stage["fecha_max"],
             "umbral_cobertura": UMBRAL_COBERTURA, "archivos": meta_archivos,
+            # (25/09) Lo que V11 necesita para decir cómo se elige el modelo: la capacidad de
+            # contacto del mes (C08, la misma constante del E1, build.CAPACIDAD) y la meta de lift
+            # del decil superior contra la regla de recency (C22, meta declarada en el E1, no una
+            # medición). Van en meta porque V11 es copia exacta de resumen_tablon.json.
+            "plan_modelo": {
+                "capacidad": list(CAPACIDAD), "fila_capacidad": "C08",
+                "meta_lift": META_LIFT, "fila_meta": "C22",
+            },
         },
         "decisiones": decisiones,
         "vistas": {

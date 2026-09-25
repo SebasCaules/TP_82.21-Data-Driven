@@ -97,7 +97,7 @@ export default function App() {
       <Lateral indice={indice} irA={irA} />
 
       <div className="principal">
-        <p className="solo-lector" aria-live="polite">{`Vista ${indice + 1} de ${VISTAS.length}: ${vista.titulo}`}</p>
+        <p className="solo-lector" aria-live="polite">{`Vista ${indice + 1} de ${VISTAS.length}: ${vista.pregunta ?? vista.titulo}`}</p>
         <Encabezado indice={indice} vista={vista} />
 
         <main className="cuerpo">
@@ -109,19 +109,20 @@ export default function App() {
   )
 }
 
-/** Sin barra de filtros ni corte: qué vista es y qué pregunta responde, y el corte fijo con
- *  el que trabaja toda la SPA. Ver CONTRACT_E2.md §0: cada vista muestra "antes" y "después"
- *  sobre el mismo corte, no un corte que se elige. (24/09) Antes repetía la marca del riel. */
+/** (25/09, pedido del usuario) El encabezado de cada vista es la pregunta que responde, grande:
+ *  es el h1 de la página. Las vistas ya no llevan título propio ni pie. A la derecha, chico, en
+ *  qué vista se está y el corte fijo con el que trabaja toda la SPA (CONTRACT_E2.md §0). */
 function Encabezado({ indice, vista }) {
   return (
     <header className="e2-enc">
-      <span className="e2-enc-preg">
-        <b>{`Vista ${indice + 1} de ${VISTAS.length}`}</b>{vista.pregunta ? ` · ${vista.pregunta}` : ''}
-      </span>
-      <span className="e2-enc-corte">{`corte ${fechaCorta(D2.meta.corte_ref)} · datos de ${D2.meta.archivos.length} archivos`}</span>
+      <h1 className="e2-preg">{preguntaTitulo(vista.pregunta ?? vista.corto)}</h1>
+      <span className="e2-enc-corte">{`${indice + 1} / ${VISTAS.length} · corte ${fechaCorta(D2.meta.corte_ref)}`}</span>
     </header>
   )
 }
+
+/** «¿qué cambió y qué falta?» → «¿Qué cambió y qué falta?» */
+const preguntaTitulo = (p) => (p ? p.replace(/^(¿?)(\p{L})/u, (_, a, b) => a + b.toUpperCase()) : p)
 
 /** El favicon 4b del mockup de direcciones, igual que en el E1 (src/App.jsx). */
 const Marca = () => (
@@ -175,6 +176,7 @@ function Impresion() {
       <div className="impresion-flujo">
         {VISTAS.map((v) => (
           <div className="hoja" key={v.id}>
+            <h1 className="e2-preg">{preguntaTitulo(v.pregunta ?? v.corto)}</h1>
             <v.Componente />
           </div>
         ))}

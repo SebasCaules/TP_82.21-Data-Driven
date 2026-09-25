@@ -144,8 +144,6 @@ export default function V01({ irA }) {
   }
   return (
     <section className="pant v01 v01r">
-      <h1 className="titulo">{TITULO}</h1>
-
       <div className="e2-kpis v01r-kpis">
         <div className="tarjeta e2-central" title={T_CENTRAL}>
           <span className="kpi-lbl"><span>Clientes en riesgo</span><b className="e2-tag">en revisión</b></span>
@@ -207,9 +205,6 @@ export default function V01({ irA }) {
         </div>
       </div>
 
-      <p className="pie-vista" style={{ flexShrink: 0, margin: 0 }} title={PIE_TITLE}>
-        {PIE}
-      </p>
     </section>
   )
 }
@@ -293,8 +288,6 @@ const ORDEN_ESTADOS = ['aplicada', 'declarada', 'a confirmar', 'pendiente del ne
 function Detalle({ irA, marcada, volver }) {
   return (
     <section className="pant v01 v01q" style={{ gap: 'clamp(4px, 0.6vh, 10px)' }}>
-      <h1 className="titulo">{TITULO}</h1>
-
       <p className="e2-nota" style={{ flexShrink: 0, margin: 0, fontSize: LETRA_TABLA, lineHeight: 1.25 }}>
         <button type="button" className="v01-ir" onClick={volver} style={{ marginRight: '0.8em' }}>
           ← Volver al resumen
@@ -376,9 +369,6 @@ function Detalle({ irA, marcada, volver }) {
         </table>
       </div>
 
-      <p className="pie-vista" style={{ flexShrink: 0, margin: 0 }} title={PIE_TITLE}>
-        {PIE}
-      </p>
     </section>
   )
 }

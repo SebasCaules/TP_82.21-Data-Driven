@@ -59,13 +59,14 @@ function yEn(pts, x) {
  * referencia: { v, texto }, la línea del nivel base («nivel 2022»).
  * tituloX: título del eje de tiempo; va al final del renglón de los años, sin sumar alto.
  */
-export default function LineaIndice({ series, anios, w, h, referencia, tituloX, ariaLabel }) {
+export default function LineaIndice({ series, anios, w, h, referencia, tituloX, ariaLabel, escalaRotulo = 1 }) {
   const k = useEscalaTexto()
   const vals = series.flatMap((s) => s.puntos.map((p) => p.v)).filter((v) => v != null)
   if (!vals.length || !anios.length || w < 160) return null
 
   const fEje = 10.5 * k
-  const fRot = 12 * k
+  // (25/09) escalaRotulo agranda los rótulos del final de cada serie (V08: son la lectura).
+  const fRot = 12 * k * escalaRotulo
   const sep = 7 * k                 // del último punto a su rótulo
   const t0 = anios[0]
   const t1 = anios[anios.length - 1] + 1
@@ -203,7 +204,7 @@ export default function LineaIndice({ series, anios, w, h, referencia, tituloX, 
       )))}
 
       {finales.map((r) => (
-        <text key={'r' + r.id} x={r.x} y={r.y} fontSize={fRot} fontWeight={600} fill={r.tono}
+        <text key={'r' + r.id} x={r.x} y={r.y} fontSize={fRot} fontWeight={escalaRotulo > 1 ? 700 : 600} fill={r.tono}
               dominantBaseline="central" className="tabular">{r.texto}</text>
       ))}
     </svg>

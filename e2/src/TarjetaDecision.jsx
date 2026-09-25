@@ -12,13 +12,16 @@
 import { estadoVisible } from './estados.js'
 
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s)
-const llano = (d) => (d.llano ? d.llano : cap(d.decision))
+// (25/09, pedido del usuario: la de V03 era muy verbosa y en V06 y V07 no se notaban) La tarjeta
+// muestra la frase corta del payload (llano_corto, 60 caracteres como mucho); el llano completo
+// va al title con la regla y la justificación.
+const llano = (d) => d.llano_corto || d.llano || cap(d.decision)
 
 export default function TarjetaDecision({ dc, dcs, style }) {
   const lista = (dcs ?? [dc]).filter(Boolean)
   if (!lista.length) return null
   // «a confirmar» si la decisión tiene un pedido abierto en V12, como en V01 (estados.js).
-  const title = lista.map((d) => `${d.id} · regla: ${cap(d.decision)}` +
+  const title = lista.map((d) => `${d.id} · ${d.llano ?? cap(d.decision)} · regla: ${cap(d.decision)}` +
     (d.justificacion ? ` · por qué: ${cap(d.justificacion)}` : '')).join('\n')
   if (lista.length === 1) {
     const d = lista[0]
@@ -34,7 +37,7 @@ export default function TarjetaDecision({ dc, dcs, style }) {
       <span className="kpi-lbl"><span>Decisiones</span></span>
       {lista.map((d) => (
         <p key={d.id} className="dec-llano">
-          <b className="dec-id">{d.id} · {estadoVisible(d)}</b> {llano(d)}
+          <b className="dec-id">{d.id} · {estadoVisible(d)}</b>{llano(d)}
         </p>
       ))}
     </div>

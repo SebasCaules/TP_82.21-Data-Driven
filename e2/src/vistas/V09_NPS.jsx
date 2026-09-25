@@ -93,8 +93,6 @@ export default function V09_NPS() {
   const k = useEscalaTexto()
   return (
     <section className="pant v09">
-      <h1 className="titulo">{TITULO}</h1>
-
       <Banda dcs={[DC11]}>
         <div className="tarjeta"
              title={`${entero(V09.sin_interaccion.n)} de ${entero(V09.filas)} filas cliente-mes, ${ANIOS}: se conservan marcadas`}>
@@ -102,12 +100,11 @@ export default function V09_NPS() {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Con NPS, {ANIOS}</span>
-              <span className="par-val tabular e2-cifra">{pct(V09.sin_interaccion.pct)}</span>
+              <span className="par-val tabular e2-cifra" style={{ color: 'var(--terra)' }}>{pct(V09.sin_interaccion.pct)}</span>
             </div>
           </div>
-          <p className="e2-linea">{entero(V09.sin_interaccion.n)} de {entero(V09.filas)}: se conservan marcadas.</p>
         </div>
-        <div className="tarjeta e2-central" title={NOTA_NPS}>
+        <div className="tarjeta" title={NOTA_NPS}>
           <span className="kpi-lbl">
             <span>NPS medio {ULTIMO.anio}</span>
             {TRAMO_FLAG && <b className="e2-tag">incluye {TRAMO_FLAG}</b>}
@@ -115,7 +112,7 @@ export default function V09_NPS() {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Con las filas marcadas</span>
-              <span className="par-val tabular e2-cifra">{decimal(ULTIMO.con_todo, 1)}</span>
+              <span className="par-val tabular e2-cifra" style={{ color: 'var(--terra)' }}>{decimal(ULTIMO.con_todo, 1)}</span>
             </div>
             <div className="par-item">
               <span className="par-lbl">Sin ellas</span>
@@ -132,7 +129,6 @@ export default function V09_NPS() {
         </Lienzo>
       </div>
 
-      <p className="pie-vista">{PIE}</p>
     </section>
   )
 }
@@ -141,9 +137,12 @@ export default function V09_NPS() {
 // usa --antes ni --despues: no son un antes y un después de DC-11 sino dos lecturas del
 // mismo año (NAR-V09-1). Se dibujan en este orden: la de tinta queda encima donde se
 // cruzan (2022).
+// (25/09, pedido del usuario: más contraste) La serie con las filas marcadas va en terracota,
+// el color del tablero para lo que está en duda (las filas marcadas lo están), y la otra en
+// tinta; las cifras de la banda usan los mismos colores, así se leen como la leyenda.
 const SERIES = [
-  { campo: 'con_todo', nombre: 'Con las filas marcadas (todas las filas)', color: 'var(--mut2)', trazo: 'punteado' },
-  { campo: 'solo_con_interaccion', nombre: 'Sin las filas marcadas (solo con reclamo o consulta)', color: 'var(--ink)', trazo: 'solido' },
+  { campo: 'con_todo', nombre: 'Con las filas marcadas', color: 'var(--terra)', trazo: 'punteado' },
+  { campo: 'solo_con_interaccion', nombre: 'Sin ellas (solo con reclamo o consulta)', color: 'var(--ink)', trazo: 'solido' },
 ]
 
 /** Leyenda de la línea doble, suelta arriba del gráfico. (24/09) En sans, sin mayúsculas
@@ -222,7 +221,7 @@ function GraficoNPS({ serie, w, h, k = 1 }) {
         const arriba = campo === 'con_todo'
         return (
           <g key={campo}>
-            <polyline points={aPolyline(pts)} fill="none" stroke={color} strokeWidth="2.25"
+            <polyline points={aPolyline(pts)} fill="none" stroke={color} strokeWidth={3 * k}
                       strokeLinejoin="round" strokeLinecap="round"
                       strokeDasharray={trazo === 'punteado' ? '5 3' : undefined} />
             {pts.map(([x, y], i) => (
@@ -233,8 +232,8 @@ function GraficoNPS({ serie, w, h, k = 1 }) {
                   : <circle cx={x} cy={y} r={3.5} fill={color} stroke="var(--sup)" strokeWidth="1.5" />}
               </g>
             ))}
-            <text x={pts[ultimo][0]} y={pts[ultimo][1] + (arriba ? -9 * k : 15 * k)}
-                  fontSize={11 * k} fontWeight={700} fill={color}
+            <text x={pts[ultimo][0]} y={pts[ultimo][1] + (arriba ? -10 * k : 20 * k)}
+                  fontSize={16 * k} fontWeight={700} fill={color}
                   textAnchor="end" className="tabular">
               {decimal(serie[ultimo][campo], 1)}
             </text>

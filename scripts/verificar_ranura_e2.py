@@ -16,13 +16,13 @@ JS = """() => {
   const d = document.querySelector('.e2-banda > .tarjeta-dec')
   const r = d ? d.getBoundingClientRect() : null
   const f = window.__fit ? window.__fit() : {ok:false, problemas:[{tipo:'sin __fit'}]}
-  const t = document.querySelector('h1.titulo')
-  const pie = document.querySelector('.cuerpo .pie-vista')
+  const t = document.querySelector('h1.e2-preg')
+  const pant = document.querySelector('.cuerpo .pant')
   const desb = d ? d.scrollHeight > d.clientHeight + 1 : false
   const chicos = [...document.querySelectorAll('.cuerpo .pant *')].filter(el => [...el.childNodes].some(n => n.nodeType===3 && n.textContent.trim()) && parseFloat(getComputedStyle(el).fontSize) < 10 && el.getBoundingClientRect().width>0).length
   return { dec: r ? [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)] : null, desborda: desb,
            fit: f.ok ? 'ok' : f.problemas.map(p => p.tipo + ':' + (p.detalle||'')).slice(0,3).join(' | '),
-           titulo2: t && t.scrollHeight > t.clientHeight + 2, pieFuera: pie ? pie.getBoundingClientRect().bottom > innerHeight + 0.5 : 'sin pie', chicos }
+           titulo2: !t || t.getBoundingClientRect().height > parseFloat(getComputedStyle(t).lineHeight) * 1.5, pieFuera: pant ? pant.getBoundingClientRect().bottom > innerHeight + 0.5 : 'sin pant', chicos }
 }"""
 out = {}
 with sync_playwright() as pw:

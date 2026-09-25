@@ -24,7 +24,7 @@ const PREGUNTA = {
   V08: '¿por qué no se deflacta?',
   V09: '¿cuánto vale el NPS?',
   V10: '¿cambió la cifra del directorio?',
-  V11: '¿con qué se entrena el modelo?',
+  V11: '¿cómo se entrena y se elige el modelo?',
   V12: '¿qué falta del lado del negocio?',
 }
 

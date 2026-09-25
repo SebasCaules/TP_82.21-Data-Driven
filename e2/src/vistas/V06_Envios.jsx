@@ -98,7 +98,6 @@ const FRASE_EMBUDO = `Con los ${entero(repetidos)} repetidos fuera, el embudo ${
 
 // (24/09) Un id de decisión dentro de una frase no se parte en «(DC- / 04)» al cambiar de
 // renglón: la regla de estilos_e2.css (D1-02) cubre solo el <b> de los rótulos.
-const Id = ({ children }) => <span style={{ whiteSpace: 'nowrap' }}>{children}</span>
 
 // Las cifras de la derecha van un escalón más chicas que la cadena de la respuesta
 // (VIS-V06-1): el ojo tiene que llegar primero al 549.
@@ -222,8 +221,6 @@ export default function V06Envios() {
   const k = useEscalaTexto()
   return (
     <section className="pant v06">
-      <h1 className="titulo">{TITULO}</h1>
-
       <Banda dcs={[dc05, dc12]}>
         <div className="tarjeta e2-central" title={NOTA_CADENA}>
           <span className="kpi-lbl">
@@ -263,7 +260,7 @@ export default function V06Envios() {
         {/* (24/09) Envíos a clientes que hoy figuran sin consentimiento (D18): el dato que
             conecta la pregunta con el riesgo de seguir escribiendo mal. «Hoy» porque el
             cruce es con acepta_marketing tal como está ahora, no al momento del envío. */}
-        <div className="tarjeta">
+        <div className="tarjeta" title={`Campañas ${aniosCampanias} a clientes que hoy no aceptan marketing; la lista de contacto ya los deja afuera.`}>
           <span className="kpi-lbl frase" style={{ color: 'var(--terra)', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
             <svg width="14" height="14" data-icono="true" aria-hidden="true"
                  style={{ flexShrink: 0, marginTop: 2 }}>
@@ -282,14 +279,11 @@ export default function V06Envios() {
               </span>
             </div>
           </div>
-          <span className="kpi-sub">
-            Campañas {aniosCampanias}; la lista de contacto ya los deja afuera.
-          </span>
         </div>
 
         {/* (24/09) Las bajas en sus dos usos, sin flecha: la lista de contacto sigue
             filtrando las 1.211 y el análisis de compras usa las 812 (DISENO.md regla 3). */}
-        <div className="tarjeta">
+        <div className="tarjeta" title={`Las ${entero(bajasFueraCorte)} pedidas en ${ANIO_BAJAS} sacan al cliente de la lista, pero no entran al análisis de compras (no hay ventas de ${ANIO_BAJAS}) · DC-12`}>
           <span className="kpi-lbl frase">Bajas: dos usos del mismo registro</span>
           <ParDoble
             sensibilidad={false}
@@ -299,13 +293,10 @@ export default function V06Envios() {
             valSens={<span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(bajas.hasta_corte)}</span>}
             style={{ flex: '0 0 auto', marginTop: 4 }}
           />
-          <span className="kpi-sub">
-            Las {entero(bajasFueraCorte)} de {ANIO_BAJAS} solo sacan al cliente de la lista · <Id>DC-12</Id>
-          </span>
         </div>
 
         {/* (24/09) DC-05 en una tarjeta compacta: el par de envíos y el embudo en una frase. */}
-        <div className="tarjeta">
+        <div className="tarjeta" title={FRASE_EMBUDO}>
           <span className="kpi-lbl"><span>Campañas: envíos repetidos</span><b>DC-05</b></span>
           <div className="ban-par">
             <div className="par-item par-antes">
@@ -318,15 +309,9 @@ export default function V06Envios() {
               <span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(envios.despues)}</span>
             </div>
           </div>
-          <span className="kpi-sub">{FRASE_EMBUDO}</span>
         </div>
       </div>
 
-      <p className="pie-vista">
-        corte <b>{fechaCorta(infoMeta.corte_ref)}</b> · base: los <b>{entero(TAM_LISTA)}</b> clientes
-        de mayor exposición, identidad unida (<b>E02</b>) · envíos <b>{entero(envios.despues)}</b>{' '}
-        (<b>D15</b>) · sin consentimiento (<b>D18</b>) · fila <b>C11</b> · <b>D03</b> (bajas)
-      </p>
     </section>
   )
 }

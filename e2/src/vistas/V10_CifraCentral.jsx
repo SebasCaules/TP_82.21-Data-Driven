@@ -29,6 +29,8 @@
 // V04. Con más de una fila en V.cambios, la primera columna las lista una debajo de otra.
 
 import { D2 } from '../datos_e2.js'
+import { Lienzo } from '../../../src/graficos.jsx'
+import { useEscalaTexto } from '../escala.js'
 import ValorMonto from '../ValorMonto.jsx'
 import { entero, pct, montoM, decimal, fechaCorta, mesCorto, partesMonto } from '../formato.js'
 
@@ -126,124 +128,135 @@ function Aro() {
   )
 }
 
-// (24/09) Tamaños: los porcentajes, un escalón arriba del resto del tablero (es la única
-// vista que los tiene como protagonistas) y la sensibilidad un escalón abajo del par, en
-// tinta. Crecen con el ancho y con el alto de la pantalla: con solo vw, a 1440 × 900 y a
-// 1920 × 1080 la vista quedaba con media tarjeta en blanco. En la hoja impresa, vw y vh son
-// los de la hoja.
-const T = {
-  pct: 'clamp(34px, calc(2.4vw + 3.6vh), 88px)',
-  monto: 'clamp(20px, calc(1vw + 1.5vh), 40px)',
-  pctSens: 'clamp(28px, calc(1.8vw + 2.6vh), 64px)',
-  montoSens: 'clamp(17px, calc(0.85vw + 1.25vh), 34px)',
-  delta: 'clamp(21px, calc(1.1vw + 2.2vh), 46px)',
-  deltaM: 'clamp(16px, calc(0.7vw + 1.4vh), 30px)',
-  aire: 'clamp(3px, 0.9vh, 12px)',
-}
-// «de exposición anual» al lado de la cifra: en la letra de lectura, no en la de la unidad
-// (a 0,6 em quedaba en 10 px).
-const UNIDAD_FRASE = { font: '400 var(--e2-txt2)/1.2 var(--fuente)', color: 'var(--mut2)', letterSpacing: 0 }
-const PUNTEADO = { borderLeft: '1px dashed var(--mut2)', paddingLeft: 'clamp(12px, 1.4vw, 24px)' }
+// (25/09, pedido del usuario: mucho texto y números difíciles de entender) La vista queda en
+// tres tarjetas de cifra, sin frases de apoyo: el E1, los datos corregidos (la cifra que manda,
+// «en revisión») y la sensibilidad sin sep–dic 2025, punteada; cada una con su % y su exposición
+// anual, y el Δ en puntos en una línea. Debajo, una sola escala de 0 a 100 % con las cuatro
+// lecturas del riesgo (la del 31/08/2026 viene de V02): se ve de un golpe que corregir los datos
+// casi no la mueve y que la duda sobre sep–dic 2025 sí. Lo que decían las notas va al title.
+const DELTA_DC04 = V.cambios.find((c) => c.decision === DC04.id)
+const TIT_E1 = `${entero(V.e1.en_riesgo)} en riesgo de ${entero(V.e1.elegibles)} números de cliente con 3 compras o más`
+const TIT_DESP = `${entero(V.despues.en_riesgo)} en riesgo de ${entero(V.despues.elegibles)} personas con 3 compras o más. ${NOTA_DC04}`
+const TIT_SENS = `${entero(V.sens.en_riesgo)} en riesgo de ${entero(V.sens.elegibles)} personas. ${NOTA_SENS}`
 
-/** Un monto con la moneda y la unidad un escalón más chicas (como ValorMonto) y el signo
- *  pegado a la cifra: «ARS +1,5 M», «ARS −18,7 M». */
-function MontoConSigno({ M }) {
-  const p = partesMonto(montoM(Math.abs(M)))
-  return (<><span className="par-unidad">{p.pre}</span>{signo(M)}{p.num}<span className="par-unidad">{p.suf}</span></>)
-}
+const pp = (x) => `${signo(x)}${decimal(Math.abs(x), 1)} puntos`
 
-/** Una columna del par de arriba: rótulo, %, exposición y los conteos de los que sale. */
-function Cifra({ lbl, x, clase, base, sens = false }) {
-  const tinta = sens ? { color: 'var(--ink)' } : undefined
+function Exposicion({ M }) {
   return (
-    <div className={`par-item ${clase ?? ''}`} style={{ flex: '1 1 0', minWidth: 0, ...(sens ? PUNTEADO : null) }}>
-      <span className="par-lbl" style={sens ? { color: 'var(--mut2)' } : undefined}>
-        <span>{sens && <Aro />}{lbl}</span>
-      </span>
-      <span className="par-val tabular" style={{ fontSize: sens ? T.pctSens : T.pct, ...tinta }}>{pct(x.pct)}</span>
-      <span className="par-val tabular" style={{ fontSize: sens ? T.montoSens : T.monto, marginTop: T.aire, ...tinta }}>
-        <ValorMonto texto={montoM(x.exposicion_M)} className="" />
-      </span>
-      <span className="kpi-sub" style={{ minHeight: 0 }}>
-        de exposición anual · {entero(x.en_riesgo)} en riesgo de {entero(x.elegibles)} {base} con 3
-        compras o más
-      </span>
-      {sens && (
-        <span className="kpi-sub" style={{ minHeight: 0, marginTop: T.aire, color: 'var(--ink)', fontSize: 'var(--e2-txt)' }}>
-          {NOTA_SENS}
-        </span>
-      )}
-    </div>
-  )
-}
-
-/** Un Δ de la tarjeta de abajo: puntos grandes, pesos un escalón abajo, y qué lo explica. */
-function Delta({ lbl, pp, M, nota, sens = false }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0, ...(sens ? PUNTEADO : null) }}>
-      <span className="kpi-lbl" style={{ display: 'block' }}>{sens && <Aro />}{lbl}</span>
-      <div className="ban-par" style={{ marginTop: T.aire }}>
-        <div className="par-item" style={{ color: 'var(--ink)' }}>
-          <span className="par-val tabular" style={{ fontSize: T.delta }}>
-            {signo(pp)}{decimal(Math.abs(pp), 1)}<span className="par-unidad"> puntos</span>
-          </span>
-          <span className="par-val tabular" style={{ fontSize: T.deltaM, marginTop: T.aire }}>
-            <MontoConSigno M={M} />
-            <span style={UNIDAD_FRASE}> de exposición anual</span>
-          </span>
-        </div>
-      </div>
-      {nota && <span className="kpi-sub" style={{ minHeight: 0, marginTop: T.aire, fontSize: 'var(--e2-txt)' }}>{nota}</span>}
-    </div>
+    <p className="e2-linea v10-expo">
+      exposición <ValorMonto texto={montoM(M)} className="tabular" /> al año
+    </p>
   )
 }
 
 export default function V10CifraCentral() {
-  const gap = 'clamp(12px, 1.8vw, 30px)'
   return (
     <section className="pant v10">
-      <h1 className="titulo">{TITULO}</h1>
-
-      {/* (24/09) Arriba, la cifra del directorio; abajo, los Δ. Las dos crecen por igual desde
-          el alto de su contenido y lo centran (ver la cabecera). */}
-      <div className="tarjeta" style={{ flex: '1 1 auto', justifyContent: 'center' }}>
-        <span className="kpi-lbl frase">Clientes en riesgo entre los que tienen 3 compras o más</span>
-        <div className="ban-par dos-renglones" style={{ alignItems: 'flex-start', marginTop: T.aire }}>
-          <Cifra lbl={ETQ_E1} x={V.e1} clase="par-antes" base="números" />
-          <span className="par-flecha" aria-hidden="true">→</span>
-          <Cifra lbl={ETQ_DESPUES} x={V.despues} clase="par-despues" base="personas" />
-          <Cifra lbl={ETQ_SENS} x={V.sens} base="personas" sens />
-        </div>
-        <p className="e2-nota" style={{ marginTop: 'clamp(8px, 1.6vh, 20px)' }}>{NOTA_EXPOSICION}</p>
-      </div>
-
-      <div className="tarjeta" style={{ flex: '1 1 auto', justifyContent: 'center' }}>
-        <span className="kpi-lbl frase">Qué mueve la cifra y qué la pone en duda</span>
-        <div
-          style={{
-            display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', columnGap: gap,
-            marginTop: 'clamp(8px, 2vh, 28px)', alignItems: 'start',
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
-            {V.cambios.map((c) => (
-              <Delta
-                key={c.decision}
-                lbl={`${c.decision}${c.decision === DC04.id ? ' · unir duplicados' : ''} · ${estado(c.decision)}`}
-                pp={c.delta_pct_pp} M={c.delta_exposicion_M}
-                nota={UNICA ? NOTA_DC04 : null}
-              />
-            ))}
+      <div className="e2-kpis v10-kpis">
+        <div className="tarjeta" title={TIT_E1}>
+          <span className="kpi-lbl"><span>Entregable 1</span></span>
+          <div className="ban-par">
+            <div className="par-item par-antes">
+              <span className="par-lbl">Riesgo al {fechaCorta(D2.meta.corte_ref)}</span>
+              <span className="par-val tabular e2-cifra">{pct(V.e1.pct)}</span>
+            </div>
           </div>
-          <Delta lbl={`${DC09.id} · sensibilidad`} pp={DIF_SENS.pp} M={DIF_SENS.M} nota={NOTA_DC09} sens />
-          <Delta lbl={`${DC08.id} · corte común · ${DC08.estado}`} pp={DIF_CORTE.pp} M={DIF_CORTE.M} nota={NOTA_DC08} />
+          <Exposicion M={V.e1.exposicion_M} />
         </div>
-        <p className="e2-nota" style={{ marginTop: 'clamp(10px, 2.4vh, 32px)' }}>
-          Las otras {entero(OTRAS)} decisiones no cambian esta cifra ({vista('V01')}).
-        </p>
+        <div className="tarjeta e2-central" title={TIT_DESP}>
+          <span className="kpi-lbl"><span>Datos corregidos</span><b className="e2-tag">en revisión</b></span>
+          <div className="ban-par">
+            <div className="par-item par-unico">
+              <span className="par-lbl">
+                {DELTA_DC04 ? `${pp(DELTA_DC04.delta_pct_pp)} por clientes duplicados` : `Riesgo al ${fechaCorta(D2.meta.corte_ref)}`}
+              </span>
+              <span className="par-val tabular e2-cifra">{pct(V.despues.pct)}</span>
+            </div>
+          </div>
+          <Exposicion M={V.despues.exposicion_M} />
+        </div>
+        <div className="tarjeta e2-si" title={TIT_SENS}>
+          <span className="kpi-lbl"><span><Aro />Sin {MESES_FLAG}</span></span>
+          <div className="ban-par">
+            <div className="par-item">
+              <span className="par-lbl">{pp(DIF_SENS.pp)} si faltan ventas</span>
+              <span className="par-val tabular e2-cifra">{pct(V.sens.pct)}</span>
+            </div>
+          </div>
+          <Exposicion M={V.sens.exposicion_M} />
+        </div>
       </div>
 
-      <p className="pie-vista">{PIE}</p>
+      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }} title={NOTA_EXPOSICION}>
+        <span className="kpi-lbl frase">Clientes en riesgo, según cómo se mida</span>
+        <Lienzo>
+          {({ w, h }) => <Escala w={w} h={h} />}
+        </Lienzo>
+      </div>
     </section>
+  )
+}
+
+/** (25/09) Las cuatro lecturas del riesgo sobre una sola escala de 0 a 100 %: el E1 (gris), los
+ *  datos corregidos (--acc), la sensibilidad sin sep–dic 2025 (aro punteado) y la medición al
+ *  31/08/2026 de V02 (hueca, gris). Rótulos arriba y abajo de la línea, alternados, para que el
+ *  49,6 y el 50,4, que casi se tocan, no se pisen. */
+function Escala({ w, h }) {
+  const k = useEscalaTexto()
+  if (w < 200) return null
+  const padX = Math.round(24 * k)
+  const x0 = padX
+  const x1 = w - padX
+  const yLinea = Math.round(h * 0.52)
+  const X = (v) => x0 + (v / 100) * (x1 - x0)
+  const fVal = Math.round(30 * k)
+  const fEtq = Math.round(14 * k)
+  const r = Math.max(7, Math.round(9 * k))
+  const puntos = [
+    { v: RIESGO_V02.al_2026_08_31.pct, etq: `medido al ${fechaCorta(RIESGO_V02.al_2026_08_31.corte)}`, tono: 'var(--mut2)', forma: 'hueco', arriba: true, ancla: 'middle' },
+    // El E1 y la sensibilidad van abajo, alineados hacia afuera (el E1 a la derecha de su marca,
+    // la sensibilidad a la izquierda de la suya): centrados se pisaban.
+    { v: V.e1.pct, etq: 'Entregable 1', tono: 'var(--gris)', forma: 'lleno', arriba: false, ancla: 'start' },
+    { v: V.despues.pct, etq: 'datos corregidos', tono: 'var(--acc)', forma: 'lleno', arriba: true, fuerte: true, ancla: 'middle' },
+    { v: V.sens.pct, etq: `sin ${MESES_FLAG}`, tono: 'var(--ink)', forma: 'aro', arriba: false, ancla: 'end' },
+  ]
+  const ticks = [0, 25, 50, 75, 100]
+  const rotulados = new Set([0, 100])
+  return (
+    <svg width={w} height={h} role="img" style={{ display: 'block' }}
+         aria-label={'Clientes en riesgo según cómo se mida: ' + puntos.map((p) => `${p.etq} ${pct(p.v)}`).join(', ')}>
+      <line x1={x0} x2={x1} y1={yLinea} y2={yLinea} stroke="var(--eje)" strokeWidth={2} />
+      {ticks.map((t) => (
+        <g key={t}>
+          <line x1={X(t)} x2={X(t)} y1={yLinea - 5} y2={yLinea + 5} stroke="var(--eje)" strokeWidth={1} />
+          {rotulados.has(t) && (
+            <text x={X(t)} y={yLinea + 5 + 13 * k} fontSize={11 * k} fill="var(--mut)" textAnchor="middle" className="tabular">{t} %</text>
+          )}
+        </g>
+      ))}
+      {/* El tramo entre la sensibilidad y los datos corregidos: lo que la duda puede mover. */}
+      <line x1={X(V.sens.pct)} x2={X(V.despues.pct)} y1={yLinea} y2={yLinea}
+            stroke="var(--ink)" strokeWidth={2} strokeDasharray="4 4" />
+      {puntos.map((p) => {
+        const x = X(p.v)
+        const dy = p.arriba ? -1 : 1
+        const xt = p.ancla === 'start' ? x - r : p.ancla === 'end' ? x + r : x
+        const yVal = yLinea + dy * (r + 18 * k + (p.arriba ? 0 : fVal * 0.8))
+        const yEtq = yVal + dy * (p.arriba ? fVal * 0.95 : fEtq * 1.4) * (p.arriba ? 1 : 1)
+        return (
+          <g key={p.etq}>
+            <title>{`${p.etq}: ${pct(p.v)}`}</title>
+            <line x1={x} x2={x} y1={yLinea} y2={yLinea + dy * (r + 6 * k)} stroke={p.tono} strokeWidth={1.5} />
+            {p.forma === 'lleno' && <circle cx={x} cy={yLinea} r={r} fill={p.tono} stroke="var(--sup)" strokeWidth={2} />}
+            {p.forma === 'hueco' && <circle cx={x} cy={yLinea} r={r} fill="var(--sup)" stroke={p.tono} strokeWidth={2} />}
+            {p.forma === 'aro' && <circle cx={x} cy={yLinea} r={r} fill="var(--sup)" stroke={p.tono} strokeWidth={2} strokeDasharray="3 2" />}
+            <text x={xt} y={yVal} fontSize={fVal} fontWeight={700} fill={p.fuerte ? 'var(--acc)' : 'var(--ink)'}
+                  textAnchor={p.ancla} className="tabular">{pct(p.v)}</text>
+            <text x={xt} y={p.arriba ? yVal - fVal * 0.95 : yVal + fEtq * 1.5} fontSize={fEtq} fontWeight={600}
+                  fill="var(--mut2)" textAnchor={p.ancla}>{p.etq}</text>
+          </g>
+        )
+      })}
+    </svg>
   )
 }

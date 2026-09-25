@@ -103,8 +103,6 @@ export default function V03Cobertura() {
   const k = useEscalaTexto()
   return (
     <section className="pant v03">
-      <h1 className="titulo">{TITULO}</h1>
-
       <Banda dcs={[DC09]}>
         <div className="tarjeta e2-central" title={`Clientes en riesgo ${ETQ_CREF}`}>
           <span className="kpi-lbl"><span>Riesgo al {fechaCorta(D2.meta.corte_ref)}</span><b className="e2-tag">en revisión</b></span>
@@ -137,7 +135,6 @@ export default function V03Cobertura() {
         </Lienzo>
       </div>
 
-      <p className="pie-vista">{PIE}</p>
     </section>
   )
 }
@@ -214,7 +211,7 @@ function GraficoOperaciones({ w, h, serie, k }) {
           <line x1={xFranja} x2={xFranja} y1={padT} y2={yBase} stroke={TERRA} strokeWidth="1.5" />
           <text x={xFranja} y={padT - f(8)} fontSize={f(12)} fontWeight={600} fill={TERRA}
                 fontFamily={SANS} textAnchor="start">
-            {mesCorto(PRIMER_FLAG)} a {mesCorto(ULTIMO_FLAG)}: cobertura no confirmada
+            cobertura no confirmada
           </text>
         </g>
       )}
@@ -282,13 +279,6 @@ function GraficoOperaciones({ w, h, serie, k }) {
           {fmtPct0(razonPct(p))}
         </text>
       ))}
-      {ultimo && (
-        <text x={X(ultimo.i) + f(9)} y={Y(ultimo.n)} fontSize={f(11)} fontWeight={600} fill={TERRA}
-              fontFamily={SANS} className="tabular" style={halo}>
-          <tspan x={X(ultimo.i) + f(9)} dy={f(5)}>{entero(ultimo.n)} contra {entero(ultimo.n_prev)}</tspan>
-          <tspan x={X(ultimo.i) + f(9)} dy={f(13)}>en {mesPrev(ultimo.mes)}</tspan>
-        </text>
-      )}
 
       {/* eje X: los doce meses; los marcados en terracota y negrita, así el eje los nombra. */}
       {pts.map((p) => {

@@ -31,7 +31,6 @@ import ParDoble from '../ParDoble.jsx'
 const V = D2.vistas.V07
 const DC13 = D2.decisiones.find((d) => d.id === 'DC-13')
 const DC06 = D2.decisiones.find((d) => d.id === 'DC-06')
-const DC14 = D2.decisiones.find((d) => d.id === 'DC-14')
 const BASE_DESPUES = V.ofertas.reduce((s, o) => s + o.despues.n, 0)
 
 // (24/09) La referencia del gráfico: la tasa de todas las ofertas juntas (compras sobre
@@ -106,7 +105,9 @@ export default function V07Campanias() {
     etiqueta: o.tipo,
     valor: o.despues.tasa_pct,
     ic: [o.despues.ic_lo, o.despues.ic_hi],
-    enfasis: true,
+    // (25/09, pedido del usuario: qué valor mirar) En --acc solo la oferta cuya base cambia con
+    // DC-13 (los envíos que suma el dedupe caen ahí); las demás en gris.
+    enfasis: o.antes.n !== o.despues.n,
     nota: o.antes.n !== o.despues.n
       ? `${entero(o.antes.n)} → ${entero(o.despues.n)} envíos`
       : (w >= 800 ? `${entero(o.despues.n)} envíos` : undefined),
@@ -119,8 +120,6 @@ export default function V07Campanias() {
     (PEDIDO_V12 ? ` Pendiente de Casa Óga (vista 12): ${PEDIDO_V12.que}.` : '')
   return (
     <section className="pant v07">
-      <h1 className="titulo">{TITULO}</h1>
-
       <Banda dcs={[DC13, DC06]}>
         <div className="tarjeta e2-central" title={casos}>
           <span className="kpi-lbl"><span>Envíos con oferta</span></span>
@@ -136,23 +135,20 @@ export default function V07Campanias() {
               <span className="par-val tabular e2-cifra">{entero(DC13.despues.valor)}</span>
             </div>
           </div>
-          <p className="e2-linea">{entero(V.envios_duplicados_por_join)} envíos más en la base de conversión.</p>
+          <p className="e2-linea">
+            {entero(V.envios_duplicados_por_join)} envíos más{todasIguales ? '; ninguna tasa cambia.' : ' en la base de conversión.'}
+          </p>
         </div>
       </Banda>
 
       <div className="lienzo v07-cuerpo" style={{ gap: 'var(--e2-gap)' }}>
-        <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
+        <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}
+             title={SE_PISAN ? `Las ofertas convierten entre ${pct(TASA_MIN, 2)} y ${pct(TASA_MAX, 2)} y sus rangos se superponen: ninguna se distingue.` : undefined}>
           {/* (24/09) El rótulo es una frase: va en sans (.frase); el id queda en mono. */}
           <span className="kpi-lbl frase">
-            <span>Conversión a 7 días por oferta: el punto es la tasa y la línea, su rango probable al 95 %</span>
+            <span>Conversión a 7 días por oferta, con su rango probable al 95 %</span>
             <b style={ID_MONO}>DC-13</b>
           </span>
-          {SE_PISAN && (
-            <p className="e2-nota" title={DC14 ? `La tasa de éxito por acción se arma en el Entregable 3 (${DC14.id}).` : undefined}>
-              Las ofertas convierten entre {pct(TASA_MIN, 2)} y {pct(TASA_MAX, 2)} y sus rangos se
-              superponen: ninguna se distingue.
-            </p>
-          )}
           <Lienzo>
             {({ w, h }) => (
               <PuntosIC
@@ -183,11 +179,9 @@ export default function V07Campanias() {
             valSens={<span className="par-val tabular">{entero(V.gold.socios)}</span>}
             style={{ flex: '0 0 auto', marginTop: 8 }}
           />
-          <p className="e2-nota">Una cifra cuenta envíos y la otra, personas.</p>
         </div>
       </div>
 
-      <p className="pie-vista">{PIE}</p>
     </section>
   )
 }
