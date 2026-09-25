@@ -224,7 +224,7 @@ function GraficoNPS({ serie, w, h, k = 1 }) {
     <svg width={w} height={h} role="img"
          aria-label={'NPS anual, en puntos: ' + serie.map((f) => `${f.anio} con las filas marcadas ${decimal(f.con_todo, 1)}, sin ellas ${decimal(f.solo_con_interaccion, 1)}`).join('; ')}
          style={{ display: 'block' }}>
-      <text fontFamily="var(--fuente)" x={2} y={9 * k} fontSize={10.5 * k} fill="var(--mut)">NPS (puntos)</text>
+      <text fontFamily="var(--fuente)" x={2} y={11 * k} fontSize={10.5 * k} fill="var(--mut)">NPS (puntos)</text>
 
       <line x1={padL} x2={padL} y1={padT} y2={yBase} stroke="var(--eje)" strokeWidth="1" />
       {ticks.map((t) => (
