@@ -146,10 +146,10 @@
 
 /* V01 (25/09): resumen. Tres tarjetas con la respuesta y, debajo, las 15 decisiones como fichas
    en tres grupos. Segunda pasada del 25/09 (pedido del usuario: más contraste, menos texto) y
-   tercera (el negativo en tinta quedó demasiado fuerte): texto en tinta y cifras grandes, pero la
-   cifra central y las fichas que la afectan se marcan con el azul claro de la fila activa del E1
-   (--azul1) y un filete en --acc, no con un bloque oscuro. Las cifras y las fichas crecen con el
-   ancho y con el alto. */
+   tercera (el negativo en tinta quedó demasiado fuerte; el azul claro de fondo tampoco gustó; el
+   usuario eligió entre tres variantes renderizadas): todas las tarjetas y fichas en blanco, texto
+   en tinta, y la cifra central y las fichas que la afectan marcadas solo con el azul --acc (filete
+   y cifra). Las cifras y las fichas crecen con el ancho y con el alto. */
 .v01r-kpis {
   flex-shrink: 0;
   display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1fr);
@@ -165,13 +165,14 @@
    de ParDoble en el rótulo. */
 .v01r-kpis .tarjeta.v01r-si { border: 1px dashed var(--mut2); border-top: 3px dashed var(--mut2); }
 
-/* La cifra central, en azul claro con filete --acc: es lo primero que tiene que ver la sala. El
-   E1 en gris (4,4:1 sobre el azul, texto grande) y los datos corregidos en tinta (12:1). */
-.v01r-kpis .v01r-heroe { background: var(--azul1); border-color: rgba(34, 69, 111, .35); border-top-color: var(--acc); }
+/* La cifra central, marcada con el azul --acc: filete grueso arriba y el dato corregido en azul;
+   el E1 en gris. Es lo primero que tiene que ver la sala, sin un bloque de color. */
+.v01r-kpis .v01r-heroe { border-top: 5px solid var(--acc); }
 .v01r-heroe .ban-par .par-antes .par-lbl,
 .v01r-heroe .ban-par .par-antes .par-val.v01r-val,
 .v01r-heroe .ban-par .par-flecha { color: var(--mut); }
-.v01r-heroe .ban-par .par-despues .par-lbl { color: var(--acc); }
+.v01r-heroe .ban-par .par-despues .par-lbl,
+.v01r-heroe .ban-par .par-despues .par-val.v01r-val { color: var(--acc); }
 .v01r-heroe .kpi-lbl b.v01r-tag {
   color: var(--acc); border: 1px solid var(--acc); border-radius: 3px;
   padding: 1px 6px; font-weight: 600; white-space: nowrap;
@@ -205,9 +206,9 @@
 button.v01r-ficha { cursor: pointer; }
 button.v01r-ficha:hover { border-color: var(--acc); }
 button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
-/* Las que afectan la cifra central, con el azul claro y el filete de su tarjeta; las que no
-   cambian ningún número, con borde punteado y la letra un paso más suave. */
-.g-central .v01r-ficha { background: var(--azul1); border-color: rgba(34, 69, 111, .35); border-left: 3px solid var(--acc); font-weight: 600; }
+/* Las que afectan la cifra central, con el filete y el azul de su tarjeta; las que no cambian
+   ningún número, con borde punteado y la letra un paso más suave. */
+.g-central .v01r-ficha { border-left: 4px solid var(--acc); color: var(--acc); font-weight: 600; }
 .g-sin .v01r-ficha { border-style: dashed; border-color: var(--gris); color: var(--mut2); }
 
 /* V01 · detalle (24/09): la tabla escala con la pantalla y cada celda de texto entra en hasta dos
