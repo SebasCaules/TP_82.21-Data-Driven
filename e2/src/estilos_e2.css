@@ -198,6 +198,11 @@
   --dec-osc: #0f5c52;
   --dec-fondo: #e3f1ec;
   --dec-borde: #b9ddd2;
+  /* (25/09, pedido del usuario) Colores de los niveles del programa de fidelización, apagados para
+     ir con el papel y la tinta; los tres con 3:1 o más contra el blanco (objetos gráficos). */
+  --bronce: #a0652f;
+  --plata: #8b939d;
+  --oro: #b08407;
   --e2-gap: clamp(10px, 1.4vw, 24px);
   --e2-dec-w: clamp(280px, 27vw, 520px);
   --e2-banda-h: calc(3.3vw + 9.1vh + 48px);
@@ -206,6 +211,11 @@
   flex-shrink: 0;
   display: grid; grid-template-columns: minmax(0, 1fr) var(--e2-dec-w);
   gap: var(--e2-gap); height: var(--e2-banda-h);
+}
+/* (25/09) Fuera del rango verificado (ventanas de menos de 640 px de alto) la banda crece si una
+   tarjeta lo necesita, en vez de cortar su última línea; en el rango, todas miden --e2-banda-h. */
+@media screen and (max-height: 639px), screen and (max-width: 1151px) {
+  .e2-banda { height: auto; min-height: var(--e2-banda-h); }
 }
 .e2-banda > .e2-banda-cifras { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); min-height: 0; }
 .e2-banda > .tarjeta-dec {

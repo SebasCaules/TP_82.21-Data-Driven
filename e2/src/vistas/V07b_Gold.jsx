@@ -3,7 +3,7 @@
 // el nivel del programa de fidelización. Las dos cifras de la banda son dos lecturas que no se
 // restan (envíos contra personas): van sin flecha, la de la campaña en terracota porque es la
 // etiqueta que confunde y la del programa en --acc. Debajo, los socios del programa por nivel
-// (D2.vistas.V07.gold.por_nivel, D23), con Gold marcado: tres personas.
+// (D2.vistas.V07.gold.por_nivel, D23), cada barra con el color de su nivel.
 
 import { Lienzo, BarrasH } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
@@ -29,10 +29,14 @@ export const meta = {
 
 export default function V07bGold() {
   const k = useEscalaTexto()
+  // (25/09, pedido del usuario: acá no hay nada que resaltar) Cada barra con el color de su nivel,
+  // en tonos de la paleta; la de Gold, con un ancho mínimo visible (son 3 socios de 4.043).
+  const COLOR = { Bronze: 'var(--bronce)', Silver: 'var(--plata)', Gold: 'var(--oro)' }
   const datos = NIVELES.map((n) => ({
     etiqueta: n,
     valor: G.por_nivel[n],
-    enfasis: n === 'Gold',
+    color: COLOR[n],
+    anchoMin: n === 'Gold' ? 4 : undefined,
     sufijo: n === 'Gold' ? 'socios' : undefined,
   }))
   return (

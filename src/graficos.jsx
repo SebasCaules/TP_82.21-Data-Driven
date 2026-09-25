@@ -217,7 +217,9 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
          style={{ display: 'block' }}>
       {datos.map((d, i) => {
         const y = padTop + i * paso + (paso - alto) / 2
-        const largo = Math.max(1, (d.valor / max) * ancho)
+        // (25/09, E2) d.anchoMin opcional: el ancho mínimo visible de una barra muy chica (V07b,
+        // Gold = 3 socios). Sin el campo, igual que antes: el E1 no cambia.
+        const largo = Math.max(d.anchoMin ?? 1, (d.valor / max) * ancho)
         return (
           <g key={d.etiqueta}>
             <title>{lectura(d.etiqueta, formato(d.valor), d.sufijo, d.nota, tituloEje)}</title>
@@ -225,8 +227,10 @@ export function BarrasH({ datos, w, h, formato, formatoEje, tituloEje, anchoEtiq
                   fill={d.excepcion ? EXC : d.enfasis ? INK : MUT2}
                   textAnchor="end" dominantBaseline="central"
                   fontWeight={d.enfasis || d.excepcion ? 600 : 400}>{d.etiqueta}</text>
+            {/* (25/09, E2) d.color opcional: el color propio de la barra (V07b, un color por nivel
+                del programa). Sin el campo, igual que antes: el E1 no cambia. */}
             <rect x={x0} y={y} width={largo} height={alto}
-                  fill={d.excepcion ? EXC : d.enfasis ? ACC : GRIS} />
+                  fill={d.color ?? (d.excepcion ? EXC : d.enfasis ? ACC : GRIS)} />
             {/* etiqueta directa sobre la serie, no leyenda aparte (regla 14) */}
             <text x={x0 + largo + 7} y={y + alto / 2} fontSize={fuente}
                   fill={d.excepcion ? EXC : d.enfasis ? INK : MUT2} dominantBaseline="central"
