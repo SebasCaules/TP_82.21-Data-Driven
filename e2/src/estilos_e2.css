@@ -144,39 +144,42 @@
 /* Anuncio para lectores de pantalla al cambiar de vista (D5-23): fuera de la pantalla. */
 .solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* V01 (25/09): resumen. Tres tarjetas con la respuesta y, debajo, las 15 decisiones como fichas
-   en tres grupos. Segunda pasada del 25/09 (pedido del usuario: más contraste, menos texto) y
-   tercera (el negativo en tinta quedó demasiado fuerte; el azul claro de fondo tampoco gustó; el
-   usuario eligió entre tres variantes renderizadas): todas las tarjetas y fichas en blanco, texto
-   en tinta, y la cifra central y las fichas que la afectan marcadas solo con el azul --acc (filete
-   y cifra). Las cifras y las fichas crecen con el ancho y con el alto. */
-.v01r-kpis {
+/* Tarjetas de cifra del E2 (25/09, nacen en el resumen de V01 y las usa también V02). Una fila de
+   tarjetas blancas, cada una con un rótulo, una cifra grande y a lo sumo una frase. La cifra crece
+   con el ancho y con el alto de la pantalla. Variantes: .e2-central, la cifra que manda (filete de
+   5 px y cifra en --acc; el antes, si hay, en gris); .e2-si, una hipótesis o sensibilidad (la
+   tarjeta entera punteada: forma, no color). El usuario eligió este tono entre tres variantes: el
+   negativo en tinta y el fondo --azul1 no gustaron. */
+.e2-kpis {
   flex-shrink: 0;
-  display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1fr);
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(10px, 1.4vw, 24px);
 }
-.v01r-kpis .tarjeta { min-width: 0; padding: clamp(12px, 1.6vh, 20px) clamp(14px, 1.2vw, 22px); }
-.v01r .kpi-lbl { color: var(--ink); font-size: var(--e2-rot); }
-.v01r-kpis .ban-par { margin-top: clamp(8px, 1.4vh, 16px); }
-.v01r-kpis .par-lbl { color: var(--ink); }
-.v01r-kpis .par-val.v01r-val { font-size: clamp(34px, calc(1.1vw + 4.2vh), 100px); font-weight: 600; color: var(--ink); }
-.v01r-linea { margin: clamp(6px, 1vh, 12px) 0 0; font: 500 clamp(12.5px, calc(0.2vw + 1.3vh + 2px), 20px)/1.3 var(--fuente); color: var(--ink); }
-/* La sensibilidad es una hipótesis: la tarjeta entera va punteada (forma, no color), con el aro
-   de ParDoble en el rótulo. */
-.v01r-kpis .tarjeta.v01r-si { border: 1px dashed var(--mut2); border-top: 3px dashed var(--mut2); }
-
-/* La cifra central, marcada con el azul --acc: filete grueso arriba y el dato corregido en azul;
-   el E1 en gris. Es lo primero que tiene que ver la sala, sin un bloque de color. */
-.v01r-kpis .v01r-heroe { border-top: 5px solid var(--acc); }
-.v01r-heroe .ban-par .par-antes .par-lbl,
-.v01r-heroe .ban-par .par-antes .par-val.v01r-val,
-.v01r-heroe .ban-par .par-flecha { color: var(--mut); }
-.v01r-heroe .ban-par .par-despues .par-lbl,
-.v01r-heroe .ban-par .par-despues .par-val.v01r-val { color: var(--acc); }
-.v01r-heroe .kpi-lbl b.v01r-tag {
+.e2-kpis > .tarjeta { min-width: 0; padding: clamp(12px, 1.6vh, 20px) clamp(14px, 1.2vw, 22px); }
+.e2-kpis .kpi-lbl { color: var(--ink); font-size: var(--e2-rot); }
+.e2-kpis .ban-par { margin-top: clamp(8px, 1.4vh, 16px); }
+.e2-kpis .par-lbl { color: var(--ink); }
+.e2-kpis .par-val.e2-cifra { font-size: clamp(34px, calc(1.1vw + 4.2vh), 100px); font-weight: 600; color: var(--ink); }
+.e2-linea { margin: clamp(6px, 1vh, 12px) 0 0; font: 500 clamp(12.5px, calc(0.2vw + 1.3vh + 2px), 20px)/1.3 var(--fuente); color: var(--ink); }
+.e2-kpis > .tarjeta.e2-si { border: 1px dashed var(--mut2); border-top: 3px dashed var(--mut2); }
+.e2-kpis > .tarjeta.e2-central { border-top: 5px solid var(--acc); }
+.e2-central .ban-par .par-antes .par-lbl,
+.e2-central .ban-par .par-antes .par-val.e2-cifra,
+.e2-central .ban-par .par-flecha { color: var(--mut); }
+.e2-central .ban-par .par-despues .par-lbl,
+.e2-central .ban-par .par-despues .par-val.e2-cifra,
+.e2-central .ban-par .par-unico .par-val.e2-cifra { color: var(--acc); }
+.e2-kpis .kpi-lbl b.e2-tag {
   color: var(--acc); border: 1px solid var(--acc); border-radius: 3px;
   padding: 1px 6px; font-weight: 600; white-space: nowrap;
 }
+/* La tarjeta de decisión en la fila de cifras: rótulo en tinta como las otras. */
+.e2-kpis > .tarjeta-dec .dec-llano { font-size: clamp(12.5px, calc(0.2vw + 1.3vh + 2px), 20px); }
+
+/* V01 (25/09): resumen. Tres tarjetas de cifra con la respuesta y, debajo, las 15 decisiones
+   como fichas en tres grupos. La primera tarjeta es más ancha porque lleva el par E1 → corregido. */
+.v01r-kpis { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1fr); }
+.v01r .kpi-lbl { color: var(--ink); font-size: var(--e2-rot); }
 
 .v01r-mapa { flex: 1; min-height: 0; }
 .v01r-grupos {
@@ -210,6 +213,16 @@ button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset:
    ningún número, con borde punteado y la letra un paso más suave. */
 .g-central .v01r-ficha { border-left: 4px solid var(--acc); color: var(--acc); font-weight: 600; }
 .g-sin .v01r-ficha { border-style: dashed; border-color: var(--gris); color: var(--mut2); }
+
+/* V02 (25/09): las dos cifras y la decisión arriba; el dibujo de ventanas a todo el ancho. La
+   tarjeta de la decisión es más ancha porque es una frase. */
+.v02-kpis { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.3fr); }
+.v02-mapa { flex: 1; min-height: 0; }
+.v02-leyenda {
+  display: flex; flex-wrap: wrap; gap: 3px 16px; margin-top: 4px;
+  font: 400 var(--e2-txt2)/1.25 var(--fuente); color: var(--mut2);
+}
+.v02-leyenda > span { display: inline-flex; align-items: center; gap: 6px; }
 
 /* V01 · detalle (24/09): la tabla escala con la pantalla y cada celda de texto entra en hasta dos
    renglones (.clamp2), en pantalla y en la hoja impresa. Antes, a 1152×640 y en el PDF, el

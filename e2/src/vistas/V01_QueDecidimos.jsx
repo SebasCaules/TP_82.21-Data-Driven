@@ -146,29 +146,29 @@ export default function V01({ irA }) {
     <section className="pant v01 v01r">
       <h1 className="titulo">{TITULO}</h1>
 
-      <div className="v01r-kpis">
-        <div className="tarjeta v01r-heroe" title={T_CENTRAL}>
-          <span className="kpi-lbl"><span>Clientes en riesgo</span><b className="v01r-tag">en revisión</b></span>
+      <div className="e2-kpis v01r-kpis">
+        <div className="tarjeta e2-central" title={T_CENTRAL}>
+          <span className="kpi-lbl"><span>Clientes en riesgo</span><b className="e2-tag">en revisión</b></span>
           <div className="ban-par">
             <div className="par-item par-antes">
               <span className="par-lbl">Entregable 1</span>
-              <span className="par-val tabular v01r-val">{pct(V10.e1.pct)}</span>
+              <span className="par-val tabular e2-cifra">{pct(V10.e1.pct)}</span>
             </div>
             <span className="par-flecha" aria-hidden="true">→</span>
             <div className="par-item par-despues">
               <span className="par-lbl">Datos corregidos</span>
-              <span className="par-val tabular v01r-val">{pct(V10.despues.pct)}</span>
+              <span className="par-val tabular e2-cifra">{pct(V10.despues.pct)}</span>
             </div>
           </div>
-          <p className="v01r-linea">{MUEVE}</p>
+          <p className="e2-linea">{MUEVE}</p>
         </div>
 
-        <div className="tarjeta v01r-si" title={T_SENS}>
+        <div className="tarjeta e2-si" title={T_SENS}>
           <span className="kpi-lbl"><span><Aro />Sin {MESES_FLAG}</span></span>
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Medido al {fechaCorta(V10.sens.corte)}</span>
-              <span className="par-val tabular v01r-val">{pct(V10.sens.pct)}</span>
+              <span className="par-val tabular e2-cifra">{pct(V10.sens.pct)}</span>
             </div>
           </div>
         </div>
@@ -178,10 +178,10 @@ export default function V01({ irA }) {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Sin respuesta</span>
-              <span className="par-val tabular v01r-val">{N_PEDIDOS}</span>
+              <span className="par-val tabular e2-cifra">{N_PEDIDOS}</span>
             </div>
           </div>
-          {DECIDE && <p className="v01r-linea">{DECIDE}</p>}
+          {DECIDE && <p className="e2-linea">{DECIDE}</p>}
         </div>
       </div>
 
