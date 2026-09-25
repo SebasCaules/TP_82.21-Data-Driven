@@ -4,16 +4,22 @@
 // filas de dos renglones que el directorio no iba a leer, puestas en la banda donde el layout de
 // la cátedra pone las tarjetas (clase 4: filtros, tarjetas, gráficos y, al final, la tabla de
 // detalle; wiki/conceptos/diseno-de-dashboard.md). Ahora arriba va la respuesta: el título y tres
-// tarjetas, el tope de la cátedra, con lo que cambió, lo que está en duda y lo que falta de Casa
-// Óga. Debajo, las 15 decisiones como fichas cortas, agrupadas por lo que hacen con la cifra
-// central con el mismo corte que V10 (DC-04, DC-09 y DC-08; «las otras 12 no cambian esta
-// cifra»). La tabla de antes pasa al detalle, detrás de «Ver las 15 en detalle»: el directorio no
-// la necesita para seguir la presentación y la cátedra la tiene a un clic.
+// tarjetas, el tope de la cátedra: la cifra central, su sensibilidad y los pedidos a Casa Óga.
+// Debajo, las 15 decisiones como fichas de una o dos palabras, agrupadas por lo que hacen con la
+// cifra central con el mismo corte que V10 (DC-04, DC-09 y DC-08; «las otras 12 no cambian esta
+// cifra»). La tabla de antes pasa al detalle, detrás de «Ver en detalle»: el directorio no la
+// necesita para seguir la presentación y la cátedra la tiene a un clic.
 //
-// Cada ficha lleva a la vista de su decisión, con el mismo «04» del riel. Las cuatro que no tienen
-// vista propia (DC-01, DC-03, DC-07 y DC-14) abren el detalle con su fila marcada. Ninguna cifra
-// se escribe a mano: todo sale de D2.vistas.V10, V03, V12 y D2.decisiones. Los nombres cortos de
-// las fichas son texto de la vista, no datos; una decisión sin nombre corto muestra su hallazgo.
+// (25/09, segunda pasada, pedido del usuario: más contraste y menos texto.) Cada tarjeta dice un
+// rótulo, una cifra y a lo sumo una frase de seis palabras; la de la cifra central va en negativo
+// (tinta de fondo, cifra en blanco) y las fichas que la afectan también, para que el ojo las una.
+// Salen la exposición, las frases de apoyo, la leyenda de estados, el id y el número de vista de
+// cada ficha: todo eso sigue en el title de cada pieza, en el detalle y en las vistas 3, 10 y 12.
+//
+// Cada ficha lleva a la vista de su decisión; las cuatro sin vista propia (DC-01, DC-03, DC-07 y
+// DC-14) abren el detalle con su fila marcada. Ninguna cifra se escribe a mano: todo sale de
+// D2.vistas.V10, V03, V12 y D2.decisiones. Los nombres cortos son texto de la vista, no datos; una
+// decisión sin nombre corto muestra su hallazgo.
 //
 // Detalle (24/09, sin cambios): la tabla con el estado en una pastilla propia, porque "aplicada"
 // cambia un número, "declarada" no cambia nada y solo se deja por escrito, y "pendiente del
@@ -23,7 +29,7 @@
 // vista. La pastilla NO es <Semaforo> ("EN META / POR DEBAJO / FUERA DE META"): esos rótulos
 // hablan de una meta que la vista no tiene.
 import { useState } from 'react'
-import { fechaCorta, mesCorto, montoM, pct } from '../formato.js'
+import { fechaCorta, mesCorto, pct } from '../formato.js'
 import { D2 } from '../datos_e2.js'
 import { ESPERA, estadoVisible } from '../estados.js'
 
@@ -44,7 +50,6 @@ const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s)
 const FLAG = vistas.V03.meses_flag
 const MESES_FLAG = `${mesCorto(FLAG[0]).slice(0, 3)}–⁠${mesCorto(FLAG[FLAG.length - 1]).slice(0, 3)}`
   + ` ${FLAG[FLAG.length - 1].slice(0, 4)}`
-const UMBRAL = Math.round(D2.meta.umbral_cobertura * 100)
 
 // (25/09) El título es la respuesta del tablero entero: cuánto cambia la cifra que el directorio
 // vio en el E1 y qué la deja en revisión. Todo lo que el h1 y `meta.titulo` necesitan se calcula
@@ -52,20 +57,20 @@ const UMBRAL = Math.round(D2.meta.umbral_cobertura * 100)
 const TITULO = `El riesgo del E1 pasa de ${pct(V10.e1.pct)} a ${pct(V10.despues.pct)}; `
   + `falta confirmar ${MESES_FLAG}`
 
-// Los tres grupos de fichas. «Tocan la cifra central» son las tres que V10 muestra: las de
+// Los tres grupos de fichas. «Afectan la cifra central» son las tres que V10 muestra: las de
 // V10.cambios (hoy solo DC-04), la sensibilidad (DC-09) y el corte común (DC-08). El resto se
-// parte por estado: las aplicadas corrigen o marcan otro dato; las declaradas y la pendiente no
-// cambian ningún número.
+// parte por estado: las aplicadas corrigen otro dato (o lo marcan con una bandera); las
+// declaradas y la pendiente no cambian ningún número.
 const porId = Object.fromEntries(decisiones.map((d) => [d.id, d]))
 const CENTRAL = [...new Set([...V10.cambios.map((c) => c.decision), 'DC-09', 'DC-08'])].filter((id) => porId[id])
 const GRUPOS = [
-  { clave: 'central', texto: 'tocan la cifra central', decs: CENTRAL.map((id) => porId[id]) },
+  { clave: 'central', texto: 'afectan la cifra central', decs: CENTRAL.map((id) => porId[id]) },
   {
-    clave: 'otros', texto: 'corrigen o marcan otros datos',
+    clave: 'otros', texto: 'corrigen otros datos',
     decs: decisiones.filter((d) => !CENTRAL.includes(d.id) && d.estado === 'aplicada'),
   },
   {
-    clave: 'sin', texto: 'no cambian ningún número',
+    clave: 'sin', texto: 'no cambian números',
     decs: decisiones.filter((d) => !CENTRAL.includes(d.id) && d.estado !== 'aplicada'),
   },
 ]
@@ -74,20 +79,20 @@ const GRUPOS = [
 // DC-09 y el año siguiente al corte, que es el de las bajas que DC-12 deja fuera.
 const ANIO_BAJAS = Number(D2.meta.corte_ref.slice(0, 4)) + 1
 const NOMBRE = {
-  'DC-01': 'Filas de venta repetidas',
+  'DC-01': 'Filas repetidas',
   'DC-02': 'Devoluciones',
   'DC-03': 'Canal de venta',
   'DC-04': 'Clientes duplicados',
   'DC-05': 'Envíos repetidos',
   'DC-06': 'Nivel Gold',
-  'DC-07': 'Edades y puntos inválidos',
-  'DC-08': 'Fecha de corte común',
-  'DC-09': `${cap(MESES_FLAG)} sin confirmar`,
-  'DC-10': 'Sin ajuste por inflación',
-  'DC-11': 'NPS sin reclamos ni consultas',
-  'DC-12': `Bajas pedidas en ${ANIO_BAJAS}`,
+  'DC-07': 'Edades y puntos',
+  'DC-08': 'Fecha de corte',
+  'DC-09': cap(MESES_FLAG),
+  'DC-10': 'Inflación',
+  'DC-11': 'NPS sin contacto',
+  'DC-12': `Bajas ${ANIO_BAJAS}`,
   'DC-13': 'Campañas duplicadas',
-  'DC-14': 'Costo de las acciones',
+  'DC-14': 'Costo de acciones',
   'DC-15': 'Diccionario de datos',
 }
 const nombre = (d) => NOMBRE[d.id] ?? cap(sinConsulta(d.hallazgo))
@@ -100,13 +105,21 @@ const PEDIDOS_EN_TABLA = pedidos.filter((p) => porId[p.id]).length
 const esperan = decisiones.filter((d) => ESPERA.has(d.id) || d.estado === 'pendiente del negocio').length
 const cerradas = decisiones.length - esperan
 
-// Tarjeta 1: la cifra del E1 contra la de los datos corregidos, y qué la mueve.
-const DC04 = porId['DC-04']
+// Tarjeta 1: qué mueve la cifra. Con una sola fila en V10.cambios, y que sea DC-04, son los
+// clientes duplicados (vista 4); si no, cuántas decisiones la mueven (vista 10).
 const UNICA = V10.cambios.length === 1 && V10.cambios[0].decision === 'DC-04'
-const EXPOSICION = `Exposición anual ${montoM(V10.e1.exposicion_M)} → ${montoM(V10.despues.exposicion_M)}: `
-  + 'facturación proyectada, no recupero; pesos sin ajustar por inflación.'
-// Tarjeta 3: el pedido de DC-09 es el que decide la cifra central, y V12 lo pone primero.
-const PEDIDO_DC09 = PEDIDO['DC-09']
+const MUEVE = UNICA ? 'Solo cambia por los clientes duplicados.' : `Cambia por ${V10.cambios.length} decisiones.`
+// Tarjeta 3: el pedido de DC-09 es el que decide la cifra central (V12 lo pone primero).
+const DECIDE = PEDIDO['DC-09'] ? `El de ${MESES_FLAG} decide la cifra central.` : null
+
+// Lo que la tarjeta ya no escribe queda en su title, para quien presenta.
+const T_CENTRAL = `Clientes en riesgo entre los que tienen 3 compras o más, al ${fechaCorta(D2.meta.corte_ref)}; `
+  + `en revisión por ${MESES_FLAG}. Detalle en las vistas 4 y 10.`
+const T_SENS = `Si ${MESES_FLAG} están incompletos: riesgo medido al ${fechaCorta(V10.sens.corte)}, antes de los meses con menos del `
+  + `${Math.round(D2.meta.umbral_cobertura * 100)} % de las operaciones de un año antes. No reemplaza la cifra: `
+  + 'la pone en duda. Vista 3.'
+const T_PEDIDOS = `${PEDIDOS_EN_TABLA} de los ${N_PEDIDOS} son de decisiones de abajo; el primero: `
+  + `${PEDIDO['DC-09'] ?? '—'}. Vista 12.`
 
 // (24/09) El pie queda en un renglón con lo que el directorio usa. Las filas del registro de
 // las decisiones que remiten a esta vista y la fuente, que el directorio no usa, van al title.
@@ -114,7 +127,7 @@ const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · ${D2.meta.archivos.length
   `${decisiones.length} decisiones`
 const REGISTRO = [...new Set(decisiones.filter((d) => d.vista === 'V01').flatMap((d) => d.cifras ?? []))]
 const PIE_TITLE = `decisiones ${decisiones[0].id} a ${decisiones[decisiones.length - 1].id} · ` +
-  `registro: C03, C04, D05, D22, E01, ${REGISTRO.join(', ')} · fuente: e2.json, pipeline/build_e2.py`
+  `registro: C03, D05, D22, E01, ${REGISTRO.join(', ')} · fuente: e2.json, pipeline/build_e2.py`
 
 export default function V01({ irA }) {
   // null: el resumen. Un id o '': el detalle, con esa fila marcada (o ninguna).
@@ -127,10 +140,8 @@ export default function V01({ irA }) {
       <h1 className="titulo">{TITULO}</h1>
 
       <div className="v01r-kpis">
-        <div className="tarjeta">
-          <span className="kpi-lbl" title="Clientes en riesgo entre los que tienen 3 compras o más (vista 10)">
-            <span>Clientes en riesgo al {fechaCorta(D2.meta.corte_ref)}</span><b>en revisión</b>
-          </span>
+        <div className="tarjeta v01r-heroe" title={T_CENTRAL}>
+          <span className="kpi-lbl"><span>Clientes en riesgo</span><b className="v01r-tag">en revisión</b></span>
           <div className="ban-par">
             <div className="par-item par-antes">
               <span className="par-lbl">Entregable 1</span>
@@ -142,55 +153,36 @@ export default function V01({ irA }) {
               <span className="par-val tabular v01r-val">{pct(V10.despues.pct)}</span>
             </div>
           </div>
-          <p className="kpi-sub">
-            {UNICA
-              ? <>Lo mueve una sola decisión: unir los números de cliente duplicados <Ref id={DC04.vista} irA={irA} />.</>
-              : <>Lo mueven {V10.cambios.length} decisiones <Ref id="V10" irA={irA} />.</>}
-          </p>
-          <p className="kpi-base">{EXPOSICION}</p>
+          <p className="v01r-linea">{MUEVE}</p>
         </div>
 
-        <div className="tarjeta">
-          <span className="kpi-lbl"><span><Aro />Si {MESES_FLAG} están incompletos</span></span>
+        <div className="tarjeta v01r-si" title={T_SENS}>
+          <span className="kpi-lbl"><span><Aro />Sin {MESES_FLAG}</span></span>
           <div className="ban-par">
-            <div className="par-item v01r-sens">
+            <div className="par-item">
               <span className="par-lbl">Medido al {fechaCorta(V10.sens.corte)}</span>
               <span className="par-val tabular v01r-val">{pct(V10.sens.pct)}</span>
             </div>
           </div>
-          <p className="kpi-sub">
-            Esos meses traen menos del {UMBRAL} % de las operaciones de un año antes <Ref id="V03" irA={irA} />.
-          </p>
-          <p className="kpi-base">No reemplaza la cifra: la pone en duda.</p>
         </div>
 
-        <div className="tarjeta">
+        <div className="tarjeta" title={T_PEDIDOS}>
           <span className="kpi-lbl"><span>Pedidos a Casa Óga</span></span>
           <div className="ban-par">
             <div className="par-item">
-              <span className="par-lbl">Esperan una respuesta</span>
-              <span className="par-val tabular v01r-val">{N_PEDIDOS}<span className="par-unidad"> pedidos</span></span>
+              <span className="par-lbl">Sin respuesta</span>
+              <span className="par-val tabular v01r-val">{N_PEDIDOS}</span>
             </div>
           </div>
-          <p className="kpi-sub">
-            {PEDIDO_DC09
-              ? <>El primero decide la cifra central: {PEDIDO_DC09} <Ref id="V12" irA={irA} />.</>
-              : <>El detalle está en la <IrVista id="V12" irA={irA} prefijo="vista " />.</>}
-          </p>
-          <p className="kpi-base">
-            {PEDIDOS_EN_TABLA} {PEDIDOS_EN_TABLA === 1 ? 'corresponde a una decisión marcada' : 'corresponden a decisiones marcadas'} abajo
-            con <span className="v01r-marca" aria-hidden="true">◑</span> o <span className="v01r-marca" aria-hidden="true">○</span>.
-          </p>
+          {DECIDE && <p className="v01r-linea">{DECIDE}</p>}
         </div>
       </div>
 
       <div className="tarjeta v01r-mapa">
         <span className="kpi-lbl">
-          <span>{`Las ${decisiones.length} decisiones sobre los datos`}</span>
+          <span>{`Las ${decisiones.length} decisiones`}</span>
           {irA && (
-            <button type="button" className="v01-ir" onClick={() => setDetalle('')}>
-              {`Ver las ${decisiones.length} en detalle →`}
-            </button>
+            <button type="button" className="v01-ir" onClick={() => setDetalle('')}>Ver en detalle →</button>
           )}
         </span>
         <div className="v01r-grupos">
@@ -206,11 +198,6 @@ export default function V01({ irA }) {
             </div>
           ))}
         </div>
-        <p className="e2-nota">
-          <span className="v01r-marca" aria-hidden="true">◑</span> a confirmar: ya se aplica, pero Casa Óga
-          tiene que confirmarla. <span className="v01r-marca" aria-hidden="true">○</span> pendiente: falta una
-          respuesta de Casa Óga.
-        </p>
       </div>
 
       <p className="pie-vista" style={{ flexShrink: 0, margin: 0 }} title={PIE_TITLE}>
@@ -220,37 +207,24 @@ export default function V01({ irA }) {
   )
 }
 
-/** (25/09) Ficha de una decisión: id, nombre corto, la marca si espera a Casa Óga y el número de
- *  su vista, que es a donde lleva. Sin vista propia, abre el detalle con su fila marcada. En la
- *  hoja impresa no llega irA y la ficha va como texto. */
+/** (25/09) Ficha de una decisión: solo el nombre corto. El id, el estado, la decisión en llano y
+ *  el pedido abierto van en el title; lleva a la vista de la decisión o, sin vista propia, al
+ *  detalle con su fila marcada. En la hoja impresa no llega irA y la ficha va como texto. */
 function Ficha({ d, irA, abrir }) {
   const est = estadoVisible(d)
-  const marca = est === 'a confirmar' ? '◑' : est === 'pendiente del negocio' ? '○' : null
   const propia = d.vista && d.vista !== 'V01'
   const title = `${d.id} · ${est} — ${d.llano ?? cap(d.decision)}` +
-    (PEDIDO[d.id] ? ` Pedido abierto: ${PEDIDO[d.id]}.` : '')
-  const contenido = (
-    <>
-      <span className="f-id tabular">{d.id}</span>
-      <span className="f-txt">{nombre(d)}</span>
-      {marca && <span className="f-marca" aria-hidden="true">{marca}</span>}
-      {propia && <span className="f-v tabular" aria-hidden="true">{etiquetaVista(d.vista)}</span>}
-    </>
-  )
-  if (!irA) return <span className="v01r-ficha" title={title}>{contenido}</span>
+    (PEDIDO[d.id] ? ` Pedido abierto: ${PEDIDO[d.id]}.` : '') +
+    (propia ? ` Vista ${etiquetaVista(d.vista)}.` : '')
+  if (!irA) return <span className="v01r-ficha" title={title}>{nombre(d)}</span>
   const destino = propia ? `ir a la vista ${numeroVista(d.vista)}` : 'ver el detalle'
   return (
     <button type="button" className="v01r-ficha" title={title}
             aria-label={`${d.id}, ${nombre(d)}, ${est}: ${destino}`}
             onClick={() => (propia ? irA(numeroVista(d.vista) - 1) : abrir())}>
-      {contenido}
+      {nombre(d)}
     </button>
   )
-}
-
-// «(vista 4)» en un solo renglón: sin esto, a 1440 el paréntesis de cierre quedaba solo abajo.
-function Ref({ id, irA }) {
-  return <span style={{ whiteSpace: 'nowrap' }}>(<IrVista id={id} irA={irA} prefijo="vista " />)</span>
 }
 
 // El aro punteado de la sensibilidad, el mismo de ParDoble y V10.
