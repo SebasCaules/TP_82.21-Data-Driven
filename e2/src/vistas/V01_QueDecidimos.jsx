@@ -62,12 +62,19 @@ const TITULO = `El riesgo del E1 pasa de ${pct(V10.e1.pct)} a ${pct(V10.despues.
 // parte por estado: las aplicadas corrigen otro dato (o lo marcan con una bandera); las
 // declaradas y la pendiente no cambian ningún número.
 const porId = Object.fromEntries(decisiones.map((d) => [d.id, d]))
+// (25/09) Las fichas van en una grilla de tres columnas iguales: 3 + 9 + 3 llenan cinco filas
+// completas, alineadas entre grupos. Las nueve del medio, una fila por tema: ventas (DC-01, DC-02,
+// DC-03), campañas y contacto (DC-05, DC-13, DC-12) y clientes (DC-06, DC-07, DC-11). Una decisión
+// que no esté en la lista va al final, por id.
+const ORDEN_OTROS = ['DC-01', 'DC-02', 'DC-03', 'DC-05', 'DC-13', 'DC-12', 'DC-06', 'DC-07', 'DC-11']
+const posicion = (id) => (ORDEN_OTROS.includes(id) ? ORDEN_OTROS.indexOf(id) : ORDEN_OTROS.length)
+const ordenar = (decs) => [...decs].sort((x, y) => posicion(x.id) - posicion(y.id) || x.id.localeCompare(y.id))
 const CENTRAL = [...new Set([...V10.cambios.map((c) => c.decision), 'DC-09', 'DC-08'])].filter((id) => porId[id])
 const GRUPOS = [
   { clave: 'central', texto: 'afectan la cifra central', decs: CENTRAL.map((id) => porId[id]) },
   {
     clave: 'otros', texto: 'corrigen otros datos',
-    decs: decisiones.filter((d) => !CENTRAL.includes(d.id) && d.estado === 'aplicada'),
+    decs: ordenar(decisiones.filter((d) => !CENTRAL.includes(d.id) && d.estado === 'aplicada')),
   },
   {
     clave: 'sin', texto: 'no cambian números',

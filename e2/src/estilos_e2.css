@@ -192,12 +192,15 @@
 .v01r-gcab { display: flex; align-items: baseline; gap: .4em; }
 .v01r-n { font: 700 clamp(28px, calc(0.6vw + 3.4vh), 62px)/1 var(--fuente); letter-spacing: -.02em; color: var(--ink); }
 .v01r-gtxt { font: 600 clamp(13px, calc(0.2vw + 1.6vh + 1px), 23px)/1.2 var(--fuente); color: var(--ink); }
-.v01r-fichas { display: flex; flex-wrap: wrap; gap: clamp(6px, 0.6vw, 12px); }
+/* (25/09) Grilla de tres columnas iguales en los tres grupos: las fichas miden lo mismo y
+   quedan alineadas de un grupo al otro, en vez de cortar el renglón donde cae cada texto. */
+.v01r-fichas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 0.6vw, 12px); }
 .v01r-ficha {
-  display: inline-flex; align-items: center;
+  display: flex; align-items: center; width: 100%; min-width: 0;
   padding: .4em .8em; border: 1.5px solid rgba(22, 35, 58, .5); border-radius: 3px;
   background: var(--sup); color: var(--ink); text-align: left;
   font: 600 clamp(12.5px, calc(0.2vw + 1.6vh + 0.5px), 22px)/1.2 var(--fuente);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 button.v01r-ficha { cursor: pointer; }
 button.v01r-ficha:hover { background: var(--azul1); }
