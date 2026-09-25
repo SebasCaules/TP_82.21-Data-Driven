@@ -143,16 +143,11 @@ function Gantt({ filas, corteRef, w, h, k }) {
   const fuenteEtq = Math.max(10.5, Math.min(12.5, paso * 0.5)) * k
   // La columna de nombres mide el nombre más largo (estimación de 0,56 em por carácter).
   const padLabel = Math.round(Math.max(...filas.map((a) => nombre(a).length)) * fuenteEtq * 0.56 + 14 * k)
-  // (25/09, pedido del usuario) La barra con fechas después del corte (hoy Clientes, por las
-  // altas inválidas) dice al final hasta qué fecha llega. El margen derecho se abre lo justo para
-  // que esa etiqueta entre después del fin de la barra, dentro del dibujo.
-  const conExcedente = filas.filter((a) => a.tipo !== 'contexto' && !ES_MAESTRO(a) && a.hasta > corteRef)
-  const ultimo = conExcedente.sort(porHasta)[0]
-  const etqFin = ultimo ? `hasta ${fechaCorta(ultimo.hasta)}` : ''
-  const fEtqFin = fPlaq
-  const wEtqFin = etqFin.length * fEtqFin * 0.58
-  const fracFin = ultimo ? (EJE_HASTA - aDias(ultimo.hasta)) / EJE_TOTAL : 0
-  const padRight = Math.max(8, Math.ceil((wEtqFin + 8 * k - fracFin * (w - padLabel)) / (1 - fracFin)))
+  // (25/09, pedido del usuario) Hasta dónde llega la barra con fechas después del corte (hoy
+  // Clientes, por las altas inválidas): una línea punteada vertical en su última fecha y esa
+  // fecha escrita en el eje, en el terracota de la barra.
+  const ultimo = filas.filter((a) => a.tipo !== 'contexto' && !ES_MAESTRO(a) && a.hasta > corteRef).sort(porHasta)[0]
+  const padRight = 8
   const anchoDisp = Math.max(60, w - padLabel - padRight)
   const yBase = padTop + disponible
 
@@ -233,10 +228,6 @@ function Gantt({ filas, corteRef, w, h, k }) {
                 </title>
               </rect>
             )}
-            {excedente && (
-              <text x={x1 + 6 * k} y={yc} fontSize={fEtqFin} fontWeight={700} fill="var(--terra-osc)"
-                    dominantBaseline="central" className="tabular">{`hasta ${fechaCorta(a.hasta)}`}</text>
-            )}
           </g>
         )
       })}
@@ -258,6 +249,18 @@ function Gantt({ filas, corteRef, w, h, k }) {
           </g>
         )
       })}
+
+      {ultimo && (() => {
+        const xf = xDe(ultimo.hasta)
+        return (
+          <g>
+            <title>{`${ultimo.nombre}: fechas hasta el ${fechaCorta(ultimo.hasta)} (altas con fecha inválida, ${DC07.id})`}</title>
+            <line x1={xf} x2={xf} y1={padTop - 4} y2={yBase + 4} stroke="var(--terra)" strokeWidth="1.5" strokeDasharray="3 3" />
+            <text x={xf} y={yBase + 5 + fTick} fontSize={fTick} fontWeight={700} fill="var(--terra-osc)"
+                  textAnchor="middle" className="tabular">{fechaCorta(ultimo.hasta)}</text>
+          </g>
+        )
+      })()}
 
       {/* La línea del corte común marca la decisión (DC-08): sólida, 2,5 px y en --despues. La
           del 31/08/2026, punteada en --antes. Las plaquetas dicen solo la fecha: las cifras están
