@@ -26,9 +26,8 @@
 // propia escala), así que la línea se arma a mano con escalaNice para que las dos series
 // compartan el mismo eje.
 
-import { Lienzo, BarraMini, escalaNice } from '../../../src/graficos.jsx'
-import TarjetaDecision from '../TarjetaDecision.jsx'
-import ParDoble from '../ParDoble.jsx'
+import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
+import Banda from '../Banda.jsx'
 import { useEscalaTexto } from '../escala.js'
 import { D2 } from '../datos_e2.js'
 import { entero, pct, decimal, fechaCorta, mesCorto } from '../formato.js'
@@ -80,75 +79,57 @@ export const meta = {
   pie: PIE,
 }
 
+// (25/09, regla del usuario) Banda de cifras: las filas marcadas y el NPS con y sin ellas (dos
+// lecturas del mismo año, en tinta y sin flecha) y, a la derecha, DC-11 solo en llano. Lo que
+// explicaban las notas (cuántos puntos suman las filas marcadas) queda en el title del NPS. La
+// línea anual va debajo, a todo el ancho.
+const NOTA_NPS = `Las ${entero(ULTIMO.n_sin_interaccion)} filas marcadas de ${ULTIMO.anio} suben el NPS ` +
+  `${decimal(brecha(ULTIMO), 1)} puntos; en ${PRIMERO.anio}, ${decimal(brecha(PRIMERO), 1)}. Mientras su ` +
+  'origen no esté confirmado se informan las dos cifras.' +
+  (TRAMO_FLAG ? ` ${ULTIMO.anio} completo: incluye ${TRAMO_FLAG}, meses con cobertura no confirmada ` +
+    `(${DC09.id}, vista ${numeroVista(DC09.vista)}).` : '')
+
 export default function V09_NPS() {
   const k = useEscalaTexto()
   return (
     <section className="pant v09">
       <h1 className="titulo">{TITULO}</h1>
 
-      <div className="lienzo v09-cuerpo">
-        <div className="tarjeta" style={{ gap: 'clamp(8px, 1.4vh, 16px)' }}>
-          {/* (24/09) Arriba, en un renglón: qué filas se marcan y el NPS con y sin ellas. */}
-          <div style={{ display: 'flex', gap: 'clamp(16px, 2.4vw, 34px)', alignItems: 'flex-start', flex: '0 0 auto' }}>
-            <div style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-              <span className="kpi-lbl frase">Filas con NPS y sin reclamos ni consultas</span>
-              {/* El hallazgo dibujado: la parte marcada, con su porcentaje sobre la barra
-                  (VIS-V09-1) y la trama en la parte, no en el resto (OMI-TRANSVERSAL-3). */}
-              <div style={{ height: 32, display: 'flex', flexDirection: 'column', marginTop: 6 }}>
-                <Lienzo>
-                  {({ w, h }) => (
-                    <BarraMini parte={V09.sin_interaccion.n} total={V09.filas} w={w} h={h}
-                               excepcion tramaEn="parte" alturaBarra={20}
-                               rotulo={pct(V09.sin_interaccion.pct)} />
-                  )}
-                </Lienzo>
-              </div>
-              <p className="e2-nota">
-                {entero(V09.sin_interaccion.n)} de {entero(V09.filas)} filas cliente-mes, {ANIOS}: se
-                conservan marcadas
-              </p>
-            </div>
-
-            <div style={{ flex: '1.25 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span className="kpi-lbl frase" style={{ marginBottom: 0 }}>
-                <span>
-                  NPS medio {ULTIMO.anio}, en puntos
-                  {TRAMO_FLAG && (
-                    <span style={{ fontWeight: 400, color: 'var(--mut2)' }}>
-                      {' '}· año completo: incluye {TRAMO_FLAG}, meses con cobertura no confirmada
-                      ({DC09.id}, vista {numeroVista(DC09.vista)})
-                    </span>
-                  )}
-                </span>
-              </span>
-              <ParDoble
-                sensibilidad={false}
-                lblRef="Con las filas marcadas"
-                valRef={<span className="par-val tabular">{decimal(ULTIMO.con_todo, 1)}</span>}
-                lblSens="Sin las filas marcadas"
-                valSens={<span className="par-val tabular">{decimal(ULTIMO.solo_con_interaccion, 1)}</span>}
-                style={{ flex: '0 0 auto' }}
-              />
-              <p className="e2-nota">
-                Las {entero(ULTIMO.n_sin_interaccion)} filas marcadas de {ULTIMO.anio} suben el NPS{' '}
-                {decimal(brecha(ULTIMO), 1)} puntos; en {PRIMERO.anio}, {decimal(brecha(PRIMERO), 1)}.
-                Mientras su origen no esté confirmado se informan las dos cifras.
-              </p>
+      <Banda dcs={[DC11]}>
+        <div className="tarjeta"
+             title={`${entero(V09.sin_interaccion.n)} de ${entero(V09.filas)} filas cliente-mes, ${ANIOS}: se conservan marcadas`}>
+          <span className="kpi-lbl"><span>Filas sin reclamos ni consultas</span></span>
+          <div className="ban-par">
+            <div className="par-item">
+              <span className="par-lbl">Con NPS, {ANIOS}</span>
+              <span className="par-val tabular e2-cifra">{pct(V09.sin_interaccion.pct)}</span>
             </div>
           </div>
-
-          <div style={{ flex: '1 1 0', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-            <LeyendaLinea k={k} />
-            <Lienzo>
-              {({ w, h }) => <GraficoNPS serie={SERIE} w={w} h={h} k={k} />}
-            </Lienzo>
+          <p className="e2-linea">{entero(V09.sin_interaccion.n)} de {entero(V09.filas)}: se conservan marcadas.</p>
+        </div>
+        <div className="tarjeta e2-central" title={NOTA_NPS}>
+          <span className="kpi-lbl">
+            <span>NPS medio {ULTIMO.anio}</span>
+            {TRAMO_FLAG && <b className="e2-tag">incluye {TRAMO_FLAG}</b>}
+          </span>
+          <div className="ban-par">
+            <div className="par-item">
+              <span className="par-lbl">Con las filas marcadas</span>
+              <span className="par-val tabular e2-cifra">{decimal(ULTIMO.con_todo, 1)}</span>
+            </div>
+            <div className="par-item">
+              <span className="par-lbl">Sin ellas</span>
+              <span className="par-val tabular e2-cifra">{decimal(ULTIMO.solo_con_interaccion, 1)}</span>
+            </div>
           </div>
         </div>
+      </Banda>
 
-        {/* (24/09) La columna queda solo con la decisión y mide lo que su texto. */}
-        <div className="fijo" style={{ display: 'flex', flexDirection: 'column', width: 'clamp(208px, 21vw, 254px)' }}>
-          <TarjetaDecision dc={DC11} />
-        </div>
+      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
+        <LeyendaLinea k={k} />
+        <Lienzo>
+          {({ w, h }) => <GraficoNPS serie={SERIE} w={w} h={h} k={k} />}
+        </Lienzo>
       </div>
 
       <p className="pie-vista">{PIE}</p>

@@ -21,8 +21,7 @@ import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { entero, fechaCorta, mesCorto, pct } from '../formato.js'
 import { useEscalaTexto } from '../escala.js'
-import ParDoble from '../ParDoble.jsx'
-import TarjetaDecision from '../TarjetaDecision.jsx'
+import Banda from '../Banda.jsx'
 
 const V03 = D2.vistas.V03
 const DC09 = D2.decisiones.find((d) => d.id === 'DC-09')
@@ -82,43 +81,60 @@ const PIE = `corte de referencia ${fechaCorta(D2.meta.corte_ref)} · serie de fi
 
 export const meta = { id: 'V03', corto: 'Cobertura 2025', titulo: TITULO, pie: PIE }
 
+// El aro punteado de la sensibilidad, el mismo de ParDoble, V01, V02 y V10.
+function Aro() {
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        display: 'inline-block', width: 9, height: 9, borderRadius: '50%', border: '1.5px dashed var(--mut2)',
+        boxSizing: 'border-box', marginRight: 6, verticalAlign: '-1px', flexShrink: 0,
+      }}
+    />
+  )
+}
+
+// (25/09, regla del usuario) El par de riesgo pasa a la banda de cifras: el riesgo al corte, con
+// «en revisión», y la sensibilidad en tarjeta punteada, como en V01 y V02; la decisión DC-09 va a
+// la derecha, solo en llano. La nota que explicaba el par queda en el title de la sensibilidad.
+const MESES_TXT = `${mesCorto(PRIMER_FLAG).slice(0, 3)}–\u2060${mesCorto(ULTIMO_FLAG).slice(0, 3)}\u00a0${ULTIMO_FLAG.slice(0, 4)}`
+
 export default function V03Cobertura() {
   const k = useEscalaTexto()
   return (
     <section className="pant v03">
       <h1 className="titulo">{TITULO}</h1>
 
-      <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(10px, 1.5vh, 16px)' }}>
-        {/* (24/09) El par de riesgo a la izquierda y, a la derecha, la nota que lo explica.
-            El rótulo es una frase: va en sans (.frase), no en mono mayúscula. */}
-        <div style={{ display: 'flex', gap: 'clamp(16px, 2.4vw, 34px)', flex: '0 0 auto', alignItems: 'flex-start' }}>
-          <div style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span className="kpi-lbl frase" style={{ marginBottom: 0 }}>
-              Clientes en riesgo, según la fecha de medición
-            </span>
-            <ParDoble
-              lblRef={ETQ_CREF}
-              valRef={<span className="par-val tabular">{pct(CREF.pct)}</span>}
-              lblSens={ETQ_SENS}
-              valSens={<span className="par-val tabular">{pct(CSENS.pct)}</span>}
-              style={{ flex: '0 0 auto' }}
-            />
+      <Banda dcs={[DC09]}>
+        <div className="tarjeta e2-central" title={`Clientes en riesgo ${ETQ_CREF}`}>
+          <span className="kpi-lbl"><span>Riesgo al {fechaCorta(D2.meta.corte_ref)}</span><b className="e2-tag">en revisión</b></span>
+          <div className="ban-par">
+            <div className="par-item par-unico">
+              <span className="par-lbl">Duplicados unidos</span>
+              <span className="par-val tabular e2-cifra">{pct(CREF.pct)}</span>
+            </div>
           </div>
-          <p className="e2-nota" style={{ flex: '1.2 1 0', minWidth: 0, margin: 0 }}>{NOTA_PAR}</p>
+          <p className="e2-linea">La cifra central (vista {numeroVista('V10')}).</p>
         </div>
-
-        <div className="tarjeta" style={{ flex: '1', minHeight: 0 }}>
-          <span className="kpi-lbl frase">
-            Operaciones por mes, {ANIO} contra {ANIO - 1}
-          </span>
-          <Lienzo>
-            {({ w, h }) => <GraficoOperaciones w={w} h={h} serie={SERIE} k={k} />}
-          </Lienzo>
+        <div className="tarjeta e2-si" title={NOTA_PAR}>
+          <span className="kpi-lbl"><span><Aro />Sin {MESES_TXT}</span></span>
+          <div className="ban-par">
+            <div className="par-item">
+              <span className="par-lbl">Riesgo al {fechaCorta(D2.meta.corte_sens)}</span>
+              <span className="par-val tabular e2-cifra">{pct(CSENS.pct)}</span>
+            </div>
+          </div>
+          <p className="e2-linea">Si esos meses están incompletos.</p>
         </div>
+      </Banda>
 
-        {/* (24/09) En un lienzo en columna, align-self: flex-start (estilos_e2.css) encogía
-            la tarjeta a su texto: acá va a todo el ancho. */}
-        <TarjetaDecision dc={DC09} style={{ flex: '0 0 auto', alignSelf: 'stretch' }} />
+      <div className="tarjeta" style={{ flex: '1', minHeight: 0 }}>
+        <span className="kpi-lbl frase">
+          Operaciones por mes, {ANIO} contra {ANIO - 1}
+        </span>
+        <Lienzo>
+          {({ w, h }) => <GraficoOperaciones w={w} h={h} serie={SERIE} k={k} />}
+        </Lienzo>
       </div>
 
       <p className="pie-vista">{PIE}</p>

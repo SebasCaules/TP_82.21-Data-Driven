@@ -40,7 +40,7 @@ import { D2 } from '../datos_e2.js'
 import { entero, pct, fechaCorta } from '../formato.js'
 import { useEscalaTexto } from '../escala.js'
 import ParDoble from '../ParDoble.jsx'
-import TarjetaDecision from '../TarjetaDecision.jsx'
+import Banda from '../Banda.jsx'
 
 // Todo lo que el h1 y `meta.titulo` necesitan se calcula acá afuera, a nivel de módulo: son
 // el mismo texto (regla dura del contrato de vistas) y D2 es estático, así que no hace falta
@@ -209,119 +209,116 @@ function BarraContactables800({ w, h, k }) {
   )
 }
 
+// (25/09, regla del usuario) La cadena 568 → 567 → 549, que es lo que afirma el título, pasa a la
+// banda de cifras, y las dos decisiones de la vista (DC-05 y DC-12) van juntas a la derecha, en
+// la misma tarjeta y solo en llano. Debajo, la barra de los 800 a todo el ancho y una fila con
+// los envíos sin consentimiento, las bajas en sus dos usos y los envíos repetidos de DC-05.
+const NOTA_CADENA = `${entero(anclaContactables800)}: Entregable 1, lista armada antes de unir identidades · `
+  + `${entero(conConsentimiento)}: con consentimiento, identidad unida (DC-04) · ${entero(sinBaja)}: además `
+  + `sin baja pedida, ${entero(conBaja)} menos (DC-12). La lista sale del riesgo al `
+  + `${fechaCorta(infoMeta.corte_ref)}, en revisión.`
+
 export default function V06Envios() {
   const k = useEscalaTexto()
   return (
     <section className="pant v06">
       <h1 className="titulo">{TITULO}</h1>
 
-      <div className="lienzo" style={{ flexDirection: 'column', gap: 'clamp(8px, 1.3vh, 16px)' }}>
-        <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)', flex: '1.6 1 0', minHeight: 0 }}>
-          {/* (24/09) Rótulo, barra, cadena y nota van juntos y centrados en el alto de la
-              tarjeta: con el alto fijo de 150 px, a 1920 la tarjeta quedaba más de la mitad
-              vacía abajo. La caja de la barra crece con la pantalla (medidasBarra). */}
-          <div className="tarjeta" style={{ flex: '1.5 1 0', minWidth: 0, justifyContent: 'center' }}>
-            <span className="kpi-lbl frase">
-              A quién se le puede escribir · los {entero(TAM_LISTA)} clientes de mayor exposición
-            </span>
-            <div style={{ flex: '0 1 auto', height: medidasBarra(k).caja, minHeight: 110, display: 'flex', marginTop: 4 }}>
-              <Lienzo>
-                {({ w, h }) => <BarraContactables800 w={w} h={h} k={k} />}
-              </Lienzo>
+      <Banda dcs={[dc05, dc12]}>
+        <div className="tarjeta e2-central" title={NOTA_CADENA}>
+          <span className="kpi-lbl">
+            <span>Contactables de la lista de {entero(TAM_LISTA)}</span><b className="e2-tag">en revisión</b>
+          </span>
+          <div className="ban-par">
+            <div className="par-item par-antes">
+              <span className="par-lbl">Entregable 1</span>
+              <span className="par-val tabular e2-cifra">{entero(anclaContactables800)}</span>
             </div>
-            <div className="ban-par" style={{ gap: 'clamp(7px, 1vw, 14px)' }}>
-              <div className="par-item par-antes">
-                <span className="par-lbl">Entregable 1</span>
-                <span className="par-val tabular">{entero(anclaContactables800)}</span>
-              </div>
-              <span className="par-flecha" aria-hidden="true">→</span>
-              <div className="par-item par-antes">
-                <span className="par-lbl">identidad unida (DC-04)</span>
-                <span className="par-val tabular">{entero(conConsentimiento)}</span>
-              </div>
-              <span className="par-flecha" aria-hidden="true">→</span>
-              <div className="par-item par-despues">
-                <span className="par-lbl">sin bajas (DC-12)</span>
-                <span className="par-val tabular">{entero(sinBaja)}</span>
-              </div>
+            <span className="par-flecha" aria-hidden="true">→</span>
+            <div className="par-item par-antes">
+              <span className="par-lbl">Identidad unida</span>
+              <span className="par-val tabular e2-cifra">{entero(conConsentimiento)}</span>
             </div>
-            <span className="kpi-sub">
-              {entero(anclaContactables800)}: Entregable 1, lista armada antes de unir
-              identidades · {entero(conConsentimiento)}: con consentimiento, identidad unida{' '}
-              <Id>(DC-04)</Id> · {entero(sinBaja)}: además sin baja pedida, {entero(conBaja)} menos{' '}
-              <Id>(DC-12).</Id> La lista sale del riesgo al {fechaCorta(infoMeta.corte_ref)}, en revisión.
-            </span>
-          </div>
-
-          <div style={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', gap: 'clamp(10px, 1.4vh, 18px)', minWidth: 0 }}>
-            {/* (24/09) Envíos a clientes que hoy figuran sin consentimiento (D18): el dato que
-                conecta la pregunta con el riesgo de seguir escribiendo mal. «Hoy» porque el
-                cruce es con acepta_marketing tal como está ahora, no al momento del envío. */}
-            <div className="tarjeta" style={{ flex: '1 1 0', justifyContent: 'center' }}>
-              <span className="kpi-lbl frase" style={{ color: 'var(--terra)', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-                <svg width="14" height="14" data-icono="true" aria-hidden="true"
-                     style={{ flexShrink: 0, marginTop: 2 }}>
-                  <Tramas />
-                  <rect width="14" height="14" fill="url(#trama-exc)" />
-                </svg>
-                <span>Envíos de campañas a clientes que hoy figuran sin consentimiento</span>
-              </span>
-              <div className="ban-par">
-                <div className="par-item">
-                  <span className="par-val tabular" style={{ fontSize: SECUNDARIA, color: 'var(--ink)' }}>
-                    {entero(sinConsEnvios.n)}{' '}
-                    <span className="par-unidad" style={{ fontSize: '.7em', color: 'var(--mut2)' }}>
-                      de {entero(envios.despues)} envíos · {pct(sinConsEnvios.pct)}
-                    </span>
-                  </span>
-                </div>
-              </div>
-              <span className="kpi-sub">
-                Campañas {aniosCampanias} a clientes que hoy no aceptan marketing; la lista de
-                contacto ya los deja afuera.
-              </span>
-            </div>
-
-            {/* (24/09) Las bajas en sus dos usos, sin flecha: la lista de contacto sigue
-                filtrando las 1.211 y el análisis de compras usa las 812 (DISENO.md regla 3). */}
-            <div className="tarjeta" style={{ flex: '1 1 0', justifyContent: 'center' }}>
-              <span className="kpi-lbl frase">Bajas: dos usos del mismo registro</span>
-              <ParDoble
-                sensibilidad={false}
-                lblRef="Filtro de contacto"
-                valRef={<span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(bajas.total)}</span>}
-                lblSens="Análisis de compras"
-                valSens={<span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(bajas.hasta_corte)}</span>}
-                style={{ flex: '0 0 auto', marginTop: 4 }}
-              />
-              <span className="kpi-sub">
-                Las {entero(bajasFueraCorte)} pedidas en {ANIO_BAJAS} sacan al cliente de la lista,
-                pero no entran al análisis de compras (no hay ventas de {ANIO_BAJAS}) · <Id>DC-12</Id>
-              </span>
+            <span className="par-flecha" aria-hidden="true">→</span>
+            <div className="par-item par-despues">
+              <span className="par-lbl">Sin bajas</span>
+              <span className="par-val tabular e2-cifra">{entero(sinBaja)}</span>
             </div>
           </div>
         </div>
+      </Banda>
 
-        <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)', flex: '1 1 0', minHeight: 0 }}>
-          {/* (24/09) DC-05 en una tarjeta compacta: el par de envíos y el embudo en una frase. */}
-          <div className="tarjeta" style={{ flex: '1.3 1 0', minWidth: 0 }}>
-            <span className="kpi-lbl"><span>Campañas: envíos repetidos</span><b>DC-05</b></span>
-            <div className="ban-par">
-              <div className="par-item par-antes">
-                <span className="par-lbl">Antes</span>
-                <span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(envios.antes)}</span>
-              </div>
-              <span className="par-flecha" aria-hidden="true">→</span>
-              <div className="par-item par-despues">
-                <span className="par-lbl">Después</span>
-                <span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(envios.despues)}</span>
-              </div>
+      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0, justifyContent: 'center' }}>
+        <span className="kpi-lbl frase">
+          A quién se le puede escribir · los {entero(TAM_LISTA)} clientes de mayor exposición
+        </span>
+        <div style={{ flex: '0 1 auto', height: medidasBarra(k).caja, minHeight: 110, display: 'flex', marginTop: 4 }}>
+          <Lienzo>
+            {({ w, h }) => <BarraContactables800 w={w} h={h} k={k} />}
+          </Lienzo>
+        </div>
+      </div>
+
+      <div className="v06-fila">
+        {/* (24/09) Envíos a clientes que hoy figuran sin consentimiento (D18): el dato que
+            conecta la pregunta con el riesgo de seguir escribiendo mal. «Hoy» porque el
+            cruce es con acepta_marketing tal como está ahora, no al momento del envío. */}
+        <div className="tarjeta">
+          <span className="kpi-lbl frase" style={{ color: 'var(--terra)', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+            <svg width="14" height="14" data-icono="true" aria-hidden="true"
+                 style={{ flexShrink: 0, marginTop: 2 }}>
+              <Tramas />
+              <rect width="14" height="14" fill="url(#trama-exc)" />
+            </svg>
+            <span>Envíos a clientes que hoy figuran sin consentimiento</span>
+          </span>
+          <div className="ban-par">
+            <div className="par-item">
+              <span className="par-val tabular" style={{ fontSize: SECUNDARIA, color: 'var(--ink)' }}>
+                {entero(sinConsEnvios.n)}{' '}
+                <span className="par-unidad" style={{ fontSize: '.7em', color: 'var(--mut2)' }}>
+                  de {entero(envios.despues)} · {pct(sinConsEnvios.pct)}
+                </span>
+              </span>
             </div>
-            <span className="kpi-sub">{FRASE_EMBUDO}</span>
           </div>
+          <span className="kpi-sub">
+            Campañas {aniosCampanias}; la lista de contacto ya los deja afuera.
+          </span>
+        </div>
 
-          <TarjetaDecision dc={dc05} style={{ flex: '1 1 0', minWidth: 0 }} />
-          <TarjetaDecision dc={dc12} style={{ flex: '1 1 0', minWidth: 0 }} />
+        {/* (24/09) Las bajas en sus dos usos, sin flecha: la lista de contacto sigue
+            filtrando las 1.211 y el análisis de compras usa las 812 (DISENO.md regla 3). */}
+        <div className="tarjeta">
+          <span className="kpi-lbl frase">Bajas: dos usos del mismo registro</span>
+          <ParDoble
+            sensibilidad={false}
+            lblRef="Filtro de contacto"
+            valRef={<span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(bajas.total)}</span>}
+            lblSens="Análisis de compras"
+            valSens={<span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(bajas.hasta_corte)}</span>}
+            style={{ flex: '0 0 auto', marginTop: 4 }}
+          />
+          <span className="kpi-sub">
+            Las {entero(bajasFueraCorte)} de {ANIO_BAJAS} solo sacan al cliente de la lista · <Id>DC-12</Id>
+          </span>
+        </div>
+
+        {/* (24/09) DC-05 en una tarjeta compacta: el par de envíos y el embudo en una frase. */}
+        <div className="tarjeta">
+          <span className="kpi-lbl"><span>Campañas: envíos repetidos</span><b>DC-05</b></span>
+          <div className="ban-par">
+            <div className="par-item par-antes">
+              <span className="par-lbl">Antes</span>
+              <span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(envios.antes)}</span>
+            </div>
+            <span className="par-flecha" aria-hidden="true">→</span>
+            <div className="par-item par-despues">
+              <span className="par-lbl">Después</span>
+              <span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(envios.despues)}</span>
+            </div>
+          </div>
+          <span className="kpi-sub">{FRASE_EMBUDO}</span>
         </div>
       </div>
 

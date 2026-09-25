@@ -23,7 +23,7 @@
 import { Lienzo, PuntosIC } from '../../../src/graficos.jsx'
 import { entero, fechaCorta, pct } from '../formato.js'
 import { D2 } from '../datos_e2.js'
-import TarjetaDecision from '../TarjetaDecision.jsx'
+import Banda from '../Banda.jsx'
 import ParDoble from '../ParDoble.jsx'
 
 // Título, pie y `meta` comparten las cifras, calculadas acá a nivel de módulo para que
@@ -112,40 +112,47 @@ export default function V07Campanias() {
       : (w >= 800 ? `${entero(o.despues.n)} envíos` : undefined),
   }))
 
+  // (25/09, regla del usuario) El par de envíos con oferta pasa a la banda de cifras y las dos
+  // decisiones (DC-13 y DC-06) van juntas a la derecha, solo en llano. Los dos casos de DC-13 y el
+  // pedido de V12 quedan en el title del par; el par Gold, en su propia tarjeta junto al gráfico.
+  const casos = V.casos.map((c) => { const l = lineaCaso(c); return `${l.id} ${l.texto}` }).join(' ') +
+    (PEDIDO_V12 ? ` Pendiente de Casa Óga (vista 12): ${PEDIDO_V12.que}.` : '')
   return (
     <section className="pant v07">
       <h1 className="titulo">{TITULO}</h1>
 
-      <div className="lienzo v07-cuerpo">
-        {/* Columna izquierda: el gráfico, con el antes/después de DC-13 como encabezado */}
-        <div className="tarjeta" style={{ flex: '1.6 1 0', minWidth: 0 }}>
+      <Banda dcs={[DC13, DC06]}>
+        <div className="tarjeta e2-central" title={casos}>
+          <span className="kpi-lbl"><span>Envíos con oferta</span></span>
+          {/* El mismo indicador (envíos con oferta) sobre la misma base: par con flecha. */}
+          <div className="ban-par">
+            <div className="par-item par-antes">
+              <span className="par-lbl">Sin {V.casos.map((c) => c.id_campania).join(' ni ')}</span>
+              <span className="par-val tabular e2-cifra">{entero(DC13.antes.valor)}</span>
+            </div>
+            <span className="par-flecha" aria-hidden="true">→</span>
+            <div className="par-item par-despues">
+              <span className="par-lbl">Duplicados resueltos</span>
+              <span className="par-val tabular e2-cifra">{entero(DC13.despues.valor)}</span>
+            </div>
+          </div>
+          <p className="e2-linea">{entero(V.envios_duplicados_por_join)} envíos más en la base de conversión.</p>
+        </div>
+      </Banda>
+
+      <div className="lienzo v07-cuerpo" style={{ gap: 'var(--e2-gap)' }}>
+        <div className="tarjeta" style={{ flex: '1 1 0', minWidth: 0 }}>
           {/* (24/09) El rótulo es una frase: va en sans (.frase); el id queda en mono. */}
           <span className="kpi-lbl frase">
             <span>Conversión a 7 días por oferta: el punto es la tasa y la línea, su rango probable al 95 %</span>
             <b style={ID_MONO}>DC-13</b>
           </span>
-
-          {/* El mismo indicador (envíos con oferta) sobre la misma base: par con flecha. */}
-          <div className="ban-par">
-            <div className="par-item par-antes">
-              <span className="par-lbl">Sin {V.casos.map((c) => c.id_campania).join(' ni ')}</span>
-              <span className="par-val tabular">{entero(DC13.antes.valor)}<span className="par-unidad"> envíos</span></span>
-            </div>
-            <span className="par-flecha" aria-hidden="true">→</span>
-            <div className="par-item par-despues">
-              <span className="par-lbl">Duplicados resueltos</span>
-              <span className="par-val tabular">{entero(DC13.despues.valor)}<span className="par-unidad"> envíos</span></span>
-            </div>
-          </div>
-
           {SE_PISAN && (
-            <p className="e2-nota">
-              Las ofertas convierten entre {pct(TASA_MIN, 2)} y {pct(TASA_MAX, 2)} y sus rangos se superponen:
-              con esta base ninguna se distingue
-              {DC14 ? <>; la tasa de éxito por acción se arma en el Entregable 3 ({DC14.id}).</> : '.'}
+            <p className="e2-nota" title={DC14 ? `La tasa de éxito por acción se arma en el Entregable 3 (${DC14.id}).` : undefined}>
+              Las ofertas convierten entre {pct(TASA_MIN, 2)} y {pct(TASA_MAX, 2)} y sus rangos se
+              superponen: ninguna se distingue.
             </p>
           )}
-
           <Lienzo>
             {({ w, h }) => (
               <PuntosIC
@@ -164,42 +171,19 @@ export default function V07Campanias() {
           </Lienzo>
         </div>
 
-        {/* Columna derecha (24/09): una tarjeta por decisión. DC-13 cuenta sus dos casos en
-            lugar de la regla general, que no eligió ninguno; DC-06 lleva el par Gold abajo. */}
-        <div style={{ flex: '1 1 0', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 8, minWidth: 0 }}>
-          <TarjetaDecision dc={DC13} sinJustificacion sinRegla style={{ flex: '0 0 auto' }}>
-            {V.casos.map((c) => {
-              const l = lineaCaso(c)
-              return (
-                <p key={c.id_campania} className="dec-just"><b>{l.id}</b> {l.texto}</p>
-              )
-            })}
-            {PEDIDO_V12 && (
-              <p className="dec-just"><b>Pendiente de Casa Óga (vista 12).</b> {cap(PEDIDO_V12.que)}.</p>
-            )}
-          </TarjetaDecision>
-
-          {/* Las dos tarjetas miden lo que su texto y la columna las reparte (space-between):
-              DC-13 arriba y DC-06 abajo, a ras del gráfico. Estirar la de DC-06 y bajar el par
-              con marginTop auto dejaba, desde 1440 px, un bloque blanco de hasta 400 px entre
-              la decisión y su evidencia. */}
-          <TarjetaDecision dc={DC06} style={{ flex: '0 0 auto' }}>
-            <div style={{ paddingTop: 10, display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span className="kpi-lbl frase" style={{ marginBottom: 0 }}>"Gold" en la campaña y en el programa</span>
-              <ParDoble
-                sensibilidad={false}
-                lblRef="Envíos al segmento Gold"
-                valRef={<span className="par-val tabular">{entero(V.gold.envios)}</span>}
-                lblSens="Socios Gold del programa"
-                valSens={<span className="par-val tabular">{entero(V.gold.socios)}</span>}
-                style={{ flex: '0 0 auto' }}
-              />
-              <p className="e2-nota">
-                Una cifra cuenta envíos y la otra, personas: la diferencia no dice cuántos clientes
-                están mal etiquetados.
-              </p>
-            </div>
-          </TarjetaDecision>
+        {/* El par Gold de DC-06: dos lecturas que no se restan (envíos contra personas), en tinta
+            y sin flecha (DISENO.md regla 3). */}
+        <div className="tarjeta" style={{ flex: '0 0 var(--e2-dec-w)', minWidth: 0, alignSelf: 'flex-start' }}>
+          <span className="kpi-lbl"><span>"Gold" en la campaña y en el programa</span><b style={ID_MONO}>DC-06</b></span>
+          <ParDoble
+            sensibilidad={false}
+            lblRef="Envíos al segmento Gold"
+            valRef={<span className="par-val tabular">{entero(V.gold.envios)}</span>}
+            lblSens="Socios Gold del programa"
+            valSens={<span className="par-val tabular">{entero(V.gold.socios)}</span>}
+            style={{ flex: '0 0 auto', marginTop: 8 }}
+          />
+          <p className="e2-nota">Una cifra cuenta envíos y la otra, personas.</p>
         </div>
       </div>
 

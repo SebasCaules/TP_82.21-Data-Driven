@@ -32,7 +32,7 @@ import { Lienzo, Plaqueta, Tramas } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { entero, pct, fechaCorta, mesCorto } from '../formato.js'
 import { useEscalaTexto } from '../escala.js'
-import TarjetaDecision from '../TarjetaDecision.jsx'
+import Banda from '../Banda.jsx'
 
 const V = D2.vistas.V02
 const V03 = D2.vistas.V03
@@ -309,7 +309,7 @@ export default function V02Ventana() {
     <section className="pant v02">
       <h1 className="titulo">{TITULO}</h1>
 
-      <div className="e2-kpis v02-kpis">
+      <Banda dcs={[DC08]}>
         <div className="tarjeta e2-central"
              title={`${entero(R_CORTE.en_riesgo)} de ${entero(R_CORTE.elegibles)} clientes elegibles; ` +
                `en revisión por ${DC09.id} (vista ${VISTA_COB})`}>
@@ -336,8 +336,7 @@ export default function V02Ventana() {
           <p className="e2-linea">{entero(MESES_SIN_VENTAS)} meses sin ventas cargadas.</p>
         </div>
 
-        <TarjetaDecision dc={DC08} sinJustificacion />
-      </div>
+      </Banda>
 
       <div className="tarjeta v02-mapa">
         <span className="kpi-lbl">

@@ -23,7 +23,8 @@ decisión**. Datos: solo `e2/src/datos_e2.js` (`D2`, contrato `pipeline/CONTRACT
    marcadas (V09, `BarraMini` con `tramaEn="parte"`) y la prueba aparte (V11). En V08 (las barras
    que bajan, como en el E1) y en V11 (ajuste y prueba) la trama es además forma para separar
    barras vecinas.
-3. **Un par de números grandes** (`.ban-par`) arriba a la izquierda cuando la decisión mueve
+3. (25/09: lo que esta regla dice del lugar y del contenido de la tarjeta de decisión queda
+   reemplazado por la regla 11.) **Un par de números grandes** (`.ban-par`) arriba a la izquierda cuando la decisión mueve
    una cifra; debajo, el gráfico en un `<Lienzo>` de `src/graficos.jsx`; a la derecha o al
    pie, la **decisión en una frase** y la **justificación en una frase**, tomadas de
    `D2.decisiones` (campos `decision`, `justificacion`), con el id `DC-nn` visible. Desde el 22/09 la
@@ -83,6 +84,21 @@ decisión**. Datos: solo `e2/src/datos_e2.js` (`D2`, contrato `pipeline/CONTRACT
     pregunta» y, a la derecha, el corte fijo y la cantidad de archivos; ya no repite la marca del
     riel. La pregunta es la columna Pregunta de la tabla de abajo, copiada en `PREGUNTA` de
     `e2/src/vistas/index.jsx`: si cambia una, cambia la otra. El encabezado no se imprime.
+
+11. **Banda de cifras y tarjeta de decisión (25/09, regla del usuario).** Toda vista con decisión
+    abre, debajo del título, con la banda de cifras (`e2/src/Banda.jsx`): a la izquierda, las
+    tarjetas de cifra de la vista (`.e2-kpis`: rótulo, cifra grande y a lo sumo una frase;
+    `.e2-central` para la cifra que manda, filete de 5 px y cifra en `--acc`; `.e2-si` para una
+    hipótesis o sensibilidad, la tarjeta entera punteada); a la derecha, la tarjeta de decisión,
+    siempre el mismo rectángulo en todas las vistas: ancho `--e2-dec-w` y alto `--e2-banda-h`
+    (`estilos_e2.css`). La tarjeta (`e2/src/TarjetaDecision.jsx`) dice solo qué se decidió: el
+    `llano` de cada decisión, con su id y su estado. Sin regla técnica ni justificación, ni en
+    pantalla ni en la hoja impresa (van en su `title`), y sin contenido propio de la vista. Con dos
+    decisiones (V06: DC-05 y DC-12; V07: DC-13 y DC-06) la misma tarjeta las lista, una línea por
+    decisión. Lo que no entra en la banda va al gráfico de abajo, a todo el ancho. El control
+    (`scripts/verificar_vista_e2.py` y la medición de la tarjeta en las cinco resoluciones) exige
+    el mismo rectángulo en V02 a V09. Donde una fila de la tabla de abajo ubique la tarjeta de
+    decisión o le sume texto («Por qué», «Qué vimos», casos, pares), manda esta regla.
 
 ## Las 12 vistas
 

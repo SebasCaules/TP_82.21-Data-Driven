@@ -23,9 +23,8 @@
 
 import { Lienzo, BarrasH } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
-import { entero, pct, montoM, fechaCorta } from '../formato.js'
-import TarjetaDecision from '../TarjetaDecision.jsx'
-import ValorMonto from '../ValorMonto.jsx'
+import { entero, pct, fechaCorta } from '../formato.js'
+import Banda from '../Banda.jsx'
 import { useEscalaTexto } from '../escala.js'
 
 const V = D2.vistas.V04
@@ -79,8 +78,7 @@ const TITULO = `Unir ${entero(V.duplicados_con_actividad)} números de cliente d
 
 // (24/09) Una sola constante para meta.pie y la pantalla, así no divergen.
 // Entra en dos renglones a 1152: la cobertura se dice como en la regla 4 de DISENO.md.
-const PIE = `riesgo y exposición en revisión por la cobertura de 2025 (${vista(DC09)}) · `
-  + `pesos del extracto, sin ajustar por inflación (DC-10, ${vista(DC10)}) · `
+const PIE = `riesgo en revisión por la cobertura de 2025 (${vista(DC09)}) · `
   + `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(V.antes.clientes)} números de cliente · `
   + `E10: ${entero(TOTAL_IDS)} números = ${entero(TOTAL_PERSONAS)} personas; de los `
   + `${entero(TOTAL_IDS - TOTAL_PERSONAS)} que sobran, ${entero(V.duplicados_con_actividad)} tenían `
@@ -93,28 +91,10 @@ export const meta = {
   pie: PIE,
 }
 
-/** Un par grande antes/después, para la fila de tres métricas de arriba. */
-// flex por tarjeta: la de montos necesita mas ancho porque .par-val no parte la cifra.
-function ParAntesDespues({ etiqueta, antes, despues, nota, flex = '1 1 0' }) {
-  return (
-    <div className="tarjeta" style={{ flex, minWidth: 0 }}>
-      <span className="kpi-lbl">{etiqueta}</span>
-      <div className="ban-par">
-        <div className="par-item par-antes">
-          <span className="par-lbl">Antes</span>
-          {typeof antes === 'string' ? <span className="par-val tabular">{antes}</span> : antes}
-        </div>
-        <span className="par-flecha" aria-hidden="true">→</span>
-        <div className="par-item par-despues">
-          <span className="par-lbl">Después</span>
-          {typeof despues === 'string' ? <span className="par-val tabular">{despues}</span> : despues}
-        </div>
-      </div>
-      {nota && <span className="kpi-sub" style={{ minHeight: 0 }}>{nota}</span>}
-    </div>
-  )
-}
-
+// (25/09, regla del usuario) La decisión va a la derecha de la banda de cifras, solo en llano
+// (sale el «Por qué» propio). En la banda entra un par: el riesgo, que es el título; la cuenta
+// de clientes pasa al encabezado del gráfico y la exposición queda para la vista 10, que la
+// muestra con su salvedad.
 export default function V04Duplicados() {
   // Tope de alto del gráfico: crece con la pantalla (k entero, hasta 1,4; ver abajo).
   const tope = Math.round((3 * 80 + 56) * useEscalaTexto())
@@ -127,52 +107,54 @@ export default function V04Duplicados() {
     <section className="pant v04">
       <h1 className="titulo">{TITULO}</h1>
 
-      <div style={{ display: 'flex', gap: 'clamp(12px, 1.8vw, 30px)' }}>
-        <ParAntesDespues etiqueta="Clientes" nota={NOTA_CLIENTES} flex="1 1 0"
-                          antes={entero(V.antes.clientes)} despues={entero(V.despues.clientes)} />
-        <ParAntesDespues etiqueta="Riesgo · en revisión" nota={NOTA_RIESGO} flex="0.9 1 0"
-                          antes={pct(V.antes.pct)} despues={pct(V.despues.pct)} />
-        <ParAntesDespues etiqueta="Exposición anual · en revisión" nota={NOTA_EXPOSICION}
-                          flex="1.1 1 0"
-                          antes={<ValorMonto texto={montoM(V.antes.exposicion_M)} />}
-                          despues={<ValorMonto texto={montoM(V.despues.exposicion_M)} />} />
-      </div>
-
-      <div className="lienzo">
-        <div className="tarjeta" style={{ flex: '3 1 0', minWidth: 0 }}>
-          <span className="kpi-lbl frase">Personas con más de un número de cliente</span>
-          <span className="kpi-sub">
-            {entero(TOTAL_IDS)} números de cliente son {entero(TOTAL_PERSONAS)} personas: {REPARTO}
-          </span>
-          {/* tope de alto: a 1920 las tres barras quedaban de 128 px cada una. (24/09) El tope
-              crece con la pantalla (k entero), para que el gráfico llene más la tarjeta
-              (barras de ~72 px a 1920, no de 128), y el gráfico va pegado a su subtítulo: el
-              blanco que sobra queda abajo y no separa las barras de su rótulo. */}
-          <div style={{ flex: '1 1 0', minHeight: 0, maxHeight: tope,
-                        marginTop: 'clamp(6px, 1.6vh, 20px)',
-                        display: 'flex', flexDirection: 'column' }}>
-            <Lienzo className="lienzo">
-              {({ w, h }) => (
-                <BarrasH
-                  datos={datosBarras} w={w} h={h}
-                  formato={entero}
-                  anchoEtiqueta={92}
-                  tituloEje="Personas"
-                />
-              )}
-            </Lienzo>
+      <Banda dcs={[DC04]}>
+        <div className="tarjeta e2-central" title={`${NOTA_RIESGO}. ${NOTA_EXPOSICION}.`}>
+          <span className="kpi-lbl"><span>Clientes en riesgo</span><b className="e2-tag">en revisión</b></span>
+          <div className="ban-par">
+            <div className="par-item par-antes">
+              <span className="par-lbl">Antes</span>
+              <span className="par-val tabular e2-cifra">{pct(V.antes.pct)}</span>
+            </div>
+            <span className="par-flecha" aria-hidden="true">→</span>
+            <div className="par-item par-despues">
+              <span className="par-lbl">Después</span>
+              <span className="par-val tabular e2-cifra">{pct(V.despues.pct)}</span>
+            </div>
           </div>
-        </div>
-
-        {/* (24/09) «Por qué» propio, sin cifras (NAR-V04-1): el del payload contradecía el
-            título. Puente hasta que D2 traiga justificacion_llano de DC-04. */}
-        <TarjetaDecision dc={DC04} sinJustificacion style={{ flex: '2 1 0', minWidth: 0 }}>
-          <p className="dec-just">
-            <b>Por qué.</b> Una persona con varios números de cliente se cuenta varias veces y
-            su ritmo de compra queda partido: puede parecer en riesgo sin estarlo, o esconder
-            que lo está.
+          <p className="e2-linea">
+            {`${entero(V.antes.en_riesgo)} de ${entero(V.antes.elegibles)} números → `}
+            {`${entero(V.despues.en_riesgo)} de ${entero(V.despues.elegibles)} personas`}
           </p>
-        </TarjetaDecision>
+        </div>
+      </Banda>
+
+      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
+        <span className="kpi-lbl frase">
+          <span>Personas con más de un número de cliente</span>
+          <b className="tabular" title={NOTA_CLIENTES}>
+            {entero(V.antes.clientes)} números → {entero(V.despues.clientes)} personas
+          </b>
+        </span>
+        <span className="kpi-sub">
+          {entero(TOTAL_IDS)} números de cliente son {entero(TOTAL_PERSONAS)} personas: {REPARTO}
+        </span>
+        {/* tope de alto: a 1920 las tres barras quedaban de 128 px cada una. (24/09) El tope
+            crece con la pantalla (k entero), para que el gráfico llene más la tarjeta, y el
+            gráfico va pegado a su subtítulo: el blanco que sobra queda abajo. */}
+        <div style={{ flex: '1 1 0', minHeight: 0, maxHeight: tope,
+                      marginTop: 'clamp(6px, 1.6vh, 20px)',
+                      display: 'flex', flexDirection: 'column' }}>
+          <Lienzo className="lienzo">
+            {({ w, h }) => (
+              <BarrasH
+                datos={datosBarras} w={w} h={h}
+                formato={entero}
+                anchoEtiqueta={92}
+                tituloEje="Personas"
+              />
+            )}
+          </Lienzo>
+        </div>
       </div>
 
       <p className="pie-vista">{PIE}</p>

@@ -40,7 +40,7 @@ import { Lienzo, Tramas } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { pct, pesos, decimal, fechaCorta, mesCorto, categoria } from '../formato.js'
 import { useEscalaTexto } from '../escala.js'
-import TarjetaDecision from '../TarjetaDecision.jsx'
+import Banda from '../Banda.jsx'
 import LineaIndice, { anchoTexto } from '../LineaIndice.jsx'
 
 const V = D2.vistas.V08
@@ -148,22 +148,46 @@ export default function V08Precios() {
     5 * Math.ceil(Math.max(0, ...pcts) / 5),
   ]
 
+  // (25/09, regla del usuario) Banda de cifras: las dos cifras del título (IPC y precio) y, a la
+  // derecha, DC-10 solo en llano. «Qué vimos» (la baja real que daría deflactar) queda en el title
+  // del precio. La línea y las barras van debajo, a todo el ancho.
+  const signo = V.variacion_pct < 0 ? '−' : '+'
+  const QUE_VIMOS = `Con un IPC de ${decimal(ipcUltimo, 1)}× el precio del extracto ${verboPrecio} ` +
+    `${pct(Math.abs(V.variacion_pct))}: la serie no sigue a la inflación. Ajustarla por IPC daría una ` +
+    `${variacionReal < 0 ? 'baja' : 'suba'} real de ${pct(Math.abs(variacionReal))}, una anomalía encima de otra.`
   return (
     <section className="pant v08">
       <h1 className="titulo">{TITULO}</h1>
 
-      {/* (24/09) La línea índice va sola y a todo el ancho: al lado, la tarjeta de la decisión
-          (que mide lo que su texto) dejaba vacía casi la mitad de la columna. 2,2 contra 1 de
-          las barras: a 1152×640 manda el piso de 180 px de las barras y la línea se queda con
-          el resto, que deja el precio (0,92× en un eje hasta 15×) a 15 px de la base; en
-          pantallas grandes el alto que sobra va a la línea y no a la fila de la tarjeta. */}
+      <Banda dcs={[DC10]}>
+        <div className="tarjeta" title="IPC acumulado al 1 de enero de cada año · INDEC">
+          <span className="kpi-lbl"><span>IPC acumulado</span></span>
+          <div className="ban-par">
+            <div className="par-item">
+              <span className="par-lbl">{eneDe(anioIpcIni)} → {eneDe(anioIpcFin)}</span>
+              <span className="par-val tabular e2-cifra">{decimal(ipcUltimo, 1)}×</span>
+            </div>
+          </div>
+          <p className="e2-linea">Nivel general de precios (INDEC).</p>
+        </div>
+        <div className="tarjeta e2-central" title={QUE_VIMOS}>
+          <span className="kpi-lbl"><span>Precio mediano del extracto</span></span>
+          <div className="ban-par">
+            <div className="par-item par-unico">
+              <span className="par-lbl">{anioPrecioIni} → {anioPrecioFin}</span>
+              <span className="par-val tabular e2-cifra">{signo}{pct(Math.abs(V.variacion_pct))}</span>
+            </div>
+          </div>
+          <p className="e2-linea"><Cifra>{pesos(m0)}</Cifra> → <Cifra>{pesos(mN)}</Cifra></p>
+        </div>
+      </Banda>
+
+      {/* (24/09) La línea índice va sola y a todo el ancho. 2,2 contra 1 de las barras: a
+          1152×640 manda el piso de alto de las barras y la línea se queda con el resto. */}
       <div className="lienzo" style={{ flex: '2.2 1 0' }}>
         <div className="tarjeta" style={{ minWidth: 0, paddingTop: 6, paddingBottom: 6 }}>
           <span className="kpi-lbl frase" style={{ flex: '0 0 auto' }}>
-            <span>
-              Veces el nivel de {anioPrecioIni} · precio mediano{' '}
-              <span style={{ whiteSpace: 'nowrap' }}>{pesos(m0)} → {pesos(mN)}</span>
-            </span>
+            <span>Veces el nivel de {anioPrecioIni}</span>
           </span>
           <Lienzo className="lienzo">
             {({ w, h }) => (
@@ -174,13 +198,10 @@ export default function V08Precios() {
         </div>
       </div>
 
-      {/* Barras y decisión en la misma fila (24/09): el divergente tiene ancho de sobra (3
-          contra 1) y la tarjeta, corta, mide casi lo mismo que la fila. Piso de alto: con
-          180 px cada una de las siete filas mide ~17 px a 1152×640 (con el título del eje
-          debajo, como en la primitiva del E1, eran 13 y las etiquetas se pisaban). El título
-          va en el renglón de las marcas: los 22 px que ahorra son aire para las filas. */}
-      <div className="lienzo" style={{ flex: '1 1 0', minHeight: 180 }}>
-        <div className="tarjeta" style={{ minWidth: 0, flex: '3 1 0', paddingTop: 6, paddingBottom: 6 }}>
+      {/* Las barras por categoría a todo el ancho (25/09: la decisión subió a la banda). Piso de
+          alto: con 170 px cada una de las siete filas mide ~16 px a 1152×640. */}
+      <div className="lienzo" style={{ flex: '1 1 0', minHeight: 170 }}>
+        <div className="tarjeta" style={{ minWidth: 0, paddingTop: 6, paddingBottom: 6 }}>
           <Lienzo className="lienzo">
             {({ w, h }) => (
               <Divergentes
@@ -193,15 +214,6 @@ export default function V08Precios() {
             )}
           </Lienzo>
         </div>
-
-        <TarjetaDecision dc={DC10} sinJustificacion style={{ minWidth: 0, flex: '1 1 0' }}>
-          <p className="dec-just">
-            <b>Qué vimos.</b> Con un IPC de {decimal(ipcUltimo, 1)}× el precio del extracto{' '}
-            {verboPrecio} <Cifra>{pct(Math.abs(V.variacion_pct))}</Cifra>: la serie no sigue a la
-            inflación. Ajustarla por IPC daría una {variacionReal < 0 ? 'baja' : 'suba'} real
-            de <Cifra>{pct(Math.abs(variacionReal))}</Cifra>, una anomalía encima de otra.
-          </p>
-        </TarjetaDecision>
       </div>
 
       <p className="pie-vista">{PIE}</p>

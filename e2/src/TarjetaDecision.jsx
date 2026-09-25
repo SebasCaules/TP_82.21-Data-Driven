@@ -1,32 +1,42 @@
 // Tarjeta de decisión única del tablero E2 (auditoría del 22/09, hallazgo D1-10: la misma
-// pieza se dibujaba de seis formas). En todas las vistas se lee igual: rótulo mono
-// «Decisión» con el id y el estado a la derecha; la decisión dicha en llano para el
-// directorio (D2.decisiones[].llano, escrita en pipeline/build_e2.py contra la tabla del
-// wiki); debajo la regla técnica tal como la tiene el wiki (decision) y, si hay, la
-// justificación. Ningún texto se escribe acá: todo sale del payload. La posición de la
-// tarjeta la decide el layout de cada vista. (24/09) En pantalla la regla técnica no se ve
-// (estilos_e2.css, @media screen): repetía el llano en jerga. La hoja impresa la conserva.
+// pieza se dibujaba de seis formas).
+//
+// (25/09, regla del usuario) La tarjeta dice solo qué se decidió: el llano de cada decisión
+// (D2.decisiones[].llano, escrito en pipeline/build_e2.py contra la tabla del wiki). Sin la
+// regla técnica ni la justificación, ni en pantalla ni en la hoja impresa: van en el title, para
+// quien presenta. Tampoco acepta contenido propio de la vista (children): lo que una vista quiera
+// mostrar además va en su banda de cifras o en su gráfico. Va siempre en el mismo lugar, arriba a
+// la derecha, dentro de la banda de cifras (Banda.jsx), con el mismo ancho y alto en todas las
+// vistas. Con dos decisiones (V06, V07) la misma tarjeta las lista, cada una con su id y estado.
 
 import { estadoVisible } from './estados.js'
 
 const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s)
+const llano = (d) => (d.llano ? d.llano : cap(d.decision))
 
-export default function TarjetaDecision({
-  dc, rotulo = 'Decisión', sinJustificacion = false, sinRegla = false, style, children,
-}) {
-  if (!dc) return null
+export default function TarjetaDecision({ dc, dcs, style }) {
+  const lista = (dcs ?? [dc]).filter(Boolean)
+  if (!lista.length) return null
+  // «a confirmar» si la decisión tiene un pedido abierto en V12, como en V01 (estados.js).
+  const title = lista.map((d) => `${d.id} · regla: ${cap(d.decision)}` +
+    (d.justificacion ? ` · por qué: ${cap(d.justificacion)}` : '')).join('\n')
+  if (lista.length === 1) {
+    const d = lista[0]
+    return (
+      <div className="tarjeta tarjeta-dec" style={style} title={title}>
+        <span className="kpi-lbl"><span>Decisión</span><b>{d.id} · {estadoVisible(d)}</b></span>
+        <p className="dec-llano">{llano(d)}</p>
+      </div>
+    )
+  }
   return (
-    <div className="tarjeta tarjeta-dec" style={style}>
-      {/* (24/09) «a confirmar» si la decisión tiene un pedido abierto en V12, como en V01 */}
-      <span className="kpi-lbl"><span>{rotulo}</span><b>{dc.id} · {estadoVisible(dc)}</b></span>
-      <p className="dec-llano">{dc.llano ? dc.llano : cap(dc.decision)}</p>
-      {dc.llano && !sinRegla && (
-        <p className="dec-regla"><b>Regla.</b> {cap(dc.decision)}</p>
-      )}
-      {dc.justificacion && !sinJustificacion && (
-        <p className="dec-just"><b>Por qué.</b> {cap(dc.justificacion)}</p>
-      )}
-      {children}
+    <div className="tarjeta tarjeta-dec varias" style={style} title={title}>
+      <span className="kpi-lbl"><span>Decisiones</span></span>
+      {lista.map((d) => (
+        <p key={d.id} className="dec-llano">
+          <b className="dec-id">{d.id} · {estadoVisible(d)}</b> {llano(d)}
+        </p>
+      ))}
     </div>
   )
 }

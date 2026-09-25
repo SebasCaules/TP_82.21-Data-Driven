@@ -24,7 +24,7 @@
 import { D2 } from '../datos_e2.js'
 import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
 import { entero, pct, mesCorto, fechaCorta } from '../formato.js'
-import TarjetaDecision from '../TarjetaDecision.jsx'
+import Banda from '../Banda.jsx'
 import { useEscalaTexto } from '../escala.js'
 
 const V05 = D2.vistas.V05
@@ -78,6 +78,12 @@ const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(unidadesDe
     ? `la línea por fecha de devolución incluye las ${entero(repetidas)} registradas dos veces · ` : '') +
   `${DC02.cifras.join(' · ')} · E05 (desfase) · fecha de devolución manda${CONSULTA ? ` (${CONSULTA})` : ''}`
 
+// Lo que la tarjeta de DC-02 decía además del llano (24/09), para el title del par.
+const NOTA_PAR = `${entero(V05.devoluciones.crudas)} filas en el archivo de Devoluciones, ` +
+  `${entero(V05.devoluciones.unicas)} devoluciones distintas (${entero(repetidas)} registradas dos veces). ` +
+  `La fecha de devolución cae una mediana de ${entero(V05.desfase_dias.mediana)} días después de la fila ` +
+  `negativa (entre ${entero(V05.desfase_dias.min)} y ${entero(V05.desfase_dias.max)} días).`
+
 export const meta = { id: 'V05', corto: 'Devoluciones', titulo: TITULO, pie: PIE }
 
 export default function V05_Devoluciones() {
@@ -86,42 +92,26 @@ export default function V05_Devoluciones() {
       <h1 className="titulo">{TITULO}</h1>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, minHeight: 0 }}>
-        {/* fila 1: el par grande (unidades antes/después) y la tarjeta de la decisión DC-02 */}
-        <div style={{ display: 'flex', gap: 'clamp(16px, 2vw, 30px)', alignItems: 'stretch', flexShrink: 0 }}>
-          <div className="tarjeta" style={{ flex: '0 0 auto', justifyContent: 'center' }}>
-            <span className="kpi-lbl frase">Unidades vendidas, contadas una sola vez</span>
+        {/* (25/09, regla del usuario) Banda de cifras: el par de unidades y, a la derecha, DC-02
+            solo en llano. Sale el «Por qué» propio; el conteo de filas del archivo y el desfase de
+            fechas quedan en el title del par. */}
+        <Banda dcs={[DC02]}>
+          <div className="tarjeta e2-central" title={NOTA_PAR}>
+            <span className="kpi-lbl"><span>Unidades vendidas</span></span>
             <div className="ban-par">
               <div className="par-item par-antes">
                 <span className="par-lbl">Antes (doble conteo)</span>
-                <span className="par-val tabular">{entero(unidadesAntes)}</span>
+                <span className="par-val tabular e2-cifra">{entero(unidadesAntes)}</span>
               </div>
               <span className="par-flecha" aria-hidden="true">→</span>
               <div className="par-item par-despues">
-                <span className="par-lbl">Después (DC-02)</span>
-                <span className="par-val tabular">{entero(unidadesDespues)}</span>
+                <span className="par-lbl">Después</span>
+                <span className="par-val tabular e2-cifra">{entero(unidadesDespues)}</span>
               </div>
             </div>
+            <p className="e2-linea">Cada unidad devuelta se cuenta una sola vez.</p>
           </div>
-
-          {/* (24/09) «Por qué» propio y sin la cifra, que ya está en el título (OMI-V05-2). */}
-          <TarjetaDecision dc={DC02} sinJustificacion style={{ flex: 1, minWidth: 0 }}>
-            <p className="dec-just">
-              <b>Por qué.</b> Las filas de devolución traen las unidades en positivo: sumarlas las
-              cuenta como vendidas. La fecha del evento es la de devolución{CONSULTA ? ` (${CONSULTA})` : ''}.
-            </p>
-            <p className="e2-nota">
-              <span className="tabular">{entero(V05.devoluciones.crudas)}</span> filas en el archivo de
-              Devoluciones, <span className="tabular">{entero(V05.devoluciones.unicas)}</span> devoluciones
-              distintas (<span className="tabular">{entero(repetidas)}</span> registradas dos veces)
-            </p>
-            <div className="kpi-base" style={{ marginTop: 'auto' }}>
-              La fecha de devolución cae una mediana de{' '}
-              <span className="tabular">{entero(V05.desfase_dias.mediana)}</span> días después de la fila negativa{' '}
-              (entre <span className="tabular">{entero(V05.desfase_dias.min)}</span> y{' '}
-              <span className="tabular">{entero(V05.desfase_dias.max)}</span> días)
-            </div>
-          </TarjetaDecision>
-        </div>
+        </Banda>
 
         {/* fila 2: la serie mensual con las dos formas de contar, a todo el ancho (24/09) */}
         <div className="tarjeta" style={{ flex: 1, minHeight: 0, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
