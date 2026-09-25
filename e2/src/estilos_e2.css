@@ -199,8 +199,9 @@
   --dec-fondo: #e3f1ec;
   --dec-borde: #b9ddd2;
   /* (25/09, pedido del usuario) Colores de los niveles del programa de fidelización, apagados para
-     ir con el papel y la tinta; los tres con 3:1 o más contra el blanco (objetos gráficos). */
-  --bronce: #a0652f;
+     ir con el papel y la tinta; los tres con 3:1 o más contra el blanco (objetos gráficos). El
+     bronce, #a0652f hasta el 25/09, se veía marrón: sube a la luminosidad de la plata y el oro. */
+  --bronce: #b97a45;
   --plata: #8b939d;
   --oro: #b08407;
   --e2-gap: clamp(10px, 1.4vw, 24px);
