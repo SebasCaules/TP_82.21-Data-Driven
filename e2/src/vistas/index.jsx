@@ -14,7 +14,7 @@ const modulos = import.meta.glob('./V*.jsx', { eager: true })
 // antes de leer el título. V07 cambia la suya: la vista no dice qué oferta convierte más
 // sino que resolver los duplicados no mueve ninguna tasa.
 const PREGUNTA = {
-  V01: '¿qué se decidió y con qué alcance?',
+  V01: '¿qué cambió y qué falta?',
   V02: '¿por qué un corte común?',
   V03: '¿qué meses no se pueden leer?',
   V04: '¿qué cambia al unir identidades?',
