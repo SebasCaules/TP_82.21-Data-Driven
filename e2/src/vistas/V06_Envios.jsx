@@ -208,10 +208,10 @@ function BarraContactables800({ w, h, k }) {
   )
 }
 
-// (25/09, regla del usuario) La cadena 568 → 567 → 549, que es lo que afirma el título, pasa a la
-// banda de cifras, y las dos decisiones de la vista (DC-05 y DC-12) van juntas a la derecha, en
-// la misma tarjeta y solo en llano. Debajo, la barra de los 800 a todo el ancho y una fila con
-// los envíos sin consentimiento, las bajas en sus dos usos y los envíos repetidos de DC-05.
+// (25/09, regla del usuario) La cadena 568 → 567 → 549 pasa a la banda de cifras, con DC-12 a la
+// derecha, solo en llano. (25/09, pedido del usuario: una decisión por tarjeta) DC-05, los envíos
+// repetidos, pasa a su propia pantalla, V06b, con los mismos datos. Debajo, la barra de los 800 a
+// todo el ancho y una fila con los envíos sin consentimiento y las bajas en sus dos usos.
 const NOTA_CADENA = `${entero(anclaContactables800)}: Entregable 1, lista armada antes de unir identidades · `
   + `${entero(conConsentimiento)}: con consentimiento, identidad unida (DC-04) · ${entero(sinBaja)}: además `
   + `sin baja pedida, ${entero(conBaja)} menos (DC-12). La lista sale del riesgo al `
@@ -221,7 +221,7 @@ export default function V06Envios() {
   const k = useEscalaTexto()
   return (
     <section className="pant v06">
-      <Banda dcs={[dc05, dc12]}>
+      <Banda dcs={[dc12]}>
         <div className="tarjeta e2-central" title={NOTA_CADENA}>
           <span className="kpi-lbl">
             <span>Contactables de la lista de {entero(TAM_LISTA)}</span><b className="e2-tag">en revisión</b>
@@ -256,7 +256,7 @@ export default function V06Envios() {
         </div>
       </div>
 
-      <div className="v06-fila">
+      <div className="v06-fila dos">
         {/* (24/09) Envíos a clientes que hoy figuran sin consentimiento (D18): el dato que
             conecta la pregunta con el riesgo de seguir escribiendo mal. «Hoy» porque el
             cruce es con acepta_marketing tal como está ahora, no al momento del envío. */}
@@ -295,21 +295,6 @@ export default function V06Envios() {
           />
         </div>
 
-        {/* (24/09) DC-05 en una tarjeta compacta: el par de envíos y el embudo en una frase. */}
-        <div className="tarjeta" title={FRASE_EMBUDO}>
-          <span className="kpi-lbl"><span>Campañas: envíos repetidos</span><b>DC-05</b></span>
-          <div className="ban-par">
-            <div className="par-item par-antes">
-              <span className="par-lbl">Antes</span>
-              <span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(envios.antes)}</span>
-            </div>
-            <span className="par-flecha" aria-hidden="true">→</span>
-            <div className="par-item par-despues">
-              <span className="par-lbl">Después</span>
-              <span className="par-val tabular" style={{ fontSize: SECUNDARIA }}>{entero(envios.despues)}</span>
-            </div>
-          </div>
-        </div>
       </div>
 
     </section>
@@ -318,7 +303,8 @@ export default function V06Envios() {
 
 export const meta = {
   id: 'V06',
-  corto: 'Envíos y bajas',
+  dc: 'DC-12',
+  corto: 'Bajas y contacto',
   titulo: TITULO,
   pie: 'C11, E02, D15, D18, D03 (bajas)',
 }

@@ -369,6 +369,7 @@ const PIE_TITLE = `base: ${entero(V.archivos.length)} archivos declarados por el
 
 export const meta = {
   id: 'V02',
+  dc: 'DC-08',
   corto: 'Fecha de corte',
   titulo: TITULO,
   pie: PIE,

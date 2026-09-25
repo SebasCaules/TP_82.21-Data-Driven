@@ -191,6 +191,13 @@
    alcanza para rótulo, cifra y una frase; ver Banda.jsx). La tarjeta de decisión lleva solo el
    llano; con dos decisiones, una línea por decisión con su id, un paso más chica. */
 :root {
+  /* (25/09, pedido del usuario: la tarjeta de decisión con otro color que el azul; eligió el verde
+     azulado suave entre tres variantes) Colores propios de la decisión, que no se usan para datos:
+     rótulo #0f5c52 sobre el fondo, 6,7:1; tinta sobre el fondo, 13:1. */
+  --dec: #127a68;
+  --dec-osc: #0f5c52;
+  --dec-fondo: #e3f1ec;
+  --dec-borde: #b9ddd2;
   --e2-gap: clamp(10px, 1.4vw, 24px);
   --e2-dec-w: clamp(280px, 27vw, 520px);
   --e2-banda-h: calc(3.3vw + 9.1vh + 48px);
@@ -204,12 +211,13 @@
 .e2-banda > .tarjeta-dec {
   min-width: 0; min-height: 0; overflow: hidden;
   padding: clamp(12px, 1.6vh, 20px) clamp(14px, 1.2vw, 22px);
-  border-top: 5px solid var(--acc);
+  background: var(--dec-fondo); border-color: var(--dec-borde); border-top: 5px solid var(--dec);
 }
-/* (25/09, pedido del usuario: que se noten las decisiones) Rótulo en --acc y la decisión en
-   negrita, un escalón más grande que el texto de las tarjetas de cifra: es la frase corta. */
-.e2-banda > .tarjeta-dec .kpi-lbl { color: var(--acc); font-size: var(--e2-rot); }
-.e2-banda > .tarjeta-dec .kpi-lbl b { color: var(--acc); }
+/* (25/09, pedido del usuario: que se noten las decisiones) Fondo verde agua, filete y rótulo en
+   verde azulado y la decisión en negrita, un escalón más grande que el texto de las tarjetas de
+   cifra: es la frase corta. */
+.e2-banda > .tarjeta-dec .kpi-lbl { color: var(--dec-osc); font-size: var(--e2-rot); }
+.e2-banda > .tarjeta-dec .kpi-lbl b { color: var(--dec-osc); }
 .e2-banda > .tarjeta-dec .dec-llano {
   margin-top: clamp(8px, 1.4vh, 16px); color: var(--ink);
   font: 700 clamp(15px, calc(0.3vw + 1.7vh + 2px), 26px)/1.25 var(--fuente); letter-spacing: -.01em;
@@ -220,7 +228,7 @@
 }
 .tarjeta-dec .dec-id {
   display: block; margin-bottom: 2px;
-  font: 600 var(--e2-rot)/1.2 var(--mono); color: var(--acc); letter-spacing: .06em;
+  font: 600 var(--e2-rot)/1.2 var(--mono); color: var(--dec-osc); letter-spacing: .06em;
   text-transform: uppercase; white-space: nowrap;
 }
 
@@ -230,23 +238,24 @@
 .v01r .kpi-lbl { color: var(--ink); font-size: var(--e2-rot); }
 
 .v01r-mapa { flex: 1; min-height: 0; }
+/* (25/09, pedido del usuario) Tres pilares, uno por grupo: arriba la cuenta y el nombre del
+   grupo, debajo sus fichas apiladas a todo el ancho del pilar. */
 .v01r-grupos {
   flex: 1; min-height: 0;
-  display: flex; flex-direction: column; justify-content: space-evenly;
-  gap: clamp(4px, 1vh, 14px); margin-top: clamp(4px, 0.8vh, 10px);
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--e2-gap); margin-top: clamp(8px, 1.4vh, 16px); align-items: start;
 }
 .v01r-grupo {
-  display: grid; grid-template-columns: clamp(190px, 17vw, 330px) minmax(0, 1fr);
-  column-gap: clamp(10px, 1.4vw, 24px); align-items: center;
-  padding-top: clamp(4px, 1vh, 12px); border-top: 1px solid var(--bd2);
+  display: flex; flex-direction: column; gap: clamp(8px, 1.3vh, 16px); min-width: 0;
+  padding-left: var(--e2-gap); border-left: 1px solid var(--bd2);
 }
-.v01r-grupo:first-child { border-top: 0; padding-top: 0; }
-.v01r-gcab { display: flex; align-items: baseline; gap: .4em; }
+.v01r-grupo:first-child { border-left: 0; padding-left: 0; }
+.v01r-gcab { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
 .v01r-n { font: 600 clamp(28px, calc(0.6vw + 3.4vh), 62px)/1 var(--fuente); letter-spacing: -.02em; color: var(--ink); }
 .v01r-gtxt { font: 600 clamp(13px, calc(0.2vw + 1.6vh + 1px), 23px)/1.2 var(--fuente); color: var(--ink); }
 /* (25/09) Grilla de tres columnas iguales en los tres grupos: las fichas miden lo mismo y
    quedan alineadas de un grupo al otro, en vez de cortar el renglón donde cae cada texto. */
-.v01r-fichas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 0.6vw, 12px); }
+.v01r-fichas { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(5px, 0.8vh, 10px); }
 .v01r-ficha {
   display: flex; align-items: center; width: 100%; min-width: 0;
   padding: .4em .8em; border: 1px solid var(--bd); border-radius: 3px;
@@ -273,6 +282,7 @@ button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset:
 /* V06 (25/09): debajo de la barra de los 800, una fila de tres tarjetas del mismo ancho. */
 .v06-fila { flex-shrink: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--e2-gap); }
 .v06-fila > .tarjeta { min-width: 0; }
+.v06-fila.dos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 /* V10 (25/09): la exposición bajo cada %, un escalón abajo, y la escala de las cuatro lecturas. */
 .v10-kpis { flex-shrink: 0; }

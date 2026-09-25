@@ -548,7 +548,9 @@ def _armar_v07(ca_limpia: pd.DataFrame, contenido_crudo: pd.DataFrame, contenido
     return {
         "casos": casos, "ofertas": ofertas,
         "envios_duplicados_por_join": envios_duplicados_por_join,
-        "gold": {"envios": envios_gold, "socios": socios_gold, "coincidencia_pct": coincidencia_pct},
+        # (25/09) por_nivel: socios del programa por nivel (D23), para la pantalla de DC-06 (V07b).
+        "gold": {"envios": envios_gold, "socios": socios_gold, "coincidencia_pct": coincidencia_pct,
+                 "por_nivel": {k: int(v) for k, v in fidelizacion["nivel"].value_counts().items()}},
     }
 
 

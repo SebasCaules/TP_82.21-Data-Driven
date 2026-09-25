@@ -87,6 +87,7 @@ const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: filas con monto y u
 
 export const meta = {
   id: 'V08',
+  dc: 'DC-10',
   corto: 'Precios',
   titulo: TITULO,
   pie: PIE,
@@ -144,8 +145,10 @@ export default function V08Precios() {
   const nSube = categorias.filter((c) => c.pct > 0).length
   // Dominio en múltiplos de 5 que cubre los datos por los dos lados (hoy −15 a 5).
   const pcts = categorias.map((c) => c.pct)
+  // (25/09) El lado negativo llega hasta el dato más bajo más un punto, para que la barra más
+  // larga quede pegada a su rótulo; las marcas siguen en múltiplos de 5.
   const dominio = [
-    -5 * Math.ceil(Math.abs(Math.min(0, ...pcts)) / 5),
+    Math.floor(Math.min(0, ...pcts)) - 1,
     5 * Math.ceil(Math.max(0, ...pcts) / 5),
   ]
 
@@ -251,14 +254,20 @@ function Divergentes({ datos, w, h, dominio, tituloEje, encabezadoNota, rotuloNe
     encabezadoNota ? anchoTexto(encabezadoNota, fEje) : 0,
     ...datos.map((d) => (d.nota ? anchoTexto(d.nota, fuente, 400) : 0)),
   )) + 14
-  const x0 = anchoEtiqueta + anchoValor
-  const ancho = Math.max(60, w - x0 - anchoValor - anchoNota)
+  // (25/09, pedido del usuario: centrar las barras) El dibujo mide como mucho el 62 % del ancho
+  // y se centra en la tarjeta: rótulos, barras y valores quedan juntos en el medio en vez de
+  // abrirse de borde a borde.
+  const anchoBarras = Math.max(60, Math.min(w - anchoEtiqueta - anchoValor * 2 - anchoNota, w * 0.62 - anchoEtiqueta - anchoValor * 2))
+  const bloque = anchoEtiqueta + anchoValor + anchoBarras + anchoValor + anchoNota
+  const dx = Math.max(0, (w - bloque) / 2)
+  const x0 = dx + anchoEtiqueta + anchoValor
+  const ancho = anchoBarras
   const xDe = (v) => x0 + ((v - dmin) / (dmax - dmin)) * ancho
   const xc = xDe(0)
   const yBase = padTop + disponible
   const pasoEje = dmax - dmin <= 30 ? 5 : 10
   const ticks = []
-  for (let t = dmin; t <= dmax + 1e-9; t += pasoEje) ticks.push(t)
+  for (let t = Math.ceil(dmin / pasoEje) * pasoEje; t <= dmax + 1e-9; t += pasoEje) ticks.push(t)
   const yCab = padTop / 2 - 2
 
   return (
@@ -289,7 +298,7 @@ function Divergentes({ datos, w, h, dominio, tituloEje, encabezadoNota, rotuloNe
           <g key={d.etiqueta}>
             <title>{`${d.etiqueta} · ${pct(d.valor)} · ${tituloEje}` +
               (d.detalle ? ` · mediana: ${d.detalle}` : '')}</title>
-            <text x={anchoEtiqueta - 9} y={y + alto / 2} fontSize={fuenteEtq} fill="var(--ink)"
+            <text x={dx + anchoEtiqueta - 9} y={y + alto / 2} fontSize={fuenteEtq} fill="var(--ink)"
                   textAnchor="end" dominantBaseline="central">{d.etiqueta}</text>
             {d.valor !== 0 && (
               <rect x={x1} y={y} width={Math.max(2, x2 - x1)} height={alto}
@@ -315,7 +324,7 @@ function Divergentes({ datos, w, h, dominio, tituloEje, encabezadoNota, rotuloNe
         </g>
       ))}
       {/* Título del eje en el renglón de las marcas, bajo la columna de categorías. */}
-      <text x={anchoEtiqueta - 9} y={yBase + 6} fontSize={fEje} fill="var(--mut)" textAnchor="end"
+      <text x={dx + anchoEtiqueta - 9} y={yBase + 6} fontSize={fEje} fill="var(--mut)" textAnchor="end"
             dominantBaseline="hanging">{tituloEje}</text>
       {/* El cero es el eje del gráfico: en tinta, de punta a punta y más grueso que el resto. */}
       <line x1={xc} x2={xc} y1={padTop - 4} y2={yBase + 5} stroke="var(--ink)" strokeWidth="2" />

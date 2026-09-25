@@ -39,8 +39,10 @@ const pedidos = vistas.V12?.pedidos ?? []
 
 // El riel numera por posición y las vistas van en orden de archivo, V01..V12 (vistas/
 // index.jsx): el número de la vista es el de su id. etiquetaVista da el «05» del riel.
-const numeroVista = (id) => Number(id.slice(1))
-const etiquetaVista = (id) => String(numeroVista(id)).padStart(2, '0')
+// (25/09) Con V06b y V07b el número sale del id y conserva la letra: «06b» en el riel, «6b» en
+// las frases.
+const numeroVista = (id) => id.slice(1).replace(/^0/, '')
+const etiquetaVista = (id) => id.slice(1)
 
 // «(consulta n)» es la pregunta del relevamiento: sirve a la cátedra, no a la sala.
 const sinConsulta = (s) => s.replace(/\s*\(consulta \d+\)/g, '')
@@ -136,11 +138,12 @@ const REGISTRO = [...new Set(decisiones.filter((d) => d.vista === 'V01').flatMap
 const PIE_TITLE = `decisiones ${decisiones[0].id} a ${decisiones[decisiones.length - 1].id} · ` +
   `registro: C03, D05, D22, E01, ${REGISTRO.join(', ')} · fuente: e2.json, pipeline/build_e2.py`
 
-export default function V01({ irA }) {
+export default function V01({ irA, irAVista, vistaDe = (d) => d.vista }) {
   // null: el resumen. Un id o '': el detalle, con esa fila marcada (o ninguna).
   const [detalle, setDetalle] = useState(null)
+  const nav = irA ? { irAVista, vistaDe } : null
   if (detalle !== null && irA) {
-    return <Detalle irA={irA} marcada={detalle} volver={() => setDetalle(null)} />
+    return <Detalle nav={nav} marcada={detalle} volver={() => setDetalle(null)} />
   }
   return (
     <section className="pant v01 v01r">
@@ -198,7 +201,7 @@ export default function V01({ irA }) {
                 <span className="v01r-gtxt">{g.texto}</span>
               </div>
               <div className="v01r-fichas">
-                {g.decs.map((d) => <Ficha key={d.id} d={d} irA={irA} abrir={() => setDetalle(d.id)} />)}
+                {g.decs.map((d) => <Ficha key={d.id} d={d} nav={nav} abrir={() => setDetalle(d.id)} />)}
               </div>
             </div>
           ))}
@@ -212,18 +215,19 @@ export default function V01({ irA }) {
 /** (25/09) Ficha de una decisión: solo el nombre corto. El id, el estado, la decisión en llano y
  *  el pedido abierto van en el title; lleva a la vista de la decisión o, sin vista propia, al
  *  detalle con su fila marcada. En la hoja impresa no llega irA y la ficha va como texto. */
-function Ficha({ d, irA, abrir }) {
+function Ficha({ d, nav, abrir }) {
   const est = estadoVisible(d)
-  const propia = d.vista && d.vista !== 'V01'
+  const vista = nav ? nav.vistaDe(d) : d.vista
+  const propia = vista && vista !== 'V01'
   const title = `${d.id} · ${est} — ${d.llano ?? cap(d.decision)}` +
     (PEDIDO[d.id] ? ` Pedido abierto: ${PEDIDO[d.id]}.` : '') +
-    (propia ? ` Vista ${etiquetaVista(d.vista)}.` : '')
-  if (!irA) return <span className="v01r-ficha" title={title}>{nombre(d)}</span>
-  const destino = propia ? `ir a la vista ${numeroVista(d.vista)}` : 'ver el detalle'
+    (propia ? ` Vista ${numeroVista(vista)}.` : '')
+  if (!nav) return <span className="v01r-ficha" title={title}>{nombre(d)}</span>
+  const destino = propia ? `ir a la vista ${numeroVista(vista)}` : 'ver el detalle'
   return (
     <button type="button" className="v01r-ficha" title={title}
             aria-label={`${d.id}, ${nombre(d)}, ${est}: ${destino}`}
-            onClick={() => (propia ? irA(numeroVista(d.vista) - 1) : abrir())}>
+            onClick={() => (propia ? nav.irAVista(vista) : abrir())}>
       {nombre(d)}
     </button>
   )
@@ -285,7 +289,7 @@ const ORDEN_ESTADOS = ['aplicada', 'declarada', 'a confirmar', 'pendiente del ne
 
 /** El detalle ocupa el cuerpo entero, con el mismo h1 (la regla del contrato: el h1 es
  *  `meta.titulo`). Arriba, la vuelta al resumen y la cuenta que antes era el título. */
-function Detalle({ irA, marcada, volver }) {
+function Detalle({ nav, marcada, volver }) {
   return (
     <section className="pant v01 v01q" style={{ gap: 'clamp(4px, 0.6vh, 10px)' }}>
       <p className="e2-nota" style={{ flexShrink: 0, margin: 0, fontSize: LETRA_TABLA, lineHeight: 1.25 }}>
@@ -308,7 +312,7 @@ function Detalle({ irA, marcada, volver }) {
           )
         })}
         {N_PEDIDOS === 1 ? 'El pedido abierto está en la ' : `Los ${N_PEDIDOS} pedidos abiertos están en la `}
-        <IrVista id="V12" irA={irA} prefijo="vista " />
+        <IrVista id="V12" nav={nav} prefijo="vista " />
         {PEDIDOS_EN_TABLA > 0 && PEDIDOS_EN_TABLA < N_PEDIDOS
           ? `; ${PEDIDOS_EN_TABLA} ${PEDIDOS_EN_TABLA === 1 ? 'es' : 'son'} de esta tabla.`
           : '.'}
@@ -361,7 +365,7 @@ function Detalle({ irA, marcada, volver }) {
                             title={PEDIDO[dec.id] ? `Pedido abierto: ${PEDIDO[dec.id]}` : undefined} />
                 </td>
                 <td className="tabular" style={{ ...celda, padding: '2px 0', textAlign: 'center' }}>
-                  <IrVista id={dec.vista} irA={irA} />
+                  <IrVista id={nav ? nav.vistaDe(dec) : dec.vista} nav={nav} />
                 </td>
               </tr>
             ))}
@@ -391,14 +395,14 @@ function Th({ children, align = 'left' }) {
 /** (24/09) Número de vista que lleva a esa vista (OMI-V01-3): el mismo «05» del riel, como
  *  botón con estilo de texto (.v01-ir). Las decisiones de esta misma vista dicen «acá» en
  *  gris. En la hoja impresa no llega irA y el número va como texto. */
-function IrVista({ id, irA, prefijo = '' }) {
+function IrVista({ id, nav, prefijo = '' }) {
   if (!id) return <span style={{ color: 'var(--mut)' }}>—</span>
   if (id === 'V01') return <span style={{ color: 'var(--mut2)' }}>acá</span>
   const etiqueta = `${prefijo}${prefijo ? numeroVista(id) : etiquetaVista(id)}`
-  if (!irA) return <span style={{ fontWeight: prefijo ? 400 : 600, color: prefijo ? 'inherit' : 'var(--acc)' }}>{etiqueta}</span>
+  if (!nav) return <span style={{ fontWeight: prefijo ? 400 : 600, color: prefijo ? 'inherit' : 'var(--acc)' }}>{etiqueta}</span>
   return (
-    <button type="button" className="v01-ir" onClick={() => irA(numeroVista(id) - 1)}
-            title={`Ir a la vista ${etiquetaVista(id)}`}>
+    <button type="button" className="v01-ir" onClick={() => nav.irAVista(id)}
+            title={`Ir a la vista ${numeroVista(id)}`}>
       {etiqueta}
     </button>
   )

@@ -24,7 +24,6 @@ import { Lienzo, PuntosIC } from '../../../src/graficos.jsx'
 import { entero, fechaCorta, pct } from '../formato.js'
 import { D2 } from '../datos_e2.js'
 import Banda from '../Banda.jsx'
-import ParDoble from '../ParDoble.jsx'
 
 // Título, pie y `meta` comparten las cifras, calculadas acá a nivel de módulo para que
 // ninguna copia las escriba a mano.
@@ -92,7 +91,8 @@ function lineaCaso(c) {
 
 export const meta = {
   id: 'V07',
-  corto: 'Campañas: ofertas y Gold',
+  dc: 'DC-13',
+  corto: 'Ofertas por campaña',
   titulo: TITULO,
   pie: PIE,
 }
@@ -113,14 +113,14 @@ export default function V07Campanias() {
       : (w >= 800 ? `${entero(o.despues.n)} envíos` : undefined),
   }))
 
-  // (25/09, regla del usuario) El par de envíos con oferta pasa a la banda de cifras y las dos
-  // decisiones (DC-13 y DC-06) van juntas a la derecha, solo en llano. Los dos casos de DC-13 y el
-  // pedido de V12 quedan en el title del par; el par Gold, en su propia tarjeta junto al gráfico.
+  // (25/09, regla del usuario) El par de envíos con oferta pasa a la banda de cifras, con DC-13 a
+  // la derecha, solo en llano; los dos casos de DC-13 y el pedido de V12 quedan en el title del par.
+  // (25/09, pedido del usuario: una decisión por tarjeta) DC-06, el nivel Gold, pasa a V07b.
   const casos = V.casos.map((c) => { const l = lineaCaso(c); return `${l.id} ${l.texto}` }).join(' ') +
     (PEDIDO_V12 ? ` Pendiente de Casa Óga (vista 12): ${PEDIDO_V12.que}.` : '')
   return (
     <section className="pant v07">
-      <Banda dcs={[DC13, DC06]}>
+      <Banda dcs={[DC13]}>
         <div className="tarjeta e2-central" title={casos}>
           <span className="kpi-lbl"><span>Envíos con oferta</span></span>
           {/* El mismo indicador (envíos con oferta) sobre la misma base: par con flecha. */}
@@ -167,19 +167,6 @@ export default function V07Campanias() {
           </Lienzo>
         </div>
 
-        {/* El par Gold de DC-06: dos lecturas que no se restan (envíos contra personas), en tinta
-            y sin flecha (DISENO.md regla 3). */}
-        <div className="tarjeta" style={{ flex: '0 0 var(--e2-dec-w)', minWidth: 0, alignSelf: 'flex-start' }}>
-          <span className="kpi-lbl"><span>"Gold" en la campaña y en el programa</span><b style={ID_MONO}>DC-06</b></span>
-          <ParDoble
-            sensibilidad={false}
-            lblRef="Envíos al segmento Gold"
-            valRef={<span className="par-val tabular">{entero(V.gold.envios)}</span>}
-            lblSens="Socios Gold del programa"
-            valSens={<span className="par-val tabular">{entero(V.gold.socios)}</span>}
-            style={{ flex: '0 0 auto', marginTop: 8 }}
-          />
-        </div>
       </div>
 
     </section>

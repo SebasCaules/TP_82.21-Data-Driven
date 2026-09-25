@@ -84,7 +84,7 @@ const NOTA_PAR = `${entero(V05.devoluciones.crudas)} filas en el archivo de Devo
   `La fecha de devolución cae una mediana de ${entero(V05.desfase_dias.mediana)} días después de la fila ` +
   `negativa (entre ${entero(V05.desfase_dias.min)} y ${entero(V05.desfase_dias.max)} días).`
 
-export const meta = { id: 'V05', corto: 'Devoluciones', titulo: TITULO, pie: PIE }
+export const meta = { id: 'V05', dc: 'DC-02', corto: 'Devoluciones', titulo: TITULO, pie: PIE }
 
 export default function V05_Devoluciones() {
   return (

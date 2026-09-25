@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { VISTAS } from './vistas/index.jsx'
+import { VISTAS, etiquetaDe, indiceDe, TOTAL_VISTAS } from './vistas/index.jsx'
 import { D2 } from './datos_e2.js'
 import { fechaCorta } from './formato.js'
 import MarcaInicio from '../../src/MarcaInicio.jsx'
@@ -20,6 +20,11 @@ export default function App() {
 
   const irA = useCallback((i) => {
     setIndice(Math.max(0, Math.min(VISTAS.length - 1, i)))
+  }, [])
+  // (25/09) Ir a una vista por su id («V12») o a la pantalla de una decisión («DC-05»).
+  const irAVista = useCallback((ref) => {
+    const i = indiceDe(ref)
+    if (i >= 0) setIndice(i)
   }, [])
 
   const imprimirTodo = useCallback(() => {
@@ -97,12 +102,12 @@ export default function App() {
       <Lateral indice={indice} irA={irA} />
 
       <div className="principal">
-        <p className="solo-lector" aria-live="polite">{`Vista ${indice + 1} de ${VISTAS.length}: ${vista.pregunta ?? vista.titulo}`}</p>
+        <p className="solo-lector" aria-live="polite">{`Vista ${etiquetaDe(vista)} de ${TOTAL_VISTAS}: ${vista.pregunta ?? vista.titulo}`}</p>
         <Encabezado indice={indice} vista={vista} />
 
         <main className="cuerpo">
           {/* irA: V01 lleva a cada vista desde su tabla (24/09). En la hoja impresa no va. */}
-          {imprimiendo ? <Impresion /> : <vista.Componente irA={irA} />}
+          {imprimiendo ? <Impresion /> : <vista.Componente irA={irA} irAVista={irAVista} vistaDe={vistaDe} />}
         </main>
       </div>
     </div>
@@ -116,13 +121,20 @@ function Encabezado({ indice, vista }) {
   return (
     <header className="e2-enc">
       <h1 className="e2-preg">{preguntaTitulo(vista.pregunta ?? vista.corto)}</h1>
-      <span className="e2-enc-corte">{`${indice + 1} / ${VISTAS.length} · corte ${fechaCorta(D2.meta.corte_ref)}`}</span>
+      <span className="e2-enc-corte">{`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS} · corte ${fechaCorta(D2.meta.corte_ref)}`}</span>
     </header>
   )
 }
 
 /** «¿qué cambió y qué falta?» → «¿Qué cambió y qué falta?» */
 const preguntaTitulo = (p) => (p ? p.replace(/^(¿?)(\p{L})/u, (_, a, b) => a + b.toUpperCase()) : p)
+
+/** (25/09) La pantalla que muestra una decisión: la que la declara en meta.dc; si ninguna, la
+ *  vista del payload (DC-01, DC-03, DC-07 y DC-14 viven en el detalle de V01; DC-15 en V12). */
+function vistaDe(dc) {
+  const v = VISTAS.find((x) => x.dc === dc.id)
+  return v ? v.id : dc.vista
+}
 
 /** El favicon 4b del mockup de direcciones, igual que en el E1 (src/App.jsx). */
 const Marca = () => (
@@ -148,7 +160,7 @@ function Lateral({ indice, irA }) {
             <button type="button" onClick={() => irA(i)}
                     className={`lat-item${i === indice ? ' on' : ''}`}
                     aria-current={i === indice ? 'page' : undefined}>
-              <span className="lat-n tabular">{String(i + 1).padStart(2, '0')}</span>
+              <span className="lat-n tabular">{etiquetaDe(v)}</span>
               <span className="lat-txt">{v.corto}</span>
             </button>
           </li>

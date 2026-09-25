@@ -20,7 +20,9 @@ const PREGUNTA = {
   V04: '¿qué cambia al unir identidades?',
   V05: '¿cómo se cuentan las devoluciones?',
   V06: '¿a quién se le puede escribir?',
+  V06b: '¿cambia el embudo sin los envíos repetidos?',
   V07: '¿cambian las tasas por oferta al resolver los duplicados?',
+  V07b: '¿qué es un cliente Gold?',
   V08: '¿por qué no se deflacta?',
   V09: '¿cuánto vale el NPS?',
   V10: '¿cambió la cifra del directorio?',
@@ -36,6 +38,9 @@ const todas = Object.entries(modulos)
     titulo: m.meta?.titulo ?? '',
     pie: m.meta?.pie,
     pregunta: PREGUNTA[m.meta?.id],
+    // (25/09) La decisión que muestra la vista (una sola por tarjeta): con esto V01 lleva cada
+    // decisión a su pantalla aunque V06 y V07 ahora tengan dos (V06b, V07b).
+    dc: m.meta?.dc,
     Componente: m.default,
   }))
   .filter((v) => typeof v.Componente === 'function')
@@ -43,3 +48,16 @@ const todas = Object.entries(modulos)
 const reales = todas.filter((v) => v.id !== 'V00')
 
 export const VISTAS = reales.length ? reales : todas
+
+// (25/09) El número de una vista sale de su id, no de su posición: «06b» es la segunda pantalla
+// de la vista 6. Así las referencias de los textos («vista 12», «vista 3») siguen valiendo con
+// las 14 pantallas.
+export const etiquetaDe = (v) => v.id.slice(1)
+export const TOTAL_VISTAS = new Set(VISTAS.map((v) => v.id.slice(1, 3))).size
+/** Índice de la pantalla de una vista («V12») o de la que muestra una decisión («DC-05»). */
+export function indiceDe(ref) {
+  const i = ref && ref.startsWith('DC-')
+    ? VISTAS.findIndex((v) => v.dc === ref)
+    : VISTAS.findIndex((v) => v.id === ref)
+  return i
+}

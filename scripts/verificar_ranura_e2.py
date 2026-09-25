@@ -3,7 +3,7 @@ que la tienen, en las cinco resoluciones del rango, y ninguna vista desborda.
 
     python3 scripts/verificar_ranura_e2.py [url]     # default http://localhost:5178/ (npm run dev:e2)
 
-Para cada resolución recorre las 12 vistas por el riel y mide `.e2-banda > .tarjeta-dec`; además
+Para cada resolución recorre las 12 vistas por el riel y mide `.e2-banda > .tarjeta-dec` en todas las pantallas del riel (14 desde el 25/09: V06b y V07b); además
 corre window.__fit(), mira el título en un renglón, el pie dentro de la ventana, que la tarjeta no
 desborde y que no haya texto de menos de 10 px. Termina con 'TODO OK' o 'HAY PROBLEMAS'.
 """
@@ -33,7 +33,8 @@ with sync_playwright() as pw:
         pg.on("pageerror", lambda e: errs.append(str(e)[:120]))
         pg.goto(URL); pg.wait_for_selector(".lat-item"); pg.wait_for_timeout(400)
         fila = {}
-        for n in range(1, 13):
+        total = pg.locator(".lat-item").count()
+        for n in range(1, total + 1):
             pg.locator(".lat-item").nth(n - 1).click(); pg.wait_for_timeout(350)
             fila[n] = pg.evaluate(JS)
         out[f"{w}x{h}"] = {"vistas": fila, "errores": errs}

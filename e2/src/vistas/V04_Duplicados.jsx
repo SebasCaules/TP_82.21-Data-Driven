@@ -86,6 +86,7 @@ const PIE = `riesgo en revisión por la cobertura de 2025 (${vista(DC09)}) · `
 
 export const meta = {
   id: 'V04',
+  dc: 'DC-04',
   corto: 'Duplicados de cliente',
   titulo: TITULO,
   pie: PIE,

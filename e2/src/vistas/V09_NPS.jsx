@@ -74,6 +74,7 @@ const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(V09.filas)
 
 export const meta = {
   id: 'V09',
+  dc: 'DC-11',
   corto: 'NPS y soporte',
   titulo: TITULO,
   pie: PIE,

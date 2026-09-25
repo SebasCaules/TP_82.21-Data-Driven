@@ -79,7 +79,7 @@ const PIE = `corte de referencia ${fechaCorta(D2.meta.corte_ref)} · serie de fi
   `(vista ${numeroVista(DC04.vista)}), corte ${fechaCorta(D2.meta.corte_sens)} · fila E01 ` +
   `(sensibilidad); D22 en revisión al corte de referencia (hereda C03 y C04) · ${DC09.hallazgo}`
 
-export const meta = { id: 'V03', corto: 'Cobertura 2025', titulo: TITULO, pie: PIE }
+export const meta = { id: 'V03', dc: 'DC-09', corto: 'Cobertura 2025', titulo: TITULO, pie: PIE }
 
 // El aro punteado de la sensibilidad, el mismo de ParDoble, V01, V02 y V10.
 function Aro() {
