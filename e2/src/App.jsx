@@ -54,8 +54,14 @@ export default function App() {
   useEffect(() => {
     const h = hashDe(indice)
     if (location.hash.toLowerCase() !== h) {
-      if (primera.current) history.replaceState(null, '', h)
-      else history.pushState(null, '', h)
+      // Si el navegador no deja tocar el historial (algunos, con el HTML abierto como archivo), el
+      // hash igual cambia y Atrás sigue funcionando.
+      try {
+        if (primera.current) history.replaceState(null, '', h)
+        else history.pushState(null, '', h)
+      } catch {
+        location.hash = h
+      }
     }
     primera.current = false
     document.title = `${preguntaTitulo(vista.pregunta ?? vista.corto)} · ${TITULO_BASE}`
