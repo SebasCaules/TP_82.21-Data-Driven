@@ -250,11 +250,13 @@
 
 .v01r-mapa { flex: 1; min-height: 0; }
 /* (25/09, pedido del usuario) Tres pilares, uno por grupo: arriba la cuenta y el nombre del
-   grupo, debajo sus fichas apiladas a todo el ancho del pilar. */
+   grupo, debajo sus fichas apiladas a todo el ancho del pilar. (26/09, pedido del usuario) Las
+   fichas, centradas en el eje vertical: los tres pilares miden lo que el más alto, cada pila se
+   centra en el suyo y el conjunto se centra en el alto libre de la tarjeta. */
 .v01r-grupos {
   flex: 1; min-height: 0;
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--e2-gap); margin-top: clamp(8px, 1.4vh, 16px); align-items: start;
+  gap: var(--e2-gap); margin-top: clamp(8px, 1.4vh, 16px); align-items: stretch; align-content: center;
 }
 .v01r-grupo {
   display: flex; flex-direction: column; gap: clamp(8px, 1.3vh, 16px); min-width: 0;
@@ -264,22 +266,27 @@
 .v01r-gcab { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
 .v01r-n { font: 600 clamp(28px, calc(0.6vw + 3.4vh), 62px)/1 var(--fuente); letter-spacing: -.02em; color: var(--ink); }
 .v01r-gtxt { font: 600 clamp(13px, calc(0.2vw + 1.6vh + 1px), 23px)/1.2 var(--fuente); color: var(--ink); }
-/* (25/09) Grilla de tres columnas iguales en los tres grupos: las fichas miden lo mismo y
-   quedan alineadas de un grupo al otro, en vez de cortar el renglón donde cae cada texto. */
-.v01r-fichas { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(5px, 0.8vh, 10px); }
+/* (25/09) Las fichas de un pilar miden lo mismo y quedan alineadas de un pilar al otro. (26/09,
+   pedido del usuario) Como burbujas: píldora con el texto al centro. */
+.v01r-fichas {
+  flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center;
+  gap: clamp(6px, 0.9vh, 11px);
+}
 .v01r-ficha {
-  display: flex; align-items: center; width: 100%; min-width: 0;
-  padding: .4em .8em; border: 1px solid var(--bd); border-radius: 3px;
-  background: var(--sup); color: var(--ink); text-align: left;
+  display: block; width: 100%; min-width: 0;
+  padding: .45em 1.2em; border: 1px solid var(--bd); border-radius: 999px;
+  background: var(--sup); color: var(--ink); text-align: center;
   font: 500 clamp(12.5px, calc(0.2vw + 1.6vh + 0.5px), 22px)/1.2 var(--fuente);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 button.v01r-ficha { cursor: pointer; }
-button.v01r-ficha:hover { border-color: var(--acc); }
+button.v01r-ficha:hover { border-color: var(--acc); background: #f3f5f9; }
 button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
-/* Las que afectan la cifra central, con el filete y el azul de su tarjeta; las que no cambian
-   ningún número, con borde punteado y la letra un paso más suave. */
-.g-central .v01r-ficha { border-left: 4px solid var(--acc); color: var(--acc); font-weight: 600; }
+/* Las que afectan la cifra central, con todo el borde y la letra en el azul de su tarjeta y un
+   fondo del mismo azul, muy claro (26/09: antes solo un filete a la izquierda); las que no
+   cambian ningún número, con borde punteado y la letra un paso más suave. */
+.g-central .v01r-ficha { border: 1.5px solid var(--acc); background: #eaeef4; color: var(--acc); font-weight: 600; }
+.g-central button.v01r-ficha:hover { background: #dce3ed; }
 .g-sin .v01r-ficha { border-style: dashed; border-color: var(--gris); color: var(--mut2); }
 
 /* V02 (25/09): las dos cifras y la decisión en la banda; el dibujo de ventanas a todo el ancho. */

@@ -31,11 +31,14 @@ export default function V07bGold() {
   const k = useEscalaTexto()
   // (25/09, pedido del usuario: acá no hay nada que resaltar) Cada barra con el color de su nivel,
   // en tonos de la paleta; la de Gold, con un ancho mínimo visible (son 3 socios de 4.043).
+  // (26/09, pedido del usuario) La fila de Gold, en negrita: enfasis pone su rótulo y su cifra en
+  // tinta y 600; la barra sigue en --oro porque color manda sobre enfasis.
   const COLOR = { Bronze: 'var(--bronce)', Silver: 'var(--plata)', Gold: 'var(--oro)' }
   const datos = NIVELES.map((n) => ({
     etiqueta: n,
     valor: G.por_nivel[n],
     color: COLOR[n],
+    enfasis: n === 'Gold',
     anchoMin: n === 'Gold' ? 4 : undefined,
     sufijo: n === 'Gold' ? 'socios' : undefined,
   }))

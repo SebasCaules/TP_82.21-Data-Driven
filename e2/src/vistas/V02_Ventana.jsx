@@ -19,6 +19,10 @@
 // de la vista 3. El eje llega hasta el mes siguiente a la fecha más tardía del lote, así que el
 // excedente de Clientes (altas con fecha inválida hasta el 01/10/2026) termina dentro del eje.
 //
+// (26/09, pedido del usuario) La franja sin ventas llega hasta el final de la barra roja (la
+// última fecha del lote, 01/10/2026) y lo dice en letra chica: «más de 9 meses sin ventas», del
+// 29/12/2025 al 01/10/2026. La tarjeta de arriba sigue en 8 meses: mide al 31/08/2026.
+//
 // No hay una primitiva de Gantt en graficos.jsx (regla del contrato: "rectángulos con
 // <title>"), así que el eje de tiempo y las barras se arman a mano en SVG dentro de un solo
 // <Lienzo>. Los archivos del análisis van en --despues (la base que usa el resto del
@@ -67,6 +71,13 @@ const deMesAbs = (n) => `${Math.floor((n - 1) / 12)}-${String(((n - 1) % 12) + 1
 
 // Meses sin ventas entre la última venta y la medición al 31/08/2026 (enero a agosto de 2026).
 const MESES_SIN_VENTAS = mesAbs(R_2026.corte) - mesAbs(ULTIMA_VENTA)
+/** (26/09) Lapso entre dos fechas en meses enteros, con «más de» si sobran días: del 29/12/2025
+ *  al 01/10/2026, «más de 9 meses» (9 meses y 2 días). */
+function lapso(desde, hasta) {
+  const dia = (iso) => +iso.slice(8, 10)
+  const m = mesAbs(hasta) - mesAbs(desde) - (dia(hasta) < dia(desde) ? 1 : 0)
+  return `${dia(hasta) === dia(desde) ? '' : 'más de '}${entero(m)} ${m === 1 ? 'mes' : 'meses'}`
+}
 
 // (25/09) Nombre de cada archivo en llano; el nombre real va en el title de su fila.
 const NOMBRE = {
@@ -158,9 +169,14 @@ function Gantt({ filas, corteRef, w, h, k }) {
   const xc = xDe(corteRef)
   const xl = xDe(R_2026.corte)
   const xv = xDe(ULTIMA_VENTA)
+  // (26/09) La franja llega hasta la última fecha del lote (el final de la barra roja), o hasta
+  // la medición tardía si ningún archivo del análisis pasa el corte.
+  const finIso = ultimo && ultimo.hasta > R_2026.corte ? ultimo.hasta : R_2026.corte
+  const xFin = xDe(finIso)
+  const txtLapso = `${lapso(ULTIMA_VENTA, finIso)} sin ventas`
 
-  // «8 meses sin ventas» va dentro de la franja, en el tramo de filas más largo que no la cruza
-  // (hoy de Fidelización a Tiendas: solo Clientes, Calendario y Bajas pasan la última venta).
+  // El lapso va dentro de la franja, en el tramo de filas más largo que no la cruza (hoy de
+  // Fidelización a Tiendas: solo Clientes, Calendario y Bajas pasan la última venta).
   const cruzan = filas.map((a, i) => (aDias(a.hasta) > aDias(ULTIMA_VENTA) + 3 ? i : -1)).filter((i) => i >= 0)
   const bordes = [-1, ...cruzan, filas.length]
   let hueco = [-1, filas.length]
@@ -169,7 +185,10 @@ function Gantt({ filas, corteRef, w, h, k }) {
     if (bordes[q] - bordes[q - 1] > mejor) { mejor = bordes[q] - bordes[q - 1]; hueco = [bordes[q - 1], bordes[q]] }
   }
   const yMeses = padTop + ((hueco[0] + 1 + hueco[1]) / 2) * paso
-  const fMeses = 22 * k
+  // Letra chica (26/09: antes «8 meses» en 22 px): un renglón si entra en la franja; si no, dos.
+  const fMeses = 13 * k
+  const [linea1, linea2] = txtLapso.length * fMeses * 0.56 <= xFin - xv - 16 * k
+    ? [txtLapso, null] : [txtLapso.replace(/ sin ventas$/, ''), 'sin ventas']
 
   return (
     <svg width={w} height={h} role="img"
@@ -178,17 +197,16 @@ function Gantt({ filas, corteRef, w, h, k }) {
          style={{ display: 'block' }}>
       <Tramas />
 
-      {/* Franja de los meses sin ventas: lo que infla el riesgo medido al 31/08/2026. Va
-          debajo de las barras, con la cuenta de meses adentro. */}
-      <rect x={xv} y={padTop} width={Math.max(0, xl - xv)} height={disponible}
+      {/* Franja de los meses sin ventas, desde la última venta hasta la última fecha del lote
+          (lo que infla el riesgo medido al 31/08/2026 y más). Va debajo de las barras, con el
+          lapso adentro en letra chica. */}
+      <rect x={xv} y={padTop} width={Math.max(0, xFin - xv)} height={disponible}
             fill="var(--terra)" opacity=".08">
-        <title>{`sin ventas cargadas: de ${fechaCorta(ULTIMA_VENTA)} a ${fechaCorta(R_2026.corte)}`}</title>
+        <title>{`sin ventas cargadas: de ${fechaCorta(ULTIMA_VENTA)} a ${fechaCorta(finIso)} (${txtLapso})`}</title>
       </rect>
-      <g textAnchor="middle" fill="var(--terra)">
-        <text x={(xv + xl) / 2} y={yMeses - 2 * k} fontSize={fMeses} fontWeight={700}>
-          {`${entero(MESES_SIN_VENTAS)} meses`}
-        </text>
-        <text x={(xv + xl) / 2} y={yMeses + fMeses * 0.75} fontSize={13 * k} fontWeight={600}>sin ventas</text>
+      <g textAnchor="middle" fill="var(--terra)" fontSize={fMeses} fontWeight={600}>
+        <text x={(xv + xFin) / 2} y={linea2 ? yMeses - fMeses * 0.2 : yMeses} dominantBaseline="central">{linea1}</text>
+        {linea2 && <text x={(xv + xFin) / 2} y={yMeses + fMeses * 1.05} dominantBaseline="central">{linea2}</text>}
       </g>
 
       {filas.map((a, i) => {
