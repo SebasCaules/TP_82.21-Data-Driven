@@ -19,9 +19,10 @@
 // de la vista 3. El eje llega hasta el mes siguiente a la fecha más tardía del lote, así que el
 // excedente de Clientes (altas con fecha inválida hasta el 01/10/2026) termina dentro del eje.
 //
-// (26/09, pedido del usuario) La franja sin ventas llega hasta el final de la barra roja (la
-// última fecha del lote, 01/10/2026) y lo dice en letra chica: «más de 9 meses sin ventas», del
-// 29/12/2025 al 01/10/2026. La tarjeta de arriba sigue en 8 meses: mide al 31/08/2026.
+// (26/09, pedido del usuario) El lapso va en letra chica dentro de la franja. La franja llegó un
+// rato hasta el final de la barra roja (01/10/2026, «más de 9 meses»), y el usuario la volvió a
+// cortar en la medición tardía: va del 29/12/2025 al 31/08/2026, «más de 8 meses sin ventas». La
+// tarjeta de arriba dice 8 meses: enero a agosto de 2026.
 //
 // No hay una primitiva de Gantt en graficos.jsx (regla del contrato: "rectángulos con
 // <title>"), así que el eje de tiempo y las barras se arman a mano en SVG dentro de un solo
@@ -74,7 +75,7 @@ const deMesAbs = (n) => `${Math.floor((n - 1) / 12)}-${String(((n - 1) % 12) + 1
 // Meses sin ventas entre la última venta y la medición al 31/08/2026 (enero a agosto de 2026).
 const MESES_SIN_VENTAS = mesAbs(R_2026.corte) - mesAbs(ULTIMA_VENTA)
 /** (26/09) Lapso entre dos fechas en meses enteros, con «más de» si sobran días: del 29/12/2025
- *  al 01/10/2026, «más de 9 meses» (9 meses y 2 días). */
+ *  al 31/08/2026, «más de 8 meses» (8 meses y 2 días). */
 function lapso(desde, hasta) {
   const dia = (iso) => +iso.slice(8, 10)
   const m = mesAbs(hasta) - mesAbs(desde) - (dia(hasta) < dia(desde) ? 1 : 0)
@@ -173,9 +174,10 @@ function Gantt({ filas, corteRef, w, h, k }) {
   const xc = xDe(corteRef)
   const xl = xDe(R_2026.corte)
   const xv = xDe(ULTIMA_VENTA)
-  // (26/09) La franja llega hasta la última fecha del lote (el final de la barra roja), o hasta
-  // la medición tardía si ningún archivo del análisis pasa el corte.
-  const finIso = ultimo && ultimo.hasta > R_2026.corte ? ultimo.hasta : R_2026.corte
+  // (26/09, pedido del usuario) La franja termina en la medición tardía (31/08/2026), no en la
+  // última fecha del lote: el excedente de Clientes hasta el 01/10/2026 queda fuera, marcado por
+  // su propia línea punteada.
+  const finIso = R_2026.corte
   const xFin = xDe(finIso)
   const txtLapso = `${lapso(ULTIMA_VENTA, finIso)} sin ventas`
 
@@ -201,9 +203,8 @@ function Gantt({ filas, corteRef, w, h, k }) {
          style={{ display: 'block' }}>
       <Tramas />
 
-      {/* Franja de los meses sin ventas, desde la última venta hasta la última fecha del lote
-          (lo que infla el riesgo medido al 31/08/2026 y más). Va debajo de las barras, con el
-          lapso adentro en letra chica. */}
+      {/* Franja de los meses sin ventas, desde la última venta hasta la medición al 31/08/2026:
+          lo que infla ese riesgo. Va debajo de las barras, con el lapso adentro en letra chica. */}
       <rect x={xv} y={padTop} width={Math.max(0, xFin - xv)} height={disponible}
             fill="var(--terra)" opacity=".08">
         <title>{`sin ventas cargadas: de ${fechaCorta(ULTIMA_VENTA)} a ${fechaCorta(finIso)} (${txtLapso})`}</title>
