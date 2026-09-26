@@ -4,16 +4,25 @@
 // (CORTE_REF, 2025-12-31) — así que no hay controles que apagar con leyenda (Nielsen H1):
 // directamente no existen.
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { VISTAS, etiquetaDe, indiceDe, TOTAL_VISTAS } from './vistas/index.jsx'
+import { VISTAS, etiquetaDe, indiceDe, grupoDe, TOTAL_VISTAS } from './vistas/index.jsx'
 import { D2 } from './datos_e2.js'
 import { fechaCorta } from './formato.js'
 import MarcaInicio from '../../src/MarcaInicio.jsx'
 import { ImpresionCtx } from './escala.js'
 
+/** (26/09, revisión UX H8) La vista va en la URL («#v07b»): se puede recargar o compartir una
+ *  vista, y Atrás y Adelante del navegador recorren las vistas en vez de salir del tablero. */
+const hashDe = (i) => `#${VISTAS[i].id.toLowerCase()}`
+function indiceDeHash() {
+  const i = VISTAS.findIndex((v) => `#${v.id.toLowerCase()}` === location.hash.toLowerCase())
+  return i >= 0 ? i : 0
+}
+const TITULO_BASE = 'Casa Óga · Calidad de datos'
+
 export default function App() {
-  const [indice, setIndice] = useState(0)
+  const [indice, setIndice] = useState(indiceDeHash)
   const [imprimiendo, setImprimiendo] = useState(false)
 
   const vista = VISTAS[indice]
@@ -37,6 +46,24 @@ export default function App() {
       window.print()
       setImprimiendo(false)
     }))
+  }, [])
+
+  // La URL y el título de la pestaña siguen a la vista. La primera vez reemplaza la entrada del
+  // historial (abrir el tablero no agrega un paso); después, cada cambio agrega uno.
+  const primera = useRef(true)
+  useEffect(() => {
+    const h = hashDe(indice)
+    if (location.hash.toLowerCase() !== h) {
+      if (primera.current) history.replaceState(null, '', h)
+      else history.pushState(null, '', h)
+    }
+    primera.current = false
+    document.title = `${preguntaTitulo(vista.pregunta ?? vista.corto)} · ${TITULO_BASE}`
+  }, [indice, vista])
+  useEffect(() => {
+    const alVolver = () => setIndice(indiceDeHash())
+    window.addEventListener('popstate', alVolver)
+    return () => window.removeEventListener('popstate', alVolver)
   }, [])
 
   // Si el foco ya está en el riel (Tab y después flechas), sigue a la vista activa: si no,
@@ -75,6 +102,10 @@ export default function App() {
       // queda ahí, y F e I tienen que seguir funcionando.
       const suelto = t === document.body || t === document.documentElement ||
         (t.classList && t.classList.contains('lat-item'))
+      // (26/09, revisión UX H9) Las flechas, Inicio y Fin cambian de vista solo con el foco libre o
+      // en el riel: con el foco en otro control (una ficha de V01, un botón), la vista no cambia
+      // debajo del foco. En V01 las flechas mueven el foco entre fichas (moverFoco).
+      if (!suelto && ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { irA(indice + 1); e.preventDefault() }
       else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { irA(indice - 1); e.preventDefault() }
       else if (e.key === 'Home') { irA(0); e.preventDefault() }
@@ -155,16 +186,22 @@ function Lateral({ indice, irA }) {
       </div>
 
       <ol className="lat-lista">
-        {VISTAS.map((v, i) => (
-          <li key={v.id}>
-            <button type="button" onClick={() => irA(i)}
-                    className={`lat-item${i === indice ? ' on' : ''}`}
-                    aria-current={i === indice ? 'page' : undefined}>
-              <span className="lat-n tabular">{etiquetaDe(v)}</span>
-              <span className="lat-txt">{v.corto}</span>
-            </button>
-          </li>
-        ))}
+        {VISTAS.map((v, i) => {
+          // (26/09, revisión UX H2) Rótulo de grupo al abrir cada grupo, como en el riel del E1.
+          const grupo = grupoDe(v)
+          const abre = grupo.nombre && (i === 0 || grupoDe(VISTAS[i - 1]) !== grupo)
+          return (
+            <li key={v.id}>
+              {abre && <div className="lat-grupo"><span>{grupo.nombre}</span></div>}
+              <button type="button" onClick={() => irA(i)}
+                      className={`lat-item${i === indice ? ' on' : ''}`}
+                      aria-current={i === indice ? 'page' : undefined}>
+                <span className="lat-n tabular">{etiquetaDe(v)}</span>
+                <span className="lat-txt">{v.corto}</span>
+              </button>
+            </li>
+          )
+        })}
       </ol>
 
       {/* (24/09) Tres renglones en vez de cuatro: los atajos son para quien presenta, no para

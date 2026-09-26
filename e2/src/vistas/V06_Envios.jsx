@@ -41,6 +41,7 @@ import { entero, pct, fechaCorta } from '../formato.js'
 import { useEscalaTexto } from '../escala.js'
 import ParDoble from '../ParDoble.jsx'
 import Banda from '../Banda.jsx'
+import EtiquetaIr from '../EtiquetaIr.jsx'
 
 // Todo lo que el h1 y `meta.titulo` necesitan se calcula acá afuera, a nivel de módulo: son
 // el mismo texto (regla dura del contrato de vistas) y D2 es estático, así que no hace falta
@@ -217,14 +218,14 @@ const NOTA_CADENA = `${entero(anclaContactables800)}: Entregable 1, lista armada
   + `sin baja pedida, ${entero(conBaja)} menos (DC-12). La lista sale del riesgo al `
   + `${fechaCorta(infoMeta.corte_ref)}, en revisión.`
 
-export default function V06Envios() {
+export default function V06Envios({ irAVista }) {
   const k = useEscalaTexto()
   return (
     <section className="pant v06">
       <Banda dcs={[dc12]}>
         <div className="tarjeta e2-central" title={NOTA_CADENA}>
           <span className="kpi-lbl">
-            <span>Contactables de la lista de {entero(TAM_LISTA)}</span><b className="e2-tag">en revisión</b>
+            <span>Contactables de la lista de {entero(TAM_LISTA)}</span><EtiquetaIr texto="en revisión" irAVista={irAVista} />
           </span>
           <div className="ban-par">
             <div className="par-item par-antes">

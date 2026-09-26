@@ -22,6 +22,8 @@ import { D2 } from '../datos_e2.js'
 import { entero, fechaCorta, mesCorto, pct } from '../formato.js'
 import { useEscalaTexto } from '../escala.js'
 import Banda from '../Banda.jsx'
+import EtiquetaIr from '../EtiquetaIr.jsx'
+import { TRAZO } from '../trazos.js'
 
 const V03 = D2.vistas.V03
 const DC09 = D2.decisiones.find((d) => d.id === 'DC-09')
@@ -105,7 +107,7 @@ export default function V03Cobertura() {
     <section className="pant v03">
       <Banda dcs={[DC09]}>
         <div className="tarjeta e2-central" title={`Clientes en riesgo ${ETQ_CREF}`}>
-          <span className="kpi-lbl"><span>Riesgo al {fechaCorta(D2.meta.corte_ref)}</span><b className="e2-tag">en revisión</b></span>
+          <span className="kpi-lbl"><span>Riesgo al {fechaCorta(D2.meta.corte_ref)}</span><EtiquetaIr texto="en revisión" aqui /></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <span className="par-lbl">Duplicados unidos</span>
@@ -119,7 +121,7 @@ export default function V03Cobertura() {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Riesgo al {fechaCorta(D2.meta.corte_sens)}</span>
-              <span className="par-val tabular e2-cifra">{pct(CSENS.pct)}</span>
+              <span className="par-val tabular e2-cifra sec">{pct(CSENS.pct)}</span>
             </div>
           </div>
           <p className="e2-linea">Si esos meses están incompletos.</p>
@@ -241,7 +243,7 @@ function GraficoOperaciones({ w, h, serie, k }) {
       {/* Año anterior en gris, último año en tinta. */}
       <polyline points={linea(conPrev, (p) => p.n_prev)} fill="none" stroke={GRIS} strokeWidth="1.5"
                 strokeLinejoin="round" strokeLinecap="round" />
-      <polyline points={linea(conN, (p) => p.n)} fill="none" stroke={INK} strokeWidth="2.25"
+      <polyline points={linea(conN, (p) => p.n)} fill="none" stroke={INK} strokeWidth={TRAZO.serie}
                 strokeLinejoin="round" strokeLinecap="round" />
 
       {/* Rótulos directos de serie, en enero: el año anterior arriba de su línea, el último

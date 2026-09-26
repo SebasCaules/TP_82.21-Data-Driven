@@ -32,6 +32,7 @@ import { useState } from 'react'
 import { fechaCorta, mesCorto, pct } from '../formato.js'
 import { D2 } from '../datos_e2.js'
 import { ESPERA, estadoVisible } from '../estados.js'
+import EtiquetaIr from '../EtiquetaIr.jsx'
 
 const { decisiones, vistas } = D2
 const V10 = vistas.V10
@@ -149,7 +150,7 @@ export default function V01({ irA, irAVista, vistaDe = (d) => d.vista }) {
     <section className="pant v01 v01r">
       <div className="e2-kpis v01r-kpis">
         <div className="tarjeta e2-central" title={T_CENTRAL}>
-          <span className="kpi-lbl"><span>Clientes en riesgo</span><b className="e2-tag">en revisión</b></span>
+          <span className="kpi-lbl"><span>Clientes en riesgo</span><EtiquetaIr texto="en revisión" irAVista={irAVista} /></span>
           <div className="ban-par">
             <div className="par-item par-antes">
               <span className="par-lbl">Entregable 1</span>
@@ -169,7 +170,7 @@ export default function V01({ irA, irAVista, vistaDe = (d) => d.vista }) {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Medido al {fechaCorta(V10.sens.corte)}</span>
-              <span className="par-val tabular e2-cifra">{pct(V10.sens.pct)}</span>
+              <span className="par-val tabular e2-cifra sec">{pct(V10.sens.pct)}</span>
             </div>
           </div>
         </div>
@@ -179,7 +180,7 @@ export default function V01({ irA, irAVista, vistaDe = (d) => d.vista }) {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Sin respuesta</span>
-              <span className="par-val tabular e2-cifra">{N_PEDIDOS}</span>
+              <span className="par-val tabular e2-cifra sec">{N_PEDIDOS}</span>
             </div>
           </div>
           {DECIDE && <p className="e2-linea">{DECIDE}</p>}
@@ -189,11 +190,18 @@ export default function V01({ irA, irAVista, vistaDe = (d) => d.vista }) {
       <div className="tarjeta v01r-mapa">
         <span className="kpi-lbl">
           <span>{`Las ${decisiones.length} decisiones`}</span>
+          {LEYENDA_ESPERA.length > 0 && (
+            <span className="v01r-leyenda" aria-hidden="true">
+              {LEYENDA_ESPERA.map((e, i) => (
+                <span key={e.texto}>{i > 0 && ' · '}<b>{e.simbolo}</b> {e.texto}</span>
+              ))}
+            </span>
+          )}
           {irA && (
             <button type="button" className="v01-ir" onClick={() => setDetalle('')}>Ver en detalle →</button>
           )}
         </span>
-        <div className="v01r-grupos">
+        <div className="v01r-grupos" onKeyDown={moverFoco}>
           {GRUPOS.map((g) => (
             <div key={g.clave} className={`v01r-grupo g-${g.clave}`}>
               <div className="v01r-gcab">
@@ -222,15 +230,29 @@ function Ficha({ d, nav, abrir }) {
   const title = `${d.id} · ${est} — ${d.llano ?? cap(d.decision)}` +
     (PEDIDO[d.id] ? ` Pedido abierto: ${PEDIDO[d.id]}.` : '') +
     (propia ? ` Vista ${numeroVista(vista)}.` : '')
-  if (!nav) return <span className="v01r-ficha" title={title}>{nombre(d)}</span>
+  // (26/09, revisión UX H4) Las que esperan a Casa Óga, con el símbolo de su estado al final.
+  const marca = ESPERAN.has(est) ? <span className="v01r-marca" aria-hidden="true">{ESTADO_PASTILLA[est].simbolo}</span> : null
+  if (!nav) return <span className="v01r-ficha" title={title}>{nombre(d)}{marca}</span>
   const destino = propia ? `ir a la vista ${numeroVista(vista)}` : 'ver el detalle'
   return (
     <button type="button" className="v01r-ficha" title={title}
             aria-label={`${d.id}, ${nombre(d)}, ${est}: ${destino}`}
             onClick={() => (propia ? nav.irAVista(vista) : abrir())}>
-      {nombre(d)}
+      {nombre(d)}{marca}
     </button>
   )
+}
+
+/** (26/09, revisión UX H9) Con el foco en una ficha, las flechas mueven el foco entre fichas (en
+ *  el orden de los pilares) en vez de cambiar de vista; Inicio y Fin van a la primera y la última. */
+function moverFoco(e) {
+  if (!e.target.classList?.contains('v01r-ficha')) return
+  const fichas = [...e.currentTarget.querySelectorAll('button.v01r-ficha')]
+  const i = fichas.indexOf(e.target)
+  const j = { ArrowDown: i + 1, ArrowRight: i + 1, ArrowUp: i - 1, ArrowLeft: i - 1, Home: 0, End: fichas.length - 1 }[e.key]
+  if (j === undefined) return
+  e.preventDefault()
+  fichas[Math.max(0, Math.min(fichas.length - 1, j))].focus()
 }
 
 // El aro punteado de la sensibilidad, el mismo de ParDoble y V10.
@@ -272,6 +294,12 @@ const ESTADO_PASTILLA = {
   },
 }
 
+// Estados que esperan una respuesta de Casa Óga, y la leyenda del rótulo con los que aparecen.
+const ESPERAN = new Set(['a confirmar', 'pendiente del negocio'])
+const LEYENDA_ESPERA = [...ESPERAN]
+  .filter((est) => decisiones.some((d) => estadoVisible(d) === est))
+  .map((est) => ({ simbolo: ESTADO_PASTILLA[est].simbolo, texto: ESTADO_PASTILLA[est].texto }))
+
 const celda = {
   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
   padding: '2px 10px 2px 0', verticalAlign: 'middle',
@@ -293,7 +321,7 @@ function Detalle({ nav, marcada, volver }) {
   return (
     <section className="pant v01 v01q" style={{ gap: 'clamp(4px, 0.6vh, 10px)' }}>
       <p className="e2-nota" style={{ flexShrink: 0, margin: 0, fontSize: LETRA_TABLA, lineHeight: 1.25 }}>
-        <button type="button" className="v01-ir" onClick={volver} style={{ marginRight: '0.8em' }}>
+        <button type="button" className="v01-ir" onClick={volver} style={{ marginRight: 'calc(0.8em - 8px)' }}>
           ← Volver al resumen
         </button>
         <b style={{ color: 'var(--ink)' }}>

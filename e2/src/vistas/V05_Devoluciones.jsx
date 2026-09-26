@@ -26,6 +26,7 @@ import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
 import { entero, pct, mesCorto, fechaCorta } from '../formato.js'
 import Banda from '../Banda.jsx'
 import { useEscalaTexto } from '../escala.js'
+import { TRAZO } from '../trazos.js'
 
 const V05 = D2.vistas.V05
 const DC02 = D2.decisiones.find((d) => d.id === 'DC-02')
@@ -142,7 +143,7 @@ function Leyenda() {
   const item = { display: 'inline-flex', alignItems: 'center', gap: '6px' }
   const muestra = (props) => (
     <svg width="18" height="4" style={{ flexShrink: 0 }} aria-hidden="true">
-      <line x1="0" x2="18" y1="2" y2="2" strokeWidth="2" {...props} />
+      <line x1="0" x2="18" y1="2" y2="2" strokeWidth={TRAZO.serie} {...props} />
     </svg>
   )
   return (
@@ -244,12 +245,12 @@ function LineaDoble({ serie, w, h, formato, flag = [], rotuloFlag }) {
       <line x1={padL} x2={xFin} y1={yBase} y2={yBase} stroke="var(--eje)" strokeWidth="1" />
 
       <polyline points={linea(ptsA)} fill="none" stroke="var(--antes)"
-                strokeWidth="2" strokeDasharray="5 3" strokeLinejoin="round" strokeLinecap="round" />
+                strokeWidth={TRAZO.serie} strokeDasharray="5 3" strokeLinejoin="round" strokeLinecap="round" />
       <polyline points={linea(ptsB.slice(0, iCorte + 1))} fill="none" stroke="var(--despues)"
-                strokeWidth="2.25" strokeLinejoin="round" strokeLinecap="round" />
+                strokeWidth={TRAZO.serie} strokeLinejoin="round" strokeLinecap="round" />
       {hayFlag && (
         <polyline points={linea(ptsB.slice(iCorte))} fill="none" stroke="var(--despues)"
-                  strokeWidth="2.25" strokeDasharray="2 3" strokeLinejoin="round" />
+                  strokeWidth={TRAZO.serie} strokeDasharray="2 3" strokeLinejoin="round" />
       )}
 
       {serie.map((p, i) => (

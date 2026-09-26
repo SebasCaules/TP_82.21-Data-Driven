@@ -6,14 +6,18 @@ const fmtEntero = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 })
 /** 50250 → "50.250" */
 export const entero = (x) => (x == null || Number.isNaN(x) ? '—' : fmtEntero.format(Math.round(x)))
 
-/** 49.6 → "49,6 %" */
-export const pct = (x, dec = 1) => (x == null || Number.isNaN(x) ? '—' : x.toFixed(dec).replace('.', ',') + ' %')
+// (26/09, revisión UX H11) El signo menos es el tipográfico (U+2212) en todo el E2: V08 mostraba
+// «−7,6 %» en la tarjeta y «-10,2 %» (guion) en las barras de la misma pantalla.
+const menos = (t) => t.replace(/^-/, '\u2212')
+
+/** 49.6 → "49,6 %"; -10.2 → "−10,2 %" */
+export const pct = (x, dec = 1) => (x == null || Number.isNaN(x) ? '—' : menos(x.toFixed(dec).replace('.', ',')) + ' %')
 
 /** 94.9 → "ARS 94,9 M" (x ya en millones) */
 export const montoM = (x, dec = 1) => (x == null || Number.isNaN(x) ? '—' : 'ARS ' + x.toFixed(dec).replace('.', ',') + ' M')
 
 /** 12345.6 → "12.345,6" */
-export const decimal = (x, dec = 1) => (x == null || Number.isNaN(x) ? '—' : x.toLocaleString('es-AR', { minimumFractionDigits: dec, maximumFractionDigits: dec }))
+export const decimal = (x, dec = 1) => (x == null || Number.isNaN(x) ? '—' : menos(x.toLocaleString('es-AR', { minimumFractionDigits: dec, maximumFractionDigits: dec })))
 
 /** 8900 → "ARS 8.900" */
 export const pesos = (x) => (x == null || Number.isNaN(x) ? '—' : 'ARS ' + fmtEntero.format(Math.round(x)))

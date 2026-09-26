@@ -181,9 +181,32 @@
 .e2-central .ban-par .par-despues .par-lbl,
 .e2-central .ban-par .par-despues .par-val.e2-cifra,
 .e2-central .ban-par .par-unico .par-val.e2-cifra { color: var(--acc); }
-.e2-kpis .kpi-lbl b.e2-tag {
-  color: var(--acc); border: 1px solid var(--acc); border-radius: 3px;
-  padding: 1px 6px; font-weight: 600; white-space: nowrap;
+.e2-kpis .kpi-lbl .e2-tag {
+  color: var(--acc); border: 1px solid var(--acc); border-radius: 3px; background: none;
+  padding: 1px 6px; font: inherit; font-weight: 600; text-transform: inherit; letter-spacing: inherit;
+  white-space: nowrap;
+}
+/* (26/09, revisión UX H10) La etiqueta que explica su estado en otra vista («en revisión»,
+   «incluye sep–dic») es un botón: el borde --acc de las fichas de V01, puntero, fondo al pasar y
+   un área de clic de 26 px de alto sin mover la tarjeta. Donde no lleva a ningún lado (la vista
+   3, que es la causa, y la hoja impresa) va sin borde, para no prometer un clic. */
+.e2-kpis .kpi-lbl button.e2-tag { position: relative; cursor: pointer; }
+.e2-kpis .kpi-lbl button.e2-tag::after { content: ''; position: absolute; inset: -6px -4px; }
+.e2-kpis .kpi-lbl button.e2-tag:hover { background: #eaeef4; }
+.e2-kpis .kpi-lbl button.e2-tag:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+.e2-kpis .kpi-lbl .e2-tag.inerte { border-color: transparent; padding-left: 0; padding-right: 0; }
+/* (26/09, revisión UX H1) El «antes» de una vista va en gris aunque su tarjeta no sea la central
+   (el 49,6 % del E1 en V10, igual que en V01 y V04). */
+.e2-kpis .ban-par .par-antes .par-val.e2-cifra { color: var(--mut); }
+/* (26/09, revisión UX H1) Cifra secundaria: la que no responde la pregunta de la vista (la
+   sensibilidad sin sep–dic, los pedidos, el IPC, el tamaño del dataset). Un escalón más chica
+   (70 %) y en gris, para que la central sea la única con el tamaño máximo. */
+.e2-kpis .tarjeta .par-val.e2-cifra.sec { font-size: clamp(24px, calc(0.77vw + 2.94vh), 70px); color: var(--mut2); }
+/* Marca de excepción junto al rótulo (la trama terracota de V02 y V06): el terracota va en la
+   marca, no en la cifra entera. */
+.e2-marca-exc {
+  display: inline-block; flex-shrink: 0; width: .9em; height: .9em; margin-right: 6px; vertical-align: -1px;
+  background-image: repeating-linear-gradient(45deg, var(--terra), var(--terra) 2px, var(--terra-osc) 2px, var(--terra-osc) 3.5px);
 }
 /* Banda de cifras (25/09, regla del usuario): en toda vista con decisión, la franja de arriba lleva
    las tarjetas de cifra de la vista a la izquierda y la tarjeta de decisión a la derecha, siempre
@@ -251,15 +274,17 @@
 .v01r-mapa { flex: 1; min-height: 0; }
 /* (25/09, pedido del usuario) Tres pilares, uno por grupo: arriba la cuenta y el nombre del
    grupo, debajo sus fichas apiladas a todo el ancho del pilar. (26/09, pedido del usuario) Las
-   fichas, centradas en el eje vertical: los tres pilares miden lo que el más alto, cada pila se
-   centra en el suyo y el conjunto se centra en el alto libre de la tarjeta. */
+   fichas, centradas en el eje vertical: los tres pilares miden lo que el más alto y el conjunto
+   se centra en el alto libre de la tarjeta. (26/09, revisión UX H3) Se centra el pilar entero,
+   cuenta y fichas juntas: centrando solo la pila, la primera ficha quedaba a 134 px de su cuenta
+   y a 39 px del pilar vecino. */
 .v01r-grupos {
   flex: 1; min-height: 0;
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--e2-gap); margin-top: clamp(8px, 1.4vh, 16px); align-items: stretch; align-content: center;
 }
 .v01r-grupo {
-  display: flex; flex-direction: column; gap: clamp(8px, 1.3vh, 16px); min-width: 0;
+  display: flex; flex-direction: column; justify-content: center; gap: clamp(8px, 1.3vh, 16px); min-width: 0;
   padding-left: var(--e2-gap); border-left: 1px solid var(--bd2);
 }
 .v01r-grupo:first-child { border-left: 0; padding-left: 0; }
@@ -267,10 +292,11 @@
 .v01r-n { font: 600 clamp(28px, calc(0.6vw + 3.4vh), 62px)/1 var(--fuente); letter-spacing: -.02em; color: var(--ink); }
 .v01r-gtxt { font: 600 clamp(13px, calc(0.2vw + 1.6vh + 1px), 23px)/1.2 var(--fuente); color: var(--ink); }
 /* (25/09) Las fichas de un pilar miden lo mismo y quedan alineadas de un pilar al otro. (26/09,
-   pedido del usuario) Como burbujas: píldora con el texto al centro. */
+   pedido del usuario) Como burbujas: píldora con el texto al centro. (26/09, revisión UX H7)
+   8 px como mínimo entre fichas (antes 6 a 6,9 px). */
 .v01r-fichas {
-  flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center;
-  gap: clamp(6px, 0.9vh, 11px);
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  gap: clamp(8px, 1vh, 12px);
 }
 .v01r-ficha {
   display: block; width: 100%; min-width: 0;
@@ -288,6 +314,12 @@ button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset:
 .g-central .v01r-ficha { border: 1.5px solid var(--acc); background: #eaeef4; color: var(--acc); font-weight: 600; }
 .g-central button.v01r-ficha:hover { background: #dce3ed; }
 .g-sin .v01r-ficha { border-style: dashed; border-color: var(--gris); color: var(--mut2); }
+/* (26/09, revisión UX H4) Las que esperan a Casa Óga llevan al final el símbolo de su estado, el
+   mismo de la tabla del detalle (◑ a confirmar, ○ pendiente), en terracota; la leyenda va en el
+   rótulo de la tarjeta. */
+.v01r-marca { margin-left: .45em; font-family: var(--mono); font-weight: 700; color: var(--terra); }
+.v01r-leyenda { margin-left: auto; margin-right: clamp(12px, 1.4vw, 24px); color: var(--mut2); font-weight: 500; white-space: nowrap; }
+.v01r-leyenda b { color: var(--terra); font-weight: 700; }
 
 /* V02 (25/09): las dos cifras y la decisión en la banda; el dibujo de ventanas a todo el ancho. */
 .v02-mapa { flex: 1; min-height: 0; }
@@ -353,13 +385,31 @@ button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset:
 .v01q td.txt { white-space: normal; overflow: visible; line-height: 1.2; padding-top: 2px; padding-bottom: 2px; font-size: inherit; }
 .v01q .clamp2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 /* Número de vista de la tabla: botón que lleva a la vista, con el mismo «05» del riel. */
-.v01-ir { border: 0; background: none; padding: 0; font: inherit; font-weight: 600; color: var(--acc); cursor: pointer; }
+/* (26/09, revisión UX H6) 6 px de relleno y el mismo margen negativo: el área de clic pasa de
+   13 a 25 px de alto sin mover nada. */
+.v01-ir { border: 0; background: none; padding: 6px 8px; margin: -6px -8px; font: inherit; font-weight: 600; color: var(--acc); cursor: pointer; }
 .v01-ir:hover { text-decoration: underline; }
 .v01-ir:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
 
 /* Fuera del rango 1152-1920: la vista crece y el cuerpo scrollea, en vez de aplastarse (D5-21). */
 @media screen and (max-width: 1151px), screen and (max-height: 560px) {
   .cuerpo > .pant { flex: 1 0 auto; min-height: 600px; }
+}
+/* (26/09, revisión UX H5) Por debajo de 768 px (un teléfono, o una laptop con el zoom al 200 %)
+   las grillas pasan a una columna: si no, las cifras se enciman y las fichas se cortan. El tablero
+   no se oculta: el aviso queda arriba y la vista se lee de arriba abajo (N0-20, A11Y-09). */
+@media screen and (max-width: 767px) {
+  .e2-banda, .e2-kpis, .v01r-kpis, .v01r-grupos, .v06-fila, .v06-fila.dos, .v11-cuerpo, .antes-despues {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .e2-banda > .e2-banda-cifras { grid-auto-flow: row; }
+  .e2-banda { height: auto; }
+  .v11-particiones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .v01r-grupo { border-left: 0; padding-left: 0; }
+  .v01r-mapa > .kpi-lbl { flex-wrap: wrap; row-gap: 6px; }
+  .e2-kpis .ban-par { flex-wrap: wrap; row-gap: 4px; }
+  .v01r-leyenda { order: 3; flex-basis: 100%; margin: 0; }
+  .cuerpo > .pant { min-height: 960px; }
 }
 
 /* Impresión: la hoja mide en pantalla el mismo ancho que imprime (297 mm menos 2 × 10 mm

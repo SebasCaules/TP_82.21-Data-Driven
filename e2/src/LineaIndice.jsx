@@ -21,6 +21,7 @@
 
 import { escalaNice } from '../../src/graficos.jsx'
 import { useEscalaTexto } from './escala.js'
+import { TRAZO } from './trazos.js'
 
 let _ctx = null
 let _fam = null
@@ -188,7 +189,7 @@ export default function LineaIndice({ series, anios, w, h, referencia, tituloX, 
 
       {trazos.map(({ s, pts }) => (
         <polyline key={'p' + s.id} points={pts.map((p) => p.join(',')).join(' ')} fill="none"
-                  stroke={s.tono} strokeWidth={s.grosor ?? 2}
+                  stroke={s.tono} strokeWidth={s.grosor ?? TRAZO.serie}
                   strokeDasharray={s.punteado ? '6 4' : undefined}
                   strokeLinejoin="round" strokeLinecap="round" />
       ))}
@@ -199,7 +200,7 @@ export default function LineaIndice({ series, anios, w, h, referencia, tituloX, 
           <circle cx={pts[i][0]} cy={pts[i][1]} r={9} fill="transparent" />
           <circle cx={pts[i][0]} cy={pts[i][1]} r={s.punteado ? 3.25 : 3.5}
                   fill={s.punteado ? 'var(--sup)' : s.tono} stroke={s.tono}
-                  strokeWidth={s.punteado ? 1.5 : 1} />
+                  strokeWidth={TRAZO.guia} />
         </g>
       )))}
 

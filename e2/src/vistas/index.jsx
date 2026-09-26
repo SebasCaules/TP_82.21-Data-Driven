@@ -53,6 +53,16 @@ export const VISTAS = reales.length ? reales : todas
 // de la vista 6. Así las referencias de los textos («vista 12», «vista 3») siguen valiendo con
 // las 14 pantallas.
 export const etiquetaDe = (v) => v.id.slice(1)
+// (26/09, revisión UX H2) Grupos del riel, con el nombre de los pilares de V01: las tres vistas que
+// mueven la cifra central (2 a 4), las otras decisiones (5 a 9) y el cierre (10 a 12). La vista 1
+// va sola y sin rótulo («Resumen» encima de «01 Resumen» lo diría dos veces).
+const GRUPOS = [
+  { nombre: null, hasta: 1 },
+  { nombre: 'Afectan la cifra', hasta: 4 },
+  { nombre: 'Otras decisiones', hasta: 9 },
+  { nombre: 'Cierre', hasta: 12 },
+]
+export const grupoDe = (v) => GRUPOS.find((g) => +v.id.slice(1, 3) <= g.hasta) ?? GRUPOS[GRUPOS.length - 1]
 export const TOTAL_VISTAS = new Set(VISTAS.map((v) => v.id.slice(1, 3))).size
 /** Índice de la pantalla de una vista («V12») o de la que muestra una decisión («DC-05»). */
 export function indiceDe(ref) {

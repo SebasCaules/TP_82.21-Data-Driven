@@ -37,6 +37,8 @@ import { D2 } from '../datos_e2.js'
 import { entero, pct, fechaCorta, mesCorto } from '../formato.js'
 import { useEscalaTexto } from '../escala.js'
 import Banda from '../Banda.jsx'
+import EtiquetaIr from '../EtiquetaIr.jsx'
+import { TRAZO } from '../trazos.js'
 
 const V = D2.vistas.V02
 const V03 = D2.vistas.V03
@@ -118,8 +120,10 @@ const EJE_TOTAL = EJE_HASTA - EJE_DESDE
 const TICKS = []
 for (let m = mesAbs(EJE_DESDE_ISO); m < mesAbs(EJE_HASTA_ISO); m += 6) TICKS.push(`${deMesAbs(m)}-01`)
 
-// "2022-01-01" -> "ene-2022": mesCorto abrevia el año a dos cifras, y el eje lo pide entero.
-const mesAnio = (iso) => `${mesCorto(iso.slice(0, 7)).split('-')[0]}-${iso.slice(0, 4)}`
+// "2022-01-01" -> "ene-22".
+// (26/09, revisión UX H11) El mismo formato de mes que los ejes de las otras vistas («ene-25»);
+// hasta el 26/09 este eje escribía el año entero.
+const mesAnio = (iso) => mesCorto(iso.slice(0, 7))
 
 // Desde cuándo vienen los archivos, para el title y el aria-label (en pantalla lo dice el
 // corte del eje, sin nota).
@@ -252,7 +256,7 @@ function Gantt({ filas, corteRef, w, h, k }) {
 
       <line x1={padLabel} x2={padLabel + anchoDisp} y1={yBase} y2={yBase} stroke="var(--eje)" strokeWidth="1" />
       {/* Corte del eje: las barras siguen hacia la izquierda (el title dice desde cuándo). */}
-      <g stroke="var(--eje)" strokeWidth="1.2">
+      <g stroke="var(--eje)" strokeWidth={TRAZO.eje}>
         <title>{NOTA_EJE}</title>
         <line x1={padLabel - 4 * k} x2={padLabel} y1={yBase + 4 * k} y2={yBase - 4 * k} />
         <line x1={padLabel} x2={padLabel + 4 * k} y1={yBase + 4 * k} y2={yBase - 4 * k} />
@@ -321,7 +325,7 @@ function Aro() {
   )
 }
 
-export default function V02Ventana() {
+export default function V02Ventana({ irAVista }) {
   const k = useEscalaTexto()
   return (
     <section className="pant v02">
@@ -329,7 +333,7 @@ export default function V02Ventana() {
         <div className="tarjeta e2-central"
              title={`${entero(R_CORTE.en_riesgo)} de ${entero(R_CORTE.elegibles)} clientes elegibles; ` +
                `en revisión por ${DC09.id} (vista ${VISTA_COB})`}>
-          <span className="kpi-lbl"><span>Corte común</span><b className="e2-tag">en revisión</b></span>
+          <span className="kpi-lbl"><span>Corte común</span><EtiquetaIr texto="en revisión" irAVista={irAVista} /></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <span className="par-lbl">Riesgo al {fechaCorta(CORTE_REF)}</span>
@@ -346,7 +350,7 @@ export default function V02Ventana() {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Riesgo al {fechaCorta(R_2026.corte)}</span>
-              <span className="par-val tabular e2-cifra">{pct(RIESGO_SI_2026)}</span>
+              <span className="par-val tabular e2-cifra sec">{pct(RIESGO_SI_2026)}</span>
             </div>
           </div>
           <p className="e2-linea">{entero(MESES_SIN_VENTAS)} meses sin ventas cargadas.</p>

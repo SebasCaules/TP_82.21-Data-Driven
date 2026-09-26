@@ -1,9 +1,11 @@
 // V07b · Nivel Gold — segunda pantalla de la vista 7 (25/09, pedido del usuario: una sola
 // decisión por tarjeta). DC-06: el segmento «Gold» con el que Marketing etiqueta sus campañas no es
 // el nivel del programa de fidelización. Las dos cifras de la banda son dos lecturas que no se
-// restan (envíos contra personas): van sin flecha, la de la campaña en terracota porque es la
-// etiqueta que confunde y la del programa en --acc. Debajo, los socios del programa por nivel
-// (D2.vistas.V07.gold.por_nivel, D23), cada barra con el color de su nivel.
+// restan (envíos contra personas): van sin flecha, la del programa en --acc (la respuesta) y la
+// de la campaña como cifra secundaria, con la marca terracota en su rótulo porque es la etiqueta
+// que confunde (26/09, revisión UX H1: antes la cifra entera iba en terracota y competía con la
+// del programa). Debajo, los socios del programa por nivel (D2.vistas.V07.gold.por_nivel, D23),
+// cada barra con el color de su nivel.
 
 import { Lienzo, BarrasH } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
@@ -46,11 +48,11 @@ export default function V07bGold() {
     <section className="pant v07b">
       <Banda dcs={[DC06]}>
         <div className="tarjeta" title="Envíos de campaña con segmento_objetivo = Gold (D17)">
-          <span className="kpi-lbl"><span>«Gold» en las campañas</span></span>
+          <span className="kpi-lbl"><span><span className="e2-marca-exc" aria-hidden="true" />«Gold» en las campañas</span></span>
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Envíos con esa etiqueta</span>
-              <span className="par-val tabular e2-cifra" style={{ color: 'var(--terra)' }}>{entero(G.envios)}</span>
+              <span className="par-val tabular e2-cifra sec">{entero(G.envios)}</span>
             </div>
           </div>
           <p className="e2-linea">La etiqueta de Marketing.</p>

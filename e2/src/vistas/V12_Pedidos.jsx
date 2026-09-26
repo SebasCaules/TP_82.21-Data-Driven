@@ -143,13 +143,15 @@ export default function V12Pedidos() {
               const clave = p === CLAVE
               return (
                 <tr key={p.id} style={{ borderBottom: '1px solid var(--bd2)' }}>
-                  <td className="tabular" style={{
+                  {/* (26/09, revisión UX H13) Un pedido que no es una decisión no muestra su código del
+                      registro («D18 (registro)»): va en el title. */}
+                  <td className="tabular" title={p.id.startsWith('DC-') ? undefined : `${p.id.replace(/\s*\(.*\)$/, '')}: dato del registro de cifras, no una decisión`} style={{
                     ...celda, ...primera, color: 'var(--mut2)', fontFamily: 'var(--mono)',
                     fontSize: 'clamp(11px, 0.8vw, 14px)',
                     // La barra marca la fila que decide la cifra central, sin mover la columna.
                     boxShadow: clave ? 'inset 3px 0 0 var(--acc)' : 'none',
                   }}>
-                    {p.id}
+                    {p.id.startsWith('DC-') ? p.id : '—'}
                   </td>
                   <td style={{ ...celda, color: 'var(--ink)', fontWeight: 600 }}>
                     {duro(p.que)}

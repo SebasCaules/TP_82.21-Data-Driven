@@ -31,6 +31,8 @@ import Banda from '../Banda.jsx'
 import { useEscalaTexto } from '../escala.js'
 import { D2 } from '../datos_e2.js'
 import { entero, pct, decimal, fechaCorta, mesCorto } from '../formato.js'
+import EtiquetaIr from '../EtiquetaIr.jsx'
+import { TRAZO } from '../trazos.js'
 
 const V09 = D2.vistas.V09
 const DC11 = D2.decisiones.find((d) => d.id === 'DC-11')
@@ -90,25 +92,25 @@ const NOTA_NPS = `Las ${entero(ULTIMO.n_sin_interaccion)} filas marcadas de ${UL
   (TRAMO_FLAG ? ` ${ULTIMO.anio} completo: incluye ${TRAMO_FLAG}, meses con cobertura no confirmada ` +
     `(${DC09.id}, vista ${numeroVista(DC09.vista)}).` : '')
 
-export default function V09_NPS() {
+export default function V09_NPS({ irAVista }) {
   const k = useEscalaTexto()
   return (
     <section className="pant v09">
       <Banda dcs={[DC11]}>
         <div className="tarjeta"
              title={`${entero(V09.sin_interaccion.n)} de ${entero(V09.filas)} filas cliente-mes, ${ANIOS}: se conservan marcadas`}>
-          <span className="kpi-lbl"><span>Filas sin reclamos ni consultas</span></span>
+          <span className="kpi-lbl"><span><span className="e2-marca-exc" aria-hidden="true" />Filas sin reclamos ni consultas</span></span>
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Con NPS, {ANIOS}</span>
-              <span className="par-val tabular e2-cifra" style={{ color: 'var(--terra)' }}>{pct(V09.sin_interaccion.pct)}</span>
+              <span className="par-val tabular e2-cifra sec">{pct(V09.sin_interaccion.pct)}</span>
             </div>
           </div>
         </div>
         <div className="tarjeta" title={NOTA_NPS}>
           <span className="kpi-lbl">
             <span>NPS medio {ULTIMO.anio}</span>
-            {TRAMO_FLAG && <b className="e2-tag">incluye {TRAMO_FLAG}</b>}
+            {TRAMO_FLAG && <EtiquetaIr texto={`incluye ${TRAMO_FLAG}`} irAVista={irAVista} />}
           </span>
           <div className="ban-par">
             <div className="par-item">
@@ -154,7 +156,7 @@ function LeyendaLinea({ k }) {
   const item = ({ color, nombre, trazo }) => (
     <span key={nombre} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, font: `500 ${11 * k}px/1.2 var(--fuente)`, color: trazo === 'solido' ? 'var(--ink)' : 'var(--mut2)' }}>
       <svg width="22" height="10" aria-hidden="true" data-icono="true" style={{ flexShrink: 0 }}>
-        <line x1="0" y1="5" x2="22" y2="5" stroke={color} strokeWidth="2"
+        <line x1="0" y1="5" x2="22" y2="5" stroke={color} strokeWidth={TRAZO.serie}
               strokeDasharray={trazo === 'punteado' ? '4 3' : undefined} />
         {trazo === 'punteado'
           ? <rect x="8" y="2" width="6" height="6" fill="var(--sup)" stroke={color} strokeWidth="1.5" />
@@ -222,7 +224,7 @@ function GraficoNPS({ serie, w, h, k = 1 }) {
         const arriba = campo === 'con_todo'
         return (
           <g key={campo}>
-            <polyline points={aPolyline(pts)} fill="none" stroke={color} strokeWidth={3 * k}
+            <polyline points={aPolyline(pts)} fill="none" stroke={color} strokeWidth={TRAZO.serie}
                       strokeLinejoin="round" strokeLinecap="round"
                       strokeDasharray={trazo === 'punteado' ? '5 3' : undefined} />
             {pts.map(([x, y], i) => (

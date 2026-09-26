@@ -25,6 +25,7 @@ import { Lienzo, BarrasH } from '../../../src/graficos.jsx'
 import { D2 } from '../datos_e2.js'
 import { entero, pct, fechaCorta } from '../formato.js'
 import Banda from '../Banda.jsx'
+import EtiquetaIr from '../EtiquetaIr.jsx'
 import { useEscalaTexto } from '../escala.js'
 
 const V = D2.vistas.V04
@@ -96,7 +97,7 @@ export const meta = {
 // (sale el «Por qué» propio). En la banda entra un par: el riesgo, que es el título; la cuenta
 // de clientes pasa al encabezado del gráfico y la exposición queda para la vista 10, que la
 // muestra con su salvedad.
-export default function V04Duplicados() {
+export default function V04Duplicados({ irAVista }) {
   // Tope de alto del gráfico: crece con la pantalla (k entero, hasta 1,4; ver abajo).
   const k = useEscalaTexto()
   const tope = Math.round((3 * 80 + 56) * k)
@@ -114,7 +115,7 @@ export default function V04Duplicados() {
     <section className="pant v04">
       <Banda dcs={[DC04]}>
         <div className="tarjeta e2-central" title={`${NOTA_RIESGO}. ${NOTA_EXPOSICION}.`}>
-          <span className="kpi-lbl"><span>Clientes en riesgo</span><b className="e2-tag">en revisión</b></span>
+          <span className="kpi-lbl"><span>Clientes en riesgo</span><EtiquetaIr texto="en revisión" irAVista={irAVista} /></span>
           <div className="ban-par">
             <div className="par-item par-antes">
               <span className="par-lbl">Antes</span>

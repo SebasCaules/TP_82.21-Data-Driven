@@ -32,6 +32,8 @@ import { D2 } from '../datos_e2.js'
 import { Lienzo } from '../../../src/graficos.jsx'
 import { useEscalaTexto } from '../escala.js'
 import ValorMonto from '../ValorMonto.jsx'
+import EtiquetaIr from '../EtiquetaIr.jsx'
+import { TRAZO } from '../trazos.js'
 import { entero, pct, montoM, decimal, fechaCorta, mesCorto, partesMonto } from '../formato.js'
 
 const V = D2.vistas.V10
@@ -149,7 +151,7 @@ function Exposicion({ M }) {
   )
 }
 
-export default function V10CifraCentral() {
+export default function V10CifraCentral({ irAVista }) {
   return (
     <section className="pant v10">
       <div className="e2-kpis v10-kpis">
@@ -164,7 +166,7 @@ export default function V10CifraCentral() {
           <Exposicion M={V.e1.exposicion_M} />
         </div>
         <div className="tarjeta e2-central" title={TIT_DESP}>
-          <span className="kpi-lbl"><span>Datos corregidos</span><b className="e2-tag">en revisión</b></span>
+          <span className="kpi-lbl"><span>Datos corregidos</span><EtiquetaIr texto="en revisión" irAVista={irAVista} /></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <span className="par-lbl">
@@ -180,7 +182,7 @@ export default function V10CifraCentral() {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">{pp(DIF_SENS.pp)} si faltan ventas</span>
-              <span className="par-val tabular e2-cifra">{pct(V.sens.pct)}</span>
+              <span className="par-val tabular e2-cifra sec">{pct(V.sens.pct)}</span>
             </div>
           </div>
           <Exposicion M={V.sens.exposicion_M} />
@@ -225,7 +227,7 @@ function Escala({ w, h }) {
   return (
     <svg width={w} height={h} role="img" style={{ display: 'block' }}
          aria-label={'Clientes en riesgo según cómo se mida: ' + puntos.map((p) => `${p.etq} ${pct(p.v)}`).join(', ')}>
-      <line x1={x0} x2={x1} y1={yLinea} y2={yLinea} stroke="var(--eje)" strokeWidth={2} />
+      <line x1={x0} x2={x1} y1={yLinea} y2={yLinea} stroke="var(--eje)" strokeWidth={TRAZO.guia} />
       {ticks.map((t) => (
         <g key={t}>
           <line x1={X(t)} x2={X(t)} y1={yLinea - 5} y2={yLinea + 5} stroke="var(--eje)" strokeWidth={1} />
@@ -236,23 +238,26 @@ function Escala({ w, h }) {
       ))}
       {/* El tramo entre la sensibilidad y los datos corregidos: lo que la duda puede mover. */}
       <line x1={X(V.sens.pct)} x2={X(V.despues.pct)} y1={yLinea} y2={yLinea}
-            stroke="var(--ink)" strokeWidth={2} strokeDasharray="4 4" />
+            stroke="var(--ink)" strokeWidth={TRAZO.serie} strokeDasharray="4 4" />
       {puntos.map((p) => {
         const x = X(p.v)
         const dy = p.arriba ? -1 : 1
         const xt = p.ancla === 'start' ? x - r : p.ancla === 'end' ? x + r : x
-        const yVal = yLinea + dy * (r + 18 * k + (p.arriba ? 0 : fVal * 0.8))
+        // (26/09, revisión UX H1) Solo los datos corregidos con el tamaño grande y en --acc; las otras
+        // tres lecturas, un escalón más chicas y en gris, como las cifras secundarias de arriba.
+        const fv = p.fuerte ? fVal : Math.round(fVal * 0.72)
+        const yVal = yLinea + dy * (r + 18 * k + (p.arriba ? 0 : fv * 0.8))
         const yEtq = yVal + dy * (p.arriba ? fVal * 0.95 : fEtq * 1.4) * (p.arriba ? 1 : 1)
         return (
           <g key={p.etq}>
             <title>{`${p.etq}: ${pct(p.v)}`}</title>
             <line x1={x} x2={x} y1={yLinea} y2={yLinea + dy * (r + 6 * k)} stroke={p.tono} strokeWidth={1.5} />
-            {p.forma === 'lleno' && <circle cx={x} cy={yLinea} r={r} fill={p.tono} stroke="var(--sup)" strokeWidth={2} />}
-            {p.forma === 'hueco' && <circle cx={x} cy={yLinea} r={r} fill="var(--sup)" stroke={p.tono} strokeWidth={2} />}
-            {p.forma === 'aro' && <circle cx={x} cy={yLinea} r={r} fill="var(--sup)" stroke={p.tono} strokeWidth={2} strokeDasharray="3 2" />}
-            <text x={xt} y={yVal} fontSize={fVal} fontWeight={700} fill={p.fuerte ? 'var(--acc)' : 'var(--ink)'}
+            {p.forma === 'lleno' && <circle cx={x} cy={yLinea} r={r} fill={p.tono} stroke="var(--sup)" strokeWidth={TRAZO.guia} />}
+            {p.forma === 'hueco' && <circle cx={x} cy={yLinea} r={r} fill="var(--sup)" stroke={p.tono} strokeWidth={TRAZO.guia} />}
+            {p.forma === 'aro' && <circle cx={x} cy={yLinea} r={r} fill="var(--sup)" stroke={p.tono} strokeWidth={TRAZO.guia} strokeDasharray="3 2" />}
+            <text x={xt} y={yVal} fontSize={fv} fontWeight={p.fuerte ? 700 : 600} fill={p.fuerte ? 'var(--acc)' : 'var(--mut2)'}
                   textAnchor={p.ancla} className="tabular">{pct(p.v)}</text>
-            <text x={xt} y={p.arriba ? yVal - fVal * 0.95 : yVal + fEtq * 1.5} fontSize={fEtq} fontWeight={600}
+            <text x={xt} y={p.arriba ? yVal - fv * 0.95 : yVal + fEtq * 1.5} fontSize={fEtq} fontWeight={600}
                   fill="var(--mut2)" textAnchor={p.ancla}>{p.etq}</text>
           </g>
         )

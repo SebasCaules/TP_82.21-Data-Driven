@@ -42,6 +42,7 @@ import { pct, pesos, decimal, fechaCorta, mesCorto, categoria } from '../formato
 import { useEscalaTexto } from '../escala.js'
 import Banda from '../Banda.jsx'
 import LineaIndice, { anchoTexto } from '../LineaIndice.jsx'
+import { TRAZO } from '../trazos.js'
 
 const V = D2.vistas.V08
 const DC10 = D2.decisiones.find((d) => d.id === 'DC-10')
@@ -103,7 +104,7 @@ export default function V08Precios() {
       id: 'ipc',
       tono: 'var(--gris)',
       punteado: true,
-      grosor: 1.75,
+      grosor: TRAZO.guia,
       rotuloFinal: `IPC ${decimal(ipcUltimo, 1)}× (a ${eneDe(anioIpcFin)})`,
       puntos: V.ipc.map((d) => ({
         t: d.anio,
@@ -116,7 +117,7 @@ export default function V08Precios() {
     {
       id: 'precio',
       tono: 'var(--acc)',
-      grosor: 4,
+      grosor: TRAZO.enfasis,
       rotuloFinal: `precio ${decimal(mN / m0, 2)}×`,
       puntos: V.mediana_unitaria.map((d) => {
         const flag = flagDe(d.anio)
@@ -167,7 +168,7 @@ export default function V08Precios() {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">{eneDe(anioIpcIni)} → {eneDe(anioIpcFin)}</span>
-              <span className="par-val tabular e2-cifra">{decimal(ipcUltimo, 1)}×</span>
+              <span className="par-val tabular e2-cifra sec">{decimal(ipcUltimo, 1)}×</span>
             </div>
           </div>
           <p className="e2-linea">Nivel general de precios (INDEC).</p>
@@ -327,7 +328,7 @@ function Divergentes({ datos, w, h, dominio, tituloEje, encabezadoNota, rotuloNe
       <text x={dx + anchoEtiqueta - 9} y={yBase + 6} fontSize={fEje} fill="var(--mut)" textAnchor="end"
             dominantBaseline="hanging">{tituloEje}</text>
       {/* El cero es el eje del gráfico: en tinta, de punta a punta y más grueso que el resto. */}
-      <line x1={xc} x2={xc} y1={padTop - 4} y2={yBase + 5} stroke="var(--ink)" strokeWidth="2" />
+      <line x1={xc} x2={xc} y1={padTop - 4} y2={yBase + 5} stroke="var(--ink)" strokeWidth={TRAZO.guia} />
     </svg>
   )
 }

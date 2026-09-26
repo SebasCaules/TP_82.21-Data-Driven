@@ -452,7 +452,7 @@ export default function V11Dataset() {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Filas cliente-mes</span>
-              <span className="par-val tabular e2-cifra">{entero(V.filas)}</span>
+              <span className="par-val tabular e2-cifra sec">{entero(V.filas)}</span>
             </div>
           </div>
           <p className="e2-linea">{V.n_features} variables · {entero(V.clientes_distintos)} clientes</p>
@@ -462,13 +462,13 @@ export default function V11Dataset() {
           <div className="ban-par">
             <div className="par-item">
               <span className="par-lbl">Entran en riesgo a {H} días</span>
-              <span className="par-val tabular e2-cifra">{pct(TASA_GLOBAL, 2)}</span>
+              <span className="par-val tabular e2-cifra sec">{pct(TASA_GLOBAL, 2)}</span>
             </div>
           </div>
           <p className="e2-linea">{entero(V.positivos)} de {entero(V.filas)} filas</p>
         </div>
-        <div className="tarjeta e2-central" title="Lift del decil superior del modelo contra la regla de recency (fila C22): es una meta del E1, no una medición.">
-          <span className="kpi-lbl"><span>Meta del modelo</span><b className="e2-tag">{PLAN.fila_meta ?? 'C22'}</b></span>
+        <div className="tarjeta e2-central" title={`Lift del decil superior del modelo contra la regla de recency (fila ${PLAN.fila_meta ?? 'C22'} del registro de cifras): es una meta del E1, no una medición.`}>
+          <span className="kpi-lbl"><span>Meta del modelo</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <span className="par-lbl">Lift contra la regla de hoy</span>
