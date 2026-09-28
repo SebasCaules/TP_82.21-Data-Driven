@@ -183,8 +183,9 @@ export default function V12Pedidos() {
 // la mitad de la pantalla a 1920x1080; con 3vh baja mas y a 1152x640 sigue entrando.
 // (24/09) La letra de las celdas sube de un tope de 16 px a 19 px: a 1920 sobraba un tercio
 // de pantalla debajo de la tabla. A 1152 queda en el piso de siempre (12,5 px). Y el padding
-// reparte 15vh entre las filas: con cinco pedidos da los 3vh de siempre; si el payload suma
-// uno, baja solo a 2,5vh y la tabla sigue terminando antes del pie a 1152×640.
+// reparte 15vh entre las filas: con cinco pedidos o menos (desde el 28/09 son cuatro) da los 3vh
+// de siempre; si el payload suma uno, baja solo a 2,5vh y la tabla sigue terminando antes del pie
+// a 1152×640.
 const AIRE = `clamp(6px, ${(15 / Math.max(N, 5)).toFixed(2)}vh, 36px)`
 const celda = {
   padding: `${AIRE} 10px ${AIRE} 0`, verticalAlign: 'top',
