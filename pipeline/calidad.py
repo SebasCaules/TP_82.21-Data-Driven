@@ -53,6 +53,11 @@ def serie_devoluciones(tx_dedupe: pd.DataFrame, devoluciones: pd.DataFrame) -> d
     neg = tx_dedupe.loc[tx_dedupe["monto_neto"] < 0, ["id_transaccion", "fecha"]].copy()
     dv = devoluciones.copy()
     dv["fecha_devolucion"] = pd.to_datetime(dv["fecha_devolucion"])
+    crudas = len(dv)
+    # (28/09) Las 5 transacciones repetidas en ventas (DC-01) también tienen dos registros en
+    # Devoluciones.csv. Queda el primero por fecha_devolucion: así la serie por fecha suma las
+    # mismas 608 devoluciones que la serie por fila negativa, y solo cambia el mes.
+    dv = dv.sort_values(["fecha_devolucion", "id_devolucion"]).drop_duplicates("id_transaccion", keep="first")
 
     j = neg.merge(dv, on="id_transaccion", how="inner")
     j["desfase"] = (j["fecha_devolucion"] - j["fecha"]).dt.days
@@ -68,7 +73,7 @@ def serie_devoluciones(tx_dedupe: pd.DataFrame, devoluciones: pd.DataFrame) -> d
     motivos = [{"motivo": m, "n": int(n)} for m, n in dv["motivo"].value_counts().items()]
 
     return {
-        "crudas": int(len(dv)),
+        "crudas": int(crudas),
         "unicas": int(len(neg)),
         "serie": serie,
         "desfase_dias": {

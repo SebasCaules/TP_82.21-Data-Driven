@@ -131,8 +131,11 @@ const T_CENTRAL = `Clientes en riesgo entre los que tienen 3 compras o más, al 
 const T_SENS = `Si ${MESES_FLAG} están incompletos: riesgo medido al ${fechaCorta(V10.sens.corte)}, antes de los meses con menos del `
   + `${Math.round(D2.meta.umbral_cobertura * 100)} % de las operaciones de un año antes. No reemplaza la cifra: `
   + 'la pone en duda. Vista 3.'
-const T_PEDIDOS = `${PEDIDOS_EN_TABLA} de los ${N_PEDIDOS} son de decisiones de abajo; el primero: `
-  + `${PEDIDO['DC-09'] ?? '—'}. Vista 12.`
+// (28/09) Con un solo pedido, «1 de los 1 son… el primero» no se lee: va el pedido con su decisión.
+const T_PEDIDOS = N_PEDIDOS === 1
+  ? `${pedidos[0].id}: ${pedidos[0].que}. Vista 12.`
+  : `${PEDIDOS_EN_TABLA} de los ${N_PEDIDOS} son de decisiones de abajo; el primero: `
+    + `${PEDIDO['DC-09'] ?? '—'}. Vista 12.`
 
 // (24/09) El pie queda en un renglón con lo que el directorio usa. Las filas del registro de
 // las decisiones que remiten a esta vista y la fuente, que el directorio no usa, van al title.
