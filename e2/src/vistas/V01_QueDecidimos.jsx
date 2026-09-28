@@ -25,7 +25,7 @@
 // cambia un número, "declarada" no cambia nada y solo se deja por escrito, y "pendiente del
 // negocio" espera un archivo que Casa Óga todavía no dio. "A confirmar" es una decisión aplicada
 // con un pedido abierto en V12 (desde el 28/09, solo DC-09): ya corre en el cálculo, pero Casa Óga
-// tiene que confirmarla. La regla vive en estados.js, que también usa la tarjeta de decisión de cada
+// todavía no explicó la causa (el criterio lo delegó al equipo, consulta 2). La regla vive en estados.js, que también usa la tarjeta de decisión de cada
 // vista. La pastilla NO es <Semaforo> ("EN META / POR DEBAJO / FUERA DE META"): esos rótulos
 // hablan de una meta que la vista no tiene.
 import { useState } from 'react'
@@ -182,7 +182,7 @@ export default function V01({ irA, irAVista, vistaDe = (d) => d.vista }) {
           <span className="kpi-lbl"><span>Pedidos a Casa Óga</span></span>
           <div className="ban-par">
             <div className="par-item">
-              <span className="par-lbl">Sin respuesta</span>
+              <span className="par-lbl">Abiertos</span>
               <span className="par-val tabular e2-cifra sec">{N_PEDIDOS}</span>
             </div>
           </div>
@@ -289,7 +289,7 @@ const ESTADO_PASTILLA = {
   },
   'a confirmar': {
     simbolo: '◑', texto: 'a confirmar', color: 'var(--terra)',
-    def: 'ya se aplica, pero Casa Óga tiene que confirmarla.',
+    def: 'ya se aplica, pero Casa Óga todavía no explicó la causa del hallazgo.',
   },
   'pendiente del negocio': {
     simbolo: '○', texto: 'pendiente', color: 'var(--terra)',

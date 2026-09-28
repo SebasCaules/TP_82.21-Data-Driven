@@ -305,9 +305,11 @@ def dedupe_contenido_campanias(contenido: pd.DataFrame, campanias_crudo: pd.Data
             criterio = "fecha_creacion más reciente"
             if len(orden) > 1 and orden["fecha_creacion"].iloc[0] == orden["fecha_creacion"].iloc[1]:
                 elegida = sub.iloc[0]
+                # (28/09) Casa Óga delegó el criterio (consulta 7): el caso ya no espera su
+                # confirmación, se le reporta en V12.
                 desempate = ("fecha_envio y fecha_creacion empatan las dos; CONTRACT_E2.md no da un "
-                              "tercer criterio. Se conserva la primera fila del archivo (BLOCKED: "
-                              "requiere que Casa Óga confirme la fila real, ver V12/DC-13).")
+                              "tercer criterio. Se conserva la primera fila del archivo y el caso se "
+                              "reporta a Casa Óga (V12, DC-13).")
 
         descartada = sub.loc[sub.index != elegida.name].iloc[0]
         filas_resueltas.append(elegida)
