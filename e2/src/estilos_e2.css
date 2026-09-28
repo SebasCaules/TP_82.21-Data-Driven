@@ -293,14 +293,15 @@
 .v01r-gtxt { font: 600 clamp(13px, calc(0.2vw + 1.6vh + 1px), 23px)/1.2 var(--fuente); color: var(--ink); }
 /* (25/09) Las fichas de un pilar miden lo mismo y quedan alineadas de un pilar al otro. (26/09,
    pedido del usuario) Como burbujas: píldora con el texto al centro. (26/09, revisión UX H7)
-   8 px como mínimo entre fichas (antes 6 a 6,9 px). */
+   8 px como mínimo entre fichas (antes 6 a 6,9 px). (28/09, pedido del usuario) Vuelven a ser
+   rectángulos, con el radio de 3 px de las tarjetas; el texto sigue al centro. */
 .v01r-fichas {
   display: grid; grid-template-columns: minmax(0, 1fr);
   gap: clamp(8px, 1vh, 12px);
 }
 .v01r-ficha {
   display: block; width: 100%; min-width: 0;
-  padding: .45em 1.2em; border: 1px solid var(--bd); border-radius: 999px;
+  padding: .45em 1.2em; border: 1px solid var(--bd); border-radius: 3px;
   background: var(--sup); color: var(--ink); text-align: center;
   font: 500 clamp(12.5px, calc(0.2vw + 1.6vh + 0.5px), 22px)/1.2 var(--fuente);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
