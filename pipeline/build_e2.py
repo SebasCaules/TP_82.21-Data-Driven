@@ -626,7 +626,20 @@ def _armar_v11() -> dict:
     return resumen
 
 
-def _armar_v12() -> dict:
+def _negativas_sin_solicitud(clientes_crudo: pd.DataFrame, bajas: pd.DataFrame,
+                             campanias_crudo: pd.DataFrame) -> dict:
+    """(28/09) D18: las negativas de marketing sin solicitud de baja, y cuántas de ellas
+    recibieron envíos (envíos únicos, DC-05). Se leen como clientes que no aceptaron marketing
+    al alta (fila E12 del registro; entregas/entregable-2/_build/B/pedidos_inferidos.py)."""
+    neg = clientes_crudo[clientes_crudo["acepta_marketing"] == False]  # noqa: E712
+    sin = neg[~neg["id_cliente"].isin(set(bajas["id_cliente"]))]
+    env = campanias_crudo.drop_duplicates()
+    env = env[env["id_cliente"].isin(set(sin["id_cliente"]))]
+    return {"sin_solicitud": int(len(sin)), "con_envio": int(env["id_cliente"].nunique()),
+            "envios": int(len(env))}
+
+
+def _armar_v12(neg: dict) -> dict:
     """Lo que se le reporta a Casa Oga (decisiones-de-calidad-de-datos.md,
     seccion 'Lo que se le reporta a Casa Oga')."""
     # (28/09, decisión del usuario) Queda un solo pedido, el de DC-09: solo Casa Óga puede decir
@@ -639,7 +652,29 @@ def _armar_v12() -> dict:
         {"id": "DC-09", "que": "explicar la caída de operaciones de septiembre a diciembre de 2025",
          "detalle": "esos meses quedan marcados 'cobertura no confirmada' (menos del 60 % de las operaciones del mismo mes del año anterior).",
          "estado": "pendiente del negocio"},
+    ],
+        # (28/09, pedido del usuario) Lo que se le reporta sin esperar respuesta, debajo del pedido
+        # en V12: las acciones que quedan de su lado y los casos que delegó.
+        "reportes": [
+        {"id": "D18 (registro)",
+         "que": f"dejar de enviar campañas a {_miles(neg['sin_solicitud'])} clientes que no aceptaron marketing",
+         "detalle": (f"no tienen una solicitud de baja: no aceptaron marketing al darse de alta. Quedan fuera "
+                     f"de la lista de contacto, pero {_miles(neg['con_envio'])} recibieron "
+                     f"{_miles(neg['envios'])} envíos de campañas."),
+         "cifras": neg},
+        {"id": "DC-07", "que": "corregir en origen 106 edades fuera de rango y 74 filas de fidelización inconsistentes",
+         "detalle": ("edades fuera de 15 a 100 años y socios con más puntos canjeados que acumulados. El equipo "
+                     "ya los marca en el dataset; la corrección es de Sistemas.")},
+        {"id": "DC-13", "que": "los casos CAMP004 y CAMP034, con la fila elegida",
+         "detalle": ("Contenido_Campanias.csv trae dos filas para cada una y queda Envío gratis en las dos, con "
+                     "el criterio que Casa Óga dejó en manos del equipo. Con cualquiera de las filas, ninguna "
+                     "tasa por oferta cambia.")},
     ]}
+
+
+def _miles(n: int) -> str:
+    """2343 -> '2.343'."""
+    return f"{n:,}".replace(",", ".")
 
 
 # =================================================================== anclas
@@ -760,7 +795,8 @@ def main() -> int:
     v09 = _armar_v09(soporte, tx_e1)
     v10 = _armar_v10(v02, v04, v03)
     v11 = _armar_v11()
-    v12 = _armar_v12()
+    v12 = _armar_v12(_negativas_sin_solicitud(pd.read_csv(DATA_E1 / "Clientes.csv"), bajas,
+                                              pd.read_csv(DATA_E1 / "Campanias_marketing.csv")))
 
     # ---- DC-14: tasa proxy por accion (usa la conversion 'despues' de V07) ----
     # Tabla editorial para la seccion 3 (no viaja en e2.json, ver nota del final

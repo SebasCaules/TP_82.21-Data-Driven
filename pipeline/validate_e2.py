@@ -286,7 +286,7 @@ def main() -> int:
         "V08": {"mediana_unitaria", "ipc", "variacion_pct", "por_categoria"},
         "V09": {"filas", "sin_interaccion", "nps_anual", "reclamos_por_cliente_mes", "riesgo_vs_soporte"},
         "V10": {"e1", "despues", "sens", "cambios"},
-        "V12": {"pedidos"},
+        "V12": {"pedidos", "reportes"},
     }
     vistas = payload.get("vistas", {})
     for vnn, claves in claves_esperadas.items():
@@ -333,6 +333,22 @@ def main() -> int:
             _FALLAS.append(f"{d['id']}: llano_corto vacío o de más de 60 caracteres ({len(corto)})")
             print(f"FALLA {d['id']}: llano_corto de {len(corto)} caracteres")
     print(f"OK    llano_corto: {sum(1 for d in payload["decisiones"] if 0 < len(d.get("llano_corto", "")) <= 60)} de {len(payload["decisiones"])} con 60 caracteres o menos")
+    # (28/09) V12.reportes: las cifras de D18 se recalculan acá, con pandas y sin build_e2.
+    cli = pd.read_csv(DATA_E1 / "Clientes.csv")
+    baj = pd.read_csv(DATA_E2 / "Historial_Bajas_No_Contacto.csv")
+    cam = pd.read_csv(DATA_E1 / "Campanias_marketing.csv").drop_duplicates()
+    sin_ids = set(cli.loc[cli["acepta_marketing"] == False, "id_cliente"]) - set(baj["id_cliente"])  # noqa: E712
+    esperado = {"sin_solicitud": len(sin_ids),
+                "con_envio": int(cam.loc[cam["id_cliente"].isin(sin_ids), "id_cliente"].nunique()),
+                "envios": int(cam["id_cliente"].isin(sin_ids).sum())}
+    rep = {r["id"]: r for r in payload["vistas"].get("V12", {}).get("reportes", [])}
+    real = rep.get("D18 (registro)", {}).get("cifras")
+    if real != esperado or set(rep) != {"D18 (registro)", "DC-07", "DC-13"}:
+        _FALLAS.append(f"V12.reportes: {sorted(rep)} y cifras {real} != {esperado}")
+        print(f"FALLA V12.reportes: {real} != {esperado}")
+    else:
+        print(f"OK    V12.reportes: D18, DC-07 y DC-13; D18 = {esperado['sin_solicitud']} sin solicitud, "
+              f"{esperado['con_envio']} con envíos, {esperado['envios']} envíos (E12)")
     pm = payload["meta"].get("plan_modelo", {})
     if pm.get("capacidad") != [500, 800] or pm.get("meta_lift") != 1.3:
         _FALLAS.append(f"meta.plan_modelo: {pm} != capacidad [500, 800] (C08) y meta_lift 1.3 (C22)")

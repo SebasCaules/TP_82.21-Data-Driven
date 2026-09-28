@@ -113,7 +113,11 @@ const FRASE_ABIERTOS = (ESPERAN.length
 // cosas calculadas. Salen «consultas 1 a 9 de la Parte A, 3.4» y «respuestas del 22/09», que
 // estaban escritas a mano (D2.meta no las trae) y son referencias para la cátedra, no para la
 // sala. La fuente va al title. El corte va primero, como en el resto de las vistas (D1-18).
-const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${N} pedidos`
+// (28/09) Lo que se le reporta a Casa Óga sin esperar respuesta, debajo del pedido.
+const REPORTES = D2.vistas.V12?.reportes ?? []
+const R = REPORTES.length
+const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${N} ${N === 1 ? 'pedido' : 'pedidos'}` +
+  (R ? ` y ${R} ${R === 1 ? 'reporte' : 'reportes'}` : '')
 const PIE_TITLE = 'fuente: e2.json, vistas.V12.pedidos (pipeline/build_e2.py)'
 
 export const meta = {
@@ -129,7 +133,8 @@ export default function V12Pedidos() {
       {/* (25/09, pedido del usuario: sin comentarios auxiliares) La frase que contaba cuántas
           decisiones esperan pasa al title de la tabla; el primer pedido, marcado, dice qué
           depende de su respuesta. */}
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }} title={FRASE_ABIERTOS}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}
+           title={FRASE_ABIERTOS + (R ? ` Además se le reportan ${R} cosas que no esperan respuesta.` : '')}>
         <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
           <colgroup>
             <col style={{ width: '10%' }} />
@@ -144,20 +149,12 @@ export default function V12Pedidos() {
             </tr>
           </thead>
           <tbody>
+            {R > 0 && <Grupo primero>{N === 1 ? 'Espera una respuesta' : 'Esperan una respuesta'}</Grupo>}
             {FILAS.map((p) => {
               const clave = p === CLAVE
               return (
                 <tr key={p.id} style={{ borderBottom: '1px solid var(--bd2)' }}>
-                  {/* (26/09, revisión UX H13) Un pedido que no es una decisión no muestra su código del
-                      registro («D18 (registro)»): va en el title. */}
-                  <td className="tabular" title={p.id.startsWith('DC-') ? undefined : `${p.id.replace(/\s*\(.*\)$/, '')}: dato del registro de cifras, no una decisión`} style={{
-                    ...celda, ...primera, color: 'var(--mut2)', fontFamily: 'var(--mono)',
-                    fontSize: 'clamp(11px, 0.8vw, 14px)',
-                    // La barra marca la fila que decide la cifra central, sin mover la columna.
-                    boxShadow: clave ? 'inset 3px 0 0 var(--acc)' : 'none',
-                  }}>
-                    {p.id.startsWith('DC-') ? p.id : '—'}
-                  </td>
+                  <CeldaId id={p.id} marcada={clave} />
                   <td style={{ ...celda, color: 'var(--ink)', fontWeight: 600 }}>
                     {duro(p.que)}
                   </td>
@@ -176,6 +173,20 @@ export default function V12Pedidos() {
               )
             })}
           </tbody>
+          {/* (28/09, pedido del usuario) Debajo del pedido, lo que se le reporta sin esperar
+              respuesta: las acciones que quedan de su lado y los casos que dejó en manos del equipo. */}
+          {R > 0 && (
+            <tbody>
+              <Grupo>Se reporta, sin esperar respuesta</Grupo>
+              {REPORTES.map((r) => (
+                <tr key={r.id} style={{ borderBottom: '1px solid var(--bd2)' }}>
+                  <CeldaId id={r.id} />
+                  <td style={{ ...celda, color: 'var(--ink)', fontWeight: 500 }}>{duro(r.que)}</td>
+                  <td style={{ ...celda, color: 'var(--mut2)' }}>{duro(llano(r.detalle))}</td>
+                </tr>
+              ))}
+            </tbody>
+          )}
         </table>
       </div>
 
@@ -190,13 +201,46 @@ export default function V12Pedidos() {
 // reparte 15vh entre las filas: con cinco pedidos o menos (desde el 28/09 son cuatro) da los 3vh
 // de siempre; si el payload suma uno, baja solo a 2,5vh y la tabla sigue terminando antes del pie
 // a 1152×640.
-const AIRE = `clamp(6px, ${(15 / Math.max(N, 5)).toFixed(2)}vh, 36px)`
+// (28/09) Cuenta también las filas de lo que se reporta.
+const AIRE = `clamp(6px, ${(15 / Math.max(N + R, 5)).toFixed(2)}vh, 36px)`
 const celda = {
   padding: `${AIRE} 10px ${AIRE} 0`, verticalAlign: 'top',
   fontSize: 'clamp(12.5px, 1.05vw, 19px)', lineHeight: 1.32,
 }
 // La primera columna deja lugar a la barra de la fila marcada, en todas las filas por igual.
 const primera = { paddingLeft: 10 }
+
+/** (26/09, revisión UX H13) El id de la fila. Un pedido o reporte que no es una decisión no
+ *  muestra su código del registro («D18 (registro)»): va en el title. La barra marca la fila que
+ *  decide la cifra central, sin mover la columna. */
+function CeldaId({ id, marcada = false }) {
+  const esDc = id.startsWith('DC-')
+  return (
+    <td className="tabular" title={esDc ? undefined : `${id.replace(/\s*\(.*\)$/, '')}: dato del registro de cifras, no una decisión`}
+        style={{
+          ...celda, ...primera, color: 'var(--mut2)', fontFamily: 'var(--mono)',
+          fontSize: 'clamp(11px, 0.8vw, 14px)',
+          boxShadow: marcada ? 'inset 3px 0 0 var(--acc)' : 'none',
+        }}>
+      {esDc ? id : '—'}
+    </td>
+  )
+}
+
+/** (28/09) Rótulo de grupo a todo el ancho de la tabla, con la letra de los rótulos de columna. */
+function Grupo({ children, primero = false }) {
+  return (
+    <tr style={{ borderBottom: '1px solid var(--bd)' }}>
+      <td colSpan={3} style={{
+        padding: `${primero ? 'clamp(8px, 1.4vh, 16px)' : 'clamp(18px, 3.4vh, 40px)'} 10px 6px 10px`,
+        font: '600 var(--e2-rot)/1.2 var(--mono)', textTransform: 'uppercase', letterSpacing: '.06em',
+        color: 'var(--mut2)',
+      }}>
+        {children}
+      </td>
+    </tr>
+  )
+}
 
 // (24/09) Los rótulos de columna crecen con --e2-rot, como los demás rótulos mono del E2.
 function Th({ children, primera: esPrimera }) {
