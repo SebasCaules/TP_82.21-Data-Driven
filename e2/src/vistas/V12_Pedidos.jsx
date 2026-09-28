@@ -100,7 +100,7 @@ const ids = (ds) => lista(ds.map((d) => d.id))
 const QUIENES = [
   PEND.length && `${ids(PEND)} ${PEND.length === 1 ? 'sigue pendiente' : 'siguen pendientes'}`,
   CONF.length && `${ids(CONF)} ${CONF.length === 1
-    ? 'ya se aplica, pero falta la causa' : 'ya se aplican, pero faltan las causas'}`,
+    ? 'ya está aplicada, pero falta la causa' : 'ya están aplicadas, pero faltan las causas'}`,
 ].filter(Boolean).join(' y ')
 const FRASE_ABIERTOS = (ESPERAN.length
   ? `${ESPERAN.length} de las ${DECS.length} decisiones ${ESPERAN.length === 1 ? 'espera' : 'esperan'} `

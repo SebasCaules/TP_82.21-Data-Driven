@@ -292,7 +292,7 @@ const ESTADO_PASTILLA = {
   },
   'a confirmar': {
     simbolo: '◑', texto: 'a confirmar', color: 'var(--terra)',
-    def: 'ya se aplica, pero Casa Óga todavía no explicó la causa del hallazgo.',
+    def: 'ya está aplicada, pero Casa Óga todavía no explicó la causa del hallazgo.',
   },
   'pendiente del negocio': {
     simbolo: '○', texto: 'pendiente', color: 'var(--terra)',

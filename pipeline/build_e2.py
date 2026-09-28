@@ -288,7 +288,7 @@ def _llano(ctx: dict) -> dict[str, str]:
         "DC-04": "Los números de cliente de una misma persona se unen en uno antes de contar.",
         "DC-05": "Cada envío de campaña se cuenta una sola vez; los repetidos eran copias idénticas.",
         "DC-06": "El nivel de socio sale del programa de fidelización, no de la etiqueta de la campaña.",
-        "DC-07": "Las edades imposibles se marcan como sin dato, sin borrar ninguna fila; la corrección en origen se pide a Sistemas (vista 12).",
+        "DC-07": "Las edades imposibles quedan como sin dato y no se borra ninguna fila. La corrección en origen se le pide a Sistemas (vista 12).",
         "DC-08": f"Todo lo que cruza compras se mide al {ref}, porque después no hay ventas cargadas.",
         "DC-09": f"{meses[0].upper() + meses[1:]} quedan marcados como cobertura no confirmada; el riesgo se muestra también medido al {sens}.",
         "DC-10": "Los montos quedan en pesos corrientes, sin ajustar por inflación, y así se aclara.",
@@ -655,7 +655,7 @@ def _armar_v12(neg: dict) -> dict:
         # (28/09, auditoría previa a la entrega) La consulta 10 de la Parte A sigue sin respuesta: V12 es
         # la lista de lo abierto con Casa Óga y tiene que coincidir con el 3.4.
         {"id": "Consulta 10", "que": "decir si hay datos de ventas anteriores a 2022",
-         "detalle": "consulta 10 de la Parte A (3.4): la pregunta 65 del envío del 11/08 no tiene fila en la planilla del 18/08. Con más historia, el entrenamiento suma cortes.",
+         "detalle": "es la consulta 10 de la Parte A (3.4), la pregunta 65 del envío del 11/08, que no aparece en la planilla del 18/08. Con más años de historia, el modelo tendría más cortes para entrenar.",
          "estado": "pendiente del negocio"},
     ],
         # (28/09, pedido del usuario) Lo que se le reporta sin esperar respuesta, debajo del pedido
@@ -663,8 +663,8 @@ def _armar_v12(neg: dict) -> dict:
         "reportes": [
         {"id": "D18 (registro)",
          "que": f"dejar de enviar campañas a {_miles(neg['sin_solicitud'])} clientes que no aceptaron marketing",
-         "detalle": (f"no tienen una solicitud de baja: se infiere que no aceptaron marketing al darse de alta. Quedan fuera "
-                     f"de la lista de contacto, pero {_miles(neg['con_envio'])} recibieron "
+         "detalle": (f"no tienen solicitud de baja, así que todo indica que no aceptaron marketing al darse de alta. Ya quedan "
+                     f"fuera de la lista de contacto, pero {_miles(neg['con_envio'])} de ellos recibieron "
                      f"{_miles(neg['envios'])} envíos de campañas."),
          "cifras": neg},
         {"id": "DC-07", "que": "corregir en origen 106 edades fuera de rango y 74 filas de fidelización inconsistentes",
