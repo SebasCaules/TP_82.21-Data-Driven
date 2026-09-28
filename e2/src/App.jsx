@@ -167,7 +167,7 @@ function Encabezado({ indice, vista }) {
 const preguntaTitulo = (p) => (p ? p.replace(/^(¿?)(\p{L})/u, (_, a, b) => a + b.toUpperCase()) : p)
 
 /** (25/09) La pantalla que muestra una decisión: la que la declara en meta.dc; si ninguna, la
- *  vista del payload (DC-01, DC-03, DC-07 y DC-14 viven en el detalle de V01; DC-15 en V12). */
+ *  vista del payload (DC-01, DC-03, DC-07, DC-14 y, desde el 28/09, DC-15 viven en el detalle de V01). */
 function vistaDe(dc) {
   const v = VISTAS.find((x) => x.dc === dc.id)
   return v ? v.id : dc.vista

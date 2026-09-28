@@ -20,7 +20,8 @@
 // color de excepción: no es un problema nuevo, es la prioridad. Los demás siguen en el orden
 // del payload. El orden completo por impacto y un «qué destraba» para cada fila esperan dos
 // campos nuevos del pipeline (rotulo, destraba): cruzar p.id con D2.decisiones[].vista no
-// alcanza, porque «D18 (registro)» no es una decisión y DC-15 remite a esta misma vista.
+// alcanza, porque «D18 (registro)» no es una decisión (hasta el 28/09, además, DC-15 remitía a esta
+// misma vista; ahora está declarada y no es un pedido).
 
 import { D2 } from '../datos_e2.js'
 import { fechaCorta, mesCorto, montoM, pct } from '../formato.js'

@@ -328,7 +328,9 @@ function Detalle({ nav, marcada, volver }) {
           {`${decisiones.length} decisiones: ${cerradas} ${cerradas === 1 ? 'cerrada' : 'cerradas'} y ` +
             `${esperan} ${esperan === 1 ? 'espera' : 'esperan'} una respuesta de Casa Óga.`}
         </b>{' '}
-        {ORDEN_ESTADOS.map((est) => {
+        {/* (28/09) Solo los estados que tiene alguna decisión: sin DC-15 pendiente, la leyenda no
+            define «pendiente». */}
+        {ORDEN_ESTADOS.filter((est) => decisiones.some((d) => estadoVisible(d) === est)).map((est) => {
           const e = ESTADO_PASTILLA[est]
           return (
             <span key={est}>

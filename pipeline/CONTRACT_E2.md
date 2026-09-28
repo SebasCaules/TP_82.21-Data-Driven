@@ -89,7 +89,7 @@ DC-09, DC-10, DC-11 y DC-14 son lecturas sobre la base ya corregida.
 - **V09 NPS y soporte** — `{"filas": 14976, "sin_interaccion": {"n": 4312, "pct": 28.8}, "nps_anual": [{"anio", "con_todo", "solo_con_interaccion", "n_filas", "n_sin_interaccion"}], "reclamos_por_cliente_mes": [{"anio", "valor"}], "riesgo_vs_soporte": {"en_riesgo": {"reclamos_acum": 2.34, "nps": 19.1}, "sin_riesgo": {"reclamos_acum": 2.00, "nps": 24.3}}}`.
 - **V10 La cifra central** — `{"e1": {"pct": 49.6, "exposicion_M": 94.9, "en_riesgo": 2452, "elegibles": 4940}, "despues": {"pct": 50.4, "exposicion_M": 96.4, "en_riesgo", "elegibles"}, "sens": {"corte": "2025-08-31", "pct", "exposicion_M", "en_riesgo", "elegibles"}, "cambios": [{"decision": "DC-04", "delta_pct_pp", "delta_exposicion_M"}]}`.
 - **V11 Dataset de entrenamiento** — copia de `resumen_tablon.json` (sección 4).
-- **V12 Lo que le pedimos a Casa Óga** — `{"pedidos": [{"id": "DC-13", "que": "…", "detalle": "…", "estado": "pendiente del negocio"}]}` (DC-09 meses, DC-13 casos, DC-07 correcciones, 598 negativas, DC-15 diccionario).
+- **V12 Lo que le pedimos a Casa Óga** — `{"pedidos": [{"id": "DC-13", "que": "…", "detalle": "…", "estado": "pendiente del negocio"}]}` (DC-09 meses, DC-13 casos, DC-07 correcciones, 598 negativas; desde el 28/09 DC-15 ya no es un pedido: quedó declarada).
 
 ## 4. Tablón (`pipeline/tablon.py`)
 

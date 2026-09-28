@@ -195,7 +195,7 @@ _DECISIONES_META = {
     "DC-12": dict(dimension="actualidad", vista="V06"),
     "DC-13": dict(dimension="unicidad", vista="V07"),
     "DC-14": dict(dimension="completitud", vista="V01"),  # decision N0 del 22/09: declarada, se ve en la tabla de V01
-    "DC-15": dict(dimension="trazabilidad", vista="V12"),
+    "DC-15": dict(dimension="trazabilidad", vista="V01"),  # 28/09: declarada; sale de los pedidos de V12 y se ve en la tabla de V01
 }
 
 
@@ -296,7 +296,7 @@ def _llano(ctx: dict) -> dict[str, str]:
         "DC-12": "Las bajas pedidas en 2026 no entran al análisis de compras, pero sí sacan al cliente de la lista de contacto.",
         "DC-13": "En CAMP004 y CAMP034 queda una oferta por campaña; en CAMP034 hubo empate y Casa Óga tiene que confirmar cuál.",
         "DC-14": "El costo de cada acción se toma como vigente al 22/09; la tasa de éxito por acción no existe en los datos y se construye en el Entregable 3.",
-        "DC-15": "El diccionario de datos columna por columna no llegó; mientras tanto vale el esquema que el equipo levantó de los archivos.",
+        "DC-15": "La documentación del caso no describe las columnas: el esquema sale de los CSV y el significado de las dudosas, de las consultas 1 a 8.",
     }
 
 
@@ -326,7 +326,7 @@ def _llano_corto(ctx: dict) -> dict[str, str]:
         "DC-12": f"Las bajas de {anio_bajas} solo sacan clientes de la lista.",
         "DC-13": "Queda una oferta por campaña; CAMP034, a confirmar.",
         "DC-14": "El costo de cada acción se toma vigente al 22/09.",
-        "DC-15": "Sin diccionario, vale el esquema del equipo.",
+        "DC-15": "Sin diccionario: vale el esquema de los CSV.",
     }
 
 
@@ -641,9 +641,6 @@ def _armar_v12() -> dict:
          "estado": "pendiente del negocio"},
         {"id": "DC-07", "que": "corregir en origen 106 edades fuera de rango y 74 filas de fidelización inconsistentes",
          "detalle": "edades fuera de 15 a 100 años y socios con más puntos canjeados que acumulados; pedido a Sistemas.",
-         "estado": "pendiente del negocio"},
-        {"id": "DC-15", "que": "enviar el diccionario de datos, columna por columna",
-         "detalle": "no está en el DOCX del 08/09; mientras tanto se usa el esquema que armó el equipo leyendo los archivos.",
          "estado": "pendiente del negocio"},
     ]}
 

@@ -391,13 +391,15 @@ def tasa_exito_proxy_por_accion(catalogo: pd.DataFrame, conversion_ofertas: dict
 
 
 # ---------------------------------------------------------------- DC-15 ----
-def documentacion_pendiente() -> dict:
+def documentacion_declarada() -> dict:
     """DC-15: sin calculo, solo estado. El diccionario columna por columna no esta
-    en el DOCX del 08/09; se pide la version del campus (pendiente del negocio)."""
+    en el DOCX del 08/09, y la version del campus (26/09) es la misma. Desde el 28/09
+    se declara: el esquema sale de los CSV y el significado de las columnas dudosas,
+    de las consultas 1 a 8. No se pide otra version."""
     return {
-        "estado": "pendiente del negocio",
+        "estado": "declarada",
         "que": "diccionario de datos columna por columna",
-        "detalle": "no esta en el DOCX del 08/09; se pide la version del campus",
+        "detalle": "no esta en la documentacion del caso; vale el esquema de los CSV",
     }
 
 

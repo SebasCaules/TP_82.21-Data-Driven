@@ -133,8 +133,10 @@ decisión**. Datos: solo `e2/src/datos_e2.js` (`D2`, contrato `pipeline/CONTRACT
       rótulo.
     - **Pilares de V01 (H3, H7).** Se centra el pilar entero, cuenta y fichas juntas (la primera
       ficha queda a 8–14 px de su cuenta), y las fichas van a 8 px o más una de otra.
-    - **Estado en las fichas (H4).** Las cuatro que esperan a Casa Óga llevan el símbolo del
-      detalle (◑ a confirmar, ○ pendiente), con la leyenda en el rótulo de la tarjeta.
+    - **Estado en las fichas (H4).** Las que esperan a Casa Óga llevan el símbolo del detalle
+      (◑ a confirmar, ○ pendiente), con la leyenda en el rótulo de la tarjeta. Desde el 28/09 son
+      tres, todas a confirmar (DC-07, DC-09 y DC-13): DC-15 quedó declarada, y la leyenda y el
+      detalle muestran solo los estados que tiene alguna decisión.
     - **Pantalla angosta (H5).** Por debajo de 768 px las grillas pasan a una columna y los pares
       se parten en dos renglones. El tablero no se oculta, por N0-20 (con el zoom al 200 % no
       quedaría nada en pantalla).
