@@ -24,8 +24,8 @@
 // Detalle (24/09, sin cambios): la tabla con el estado en una pastilla propia, porque "aplicada"
 // cambia un número, "declarada" no cambia nada y solo se deja por escrito, y "pendiente del
 // negocio" espera un archivo que Casa Óga todavía no dio. "A confirmar" es una decisión aplicada
-// con un pedido abierto en V12 (DC-07, DC-09, DC-13): ya corre en el cálculo, pero Casa Óga tiene
-// que confirmarla. La regla vive en estados.js, que también usa la tarjeta de decisión de cada
+// con un pedido abierto en V12 (desde el 28/09, solo DC-09): ya corre en el cálculo, pero Casa Óga
+// tiene que confirmarla. La regla vive en estados.js, que también usa la tarjeta de decisión de cada
 // vista. La pastilla NO es <Semaforo> ("EN META / POR DEBAJO / FUERA DE META"): esos rótulos
 // hablan de una meta que la vista no tiene.
 import { useState } from 'react'
@@ -110,7 +110,7 @@ const nombre = (d) => NOMBRE[d.id] ?? cap(sinConsulta(d.hallazgo))
 // El pedido abierto de cada decisión que espera a Casa Óga, para el title de su ficha y su pastilla.
 const PEDIDO = Object.fromEntries(pedidos.map((p) => [p.id, p.que]))
 const N_PEDIDOS = pedidos.length
-// Cuántos de los pedidos de V12 son decisiones: el quinto es un dato del registro (D18).
+// Cuántos de los pedidos de V12 son decisiones (hasta el 28/09, uno era un dato del registro, D18).
 const PEDIDOS_EN_TABLA = pedidos.filter((p) => porId[p.id]).length
 const esperan = decisiones.filter((d) => ESPERA.has(d.id) || d.estado === 'pendiente del negocio').length
 const cerradas = decisiones.length - esperan
@@ -120,7 +120,10 @@ const cerradas = decisiones.length - esperan
 const UNICA = V10.cambios.length === 1 && V10.cambios[0].decision === 'DC-04'
 const MUEVE = UNICA ? 'Solo cambia por los clientes duplicados.' : `Cambia por ${V10.cambios.length} decisiones.`
 // Tarjeta 3: el pedido de DC-09 es el que decide la cifra central (V12 lo pone primero).
-const DECIDE = PEDIDO['DC-09'] ? `El de ${MESES_FLAG} decide la cifra central.` : null
+// (28/09) Con un solo pedido, «el de» no tiene de qué otro separarse.
+const DECIDE = PEDIDO['DC-09']
+  ? (N_PEDIDOS === 1 ? `Es el de ${MESES_FLAG}: decide la cifra central.` : `El de ${MESES_FLAG} decide la cifra central.`)
+  : null
 
 // Lo que la tarjeta ya no escribe queda en su title, para quien presenta.
 const T_CENTRAL = `Clientes en riesgo entre los que tienen 3 compras o más, al ${fechaCorta(D2.meta.corte_ref)}; `

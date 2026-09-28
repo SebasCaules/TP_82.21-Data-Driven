@@ -1,5 +1,5 @@
 // Estado visible de una decisión (24/09). Una decisión aplicada que además tiene un pedido
-// abierto en V12 (hoy DC-07, DC-09 y DC-13) se muestra «a confirmar»: ya corre en el
+// abierto en V12 (desde el 28/09, solo DC-09) se muestra «a confirmar»: ya corre en el
 // cálculo, pero Casa Óga tiene que confirmarla. Lo usan la tabla de V01 y la tarjeta de
 // decisión de cada vista, para que la misma decisión no diga «a confirmar» en una vista y
 // «aplicada» en otra. El estado del payload no se toca: esto es solo cómo se muestra.

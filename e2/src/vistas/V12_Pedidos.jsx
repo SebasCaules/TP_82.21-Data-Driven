@@ -20,8 +20,8 @@
 // color de excepción: no es un problema nuevo, es la prioridad. Los demás siguen en el orden
 // del payload. El orden completo por impacto y un «qué destraba» para cada fila esperan dos
 // campos nuevos del pipeline (rotulo, destraba): cruzar p.id con D2.decisiones[].vista no
-// alcanza, porque «D18 (registro)» no es una decisión (hasta el 28/09, además, DC-15 remitía a esta
-// misma vista; ahora está declarada y no es un pedido).
+// alcanza, porque un pedido puede no ser una decisión (hasta el 28/09, «D18 (registro)»; ese día
+// salieron D18, DC-07, DC-13 y DC-15, y queda solo DC-09).
 
 import { D2 } from '../datos_e2.js'
 import { fechaCorta, mesCorto, montoM, pct } from '../formato.js'
@@ -69,10 +69,14 @@ const DESTRABA = CLAVE
 const N = PEDIDOS.length
 // (24/09) El título dice cuál de los pedidos importa, no solo cuántos son. Antes: «Cinco
 // cosas quedan en manos de Casa Óga», que no distinguía el que mueve la cifra central.
-const TITULO = CLAVE
-  ? `${numeroEnLetras(N)} pedidos a Casa Óga; el de ${mesCorto(FLAG[0])} a `
-    + `${mesCorto(FLAG.at(-1))} decide la cifra central`
-  : `${numeroEnLetras(N)} pedidos a Casa Óga siguen abiertos`
+// (28/09) Con un solo pedido, en singular: «Un pedido a Casa Óga: el de sep-25 a dic-25, que decide
+// la cifra central».
+const MESES_CLAVE = CLAVE ? `${mesCorto(FLAG[0])} a ${mesCorto(FLAG.at(-1))}` : ''
+const TITULO = N === 1
+  ? (CLAVE ? `Un pedido a Casa Óga: el de ${MESES_CLAVE}, que decide la cifra central` : 'Un pedido a Casa Óga sigue abierto')
+  : CLAVE
+    ? `${numeroEnLetras(N)} pedidos a Casa Óga; el de ${MESES_CLAVE} decide la cifra central`
+    : `${numeroEnLetras(N)} pedidos a Casa Óga siguen abiertos`
 
 // (24/09) La frase decía «Las decisiones ya están tomadas», y D2 dice otra cosa: DC-15 está
 // «pendiente del negocio». Ahora se calcula, y con la misma cuenta y las mismas palabras que

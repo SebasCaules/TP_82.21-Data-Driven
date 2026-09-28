@@ -294,7 +294,7 @@ def _llano(ctx: dict) -> dict[str, str]:
         "DC-10": "Los montos quedan en pesos corrientes, sin ajustar por inflación, y así se aclara.",
         "DC-11": "Las filas con NPS y sin reclamos ni consultas se conservan marcadas: no se borran ni se completan.",
         "DC-12": "Las bajas pedidas en 2026 no entran al análisis de compras, pero sí sacan al cliente de la lista de contacto.",
-        "DC-13": "En CAMP004 y CAMP034 queda una oferta por campaña; en CAMP034 hubo empate y Casa Óga tiene que confirmar cuál.",
+        "DC-13": "En CAMP004 y CAMP034 queda una oferta por campaña; con cualquiera de las dos filas, ninguna tasa cambia.",
         "DC-14": "El costo de cada acción se toma como vigente al 22/09; la tasa de éxito por acción no existe en los datos y se construye en el Entregable 3.",
         "DC-15": "La documentación del caso no describe las columnas: el esquema sale de los CSV y el significado de las dudosas, de las consultas 1 a 8.",
     }
@@ -324,7 +324,7 @@ def _llano_corto(ctx: dict) -> dict[str, str]:
         "DC-10": "Los montos no se ajustan por inflación.",
         "DC-11": "Las filas de NPS sin contacto se marcan, no se borran.",
         "DC-12": f"Las bajas de {anio_bajas} solo sacan clientes de la lista.",
-        "DC-13": "Queda una oferta por campaña; CAMP034, a confirmar.",
+        "DC-13": "Queda una oferta por campaña; ninguna tasa cambia.",
         "DC-14": "El costo de cada acción se toma vigente al 22/09.",
         "DC-15": "Sin diccionario: vale el esquema de los CSV.",
     }
@@ -629,18 +629,15 @@ def _armar_v11() -> dict:
 def _armar_v12() -> dict:
     """Lo que se le reporta a Casa Oga (decisiones-de-calidad-de-datos.md,
     seccion 'Lo que se le reporta a Casa Oga')."""
+    # (28/09, decisión del usuario) Queda un solo pedido, el de DC-09: solo Casa Óga puede decir
+    # si la caída de sep-dic 2025 es real o una carga parcial. Salen DC-13 (Casa Óga delegó el
+    # criterio en la consulta 7 y con cualquiera de las filas ninguna tasa cambia), D18 (se infiere
+    # que las 598 no aceptaron marketing al alta) y DC-07 (la corrección en origen es una acción de
+    # Sistemas, no una pregunta): se reportan sin esperar respuesta (el wiki, «Lo que se le reporta
+    # a Casa Óga»). DC-15 salió el mismo día, declarada.
     return {"pedidos": [
-        {"id": "DC-13", "que": "confirmar la fila correcta de CAMP004 y CAMP034",
-         "detalle": "Contenido_Campanias.csv trae dos filas para cada una; el equipo resolvió por criterio y pide que Casa Óga confirme cuál es la real.",
-         "estado": "pendiente del negocio"},
         {"id": "DC-09", "que": "explicar la caída de operaciones de septiembre a diciembre de 2025",
          "detalle": "esos meses quedan marcados 'cobertura no confirmada' (menos del 60 % de las operaciones del mismo mes del año anterior).",
-         "estado": "pendiente del negocio"},
-        {"id": "D18 (registro)", "que": "confirmar las 598 negativas de marketing sin solicitud registrada",
-         "detalle": "598 clientes sin consentimiento no tienen una fila en Historial_Bajas_No_Contacto.csv que lo explique.",
-         "estado": "pendiente del negocio"},
-        {"id": "DC-07", "que": "corregir en origen 106 edades fuera de rango y 74 filas de fidelización inconsistentes",
-         "detalle": "edades fuera de 15 a 100 años y socios con más puntos canjeados que acumulados; pedido a Sistemas.",
          "estado": "pendiente del negocio"},
     ]}
 
@@ -880,8 +877,9 @@ def main() -> int:
           "este caso. decisiones/V07.casos trae 'criterio': 'fecha_creacion más reciente' (dentro "
           "del enum del contrato) mas una clave 'desempate' que declara el empate, y se conserva "
           "la primera fila del archivo (Envío gratis) de forma arbitraria y documentada, no como "
-          "respuesta del negocio. Pregunta pendiente para Casa Óga (ya en V12/DC-13): ¿cual de las "
-          "dos filas de CAMP034 es la real, Envío gratis o Descuento?")
+          "respuesta del negocio. Desde el 28/09 no se le pregunta a Casa Óga: delegó el criterio "
+          "(consulta 7) y con cualquiera de las dos filas de CAMP034 (o de CAMP004) ninguna tasa "
+          "por oferta cambia; los casos se reportan.")
     print("- V06.lista_800 (contactables de la lista de 800): sale de features.top_lista sobre la "
           "base DESPUES de DC-04 (tx_e2/F_despues_ref, CONTRACT_E2.md seccion 3), y las bajas de "
           "Historial_Bajas_No_Contacto.csv se mapean a id_cliente_canonico antes de cruzarlas. Da "

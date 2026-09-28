@@ -65,8 +65,9 @@ const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base ${entero(BASE_DESPUE
 // El id de decisión en mono dentro de un rótulo .frase, como en el resto de las tarjetas.
 const ID_MONO = { font: '600 var(--e2-rot)/1.2 var(--mono)', letterSpacing: '.07em' }
 
-// El pedido de DC-13 a Casa Óga tal como lo lista V12, para que las dos vistas digan lo mismo
-// (V12 pide confirmar los dos casos, no solo el empate).
+// El pedido de DC-13 a Casa Óga tal como lo lista V12, para que las dos vistas digan lo mismo.
+// (28/09) Ya no hay pedido: Casa Óga delegó el criterio y con cualquiera de las filas ninguna tasa
+// cambia; si el payload volviera a traerlo, el title lo nombra.
 const PEDIDO_V12 = D2.vistas.V12?.pedidos?.find((p) => p.id === DC13.id)
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
