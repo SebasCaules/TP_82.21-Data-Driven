@@ -36,7 +36,7 @@
 \setcounter{tocdepth}{1}  % en el consolidado el índice interno lista solo secciones: los incisos están en la página de contenido global y en el pie
 \noindent{\small\bfseries\color[HTML]{B8433A} ANEXO 1}\\[1mm]
 {\Large\bfseries Formulación del tablero de riesgo de clientes}\\[1mm]
-{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.1 · 22/09/2026}
+{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.1 · 28/09/2026}
 \else
 \begin{center}
 {\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
@@ -565,10 +565,10 @@ resuelto por bisección sobre $\delta$.
 \impl{pipeline/series.py (\texttt{potencia\_experimento}), con $p_0$ igual a la compra a 7 días global de la ecuación~\eqref{eq:compra7d}, \texttt{n\_por\_rama=360}, \texttt{cortes=3}; reproducido en entregas/entregable-1/\_build/F/recalc\_e1.py, líneas C24.}
 \valor{$p_0 = 1{,}21\%$. Entre las dos ramas de mensaje ($n = \text{1.080}$ cada una): MDE $= 1{,}71$ puntos porcentuales, 1,4 veces la tasa base; es el número que titula la vista 13. Contra el control ($n = 240$, los 80 por corte), con la misma fórmula generalizada a ramas de tamaño distinto: MDE $= 2{,}95$ pp entre una rama de mensaje y el control, y $2{,}68$ pp entre las dos ramas juntas (2.160) y el control (fila C24b del registro; reproducido en recalc\_e1.py). El diseño, tal como está, sirve para aprender si el mensaje importa; medir el recupero contra el control con precisión exige un control más grande o más cortes, y el tamaño se acuerda con Marketing antes del piloto (envío 45), que pidió que el control sea una porción menor y no comprometa a los clientes de mayor valor.}
 
-\section{Limitación: la carga parcial del extracto en 2025}
+\section{Limitación: la caída del extracto en 2025}
 \label{sec:carga-parcial}
 
-El extracto de transacciones tiene carga parcial en los dos extremos: sube de 44 ventas en enero de 2022 a 893 en diciembre, y baja de 1.390 en enero de 2025 a 255 en diciembre, con el ticket medio estable y las altas de clientes sin caída. Como $\rho_i(t)$ se mide contra el corte, una carga incompleta del cierre de 2025 infla la recencia de todos y con ella $B_i(t)$, $X(t)$ y el riesgo por quintil. Las tres cifras (2.452 en riesgo, ARS 94,9 M/año, 51,8\% en Q5) se mantienen como referencia del tablero y se declaran en revisión hasta que Casa Óga informe el criterio de extracción de cada sistema (pedido del Entregable 2, sección 2.4). Ninguna se repite sin esta salvedad.
+El extracto de transacciones cae en los dos extremos: sube de 44 ventas en enero de 2022 a 893 en diciembre, y baja de 1.390 en enero de 2025 a 255 en diciembre, con el ticket medio estable y las altas de clientes sin caída. Se lee como una carga parcial, pero Casa Óga no tiene la causa (consulta 2 del Entregable 2). Como $\rho_i(t)$ se mide contra el corte, una carga incompleta del cierre de 2025 inflaría la recencia de todos y con ella $B_i(t)$, $X(t)$ y el riesgo por quintil. Las tres cifras (2.452 en riesgo, ARS 94,9 M/año, 51,8\% en Q5) se mantienen como referencia del tablero y se declaran en revisión hasta que Casa Óga explique la caída de septiembre a diciembre de 2025 (decisión DC-09 del Entregable 2). Con las decisiones de calidad del Entregable 2, sobre 5.634 clientes con la identidad unida, el riesgo pasa a 50,4\% de los elegibles y la exposición a ARS 96,4 M/año; con corte al 31/08/2025, a 38,5\% y ARS 77,7 M. Ninguna se repite sin esta salvedad.
 
 \section{Supuesto: la exposición no es recupero}
 

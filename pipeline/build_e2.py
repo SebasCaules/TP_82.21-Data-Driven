@@ -652,6 +652,11 @@ def _armar_v12(neg: dict) -> dict:
         {"id": "DC-09", "que": "explicar la caída de operaciones de septiembre a diciembre de 2025",
          "detalle": "esos meses quedan marcados 'cobertura no confirmada' (menos del 60 % de las operaciones del mismo mes del año anterior).",
          "estado": "pendiente del negocio"},
+        # (28/09, auditoría previa a la entrega) La consulta 10 de la Parte A sigue sin respuesta: V12 es
+        # la lista de lo abierto con Casa Óga y tiene que coincidir con el 3.4.
+        {"id": "Consulta 10", "que": "decir si hay datos de ventas anteriores a 2022",
+         "detalle": "consulta 10 de la Parte A (3.4): la pregunta 65 del envío del 11/08 no tiene fila en la planilla del 18/08. Con más historia, el entrenamiento suma cortes.",
+         "estado": "pendiente del negocio"},
     ],
         # (28/09, pedido del usuario) Lo que se le reporta sin esperar respuesta, debajo del pedido
         # en V12: las acciones que quedan de su lado y los casos que delegó.

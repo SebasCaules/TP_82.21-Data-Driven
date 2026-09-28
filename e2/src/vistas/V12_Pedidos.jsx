@@ -106,8 +106,8 @@ const FRASE_ABIERTOS = (ESPERAN.length
   ? `${ESPERAN.length} de las ${DECS.length} decisiones ${ESPERAN.length === 1 ? 'espera' : 'esperan'} `
     + `una respuesta de Casa Óga: ${QUIENES}.`
   : `Ninguna de las ${DECS.length} decisiones espera una respuesta de Casa Óga.`)
-  + (OTROS.length === 1 ? ` El\u00a0pedido\u00a0${OTROS[0]} no es una decisión: es un dato del registro.` : '')
-  + (OTROS.length > 1 ? ` Los pedidos ${lista(OTROS)} no son decisiones: son datos del registro.` : '')
+  + (OTROS.length === 1 ? ` La\u00a0${OTROS[0].toLowerCase()} no es una decisión: es una pregunta sin respuesta.` : '')
+  + (OTROS.length > 1 ? ` ${lista(OTROS)} no son decisiones: son preguntas sin respuesta.` : '')
 
 // (24/09) El pie queda en lo que el directorio usa, como en V01: el corte y la base, las dos
 // cosas calculadas. Salen «consultas 1 a 9 de la Parte A, 3.4» y «respuestas del 22/09», que

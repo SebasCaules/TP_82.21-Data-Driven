@@ -134,7 +134,7 @@ const T_SENS = `Si ${MESES_FLAG} están incompletos: riesgo medido al ${fechaCor
 // (28/09) Con un solo pedido, «1 de los 1 son… el primero» no se lee: va el pedido con su decisión.
 const T_PEDIDOS = N_PEDIDOS === 1
   ? `${pedidos[0].id}: ${pedidos[0].que}. Vista 12.`
-  : `${PEDIDOS_EN_TABLA} de los ${N_PEDIDOS} son de decisiones de abajo; el primero: `
+  : `${PEDIDOS_EN_TABLA} de los ${N_PEDIDOS} ${PEDIDOS_EN_TABLA === 1 ? 'es de una decisión' : 'son de decisiones'} de abajo; el primero: `
     + `${PEDIDO['DC-09'] ?? '—'}. Vista 12.`
 
 // (24/09) El pie queda en un renglón con lo que el directorio usa. Las filas del registro de
