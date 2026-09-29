@@ -492,3 +492,45 @@ button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset:
 /* (29/09) Miniatura en la orientación del mapa: 7 columnas anchas, 13 filas bajas. */
 .mapa-mini { grid-template-columns: repeat(7, 14px); gap: 1px 2px; }
 .mapa-mini .mapa-c { height: 2px; min-height: 2px; border-radius: 0; }
+/* ---------- movimiento (29/09, pedido del usuario) ----------
+   Cambio de vista: View Transitions con dirección (data-dir en <html>, lo pone App.jsx). La página
+   entera no se funde: se mueven el cuerpo de la vista y la pregunta; el resaltado del riel se
+   desliza de un ítem al otro; la miniatura del mapa queda en su lugar y solo cambian sus celdas. */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+.cuerpo { view-transition-name: e2-cuerpo; }
+.e2-enc .e2-preg { view-transition-name: e2-preg; }
+.lat-item.on { view-transition-name: e2-riel; }
+.mapa-boton { view-transition-name: e2-mini; }
+@media print { .cuerpo, .e2-enc .e2-preg, .lat-item.on, .mapa-boton { view-transition-name: none; } }
+
+@keyframes e2-sale { to { opacity: 0; transform: translateY(var(--e2-dy-sale)); } }
+@keyframes e2-entra { from { opacity: 0; transform: translateY(var(--e2-dy-entra)); } }
+:root { --e2-dy-sale: -14px; --e2-dy-entra: 22px; --e2-dy-preg: 10px; }
+:root[data-dir="atras"] { --e2-dy-sale: 14px; --e2-dy-entra: -22px; --e2-dy-preg: -10px; }
+
+::view-transition-group(e2-cuerpo) { animation-duration: 0s; }
+::view-transition-old(e2-cuerpo) { animation: e2-sale 110ms cubic-bezier(0.4, 0, 1, 1) both; }
+::view-transition-new(e2-cuerpo) { animation: e2-entra 380ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both; }
+::view-transition-group(e2-preg) { animation-duration: 0s; }
+::view-transition-old(e2-preg) { animation: e2-sale 100ms cubic-bezier(0.4, 0, 1, 1) both; --e2-dy-sale: calc(var(--e2-dy-preg) * -1); }
+::view-transition-new(e2-preg) { animation: e2-entra 340ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both; --e2-dy-entra: var(--e2-dy-preg); }
+::view-transition-old(e2-cuerpo), ::view-transition-old(e2-preg) { mix-blend-mode: normal; }
+::view-transition-group(e2-riel) { animation-duration: 320ms; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+::view-transition-group(e2-mini) { animation-duration: 0s; }
+::view-transition-old(e2-mini), ::view-transition-new(e2-mini) { animation-duration: 260ms; }
+
+/* Modal del mapa: la caja la anima MapaCalidad.jsx (nace de la miniatura); acá, las celdas de la
+   decisión se encienden en cascada cuando la caja ya llegó, y el fondo toma un desenfoque leve. */
+.mapa-modal { backdrop-filter: blur(2px); }
+.mapa-modal-caja { transform-origin: 50% 50%; will-change: transform; }
+.mapa-modal.cerrando { pointer-events: none; }
+@keyframes mapa-enciende { from { opacity: .15; transform: scale(.55); } 60% { transform: scale(1.12); } }
+.mapa-modal .mapa-c.on { animation: mapa-enciende 420ms cubic-bezier(0.16, 1, 0.3, 1) calc(360ms + var(--i, 0) * 28ms) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(e2-cuerpo), ::view-transition-old(e2-preg) { animation: e2-sale 120ms linear both; --e2-dy-sale: 0px; }
+  ::view-transition-new(e2-cuerpo), ::view-transition-new(e2-preg) { animation: e2-entra 160ms linear both; --e2-dy-entra: 0px; }
+  ::view-transition-group(e2-riel) { animation-duration: 0s; }
+  .mapa-modal { backdrop-filter: none; }
+  .mapa-modal .mapa-c.on { animation: none; }
+}
