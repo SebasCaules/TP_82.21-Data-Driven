@@ -14,6 +14,9 @@
   --e2-txt2: clamp(11.5px, 0.3vw + 8px, 14.5px);
   /* Rótulos cortos en mono (kpi-lbl, par-lbl): 10,5 px a 1152, 12,4 a 1920 (24/09). */
   --e2-rot: clamp(10.5px, 0.25vw + 7.6px, 13px);
+  /* Ocre de la marca de riesgo de sesgo alto (V11b, 29/09): un aviso declarado, no un
+     problema, así que no usa el terracota. 5,0:1 sobre blanco. */
+  --sesgo: #9a6400;
 }
 
 /* ---------- encabezado: nombre del tablero + corte fijo, sin controles ---------- */
@@ -536,27 +539,50 @@ button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset:
 }
 
 /* ---------- V11b · variables del dataset (29/09) ---------- */
-.v11b { display: flex; flex-direction: column; gap: 12px; height: 100%; min-height: 0; }
+/* (29/09, después de la presentación) Marca por variable con forma y color propios (rombo ocre:
+   riesgo de sesgo alto; reloj gris: sin historia), leyenda arriba y texto emergente por variable.
+   «Nuevo en el E2» pasa al encabezado de la tarjeta, en contorno, para no competir con las marcas. */
+.v11b { display: flex; flex-direction: column; gap: 10px; height: 100%; min-height: 0; }
 .v11b-banda { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .v11b-resumen { margin: 0; font: 400 var(--e2-txt)/1.4 var(--fuente); color: var(--ink); max-width: 70ch; }
 .v11b-ver { flex-shrink: 0; border: 1px solid var(--acc); background: #fff; color: var(--acc); font: 600 var(--e2-txt2)/1 var(--fuente); padding: 8px 12px; border-radius: 3px; cursor: pointer; }
 .v11b-ver:hover { background: var(--acc); color: #fff; }
-.v11b-grilla { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 10px; }
+/* Filas del alto de su contenido, estiradas con lo que sobra. Con 1fr las tres medían lo que
+   Ventas (14 variables) y a 1152 × 640 la tercera fila quedaba fuera de la pantalla. */
+.v11b-grilla { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: auto; align-content: stretch; gap: 10px; }
 .v11b-grupo { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-top: 3px solid var(--bd); min-height: 0; overflow: hidden; }
 .v11b-grupo.nuevo { border-top-color: var(--acc); }
-.v11b-enc { display: flex; justify-content: space-between; align-items: baseline; }
+.v11b-enc { display: flex; align-items: baseline; gap: 8px; }
 .v11b-nombre { font: 700 var(--e2-txt)/1.2 var(--fuente); color: var(--ink); }
-.v11b-n { font: 700 clamp(22px, 1.8vw, 32px)/1 var(--fuente); color: var(--acc); }
-.v11b-chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 18px; }
-.v11b-chip { font: 600 10.5px/1 var(--mono); letter-spacing: .03em; padding: 3px 6px; border-radius: 2px; text-transform: uppercase; }
-.v11b-chip.nuevo { background: var(--acc); color: #fff; }
-.v11b-chip.foto { background: #f3ead2; color: #6b5313; }
-.v11b-chip.sesgo { background: #f4e2df; color: #8f3128; }
-.v11b-vars { margin: 0; font: 400 var(--e2-txt2)/1.45 var(--mono); font-size: 11.5px; color: var(--mut2); overflow-wrap: anywhere; }
+.v11b-n { margin-left: auto; font: 700 clamp(22px, 1.8vw, 32px)/1 var(--fuente); color: var(--acc); }
+.v11b-nuevo { font: 600 10px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--acc); border: 1px solid var(--acc); border-radius: 2px; padding: 2px 5px; white-space: nowrap; }
+.v11b-leyenda { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 24px; font: 400 var(--e2-txt2)/1.35 var(--fuente); color: var(--mut2); }
+.v11b-leyenda li { display: inline-flex; align-items: center; gap: 6px; }
+.v11b-leyenda b { font-weight: 600; color: var(--ink); }
+.v11b-ley { display: inline-flex; align-items: center; gap: 5px; cursor: help; border-bottom: 1px dotted var(--mut); }
+.v11b-ley:hover { border-bottom-color: var(--acc); }
+.v11b-vars { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 2px 12px; font: 400 var(--e2-txt2)/1.45 var(--mono); color: var(--mut2); overflow-wrap: anywhere; }
+.v11b-var { display: inline-flex; align-items: center; gap: 3px; cursor: help; border-bottom: 1px dotted transparent; }
+.v11b-var:hover { color: var(--acc); border-bottom-color: var(--acc); }
+.v11b-var.sesgo, .v11b-var.historia { color: var(--ink); }
+.v11b-var:focus-visible, .v11b-ley:focus-visible, .v11b-sesgo-alto:focus-visible { outline: 2px solid var(--sel); outline-offset: 2px; border-radius: 2px; }
+.v11b-marca { width: .8em; height: .8em; flex-shrink: 0; }
+.v11b-marca.sesgo path { fill: var(--sesgo); }
+.v11b-marca.historia circle, .v11b-marca.historia path { fill: none; stroke: var(--mut); stroke-width: 1.3; stroke-linecap: round; }
+/* Texto emergente (Emergente.jsx) sobre la ficha del glosario del E1 (.def-pop). */
+.e2-emergente { z-index: 70; max-width: min(340px, calc(100vw - 16px)); pointer-events: none; }
+.v11b-ficha-nombre { font: 600 12px/1.2 var(--mono); color: var(--ink); }
+.v11b-ficha-marca { margin: 0; display: flex; gap: 6px; align-items: baseline; }
+.v11b-ficha-marca .v11b-marca { position: relative; top: 1px; }
+.v11b-ficha-marca b { font-weight: 600; color: var(--ink); }
 .v11b-modal { width: min(1320px, 96vw); }
+.v11b-modal .v11b-leyenda { margin-bottom: 10px; }
 .v11b-tabla { width: 100%; border-collapse: collapse; font: 400 12px/1.35 var(--fuente); color: var(--ink); }
 .v11b-tabla th { position: sticky; top: -14px; background: #fff; text-align: left; font: 600 10.5px/1.2 var(--mono); text-transform: uppercase; color: var(--mut); padding: 6px 8px; border-bottom: 1px solid var(--ink); }
 .v11b-tabla td { padding: 5px 8px; border-bottom: 1px solid var(--bd); vertical-align: top; }
-.v11b-tabla .v11b-var { font-family: var(--mono); font-size: 11.5px; }
+.v11b-tabla .v11b-var-celda { font-family: var(--mono); font-size: 11.5px; }
+.v11b-tabla .v11b-var-celda .v11b-marca { margin-right: 3px; vertical-align: -1px; }
 .v11b-tabla tr.target td { background: #eef3f8; font-weight: 600; }
-.v11b-tabla .s-alto { color: #8f3128; font-weight: 600; }
+.v11b-tabla .s-alto { font-weight: 600; }
+.v11b-tabla .s-bajo { color: var(--mut); }
+.v11b-sesgo-alto { display: inline-flex; align-items: center; gap: 4px; cursor: help; border-bottom: 1px dotted var(--mut); }
