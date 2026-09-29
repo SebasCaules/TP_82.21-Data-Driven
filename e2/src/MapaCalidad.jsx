@@ -25,7 +25,9 @@ export function celdasDe(dcs) {
   return out
 }
 
-export function Mapa({ modo = 'despues', resaltar = [], mini = false }) {
+const CORTO = { Completitud: 'Compl.', Consistencia: 'Consist.', Exactitud: 'Exact.', Actualidad: 'Actual.', Validez: 'Validez', Unicidad: 'Unic.', Trazabilidad: 'Traz.' }
+
+export function Mapa({ modo = 'despues', resaltar = [], mini = false, corto = false }) {
   const marcar = resaltar.length > 0
   // (29/09) La miniatura va traspuesta (7 filas de dimensiones × 13 columnas de archivos) para que
   // entre en el alto del encabezado sin empujar la vista hacia abajo.
@@ -44,7 +46,7 @@ export function Mapa({ modo = 'despues', resaltar = [], mini = false }) {
     <div className={`mapa ${mini ? 'mapa-mini' : ''}`} role="img"
       aria-label={`Mapa de calidad ${modo === 'antes' ? 'antes' : 'después'} de las decisiones`}>
       {!mini && <span />}
-      {!mini && DIMS.map((d) => <span key={d} className="mapa-dim">{d}</span>)}
+      {!mini && DIMS.map((d) => <span key={d} className="mapa-dim" title={d}>{corto ? CORTO[d] : d}</span>)}
       {MAPA.map((f) => [
         !mini && <span key={f.archivo} className="mapa-arch">{f.archivo.replaceAll('_', ' ')}</span>,
         ...f.celdas.map((c, j) => {
@@ -85,8 +87,9 @@ export function MapaMini({ dcs, etiqueta }) {
     window.addEventListener('keydown', onKey, true)
     return () => window.removeEventListener('keydown', onKey, true)
   }, [abierto])
+  const nombre = dcs?.length > 2 ? `${dcs.length} decisiones` : dcs?.join(' y ')
   const titulo = dcs?.length
-    ? (celdas.length ? `${dcs.join(', ')} en el mapa de calidad: ${celdas.length} ${celdas.length === 1 ? 'celda' : 'celdas'}` : `${dcs.join(', ')} no cierra una celda del mapa`)
+    ? (celdas.length ? `${nombre}: ${celdas.length} ${celdas.length === 1 ? 'celda' : 'celdas'} del mapa de calidad` : `${nombre} no cierra una celda del mapa`)
     : 'Mapa de calidad después de las decisiones'
   return (
     <>
@@ -101,13 +104,13 @@ export function MapaMini({ dcs, etiqueta }) {
               <button type="button" className="mapa-cerrar" onClick={() => setAbierto(false)} aria-label="Cerrar">×</button>
             </div>
             <div className="mapa-par">
-              <div><p className="mapa-rot">Antes (Parte A, 3.1)</p><Mapa modo="antes" resaltar={dcs ?? []} /></div>
-              <div><p className="mapa-rot">Después de las decisiones (Parte B, 1.1)</p><Mapa modo="despues" resaltar={dcs ?? []} /></div>
+              <div><p className="mapa-rot">Antes (Parte A, 3.1)</p><Mapa modo="antes" resaltar={dcs ?? []} corto /></div>
+              <div><p className="mapa-rot">Después de las decisiones (Parte B, 1.1)</p><Mapa modo="despues" resaltar={dcs ?? []} corto /></div>
             </div>
-            {celdas.length > 0 && (
+            {celdas.length > 0 && celdas.length <= 6 && (
               <ul className="mapa-lista">
                 {celdas.map((c) => (
-                  <li key={c.archivo + c.dim}><b>{c.archivo.replaceAll('_', ' ')} · {c.dim}</b>: {c.antes} {c.hallazgo} → {c.despues} ({c.ref})</li>
+                  <li key={c.archivo + c.dim}><b>{c.archivo.replaceAll('_', ' ')} · {c.dim}.</b> {c.hallazgo} → {c.despues}</li>
                 ))}
               </ul>
             )}
