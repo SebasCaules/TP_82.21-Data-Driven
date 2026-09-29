@@ -645,8 +645,9 @@ def _armar_v12(neg: dict, v11: dict) -> dict:
     # (29/09, cierre) Sin pedidos: nada espera una respuesta de Casa Óga. La causa de la caída de
     # sep-dic 2025 (DC-09) pasa a lo que se le reporta: Casa Óga dijo que no la tiene, que no se asuma
     # una y que el criterio de los meses incompletos es del equipo (consulta 2), y ya está aplicado
-    # (umbral del 60 %). La consulta 10 (datos anteriores a 2022, envío 65) no tuvo respuesta en la
-    # planilla del 18/08 ni en la del 22/09: el equipo trabaja con 2022-2025 y se le informa.
+    # (umbral del 60 %). La consulta 10 (datos anteriores a 2022) se hizo en la Parte A del E2 (15/09;
+    # no estaba en el relevamiento del 11/08) y no tuvo respuesta el 22/09: el equipo trabaja con
+    # 2022-2025 y se le informa.
     cortes = [c["corte"] for c in v11["cortes"]]
     primero, ultimo = cortes[0], cortes[-1]
     mes = lambda f: f"{_MESES_ES[int(f[5:7]) - 1]} de {f[:4]}"
