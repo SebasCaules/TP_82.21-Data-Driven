@@ -534,3 +534,29 @@ button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset:
   .mapa-modal { backdrop-filter: none; }
   .mapa-modal .mapa-c.on { animation: none; }
 }
+
+/* ---------- V11b · variables del dataset (29/09) ---------- */
+.v11b { display: flex; flex-direction: column; gap: 12px; height: 100%; min-height: 0; }
+.v11b-banda { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.v11b-resumen { margin: 0; font: 400 var(--e2-txt)/1.4 var(--fuente); color: var(--ink); max-width: 70ch; }
+.v11b-ver { flex-shrink: 0; border: 1px solid var(--acc); background: #fff; color: var(--acc); font: 600 var(--e2-txt2)/1 var(--fuente); padding: 8px 12px; border-radius: 3px; cursor: pointer; }
+.v11b-ver:hover { background: var(--acc); color: #fff; }
+.v11b-grilla { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 10px; }
+.v11b-grupo { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-top: 3px solid var(--bd); min-height: 0; overflow: hidden; }
+.v11b-grupo.nuevo { border-top-color: var(--acc); }
+.v11b-enc { display: flex; justify-content: space-between; align-items: baseline; }
+.v11b-nombre { font: 700 var(--e2-txt)/1.2 var(--fuente); color: var(--ink); }
+.v11b-n { font: 700 clamp(22px, 1.8vw, 32px)/1 var(--fuente); color: var(--acc); }
+.v11b-chips { display: flex; flex-wrap: wrap; gap: 4px; min-height: 18px; }
+.v11b-chip { font: 600 10.5px/1 var(--mono); letter-spacing: .03em; padding: 3px 6px; border-radius: 2px; text-transform: uppercase; }
+.v11b-chip.nuevo { background: var(--acc); color: #fff; }
+.v11b-chip.foto { background: #f3ead2; color: #6b5313; }
+.v11b-chip.sesgo { background: #f4e2df; color: #8f3128; }
+.v11b-vars { margin: 0; font: 400 var(--e2-txt2)/1.45 var(--mono); font-size: 11.5px; color: var(--mut2); overflow-wrap: anywhere; }
+.v11b-modal { width: min(1320px, 96vw); }
+.v11b-tabla { width: 100%; border-collapse: collapse; font: 400 12px/1.35 var(--fuente); color: var(--ink); }
+.v11b-tabla th { position: sticky; top: -14px; background: #fff; text-align: left; font: 600 10.5px/1.2 var(--mono); text-transform: uppercase; color: var(--mut); padding: 6px 8px; border-bottom: 1px solid var(--ink); }
+.v11b-tabla td { padding: 5px 8px; border-bottom: 1px solid var(--bd); vertical-align: top; }
+.v11b-tabla .v11b-var { font-family: var(--mono); font-size: 11.5px; }
+.v11b-tabla tr.target td { background: #eef3f8; font-weight: 600; }
+.v11b-tabla .s-alto { color: #8f3128; font-weight: 600; }

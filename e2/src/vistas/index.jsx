@@ -28,6 +28,7 @@ const PREGUNTA = {
   V09: '¿cuánto vale el NPS?',
   V10: '¿cambió la cifra del directorio?',
   V11: '¿cómo se entrena y se elige el modelo?',
+  V11b: '¿con qué variables aprende el modelo?',
   V12: '¿qué falta del lado del negocio?',
 }
 
