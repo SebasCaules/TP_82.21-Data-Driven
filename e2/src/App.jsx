@@ -162,7 +162,7 @@ function Encabezado({ indice, vista }) {
       <div className="e2-enc-der">
         <span className="e2-enc-corte">{`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS} · corte ${fechaCorta(D2.meta.corte_ref)}`}</span>
         {/* (29/09) Miniatura del mapa de calidad con las celdas de la decisión de esta vista; abre un modal. */}
-        {vista.id !== 'V01b' && <MapaMini dcs={DCS_VISTA[vista.id] ?? (vista.dc ? [vista.dc] : [])} etiqueta={etiquetaDe(vista)} />}
+        {vista.id !== 'V01b' && <MapaMini key={vista.id} dcs={DCS_VISTA[vista.id] ?? (vista.dc ? [vista.dc] : [])} etiqueta={etiquetaDe(vista)} />}
       </div>
     </header>
   )
