@@ -29,12 +29,12 @@ const CORTO = { Completitud: 'Compl.', Consistencia: 'Consist.', Exactitud: 'Exa
 
 export function Mapa({ modo = 'despues', resaltar = [], mini = false, corto = false }) {
   const marcar = resaltar.length > 0
-  // (29/09) La miniatura va traspuesta (7 filas de dimensiones × 13 columnas de archivos) para que
-  // entre en el alto del encabezado sin empujar la vista hacia abajo.
+  // (29/09) La miniatura tiene la misma orientación que el mapa (13 archivos × 7 dimensiones), con
+  // celdas anchas y bajas para que entre en el alto del encabezado sin empujar la vista.
   if (mini) {
     return (
       <div className="mapa mapa-mini" role="img" aria-label="Mapa de calidad después de las decisiones">
-        {DIMS.map((d, j) => MAPA.map((f) => {
+        {MAPA.map((f) => DIMS.map((d, j) => {
           const c = f.celdas[j]
           const on = marcar && resaltar.includes(c.ref)
           return <span key={d + f.archivo} className={`mapa-c ${c.despues ? GRUPO[c.despues] : 'ok'} ${marcar ? (on ? 'on' : 'off') : ''}`} />
