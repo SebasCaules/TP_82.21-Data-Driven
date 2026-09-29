@@ -4,7 +4,7 @@
 // (CORTE_REF, 2025-12-31) — así que no hay controles que apagar con leyenda (Nielsen H1):
 // directamente no existen.
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { VISTAS, etiquetaDe, indiceDe, grupoDe, TOTAL_VISTAS } from './vistas/index.jsx'
 import { D2 } from './datos_e2.js'
@@ -23,19 +23,49 @@ function indiceDeHash() {
 const TITULO_BASE = 'Casa Óga · Calidad de datos'
 
 export default function App() {
-  const [indice, setIndice] = useState(indiceDeHash)
+  const [indice, setIndiceCrudo] = useState(indiceDeHash)
   const [imprimiendo, setImprimiendo] = useState(false)
 
   const vista = VISTAS[indice]
 
+  // (29/09, pedido del usuario) Cambio de vista con transición: la vista nueva entra desde el lado
+  // hacia el que se avanza en el riel (abajo al avanzar, arriba al volver) y el resaltado del riel
+  // se desliza hasta el ítem nuevo. View Transitions donde existe; si no, una entrada con WAAPI
+  // (efecto de abajo). Todas las rutas (riel, flechas, V01, Atrás del navegador) pasan por acá.
+  const actual = useRef(indice)
+  const setIndice = useCallback((i) => {
+    if (i === actual.current) return
+    const dir = i > actual.current ? 'adelante' : 'atras'
+    actual.current = i
+    document.documentElement.dataset.dir = dir
+    if (document.startViewTransition && document.visibilityState === 'visible') {
+      document.startViewTransition(() => flushSync(() => setIndiceCrudo(i)))
+    } else setIndiceCrudo(i)
+  }, [])
+
   const irA = useCallback((i) => {
     setIndice(Math.max(0, Math.min(VISTAS.length - 1, i)))
-  }, [])
+  }, [setIndice])
   // (25/09) Ir a una vista por su id («V12») o a la pantalla de una decisión («DC-05»).
   const irAVista = useCallback((ref) => {
     const i = indiceDe(ref)
     if (i >= 0) setIndice(i)
-  }, [])
+  }, [setIndice])
+
+  // Sin View Transitions (Firefox, Safari < 18): solo la entrada de la vista nueva.
+  const cuerpo = useRef(null)
+  const montada = useRef(false)
+  useLayoutEffect(() => {
+    if (!montada.current) { montada.current = true; return }
+    if (document.startViewTransition || !cuerpo.current?.animate) return
+    const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches
+    const dy = document.documentElement.dataset.dir === 'atras' ? -18 : 18
+    cuerpo.current.animate(
+      quieto ? [{ opacity: 0 }, { opacity: 1 }]
+        : [{ opacity: 0, transform: `translateY(${dy}px)` }, { opacity: 1, transform: 'none' }],
+      { duration: quieto ? 140 : 340, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+    )
+  }, [indice])
 
   const imprimirTodo = useCallback(() => {
     // Mismos dos rAF que el E1: dan tiempo a que el flujo de hojas esté montado y medido
@@ -71,7 +101,7 @@ export default function App() {
     const alVolver = () => setIndice(indiceDeHash())
     window.addEventListener('popstate', alVolver)
     return () => window.removeEventListener('popstate', alVolver)
-  }, [])
+  }, [setIndice])
 
   // Si el foco ya está en el riel (Tab y después flechas), sigue a la vista activa: si no,
   // el anillo de foco queda en el botón anterior y el activo se ve sin foco. No roba el foco
@@ -143,7 +173,7 @@ export default function App() {
         <p className="solo-lector" aria-live="polite">{`Vista ${etiquetaDe(vista)} de ${TOTAL_VISTAS}: ${vista.pregunta ?? vista.titulo}`}</p>
         <Encabezado indice={indice} vista={vista} />
 
-        <main className="cuerpo">
+        <main className="cuerpo" ref={cuerpo}>
           {/* irA: V01 lleva a cada vista desde su tabla (24/09). En la hoja impresa no va. */}
           {imprimiendo ? <Impresion /> : <vista.Componente irA={irA} irAVista={irAVista} vistaDe={vistaDe} />}
         </main>
