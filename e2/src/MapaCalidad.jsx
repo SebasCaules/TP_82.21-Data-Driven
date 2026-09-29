@@ -27,6 +27,19 @@ export function celdasDe(dcs) {
 
 export function Mapa({ modo = 'despues', resaltar = [], mini = false }) {
   const marcar = resaltar.length > 0
+  // (29/09) La miniatura va traspuesta (7 filas de dimensiones × 13 columnas de archivos) para que
+  // entre en el alto del encabezado sin empujar la vista hacia abajo.
+  if (mini) {
+    return (
+      <div className="mapa mapa-mini" role="img" aria-label="Mapa de calidad después de las decisiones">
+        {DIMS.map((d, j) => MAPA.map((f) => {
+          const c = f.celdas[j]
+          const on = marcar && resaltar.includes(c.ref)
+          return <span key={d + f.archivo} className={`mapa-c ${c.despues ? GRUPO[c.despues] : 'ok'} ${marcar ? (on ? 'on' : 'off') : ''}`} />
+        }))}
+      </div>
+    )
+  }
   return (
     <div className={`mapa ${mini ? 'mapa-mini' : ''}`} role="img"
       aria-label={`Mapa de calidad ${modo === 'antes' ? 'antes' : 'después'} de las decisiones`}>

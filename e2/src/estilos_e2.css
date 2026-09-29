@@ -466,3 +466,12 @@ button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset:
 .v01b .mapa-par.grande .mapa { grid-template-columns: minmax(0, 8.5em) repeat(7, minmax(0, 1fr)); }
 .v01b .mapa-par.grande .mapa-arch { white-space: normal; line-height: 1.15; }
 .v01b .mapa-par.grande .mapa-dim { font-size: clamp(8.5px, .62vw, 11px); letter-spacing: -.01em; }
+/* (29/09) Miniatura: el resaltado es solo contraste (sin contorno, que en celdas de 9 px se pegaba) y
+   el bloque de la derecha no le quita ancho a la pregunta. */
+.mapa-mini .mapa-c.on { outline: 0; }
+.mapa-mini .mapa-c.off { opacity: .28; }
+.mapa-mini { gap: 2px; }
+.e2-enc-der { flex-shrink: 0; }
+.e2-enc-corte { white-space: nowrap; }
+.mapa-mini { grid-template-columns: repeat(13, 8px); gap: 1px; }
+.mapa-mini .mapa-c { height: 5px; min-height: 5px; border-radius: 1px; }
