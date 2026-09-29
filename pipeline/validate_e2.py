@@ -343,11 +343,11 @@ def main() -> int:
                 "envios": int(cam["id_cliente"].isin(sin_ids).sum())}
     rep = {r["id"]: r for r in payload["vistas"].get("V12", {}).get("reportes", [])}
     real = rep.get("D18 (registro)", {}).get("cifras")
-    if real != esperado or set(rep) != {"DC-09", "Consulta 10", "D18 (registro)", "DC-07", "DC-13"}:
+    if real != esperado or set(rep) != {"DC-09", "D18 (registro)", "DC-07", "DC-13"}:
         _FALLAS.append(f"V12.reportes: {sorted(rep)} y cifras {real} != {esperado}")
         print(f"FALLA V12.reportes: {real} != {esperado}")
     else:
-        print(f"OK    V12.reportes: DC-09, consulta 10, D18, DC-07 y DC-13, sin pedidos; D18 = {esperado['sin_solicitud']} sin solicitud, "
+        print(f"OK    V12.reportes: DC-09, D18, DC-07 y DC-13, sin pedidos; D18 = {esperado['sin_solicitud']} sin solicitud, "
               f"{esperado['con_envio']} con envíos, {esperado['envios']} envíos (E12)")
     pm = payload["meta"].get("plan_modelo", {})
     if pm.get("capacidad") != [500, 800] or pm.get("meta_lift") != 1.3:

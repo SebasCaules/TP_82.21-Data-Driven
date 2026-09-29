@@ -6,8 +6,8 @@
 // (29/09, cierre) Hasta ese día la vista era «Lo que le pedimos a Casa Óga», con un pedido (DC-09)
 // y, debajo, lo que se reportaba sin esperar respuesta. Ya no hay pedidos: Casa Óga no tiene la
 // causa de la caída de sep-dic 2025, pidió que no se asuma una y dejó el criterio de esos meses al
-// equipo (consulta 2), que ya está aplicado. La causa pasa a lo que se le reporta, junto con la
-// consulta 10 (sin respuesta; el equipo trabaja con 2022-2025) y los tres reportes del 28/09
+// equipo (consulta 2), que ya está aplicado. La causa pasa a lo que se le reporta, junto con los
+// tres reportes del 28/09 (la «consulta 10» salió el 29/09: nunca se le preguntó)
 // (D18, DC-07 y DC-13). Regla de dos estados para el público (CLAUDE.md del vault, §8): nada se
 // muestra como pendiente.
 //
@@ -123,7 +123,7 @@ const celda = {
 const primera = { paddingLeft: 10 }
 
 /** (26/09, revisión UX H13) El id de la fila. Un reporte que no es una decisión no muestra su
- *  código («D18 (registro)», «Consulta 10»): va en el title. La barra marca la fila de la cifra
+ *  código («D18 (registro)»): va en el title. La barra marca la fila de la cifra
  *  central, sin mover la columna. */
 function CeldaId({ id, marcada = false }) {
   const esDc = id.startsWith('DC-')

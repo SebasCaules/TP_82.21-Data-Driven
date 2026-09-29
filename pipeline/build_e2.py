@@ -645,21 +645,14 @@ def _armar_v12(neg: dict, v11: dict) -> dict:
     # (29/09, cierre) Sin pedidos: nada espera una respuesta de Casa Óga. La causa de la caída de
     # sep-dic 2025 (DC-09) pasa a lo que se le reporta: Casa Óga dijo que no la tiene, que no se asuma
     # una y que el criterio de los meses incompletos es del equipo (consulta 2), y ya está aplicado
-    # (umbral del 60 %). La consulta 10 (datos anteriores a 2022) se hizo en la Parte A del E2 (15/09;
-    # no estaba en el relevamiento del 11/08) y no tuvo respuesta el 22/09: el equipo trabaja con
-    # 2022-2025 y se le informa.
-    cortes = [c["corte"] for c in v11["cortes"]]
-    primero, ultimo = cortes[0], cortes[-1]
-    mes = lambda f: f"{_MESES_ES[int(f[5:7]) - 1]} de {f[:4]}"
+    # (umbral del 60 %). (29/09) Sale la «consulta 10» (datos anteriores a 2022): la Parte A enviada
+    # el 15/09 tenía nueve consultas y Casa Óga respondió las nueve; la décima la agregó el equipo
+    # después y nunca se le preguntó.
     return {"reportes": [
         {"id": "DC-09", "que": "la caída de operaciones de septiembre a diciembre de 2025",
          "detalle": ("Casa Óga la revisa con Operaciones y el proveedor del POS. El equipo marca esos meses "
                      "como 'cobertura no confirmada' (menos del 60 % de las operaciones del mismo mes del año "
                      "anterior) y da el riesgo también medido antes de ellos.")},
-        {"id": "Consulta 10", "que": "el equipo trabaja con las ventas de 2022 a 2025",
-         "detalle": (f"la consulta 10 (datos anteriores a 2022) no tuvo respuesta. El dataset pide 12 meses de "
-                     f"historia y sus cortes van de {mes(primero)} a {mes(ultimo)}: 2022-2025 alcanza. Años "
-                     f"anteriores sumarían cortes en el Entregable 3.")},
         # (28/09, pedido del usuario) Las acciones que quedan de su lado y los casos que delegó.
         {"id": "D18 (registro)",
          "que": f"dejar de enviar campañas a {_miles(neg['sin_solicitud'])} clientes que no aceptaron marketing",
