@@ -15,6 +15,7 @@ const modulos = import.meta.glob('./V*.jsx', { eager: true })
 // sino que resolver los duplicados no mueve ninguna tasa.
 const PREGUNTA = {
   V01: '¿qué cambió y qué falta?',
+  V01b: '¿qué cambió en el mapa de calidad?',
   V02: '¿por qué un corte común?',
   V03: '¿qué meses no se pueden leer?',
   V04: '¿qué cambia al unir identidades?',

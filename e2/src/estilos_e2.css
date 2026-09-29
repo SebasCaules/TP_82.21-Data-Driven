@@ -421,3 +421,74 @@ button.v01r-ficha:focus-visible { outline: 2px solid var(--acc); outline-offset:
   .e2-enc { display: none; }
   .app { background: #fff; }
 }
+
+/* ---------- mapa de calidad (29/09): vista 1b, miniatura del encabezado y modal ---------- */
+.mapa { display: grid; grid-template-columns: minmax(9em, auto) repeat(7, 1fr); gap: 3px; font: 600 11px/1 var(--fuente); }
+.mapa-mini { grid-template-columns: repeat(7, 7px); gap: 1px; }
+.mapa-dim { font: 600 10px/1.1 var(--fuente); color: var(--mut); text-align: center; align-self: end; padding-bottom: 2px; }
+.mapa-arch { font: 600 11px/1.2 var(--fuente); color: var(--mut2); text-align: right; padding-right: 6px; align-self: center; }
+.mapa-c { display: flex; align-items: center; justify-content: center; min-height: 20px; border-radius: 2px; background: #e7efe9; color: #2f6b4f; font-style: normal; }
+.mapa-mini .mapa-c { min-height: 5px; height: 5px; }
+.mapa-c.tratada { background: var(--despues); color: #fff; }
+.mapa-c.declarada { background: #c99a2e; color: var(--ink); }
+.mapa-c.pendiente, .mapa-c.grave { background: var(--terra); color: #fff; }
+.mapa-c.aviso { background: #e8c872; color: var(--ink); }
+.mapa-c.off { opacity: .22; }
+.mapa-c.on { outline: 2px solid var(--ink); outline-offset: 1px; position: relative; z-index: 1; }
+.mapa-mini .mapa-c.on { outline-width: 1px; }
+.mapa-ley { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 8px 0 0; font: 400 11px/1.3 var(--fuente); color: var(--mut); }
+.mapa-ley .mapa-c { display: inline-flex; width: 20px; min-height: 16px; margin-right: 3px; }
+.mapa-rot { margin: 0 0 6px; font: 600 var(--e2-rot)/1.2 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink); }
+.mapa-par { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(12px, 1.5vw, 24px); }
+.v01b .mapa-par.grande .mapa-c { min-height: clamp(20px, 3.4vh, 34px); font-size: clamp(11px, .7vw, 14px); }
+.v01b .mapa-par.grande .mapa-arch, .v01b .mapa-par.grande .mapa-dim { font-size: clamp(10px, .65vw, 13px); }
+.e2-enc-der { display: flex; align-items: center; gap: 12px; }
+.mapa-boton { border: 1px solid var(--bd); background: #fff; padding: 3px; border-radius: 3px; cursor: zoom-in; line-height: 0; }
+.mapa-boton:hover, .mapa-boton:focus-visible { border-color: var(--acc); }
+.mapa-modal { position: fixed; inset: 0; z-index: 50; background: rgba(22, 35, 58, .45); display: flex; align-items: center; justify-content: center; }
+.mapa-modal-caja { background: #fff; border-radius: 4px; padding: 16px 20px; width: min(1180px, 94vw); max-height: 92vh; overflow: auto; box-shadow: 0 10px 40px rgba(0, 0, 0, .25); }
+.mapa-modal-enc { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font: 400 15px/1.3 var(--fuente); color: var(--ink); }
+.mapa-cerrar { border: 0; background: none; font-size: 26px; line-height: 1; cursor: pointer; color: var(--mut); }
+.mapa-lista { margin: 12px 0 0; padding-left: 18px; font: 400 13px/1.45 var(--fuente); color: var(--ink); }
+@media print { .mapa-boton, .mapa-modal { display: none; } }
+.mapa-mini { grid-template-columns: repeat(7, 9px); }
+.mapa-mini .mapa-c { height: 6px; min-height: 6px; }
+.mapa-mini .mapa-c.off { opacity: .35; }
+.mapa-dim { font-size: 9px; overflow-wrap: anywhere; }
+/* (29/09) Vista 1b: los dos mapas ocupan todo el alto libre; rótulos de dimensión sin cortar palabras. */
+.mapa-dim { overflow-wrap: normal; word-break: normal; hyphens: none; font-size: 10px; }
+.v01b { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.v01b .mapa-par.grande { flex: 1; min-height: 0; }
+.v01b .mapa-par.grande > .tarjeta { display: flex; flex-direction: column; min-height: 0; }
+.v01b .mapa-par.grande .mapa { flex: 1; grid-template-rows: auto repeat(13, 1fr); grid-template-columns: minmax(10em, auto) repeat(7, minmax(0, 1fr)); }
+.v01b .mapa-par.grande .mapa-c { min-height: 0; }
+.v01b .mapa-par.grande .mapa-ley .mapa-c { min-height: 16px; width: 20px; font-size: 11px; flex: none; }
+.v01b .mapa-par.grande .mapa { grid-template-columns: minmax(0, 8.5em) repeat(7, minmax(0, 1fr)); }
+.v01b .mapa-par.grande .mapa-arch { white-space: normal; line-height: 1.15; }
+.v01b .mapa-par.grande .mapa-dim { font-size: clamp(8.5px, .62vw, 11px); letter-spacing: -.01em; }
+/* (29/09) Miniatura: el resaltado es solo contraste (sin contorno, que en celdas de 9 px se pegaba) y
+   el bloque de la derecha no le quita ancho a la pregunta. */
+.mapa-mini .mapa-c.on { outline: 0; }
+.mapa-mini .mapa-c.off { opacity: .28; }
+.mapa-mini { gap: 2px; }
+.e2-enc-der { flex-shrink: 0; }
+.e2-enc-corte { white-space: nowrap; }
+.mapa-mini { grid-template-columns: repeat(13, 8px); gap: 1px; }
+.mapa-mini .mapa-c { height: 5px; min-height: 5px; border-radius: 1px; }
+/* (29/09) Modal con menos ruido: sin contornos, lo que no es de la decisión casi invisible, mapas en
+   columna si no entran lado a lado, celdas más chicas y título corto. */
+.mapa-modal .mapa-c.on { outline: 0; }
+.mapa-modal .mapa-c.off { opacity: .15; }
+.mapa-modal .mapa-par { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px 28px; }
+.mapa-modal .mapa { grid-template-columns: minmax(0, 7.5em) repeat(7, minmax(0, 1fr)); gap: 2px; font-size: 10px; }
+.mapa-modal .mapa-c { min-height: 18px; }
+.mapa-modal .mapa-arch { font-size: 10px; font-weight: 500; line-height: 1.1; white-space: normal; }
+.mapa-modal .mapa-dim { font-size: 9px; font-weight: 500; }
+.mapa-modal-enc strong { font-size: 15px; font-weight: 600; }
+.mapa-modal-caja { padding: 14px 18px; }
+.mapa-modal .mapa-lista { list-style: none; padding: 0; font-size: 12.5px; color: var(--mut2); }
+.mapa-modal .mapa-lista b { color: var(--ink); font-weight: 600; }
+@media (max-width: 900px) { .e2-enc { flex-wrap: wrap; } .e2-preg { flex: 1 1 100%; } }
+/* (29/09) Miniatura en la orientación del mapa: 7 columnas anchas, 13 filas bajas. */
+.mapa-mini { grid-template-columns: repeat(7, 14px); gap: 1px 2px; }
+.mapa-mini .mapa-c { height: 2px; min-height: 2px; border-radius: 0; }

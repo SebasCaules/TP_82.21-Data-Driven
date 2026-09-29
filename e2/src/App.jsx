@@ -11,6 +11,7 @@ import { D2 } from './datos_e2.js'
 import { fechaCorta } from './formato.js'
 import MarcaInicio from '../../src/MarcaInicio.jsx'
 import { ImpresionCtx } from './escala.js'
+import { MapaMini } from './MapaCalidad.jsx'
 
 /** (26/09, revisión UX H8) La vista va en la URL («#v07b»): se puede recargar o compartir una
  *  vista, y Atrás y Adelante del navegador recorren las vistas en vez de salir del tablero. */
@@ -158,9 +159,20 @@ function Encabezado({ indice, vista }) {
   return (
     <header className="e2-enc">
       <h1 className="e2-preg">{preguntaTitulo(vista.pregunta ?? vista.corto)}</h1>
-      <span className="e2-enc-corte">{`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS} · corte ${fechaCorta(D2.meta.corte_ref)}`}</span>
+      <div className="e2-enc-der">
+        <span className="e2-enc-corte">{`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS} · corte ${fechaCorta(D2.meta.corte_ref)}`}</span>
+        {/* (29/09) Miniatura del mapa de calidad con las celdas de la decisión de esta vista; abre un modal. */}
+        {vista.id !== 'V01b' && <MapaMini key={vista.id} dcs={DCS_VISTA[vista.id] ?? (vista.dc ? [vista.dc] : [])} etiqueta={etiquetaDe(vista)} />}
+      </div>
     </header>
   )
+}
+
+/** (29/09) Decisiones que resalta la miniatura cuando la vista no declara una sola en meta.dc. */
+const DCS_VISTA = {
+  V01: ['DC-01', 'DC-02', 'DC-03', 'DC-04', 'DC-05', 'DC-06', 'DC-07', 'DC-08', 'DC-11', 'DC-12', 'DC-13', 'DC-14', 'DC-15'],
+  V10: ['DC-04', 'DC-08'],
+  V12: ['DC-07', 'DC-13'],
 }
 
 /** «¿qué cambió y qué falta?» → «¿Qué cambió y qué falta?» */
