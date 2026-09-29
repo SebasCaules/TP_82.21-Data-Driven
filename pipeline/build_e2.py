@@ -653,9 +653,11 @@ def _armar_v12(neg: dict) -> dict:
          "detalle": "esos meses quedan marcados 'cobertura no confirmada' (menos del 60 % de las operaciones del mismo mes del año anterior).",
          "estado": "pendiente del negocio"},
         # (28/09, auditoría previa a la entrega) La consulta 10 de la Parte A sigue sin respuesta: V12 es
-        # la lista de lo abierto con Casa Óga y tiene que coincidir con el 3.4.
+        # la lista de lo abierto con Casa Óga y tiene que coincidir con el 3.4. (29/09) En la planilla
+        # revisada, la fila 65 lleva el texto de la pregunta 65 del envío con la respuesta del
+        # diccionario de datos (la que en la del 18/08 respondía la 64): tiene fila y sigue sin respuesta.
         {"id": "Consulta 10", "que": "decir si hay datos de ventas anteriores a 2022",
-         "detalle": "es la consulta 10 de la Parte A (3.4), la pregunta 65 del envío del 11/08, que no aparece en la planilla del 18/08. Con más años de historia, el modelo tendría más cortes para entrenar.",
+         "detalle": "es la consulta 10 de la Parte A (3.4), la pregunta 65 del envío del 11/08: la planilla revisada la responde con el texto del diccionario de datos. Con más años de historia, el modelo tendría más cortes para entrenar.",
          "estado": "pendiente del negocio"},
     ],
         # (28/09, pedido del usuario) Lo que se le reporta sin esperar respuesta, debajo del pedido
