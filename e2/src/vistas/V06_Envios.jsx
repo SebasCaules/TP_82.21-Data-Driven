@@ -216,7 +216,7 @@ function BarraContactables800({ w, h, k }) {
 const NOTA_CADENA = `${entero(anclaContactables800)}: Entregable 1, lista armada antes de unir identidades · `
   + `${entero(conConsentimiento)}: con consentimiento, identidad unida (DC-04) · ${entero(sinBaja)}: además `
   + `sin baja pedida, ${entero(conBaja)} menos (DC-12). La lista sale del riesgo al `
-  + `${fechaCorta(infoMeta.corte_ref)}, en revisión.`
+  + `${fechaCorta(infoMeta.corte_ref)}, que se informa con la sensibilidad de DC-09 (vista 3).`
 
 export default function V06Envios({ irAVista }) {
   const k = useEscalaTexto()
@@ -225,7 +225,7 @@ export default function V06Envios({ irAVista }) {
       <Banda dcs={[dc12]}>
         <div className="tarjeta e2-central" title={NOTA_CADENA}>
           <span className="kpi-lbl">
-            <span>Contactables de la lista de {entero(TAM_LISTA)}</span><EtiquetaIr texto="en revisión" irAVista={irAVista} />
+            <span>Contactables de la lista de {entero(TAM_LISTA)}</span><EtiquetaIr texto="con sensibilidad" irAVista={irAVista} />
           </span>
           <div className="ban-par">
             <div className="par-item par-antes">

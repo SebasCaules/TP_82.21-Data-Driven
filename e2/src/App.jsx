@@ -205,7 +205,7 @@ const DCS_VISTA = {
   V12: ['DC-07', 'DC-13'],
 }
 
-/** «¿qué cambió y qué falta?» → «¿Qué cambió y qué falta?» */
+/** «¿qué cambió con las decisiones?» → «¿Qué cambió con las decisiones?» */
 const preguntaTitulo = (p) => (p ? p.replace(/^(¿?)(\p{L})/u, (_, a, b) => a + b.toUpperCase()) : p)
 
 /** (25/09) La pantalla que muestra una decisión: la que la declara en meta.dc; si ninguna, la

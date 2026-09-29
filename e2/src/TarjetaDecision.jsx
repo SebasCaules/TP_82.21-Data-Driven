@@ -20,7 +20,7 @@ const llano = (d) => d.llano_corto || d.llano || cap(d.decision)
 export default function TarjetaDecision({ dc, dcs, style }) {
   const lista = (dcs ?? [dc]).filter(Boolean)
   if (!lista.length) return null
-  // «a confirmar» si la decisión tiene un pedido abierto en V12, como en V01 (estados.js).
+  // El estado, el mismo que en la tabla de V01 (estados.js).
   const title = lista.map((d) => `${d.id} · ${d.llano ?? cap(d.decision)} · regla: ${cap(d.decision)}` +
     (d.justificacion ? ` · por qué: ${cap(d.justificacion)}` : '')).join('\n')
   if (lista.length === 1) {

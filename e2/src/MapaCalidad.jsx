@@ -5,15 +5,15 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { DIMS, MAPA } from './mapa.js'
 
+// (29/09, cierre) Dos estados para el público: tratada o declarada. Ninguna celda queda pendiente.
 const LETRA = {
-  corregida: 'C', 'corregida en parte': 'C½', marcada: 'M', 'corte común': 'F',
-  declarada: 'D', pendiente: 'N',
+  corregida: 'C', 'corregida en parte': 'C½', marcada: 'M', 'corte común': 'F', declarada: 'D',
 }
 const GRUPO = {
   corregida: 'tratada', 'corregida en parte': 'tratada', marcada: 'tratada', 'corte común': 'tratada',
-  declarada: 'declarada', pendiente: 'pendiente',
+  declarada: 'declarada',
 }
-const letraDespues = (c) => (c.despues === 'pendiente' && c.ref?.startsWith('equipo') ? 'E' : LETRA[c.despues])
+const letraDespues = (c) => LETRA[c.despues]
 
 /** Celdas del mapa que cierra alguna de las decisiones dadas. */
 export function celdasDe(dcs) {
@@ -70,11 +70,23 @@ export function Mapa({ modo = 'despues', resaltar = [], mini = false, corto = fa
   )
 }
 
+// (29/09) Los conteos salen de MAPA. Desde el cierre del 29/09 no queda ninguna celda pendiente:
+// las ocho que lo estaban quedaron declaradas (seis de trazabilidad, cuya corrección en origen es de
+// Casa Óga, y las dos del calendario).
+const CELDAS = MAPA.flatMap((f) => f.celdas)
+const cuenta = (pred) => CELDAS.filter(pred).length
+const N_ANTES = { ok: cuenta((c) => c.antes === '✓'), aviso: cuenta((c) => c.antes === '▲'), grave: cuenta((c) => c.antes === '✕') }
+const N_DESPUES = {
+  ok: cuenta((c) => !c.despues),
+  tratada: cuenta((c) => GRUPO[c.despues] === 'tratada'),
+  declarada: cuenta((c) => GRUPO[c.despues] === 'declarada'),
+}
+
 export function Leyenda({ modo }) {
   return modo === 'antes' ? (
-    <p className="mapa-ley"><i className="mapa-c ok">✓</i> sin hallazgo (43) <i className="mapa-c aviso">▲</i> hallazgo (27) <i className="mapa-c grave">✕</i> hallazgo grave (21)</p>
+    <p className="mapa-ley"><i className="mapa-c ok">✓</i> sin hallazgo ({N_ANTES.ok}) <i className="mapa-c aviso">▲</i> hallazgo ({N_ANTES.aviso}) <i className="mapa-c grave">✕</i> hallazgo grave ({N_ANTES.grave})</p>
   ) : (
-    <p className="mapa-ley"><i className="mapa-c ok">✓</i> sin hallazgo (43) <i className="mapa-c tratada">C</i> tratada: C corregida · C½ en parte · M marcada · F corte común (25) <i className="mapa-c declarada">D</i> declarada (15) <i className="mapa-c pendiente">N</i> pendiente: N del negocio · E del equipo (8)</p>
+    <p className="mapa-ley"><i className="mapa-c ok">✓</i> sin hallazgo ({N_DESPUES.ok}) <i className="mapa-c tratada">C</i> tratada: C corregida · C½ en parte · M marcada · F corte común ({N_DESPUES.tratada}) <i className="mapa-c declarada">D</i> declarada ({N_DESPUES.declarada})</p>
   )
 }
 

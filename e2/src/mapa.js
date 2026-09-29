@@ -1,6 +1,7 @@
 // Mapa de calidad antes y después de las decisiones (13 archivos × 7 dimensiones).
 // Antes: tabla 3.1 de la Parte A (entregas/entregable-2/A-…Parte_A.docx). Después: MAPA_DESPUES de
-// entregas/entregable-2/_build/B/contenido_b.py (Parte B 1.1). Generado el 29/09; no se edita a mano.
+// entregas/entregable-2/_build/B/contenido_b.py (Parte B 1.1). Generado el 29/09 por
+// scripts/generar_mapa.py; no se edita a mano.
 export const DIMS = ["Completitud", "Consistencia", "Exactitud", "Actualidad", "Validez", "Unicidad", "Trazabilidad"]
 export const MAPA = [
  {
@@ -139,8 +140,8 @@ export const MAPA = [
    {
     "antes": "▲",
     "hallazgo": "proveedor externo, sin dueño interno",
-    "despues": "pendiente",
-    "ref": "negocio"
+    "despues": "declarada",
+    "ref": "—"
    }
   ]
  },
@@ -186,8 +187,8 @@ export const MAPA = [
    {
     "antes": "▲",
     "hallazgo": "origen del segmento sin declarar",
-    "despues": "pendiente",
-    "ref": "negocio"
+    "despues": "declarada",
+    "ref": "—"
    }
   ]
  },
@@ -233,8 +234,8 @@ export const MAPA = [
    {
     "antes": "▲",
     "hallazgo": "sin dueño declarado",
-    "despues": "pendiente",
-    "ref": "negocio"
+    "despues": "declarada",
+    "ref": "—"
    }
   ]
  },
@@ -244,8 +245,8 @@ export const MAPA = [
    {
     "antes": "✕",
     "hallazgo": "8 feriados por año; faltan Carnaval, 2/4 y 17/8",
-    "despues": "pendiente",
-    "ref": "equipo, B 1.2"
+    "despues": "declarada",
+    "ref": "—"
    },
    {
     "antes": "✓",
@@ -280,8 +281,8 @@ export const MAPA = [
    {
     "antes": "✕",
     "hallazgo": "sin fuente oficial declarada",
-    "despues": "pendiente",
-    "ref": "equipo, B 1.2"
+    "despues": "declarada",
+    "ref": "—"
    }
   ]
  },
@@ -421,8 +422,8 @@ export const MAPA = [
    {
     "antes": "▲",
     "hallazgo": "regla de cálculo del NPS sin declarar",
-    "despues": "pendiente",
-    "ref": "consulta 4"
+    "despues": "declarada",
+    "ref": "DC-11"
    }
   ]
  },
@@ -515,8 +516,8 @@ export const MAPA = [
    {
     "antes": "▲",
     "hallazgo": "la definición interna no tiene respaldo",
-    "despues": "pendiente",
-    "ref": "negocio"
+    "despues": "declarada",
+    "ref": "—"
    }
   ]
  },
@@ -609,8 +610,8 @@ export const MAPA = [
    {
     "antes": "✕",
     "hallazgo": "entrevistas sin transcripción ni fecha",
-    "despues": "pendiente",
-    "ref": "negocio"
+    "despues": "declarada",
+    "ref": "—"
    }
   ]
  }

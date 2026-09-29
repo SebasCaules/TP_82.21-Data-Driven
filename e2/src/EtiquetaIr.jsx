@@ -1,5 +1,5 @@
 // (26/09, revisión UX H10) Etiqueta de una tarjeta de cifra que remite a la pantalla que explica
-// su estado: «en revisión» e «incluye sep–dic» llevan a la de DC-09 (vista 3), que es la causa.
+// su estado: «con sensibilidad» (hasta el 29/09, «en revisión») e «incluye sep–dic» llevan a la de DC-09 (vista 3), que es la causa.
 // Es un botón con el borde --acc de las fichas de V01. Sin irAVista (la hoja impresa) o en la
 // pantalla a la que llevaría, queda como texto sin borde (.inerte): no promete un clic.
 

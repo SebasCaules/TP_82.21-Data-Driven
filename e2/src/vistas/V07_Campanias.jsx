@@ -11,7 +11,7 @@
 // si los cinco rangos se pisan en el payload (SE_PISAN). CAMP034 no tiene ganador:
 // fecha_envio y fecha_creacion empatan entre las dos filas, así que el criterio de DC-13 no
 // decide (ver `casos[i].desempate` en el payload); la tarjeta de DC-13 cuenta cada caso con
-// sus dos filas (la que queda, la que sale y qué fecha decidió) y el pedido de V12.
+// sus dos filas (la que queda, la que sale y qué fecha decidió); V12 los reporta.
 //
 // DC-06: el segmento "Gold" que manda Marketing en las campañas no es el nivel del programa
 // de fidelización. (24/09) 5.066 son ENVÍOS con la etiqueta "Gold" y 3 son SOCIOS Gold en
@@ -65,10 +65,8 @@ const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base ${entero(BASE_DESPUE
 // El id de decisión en mono dentro de un rótulo .frase, como en el resto de las tarjetas.
 const ID_MONO = { font: '600 var(--e2-rot)/1.2 var(--mono)', letterSpacing: '.07em' }
 
-// El pedido de DC-13 a Casa Óga tal como lo lista V12, para que las dos vistas digan lo mismo.
-// (28/09) Ya no hay pedido: Casa Óga delegó el criterio y con cualquiera de las filas ninguna tasa
-// cambia; si el payload volviera a traerlo, el title lo nombra.
-const PEDIDO_V12 = D2.vistas.V12?.pedidos?.find((p) => p.id === DC13.id)
+// (28/09) DC-13 no espera nada de Casa Óga: delegó el criterio (consulta 7) y con cualquiera de las
+// filas ninguna tasa cambia. Los dos casos se le reportan en V12.
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
 // (24/09) Un caso de DC-13 en una línea, armada con las dos filas del payload: qué oferta
@@ -115,10 +113,10 @@ export default function V07Campanias() {
   }))
 
   // (25/09, regla del usuario) El par de envíos con oferta pasa a la banda de cifras, con DC-13 a
-  // la derecha, solo en llano; los dos casos de DC-13 y el pedido de V12 quedan en el title del par.
+  // la derecha, solo en llano; los dos casos de DC-13 quedan en el title del par.
   // (25/09, pedido del usuario: una decisión por tarjeta) DC-06, el nivel Gold, pasa a V07b.
   const casos = V.casos.map((c) => { const l = lineaCaso(c); return `${l.id} ${l.texto}` }).join(' ') +
-    (PEDIDO_V12 ? ` Pendiente de Casa Óga (vista 12): ${PEDIDO_V12.que}.` : '')
+    ' Los dos casos se le reportan a Casa Óga (vista 12).'
   return (
     <section className="pant v07">
       <Banda dcs={[DC13]}>

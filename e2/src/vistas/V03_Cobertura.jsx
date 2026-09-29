@@ -1,7 +1,7 @@
 // V03 — Cobertura 2025. Contrato: app/e2/DISENO.md fila V03, app/pipeline/CONTRACT_E2.md
 // §3 vistas.V03. DC-09: cuatro meses de 2025 (sep-dic) traen menos del 60 % de las
 // operaciones del mismo mes de 2024 y se marcan "cobertura no confirmada"; el riesgo al
-// corte de referencia queda en revisión y se acompaña con la sensibilidad al 31/08/2025,
+// corte de referencia se informa con la sensibilidad al 31/08/2025,
 // antes de esos meses.
 //
 // (24/09) El gráfico ya no dibuja la razón interanual de 36 meses. Esa razón bajaba de
@@ -14,7 +14,7 @@
 // (LEG-V03-1): con 12 meses hay lugar para los cuatro valores. No se usan --antes/--despues
 // ni --acc: en este tablero dicen «antes y después de la decisión», y acá no hay decisión
 // que mueva la serie. Arriba, el par de riesgo según la fecha de medición y, al lado, qué
-// quiere decir ese par y quién puede confirmar la causa (REL-V03-1). El par de exposición
+// quiere decir ese par y quién revisa la causa (REL-V03-1). El par de exposición
 // se fue: repetía V10.
 
 import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
@@ -57,20 +57,18 @@ const UMBRAL_PCT = Math.round(UMBRAL * 100)
 // Rótulos más cortos: dos renglones como mucho, también a 1152. La sensibilidad ya no se
 // llama «último mes confirmado»: ningún criterio confirma un mes y agosto quedó a tres
 // puntos del umbral (INT-TRANSVERSAL-1). Dice solo que es antes de los meses marcados.
-const ETQ_CREF = `al ${fechaCorta(D2.meta.corte_ref)} · en revisión · duplicados unidos`
-const ETQ_SENS = `al ${fechaCorta(D2.meta.corte_sens)} · antes de los meses sin confirmar`
+const ETQ_CREF = `al ${fechaCorta(D2.meta.corte_ref)} · duplicados unidos`
+const ETQ_SENS = `al ${fechaCorta(D2.meta.corte_sens)} · antes de los meses marcados`
 
-// (24/09) Qué es el par y qué falta saber, al lado del par (REL-V03-1). Las cifras y los
-// números de vista salen de D2; la pregunta a Casa Óga se nombra solo si V12 trae el pedido.
+// (24/09) Qué es el par y quién revisa la causa, al lado del par (REL-V03-1). Las cifras y los
+// números de vista salen de D2. (29/09, cierre) La causa se le reporta a Casa Óga (vista 12).
 const PRIMER_FLAG = V03.meses_flag[0]
 const ULTIMO_FLAG = V03.meses_flag[N_FLAG - 1]
-const PEDIDO = (D2.vistas.V12?.pedidos ?? []).some((p) => p.id === DC09.id)
 const NOTA_PAR = `No es un antes y un después: es la misma cifra medida en dos fechas. ` +
   `Si de ${mesCorto(PRIMER_FLAG)} a ${mesCorto(ULTIMO_FLAG)} faltan ventas, clientes que sí ` +
   `compraron parecen inactivos. La cifra del tablero sigue siendo ${pct(CREF.pct)} ` +
-  `(vista ${numeroVista('V10')}). ¿Se vendió menos o faltan filas en el archivo? ` +
-  (PEDIDO ? `Lo tiene que confirmar Casa Óga (pedido ${DC09.id}, vista ${numeroVista('V12')}).`
-    : 'Lo tiene que confirmar Casa Óga.')
+  `(vista ${numeroVista('V10')}). Si se vendió menos o faltan filas, lo revisa Casa Óga con ` +
+  `Operaciones y el proveedor del POS (vista ${numeroVista('V12')}).`
 
 // El titulo dice el hallazgo: cuantos meses del ultimo año quedan bajo el umbral (D4-15).
 const TITULO = `${capitalizar(N_PALABRA[N_FLAG] ?? String(N_FLAG))} meses de ${ANIO} con menos del ` +
@@ -79,7 +77,7 @@ const TITULO = `${capitalizar(N_PALABRA[N_FLAG] ?? String(N_FLAG))} meses de ${A
 const PIE = `corte de referencia ${fechaCorta(D2.meta.corte_ref)} · serie de filas únicas ` +
   `con monto positivo, antes de ${DC04.id} · sensibilidad después de ${DC04.id} ` +
   `(vista ${numeroVista(DC04.vista)}), corte ${fechaCorta(D2.meta.corte_sens)} · fila E01 ` +
-  `(sensibilidad); D22 en revisión al corte de referencia (hereda C03 y C04) · ${DC09.hallazgo}`
+  `(sensibilidad); D22 al corte de referencia (hereda C03 y C04) · ${DC09.hallazgo}`
 
 export const meta = { id: 'V03', dc: 'DC-09', corto: 'Cobertura 2025', titulo: TITULO, pie: PIE }
 
@@ -97,7 +95,7 @@ function Aro() {
 }
 
 // (25/09, regla del usuario) El par de riesgo pasa a la banda de cifras: el riesgo al corte, con
-// «en revisión», y la sensibilidad en tarjeta punteada, como en V01 y V02; la decisión DC-09 va a
+// «con sensibilidad», y la sensibilidad en tarjeta punteada, como en V01 y V02; la decisión DC-09 va a
 // la derecha, solo en llano. La nota que explicaba el par queda en el title de la sensibilidad.
 const MESES_TXT = `${mesCorto(PRIMER_FLAG).slice(0, 3)}–\u2060${mesCorto(ULTIMO_FLAG).slice(0, 3)}\u00a0${ULTIMO_FLAG.slice(0, 4)}`
 
@@ -107,7 +105,7 @@ export default function V03Cobertura() {
     <section className="pant v03">
       <Banda dcs={[DC09]}>
         <div className="tarjeta e2-central" title={`Clientes en riesgo ${ETQ_CREF}`}>
-          <span className="kpi-lbl"><span>Riesgo al {fechaCorta(D2.meta.corte_ref)}</span><EtiquetaIr texto="en revisión" aqui /></span>
+          <span className="kpi-lbl"><span>Riesgo al {fechaCorta(D2.meta.corte_ref)}</span><EtiquetaIr texto="con sensibilidad" aqui /></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <span className="par-lbl">Duplicados unidos</span>

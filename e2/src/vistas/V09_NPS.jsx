@@ -1,6 +1,7 @@
 // V09 — NPS y soporte (e2/DISENO.md). DC-11: 4.312 filas de Interacciones_soporte traen NPS
 // con cero reclamos y cero consultas ese mes. No se sabe si es un cliente satisfecho que no
-// llamó o un NPS mal cargado (consulta 4, sin confirmar): se conserva con bandera y se marca
+// llamó o un NPS mal cargado (consulta 4: Casa Óga no lo sabe y dejó el criterio al equipo): se
+// conserva con bandera y se marca
 // en vez de borrarse o imputarse.
 //
 // (24/09) La vista responde «¿cuánto vale el NPS?» con las dos cifras y ninguna por encima
@@ -59,9 +60,6 @@ const mesNombre = (ym) => mesCorto(ym).split('-')[0]
 const FLAG = D2.vistas.V03.meses_flag.filter((m) => m.startsWith(`${ULTIMO.anio}-`))
 const TRAMO_FLAG = FLAG.length ? `${mesNombre(FLAG[0])}–${mesNombre(FLAG[FLAG.length - 1])}` : null
 
-// El pedido a Casa Óga se nombra solo si V12 lo trae (como en V03); si no, queda la
-// consulta del registro.
-const PEDIDO = D2.vistas.V12.pedidos.some((p) => p.id === DC11.id)
 
 // NAR-V09-1: el título da las dos cifras del último año, sin elegir una (69 caracteres).
 const TITULO = `NPS ${ULTIMO.anio}: ${decimal(ULTIMO.con_todo, 1)} con las filas sin reclamos ni consultas, ` +
@@ -71,8 +69,8 @@ const PIE = `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(V09.filas)
   `${ANIOS} · registro D19, E04 (sin las filas marcadas)` +
   (TRAMO_FLAG ? ` · ${ULTIMO.anio} completo: ${TRAMO_FLAG} con cobertura no confirmada ` +
     `(${DC09.id}, vista ${numeroVista(DC09.vista)})` : '') +
-  ` · el origen de las ${entero(V09.sin_interaccion.n)} filas marcadas no está confirmado ` +
-  (PEDIDO ? `(pedido abierto a Casa Óga, vista ${numeroVista('V12')})` : '(consulta 4)')
+  ` · Casa Óga no tiene el origen de las ${entero(V09.sin_interaccion.n)} filas marcadas y dejó el ` +
+  'criterio al equipo (consulta 4)'
 
 export const meta = {
   id: 'V09',
@@ -87,8 +85,8 @@ export const meta = {
 // explicaban las notas (cuántos puntos suman las filas marcadas) queda en el title del NPS. La
 // línea anual va debajo, a todo el ancho.
 const NOTA_NPS = `Las ${entero(ULTIMO.n_sin_interaccion)} filas marcadas de ${ULTIMO.anio} suben el NPS ` +
-  `${decimal(brecha(ULTIMO), 1)} puntos; en ${PRIMERO.anio}, ${decimal(brecha(PRIMERO), 1)}. Mientras su ` +
-  'origen no esté confirmado se informan las dos cifras.' +
+  `${decimal(brecha(ULTIMO), 1)} puntos; en ${PRIMERO.anio}, ${decimal(brecha(PRIMERO), 1)}. Casa Óga no ` +
+  'tiene su origen y dejó el criterio al equipo (consulta 4): se informan las dos cifras.' +
   (TRAMO_FLAG ? ` ${ULTIMO.anio} completo: incluye ${TRAMO_FLAG}, meses con cobertura no confirmada ` +
     `(${DC09.id}, vista ${numeroVista(DC09.vista)}).` : '')
 

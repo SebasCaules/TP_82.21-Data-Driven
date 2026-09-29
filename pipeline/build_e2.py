@@ -242,7 +242,7 @@ def _pares_antes_despues(ctx: dict) -> dict:
                   (sc["edades_fuera_de_rango"] + sc["edades_nulas"], "edades sin valor (106 marcadas con bandera + 524 nulas de origen)")),
         "DC-08": ((al2026["pct"], "% en riesgo (calendario extendido, 31/08/2026)"),
                   (e1["pct"], "% en riesgo (corte 31/12/2025)")),
-        "DC-09": ((despues["pct"], "% riesgo al 31/12/2025 con DC-04 (en revisión)"),
+        "DC-09": ((despues["pct"], "% riesgo al 31/12/2025 con DC-04"),
                   (sens["corte_sens"]["pct"], "% riesgo al 31/08/2025 (sensibilidad)")),
         "DC-10": ((v08["variacion_pct"], "% variación precio unitario 2022-2025"),
                   (v08["variacion_pct"], "% variación (sin deflactar, limitación declarada)")),
@@ -251,7 +251,7 @@ def _pares_antes_despues(ctx: dict) -> dict:
         "DC-12": ((v06["bajas"]["total"], "bajas totales"), (v06["bajas"]["hasta_corte"], "bajas ≤ corte (analisis de comportamiento)")),
         "DC-13": ((ofertas_antes_n, "envíos con oferta única (sin CAMP004/CAMP034)"), (v06["envios"]["despues"], "envíos con oferta (duplicados resueltos)")),
         "DC-14": ((n_acciones_catalogo, "acciones con costo, sin tasa de éxito"),
-                  (n_acciones_catalogo, "acciones con costo vigente, tasa de éxito pendiente del E3")),
+                  (n_acciones_catalogo, "acciones con costo vigente; tasa de éxito: la construye el equipo en el E3")),
         "DC-15": ((None, "sin diccionario"), (None, "sin diccionario")),
     }
 
@@ -288,7 +288,7 @@ def _llano(ctx: dict) -> dict[str, str]:
         "DC-04": "Los números de cliente de una misma persona se unen en uno antes de contar.",
         "DC-05": "Cada envío de campaña se cuenta una sola vez; los repetidos eran copias idénticas.",
         "DC-06": "El nivel de socio sale del programa de fidelización, no de la etiqueta de la campaña.",
-        "DC-07": "Las edades imposibles quedan como sin dato y no se borra ninguna fila. La corrección en origen se le pide a Sistemas (vista 12).",
+        "DC-07": "Las edades imposibles quedan como sin dato y no se borra ninguna fila. La corrección en origen es de Sistemas y se le reporta (vista 12).",
         "DC-08": f"Todo lo que cruza compras se mide al {ref}, porque después no hay ventas cargadas.",
         "DC-09": f"{meses[0].upper() + meses[1:]} quedan marcados como cobertura no confirmada; el riesgo se muestra también medido al {sens}.",
         "DC-10": "Los montos quedan en pesos corrientes, sin ajustar por inflación, y así se aclara.",
@@ -320,7 +320,7 @@ def _llano_corto(ctx: dict) -> dict[str, str]:
         "DC-06": "El nivel de socio sale del programa, no de la campaña.",
         "DC-07": "Las edades imposibles quedan sin dato, sin borrar filas.",
         "DC-08": f"Todo se mide al {ref}: después no hay ventas.",
-        "DC-09": f"{meses} queda marcado como no confirmado.",
+        "DC-09": f"{meses} se marca: cobertura no confirmada.",
         "DC-10": "Los montos no se ajustan por inflación.",
         "DC-11": "Las filas de NPS sin contacto se marcan, no se borran.",
         "DC-12": f"Las bajas de {anio_bajas} solo sacan clientes de la lista.",
@@ -639,30 +639,27 @@ def _negativas_sin_solicitud(clientes_crudo: pd.DataFrame, bajas: pd.DataFrame,
             "envios": int(len(env))}
 
 
-def _armar_v12(neg: dict) -> dict:
+def _armar_v12(neg: dict, v11: dict) -> dict:
     """Lo que se le reporta a Casa Oga (decisiones-de-calidad-de-datos.md,
     seccion 'Lo que se le reporta a Casa Oga')."""
-    # (28/09, decisión del usuario) Queda un solo pedido, el de DC-09: solo Casa Óga puede decir
-    # si la caída de sep-dic 2025 es real o una carga parcial. Salen DC-13 (Casa Óga delegó el
-    # criterio en la consulta 7 y con cualquiera de las filas ninguna tasa cambia), D18 (se infiere
-    # que las 598 no aceptaron marketing al alta) y DC-07 (la corrección en origen es una acción de
-    # Sistemas, no una pregunta): se reportan sin esperar respuesta (el wiki, «Lo que se le reporta
-    # a Casa Óga»). DC-15 salió el mismo día, declarada.
-    return {"pedidos": [
-        {"id": "DC-09", "que": "explicar la caída de operaciones de septiembre a diciembre de 2025",
-         "detalle": "esos meses quedan marcados 'cobertura no confirmada' (menos del 60 % de las operaciones del mismo mes del año anterior).",
-         "estado": "pendiente del negocio"},
-        # (28/09, auditoría previa a la entrega) La consulta 10 de la Parte A sigue sin respuesta: V12 es
-        # la lista de lo abierto con Casa Óga y tiene que coincidir con el 3.4. (29/09) En la planilla
-        # revisada, la fila 65 lleva el texto de la pregunta 65 del envío con la respuesta del
-        # diccionario de datos (la que en la del 18/08 respondía la 64): tiene fila y sigue sin respuesta.
-        {"id": "Consulta 10", "que": "decir si hay datos de ventas anteriores a 2022",
-         "detalle": "es la consulta 10 de la Parte A (3.4), la pregunta 65 del envío del 11/08: la planilla revisada la responde con el texto del diccionario de datos. Con más años de historia, el modelo tendría más cortes para entrenar.",
-         "estado": "pendiente del negocio"},
-    ],
-        # (28/09, pedido del usuario) Lo que se le reporta sin esperar respuesta, debajo del pedido
-        # en V12: las acciones que quedan de su lado y los casos que delegó.
-        "reportes": [
+    # (29/09, cierre) Sin pedidos: nada espera una respuesta de Casa Óga. La causa de la caída de
+    # sep-dic 2025 (DC-09) pasa a lo que se le reporta: Casa Óga dijo que no la tiene, que no se asuma
+    # una y que el criterio de los meses incompletos es del equipo (consulta 2), y ya está aplicado
+    # (umbral del 60 %). La consulta 10 (datos anteriores a 2022, envío 65) no tuvo respuesta en la
+    # planilla del 18/08 ni en la del 22/09: el equipo trabaja con 2022-2025 y se le informa.
+    cortes = [c["corte"] for c in v11["cortes"]]
+    primero, ultimo = cortes[0], cortes[-1]
+    mes = lambda f: f"{_MESES_ES[int(f[5:7]) - 1]} de {f[:4]}"
+    return {"reportes": [
+        {"id": "DC-09", "que": "la caída de operaciones de septiembre a diciembre de 2025",
+         "detalle": ("Casa Óga la revisa con Operaciones y el proveedor del POS. El equipo marca esos meses "
+                     "como 'cobertura no confirmada' (menos del 60 % de las operaciones del mismo mes del año "
+                     "anterior) y da el riesgo también medido antes de ellos.")},
+        {"id": "Consulta 10", "que": "el equipo trabaja con las ventas de 2022 a 2025",
+         "detalle": (f"la consulta 10 (datos anteriores a 2022) no tuvo respuesta. El dataset pide 12 meses de "
+                     f"historia y sus cortes van de {mes(primero)} a {mes(ultimo)}: 2022-2025 alcanza. Años "
+                     f"anteriores sumarían cortes en el Entregable 3.")},
+        # (28/09, pedido del usuario) Las acciones que quedan de su lado y los casos que delegó.
         {"id": "D18 (registro)",
          "que": f"dejar de enviar campañas a {_miles(neg['sin_solicitud'])} clientes que no aceptaron marketing",
          "detalle": (f"no tienen solicitud de baja, así que todo indica que no aceptaron marketing al darse de alta. Ya quedan "
@@ -803,7 +800,7 @@ def main() -> int:
     v10 = _armar_v10(v02, v04, v03)
     v11 = _armar_v11()
     v12 = _armar_v12(_negativas_sin_solicitud(pd.read_csv(DATA_E1 / "Clientes.csv"), bajas,
-                                              pd.read_csv(DATA_E1 / "Campanias_marketing.csv")))
+                                              pd.read_csv(DATA_E1 / "Campanias_marketing.csv")), v11)
 
     # ---- DC-14: tasa proxy por accion (usa la conversion 'despues' de V07) ----
     # Tabla editorial para la seccion 3 (no viaja en e2.json, ver nota del final

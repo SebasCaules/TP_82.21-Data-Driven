@@ -14,7 +14,7 @@ const modulos = import.meta.glob('./V*.jsx', { eager: true })
 // antes de leer el título. V07 cambia la suya: la vista no dice qué oferta convierte más
 // sino que resolver los duplicados no mueve ninguna tasa.
 const PREGUNTA = {
-  V01: '¿qué cambió y qué falta?',
+  V01: '¿qué cambió con las decisiones?',
   V01b: '¿qué cambió en el mapa de calidad?',
   V02: '¿por qué un corte común?',
   V03: '¿qué meses no se pueden leer?',
@@ -29,7 +29,7 @@ const PREGUNTA = {
   V10: '¿cambió la cifra del directorio?',
   V11: '¿cómo se entrena y se elige el modelo?',
   V11b: '¿con qué variables aprende el modelo?',
-  V12: '¿qué falta del lado del negocio?',
+  V12: '¿qué se le informa a Casa Óga?',
 }
 
 const todas = Object.entries(modulos)

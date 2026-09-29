@@ -7,7 +7,8 @@
 // (24/09) El 85,2 % es lo que daría medir al 31/08/2026, no una cifra anterior que la decisión
 // corrigió, y el 49,6 % es la misma cifra que el directorio recibió en el E1 (V10): por eso no
 // hay flecha entre las dos. El título no dice que el riesgo «baja»: dice que medir tarde lo
-// inflaría. El 49,6 % lleva «en revisión», porque DC-09 (vista 3) pone en duda sep–dic 2025.
+// inflaría. (29/09, cierre) El 49,6 % lleva «con sensibilidad»: DC-09 (vista 3) lo acompaña con la
+// medición al 31/08/2025, antes de sep–dic 2025.
 //
 // (25/09, pedido del usuario: la barra roja se salía del eje, había mucho texto y las cifras de
 // arriba no resaltaban.) Las dos cifras pasan a las tarjetas de cifra del E2 (las del resumen de
@@ -333,8 +334,8 @@ export default function V02Ventana({ irAVista }) {
       <Banda dcs={[DC08]}>
         <div className="tarjeta e2-central"
              title={`${entero(R_CORTE.en_riesgo)} de ${entero(R_CORTE.elegibles)} clientes elegibles; ` +
-               `en revisión por ${DC09.id} (vista ${VISTA_COB})`}>
-          <span className="kpi-lbl"><span>Corte común</span><EtiquetaIr texto="en revisión" irAVista={irAVista} /></span>
+               `se informa con la sensibilidad de ${DC09.id} (vista ${VISTA_COB})`}>
+          <span className="kpi-lbl"><span>Corte común</span><EtiquetaIr texto="con sensibilidad" irAVista={irAVista} /></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <span className="par-lbl">Riesgo al {fechaCorta(CORTE_REF)}</span>
@@ -387,7 +388,7 @@ export default function V02Ventana({ irAVista }) {
 // (25/09) El pie en un renglón; la base y la salvedad completas van en su title.
 const PIE = `corte ${fechaCorta(CORTE_REF)} · ${entero(V.archivos.length)} archivos · registro ${DC08.cifras.join(', ')}`
 const PIE_TITLE = `base: ${entero(V.archivos.length)} archivos declarados por el equipo · fila ` +
-  `${DC08.cifras.join(', ')} del registro de cifras · riesgo y exposición en revisión por ${DC09.id} ` +
+  `${DC08.cifras.join(', ')} del registro de cifras · riesgo y exposición con la sensibilidad de ${DC09.id} ` +
   `(cobertura de operaciones ${V03.meses_flag[0]?.slice(0, 4) ?? ''}, vista ${VISTA_COB})`
 
 export const meta = {

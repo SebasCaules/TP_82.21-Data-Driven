@@ -4,7 +4,8 @@
 // filas de dos renglones que el directorio no iba a leer, puestas en la banda donde el layout de
 // la cátedra pone las tarjetas (clase 4: filtros, tarjetas, gráficos y, al final, la tabla de
 // detalle; wiki/conceptos/diseno-de-dashboard.md). Ahora arriba va la respuesta: el título y tres
-// tarjetas, el tope de la cátedra: la cifra central, su sensibilidad y los pedidos a Casa Óga.
+// tarjetas, el tope de la cátedra: la cifra central, su sensibilidad y el estado de las decisiones
+// (29/09, cierre: hasta ese día, los pedidos a Casa Óga).
 // Debajo, las 15 decisiones como fichas de una o dos palabras, agrupadas por lo que hacen con la
 // cifra central con el mismo corte que V10 (DC-04, DC-09 y DC-08; «las otras 12 no cambian esta
 // cifra»). La tabla de antes pasa al detalle, detrás de «Ver en detalle»: el directorio no la
@@ -21,22 +22,19 @@
 // D2.vistas.V10, V03, V12 y D2.decisiones. Los nombres cortos son texto de la vista, no datos; una
 // decisión sin nombre corto muestra su hallazgo.
 //
-// Detalle (24/09, sin cambios): la tabla con el estado en una pastilla propia, porque "aplicada"
-// cambia un número, "declarada" no cambia nada y solo se deja por escrito, y "pendiente del
-// negocio" espera un archivo que Casa Óga todavía no dio. "A confirmar" es una decisión aplicada
-// con un pedido abierto en V12 (desde el 28/09, solo DC-09): ya corre en el cálculo, pero Casa Óga
-// todavía no explicó la causa (el criterio lo delegó al equipo, consulta 2). La regla vive en estados.js, que también usa la tarjeta de decisión de cada
-// vista. La pastilla NO es <Semaforo> ("EN META / POR DEBAJO / FUERA DE META"): esos rótulos
-// hablan de una meta que la vista no tiene.
+// Detalle (24/09): la tabla con el estado en una pastilla propia, porque "aplicada" cambia un
+// número y "declarada" no cambia nada y solo se deja por escrito. (29/09, cierre) No queda ningún
+// otro estado: DC-09 dejó de mostrarse «a confirmar» (Casa Óga delegó el criterio, consulta 2, y la
+// causa de la caída se le reporta en V12, sin esperar respuesta). La pastilla NO es <Semaforo>
+// ("EN META / POR DEBAJO / FUERA DE META"): esos rótulos hablan de una meta que la vista no tiene.
 import { useState } from 'react'
 import { fechaCorta, mesCorto, pct } from '../formato.js'
 import { D2 } from '../datos_e2.js'
-import { ESPERA, estadoVisible } from '../estados.js'
+import { estadoVisible } from '../estados.js'
 import EtiquetaIr from '../EtiquetaIr.jsx'
 
 const { decisiones, vistas } = D2
 const V10 = vistas.V10
-const pedidos = vistas.V12?.pedidos ?? []
 
 // El riel numera por posición y las vistas van en orden de archivo, V01..V12 (vistas/
 // index.jsx): el número de la vista es el de su id. etiquetaVista da el «05» del riel.
@@ -55,15 +53,16 @@ const MESES_FLAG = `${mesCorto(FLAG[0]).slice(0, 3)}–⁠${mesCorto(FLAG[FLAG.l
   + ` ${FLAG[FLAG.length - 1].slice(0, 4)}`
 
 // (25/09) El título es la respuesta del tablero entero: cuánto cambia la cifra que el directorio
-// vio en el E1 y qué la deja en revisión. Todo lo que el h1 y `meta.titulo` necesitan se calcula
-// a nivel de módulo: son el mismo texto (regla del contrato de vistas) y D2 es estático.
+// vio en el E1 y (29/09, cierre) con qué sensibilidad se informa. Todo lo que el h1 y `meta.titulo`
+// necesitan se calcula a nivel de módulo: son el mismo texto (regla del contrato de vistas) y D2 es
+// estático.
 const TITULO = `El riesgo del E1 pasa de ${pct(V10.e1.pct)} a ${pct(V10.despues.pct)}; `
-  + `falta confirmar ${MESES_FLAG}`
+  + `sin ${MESES_FLAG} da ${pct(V10.sens.pct)}`
 
 // Los tres grupos de fichas. «Afectan la cifra central» son las tres que V10 muestra: las de
 // V10.cambios (hoy solo DC-04), la sensibilidad (DC-09) y el corte común (DC-08). El resto se
 // parte por estado: las aplicadas corrigen otro dato (o lo marcan con una bandera); las
-// declaradas y la pendiente no cambian ningún número.
+// declaradas no cambian ningún número.
 const porId = Object.fromEntries(decisiones.map((d) => [d.id, d]))
 // (25/09) Las fichas van en una grilla de tres columnas iguales: 3 + 9 + 3 llenan cinco filas
 // completas, alineadas entre grupos. Las nueve del medio, una fila por tema: ventas (DC-01, DC-02,
@@ -107,35 +106,25 @@ const NOMBRE = {
 }
 const nombre = (d) => NOMBRE[d.id] ?? cap(sinConsulta(d.hallazgo))
 
-// El pedido abierto de cada decisión que espera a Casa Óga, para el title de su ficha y su pastilla.
-const PEDIDO = Object.fromEntries(pedidos.map((p) => [p.id, p.que]))
-const N_PEDIDOS = pedidos.length
-// Cuántos de los pedidos de V12 son decisiones (hasta el 28/09, uno era un dato del registro, D18).
-const PEDIDOS_EN_TABLA = pedidos.filter((p) => porId[p.id]).length
-const esperan = decisiones.filter((d) => ESPERA.has(d.id) || d.estado === 'pendiente del negocio').length
-const cerradas = decisiones.length - esperan
+// (29/09, cierre) Tarjeta 3: las decisiones por estado, del payload (vistas.V01.por_estado).
+const POR_ESTADO = vistas.V01.por_estado
+const N_APLICADAS = POR_ESTADO.aplicada ?? 0
+const N_DECLARADAS = POR_ESTADO.declarada ?? 0
 
 // Tarjeta 1: qué mueve la cifra. Con una sola fila en V10.cambios, y que sea DC-04, son los
 // clientes duplicados (vista 4); si no, cuántas decisiones la mueven (vista 10).
 const UNICA = V10.cambios.length === 1 && V10.cambios[0].decision === 'DC-04'
 const MUEVE = UNICA ? 'Solo cambia por los clientes duplicados.' : `Cambia por ${V10.cambios.length} decisiones.`
-// Tarjeta 3: el pedido de DC-09 es el que decide la cifra central (V12 lo pone primero).
-// (28/09) Con un solo pedido, «el de» no tiene de qué otro separarse.
-const DECIDE = PEDIDO['DC-09']
-  ? (N_PEDIDOS === 1 ? `Es el de ${MESES_FLAG}: decide la cifra central.` : `El de ${MESES_FLAG} decide la cifra central.`)
-  : null
 
 // Lo que la tarjeta ya no escribe queda en su title, para quien presenta.
 const T_CENTRAL = `Clientes en riesgo entre los que tienen 3 compras o más, al ${fechaCorta(D2.meta.corte_ref)}; `
-  + `en revisión por ${MESES_FLAG}. Detalle en las vistas 4 y 10.`
+  + `se informa con la sensibilidad sin ${MESES_FLAG} (vista 3). Detalle en las vistas 4 y 10.`
 const T_SENS = `Si ${MESES_FLAG} están incompletos: riesgo medido al ${fechaCorta(V10.sens.corte)}, antes de los meses con menos del `
   + `${Math.round(D2.meta.umbral_cobertura * 100)} % de las operaciones de un año antes. No reemplaza la cifra: `
-  + 'la pone en duda. Vista 3.'
-// (28/09) Con un solo pedido, «1 de los 1 son… el primero» no se lee: va el pedido con su decisión.
-const T_PEDIDOS = N_PEDIDOS === 1
-  ? `${pedidos[0].id}: ${pedidos[0].que}. Vista 12.`
-  : `${PEDIDOS_EN_TABLA} de los ${N_PEDIDOS} ${PEDIDOS_EN_TABLA === 1 ? 'es de una decisión' : 'son de decisiones'} de abajo; el primero: `
-    + `${PEDIDO['DC-09'] ?? '—'}. Vista 12.`
+  + 'la acompaña. Vista 3.'
+const T_ESTADOS = `Aplicada: el cálculo ya la usa. Declarada: el dato no cambia y se aclara (`
+  + `${decisiones.filter((d) => d.estado === 'declarada').map((d) => d.id).join(', ')}). `
+  + 'Lo que se le reporta a Casa Óga está en la vista 12.'
 
 // (24/09) El pie queda en un renglón con lo que el directorio usa. Las filas del registro de
 // las decisiones que remiten a esta vista y la fuente, que el directorio no usa, van al title.
@@ -156,7 +145,7 @@ export default function V01({ irA, irAVista, vistaDe = (d) => d.vista }) {
     <section className="pant v01 v01r">
       <div className="e2-kpis v01r-kpis">
         <div className="tarjeta e2-central" title={T_CENTRAL}>
-          <span className="kpi-lbl"><span>Clientes en riesgo</span><EtiquetaIr texto="en revisión" irAVista={irAVista} /></span>
+          <span className="kpi-lbl"><span>Clientes en riesgo</span><EtiquetaIr texto="con sensibilidad" irAVista={irAVista} /></span>
           <div className="ban-par">
             <div className="par-item par-antes">
               <span className="par-lbl">Entregable 1</span>
@@ -181,28 +170,24 @@ export default function V01({ irA, irAVista, vistaDe = (d) => d.vista }) {
           </div>
         </div>
 
-        <div className="tarjeta" title={T_PEDIDOS}>
-          <span className="kpi-lbl"><span>Pedidos a Casa Óga</span></span>
+        <div className="tarjeta" title={T_ESTADOS}>
+          <span className="kpi-lbl"><span>{`Las ${decisiones.length} decisiones`}</span></span>
           <div className="ban-par">
             <div className="par-item">
-              <span className="par-lbl">Abiertos</span>
-              <span className="par-val tabular e2-cifra sec">{N_PEDIDOS}</span>
+              <span className="par-lbl">Aplicadas</span>
+              <span className="par-val tabular e2-cifra sec">{N_APLICADAS}</span>
+            </div>
+            <div className="par-item">
+              <span className="par-lbl">Declaradas</span>
+              <span className="par-val tabular e2-cifra sec">{N_DECLARADAS}</span>
             </div>
           </div>
-          {DECIDE && <p className="e2-linea">{DECIDE}</p>}
         </div>
       </div>
 
       <div className="tarjeta v01r-mapa">
         <span className="kpi-lbl">
           <span>{`Las ${decisiones.length} decisiones`}</span>
-          {LEYENDA_ESPERA.length > 0 && (
-            <span className="v01r-leyenda" aria-hidden="true">
-              {LEYENDA_ESPERA.map((e, i) => (
-                <span key={e.texto}>{i > 0 && ' · '}<b>{e.simbolo}</b> {e.texto}</span>
-              ))}
-            </span>
-          )}
           {irA && (
             <button type="button" className="v01-ir" onClick={() => setDetalle('')}>Ver en detalle →</button>
           )}
@@ -226,25 +211,22 @@ export default function V01({ irA, irAVista, vistaDe = (d) => d.vista }) {
   )
 }
 
-/** (25/09) Ficha de una decisión: solo el nombre corto. El id, el estado, la decisión en llano y
- *  el pedido abierto van en el title; lleva a la vista de la decisión o, sin vista propia, al
+/** (25/09) Ficha de una decisión: solo el nombre corto. El id, el estado y la decisión en llano
+ *  van en el title; lleva a la vista de la decisión o, sin vista propia, al
  *  detalle con su fila marcada. En la hoja impresa no llega irA y la ficha va como texto. */
 function Ficha({ d, nav, abrir }) {
   const est = estadoVisible(d)
   const vista = nav ? nav.vistaDe(d) : d.vista
   const propia = vista && vista !== 'V01'
   const title = `${d.id} · ${est} — ${d.llano ?? cap(d.decision)}` +
-    (PEDIDO[d.id] ? ` Pedido abierto: ${PEDIDO[d.id]}.` : '') +
     (propia ? ` Vista ${numeroVista(vista)}.` : '')
-  // (26/09, revisión UX H4) Las que esperan a Casa Óga, con el símbolo de su estado al final.
-  const marca = ESPERAN.has(est) ? <span className="v01r-marca" aria-hidden="true">{ESTADO_PASTILLA[est].simbolo}</span> : null
-  if (!nav) return <span className="v01r-ficha" title={title}>{nombre(d)}{marca}</span>
+  if (!nav) return <span className="v01r-ficha" title={title}>{nombre(d)}</span>
   const destino = propia ? `ir a la vista ${numeroVista(vista)}` : 'ver el detalle'
   return (
     <button type="button" className="v01r-ficha" title={title}
             aria-label={`${d.id}, ${nombre(d)}, ${est}: ${destino}`}
             onClick={() => (propia ? nav.irAVista(vista) : abrir())}>
-      {nombre(d)}{marca}
+      {nombre(d)}
     </button>
   )
 }
@@ -278,9 +260,9 @@ function Aro() {
 
 // Símbolo + texto + color por estado, y la definición que lee la leyenda de arriba de la
 // tabla. El símbolo (lleno / medio / vacío) es el canal redundante al color, igual que hacía
-// el semáforo del E1: una decisión "pendiente" se distingue de una "aplicada" aunque se
-// imprima en blanco y negro. (24/09) "a confirmar" lleva el medio círculo del otro lado que
-// "declarada" y el terracota de "pendiente": ya se aplica, pero espera a Casa Óga.
+// el semáforo del E1: una decisión "declarada" se distingue de una "aplicada" aunque se
+// imprima en blanco y negro. (29/09, cierre) Salen «a confirmar» y «pendiente»: ninguna decisión
+// espera una respuesta de Casa Óga.
 const ESTADO_PASTILLA = {
   aplicada: {
     simbolo: '●', texto: 'aplicada', color: 'var(--despues)',
@@ -290,21 +272,7 @@ const ESTADO_PASTILLA = {
     simbolo: '◐', texto: 'declarada', color: 'var(--mut2)',
     def: 'el dato no cambia y se aclara.',
   },
-  'a confirmar': {
-    simbolo: '◑', texto: 'a confirmar', color: 'var(--terra)',
-    def: 'ya está aplicada, pero Casa Óga todavía no explicó la causa del hallazgo.',
-  },
-  'pendiente del negocio': {
-    simbolo: '○', texto: 'pendiente', color: 'var(--terra)',
-    def: 'falta una respuesta de Casa Óga.',
-  },
 }
-
-// Estados que esperan una respuesta de Casa Óga, y la leyenda del rótulo con los que aparecen.
-const ESPERAN = new Set(['a confirmar', 'pendiente del negocio'])
-const LEYENDA_ESPERA = [...ESPERAN]
-  .filter((est) => decisiones.some((d) => estadoVisible(d) === est))
-  .map((est) => ({ simbolo: ESTADO_PASTILLA[est].simbolo, texto: ESTADO_PASTILLA[est].texto }))
 
 const celda = {
   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -319,7 +287,7 @@ const celdaTxt = { paddingRight: '10px', paddingTop: '1px', paddingBottom: '1px'
 // La leyenda va con la misma letra que la tabla (misma escala que .v01q table en
 // estilos_e2.css): antes era una línea gris de 10,5 px que nadie leía.
 const LETRA_TABLA = 'clamp(11.5px, calc(0.55vw + 5px), 16px)'
-const ORDEN_ESTADOS = ['aplicada', 'declarada', 'a confirmar', 'pendiente del negocio']
+const ORDEN_ESTADOS = ['aplicada', 'declarada']
 
 /** El detalle ocupa el cuerpo entero, con el mismo h1 (la regla del contrato: el h1 es
  *  `meta.titulo`). Arriba, la vuelta al resumen y la cuenta que antes era el título. */
@@ -331,11 +299,10 @@ function Detalle({ nav, marcada, volver }) {
           ← Volver al resumen
         </button>
         <b style={{ color: 'var(--ink)' }}>
-          {`${decisiones.length} decisiones: ${cerradas} ${cerradas === 1 ? 'cerrada' : 'cerradas'} y ` +
-            `${esperan} ${esperan === 1 ? 'espera' : 'esperan'} una respuesta de Casa Óga.`}
+          {`${decisiones.length} decisiones: ${N_APLICADAS} ${N_APLICADAS === 1 ? 'aplicada' : 'aplicadas'} y ` +
+            `${N_DECLARADAS} ${N_DECLARADAS === 1 ? 'declarada' : 'declaradas'}.`}
         </b>{' '}
-        {/* (28/09) Solo los estados que tiene alguna decisión: sin DC-15 pendiente, la leyenda no
-            define «pendiente». */}
+        {/* (28/09) Solo los estados que tiene alguna decisión. */}
         {ORDEN_ESTADOS.filter((est) => decisiones.some((d) => estadoVisible(d) === est)).map((est) => {
           const e = ESTADO_PASTILLA[est]
           return (
@@ -347,11 +314,8 @@ function Detalle({ nav, marcada, volver }) {
             </span>
           )
         })}
-        {N_PEDIDOS === 1 ? 'El pedido abierto está en la ' : `Los ${N_PEDIDOS} pedidos abiertos están en la `}
-        <IrVista id="V12" nav={nav} prefijo="vista " />
-        {PEDIDOS_EN_TABLA > 0 && PEDIDOS_EN_TABLA < N_PEDIDOS
-          ? `; ${PEDIDOS_EN_TABLA} ${PEDIDOS_EN_TABLA === 1 ? 'es' : 'son'} de esta tabla.`
-          : '.'}
+        {'Lo que se le reporta a Casa Óga está en la '}
+        <IrVista id="V12" nav={nav} prefijo="vista " />.
       </p>
 
       <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
@@ -360,8 +324,7 @@ function Detalle({ nav, marcada, volver }) {
         <table style={{
           width: '100%', height: '100%', borderCollapse: 'collapse', tableLayout: 'fixed',
         }}>
-          {/* Cinco columnas: sin ARCHIVO (va en el title del id). Estado al 12 % para que
-              entre «◑ a confirmar» a 1152. */}
+          {/* Cinco columnas: sin ARCHIVO (va en el title del id). Estado al 12 %. */}
           <colgroup>
             <col style={{ width: '6%' }} />
             <col style={{ width: '31%' }} />
@@ -397,8 +360,7 @@ function Detalle({ nav, marcada, volver }) {
                   <div className="clamp2">{dec.llano ?? cap(dec.decision)}</div>
                 </td>
                 <td style={{ padding: '1px 10px 1px 0', verticalAlign: 'middle' }}>
-                  <Pastilla estado={estadoVisible(dec)}
-                            title={PEDIDO[dec.id] ? `Pedido abierto: ${PEDIDO[dec.id]}` : undefined} />
+                  <Pastilla estado={estadoVisible(dec)} />
                 </td>
                 <td className="tabular" style={{ ...celda, padding: '2px 0', textAlign: 'center' }}>
                   <IrVista id={nav ? nav.vistaDe(dec) : dec.vista} nav={nav} />
@@ -449,7 +411,7 @@ function IrVista({ id, nav, prefijo = '' }) {
  *  de otra vista y confunden acá. (24/09) A 0,9 em de la letra de la tabla, para que crezca
  *  con ella. */
 function Pastilla({ estado, title }) {
-  const e = ESTADO_PASTILLA[estado] ?? ESTADO_PASTILLA['pendiente del negocio']
+  const e = ESTADO_PASTILLA[estado] ?? ESTADO_PASTILLA.declarada
   return (
     <span
       role="img"

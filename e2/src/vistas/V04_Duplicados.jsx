@@ -11,7 +11,8 @@
 // (24/09) Un solo vocabulario en pantalla: «número de cliente» para la base de antes y
 // «persona» para la de después (antes convivían clientes, ids, números y registros). El par
 // de riesgo lleva debajo los conteos de los que sale cada porcentaje (números de cliente
-// antes, personas después), para que se vea por qué sube. «En revisión» pasa del pie al
+// antes, personas después), para que se vea por qué sube. «En revisión» (29/09: «con
+// sensibilidad») pasa del pie al
 // rótulo de las métricas que califica (las dos al mismo corte, así que califica la métrica
 // y no solo el «después»), y la exposición dice debajo que no es recupero. La conciliación
 // de E10 (665 = 312, 353 que sobran, 348 con compras) sale del cuerpo al pie. El gráfico
@@ -79,7 +80,7 @@ const TITULO = `Unir ${entero(V.duplicados_con_actividad)} números de cliente d
 
 // (24/09) Una sola constante para meta.pie y la pantalla, así no divergen.
 // Entra en dos renglones a 1152: la cobertura se dice como en la regla 4 de DISENO.md.
-const PIE = `riesgo en revisión por la cobertura de 2025 (${vista(DC09)}) · `
+const PIE = `riesgo con la sensibilidad por la cobertura de 2025 (${vista(DC09)}) · `
   + `corte ${fechaCorta(D2.meta.corte_ref)} · base: ${entero(V.antes.clientes)} números de cliente · `
   + `E10: ${entero(TOTAL_IDS)} números = ${entero(TOTAL_PERSONAS)} personas; de los `
   + `${entero(TOTAL_IDS - TOTAL_PERSONAS)} que sobran, ${entero(V.duplicados_con_actividad)} tenían `
@@ -115,7 +116,7 @@ export default function V04Duplicados({ irAVista }) {
     <section className="pant v04">
       <Banda dcs={[DC04]}>
         <div className="tarjeta e2-central" title={`${NOTA_RIESGO}. ${NOTA_EXPOSICION}.`}>
-          <span className="kpi-lbl"><span>Clientes en riesgo</span><EtiquetaIr texto="en revisión" irAVista={irAVista} /></span>
+          <span className="kpi-lbl"><span>Clientes en riesgo</span><EtiquetaIr texto="con sensibilidad" irAVista={irAVista} /></span>
           <div className="ban-par">
             <div className="par-item par-antes">
               <span className="par-lbl">Antes</span>

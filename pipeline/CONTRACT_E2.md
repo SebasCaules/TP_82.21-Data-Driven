@@ -64,7 +64,7 @@ DC-09, DC-10, DC-11 y DC-14 son lecturas sobre la base ya corregida.
   "decisiones": [
     { "id": "DC-01", "archivo": "Transacciones_clientes.csv", "dimension": "unicidad",
       "hallazgo": "250 filas duplicadas exactas", "decision": "…", "justificacion": "…",
-      "estado": "aplicada" | "declarada" | "pendiente del negocio",
+      "estado": "aplicada" | "declarada",
       "antes":   {"valor": 50250, "etiqueta": "filas"},
       "despues": {"valor": 50000, "etiqueta": "filas"},
       "impacto": "…una frase con la cifra…", "cifras": ["D01"], "vista": "V04" }
@@ -89,7 +89,7 @@ DC-09, DC-10, DC-11 y DC-14 son lecturas sobre la base ya corregida.
 - **V09 NPS y soporte** — `{"filas": 14976, "sin_interaccion": {"n": 4312, "pct": 28.8}, "nps_anual": [{"anio", "con_todo", "solo_con_interaccion", "n_filas", "n_sin_interaccion"}], "reclamos_por_cliente_mes": [{"anio", "valor"}], "riesgo_vs_soporte": {"en_riesgo": {"reclamos_acum": 2.34, "nps": 19.1}, "sin_riesgo": {"reclamos_acum": 2.00, "nps": 24.3}}}`.
 - **V10 La cifra central** — `{"e1": {"pct": 49.6, "exposicion_M": 94.9, "en_riesgo": 2452, "elegibles": 4940}, "despues": {"pct": 50.4, "exposicion_M": 96.4, "en_riesgo", "elegibles"}, "sens": {"corte": "2025-08-31", "pct", "exposicion_M", "en_riesgo", "elegibles"}, "cambios": [{"decision": "DC-04", "delta_pct_pp", "delta_exposicion_M"}]}`.
 - **V11 Dataset de entrenamiento** — copia de `resumen_tablon.json` (sección 4).
-- **V12 Lo que le pedimos a Casa Óga** — `{"pedidos": [{"id": "DC-13", "que": "…", "detalle": "…", "estado": "pendiente del negocio"}]}` (desde el 28/09, solo DC-09, los meses de cobertura no confirmada; DC-15 quedó declarada). Clave aditiva del 28/09: `"reportes": [{"id", "que", "detalle", "cifras"?}]`, lo que se le reporta sin esperar respuesta (D18, con `cifras` = `{sin_solicitud, con_envio, envios}` que `validate_e2.py` recalcula; DC-07; DC-13).
+- **V12 Lo que se le reporta a Casa Óga** — `{"reportes": [{"id", "que", "detalle", "cifras"?}]}`: lo que se le informa sin esperar respuesta. Desde el 29/09 no hay pedidos (la clave `pedidos` sale): DC-09 (la causa de la caída de sep-dic 2025, que Casa Óga revisa con Operaciones y el proveedor del POS), la consulta 10 (sin respuesta; el equipo trabaja con 2022-2025), D18 (con `cifras` = `{sin_solicitud, con_envio, envios}` que `validate_e2.py` recalcula), DC-07 y DC-13.
 
 ## 4. Tablón (`pipeline/tablon.py`)
 

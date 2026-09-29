@@ -1,13 +1,8 @@
-// Estado visible de una decisión (24/09). Una decisión aplicada que además tiene un pedido
-// abierto en V12 (desde el 28/09, solo DC-09) se muestra «a confirmar»: ya corre en el
-// cálculo, pero Casa Óga todavía no explicó la causa (el criterio lo delegó al equipo). Lo usan la tabla de V01 y la tarjeta de
-// decisión de cada vista, para que la misma decisión no diga «a confirmar» en una vista y
-// «aplicada» en otra. El estado del payload no se toca: esto es solo cómo se muestra.
+// Estado visible de una decisión (24/09). Lo usan la tabla de V01 y la tarjeta de decisión de cada
+// vista, para que la misma decisión diga lo mismo en todas. (29/09, cierre) Hasta ese día, una
+// aplicada con un pedido abierto en V12 (DC-09) se mostraba «a confirmar». V12 ya no trae pedidos:
+// la causa de la caída de sep-dic 2025 se le reporta a Casa Óga sin esperar respuesta, y el criterio
+// de esos meses lo delegó al equipo (consulta 2). Quedan dos estados, aplicada y declarada, que son
+// los del payload.
 
-import { D2 } from './datos_e2.js'
-
-// V12 también lista pedidos que no son decisiones («D18 (registro)»): por eso el prefijo DC-.
-export const ESPERA = new Set((D2.vistas.V12?.pedidos ?? []).map((p) => p.id).filter((id) => id.startsWith('DC-')))
-
-export const estadoVisible = (dc) =>
-  (dc.estado === 'aplicada' && ESPERA.has(dc.id) ? 'a confirmar' : dc.estado)
+export const estadoVisible = (dc) => dc.estado

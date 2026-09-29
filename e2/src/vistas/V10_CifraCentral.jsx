@@ -9,7 +9,7 @@
 // mismo indicador al mismo corte, y a su derecha la sensibilidad, un escalón más chica y en
 // tinta, separada por un borde punteado y con el aro punteado de ParDoble. No es un «después»
 // más: es la misma cifra leída con otro corte, así que no lleva flecha (regla 2 de DISEÑO.md:
-// forma, no solo color). «En revisión» pasa del pie al rótulo del 50,4 % y la sensibilidad
+// forma, no solo color). «En revisión» (29/09: «con sensibilidad») pasa del pie al rótulo del 50,4 % y la sensibilidad
 // dice qué significa: si sep–dic 2025 están incompletos, el 50,4 % sobrestima el riesgo. Ya
 // no se llama «último mes confirmado»: ningún criterio confirma un mes (INT-TRANSVERSAL-1).
 // La exposición es cifra, no renglón chico (en V04 también lo es), y la salvedad de pesos y
@@ -54,18 +54,16 @@ const vista = (id) => `vista\u00a0${numeroVista(id)}`
 const FLAG = D2.vistas.V03.meses_flag
 const MESES_FLAG = `${mesCorto(FLAG[0]).slice(0, 3)}–\u2060${mesCorto(FLAG[FLAG.length - 1]).slice(0, 3)}`
   + `\u00a0${FLAG[FLAG.length - 1].slice(0, 4)}`
-// El pedido a Casa Óga se nombra solo si V12 lo trae (el mismo criterio que V03).
-const PEDIDO = (D2.vistas.V12?.pedidos ?? []).some((p) => p.id === DC09.id)
 
 // Los tres rótulos del par dicen la fecha de medición con el mismo formato «al dd/mm/aaaa»
 // (OMI-V10-2: el «01/09» escrito a mano se leía como una fecha de corte). El separador va
 // pegado a lo que tiene antes, para que un renglón no empiece con «·».
 const SEP = '\u00a0· '
 const ETQ_E1 = `Entregable 1${SEP}al ${fechaCorta(D2.meta.corte_ref)}`
-const ETQ_DESPUES = `Después de las decisiones${SEP}al ${fechaCorta(D2.meta.corte_ref)}${SEP}en revisión`
+const ETQ_DESPUES = `Después de las decisiones${SEP}al ${fechaCorta(D2.meta.corte_ref)}`
 const ETQ_SENS = `Si ${MESES_FLAG} están incompletos${SEP}medido al ${fechaCorta(V.sens.corte)}`
-const NOTA_SENS = `El ${pct(V.despues.pct)} sobrestimaría el riesgo; `
-  + (PEDIDO ? `Casa Óga tiene que confirmar esos meses (${vista('V12')})` : 'Casa Óga tiene que confirmar esos meses')
+const NOTA_SENS = `El ${pct(V.despues.pct)} sobrestimaría el riesgo; la causa de la caída la `
+  + `revisa Casa Óga con Operaciones y el proveedor del POS (${vista('V12')})`
 
 // La salvedad de la exposición, con las palabras de V04. Los pesos se califican como en el
 // E1 (8640faf): del extracto, sin afirmar «corrientes», porque la serie de precios no sigue
@@ -89,24 +87,23 @@ const NOTA_DC04 = `La base baja ${entero(MENOS_BASE)} (${entero(V.e1.elegibles)}
   + `${entero(V.despues.elegibles)} personas) y los que están en riesgo, ${entero(MENOS_RIESGO)}: `
   + `por eso el % ${V.despues.pct >= V.e1.pct ? 'sube' : 'baja'}`
 const NOTA_DC09 = `Frente al ${pct(V.despues.pct)}, si se mide al ${fechaCorta(V.sens.corte)}, antes de `
-  + `${MESES_FLAG}: no reemplaza la cifra, la pone en duda (${vista(DC09.vista)})`
+  + `${MESES_FLAG}: no reemplaza la cifra, la acompaña (${vista(DC09.vista)})`
 const NOTA_DC08 = `Frente al E1: el E1 ya medía al ${fechaCorta(RIESGO_V02.al_corte_ref.corte)}; al `
   + `${fechaCorta(RIESGO_V02.al_2026_08_31.corte)} daba ${pct(RIESGO_V02.al_2026_08_31.pct)} (${vista(DC08.vista)})`
 const estado = (id) => D2.decisiones.find((d) => d.id === id)?.estado ?? ''
 const MOSTRADAS = new Set([...V.cambios.map((c) => c.decision), DC09.id, DC08.id])
 const OTRAS = D2.decisiones.filter((d) => !MOSTRADAS.has(d.id)).length
 
-// El título dice el hallazgo con la cifra y, en la misma línea, que está en revisión y
-// cuánto da la sensibilidad (NAR-V10-1), calculado desde D2: si el payload cambia, el
+// El título dice el hallazgo con la cifra y, en la misma línea, cuánto da la sensibilidad (NAR-V10-1), calculado desde D2: si el payload cambia, el
 // título cambia solo.
 const MOTIVO = UNICA ? 'solo por duplicados' : `por ${V.cambios.length} decisiones`
-const TITULO = `${pct(V.e1.pct)} → ${pct(V.despues.pct)} ${MOTIVO}; en revisión: al `
+const TITULO = `${pct(V.e1.pct)} → ${pct(V.despues.pct)} ${MOTIVO}; con sensibilidad: al `
   + `${fechaCorta(V.sens.corte)} da ${pct(V.sens.pct)}`
 
 // (24/09) Una sola constante para meta.pie y la pantalla, así no divergen.
 const PIE = `Exposición: facturación proyectada, no recupero; pesos del extracto, sin ajustar `
-  + `por inflación (DC-10, ${vista(DC10.vista)}) · riesgo en revisión por ${MESES_FLAG} `
-  + `(${vista(DC09.vista)}; depende de la respuesta de Casa Óga, ${vista('V12')}) · corte `
+  + `por inflación (DC-10, ${vista(DC10.vista)}) · riesgo con la sensibilidad sin ${MESES_FLAG} `
+  + `(${vista(DC09.vista)}; la causa se le reporta a Casa Óga, ${vista('V12')}) · corte `
   + `${fechaCorta(D2.meta.corte_ref)}, sensibilidad ${fechaCorta(V.sens.corte)} · registro: `
   + `C03, C04, D05, D22, E01; DC-09`
 
@@ -132,7 +129,7 @@ function Aro() {
 
 // (25/09, pedido del usuario: mucho texto y números difíciles de entender) La vista queda en
 // tres tarjetas de cifra, sin frases de apoyo: el E1, los datos corregidos (la cifra que manda,
-// «en revisión») y la sensibilidad sin sep–dic 2025, punteada; cada una con su % y su exposición
+// «con sensibilidad») y la sensibilidad sin sep–dic 2025, punteada; cada una con su % y su exposición
 // anual, y el Δ en puntos en una línea. Debajo, una sola escala de 0 a 100 % con las cuatro
 // lecturas del riesgo (la del 31/08/2026 viene de V02): se ve de un golpe que corregir los datos
 // casi no la mueve y que la duda sobre sep–dic 2025 sí. Lo que decían las notas va al title.
@@ -166,7 +163,7 @@ export default function V10CifraCentral({ irAVista }) {
           <Exposicion M={V.e1.exposicion_M} />
         </div>
         <div className="tarjeta e2-central" title={TIT_DESP}>
-          <span className="kpi-lbl"><span>Datos corregidos</span><EtiquetaIr texto="en revisión" irAVista={irAVista} /></span>
+          <span className="kpi-lbl"><span>Datos corregidos</span><EtiquetaIr texto="con sensibilidad" irAVista={irAVista} /></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <span className="par-lbl">
