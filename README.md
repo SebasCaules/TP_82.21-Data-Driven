@@ -120,7 +120,8 @@ npm run build:e3                        # dist-e3/index.html
 python3 scripts/verificar_e3.py         # desborde, consola, red, teclado y controles, a 5 resoluciones
 ```
 
-`npm run dev:e3` la levanta en el puerto 5179.
+`npm run dev:e3` la levanta en el puerto 5179. El verificador usa Playwright de Python
+(`pip install playwright`); si no encuentra su Chromium, abre el Chrome instalado.
 
 | Tecla | Qué hace |
 |---|---|
