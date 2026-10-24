@@ -25,19 +25,21 @@ export function PieMarca({ className = '' }) {
   )
 }
 
-/** Puntos discretos que dicen cuántos pasos quedan en la diapositiva. */
+/** (24/10) Para quien presenta: mientras quedan pasos, «paso 1 de 3 · → sigue aquí» en el pie. Quien
+ *  ensayó con el PDF aprieta → y espera otra diapositiva; esto le dice que la misma sigue. Completa,
+ *  no se muestra. */
 function Pasos({ paso, pasos }) {
-  if (!pasos || pasos < 2) return null
+  if (!pasos || pasos < 2 || paso >= pasos) return null
   return (
-    <span className="e3-pasos" role="img" aria-label={`paso ${paso} de ${pasos}`} data-escala="">
-      {Array.from({ length: pasos }, (_, k) => <i key={k} className={k < paso ? 'on' : ''} />)}
+    <span className="e3-pasos" role="status" data-escala="">
+      paso {paso} de {pasos} · → sigue aquí
     </span>
   )
 }
 
 export default function Marco({ kicker, titulo, fuente, n, derecha, paso, pasos, children, clase = '' }) {
   return (
-    <div className={`e3-dia ${clase}`}>
+    <div className={`e3-dia ${clase}`} {...(pasos > 1 ? { 'data-paso': paso, 'data-pasos': pasos } : {})}>
       <div className="e3-avance" aria-hidden="true">
         {n != null && <i style={{ width: `${(100 * n) / TOTAL}%` }} />}
       </div>

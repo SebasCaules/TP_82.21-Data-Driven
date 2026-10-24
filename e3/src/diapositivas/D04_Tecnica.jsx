@@ -1,6 +1,7 @@
 // Diapositiva 4: factibilidad técnica (A 1.1 a 1.3, F16). Las cuatro condiciones de 1 a 3, la línea
 // del promedio y la banda de factibilidad media de la escala de la cátedra. (24/10) Pasar el puntero
-// o el foco por una condición resalta su fila, y al revés.
+// o el foco por una condición resalta su fila, y al revés. Las condiciones no son controles: el clic
+// sobre ellas pasa de diapositiva como en cualquier otro lugar de la franja.
 import { useState } from 'react'
 import { D3 } from '../datos_e3.js'
 import { fijo } from '../formato.js'
@@ -24,7 +25,7 @@ function Grafico({ activa, setActiva, estatico }) {
       <rect x={x(MEDIA.desde)} y={36} width={x(MEDIA.hasta) - x(MEDIA.desde)} height={214} className="e3-banda" />
       {T.condiciones.map((c, k) => (
         <g key={c.id} className={`e3-cond ${activa === c.id ? 'on' : ''}`} tabIndex={estatico ? -1 : 0}
-           role="button" aria-label={`${c.nombre}: ${c.puntaje}`} data-control=""
+           role="img" aria-label={`${c.nombre}: ${c.puntaje}`}
            onMouseEnter={() => setActiva(c.id)} onMouseLeave={() => setActiva(null)}
            onFocus={() => setActiva(c.id)} onBlur={() => setActiva(null)}>
           <rect x={0} y={fila(k) - 25} width={W} height={50} className="e3-cond-fondo" />

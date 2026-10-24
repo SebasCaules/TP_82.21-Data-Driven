@@ -39,6 +39,7 @@
 @media (prefers-reduced-motion: reduce) {
   .e3-pagina.adelante, .e3-pagina.atras, .e3-pagina.salto { animation: none; }
   .e3-dia g, .e3-dia span, .e3-llamadas, .e3-ic-caja { transition: none; }
+  .e3-pista { animation: none; }
 }
 
 .e3-buffer {
@@ -48,6 +49,19 @@
   font: 400 15px/1.3 var(--fuente);
 }
 .e3-buffer b { font-size: 18px; margin: 0 2px; }
+
+/* (24/10) Pista de atajos al abrir en la portada: fuera del escenario, abajo; se apaga a los 4 s. */
+.e3-pista {
+  position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 5; margin: 0;
+  background: var(--ink); color: #fff; white-space: nowrap;
+  padding: 7px 16px; border-radius: 6px;
+  font: 400 15px/1.3 var(--fuente);
+  animation: e3-pista 4s ease-in forwards;
+}
+@keyframes e3-pista { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Pantalla en negro («.» o B), como PowerPoint: tapa todo hasta la próxima tecla o clic. */
+.e3-negro { position: fixed; inset: 0; z-index: 20; background: var(--ink); cursor: none; }
 
 /* ---------- marco de cada diapositiva ---------- */
 
@@ -83,9 +97,7 @@
 }
 .e3-pie-centro { text-align: center; }
 .e3-pie-der { display: flex; justify-content: flex-end; align-items: center; gap: 14px; white-space: nowrap; }
-.e3-pasos { display: inline-flex; gap: 5px; }
-.e3-pasos i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--lbl); }
-.e3-pasos i.on { background: var(--lbl); }
+.e3-pasos { font: 700 17px/1.3 var(--fuente); color: var(--acc); }
 .e3-marca { color: inherit; }
 .e3-marca-enlace { text-decoration: none; cursor: pointer; border-radius: 3px; }
 .e3-marca-enlace:hover, .e3-marca-enlace:focus-visible { text-decoration: underline; text-underline-offset: 3px; }
@@ -229,10 +241,7 @@
   display: flex; flex-direction: column; align-items: stretch;
   padding: 34px 30px 0; text-align: left;
   font-family: var(--fuente); color: var(--ink);
-  cursor: pointer;
 }
-.e3-veredicto:hover { box-shadow: 0 0 0 2px var(--acc); }
-.e3-veredicto:focus-visible { outline: 3px solid var(--sel); outline-offset: 3px; }
 .e3-veredicto-valor {
   height: 100px; margin-top: 8px;
   display: flex; align-items: flex-end;
@@ -242,7 +251,14 @@
 .e3-veredicto.malo .e3-veredicto-valor { color: var(--terra); }
 .e3-veredicto-escala { margin-top: 8px; min-height: 56px; font: 400 20px/1.32 var(--fuente); color: var(--mut); }
 .e3-veredicto-texto { margin-top: 12px; font: 400 23px/1.34 var(--fuente); }
-.e3-ir { position: absolute; right: 18px; bottom: 12px; font: 500 15px/1 var(--mono); color: var(--mut); }
+.e3-ir {
+  position: absolute; right: 14px; bottom: 12px; height: 44px; padding: 0 14px;
+  background: var(--sup); color: var(--acc);
+  border: 1.5px solid var(--bd); border-radius: 7px;
+  font: 600 19px/1 var(--fuente); cursor: pointer;
+}
+.e3-ir:hover { border-color: var(--acc); background: var(--azul1); }
+.e3-ir:focus-visible { outline: 3px solid var(--sel); outline-offset: 2px; }
 
 /* ---------- 3: el problema ---------- */
 

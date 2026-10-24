@@ -1,5 +1,6 @@
-// Diapositiva 2: la respuesta. Cuatro tarjetas que llevan a su diapositiva (24/10): Técnica a la 4,
-// Legal a la 10, Económica a la 8 y el riesgo más crítico a la 9.
+// Diapositiva 2: la respuesta. Cuatro tarjetas, cada una con un botón a su diapositiva (24/10): Técnica
+// a la 4, Legal a la 10, Económica a la 8 y el riesgo más crítico a la 9. La tarjeta no es un botón:
+// el clic en la franja derecha o izquierda pasa de diapositiva, como en las demás.
 import { Rico } from '../texto.jsx'
 import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
@@ -18,18 +19,20 @@ export default function Respuesta({ d, ir, estatico }) {
         const destino = DESTINO[t.area] ?? POR_ORDEN[k]
         const malo = MALO.has(t.area)
         return (
-          <button key={t.area} type="button" className={`e3-tarjeta e3-veredicto ${malo ? 'malo' : ''}`}
-                  style={caja(M + k * (w + sep), Y0, w, 390)} tabIndex={estatico ? -1 : 0}
-                  onClick={() => ir?.(String(destino))} title={`Ir a la diapositiva ${destino}`}>
+          <div key={t.area} className={`e3-tarjeta e3-veredicto ${malo ? 'malo' : ''}`}
+               style={caja(M + k * (w + sep), Y0, w, 432)}>
             <span className="e3-rotulo">{t.area}</span>
             <span className={`e3-veredicto-valor ${t.valor.length > 6 ? 'largo' : ''}`}><Rico t={t.valor} /></span>
             <span className="e3-veredicto-escala"><Rico t={t.escala} /></span>
             <span className="e3-veredicto-texto"><Rico t={t.texto} /></span>
-            <span className="e3-ir" data-escala="">→ {destino}</span>
-          </button>
+            <button type="button" className="e3-ir" tabIndex={estatico ? -1 : 0}
+                    onClick={() => ir?.(String(destino))} aria-label={`${t.area}: ir a la diapositiva ${destino}`}>
+              ver la <span data-escala="">{destino}</span> →
+            </button>
+          </div>
         )
       })}
-      <div className="e3-decision" style={caja(M, 660, ANCHO, 138)}><p><Rico t={d.decision} /></p></div>
+      <div className="e3-decision" style={caja(M, 684, ANCHO, 120)}><p><Rico t={d.decision} /></p></div>
     </Marco>
   )
 }

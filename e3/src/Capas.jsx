@@ -1,5 +1,5 @@
-// Capas fuera del escenario: notas del orador (N), vista general (O o Esc), lista de anexos (A) y
-// ayuda de atajos (?). Van en píxeles reales, no escalados: son para quien presenta.
+// Capas fuera del escenario: notas del orador (N), vista general (O), lista de anexos (A) y ayuda de
+// atajos (?). Van en píxeles reales, no escalados: son para quien presenta.
 
 import { memo, useEffect, useRef, useState } from 'react'
 import { C3 } from './contenido_e3.js'
@@ -109,10 +109,11 @@ export function VistaGeneral({ actual, onIr, onCerrar }) {
   )
 }
 
-/** Lista de anexos: A1 a A6 con su título; desde un anexo, también la vuelta a la diapositiva. */
-export function ListaAnexos({ actual, origen, onIr, onVolver, onCerrar }) {
+/** Lista de anexos: A1 a A6 con su título; desde un anexo, también la vuelta a la diapositiva (la de
+ *  origen, o la última si el anexo se abrió directo por la URL). */
+export function ListaAnexos({ actual, origen, enAnexo, onIr, onVolver, onCerrar }) {
   const caja = useRef(null)
-  const items = [...(origen ? [{ id: 'volver' }] : []), ...ANEXOS]
+  const items = [...(enAnexo ? [{ id: 'volver' }] : []), ...ANEXOS]
   const [sel, setSel] = useState(Math.max(0, items.findIndex((x) => x.id === actual)))
   useEffect(() => { caja.current?.focus() }, [])
   const elegir = (x) => (x.id === 'volver' ? onVolver() : onIr(x.id))
@@ -135,7 +136,7 @@ export function ListaAnexos({ actual, origen, onIr, onVolver, onCerrar }) {
               <button type="button" className={`${j === sel ? 'sel' : ''} ${x.id === actual ? 'actual' : ''}`}
                       onClick={() => elegir(x)}>
                 {x.id === 'volver'
-                  ? <>← Volver a la diapositiva {origen}</>
+                  ? (origen ? <>← Volver a la diapositiva {origen}</> : <>← Ir a la diapositiva {TOTAL}</>)
                   : <><b>{x.a.n}</b><span>{x.a.titulo}</span></>}
               </button>
             </li>
@@ -147,16 +148,18 @@ export function ListaAnexos({ actual, origen, onIr, onVolver, onCerrar }) {
 }
 
 const ATAJOS = [
-  ['→  ↓  Espacio  Av Pág  Enter', 'siguiente (o el paso que sigue)'],
+  ['→  ↓  Espacio  Av Pág  Enter', 'siguiente (en la 3 y la 6, el paso que sigue)'],
   ['←  ↑  Re Pág  Retroceso', 'anterior; en un anexo, vuelve a la diapositiva'],
   ['Inicio  ·  Fin', 'primera  ·  última'],
   ['número y Enter', 'ir a esa diapositiva'],
   ['clic a la izquierda o a la derecha', 'anterior  ·  siguiente'],
-  ['O  ·  Esc', 'vista general'],
+  ['O', 'vista general'],
   ['A', 'anexos'],
-  ['N', 'notas del orador'],
-  ['F', 'pantalla completa'],
-  ['En un control', 'flechas lo mueven; ↑ ↓ saltan entre marcas; Esc suelta el foco'],
+  ['F  ·  F5', 'pantalla completa (F5 es el botón del control remoto)'],
+  ['.  ·  B', 'pantalla en negro; cualquier tecla vuelve'],
+  ['Esc', 'cierra lo abierto; nunca cambia la diapositiva'],
+  ['N', 'notas, para ensayar. En el aula: otra ventana con la misma dirección y N, en la laptop; las dos ventanas se siguen'],
+  ['Tab hasta un control', 'flechas lo mueven; ↑ ↓ saltan entre marcas; Esc lo suelta. Con el mouse, → sigue pasando de diapositiva'],
 ]
 
 export function Ayuda({ onCerrar }) {

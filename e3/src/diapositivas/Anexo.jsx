@@ -1,6 +1,7 @@
 // Anexos A1 a A6: tablas de respaldo para preguntas, con las filas que C3 marca en `destacar`.
 // Se llega con A, desde la vista general o con #a1 a #a6; «Volver» lleva a la diapositiva de origen.
-import Marco, { ANCHO, M, caja } from './Marco.jsx'
+// (24/10) Abierto directo por la URL no hay origen: el botón dice «Ir a la diapositiva 12», no «Volver».
+import Marco, { ANCHO, M, TOTAL, caja } from './Marco.jsx'
 import { Rico } from '../texto.jsx'
 
 const NUMERO = /^[−+\-]?[\d.,]+( %)?$/
@@ -14,7 +15,8 @@ export default function Anexo({ a, origen, volver, estatico }) {
            derecha={<>Anexo {a.n}</>} clase="e3-es-anexo">
       {!estatico && (
         <button type="button" className="e3-volver" style={caja(1128, 34, 400, 40)} onClick={volver}>
-          ← Volver a la diapositiva <span data-escala="">{origen}</span>
+          {origen ? '← Volver a la diapositiva ' : '← Ir a la diapositiva '}
+          <span data-escala="">{origen || TOTAL}</span>
         </button>
       )}
       <div className="e3-anexo-cuerpo" style={caja(M, 216, ANCHO)}>
