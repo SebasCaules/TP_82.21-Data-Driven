@@ -122,7 +122,7 @@ export default function Modelos({ d, paso = 3, estatico }) {
           </span>
         )}
       </p>
-      <div className={`e3-figura e3-ic-caja ${paso >= 3 ? '' : 'e3-oculto'}`} style={caja(M, 640, 840, 150)}>
+      <div className={`e3-figura e3-ic-caja ${paso >= 3 ? '' : 'e3-oculto'}`} style={caja(M, 636, 840, 164)}>
         <p className="e3-rotulo">Logística menos regla en validación, en puntos · intervalo del 95 %</p>
         <Intervalo />
       </div>

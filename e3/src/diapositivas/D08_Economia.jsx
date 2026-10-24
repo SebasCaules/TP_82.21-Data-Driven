@@ -22,7 +22,7 @@ function AEscala() {
         <span className="e3-escala-barra malo" style={{ width: W }} />
       </div>
       <div className="e3-escala-fila">
-        <span className="e3-escala-txt"><b>{fijo(hay, 1)} puntos</b> hay entre la regla y una lista perfecta</span>
+        <span className="e3-escala-txt"><b>{fijo(hay, 1)} puntos</b> entre la regla y una lista perfecta</span>
         <span className="e3-escala-barra" style={{ width: Math.max(2, (W * hay) / falta) }} />
       </div>
     </div>
@@ -53,7 +53,7 @@ export default function Economia({ d }) {
         </div>
       ))}
       <p className="e3-formula" style={caja(M, 754, wl)}>{d.formula}</p>
-      <div className="e3-panel" style={caja(xr, Y0, wr, 552)}>
+      <div className="e3-panel" style={caja(xr, Y0, wr, 560)}>
         <p className="e3-rotulo">{d.callout.titulo}</p>
         <p className="e3-panel-grande">{puntos(E.observada.puntos_para_pagar)} puntos</p>
         <p className="e3-panel-sub">harían falta para pagar el modelo</p>

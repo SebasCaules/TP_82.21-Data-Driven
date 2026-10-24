@@ -8,7 +8,7 @@ import { Rico } from '../texto.jsx'
 import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
 const C = D3.caso
-const FIG = { x: 726, y: Y0 + 6, w: 802, h: 256 }
+const FIG = { x: 726, y: Y0 + 6, w: 802, h: 276 }
 
 function Linea({ paso }) {
   const uid = 'e3' + useId().replace(/[^a-zA-Z0-9]/g, '')

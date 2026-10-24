@@ -88,7 +88,7 @@ function Grafico({ i, desc, id }) {
       {/* guía: el costo de la regla, desde el final de su barra hasta su beneficio */}
       <line x1={x(E.costos.regla_sin_modelo.total_anio_1_usd)} x2={x(E.costos.regla_sin_modelo.total_anio_1_usd)}
             y1={84} y2={130} className="e3-guia" />
-      <text x={x0 - 10} y={101} textAnchor="end" className="e3-t e3-t-13 e3-t-lbl e3-mayus">Beneficio anual simulado</text>
+      <text x={10} y={101} className="e3-t e3-t-13 e3-t-lbl e3-mayus">Beneficio anual simulado</text>
       {beneficio(regla, 120, 'Regla')}
       <line x1={x(E.costos.incremental_usd)} x2={x(E.costos.incremental_usd)} y1={138} y2={162} className="e3-guia" />
       <text x={x(E.costos.incremental_usd) + 6} y={156} className="e3-t e3-t-15 e3-t-lbl">
