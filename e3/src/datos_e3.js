@@ -23,8 +23,8 @@ export const D3 = {
   ],
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
-   "version": "v1.0",
-   "sha256": "5de9d229a5689690af77bbffddd0f2e131ae200661fed5cdb77020968a9bcd19"
+   "version": "v1.1",
+   "sha256": "b1dde23c92cbb6b67075a34f614a6e9ee15af25fb690c52220f4489c0c0b831c"
   }
  },
  "caso": {

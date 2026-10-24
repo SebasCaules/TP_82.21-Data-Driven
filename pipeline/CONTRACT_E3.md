@@ -80,8 +80,8 @@ El resto de los campos son texto o listas de texto: `n`, `quien`, `tipo`, `kicke
 `formula`, `pedidos_titulo`, `pedidos`.
 
 - `segundos` de cada diapositiva: el tiempo del guion (130 palabras por minuto, un número vale 3,
-  3 s por cambio, redondeo a 5 s), comprobado contra `_gen/tiempos.txt`. `TIEMPOS.total_s` = 650
-  (10:50); `TIEMPOS.turnos` = los seis turnos consecutivos con su integrante, diapositivas y segundos.
+  3 s por cambio, redondeo a 5 s), comprobado contra `_gen/tiempos.txt`. `TIEMPOS.total_s` = 655
+  (10:55); `TIEMPOS.turnos` = los seis turnos consecutivos con su integrante, diapositivas y segundos.
 - `ANEXOS[i]`: `{n: "A1"…"A6", titulo, fuente, ids, columnas, anchos, filas, destacar, pie?}`. `anchos`
   son pulgadas del PPTX: sirven como proporción. `destacar` son índices de fila (desde 0).
 - `figura` nombra el PNG del PPTX. En `/e3/` la figura se dibuja con los datos de `D3`:

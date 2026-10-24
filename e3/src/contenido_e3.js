@@ -1,7 +1,7 @@
 // Generado por entregas/entregable-3/_build/F/presentacion/exportar_web.py desde contenido.py.
 // No editar a mano: el texto se cambia en contenido.py y se vuelve a exportar.
 export const C3 = {
-  "VERSION": "v1.0",
+  "VERSION": "v1.1",
   "EQUIPO": [
     {
       "nombre": "Sebastian Caules",
@@ -303,7 +303,7 @@ export const C3 = {
         {
           "celda": "Acierto",
           "valor": "ARS 99,96",
-          "texto": "Vuelve 1 de cada 98 contactados (s = 1,02 %) y deja ARS 15.282 de margen anual menos el descuento de 15 %."
+          "texto": "Vuelve 1 de cada 98 contactados que se iban a ir (s = 1,02 %) y deja ARS 15.282 de margen anual menos el descuento de 15 %."
         },
         {
           "celda": "Falso positivo",
@@ -357,7 +357,7 @@ export const C3 = {
           "texto": "Tendría que volver ese porcentaje de los contactados que se iban a ir para que la regla se pague: 48,6 veces lo observado."
         }
       ],
-      "decision": "**Veredicto: no viable tal como está planteado.** Ninguna variable de la sensibilidad lleva el ROI a 0. La que puede cambiarlo es la tasa de éxito, y no está medida.",
+      "decision": "**Veredicto: no viable tal como está planteado.** Ninguna variable de la sensibilidad lleva el ROI a 0. El de la regla puede cambiar con la tasa de éxito, que no está medida.",
       "fuente": "Parte B 3.2 y 3.4 a 3.6",
       "ids": [
         "G38",
@@ -479,7 +479,7 @@ export const C3 = {
             },
             {
               "rotulo": "Umbral",
-              "texto": "2,87 puntos al tercer mes; si no llega, no se invierte en producción"
+              "texto": "40,4 puntos al tercer mes; si no llega, no se invierte en producción"
             },
             {
               "rotulo": "Quién",
@@ -527,12 +527,13 @@ export const C3 = {
       "nota": "La matriz completa tiene 13 riesgos, con probabilidad, impacto, estrategia y acción (anexo A4).",
       "fuente": "Parte C 6.2 y 6.3",
       "ids": [
+        "H49",
         "G49",
         "H46",
         "C18",
         "H45"
       ],
-      "guion": "Armamos una matriz de 13 riesgos. Estos son los tres críticos, cada uno con lo que se mide, el umbral y quién lo mira. Primero, que la tasa de éxito no pague la lista: Juan Manuel compara cada mes la compra de contactados y control, y si al tercer mes la diferencia no llega a 2,87 puntos, no se invierte en producción. Segundo, que al cerrar el piloto nadie opere la lista, como pasó con el proyecto anterior: María G. elige el operador antes del tercer mes. Tercero, contactar a alguien sin consentimiento: con un solo cliente así, la planilla no sale.",
+      "guion": "Armamos una matriz de 13 riesgos. Estos son los tres críticos, cada uno con lo que se mide, el umbral y quién lo mira. Primero, que la tasa de éxito no pague la lista: Juan Manuel compara cada mes la compra de contactados y control, y si al tercer mes la diferencia no llega a 40,4 puntos, no se invierte en producción. Segundo, que al cerrar el piloto nadie opere la lista, como pasó con el proyecto anterior: María G. elige el operador antes del tercer mes. Tercero, contactar a alguien sin consentimiento: con un solo cliente así, la planilla no sale.",
       "segundos": 50
     },
     {
@@ -543,7 +544,7 @@ export const C3 = {
       "titulo": "Un piloto de tres meses con grupo de control decide si se invierte más",
       "figura": "piloto.png",
       "hechos": [
-        "**1.260 tratados y 240 de control.** Detecta una diferencia de 2,87 puntos o más en la compra a 7 días.",
+        "**1.260 tratados y 240 de control.** Detecta una diferencia de 2,87 puntos o más en la compra a 7 días; para pagar la lista hacen falta 40,4.",
         "**Control:** 80 por mes, decisión del equipo. Quedan fuera los clientes de mayor valor, como pidió Sofía R. (envío 45); el equipo los define como el 20 % de mayor facturación.",
         "**Costo:** USD 1.350 de horas, dentro del presupuesto, y ARS 68.289 (USD 46,79) de acciones, que paga Marketing."
       ],
@@ -556,13 +557,14 @@ export const C3 = {
         "A quién designa para inscribir las bases en la AAIP (L1)."
       ],
       "nota": "Sigue la Parte D: evaluación en test (etapa 4), diseño de la solución, go-live y veredicto integrado.",
-      "fuente": "Parte B 3.6 · Parte C 6.4",
+      "fuente": "Parte B 3.6 · Parte C 6.3 y 6.4",
       "ids": [
         "G49",
+        "H49",
         "G50"
       ],
-      "guion": "Entonces, la propuesta. Durante tres meses sale la lista de 500 con la regla. Cada mes, 80 clientes quedan sin contactar, elegidos fuera de los de mayor valor, como pidió Sofía R. Con 240 clientes de control detectamos una diferencia de 2,87 puntos o más en la compra. Cuesta 1.350 dólares de horas, dentro del presupuesto, y 46,79 dólares de acciones que paga Marketing. Con esta entrega le presentamos a María G. cinco cosas: la definición del target, este alcance, quién opera la lista en el piloto, el grupo de control, que revisa Sofía R., y a quién designa para inscribir las bases en la AAIP. Si el piloto muestra efecto, recién ahí se invierte en producción. El modelo entra solo si en el test le gana a la regla por más que el ruido y paga lo que agrega, y hoy ninguna tasa de éxito lo paga. Gracias.",
-      "segundos": 75
+      "guion": "Entonces, la propuesta. Durante tres meses sale la lista de 500 con la regla. Cada mes, 80 clientes quedan sin contactar, elegidos fuera de los de mayor valor, como pidió Sofía R. Con 240 clientes de control detectamos una diferencia de 2,87 puntos o más en la compra. Cuesta 1.350 dólares de horas, dentro del presupuesto, y 46,79 dólares de acciones que paga Marketing. Con esta entrega le presentamos a María G. cinco cosas: la definición del target, este alcance, quién opera la lista en el piloto, el grupo de control, que revisa Sofía R., y a quién designa para inscribir las bases en la AAIP. Si la diferencia llega a 40,4 puntos, la lista se paga y recién ahí se invierte en producción. El modelo entra solo si en el test le gana a la regla por más que el ruido y paga lo que agrega, y hoy ninguna tasa de éxito lo paga. Gracias.",
+      "segundos": 80
     }
   ],
   "ANEXOS": [
@@ -1179,7 +1181,7 @@ export const C3 = {
   "TIEMPOS": {
     "palabras_por_minuto": 130,
     "cambio_s": 3,
-    "total_s": 650,
+    "total_s": 655,
     "turnos": [
       {
         "quien": "Sebastian C.",
@@ -1227,7 +1229,7 @@ export const C3 = {
         "diapositivas": [
           12
         ],
-        "segundos": 75
+        "segundos": 80
       }
     ]
   }
