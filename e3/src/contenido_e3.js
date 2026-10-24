@@ -148,7 +148,7 @@ export const C3 = {
         },
         {
           "rotulo": "Capacidad humana · 2",
-          "texto": "El piloto lo opera el equipo consultor (**inferido del envío 71**). Después, Casa Óga elige analista part-time o contrato de soporte."
+          "texto": "El piloto lo opera el equipo consultor (**inferido del envío 71**). Antes del tercer mes, Casa Óga elige analista part-time o contrato de soporte."
         }
       ],
       "nota": "El proyecto anterior se cortó porque «no quedó un responsable claro de mantenerlos» (envío 15).",
