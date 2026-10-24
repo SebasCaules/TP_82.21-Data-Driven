@@ -125,19 +125,28 @@ python3 scripts/verificar_e3.py         # desborde, consola, red, teclado y cont
 
 | Tecla | Qué hace |
 |---|---|
-| → ↓ Espacio Av Pág Enter | siguiente; en la 3 y la 6, el paso que sigue |
-| ← ↑ Re Pág Retroceso | anterior; en un anexo, vuelve a la diapositiva de la que se vino |
+| → ↓ Espacio Av Pág Enter | siguiente; en la 3 y la 6, el paso que sigue (el pie avisa «paso 1 de 3 · → sigue aquí») |
+| ← ↑ Re Pág Retroceso | anterior; deshace un paso solo si a la diapositiva se llegó con →; en un anexo, vuelve a la diapositiva de la que se vino |
 | Inicio · Fin | primera · última |
 | número y Enter | ir a esa diapositiva |
-| clic a la izquierda o a la derecha | anterior · siguiente |
-| O · Esc | vista general |
+| clic a la izquierda o a la derecha | anterior · siguiente, en todas las diapositivas |
+| O | vista general |
 | A | anexos |
 | N | notas del orador: guion, quién lo dice y su tiempo |
-| F | pantalla completa |
+| F · F5 | pantalla completa (F5 es lo que manda el botón de iniciar de un control remoto) |
+| . · B | pantalla en negro; cualquier tecla vuelve |
+| Esc | cierra lo abierto; nunca cambia la diapositiva ni muestra la vista general |
 | ? | atajos |
 
-Con el foco en un control, las flechas lo mueven (↑ y ↓ saltan entre las marcas del deslizante
-de la 9) y Esc devuelve el foco a la presentación. La página va en la URL (`#3`, `#a2`).
+Un control tocado con el mouse cambia y suelta el foco: → sigue pasando de diapositiva. Con Tab el
+foco queda en el control, las flechas lo mueven (↑ y ↓ saltan entre las marcas del deslizante de la
+9) y Esc lo suelta. La página va en la URL (`#3`, `#a2`). Al abrir en la portada, una pista de 4 s
+recuerda los atajos.
+
+Para presentar con notas: con la pantalla extendida, abrir la misma dirección en dos ventanas, una
+en el proyector y otra en la laptop con N. Las dos se siguen (la que se abre toma la posición de la
+otra) y se puede avanzar desde cualquiera. Con la pantalla duplicada, las notas se verían en el
+proyector: N queda para ensayar.
 
 ## Los datos
 
