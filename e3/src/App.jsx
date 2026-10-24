@@ -150,7 +150,7 @@ export default function App() {
     if (capa) return
     const t = e.target instanceof Element ? e.target : null
     const enControl = t?.closest('[data-control]')
-    const enBoton = t?.closest('button, a, [role=button]')
+    const enBoton = t?.closest('button, a')          // los que el navegador activa con Espacio o Enter
     if (k === 'Escape') {
       e.preventDefault()
       if (buffer) return setBuffer('')
