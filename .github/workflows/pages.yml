@@ -61,9 +61,22 @@ jobs:
       # ninguno toca la del otro.
       - run: npm run build:e2
 
-      # Arma dist-site/: landing estática en /, tablero E1 en /e1/, tablero E2 en /e2/
-      # (scripts/armar-sitio.mjs). dist/ y dist-e2/ quedan intactos: siguen siendo los
-      # archivos que se entregan por doble clic.
+      # Presentación del E3 (27/10): tercera página autocontenida. Su texto
+      # (e3/src/contenido_e3.js) lo exporta el vault y sus datos (e3/src/datos_e3.js) los
+      # arma pipeline/build_e3.py desde data/e3/, con sus anclas contra el registro de
+      # cifras. Los dos se versionan; acá se comprueba que el commiteado es lo que el
+      # pipeline genera hoy, como con src/datos.js.
+      - name: Datos de la presentación E3 y anclas
+        run: python3 -I pipeline/build_e3.py
+
+      - name: Sin deriva de los datos del E3
+        run: git diff --exit-code -- e3/src/datos_e3.js
+
+      - run: npm run build:e3
+
+      # Arma dist-site/: landing estática en /, tablero E1 en /e1/, tablero E2 en /e2/ y
+      # presentación E3 en /e3/ (scripts/armar-sitio.mjs). dist/, dist-e2/ y dist-e3/
+      # quedan intactos: siguen siendo los archivos que se abren por doble clic.
       - run: npm run sitio
 
       - uses: actions/upload-pages-artifact@v3

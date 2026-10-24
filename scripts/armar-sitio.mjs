@@ -1,4 +1,5 @@
-// Arma dist-site/ para publicar: landing en /, tablero E1 en /e1/, tablero E2 en /e2/.
+// Arma dist-site/ para publicar: landing en /, tablero E1 en /e1/, tablero E2 en /e2/ y la
+// presentación del E3 en /e3/ (24/10).
 //
 // dist/ y dist-e2/ no se mezclan acá adentro porque cada build vacía su propia carpeta
 // (emptyOutDir) y dist/ es además el archivo que se entrega del E1 por doble clic: si este
@@ -19,6 +20,7 @@ const archivos = [
   { origen: path.join(raiz, 'landing', 'index.html'), destino: path.join(sitio, 'index.html'), comando: null },
   { origen: path.join(raiz, 'dist', 'index.html'), destino: path.join(sitio, 'e1', 'index.html'), comando: 'npm run build' },
   { origen: path.join(raiz, 'dist-e2', 'index.html'), destino: path.join(sitio, 'e2', 'index.html'), comando: 'npm run build:e2' },
+  { origen: path.join(raiz, 'dist-e3', 'index.html'), destino: path.join(sitio, 'e3', 'index.html'), comando: 'npm run build:e3' },
 ]
 
 for (const { origen, comando } of archivos) {
@@ -26,7 +28,7 @@ for (const { origen, comando } of archivos) {
     const relativo = path.relative(raiz, origen)
     // Se valida ANTES de borrar dist-site/: si esto quedara después del rmSync, un
     // origen faltante dejaría el sitio publicado a medio armar (sin index.html, sin
-    // e1/ ni e2/) en lugar de conservar la versión anterior.
+    // e1/, e2/ ni e3/) en lugar de conservar la versión anterior.
     if (comando) {
       console.error(`Falta ${relativo}: se genera con "${comando}".`)
     } else {

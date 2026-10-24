@@ -85,19 +85,58 @@ desde el Finder. El aula puede no tener red.
 
 ## Sitio publicado
 
-GitHub Pages sirve tres cosas desde un solo sitio: `/` es una landing estática que elige
-entre los dos entregables, `/e1/` es este tablero y `/e2/` es el de calidad de datos. La
-landing vive en `landing/index.html`, sin build propio.
+GitHub Pages sirve cuatro cosas desde un solo sitio: `/` es una landing estática que elige
+entre los entregables, `/e1/` es este tablero, `/e2/` es el de calidad de datos y `/e3/` es la
+presentación del Entregable 3. La landing vive en `landing/index.html`, sin build propio.
 
 | Comando | Qué hace |
 |---|---|
-| `npm run sitio` | arma `dist-site/` a partir de `landing/`, `dist/` y `dist-e2/` (`scripts/armar-sitio.mjs`) |
-| `npm run build:site` | corre `build`, `build:e2` y `sitio` en orden |
+| `npm run sitio` | arma `dist-site/` a partir de `landing/`, `dist/`, `dist-e2/` y `dist-e3/` (`scripts/armar-sitio.mjs`) |
+| `npm run build:site` | corre `build`, `build:e2`, `build:e3` y `sitio` en orden |
 | `npm run preview:site` | sirve `dist-site/` en local para revisar el sitio completo |
 
-Los archivos que se entregan por doble clic no cambian: `dist/index.html` (E1) y
-`dist-e2/index.html` (E2) siguen siendo exactamente lo que generan `npm run build` y
-`npm run build:e2`. `dist-site/` es solo el empaquetado para Pages y no se versiona.
+Los archivos que se abren por doble clic no cambian: `dist/index.html` (E1),
+`dist-e2/index.html` (E2) y `dist-e3/index.html` (E3) siguen siendo exactamente lo que generan
+`npm run build`, `npm run build:e2` y `npm run build:e3`. `dist-site/` es solo el empaquetado
+para Pages y no se versiona.
+
+## Presentación del Entregable 3 (`/e3/`)
+
+La presentación del 27/10/2026 en el navegador: las 12 diapositivas del PPTX del equipo, en el
+mismo orden y con el mismo texto, más los anexos A1 a A6 de respaldo. Donde ayuda a contestar
+preguntas, la diapositiva se mueve: la tasa de éxito con y sin descuento (9), el largo y el
+filtro de la lista (7), validación o entrenamiento (6) y la matriz de los 13 riesgos (11). Un
+solo HTML autocontenido en `dist-e3/index.html`: se abre con doble clic, sin red.
+
+El texto sale del vault y los números de las salidas de las partes; el navegador no calcula
+(contrato en `pipeline/CONTRACT_E3.md`, diseño por diapositiva en `e3/DISENO.md`).
+
+```bash
+# en el vault, entregas/entregable-3/_build/F/presentacion/
+python3 exportar_web.py --app <app>    # e3/src/contenido_e3.js y data/e3/*.json
+# en la app
+python3 -I pipeline/build_e3.py         # e3/src/datos_e3.js; corta si una de sus anclas no da
+npm run build:e3                        # dist-e3/index.html
+python3 scripts/verificar_e3.py         # desborde, consola, red, teclado y controles, a 5 resoluciones
+```
+
+`npm run dev:e3` la levanta en el puerto 5179.
+
+| Tecla | Qué hace |
+|---|---|
+| → ↓ Espacio Av Pág Enter | siguiente; en la 3 y la 6, el paso que sigue |
+| ← ↑ Re Pág Retroceso | anterior; en un anexo, vuelve a la diapositiva de la que se vino |
+| Inicio · Fin | primera · última |
+| número y Enter | ir a esa diapositiva |
+| clic a la izquierda o a la derecha | anterior · siguiente |
+| O · Esc | vista general |
+| A | anexos |
+| N | notas del orador: guion, quién lo dice y su tiempo |
+| F | pantalla completa |
+| ? | atajos |
+
+Con el foco en un control, las flechas lo mueven (↑ y ↓ saltan entre las marcas del deslizante
+de la 9) y Esc devuelve el foco a la presentación. La página va en la URL (`#3`, `#a2`).
 
 ## Los datos
 
