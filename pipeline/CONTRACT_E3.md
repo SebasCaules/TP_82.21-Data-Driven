@@ -19,9 +19,9 @@ python3 -I pipeline/build_e3.py
 
 - **El navegador no calcula.** Busca en `D3` y formatea. Ninguna cifra se escribe en el JSX ni se
   deriva (ni una resta: `piloto.contactados_mes` ya viene). El texto sale de `C3` tal cual.
-- `build_e3.py` usa solo la biblioteca estándar y corre con `python3 -I`. Si una de sus 139 anclas
+- `build_e3.py` usa solo la biblioteca estándar y corre con `python3 -I`. Si una de sus 182 anclas
   no da el número del documento, sale con código 1 y no escribe nada. Además compara su fórmula
-  económica con `economia.json` (24 controles).
+  económica con `economia.json` (26 controles).
 - Los dos scripts son deterministas: dos corridas, los mismos bytes.
 - `data/e3/` son copias byte a byte (el sha256 va en `D3.meta.fuentes`) de las salidas de las partes:
   `etapa2.json` ← `_build/B/modelado/salida/`, `etapa3.json` ← `_build/C/modelado/salida/`,
@@ -140,13 +140,17 @@ factible; 1,6 a 2,0 baja; 2,1 a 2,5 media; 2,6 a 3,0 alta) y `nivel` «Factibili
   (logística con probabilidad ≥ 0,5; `largo_mes` null) o `clasificador` (la regla con todos los que
   están cerca del umbral). `precision` y `recall` con 1 decimal; `usd_anio` con 2; `casos` entero.
   En `sin_filtro`, `contactables = {quedan, vp, precision}` dice cuántos de la lista se pueden mandar;
-  en `contactables`, null. Las ocho filas del A2 son anclas (H11, H13, H15, H16).
+  en `contactables`, null. Las ocho filas del A2 son anclas (H11, H13, H15, H16), y la precisión de cada
+  largo que el selector de la diapositiva 7 deja ver, de la regla y de la logística ajustada con y sin
+  filtro, también (H11, H12, H15, H16; 24/10).
 - `elegida` (la lista que sale: regla, contactables, 500) y `elegida_modelo` (logística, contactables, 500).
 - `regla_menos_modelo_500_contactables`: `aciertos` 29 (H16) e `ic95_pp_modelo_menos_regla` (−3,25 a −1,07).
 - `comparaciones[] = {filtro, largo_mes, gana, aciertos_de_mas}` (24/10, para el selector de la diapositiva 7):
   por cada largo de lista y filtro, quién acierta más entre `regla` y `logistica_ajustada` (`empate` si dan igual)
-  y por cuántos aciertos en los 3 cortes de validación. La resta se hace acá, no en el navegador. Se muestra
-  entero si es entero y con 1 decimal si no (la regla promedia empates: 15,3). En contactables y 500: regla, 29 (H16).
+  y por cuántos aciertos en los 3 cortes de validación. La resta se hace acá, no en el navegador. Cada una es
+  ancla de la fila H48 del registro (quién gana y por cuánto, 1 decimal). Se muestra entera si es entera y, si
+  no, redondeada con «≈» (la regla reparte los empates del último puesto: 15,33 es «≈ 15»). En contactables y
+  500: regla, 29 (H16).
 - `no_contactables_lista_500` 483 (H45); `precision_de_equilibrio` (32,1 %, H17); `validacion`: filas,
   positivos, contactables (5.038) y `positivos_contactables` (1.175).
 - `ajuste`: `pliegues` 4 (H01); `brecha_pp[] = {id, antes, despues}` con 1 decimal: gradient boosting
@@ -177,7 +181,7 @@ factible; 1,6 a 2,0 baja; 2,1 a 2,5 media; 2,6 a 3,0 alta) y `nivel` «Factibili
   «−98,69 %» (G54).
 - `umbral`: `s_equilibrio_con_descuento` «49,6 %» y `s_equilibrio_sin_descuento` «39,7 %» (1 decimal);
   `veces_con_descuento` «48,6» y `veces_sin_descuento` «39,0» (G43); `modelo_usd_con_s_100` «448,90» y
-  `modelo_roi_pct_con_s_100` (−95,68; el registro G36 lo escribe «−95,7 %»; la parte no lo escribe);
+  `modelo_roi_pct_con_s_100` «−95,68» (registro G36; la parte no lo escribe);
   **`modelo_se_paga_con_s_100` false**; `maximo_pp` «18,4»; `valor_del_maximo_usd` «111,46»;
   `puntos_para_pagar_con_s_100` «20,6» (G46).
 
@@ -198,6 +202,7 @@ Precalculada en Python con la fórmula de `economia.py`. Columnas paralelas, tod
 | `regla_usd_sin`, `regla_roi_pct_sin` | lo mismo sin descuento (d = r = 0) | ídem |
 | `modelo_usd` | beneficio incremental anual del modelo sobre la regla | USD, 2 decimales |
 | `modelo_roi_pct` | ROI del modelo contra USD 10.400 | 2 decimales |
+| `modelo_usd_sin`, `modelo_roi_pct_sin` | lo mismo sin descuento (d = r = 0): s × m por acierto de más | ídem |
 | `acierto_ars` | valor de un acierto (VP) | ARS, 2 decimales |
 | `punto_usd` | valor anual de un punto de precisión sobre la regla | USD, 2 decimales |
 | `puntos_para_pagar` | puntos que pagarían los USD 10.400 | entero si ≥ 100, 1 decimal si no |
@@ -212,9 +217,10 @@ Precalculada en Python con la fórmula de `economia.py`. Columnas paralelas, tod
   marcas y de imán. Los `rotulo` son una frase corta y pueden reescribirse en la interfaz.
 - El falso positivo no depende de s: queda en `valores_celda_ars.fp`.
 - Anclas sobre la grilla: en `observada`, regla USD 299,49 y ROI −98,52 %, sin descuento USD 419,53 y
-  −97,93 %, modelo USD 5,38 y −99,95 %, acierto ARS 99,96, punto USD 6,05, 1.719 puntos; en
+  −97,93 %, modelo USD 5,38 y −99,95 %, modelo sin descuento −99,95 % (la sensibilidad «sin descuento» de la
+  B 3.5 y el A3; además, control contra `economia.json`), acierto ARS 99,96, punto USD 6,05, 1.719 puntos; en
   `ic95_inferior`, −99,97 % y −99,32 %; en `solo_cruzan`, −99,94 % y −98,32 % (anexo A3); en los
-  equilibrios, ROI 0,00 y 48,6 y 39,0 veces; en `cien`, modelo USD 448,90, 1 decimal de ROI −95,7 %,
+  equilibrios, ROI 0,00 y 48,6 y 39,0 veces; en `cien`, modelo USD 448,90, ROI −95,68 %,
   punto USD 505,02 y 20,6 puntos.
 
 ### `piloto`: diapositiva 12 (G49, B 3.6)
@@ -227,7 +233,7 @@ Precalculada en Python con la fórmula de `economia.py`. Columnas paralelas, tod
 ### `meta` y `anclas`
 
 `meta.fuentes[] = {archivo, sha256}` de los cuatro JSON; `meta.contenido = {archivo, version, sha256}`
-del `contenido_e3.js` con que se armó `D3`. `anclas[] = {id, nombre, documento, donde}`: las 139
+del `contenido_e3.js` con que se armó `D3`. `anclas[] = {id, nombre, documento, donde}`: las 182
 comprobaciones, con el texto del documento y dónde lo escribe («B 3.6 · C3 d9»). Cuando `donde` nombra
 una diapositiva o un anexo de `C3`, el script comprobó que ese texto está ahí. Sirven para un
 `title` de fuente.
@@ -241,7 +247,8 @@ una diapositiva o un anexo de `C3`, el script comprobó que ese texto está ahí
 | −35,6 %, 16.052 positivos en 59.585 filas y 33 cortes, 500 a 800 contactos (diapositiva 3) | salen del pipeline del E1 y de `resumen_v0.2.json`, que no se copian | texto de `C3` (`cifras`, `definicion`) |
 | 1.431 clientes con positivo, señal de alerta de 50 a 100 (diapositiva 4) | `etapa1.json` no se copia | texto de `C3` |
 | Práctica actual en entrenamiento | `etapa2.json` y `etapa3.json` solo la miden en validación | `entrenamiento: null` |
-| ROI del modelo con s = 100 % en las partes | la B escribe USD 448,90; el −95,7 % está solo en el registro (G36) | `modelo_roi_pct_con_s_100`, anclado a G36 |
+| ROI del modelo con s = 100 % en las partes | la B escribe USD 448,90; el −95,68 % está solo en el registro (G36) | `modelo_roi_pct_con_s_100`, anclado a G36 |
+| Diferencias de aciertos por largo y filtro (diapositiva 7) | las partes escriben solo la de 500 contactables (29) | `comparaciones`, anclado a la fila H48 del registro |
 | Legal, riesgos, sensibilidad, matriz, segmentos y costos por componente (10, 11, A3 a A6) | el pedido los deja en texto | `C3`; los números de A3 y A6 que también están en `D3` son anclas |
 
 > **Nota.** En la importancia, `reclamos_90d` (0,5 puntos, H21) pesa más que `edad` (0,4) y no está ni

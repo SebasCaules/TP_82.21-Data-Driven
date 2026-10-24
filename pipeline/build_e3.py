@@ -225,6 +225,10 @@ def armar_modelos(e2: dict, e3: dict) -> dict:
           donde="B 4.1", c3="d6")
     ancla("G13", "modelos: logística en entrenamiento (%)", f["logistica"]["entrenamiento"]["precision"], "62,4", 1,
           100, donde="B 4.1")
+    ancla("G10", "modelos: tasa base en entrenamiento (%)", f["tasa_base"]["entrenamiento"]["precision"], "31,4", 1,
+          100, donde="B 4.1")
+    ancla("G11", "modelos: regla en entrenamiento (%)", f["regla_umbral"]["entrenamiento"]["precision"], "62,7", 1,
+          100, donde="B 4.2")
     ancla("G14", "modelos: árbol en entrenamiento (%)", f["arbol"]["entrenamiento"]["precision"], "62,5", 1, 100,
           donde="B 4.1")
     ancla("G15", "modelos: gradient boosting en entrenamiento (%)", f["hgb"]["entrenamiento"]["precision"], "66,0", 1,
@@ -344,6 +348,38 @@ def armar_lista(e3: dict) -> dict:
     ancla("H16", "lista: comparación 500 contactables, aciertos de más",
           c500["aciertos_de_mas"], "29", 0, donde="C 7.2", c3="d7")
     ancla("H16", "lista: comparación 500 contactables, gana", c500["gana"], "regla", donde="C 7.2")
+    # (24/10) Las diez comparaciones del selector, contra la fila H48 del registro (regla menos
+    # logística ajustada, aciertos en los 3 cortes de validación). La de 500 sin filtro es la de H06.
+    H48 = {("sin_filtro", 500): ("logistica_ajustada", "15,3"), ("sin_filtro", 600): ("regla", "18,9"),
+           ("sin_filtro", 700): ("regla", "41,9"), ("sin_filtro", 800): ("regla", "49,0"),
+           ("contactables", 300): ("logistica_ajustada", "11,8"), ("contactables", 400): ("regla", "13,3"),
+           ("contactables", 500): ("regla", "29,0"), ("contactables", 600): ("regla", "16,0"),
+           ("contactables", 700): ("empate", "0,0"), ("contactables", 800): ("empate", "0,0")}
+    if {(c["filtro"], c["largo_mes"]) for c in comparaciones} != set(H48):
+        sys.exit("las comparaciones de la diapositiva 7 no son las diez de H48")
+    for c in comparaciones:
+        gana, doc = H48[(c["filtro"], c["largo_mes"])]
+        q = f"{c['filtro']} {c['largo_mes']}"
+        ancla("H48", f"lista: comparación {q}, gana", c["gana"], gana, donde="registro H48")
+        ancla("H48", f"lista: comparación {q}, aciertos de más", c["aciertos_de_mas"], doc, 1,
+              donde="registro H48" + ("; H06" if q == "sin_filtro 500" else ""))
+    # las precisiones que el selector deja ver, por método, filtro y largo
+    PRECISIONES = {
+        ("logistica_ajustada", "sin_filtro"): ("H11", {500: "82,6", 600: "79,2", 700: "75,3", 800: "69,3"}),
+        ("regla", "sin_filtro"): ("H12", {500: "81,6", 600: "80,2", 700: "77,3", 800: "71,4"}),
+        ("logistica_ajustada", "contactables"): ("H15", {300: "84,9", 400: "79,8", 500: "73,9", 600: "64,4",
+                                                         700: "56,0", 800: "49,0"}),
+        ("regla", "contactables"): ("H16", {300: "83,6", 400: "80,9", 500: "75,8", 600: "65,3", 700: "56,0",
+                                            800: "49,0"}),
+    }
+    for (metodo, filtro), (id_, por_largo) in PRECISIONES.items():
+        largos = sorted(f["largo_mes"] for f in filas
+                        if f["metodo"] == metodo and f["filtro"] == filtro and f["tipo"] == "lista")
+        if largos != sorted(por_largo):
+            sys.exit(f"largos de {metodo} {filtro}: {largos}, el registro {id_} trae {sorted(por_largo)}")
+        for largo, doc in por_largo.items():
+            ancla(id_, f"lista: precisión {metodo} {filtro} {largo}", busca(metodo, filtro, largo)["precision"],
+                  doc, 1, 100, donde=f"registro {id_}")
 
     # anexo A2 (C 7.2): una fila por fila del anexo
     a2 = [
@@ -406,8 +442,8 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
     def regla_usd(s, d=D, r=R):
         return ANU * neto(REG, valores(s, d, r)) / TC
 
-    def modelo_usd(s):
-        v = valores(s)
+    def modelo_usd(s, d=D, r=R):
+        v = valores(s, d, r)
         return 1.0 * ANU * DIF * (v["vp"] - v["fp"]) / TC
 
     def roi(b, c):
@@ -442,10 +478,11 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
     puntos.update(s for _, s, _ in notables)
     ss = sorted(puntos)
     col = {c: [] for c in ("s", "regla_usd", "regla_roi_pct", "regla_usd_sin", "regla_roi_pct_sin",
-                           "modelo_usd", "modelo_roi_pct", "acierto_ars", "punto_usd", "puntos_para_pagar",
-                           "veces")}
+                           "modelo_usd", "modelo_roi_pct", "modelo_usd_sin", "modelo_roi_pct_sin",
+                           "acierto_ars", "punto_usd", "puntos_para_pagar", "veces")}
     for s in ss:
-        ru, ru0, mu, pu = regla_usd(s), regla_usd(s, 0.0, 0.0), modelo_usd(s), punto_usd(s)
+        ru, ru0, pu = regla_usd(s), regla_usd(s, 0.0, 0.0), punto_usd(s)
+        mu, mu0 = modelo_usd(s), modelo_usd(s, 0.0, 0.0)
         col["s"].append(s)
         col["regla_usd"].append(r6(ru))
         col["regla_roi_pct"].append(r6(roi(ru, C_MVP)))
@@ -453,6 +490,8 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
         col["regla_roi_pct_sin"].append(r6(roi(ru0, C_MVP)))
         col["modelo_usd"].append(r6(mu))
         col["modelo_roi_pct"].append(r6(roi(mu, C_INC)))
+        col["modelo_usd_sin"].append(r6(mu0))
+        col["modelo_roi_pct_sin"].append(r6(roi(mu0, C_INC)))
         col["acierto_ars"].append(r6(valores(s)["vp"]))
         col["punto_usd"].append(r6(pu))
         col["puntos_para_pagar"].append(r6(C_INC / pu))
@@ -527,6 +566,7 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
 
     s_lo_sens = sens("Tasa de éxito de la acción", "límite inferior del intervalo")
     s_cr_sens = sens("Tasa de éxito de la acción", "compra a 7 días de los que cruzan")
+    sin_desc_sens = sens("Descuento de la oferta", "sin descuento")
     control("VP unitario", v_obs["vp"], eco["celda_4_4"]["unitario_ars"]["vp"])
     control("FP unitario", v_obs["fp"], eco["celda_4_4"]["unitario_ars"]["fp"])
     control("regla anual USD", regla_usd(S_OBS), eco["celda_4_4"]["regla_anual_usd"])
@@ -537,6 +577,9 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
             eco["escenarios"]["esperado"]["mvp_sin_descuento"]["roi_pct"])
     control("modelo USD", modelo_usd(S_OBS), eco["esperado"]["beneficio_usd"])
     control("modelo ROI", roi(modelo_usd(S_OBS), C_INC), eco["esperado"]["roi_pct"])
+    control("modelo sin descuento ROI", roi(modelo_usd(S_OBS, 0.0, 0.0), C_INC), sin_desc_sens["roi_proyecto_pct"])
+    control("regla sin descuento ROI (sensibilidad)", roi(regla_usd(S_OBS, 0.0, 0.0), C_MVP),
+            sin_desc_sens["roi_mvp_pct"])
     control("s inferior: ROI modelo", roi(modelo_usd(S_LO), C_INC), s_lo_sens["roi_proyecto_pct"])
     control("s inferior: ROI regla", roi(regla_usd(S_LO), C_MVP), s_lo_sens["roi_mvp_pct"])
     control("s solo cruzan: ROI modelo", roi(modelo_usd(S_CRUZAN), C_INC), s_cr_sens["roi_proyecto_pct"])
@@ -579,6 +622,8 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
           donde="B 3.4")
     ancla("G42", "economía: ROI de la regla sin descuento (%)", g("regla_roi_pct_sin", "observada"), "−97,93", 2,
           donde="B 3.5", c3="A3")
+    ancla("G42", "economía: ROI del modelo sin descuento (%)", g("modelo_roi_pct_sin", "observada"), "−99,95", 2,
+          donde="B 3.5", c3="A3")
     ancla("G42", "economía: s inferior, ROI del modelo (%)", g("modelo_roi_pct", "ic95_inferior"), "−99,97", 2,
           donde="B 3.5", c3="A3")
     ancla("G42", "economía: s inferior, ROI de la regla (%)", g("regla_roi_pct", "ic95_inferior"), "−99,32", 2,
@@ -600,7 +645,7 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
     ancla("G43", "economía: ROI de la regla en el equilibrio sin descuento",
           g("regla_roi_pct_sin", "equilibrio_sin_descuento"), "0,00", 2, donde="B 3.6 (ROI 0)")
     ancla("G36", "economía: modelo con s = 100 % (USD/año)", g("modelo_usd", "cien"), "448,90", 2, donde="B 3.1")
-    ancla("G36", "economía: ROI del modelo con s = 100 % (%)", g("modelo_roi_pct", "cien"), "−95,7", 1,
+    ancla("G36", "economía: ROI del modelo con s = 100 % (%)", g("modelo_roi_pct", "cien"), "−95,68", 2,
           donde="registro G36 (la parte no lo escribe)")
     ancla("G36", "economía: el modelo no se paga con s = 100 %", econ["umbral"]["modelo_se_paga_con_s_100"], False,
           donde="B 3.6")
