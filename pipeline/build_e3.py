@@ -327,6 +327,24 @@ def armar_lista(e3: dict) -> dict:
         "variables_del_modelo": len(e3["importancia"]),
     }
 
+    # (24/10) Diapositiva 7: por cada largo y filtro, quién acierta más entre la regla y la logística
+    # ajustada y por cuántos aciertos (validación, 3 cortes). La resta va acá y no en el navegador.
+    comparaciones = []
+    for filtro in ("sin_filtro", "contactables"):
+        largos = sorted({f["largo_mes"] for f in filas if f["filtro"] == filtro and f["tipo"] == "lista"})
+        for largo in largos:
+            r = busca("regla", filtro, largo)
+            m = busca("logistica_ajustada", filtro, largo)
+            dif = r["vp"] - m["vp"]
+            comparaciones.append({"filtro": filtro, "largo_mes": largo,
+                                  "gana": "regla" if dif > 1e-9 else "logistica_ajustada" if dif < -1e-9 else "empate",
+                                  "aciertos_de_mas": abs(dif)})
+    lista["comparaciones"] = comparaciones
+    c500 = next(c for c in comparaciones if c["filtro"] == "contactables" and c["largo_mes"] == 500)
+    ancla("H16", "lista: comparación 500 contactables, aciertos de más",
+          c500["aciertos_de_mas"], "29", 0, donde="C 7.2", c3="d7")
+    ancla("H16", "lista: comparación 500 contactables, gana", c500["gana"], "regla", donde="C 7.2")
+
     # anexo A2 (C 7.2): una fila por fila del anexo
     a2 = [
         (busca("logistica_ajustada", "sin_filtro", tipo="umbral"), "1.485", "82,4", "71,4", "301,17", "H11"),

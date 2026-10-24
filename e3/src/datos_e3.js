@@ -992,7 +992,69 @@ export const D3 = {
     "en_diapositiva": true
    }
   ],
-  "variables_del_modelo": 39
+  "variables_del_modelo": 39,
+  "comparaciones": [
+   {
+    "filtro": "sin_filtro",
+    "largo_mes": 500,
+    "gana": "logistica_ajustada",
+    "aciertos_de_mas": 15.333333333333485
+   },
+   {
+    "filtro": "sin_filtro",
+    "largo_mes": 600,
+    "gana": "regla",
+    "aciertos_de_mas": 18.90000000000009
+   },
+   {
+    "filtro": "sin_filtro",
+    "largo_mes": 700,
+    "gana": "regla",
+    "aciertos_de_mas": 41.94642857142844
+   },
+   {
+    "filtro": "sin_filtro",
+    "largo_mes": 800,
+    "gana": "regla",
+    "aciertos_de_mas": 49.0
+   },
+   {
+    "filtro": "contactables",
+    "largo_mes": 300,
+    "gana": "logistica_ajustada",
+    "aciertos_de_mas": 11.833333333333371
+   },
+   {
+    "filtro": "contactables",
+    "largo_mes": 400,
+    "gana": "regla",
+    "aciertos_de_mas": 13.309523809523853
+   },
+   {
+    "filtro": "contactables",
+    "largo_mes": 500,
+    "gana": "regla",
+    "aciertos_de_mas": 29.0
+   },
+   {
+    "filtro": "contactables",
+    "largo_mes": 600,
+    "gana": "regla",
+    "aciertos_de_mas": 16.0
+   },
+   {
+    "filtro": "contactables",
+    "largo_mes": 700,
+    "gana": "empate",
+    "aciertos_de_mas": 0.0
+   },
+   {
+    "filtro": "contactables",
+    "largo_mes": 800,
+    "gana": "empate",
+    "aciertos_de_mas": 0.0
+   }
+  ]
  },
  "economia": {
   "parametros": {
@@ -1395,6 +1457,18 @@ export const D3 = {
    "nombre": "modelos: coeficiente de recency_dias",
    "documento": "2,34",
    "donde": "B 4.2 · C3 d6"
+  },
+  {
+   "id": "H16",
+   "nombre": "lista: comparación 500 contactables, aciertos de más",
+   "documento": "29",
+   "donde": "C 7.2 · C3 d7"
+  },
+  {
+   "id": "H16",
+   "nombre": "lista: comparación 500 contactables, gana",
+   "documento": "regla",
+   "donde": "C 7.2"
   },
   {
    "id": "H11",

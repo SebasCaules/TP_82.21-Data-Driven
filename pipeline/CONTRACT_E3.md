@@ -19,7 +19,7 @@ python3 -I pipeline/build_e3.py
 
 - **El navegador no calcula.** Busca en `D3` y formatea. Ninguna cifra se escribe en el JSX ni se
   deriva (ni una resta: `piloto.contactados_mes` ya viene). El texto sale de `C3` tal cual.
-- `build_e3.py` usa solo la biblioteca estándar y corre con `python3 -I`. Si una de sus 137 anclas
+- `build_e3.py` usa solo la biblioteca estándar y corre con `python3 -I`. Si una de sus 139 anclas
   no da el número del documento, sale con código 1 y no escribe nada. Además compara su fórmula
   económica con `economia.json` (24 controles).
 - Los dos scripts son deterministas: dos corridas, los mismos bytes.
@@ -143,6 +143,10 @@ factible; 1,6 a 2,0 baja; 2,1 a 2,5 media; 2,6 a 3,0 alta) y `nivel` «Factibili
   en `contactables`, null. Las ocho filas del A2 son anclas (H11, H13, H15, H16).
 - `elegida` (la lista que sale: regla, contactables, 500) y `elegida_modelo` (logística, contactables, 500).
 - `regla_menos_modelo_500_contactables`: `aciertos` 29 (H16) e `ic95_pp_modelo_menos_regla` (−3,25 a −1,07).
+- `comparaciones[] = {filtro, largo_mes, gana, aciertos_de_mas}` (24/10, para el selector de la diapositiva 7):
+  por cada largo de lista y filtro, quién acierta más entre `regla` y `logistica_ajustada` (`empate` si dan igual)
+  y por cuántos aciertos en los 3 cortes de validación. La resta se hace acá, no en el navegador. Se muestra
+  entero si es entero y con 1 decimal si no (la regla promedia empates: 15,3). En contactables y 500: regla, 29 (H16).
 - `no_contactables_lista_500` 483 (H45); `precision_de_equilibrio` (32,1 %, H17); `validacion`: filas,
   positivos, contactables (5.038) y `positivos_contactables` (1.175).
 - `ajuste`: `pliegues` 4 (H01); `brecha_pp[] = {id, antes, despues}` con 1 decimal: gradient boosting
@@ -223,7 +227,7 @@ Precalculada en Python con la fórmula de `economia.py`. Columnas paralelas, tod
 ### `meta` y `anclas`
 
 `meta.fuentes[] = {archivo, sha256}` de los cuatro JSON; `meta.contenido = {archivo, version, sha256}`
-del `contenido_e3.js` con que se armó `D3`. `anclas[] = {id, nombre, documento, donde}`: las 137
+del `contenido_e3.js` con que se armó `D3`. `anclas[] = {id, nombre, documento, donde}`: las 139
 comprobaciones, con el texto del documento y dónde lo escribe («B 3.6 · C3 d9»). Cuando `donde` nombra
 una diapositiva o un anexo de `C3`, el script comprobó que ese texto está ahí. Sirven para un
 `title` de fuente.
