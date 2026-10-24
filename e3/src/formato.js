@@ -34,8 +34,9 @@ export const tasa = (s) => (s >= 1 ? '100' + NBSP + '%' : pct(s, s < 0.05 ? 2 : 
 /** Puntos para pagar el modelo: entero si es 100 o más, un decimal si es menos (B 3.6). */
 export const puntos = (x) => fijo(x, x >= 100 ? 0 : 1)
 
-/** Aciertos: entero si lo es; si no, un decimal (la regla promedia empates: 15,3). */
-export const aciertos = (x) => fijo(x, Math.abs(x - Math.round(x)) < 1e-6 ? 0 : 1)
+/** Aciertos: entero si lo es; si no, el entero más cercano con «≈» (la regla reparte los empates del
+ *  último puesto y sus aciertos llevan fracción: 15,33 es «≈ 15»; el valor exacto, en el registro H48). */
+export const aciertos = (x) => (Math.abs(x - Math.round(x)) < 1e-6 ? fijo(x, 0) : '≈' + NBSP + fijo(x, 0))
 
 /** "2024-07-31" → "31/07/2024" */
 export const fecha = (iso) => {

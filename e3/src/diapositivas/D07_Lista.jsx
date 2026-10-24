@@ -1,7 +1,9 @@
 // Diapositiva 7: modelado, etapa 3 (C 7.1 a 7.3). (24/10) Selector del largo de la lista y del filtro:
 // precisión de la regla y de la logística ajustada y cuántos aciertos más tiene la que gana
 // (D3.lista.filas y D3.lista.comparaciones, validación, 3 cortes). Estado inicial: la lista que sale,
-// 500 contactables. Al lado, la importancia por permutación de las variables que muestra el PPTX.
+// 500 contactables. Al lado, la importancia por permutación de las variables que muestra el PPTX, con
+// la leyenda de los dos colores. Una diferencia con fracción (la regla reparte los empates del último
+// puesto) se muestra redondeada con «≈»; la exacta está en el registro H48.
 import { useState } from 'react'
 import { D3 } from '../datos_e3.js'
 import { aciertos, entero, fijo, pct } from '../formato.js'
@@ -13,7 +15,7 @@ import Marco, { M, QuienN, Y0, caja } from './Marco.jsx'
 const L = D3.lista
 const METODOS = [
   { id: 'regla', nombre: 'Regla del umbral', clase: 'e3-barra-acc', corto: 'la regla' },
-  { id: 'logistica_ajustada', nombre: 'Logística ajustada', clase: 'e3-barra-azul3', corto: 'la logística' },
+  { id: 'logistica_ajustada', nombre: 'Logística ajustada', clase: 'e3-barra-azul3', corto: 'la logística ajustada' },
 ]
 const listas = L.filas.filter((f) => f.tipo === 'lista')
 const LARGOS = [...new Set(listas.map((f) => f.largo_mes))].sort((a, b) => a - b)
@@ -28,21 +30,21 @@ function Comparacion({ filtro, largo }) {
   const x = (v) => x0 + (v / 100) * (x1 - x0)
   const sim = { 'data-simulacion': '' }
   return (
-    <svg width={W} height={104} className="e3-svg" role="img" aria-label="Precisión de la regla y de la logística ajustada">
+    <svg width={W} height={110} className="e3-svg" role="img" aria-label="Precisión de la regla y de la logística ajustada">
       {METODOS.map((m, k) => {
         const f = fila(m.id, filtro, largo)
-        const y = 20 + k * 40
+        const y = 22 + k * 42
         return (
           <g key={m.id}>
-            <text x={x0 - 10} y={y + 6} textAnchor="end" className="e3-t e3-t-19">{m.nombre}</text>
-            <rect x={x0} y={y - 14} width={x(f.precision * 100) - x0} height={28} className={m.clase} />
-            <text x={x(f.precision * 100) + 8} y={y + 7} className="e3-t e3-t-19 e3-t-b" {...sim}>{pct(f.precision, 1)}</text>
+            <text x={x0 - 10} y={y + 7} textAnchor="end" className="e3-t e3-t-20">{m.nombre}</text>
+            <rect x={x0} y={y - 15} width={x(f.precision * 100) - x0} height={30} className={m.clase} />
+            <text x={x(f.precision * 100) + 8} y={y + 7} className="e3-t e3-t-20 e3-t-b" {...sim}>{pct(f.precision, 1)}</text>
           </g>
         )
       })}
-      <line x1={x0} x2={x1} y1={80} y2={80} className="e3-eje" />
+      <line x1={x0} x2={x1} y1={86} y2={86} className="e3-eje" />
       {MARCAS_PCT.map((v) => (
-        <text key={v} x={x(v)} y={100} textAnchor="middle" className="e3-t e3-t-15 e3-t-lbl" data-escala="">
+        <text key={v} x={x(v)} y={106} textAnchor="middle" className="e3-t e3-t-17 e3-t-lbl" data-escala="">
           {v === 100 ? '100 %' : v}
         </text>
       ))}
@@ -59,18 +61,24 @@ function Importancia() {
         const y = 22 + k * 33
         return (
           <g key={v.variable}>
-            <text x={x0 - 10} y={y + 6} textAnchor="end" className="e3-t e3-t-17">{v.etiqueta}</text>
+            <text x={x0 - 10} y={y + 7} textAnchor="end" className="e3-t e3-t-20">{v.etiqueta}</text>
             <rect x={x0} y={y - 12} width={Math.max(2, x(v.caida_pp) - x0)} height={24}
                   className={v.de_la_regla ? 'e3-barra-acc' : 'e3-barra-gris'} />
-            <text x={x(v.caida_pp) + 8} y={y + 6} className="e3-t e3-t-17">{fijo(v.caida_pp, 1)}</text>
+            <text x={x(v.caida_pp) + 8} y={y + 7} className="e3-t e3-t-20">{fijo(v.caida_pp, 1)}</text>
           </g>
         )
       })}
+      <g className="e3-leyenda" transform="translate(520, 134)">
+        <rect x={0} y={-14} width={22} height={16} className="e3-barra-acc" />
+        <text x={30} y={0} className="e3-t e3-t-19">variables de la regla</text>
+        <rect x={0} y={20} width={22} height={16} className="e3-barra-gris" />
+        <text x={30} y={34} className="e3-t e3-t-19">las demás</text>
+      </g>
       <line x1={x0} x2={x1} y1={212} y2={212} className="e3-eje" />
       {ESC_IMP.ticks.map((v) => (
-        <text key={v} x={x(v)} y={232} textAnchor="middle" className="e3-t e3-t-15 e3-t-lbl" data-escala="">{v}</text>
+        <text key={v} x={x(v)} y={232} textAnchor="middle" className="e3-t e3-t-17 e3-t-lbl" data-escala="">{v}</text>
       ))}
-      <text x={(x0 + x1) / 2} y={256} textAnchor="middle" className="e3-t e3-t-15 e3-t-lbl">
+      <text x={W / 2} y={256} textAnchor="middle" className="e3-t e3-t-19 e3-t-lbl">
         Puntos de precisión que se pierden al desordenar la variable
       </text>
     </svg>
@@ -95,12 +103,12 @@ export default function Lista({ d }) {
       <div className="e3-figura e3-lista" style={caja(M, Y0, 840, 258)}>
         <div className="e3-lista-ctl">
           <div>
-            <p className="e3-rotulo">Filtro</p>
+            <p className="e3-rotulo-web">Filtro</p>
             <Opciones etiqueta="Filtro de la lista" valor={filtro} onCambio={setFiltro}
                       opciones={[{ valor: 'sin_filtro', texto: 'Sin filtro' }, { valor: 'contactables', texto: 'Solo contactables' }]} />
           </div>
           <div>
-            <p className="e3-rotulo">Largo por mes</p>
+            <p className="e3-rotulo-web">Largo por mes</p>
             <Opciones etiqueta="Largo de la lista por mes" valor={largo} onCambio={setLargo} escala
                       opciones={LARGOS.map((l) => ({ valor: l, texto: entero(l), deshabilitada: !hay(filtro, l) }))} />
           </div>
@@ -110,7 +118,7 @@ export default function Lista({ d }) {
           {c.gana === 'empate'
             ? <>Empatan: los dos aciertan lo mismo en <span {...sim}>{entero(casos)}</span> contactos</>
             : <><strong {...sim}>{aciertos(c.aciertos_de_mas)}</strong> aciertos más para {gana.corto}, en{' '}
-                <span {...sim}>{entero(casos)}</span> contactos de validación</>}
+                <span {...sim}>{entero(casos)}</span> contactos</>}
           {elegida && <span className="e3-etiqueta">la lista que sale</span>}
         </p>
       </div>

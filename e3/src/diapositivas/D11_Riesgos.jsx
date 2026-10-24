@@ -1,6 +1,7 @@
 // Diapositiva 11: riesgos (C 6.2 y 6.3). Los tres críticos, como el PPTX. (24/10) Un botón muestra
 // la matriz de los 13 (probabilidad por impacto) del anexo A4 de C3, con los tres críticos
-// resaltados; el texto de cada riesgo aparece al pasar el puntero o al tocarlo.
+// resaltados; el texto de cada riesgo aparece al tocarlo o al llegar con Tab. Pasar el puntero solo
+// marca el círculo: el detalle no cambia por cruzar la matriz con el mouse.
 import { Fragment, useState } from 'react'
 import { C3 } from '../contenido_e3.js'
 import { Rico } from '../texto.jsx'
@@ -13,7 +14,8 @@ const RIESGOS = A4.filas.map((f, k) => ({
   estrategia: f[COL['Estrategia']], critico: A4.destacar.includes(k),
 }))
 const NIVELES = ['A', 'M', 'B']                    // alta arriba; el impacto crece a la derecha
-const NOMBRE = { A: 'alta', M: 'media', B: 'baja' }
+const NOMBRE = { A: 'alta', M: 'media', B: 'baja' }    // la probabilidad
+const IMPACTO = { A: 'alto', M: 'medio', B: 'bajo' }
 
 function Matriz({ estatico }) {
   const criticos = RIESGOS.filter((r) => r.critico)
@@ -32,7 +34,7 @@ function Matriz({ estatico }) {
                 {RIESGOS.filter((x) => x.prob === p && x.imp === im).map((x) => (
                   <button key={x.n} type="button" className={`e3-chip ${x.critico ? 'critico' : ''} ${x.n === sel ? 'on' : ''}`}
                           tabIndex={estatico ? -1 : 0} data-control="" aria-label={`Riesgo ${x.n}: ${x.texto}`}
-                          onMouseEnter={() => setSel(x.n)} onFocus={() => setSel(x.n)} onClick={() => setSel(x.n)}>
+                          onFocus={() => setSel(x.n)} onClick={() => setSel(x.n)}>
                     {x.n}
                   </button>
                 ))}
@@ -41,7 +43,7 @@ function Matriz({ estatico }) {
           </Fragment>
         ))}
         <span /><span />
-        {impactos.map((im) => <span key={im} className="e3-matriz-niv x">{NOMBRE[im]}</span>)}
+        {impactos.map((im) => <span key={im} className="e3-matriz-niv x">{IMPACTO[im]}</span>)}
         <span /><span />
         <span className="e3-matriz-eje-x">Impacto</span>
       </div>
@@ -50,7 +52,7 @@ function Matriz({ estatico }) {
           <>
             <p className="e3-rotulo">Riesgo {r.n} · {r.tipo}{r.critico ? ' · crítico' : ''}</p>
             <p className="e3-matriz-texto">{r.texto}</p>
-            <p className="e3-matriz-dato">Probabilidad {NOMBRE[r.prob]} · impacto {NOMBRE[r.imp]} · {r.estrategia}</p>
+            <p className="e3-matriz-dato">Probabilidad {NOMBRE[r.prob]} · impacto {IMPACTO[r.imp]} · {r.estrategia}</p>
           </>
         )}
         <p className="e3-matriz-leyenda"><i className="e3-chip critico muestra" aria-hidden="true" /> En azul, los tres críticos de la diapositiva.</p>

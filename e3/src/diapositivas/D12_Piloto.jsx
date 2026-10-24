@@ -41,9 +41,9 @@ function Grafico({ id }) {
       })}
       <line x1={x0} x2={x1} y1={240} y2={240} className="e3-eje" />
       {ESC.ticks.map((v) => (
-        <text key={v} x={x(v)} y={260} textAnchor="middle" className="e3-t e3-t-15 e3-t-lbl" data-escala="">{entero(v)}</text>
+        <text key={v} x={x(v)} y={261} textAnchor="middle" className="e3-t e3-t-17 e3-t-lbl" data-escala="">{entero(v)}</text>
       ))}
-      <text x={(x0 + x1) / 2} y={288} textAnchor="middle" className="e3-t e3-t-15 e3-t-lbl">
+      <text x={(x0 + x1) / 2} y={288} textAnchor="middle" className="e3-t e3-t-17 e3-t-lbl">
         Lista mensual de {entero(P.lista_mes)} (rayado: grupo de control, sin contacto)
       </text>
     </svg>
