@@ -71,7 +71,7 @@ function Grafico({ i, desc, id }) {
             <text x={x0 - 10} y={y + 7} textAnchor="end" className="e3-t e3-t-20">{f.nombre}</text>
             <rect x={x(0)} y={y - 14} width={x(ini) - x0} height={28} className="e3-barra-acc" />
             <rect x={x(ini)} y={y - 14} width={x(tot) - x(ini)} height={28} className="e3-barra-azul3" />
-            <text x={x(tot) + 8} y={y + 7} className="e3-t e3-t-20 e3-t-b">{usd(tot)}</text>
+            <text x={x(tot) + 8} y={y + 7} className="e3-t e3-t-19 e3-t-b e3-halo">{usd(tot)}</text>
           </g>
         )
       })}
