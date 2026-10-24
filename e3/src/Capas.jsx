@@ -85,15 +85,18 @@ export function VistaGeneral({ actual, onIr, onCerrar }) {
     e.preventDefault()
   }
   const grupo = (ps, desde) => ps.map((p, j) => (
-    <button key={p.id} type="button" className={`e3-mini ${desde + j === sel ? 'sel' : ''} ${p.id === actual ? 'actual' : ''}`}
-            style={{ width: tw }} onClick={() => onIr(p.id)}>
+    // (24/10) div y no button: la miniatura contiene los botones de la diapositiva (inertes), y un
+    // botón no puede contener otro. Flechas y Enter los atiende la capa.
+    <div key={p.id} role="button" className={`e3-mini ${desde + j === sel ? 'sel' : ''} ${p.id === actual ? 'actual' : ''}`}
+         aria-label={p.tipo === 'anexo' ? `Anexo ${p.a.n}` : `Diapositiva ${p.n}`}
+         style={{ width: tw }} onClick={() => onIr(p.id)}>
       <span className="e3-mini-marco" style={{ width: tw, height: (tw * 9) / 16 }}>
         <Miniatura p={p} k={k} />
       </span>
       <span className="e3-mini-rot">
         {p.tipo === 'anexo' ? <><b>{p.a.n}</b> {p.a.titulo}</> : <><b>{p.n}</b> {p.d.quien}</>}
       </span>
-    </button>
+    </div>
   ))
   return (
     <div className="e3-capa e3-general" role="dialog" aria-label="Vista general" tabIndex={-1} ref={caja} onKeyDown={alTeclear}>
