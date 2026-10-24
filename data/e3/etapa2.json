@@ -1,0 +1,2425 @@
+{
+  "dataset": "churn_cliente_corte_v0.2.csv.gz",
+  "scikit_learn": "1.9.1",
+  "semilla": 42,
+  "capacidad": 500,
+  "umbral_probabilidad": 0.5,
+  "variables": [
+    "recency_dias",
+    "gap_mediano",
+    "recency_sobre_umbral",
+    "frequency",
+    "compras_90d",
+    "compras_90d_prev",
+    "monetary",
+    "ticket_medio",
+    "ticket_90d",
+    "n_tiendas_distintas",
+    "n_categorias_distintas",
+    "categoria_dominante",
+    "pct_online",
+    "region_dominante",
+    "formato_tienda",
+    "meses_desde_alta",
+    "canal_alta",
+    "genero",
+    "provincia",
+    "edad",
+    "edad_flag",
+    "es_socio",
+    "envios_90d",
+    "envios_acum",
+    "ultimo_canal_campania",
+    "reclamos_90d",
+    "reclamos_acum",
+    "consultas_90d",
+    "nps_ultimo",
+    "nps_sin_interaccion_flag",
+    "tiene_panel",
+    "n_devoluciones",
+    "motivo_ultima_devolucion",
+    "pidio_baja",
+    "mes_corte",
+    "temporada",
+    "dias_a_proximo_evento",
+    "aperturas_90d",
+    "clics_90d",
+    "compro_7d_alguna"
+  ],
+  "particion": {
+    "entrenamiento": {
+      "filas": 14753,
+      "cortes": 16,
+      "positivos": 4636,
+      "tasa": 0.3142411712871958,
+      "desde": "2023-01-31",
+      "hasta": "2024-04-30"
+    },
+    "validacion": {
+      "filas": 7173,
+      "cortes": 3,
+      "positivos": 1713,
+      "tasa": 0.23881221246340442,
+      "desde": "2024-07-31",
+      "hasta": "2024-09-30"
+    },
+    "maximo_lista_500": {
+      "entrenamiento": {
+        "largo": 6920,
+        "aciertos_maximos": 4590,
+        "precision_maxima": 0.6632947976878613,
+        "cortes_con_menos_de_k_filas": 5,
+        "cortes_con_menos_de_k_positivos": 14
+      },
+      "validacion": {
+        "largo": 1500,
+        "aciertos_maximos": 1500,
+        "precision_maxima": 1.0,
+        "cortes_con_menos_de_k_filas": 0,
+        "cortes_con_menos_de_k_positivos": 0
+      }
+    }
+  },
+  "modelos": {
+    "regla_umbral": {
+      "nombre": "Regla del umbral (línea base de la etapa 1)",
+      "tipo": "regla de negocio",
+      "configuracion": "menos días para cruzar el umbral θ_i(T) primero; sin ajuste",
+      "entrenamiento": {
+        "lista_500": {
+          "largo": 6920,
+          "aciertos": 4341.857142857143,
+          "positivos": 4636,
+          "precision": 0.6274360033030554,
+          "recall": 0.9365524466904968,
+          "f1": 0.7514463729417001,
+          "confusion": {
+            "total": {
+              "filas": 14753,
+              "largo": 6920,
+              "vp": 4341.857142857143,
+              "fp": 2578.1428571428573,
+              "fn": 294.1428571428571,
+              "vn": 7538.857142857143
+            },
+            "por_corte": [
+              {
+                "corte": "2023-01-31",
+                "filas": 155,
+                "largo": 155,
+                "vp": 77.0,
+                "fp": 78.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-02-28",
+                "filas": 196,
+                "largo": 196,
+                "vp": 93.0,
+                "fp": 103.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-03-31",
+                "filas": 261,
+                "largo": 261,
+                "vp": 104.0,
+                "fp": 157.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-04-30",
+                "filas": 345,
+                "largo": 345,
+                "vp": 129.0,
+                "fp": 216.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-05-31",
+                "filas": 463,
+                "largo": 463,
+                "vp": 171.0,
+                "fp": 292.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-06-30",
+                "filas": 557,
+                "largo": 500,
+                "vp": 201.0,
+                "fp": 299.0,
+                "fn": 0.0,
+                "vn": 57.0
+              },
+              {
+                "corte": "2023-07-31",
+                "filas": 675,
+                "largo": 500,
+                "vp": 223.0,
+                "fp": 277.0,
+                "fn": 0.0,
+                "vn": 175.0
+              },
+              {
+                "corte": "2023-08-31",
+                "filas": 802,
+                "largo": 500,
+                "vp": 258.0,
+                "fp": 242.0,
+                "fn": 0.0,
+                "vn": 302.0
+              },
+              {
+                "corte": "2023-09-30",
+                "filas": 930,
+                "largo": 500,
+                "vp": 300.0,
+                "fp": 200.0,
+                "fn": 0.0,
+                "vn": 430.0
+              },
+              {
+                "corte": "2023-10-31",
+                "filas": 1076,
+                "largo": 500,
+                "vp": 357.0,
+                "fp": 143.0,
+                "fn": 0.0,
+                "vn": 576.0
+              },
+              {
+                "corte": "2023-11-30",
+                "filas": 1208,
+                "largo": 500,
+                "vp": 368.0,
+                "fp": 132.0,
+                "fn": 0.0,
+                "vn": 708.0
+              },
+              {
+                "corte": "2023-12-31",
+                "filas": 1365,
+                "largo": 500,
+                "vp": 396.0,
+                "fp": 104.0,
+                "fn": 4.0,
+                "vn": 861.0
+              },
+              {
+                "corte": "2024-01-31",
+                "filas": 1487,
+                "largo": 500,
+                "vp": 401.0,
+                "fp": 99.0,
+                "fn": 26.0,
+                "vn": 961.0
+              },
+              {
+                "corte": "2024-02-29",
+                "filas": 1605,
+                "largo": 500,
+                "vp": 417.0,
+                "fp": 83.0,
+                "fn": 65.0,
+                "vn": 1040.0
+              },
+              {
+                "corte": "2024-03-31",
+                "filas": 1752,
+                "largo": 500,
+                "vp": 425.8571428571429,
+                "fp": 74.14285714285714,
+                "fn": 91.14285714285714,
+                "vn": 1160.857142857143
+              },
+              {
+                "corte": "2024-04-30",
+                "filas": 1876,
+                "largo": 500,
+                "vp": 421.0,
+                "fp": 79.0,
+                "fn": 108.0,
+                "vn": 1268.0
+              }
+            ]
+          },
+          "precision_por_corte": [
+            {
+              "corte": "2023-01-31",
+              "precision": 0.4967741935483871
+            },
+            {
+              "corte": "2023-02-28",
+              "precision": 0.4744897959183674
+            },
+            {
+              "corte": "2023-03-31",
+              "precision": 0.39846743295019155
+            },
+            {
+              "corte": "2023-04-30",
+              "precision": 0.3739130434782609
+            },
+            {
+              "corte": "2023-05-31",
+              "precision": 0.3693304535637149
+            },
+            {
+              "corte": "2023-06-30",
+              "precision": 0.402
+            },
+            {
+              "corte": "2023-07-31",
+              "precision": 0.446
+            },
+            {
+              "corte": "2023-08-31",
+              "precision": 0.516
+            },
+            {
+              "corte": "2023-09-30",
+              "precision": 0.6
+            },
+            {
+              "corte": "2023-10-31",
+              "precision": 0.714
+            },
+            {
+              "corte": "2023-11-30",
+              "precision": 0.736
+            },
+            {
+              "corte": "2023-12-31",
+              "precision": 0.792
+            },
+            {
+              "corte": "2024-01-31",
+              "precision": 0.802
+            },
+            {
+              "corte": "2024-02-29",
+              "precision": 0.834
+            },
+            {
+              "corte": "2024-03-31",
+              "precision": 0.8517142857142858
+            },
+            {
+              "corte": "2024-04-30",
+              "precision": 0.842
+            }
+          ]
+        },
+        "decil_superior": {
+          "largo": 1476,
+          "aciertos": 1363.0,
+          "positivos": 4636,
+          "precision": 0.9234417344173442,
+          "recall": 0.2940034512510785
+        },
+        "auc_roc": 0.9578460485145199,
+        "auc_pr": 0.8819669736437875,
+        "auc_roc_cerca_del_umbral": 0.668631292013518
+      },
+      "validacion": {
+        "lista_500": {
+          "largo": 1500,
+          "aciertos": 1223.6666666666667,
+          "positivos": 1713,
+          "precision": 0.8157777777777778,
+          "recall": 0.71434131153921,
+          "f1": 0.7616972715011932,
+          "confusion": {
+            "total": {
+              "filas": 7173,
+              "largo": 1500,
+              "vp": 1223.6666666666665,
+              "fp": 276.3333333333333,
+              "fn": 489.33333333333337,
+              "vn": 5183.666666666666
+            },
+            "por_corte": [
+              {
+                "corte": "2024-07-31",
+                "filas": 2259,
+                "largo": 500,
+                "vp": 402.66666666666663,
+                "fp": 97.33333333333333,
+                "fn": 143.33333333333334,
+                "vn": 1615.6666666666665
+              },
+              {
+                "corte": "2024-08-31",
+                "filas": 2402,
+                "largo": 500,
+                "vp": 416.0,
+                "fp": 84.0,
+                "fn": 151.0,
+                "vn": 1751.0
+              },
+              {
+                "corte": "2024-09-30",
+                "filas": 2512,
+                "largo": 500,
+                "vp": 405.0,
+                "fp": 95.0,
+                "fn": 195.0,
+                "vn": 1817.0
+              }
+            ]
+          },
+          "precision_por_corte": [
+            {
+              "corte": "2024-07-31",
+              "precision": 0.8053333333333332
+            },
+            {
+              "corte": "2024-08-31",
+              "precision": 0.832
+            },
+            {
+              "corte": "2024-09-30",
+              "precision": 0.81
+            }
+          ]
+        },
+        "decil_superior": {
+          "largo": 717,
+          "aciertos": 650.0,
+          "positivos": 1713,
+          "precision": 0.9065550906555091,
+          "recall": 0.37945125510799765
+        },
+        "auc_roc": 0.9681792327151346,
+        "auc_pr": 0.8737142882625789,
+        "auc_roc_cerca_del_umbral": 0.678256686341917,
+        "como_clasificador": {
+          "total": {
+            "filas": 7173,
+            "avisados": 2253,
+            "vp": 1713,
+            "fp": 540,
+            "fn": 0,
+            "vn": 4920
+          },
+          "por_corte": [
+            {
+              "corte": "2024-07-31",
+              "filas": 2259,
+              "avisados": 709,
+              "vp": 546,
+              "fp": 163,
+              "fn": 0,
+              "vn": 1550
+            },
+            {
+              "corte": "2024-08-31",
+              "filas": 2402,
+              "avisados": 747,
+              "vp": 567,
+              "fp": 180,
+              "fn": 0,
+              "vn": 1655
+            },
+            {
+              "corte": "2024-09-30",
+              "filas": 2512,
+              "avisados": 797,
+              "vp": 600,
+              "fp": 197,
+              "fn": 0,
+              "vn": 1715
+            }
+          ],
+          "precision": 0.7603195739014648,
+          "recall": 1.0,
+          "f1": 0.8638426626323752,
+          "accuracy": 0.9247176913425345
+        }
+      }
+    },
+    "logistica": {
+      "nombre": "Regresión logística",
+      "tipo": "interpretable",
+      "configuracion": "L2 con C = 1; numéricas con vacío imputado por la mediana más una marca de vacío, estandarizadas; categóricas en one-hot; lbfgs, hasta 5.000 iteraciones",
+      "por_que": "cada coeficiente dice cuánto sube o baja el riesgo con una variable, y se le puede explicar a Marketing por qué un cliente está en la lista",
+      "entrenamiento": {
+        "lista_500": {
+          "largo": 6920,
+          "aciertos": 4321.0,
+          "positivos": 4636,
+          "precision": 0.624421965317919,
+          "recall": 0.932053494391717,
+          "f1": 0.7478366216683974,
+          "confusion": {
+            "total": {
+              "filas": 14753,
+              "largo": 6920,
+              "vp": 4321.0,
+              "fp": 2599.0,
+              "fn": 315.0,
+              "vn": 7518.0
+            },
+            "por_corte": [
+              {
+                "corte": "2023-01-31",
+                "filas": 155,
+                "largo": 155,
+                "vp": 77.0,
+                "fp": 78.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-02-28",
+                "filas": 196,
+                "largo": 196,
+                "vp": 93.0,
+                "fp": 103.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-03-31",
+                "filas": 261,
+                "largo": 261,
+                "vp": 104.0,
+                "fp": 157.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-04-30",
+                "filas": 345,
+                "largo": 345,
+                "vp": 129.0,
+                "fp": 216.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-05-31",
+                "filas": 463,
+                "largo": 463,
+                "vp": 171.0,
+                "fp": 292.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-06-30",
+                "filas": 557,
+                "largo": 500,
+                "vp": 201.0,
+                "fp": 299.0,
+                "fn": 0.0,
+                "vn": 57.0
+              },
+              {
+                "corte": "2023-07-31",
+                "filas": 675,
+                "largo": 500,
+                "vp": 223.0,
+                "fp": 277.0,
+                "fn": 0.0,
+                "vn": 175.0
+              },
+              {
+                "corte": "2023-08-31",
+                "filas": 802,
+                "largo": 500,
+                "vp": 258.0,
+                "fp": 242.0,
+                "fn": 0.0,
+                "vn": 302.0
+              },
+              {
+                "corte": "2023-09-30",
+                "filas": 930,
+                "largo": 500,
+                "vp": 300.0,
+                "fp": 200.0,
+                "fn": 0.0,
+                "vn": 430.0
+              },
+              {
+                "corte": "2023-10-31",
+                "filas": 1076,
+                "largo": 500,
+                "vp": 357.0,
+                "fp": 143.0,
+                "fn": 0.0,
+                "vn": 576.0
+              },
+              {
+                "corte": "2023-11-30",
+                "filas": 1208,
+                "largo": 500,
+                "vp": 362.0,
+                "fp": 138.0,
+                "fn": 6.0,
+                "vn": 702.0
+              },
+              {
+                "corte": "2023-12-31",
+                "filas": 1365,
+                "largo": 500,
+                "vp": 386.0,
+                "fp": 114.0,
+                "fn": 14.0,
+                "vn": 851.0
+              },
+              {
+                "corte": "2024-01-31",
+                "filas": 1487,
+                "largo": 500,
+                "vp": 401.0,
+                "fp": 99.0,
+                "fn": 26.0,
+                "vn": 961.0
+              },
+              {
+                "corte": "2024-02-29",
+                "filas": 1605,
+                "largo": 500,
+                "vp": 415.0,
+                "fp": 85.0,
+                "fn": 67.0,
+                "vn": 1038.0
+              },
+              {
+                "corte": "2024-03-31",
+                "filas": 1752,
+                "largo": 500,
+                "vp": 425.0,
+                "fp": 75.0,
+                "fn": 92.0,
+                "vn": 1160.0
+              },
+              {
+                "corte": "2024-04-30",
+                "filas": 1876,
+                "largo": 500,
+                "vp": 419.0,
+                "fp": 81.0,
+                "fn": 110.0,
+                "vn": 1266.0
+              }
+            ]
+          },
+          "precision_por_corte": [
+            {
+              "corte": "2023-01-31",
+              "precision": 0.4967741935483871
+            },
+            {
+              "corte": "2023-02-28",
+              "precision": 0.4744897959183674
+            },
+            {
+              "corte": "2023-03-31",
+              "precision": 0.39846743295019155
+            },
+            {
+              "corte": "2023-04-30",
+              "precision": 0.3739130434782609
+            },
+            {
+              "corte": "2023-05-31",
+              "precision": 0.3693304535637149
+            },
+            {
+              "corte": "2023-06-30",
+              "precision": 0.402
+            },
+            {
+              "corte": "2023-07-31",
+              "precision": 0.446
+            },
+            {
+              "corte": "2023-08-31",
+              "precision": 0.516
+            },
+            {
+              "corte": "2023-09-30",
+              "precision": 0.6
+            },
+            {
+              "corte": "2023-10-31",
+              "precision": 0.714
+            },
+            {
+              "corte": "2023-11-30",
+              "precision": 0.724
+            },
+            {
+              "corte": "2023-12-31",
+              "precision": 0.772
+            },
+            {
+              "corte": "2024-01-31",
+              "precision": 0.802
+            },
+            {
+              "corte": "2024-02-29",
+              "precision": 0.83
+            },
+            {
+              "corte": "2024-03-31",
+              "precision": 0.85
+            },
+            {
+              "corte": "2024-04-30",
+              "precision": 0.838
+            }
+          ]
+        },
+        "decil_superior": {
+          "largo": 1476,
+          "aciertos": 1355.0,
+          "positivos": 4636,
+          "precision": 0.9180216802168022,
+          "recall": 0.29227782571182054
+        },
+        "auc_roc": 0.9568856714661069,
+        "auc_pr": 0.871761955454412,
+        "auc_roc_cerca_del_umbral": 0.677537303076561,
+        "umbral_05": {
+          "total": {
+            "filas": 14753,
+            "avisados": 4595,
+            "vp": 3779,
+            "fp": 816,
+            "fn": 857,
+            "vn": 9301
+          },
+          "por_corte": [
+            {
+              "corte": "2023-01-31",
+              "filas": 155,
+              "avisados": 82,
+              "vp": 67,
+              "fp": 15,
+              "fn": 10,
+              "vn": 63
+            },
+            {
+              "corte": "2023-02-28",
+              "filas": 196,
+              "avisados": 97,
+              "vp": 79,
+              "fp": 18,
+              "fn": 14,
+              "vn": 85
+            },
+            {
+              "corte": "2023-03-31",
+              "filas": 261,
+              "avisados": 115,
+              "vp": 89,
+              "fp": 26,
+              "fn": 15,
+              "vn": 131
+            },
+            {
+              "corte": "2023-04-30",
+              "filas": 345,
+              "avisados": 131,
+              "vp": 100,
+              "fp": 31,
+              "fn": 29,
+              "vn": 185
+            },
+            {
+              "corte": "2023-05-31",
+              "filas": 463,
+              "avisados": 175,
+              "vp": 141,
+              "fp": 34,
+              "fn": 30,
+              "vn": 258
+            },
+            {
+              "corte": "2023-06-30",
+              "filas": 557,
+              "avisados": 195,
+              "vp": 166,
+              "fp": 29,
+              "fn": 35,
+              "vn": 327
+            },
+            {
+              "corte": "2023-07-31",
+              "filas": 675,
+              "avisados": 224,
+              "vp": 179,
+              "fp": 45,
+              "fn": 44,
+              "vn": 407
+            },
+            {
+              "corte": "2023-08-31",
+              "filas": 802,
+              "avisados": 248,
+              "vp": 200,
+              "fp": 48,
+              "fn": 58,
+              "vn": 496
+            },
+            {
+              "corte": "2023-09-30",
+              "filas": 930,
+              "avisados": 305,
+              "vp": 247,
+              "fp": 58,
+              "fn": 53,
+              "vn": 572
+            },
+            {
+              "corte": "2023-10-31",
+              "filas": 1076,
+              "avisados": 340,
+              "vp": 281,
+              "fp": 59,
+              "fn": 76,
+              "vn": 660
+            },
+            {
+              "corte": "2023-11-30",
+              "filas": 1208,
+              "avisados": 374,
+              "vp": 309,
+              "fp": 65,
+              "fn": 59,
+              "vn": 775
+            },
+            {
+              "corte": "2023-12-31",
+              "filas": 1365,
+              "avisados": 392,
+              "vp": 318,
+              "fp": 74,
+              "fn": 82,
+              "vn": 891
+            },
+            {
+              "corte": "2024-01-31",
+              "filas": 1487,
+              "avisados": 421,
+              "vp": 349,
+              "fp": 72,
+              "fn": 78,
+              "vn": 988
+            },
+            {
+              "corte": "2024-02-29",
+              "filas": 1605,
+              "avisados": 476,
+              "vp": 398,
+              "fp": 78,
+              "fn": 84,
+              "vn": 1045
+            },
+            {
+              "corte": "2024-03-31",
+              "filas": 1752,
+              "avisados": 488,
+              "vp": 417,
+              "fp": 71,
+              "fn": 100,
+              "vn": 1164
+            },
+            {
+              "corte": "2024-04-30",
+              "filas": 1876,
+              "avisados": 532,
+              "vp": 439,
+              "fp": 93,
+              "fn": 90,
+              "vn": 1254
+            }
+          ],
+          "precision": 0.8224156692056583,
+          "recall": 0.8151423641069888,
+          "f1": 0.8187628642617268,
+          "accuracy": 0.8865993357283264
+        }
+      },
+      "validacion": {
+        "lista_500": {
+          "largo": 1500,
+          "aciertos": 1237.0,
+          "positivos": 1713,
+          "precision": 0.8246666666666667,
+          "recall": 0.7221249270286048,
+          "f1": 0.7699968876439465,
+          "confusion": {
+            "total": {
+              "filas": 7173,
+              "largo": 1500,
+              "vp": 1237.0,
+              "fp": 263.0,
+              "fn": 476.0,
+              "vn": 5197.0
+            },
+            "por_corte": [
+              {
+                "corte": "2024-07-31",
+                "filas": 2259,
+                "largo": 500,
+                "vp": 411.0,
+                "fp": 89.0,
+                "fn": 135.0,
+                "vn": 1624.0
+              },
+              {
+                "corte": "2024-08-31",
+                "filas": 2402,
+                "largo": 500,
+                "vp": 414.0,
+                "fp": 86.0,
+                "fn": 153.0,
+                "vn": 1749.0
+              },
+              {
+                "corte": "2024-09-30",
+                "filas": 2512,
+                "largo": 500,
+                "vp": 412.0,
+                "fp": 88.0,
+                "fn": 188.0,
+                "vn": 1824.0
+              }
+            ]
+          },
+          "precision_por_corte": [
+            {
+              "corte": "2024-07-31",
+              "precision": 0.822
+            },
+            {
+              "corte": "2024-08-31",
+              "precision": 0.828
+            },
+            {
+              "corte": "2024-09-30",
+              "precision": 0.824
+            }
+          ]
+        },
+        "decil_superior": {
+          "largo": 717,
+          "aciertos": 638.0,
+          "positivos": 1713,
+          "precision": 0.8898186889818689,
+          "recall": 0.37244600116754234
+        },
+        "auc_roc": 0.9659183490181739,
+        "auc_pr": 0.8609738811360885,
+        "auc_roc_cerca_del_umbral": 0.6828890186158137,
+        "umbral_05": {
+          "total": {
+            "filas": 7173,
+            "avisados": 1669,
+            "vp": 1351,
+            "fp": 318,
+            "fn": 362,
+            "vn": 5142
+          },
+          "por_corte": [
+            {
+              "corte": "2024-07-31",
+              "filas": 2259,
+              "avisados": 532,
+              "vp": 432,
+              "fp": 100,
+              "fn": 114,
+              "vn": 1613
+            },
+            {
+              "corte": "2024-08-31",
+              "filas": 2402,
+              "avisados": 552,
+              "vp": 454,
+              "fp": 98,
+              "fn": 113,
+              "vn": 1737
+            },
+            {
+              "corte": "2024-09-30",
+              "filas": 2512,
+              "avisados": 585,
+              "vp": 465,
+              "fp": 120,
+              "fn": 135,
+              "vn": 1792
+            }
+          ],
+          "precision": 0.8094667465548232,
+          "recall": 0.7886748394629305,
+          "f1": 0.7989355410999409,
+          "accuracy": 0.9052000557646731
+        }
+      },
+      "complejidad": {
+        "coeficientes": 81,
+        "iteraciones": 56
+      }
+    },
+    "arbol": {
+      "nombre": "Árbol de decisión",
+      "tipo": "interpretable",
+      "configuracion": "profundidad máxima 5, al menos 50 filas por hoja, Gini, semilla 42; mismas variables que la logística, sin estandarizar",
+      "por_que": "la regla del umbral es un corte sobre los días sin comprar; un árbol aprende cortes del mismo tipo y se lee como reglas",
+      "entrenamiento": {
+        "lista_500": {
+          "largo": 6920,
+          "aciertos": 4322.032066938037,
+          "positivos": 4636,
+          "precision": 0.6245711079390227,
+          "recall": 0.9322761145250296,
+          "f1": 0.7480152417684384,
+          "confusion": {
+            "total": {
+              "filas": 14753,
+              "largo": 6920,
+              "vp": 4322.032066938037,
+              "fp": 2597.967933061963,
+              "fn": 313.9679330619629,
+              "vn": 7519.032066938037
+            },
+            "por_corte": [
+              {
+                "corte": "2023-01-31",
+                "filas": 155,
+                "largo": 155,
+                "vp": 77.0,
+                "fp": 78.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-02-28",
+                "filas": 196,
+                "largo": 196,
+                "vp": 93.0,
+                "fp": 103.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-03-31",
+                "filas": 261,
+                "largo": 261,
+                "vp": 104.0,
+                "fp": 157.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-04-30",
+                "filas": 345,
+                "largo": 345,
+                "vp": 129.0,
+                "fp": 216.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-05-31",
+                "filas": 463,
+                "largo": 463,
+                "vp": 171.0,
+                "fp": 292.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-06-30",
+                "filas": 557,
+                "largo": 500,
+                "vp": 201.0,
+                "fp": 298.99999999999994,
+                "fn": 0.0,
+                "vn": 56.99999999999999
+              },
+              {
+                "corte": "2023-07-31",
+                "filas": 675,
+                "largo": 500,
+                "vp": 223.0,
+                "fp": 277.0,
+                "fn": 0.0,
+                "vn": 175.0
+              },
+              {
+                "corte": "2023-08-31",
+                "filas": 802,
+                "largo": 500,
+                "vp": 258.0,
+                "fp": 242.0,
+                "fn": 0.0,
+                "vn": 301.99999999999994
+              },
+              {
+                "corte": "2023-09-30",
+                "filas": 930,
+                "largo": 500,
+                "vp": 299.9,
+                "fp": 200.1,
+                "fn": 0.09999999999999998,
+                "vn": 429.9
+              },
+              {
+                "corte": "2023-10-31",
+                "filas": 1076,
+                "largo": 500,
+                "vp": 357.0,
+                "fp": 143.0,
+                "fn": 0.0,
+                "vn": 576.0
+              },
+              {
+                "corte": "2023-11-30",
+                "filas": 1208,
+                "largo": 500,
+                "vp": 367.0,
+                "fp": 133.0,
+                "fn": 1.0,
+                "vn": 707.0
+              },
+              {
+                "corte": "2023-12-31",
+                "filas": 1365,
+                "largo": 500,
+                "vp": 387.0,
+                "fp": 113.0,
+                "fn": 13.0,
+                "vn": 852.0
+              },
+              {
+                "corte": "2024-01-31",
+                "filas": 1487,
+                "largo": 500,
+                "vp": 396.0,
+                "fp": 104.0,
+                "fn": 30.999999999999996,
+                "vn": 956.0
+              },
+              {
+                "corte": "2024-02-29",
+                "filas": 1605,
+                "largo": 500,
+                "vp": 416.1818181818182,
+                "fp": 83.81818181818183,
+                "fn": 65.81818181818181,
+                "vn": 1039.181818181818
+              },
+              {
+                "corte": "2024-03-31",
+                "filas": 1752,
+                "largo": 500,
+                "vp": 420.66666666666663,
+                "fp": 79.33333333333334,
+                "fn": 96.33333333333333,
+                "vn": 1155.6666666666667
+              },
+              {
+                "corte": "2024-04-30",
+                "filas": 1876,
+                "largo": 500,
+                "vp": 422.2835820895522,
+                "fp": 77.71641791044776,
+                "fn": 106.71641791044777,
+                "vn": 1269.2835820895523
+              }
+            ]
+          },
+          "precision_por_corte": [
+            {
+              "corte": "2023-01-31",
+              "precision": 0.4967741935483871
+            },
+            {
+              "corte": "2023-02-28",
+              "precision": 0.4744897959183674
+            },
+            {
+              "corte": "2023-03-31",
+              "precision": 0.39846743295019155
+            },
+            {
+              "corte": "2023-04-30",
+              "precision": 0.3739130434782609
+            },
+            {
+              "corte": "2023-05-31",
+              "precision": 0.3693304535637149
+            },
+            {
+              "corte": "2023-06-30",
+              "precision": 0.402
+            },
+            {
+              "corte": "2023-07-31",
+              "precision": 0.446
+            },
+            {
+              "corte": "2023-08-31",
+              "precision": 0.516
+            },
+            {
+              "corte": "2023-09-30",
+              "precision": 0.5998
+            },
+            {
+              "corte": "2023-10-31",
+              "precision": 0.714
+            },
+            {
+              "corte": "2023-11-30",
+              "precision": 0.734
+            },
+            {
+              "corte": "2023-12-31",
+              "precision": 0.774
+            },
+            {
+              "corte": "2024-01-31",
+              "precision": 0.792
+            },
+            {
+              "corte": "2024-02-29",
+              "precision": 0.8323636363636364
+            },
+            {
+              "corte": "2024-03-31",
+              "precision": 0.8413333333333333
+            },
+            {
+              "corte": "2024-04-30",
+              "precision": 0.8445671641791045
+            }
+          ]
+        },
+        "decil_superior": {
+          "largo": 1476,
+          "aciertos": 1363.0997139083956,
+          "positivos": 4636,
+          "precision": 0.9235092912658507,
+          "recall": 0.2940249598594469
+        },
+        "auc_roc": 0.9586215736623523,
+        "auc_pr": 0.8762626148928733,
+        "auc_roc_cerca_del_umbral": 0.690353039252953,
+        "umbral_05": {
+          "total": {
+            "filas": 14753,
+            "avisados": 5600,
+            "vp": 4400,
+            "fp": 1200,
+            "fn": 236,
+            "vn": 8917
+          },
+          "por_corte": [
+            {
+              "corte": "2023-01-31",
+              "filas": 155,
+              "avisados": 90,
+              "vp": 72,
+              "fp": 18,
+              "fn": 5,
+              "vn": 60
+            },
+            {
+              "corte": "2023-02-28",
+              "filas": 196,
+              "avisados": 118,
+              "vp": 91,
+              "fp": 27,
+              "fn": 2,
+              "vn": 76
+            },
+            {
+              "corte": "2023-03-31",
+              "filas": 261,
+              "avisados": 130,
+              "vp": 100,
+              "fp": 30,
+              "fn": 4,
+              "vn": 127
+            },
+            {
+              "corte": "2023-04-30",
+              "filas": 345,
+              "avisados": 163,
+              "vp": 121,
+              "fp": 42,
+              "fn": 8,
+              "vn": 174
+            },
+            {
+              "corte": "2023-05-31",
+              "filas": 463,
+              "avisados": 213,
+              "vp": 162,
+              "fp": 51,
+              "fn": 9,
+              "vn": 241
+            },
+            {
+              "corte": "2023-06-30",
+              "filas": 557,
+              "avisados": 237,
+              "vp": 192,
+              "fp": 45,
+              "fn": 9,
+              "vn": 311
+            },
+            {
+              "corte": "2023-07-31",
+              "filas": 675,
+              "avisados": 277,
+              "vp": 211,
+              "fp": 66,
+              "fn": 12,
+              "vn": 386
+            },
+            {
+              "corte": "2023-08-31",
+              "filas": 802,
+              "avisados": 318,
+              "vp": 241,
+              "fp": 77,
+              "fn": 17,
+              "vn": 467
+            },
+            {
+              "corte": "2023-09-30",
+              "filas": 930,
+              "avisados": 364,
+              "vp": 284,
+              "fp": 80,
+              "fn": 16,
+              "vn": 550
+            },
+            {
+              "corte": "2023-10-31",
+              "filas": 1076,
+              "avisados": 422,
+              "vp": 338,
+              "fp": 84,
+              "fn": 19,
+              "vn": 635
+            },
+            {
+              "corte": "2023-11-30",
+              "filas": 1208,
+              "avisados": 457,
+              "vp": 355,
+              "fp": 102,
+              "fn": 13,
+              "vn": 738
+            },
+            {
+              "corte": "2023-12-31",
+              "filas": 1365,
+              "avisados": 479,
+              "vp": 375,
+              "fp": 104,
+              "fn": 25,
+              "vn": 861
+            },
+            {
+              "corte": "2024-01-31",
+              "filas": 1487,
+              "avisados": 504,
+              "vp": 398,
+              "fp": 106,
+              "fn": 29,
+              "vn": 954
+            },
+            {
+              "corte": "2024-02-29",
+              "filas": 1605,
+              "avisados": 580,
+              "vp": 461,
+              "fp": 119,
+              "fn": 21,
+              "vn": 1004
+            },
+            {
+              "corte": "2024-03-31",
+              "filas": 1752,
+              "avisados": 604,
+              "vp": 490,
+              "fp": 114,
+              "fn": 27,
+              "vn": 1121
+            },
+            {
+              "corte": "2024-04-30",
+              "filas": 1876,
+              "avisados": 644,
+              "vp": 509,
+              "fp": 135,
+              "fn": 20,
+              "vn": 1212
+            }
+          ],
+          "precision": 0.7857142857142857,
+          "recall": 0.9490940465918896,
+          "f1": 0.8597108245408362,
+          "accuracy": 0.9026638649766149
+        }
+      },
+      "validacion": {
+        "lista_500": {
+          "largo": 1500,
+          "aciertos": 1208.0854700854702,
+          "positivos": 1713,
+          "precision": 0.8053903133903134,
+          "recall": 0.705245458310257,
+          "f1": 0.7519984252010397,
+          "confusion": {
+            "total": {
+              "filas": 7173,
+              "largo": 1500,
+              "vp": 1208.0854700854702,
+              "fp": 291.9145299145299,
+              "fn": 504.9145299145299,
+              "vn": 5168.085470085471
+            },
+            "por_corte": [
+              {
+                "corte": "2024-07-31",
+                "filas": 2259,
+                "largo": 500,
+                "vp": 405.974358974359,
+                "fp": 94.02564102564102,
+                "fn": 140.02564102564105,
+                "vn": 1618.9743589743591
+              },
+              {
+                "corte": "2024-08-31",
+                "filas": 2402,
+                "largo": 500,
+                "vp": 406.44444444444446,
+                "fp": 93.55555555555554,
+                "fn": 160.55555555555554,
+                "vn": 1741.4444444444446
+              },
+              {
+                "corte": "2024-09-30",
+                "filas": 2512,
+                "largo": 500,
+                "vp": 395.66666666666663,
+                "fp": 104.33333333333334,
+                "fn": 204.33333333333334,
+                "vn": 1807.6666666666667
+              }
+            ]
+          },
+          "precision_por_corte": [
+            {
+              "corte": "2024-07-31",
+              "precision": 0.811948717948718
+            },
+            {
+              "corte": "2024-08-31",
+              "precision": 0.8128888888888889
+            },
+            {
+              "corte": "2024-09-30",
+              "precision": 0.7913333333333332
+            }
+          ]
+        },
+        "decil_superior": {
+          "largo": 717,
+          "aciertos": 637.5112577203818,
+          "positivos": 1713,
+          "precision": 0.8891370400563204,
+          "recall": 0.3721606875191954
+        },
+        "auc_roc": 0.9620984434907377,
+        "auc_pr": 0.846461105178988,
+        "auc_roc_cerca_del_umbral": 0.66826663207282,
+        "umbral_05": {
+          "total": {
+            "filas": 7173,
+            "avisados": 2168,
+            "vp": 1615,
+            "fp": 553,
+            "fn": 98,
+            "vn": 4907
+          },
+          "por_corte": [
+            {
+              "corte": "2024-07-31",
+              "filas": 2259,
+              "avisados": 680,
+              "vp": 516,
+              "fp": 164,
+              "fn": 30,
+              "vn": 1549
+            },
+            {
+              "corte": "2024-08-31",
+              "filas": 2402,
+              "avisados": 721,
+              "vp": 539,
+              "fp": 182,
+              "fn": 28,
+              "vn": 1653
+            },
+            {
+              "corte": "2024-09-30",
+              "filas": 2512,
+              "avisados": 767,
+              "vp": 560,
+              "fp": 207,
+              "fn": 40,
+              "vn": 1705
+            }
+          ],
+          "precision": 0.7449261992619927,
+          "recall": 0.9427904261529481,
+          "f1": 0.8322597268745169,
+          "accuracy": 0.9092429945629443
+        }
+      },
+      "complejidad": {
+        "hojas": 31,
+        "profundidad": 5
+      },
+      "primeros_cortes": "|--- num__recency_sobre_umbral <= 0.52\n|   |--- num__gap_mediano <= 78.25\n|   |   |--- num__recency_sobre_umbral <= 0.12\n|   |   |   |--- truncated branch of depth 3\n|   |   |--- num__recency_sobre_umbral >  0.12\n|   |   |   |--- truncated branch of depth 3\n|   |--- num__gap_mediano >  78.25\n|   |   |--- num__gap_mediano <= 101.25\n|   |   |   |--- truncated branch of depth 3\n|   |   |--- num__gap_mediano >  101.25\n|   |   |   |--- truncated branch of depth 3\n|--- num__recency_sobre_umbral >  0.52\n|   |--- num__gap_mediano <= 153.75\n|   |   |--- num__recency_sobre_umbral <= 0.69\n|   |   |   |--- truncated branch of depth 3\n|   |   |--- num__recency_sobre_umbral >  0.69\n|   |   |   |--- truncated branch of depth 3\n|   |--- num__gap_mediano >  153.75\n|   |   |--- num__recency_sobre_umbral <= 0.69\n|   |   |   |--- truncated branch of depth 3\n|   |   |--- num__recency_sobre_umbral >  0.69\n|   |   |   |--- truncated branch of depth 3\n"
+    },
+    "hgb": {
+      "nombre": "Gradient boosting (HistGradientBoosting)",
+      "tipo": "complejo",
+      "configuracion": "valores por defecto de scikit-learn: 100 árboles de hasta 31 hojas, tasa de aprendizaje 0,1, 20 filas por hoja; categóricas nativas; sin parada temprana (separaría al azar el 10 % de las filas, no por fecha); semilla 42",
+      "por_que": "combina variables y efectos no lineales sin especificarlos a mano; es lo que puede separar, cerca del umbral, a quien vuelve a comprar solo",
+      "entrenamiento": {
+        "lista_500": {
+          "largo": 6920,
+          "aciertos": 4568.0,
+          "positivos": 4636,
+          "precision": 0.6601156069364161,
+          "recall": 0.9853321829163072,
+          "f1": 0.7905849775008653,
+          "confusion": {
+            "total": {
+              "filas": 14753,
+              "largo": 6920,
+              "vp": 4568.0,
+              "fp": 2352.0,
+              "fn": 68.0,
+              "vn": 7765.0
+            },
+            "por_corte": [
+              {
+                "corte": "2023-01-31",
+                "filas": 155,
+                "largo": 155,
+                "vp": 77.0,
+                "fp": 78.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-02-28",
+                "filas": 196,
+                "largo": 196,
+                "vp": 93.0,
+                "fp": 103.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-03-31",
+                "filas": 261,
+                "largo": 261,
+                "vp": 104.0,
+                "fp": 157.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-04-30",
+                "filas": 345,
+                "largo": 345,
+                "vp": 129.0,
+                "fp": 216.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-05-31",
+                "filas": 463,
+                "largo": 463,
+                "vp": 171.0,
+                "fp": 292.0,
+                "fn": 0.0,
+                "vn": 0.0
+              },
+              {
+                "corte": "2023-06-30",
+                "filas": 557,
+                "largo": 500,
+                "vp": 201.0,
+                "fp": 299.0,
+                "fn": 0.0,
+                "vn": 57.0
+              },
+              {
+                "corte": "2023-07-31",
+                "filas": 675,
+                "largo": 500,
+                "vp": 223.0,
+                "fp": 277.0,
+                "fn": 0.0,
+                "vn": 175.0
+              },
+              {
+                "corte": "2023-08-31",
+                "filas": 802,
+                "largo": 500,
+                "vp": 258.0,
+                "fp": 242.0,
+                "fn": 0.0,
+                "vn": 302.0
+              },
+              {
+                "corte": "2023-09-30",
+                "filas": 930,
+                "largo": 500,
+                "vp": 300.0,
+                "fp": 200.0,
+                "fn": 0.0,
+                "vn": 430.0
+              },
+              {
+                "corte": "2023-10-31",
+                "filas": 1076,
+                "largo": 500,
+                "vp": 357.0,
+                "fp": 143.0,
+                "fn": 0.0,
+                "vn": 576.0
+              },
+              {
+                "corte": "2023-11-30",
+                "filas": 1208,
+                "largo": 500,
+                "vp": 368.0,
+                "fp": 132.0,
+                "fn": 0.0,
+                "vn": 708.0
+              },
+              {
+                "corte": "2023-12-31",
+                "filas": 1365,
+                "largo": 500,
+                "vp": 400.0,
+                "fp": 100.0,
+                "fn": 0.0,
+                "vn": 865.0
+              },
+              {
+                "corte": "2024-01-31",
+                "filas": 1487,
+                "largo": 500,
+                "vp": 427.0,
+                "fp": 73.0,
+                "fn": 0.0,
+                "vn": 987.0
+              },
+              {
+                "corte": "2024-02-29",
+                "filas": 1605,
+                "largo": 500,
+                "vp": 477.0,
+                "fp": 23.0,
+                "fn": 5.0,
+                "vn": 1100.0
+              },
+              {
+                "corte": "2024-03-31",
+                "filas": 1752,
+                "largo": 500,
+                "vp": 494.0,
+                "fp": 6.0,
+                "fn": 23.0,
+                "vn": 1229.0
+              },
+              {
+                "corte": "2024-04-30",
+                "filas": 1876,
+                "largo": 500,
+                "vp": 489.0,
+                "fp": 11.0,
+                "fn": 40.0,
+                "vn": 1336.0
+              }
+            ]
+          },
+          "precision_por_corte": [
+            {
+              "corte": "2023-01-31",
+              "precision": 0.4967741935483871
+            },
+            {
+              "corte": "2023-02-28",
+              "precision": 0.4744897959183674
+            },
+            {
+              "corte": "2023-03-31",
+              "precision": 0.39846743295019155
+            },
+            {
+              "corte": "2023-04-30",
+              "precision": 0.3739130434782609
+            },
+            {
+              "corte": "2023-05-31",
+              "precision": 0.3693304535637149
+            },
+            {
+              "corte": "2023-06-30",
+              "precision": 0.402
+            },
+            {
+              "corte": "2023-07-31",
+              "precision": 0.446
+            },
+            {
+              "corte": "2023-08-31",
+              "precision": 0.516
+            },
+            {
+              "corte": "2023-09-30",
+              "precision": 0.6
+            },
+            {
+              "corte": "2023-10-31",
+              "precision": 0.714
+            },
+            {
+              "corte": "2023-11-30",
+              "precision": 0.736
+            },
+            {
+              "corte": "2023-12-31",
+              "precision": 0.8
+            },
+            {
+              "corte": "2024-01-31",
+              "precision": 0.854
+            },
+            {
+              "corte": "2024-02-29",
+              "precision": 0.954
+            },
+            {
+              "corte": "2024-03-31",
+              "precision": 0.988
+            },
+            {
+              "corte": "2024-04-30",
+              "precision": 0.978
+            }
+          ]
+        },
+        "decil_superior": {
+          "largo": 1476,
+          "aciertos": 1476.0,
+          "positivos": 4636,
+          "precision": 1.0,
+          "recall": 0.3183779119930975
+        },
+        "auc_roc": 0.9983237322634921,
+        "auc_pr": 0.9962318913951116,
+        "auc_roc_cerca_del_umbral": 0.9868387532321958,
+        "umbral_05": {
+          "total": {
+            "filas": 14753,
+            "avisados": 5029,
+            "vp": 4618,
+            "fp": 411,
+            "fn": 18,
+            "vn": 9706
+          },
+          "por_corte": [
+            {
+              "corte": "2023-01-31",
+              "filas": 155,
+              "avisados": 82,
+              "vp": 77,
+              "fp": 5,
+              "fn": 0,
+              "vn": 73
+            },
+            {
+              "corte": "2023-02-28",
+              "filas": 196,
+              "avisados": 103,
+              "vp": 93,
+              "fp": 10,
+              "fn": 0,
+              "vn": 93
+            },
+            {
+              "corte": "2023-03-31",
+              "filas": 261,
+              "avisados": 112,
+              "vp": 103,
+              "fp": 9,
+              "fn": 1,
+              "vn": 148
+            },
+            {
+              "corte": "2023-04-30",
+              "filas": 345,
+              "avisados": 147,
+              "vp": 129,
+              "fp": 18,
+              "fn": 0,
+              "vn": 198
+            },
+            {
+              "corte": "2023-05-31",
+              "filas": 463,
+              "avisados": 192,
+              "vp": 171,
+              "fp": 21,
+              "fn": 0,
+              "vn": 271
+            },
+            {
+              "corte": "2023-06-30",
+              "filas": 557,
+              "avisados": 215,
+              "vp": 200,
+              "fp": 15,
+              "fn": 1,
+              "vn": 341
+            },
+            {
+              "corte": "2023-07-31",
+              "filas": 675,
+              "avisados": 243,
+              "vp": 223,
+              "fp": 20,
+              "fn": 0,
+              "vn": 432
+            },
+            {
+              "corte": "2023-08-31",
+              "filas": 802,
+              "avisados": 279,
+              "vp": 254,
+              "fp": 25,
+              "fn": 4,
+              "vn": 519
+            },
+            {
+              "corte": "2023-09-30",
+              "filas": 930,
+              "avisados": 323,
+              "vp": 300,
+              "fp": 23,
+              "fn": 0,
+              "vn": 607
+            },
+            {
+              "corte": "2023-10-31",
+              "filas": 1076,
+              "avisados": 382,
+              "vp": 356,
+              "fp": 26,
+              "fn": 1,
+              "vn": 693
+            },
+            {
+              "corte": "2023-11-30",
+              "filas": 1208,
+              "avisados": 398,
+              "vp": 368,
+              "fp": 30,
+              "fn": 0,
+              "vn": 810
+            },
+            {
+              "corte": "2023-12-31",
+              "filas": 1365,
+              "avisados": 435,
+              "vp": 398,
+              "fp": 37,
+              "fn": 2,
+              "vn": 928
+            },
+            {
+              "corte": "2024-01-31",
+              "filas": 1487,
+              "avisados": 461,
+              "vp": 425,
+              "fp": 36,
+              "fn": 2,
+              "vn": 1024
+            },
+            {
+              "corte": "2024-02-29",
+              "filas": 1605,
+              "avisados": 518,
+              "vp": 480,
+              "fp": 38,
+              "fn": 2,
+              "vn": 1085
+            },
+            {
+              "corte": "2024-03-31",
+              "filas": 1752,
+              "avisados": 558,
+              "vp": 516,
+              "fp": 42,
+              "fn": 1,
+              "vn": 1193
+            },
+            {
+              "corte": "2024-04-30",
+              "filas": 1876,
+              "avisados": 581,
+              "vp": 525,
+              "fp": 56,
+              "fn": 4,
+              "vn": 1291
+            }
+          ],
+          "precision": 0.9182740107377212,
+          "recall": 0.9961173425366695,
+          "f1": 0.9556130367304708,
+          "accuracy": 0.9709211685758828
+        }
+      },
+      "validacion": {
+        "lista_500": {
+          "largo": 1500,
+          "aciertos": 1223.0,
+          "positivos": 1713,
+          "precision": 0.8153333333333334,
+          "recall": 0.7139521307647402,
+          "f1": 0.7612822906940554,
+          "confusion": {
+            "total": {
+              "filas": 7173,
+              "largo": 1500,
+              "vp": 1223.0,
+              "fp": 277.0,
+              "fn": 490.0,
+              "vn": 5183.0
+            },
+            "por_corte": [
+              {
+                "corte": "2024-07-31",
+                "filas": 2259,
+                "largo": 500,
+                "vp": 410.0,
+                "fp": 90.0,
+                "fn": 136.0,
+                "vn": 1623.0
+              },
+              {
+                "corte": "2024-08-31",
+                "filas": 2402,
+                "largo": 500,
+                "vp": 409.0,
+                "fp": 91.0,
+                "fn": 158.0,
+                "vn": 1744.0
+              },
+              {
+                "corte": "2024-09-30",
+                "filas": 2512,
+                "largo": 500,
+                "vp": 404.0,
+                "fp": 96.0,
+                "fn": 196.0,
+                "vn": 1816.0
+              }
+            ]
+          },
+          "precision_por_corte": [
+            {
+              "corte": "2024-07-31",
+              "precision": 0.82
+            },
+            {
+              "corte": "2024-08-31",
+              "precision": 0.818
+            },
+            {
+              "corte": "2024-09-30",
+              "precision": 0.808
+            }
+          ]
+        },
+        "decil_superior": {
+          "largo": 717,
+          "aciertos": 634.0,
+          "positivos": 1713,
+          "precision": 0.8842398884239888,
+          "recall": 0.37011091652072386
+        },
+        "auc_roc": 0.9664805227852513,
+        "auc_pr": 0.8612096064640704,
+        "auc_roc_cerca_del_umbral": 0.6757810641932066,
+        "umbral_05": {
+          "total": {
+            "filas": 7173,
+            "avisados": 1989,
+            "vp": 1563,
+            "fp": 426,
+            "fn": 150,
+            "vn": 5034
+          },
+          "por_corte": [
+            {
+              "corte": "2024-07-31",
+              "filas": 2259,
+              "avisados": 611,
+              "vp": 488,
+              "fp": 123,
+              "fn": 58,
+              "vn": 1590
+            },
+            {
+              "corte": "2024-08-31",
+              "filas": 2402,
+              "avisados": 666,
+              "vp": 518,
+              "fp": 148,
+              "fn": 49,
+              "vn": 1687
+            },
+            {
+              "corte": "2024-09-30",
+              "filas": 2512,
+              "avisados": 712,
+              "vp": 557,
+              "fp": 155,
+              "fn": 43,
+              "vn": 1757
+            }
+          ],
+          "precision": 0.7858220211161387,
+          "recall": 0.9124343257443083,
+          "f1": 0.8444084278768234,
+          "accuracy": 0.9196988707653702
+        }
+      },
+      "complejidad": {
+        "arboles": 100,
+        "hojas": 3100
+      }
+    }
+  },
+  "mejor": {
+    "modelo": "logistica",
+    "criterio": "mayor precisión de la lista de 500 por corte en validación; desempata el AUC-PR",
+    "matrices": {
+      "mejor_umbral_05": {
+        "total": {
+          "filas": 7173,
+          "avisados": 1669,
+          "vp": 1351,
+          "fp": 318,
+          "fn": 362,
+          "vn": 5142
+        },
+        "por_corte": [
+          {
+            "corte": "2024-07-31",
+            "filas": 2259,
+            "avisados": 532,
+            "vp": 432,
+            "fp": 100,
+            "fn": 114,
+            "vn": 1613
+          },
+          {
+            "corte": "2024-08-31",
+            "filas": 2402,
+            "avisados": 552,
+            "vp": 454,
+            "fp": 98,
+            "fn": 113,
+            "vn": 1737
+          },
+          {
+            "corte": "2024-09-30",
+            "filas": 2512,
+            "avisados": 585,
+            "vp": 465,
+            "fp": 120,
+            "fn": 135,
+            "vn": 1792
+          }
+        ]
+      },
+      "mejor_lista_500": {
+        "total": {
+          "filas": 7173,
+          "largo": 1500,
+          "vp": 1237.0,
+          "fp": 263.0,
+          "fn": 476.0,
+          "vn": 5197.0
+        },
+        "por_corte": [
+          {
+            "corte": "2024-07-31",
+            "filas": 2259,
+            "largo": 500,
+            "vp": 411.0,
+            "fp": 89.0,
+            "fn": 135.0,
+            "vn": 1624.0
+          },
+          {
+            "corte": "2024-08-31",
+            "filas": 2402,
+            "largo": 500,
+            "vp": 414.0,
+            "fp": 86.0,
+            "fn": 153.0,
+            "vn": 1749.0
+          },
+          {
+            "corte": "2024-09-30",
+            "filas": 2512,
+            "largo": 500,
+            "vp": 412.0,
+            "fp": 88.0,
+            "fn": 188.0,
+            "vn": 1824.0
+          }
+        ]
+      },
+      "regla_lista_500": {
+        "total": {
+          "filas": 7173,
+          "largo": 1500,
+          "vp": 1223.6666666666665,
+          "fp": 276.3333333333333,
+          "fn": 489.33333333333337,
+          "vn": 5183.666666666666
+        },
+        "por_corte": [
+          {
+            "corte": "2024-07-31",
+            "filas": 2259,
+            "largo": 500,
+            "vp": 402.66666666666663,
+            "fp": 97.33333333333333,
+            "fn": 143.33333333333334,
+            "vn": 1615.6666666666665
+          },
+          {
+            "corte": "2024-08-31",
+            "filas": 2402,
+            "largo": 500,
+            "vp": 416.0,
+            "fp": 84.0,
+            "fn": 151.0,
+            "vn": 1751.0
+          },
+          {
+            "corte": "2024-09-30",
+            "filas": 2512,
+            "largo": 500,
+            "vp": 405.0,
+            "fp": 95.0,
+            "fn": 195.0,
+            "vn": 1817.0
+          }
+        ]
+      },
+      "regla_como_clasificador": {
+        "total": {
+          "filas": 7173,
+          "avisados": 2253,
+          "vp": 1713,
+          "fp": 540,
+          "fn": 0,
+          "vn": 4920
+        },
+        "por_corte": [
+          {
+            "corte": "2024-07-31",
+            "filas": 2259,
+            "avisados": 709,
+            "vp": 546,
+            "fp": 163,
+            "fn": 0,
+            "vn": 1550
+          },
+          {
+            "corte": "2024-08-31",
+            "filas": 2402,
+            "avisados": 747,
+            "vp": 567,
+            "fp": 180,
+            "fn": 0,
+            "vn": 1655
+          },
+          {
+            "corte": "2024-09-30",
+            "filas": 2512,
+            "avisados": 797,
+            "vp": 600,
+            "fp": 197,
+            "fn": 0,
+            "vn": 1715
+          }
+        ]
+      }
+    },
+    "contra_regla": {
+      "diferencia_precision_pp": 0.8888888888888835,
+      "diferencia_aciertos": 13.333333333333258,
+      "diferencia_aciertos_por_corte": 4.4444444444444,
+      "diferencia_auc_pr": -0.012740407126490383,
+      "diferencia_auc_roc_cerca_del_umbral": 0.0046323322738967,
+      "bootstrap": {
+        "replicas": 1000,
+        "semilla": 42,
+        "unidad": "cliente",
+        "ic95": [
+          -0.0020868055555555483,
+          0.019112500000000074
+        ],
+        "replicas_con_a_mejor": 0.931
+      },
+      "solapamiento_listas": [
+        {
+          "corte": "2024-07-31",
+          "en_las_dos": 457.66666666666663,
+          "solo_en_a": 42.333333333333336,
+          "aciertos_solo_en_a": 36.0,
+          "solo_en_b": 42.33333333333333,
+          "aciertos_solo_en_b": 27.666666666666664
+        },
+        {
+          "corte": "2024-08-31",
+          "en_las_dos": 457.66666666666663,
+          "solo_en_a": 42.33333333333333,
+          "aciertos_solo_en_a": 29.333333333333336,
+          "solo_en_b": 42.33333333333333,
+          "aciertos_solo_en_b": 31.333333333333332
+        },
+        {
+          "corte": "2024-09-30",
+          "en_las_dos": 452.0,
+          "solo_en_a": 48.0,
+          "aciertos_solo_en_a": 34.0,
+          "solo_en_b": 48.0,
+          "aciertos_solo_en_b": 27.0
+        }
+      ]
+    }
+  },
+  "coeficientes_logistica": [
+    {
+      "termino": "gap_mediano",
+      "variable": "gap_mediano",
+      "coeficiente": -5.068495690998613,
+      "odds_ratio": 0.006291877953922582,
+      "filas": 14753,
+      "sentido": "baja el riesgo"
+    },
+    {
+      "termino": "recency_dias",
+      "variable": "recency_dias",
+      "coeficiente": 2.3424229715957754,
+      "odds_ratio": 10.40642050171598,
+      "filas": 14753,
+      "sentido": "sube el riesgo"
+    },
+    {
+      "termino": "motivo_ultima_devolucion_Producto defectuoso",
+      "variable": "motivo_ultima_devolucion",
+      "coeficiente": -0.9991783677617729,
+      "odds_ratio": 0.3681818269880462,
+      "filas": 84,
+      "sentido": "baja el riesgo"
+    },
+    {
+      "termino": "motivo_ultima_devolucion_Error de compra",
+      "variable": "motivo_ultima_devolucion",
+      "coeficiente": 0.9633723302398282,
+      "odds_ratio": 2.6205188440301734,
+      "filas": 64,
+      "sentido": "sube el riesgo"
+    },
+    {
+      "termino": "motivo_ultima_devolucion_(vacío)",
+      "variable": "motivo_ultima_devolucion",
+      "coeficiente": -0.7045405071366251,
+      "odds_ratio": 0.49433566578921856,
+      "filas": 14444,
+      "sentido": "baja el riesgo"
+    },
+    {
+      "termino": "motivo_ultima_devolucion_Cambio de talle/color",
+      "variable": "motivo_ultima_devolucion",
+      "coeficiente": -0.42587231594621283,
+      "odds_ratio": 0.6531997399870078,
+      "filas": 38,
+      "sentido": "baja el riesgo"
+    },
+    {
+      "termino": "canal_alta_online",
+      "variable": "canal_alta",
+      "coeficiente": -0.3939109030786803,
+      "odds_ratio": 0.6744141417874135,
+      "filas": 5882,
+      "sentido": "baja el riesgo"
+    },
+    {
+      "termino": "genero_M",
+      "variable": "genero",
+      "coeficiente": -0.3781759790014585,
+      "odds_ratio": 0.6851099250962895,
+      "filas": 6844,
+      "sentido": "baja el riesgo"
+    },
+    {
+      "termino": "formato_tienda_Chico",
+      "variable": "formato_tienda",
+      "coeficiente": -0.37811461335241425,
+      "odds_ratio": 0.6851519686015101,
+      "filas": 2492,
+      "sentido": "baja el riesgo"
+    },
+    {
+      "termino": "ultimo_canal_campania_(vacío)",
+      "variable": "ultimo_canal_campania",
+      "coeficiente": -0.3760787494577009,
+      "odds_ratio": 0.6865482656098362,
+      "filas": 3012,
+      "sentido": "baja el riesgo"
+    }
+  ],
+  "perdida_esperada": {
+    "puntaje": "probabilidad de logistica × facturación anualizada al corte",
+    "valor": "facturación anualizada F̂_i(T) = monetary × 12 / meses_desde_alta (E1, C04)",
+    "lista_500": {
+      "largo": 1500,
+      "aciertos": 1178.0,
+      "positivos": 1713,
+      "precision": 0.7853333333333333,
+      "recall": 0.6876824284880327,
+      "f1": 0.7332710862122627,
+      "confusion": {
+        "total": {
+          "filas": 7173,
+          "largo": 1500,
+          "vp": 1178.0,
+          "fp": 322.0,
+          "fn": 535.0,
+          "vn": 5138.0
+        },
+        "por_corte": [
+          {
+            "corte": "2024-07-31",
+            "filas": 2259,
+            "largo": 500,
+            "vp": 389.0,
+            "fp": 111.0,
+            "fn": 157.0,
+            "vn": 1602.0
+          },
+          {
+            "corte": "2024-08-31",
+            "filas": 2402,
+            "largo": 500,
+            "vp": 401.0,
+            "fp": 99.0,
+            "fn": 166.0,
+            "vn": 1736.0
+          },
+          {
+            "corte": "2024-09-30",
+            "filas": 2512,
+            "largo": 500,
+            "vp": 388.0,
+            "fp": 112.0,
+            "fn": 212.0,
+            "vn": 1800.0
+          }
+        ]
+      }
+    },
+    "precision_por_corte": [
+      {
+        "corte": "2024-07-31",
+        "precision": 0.778
+      },
+      {
+        "corte": "2024-08-31",
+        "precision": 0.802
+      },
+      {
+        "corte": "2024-09-30",
+        "precision": 0.776
+      }
+    ],
+    "decil_superior": {
+      "largo": 717,
+      "aciertos": 568.0,
+      "positivos": 1713,
+      "precision": 0.7921896792189679,
+      "recall": 0.3315820198482195
+    },
+    "facturacion_anualizada_validacion": {
+      "media_filas": 51762.69474972973,
+      "media_positivos": 62802.60227988104,
+      "suma_positivos": 107580857.70543621
+    },
+    "facturacion_anualizada_en_lista_500": {
+      "perdida_esperada": {
+        "lista": 116271290.51581298,
+        "vp": 86805311.17487714
+      },
+      "logistica": {
+        "lista": 95952188.64819625,
+        "vp": 77080969.78059182
+      },
+      "regla_umbral": {
+        "lista": 93118383.15735282,
+        "vp": 74723456.51395008
+      }
+    }
+  },
+  "variante_con_dias_para_cruzar": {
+    "logistica": {
+      "precision_lista_500": 0.8193333333333334,
+      "auc_pr": 0.8675281636186335
+    },
+    "arbol": {
+      "precision_lista_500": 0.81746224056014,
+      "auc_pr": 0.8619671655802938
+    },
+    "hgb": {
+      "precision_lista_500": 0.8173333333333334,
+      "auc_pr": 0.8516550482107506
+    }
+  }
+}

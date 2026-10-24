@@ -1,0 +1,705 @@
+"""
+Build E3: capa de datos de la presentación interactiva /e3/ (contrato en pipeline/CONTRACT_E3.md).
+
+    python3 -I pipeline/build_e3.py
+
+Lee, sin modificarlos:
+- data/e3/etapa2.json, etapa3.json, economia.json y condiciones.json: copias byte a byte de la salida
+  de los generadores de las partes A, B y C del Entregable 3. Las deja
+  entregas/entregable-3/_build/F/presentacion/exportar_web.py.
+- e3/src/contenido_e3.js: el texto de la presentación (C3), para comprobar que cada ancla que la
+  diapositiva escribe está escrita igual ahí.
+
+Escribe e3/src/datos_e3.js con «export const D3 = {...}». Solo biblioteca estándar.
+
+Anclas: cada una compara un valor de D3, formateado como lo mostrará la pantalla (toFixed de JS con
+coma decimal y punto de miles), con el número que escribe el documento entregado, escrito acá como
+literal junto al id de su fila en wiki/entregables/cifras-entregable-3.md. Si una no cierra, imprime
+la tabla y sale con código 1 sin escribir nada. Aparte, los controles de reimplementación comparan
+la fórmula de la grilla económica (copiada de _build/B/economia/economia.py) con lo que ese script
+escribió en economia.json.
+
+Determinista: dos corridas dan los mismos bytes.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import sys
+from decimal import ROUND_HALF_UP, Decimal
+from pathlib import Path
+
+APP = Path(__file__).resolve().parents[1]
+DATOS = APP / "data" / "e3"
+CONTENIDO = APP / "e3" / "src" / "contenido_e3.js"
+SALIDA = APP / "e3" / "src" / "datos_e3.js"
+ENTRADAS = ("etapa2.json", "etapa3.json", "economia.json", "condiciones.json")
+
+# Constantes que no vienen en los JSON: salen del texto de la Parte A y se dicen en el contrato.
+# A 2.1, definición del target: θ = máx(90 días; 1,5 × intervalo mediano), ventana de 90 días.
+FACTOR_UMBRAL, PISO_DIAS, VENTANA_DIAS = 1.5, 90, 90
+# A 1.2, tabla de scoring (F16): condiciones.json no trae los puntajes.
+CONDICIONES = [("datos", "Datos suficientes", 3), ("calidad", "Calidad utilizable", 2),
+               ("infraestructura", "Infraestructura", 2), ("capacidad_humana", "Capacidad humana", 2)]
+# A 1.2, escala de interpretación del promedio.
+ESCALA = [(1.0, 1.5, "No factible"), (1.6, 2.0, "Factibilidad baja"),
+          (2.1, 2.5, "Factibilidad media"), (2.6, 3.0, "Factibilidad alta")]
+# Grilla de la tasa de éxito: paso de 0,01 puntos hasta 5 % y de 0,1 puntos hasta 100 %.
+TRAMOS_GRILLA = [(0.0, 0.05, 0.0001), (0.05, 1.0, 0.001)]
+
+
+# ============================================================ utilidades
+
+def cargar(nombre: str) -> dict:
+    return json.loads((DATOS / nombre).read_text(encoding="utf-8"))
+
+
+def sha256(p: Path) -> str:
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def es(x, dec: int = 0) -> str:
+    """El número como lo muestra la pantalla: toFixed(dec) de JS (mitad lejos del cero, sobre el valor
+    binario exacto), punto de miles, coma decimal y el menos tipográfico."""
+    d = Decimal(x).quantize(Decimal(1).scaleb(-dec), rounding=ROUND_HALF_UP)
+    signo = "−" if d < 0 else ""
+    ent, _, fr = f"{abs(d):f}".partition(".")
+    return signo + f"{int(ent):,}".replace(",", ".") + ("," + fr if fr else "")
+
+
+def r6(x: float) -> float:
+    """Valores de la grilla con 6 decimales; sin −0."""
+    y = round(x, 6)
+    return 0.0 if y == 0 else y
+
+
+def cargar_c3() -> dict:
+    texto = CONTENIDO.read_text(encoding="utf-8")
+    marca = "export const C3 = "
+    if marca not in texto:
+        sys.exit(f"{CONTENIDO}: no encuentro «{marca}». Corre antes exportar_web.py.")
+    return json.loads(texto[texto.index(marca) + len(marca):texto.rindex(";")])
+
+
+# ============================================================ anclas y controles
+
+ANCLAS: list[dict] = []
+CONTROLES: list[dict] = []
+C3_TEXTO: dict[str, str] = {}
+
+
+def ancla(id_: str, nombre: str, valor, doc: str, dec: int | None = None, x: float = 1.0,
+          donde: str = "", c3: str | None = None) -> None:
+    """valor × x formateado con dec decimales tiene que dar doc, el número que escribe el documento.
+    Con dec None compara valor == doc tal cual. c3: «d6» o «A2», donde C3 tiene que escribir doc."""
+    mostrado = valor if dec is None else es(valor * x, dec)
+    ok = mostrado == doc
+    nota = ""
+    if c3 is not None:
+        if doc not in C3_TEXTO[c3]:
+            ok, nota = False, f"C3 {c3} no escribe «{doc}»"
+    ANCLAS.append({"id": id_, "nombre": nombre, "documento": doc, "mostrado": mostrado,
+                   "donde": donde + (f" · C3 {c3}" if c3 else ""), "ok": ok, "nota": nota})
+
+
+def control(nombre: str, valor: float, json_valor: float, tol: float = 1e-9) -> None:
+    ok = abs(valor - json_valor) <= tol * max(1.0, abs(json_valor))
+    CONTROLES.append({"nombre": nombre, "valor": valor, "json": json_valor, "ok": ok})
+
+
+# ============================================================ piezas
+
+def armar_caso(e3: dict) -> dict:
+    cr = e3["caso_real"]
+    v = cr["valores"]
+    caso = {
+        "id_cliente": cr["id_cliente_canonico"], "corte": cr["corte"],
+        "gap_mediano_dias": v["gap_mediano"], "umbral_dias": v["umbral"], "recency_dias": v["recency_dias"],
+        "dias_para_cruzar": v["dias_para_cruzar"], "ventana_dias": VENTANA_DIAS,
+        "factor_umbral": FACTOR_UMBRAL, "piso_dias": PISO_DIAS,
+        "y_churn_90": cr["y_churn_90"], "cruzo_en_la_ventana": cr["y_churn_90"] == 1,
+        "puesto_lista_modelo": cr["puesto_en_la_lista"], "puesto_lista_regla": cr["puesto_en_la_regla"],
+        "probabilidad": cr["probabilidad"],
+    }
+    ancla("H23", "caso: intervalo mediano (días)", caso["gap_mediano_dias"], "162", 0, donde="C 7.3", c3="d3")
+    ancla("H23", "caso: umbral (días)", caso["umbral_dias"], "243", 0, donde="C 7.3", c3="d3")
+    ancla("H23", "caso: días sin comprar al corte", caso["recency_dias"], "181", 0, donde="C 7.3", c3="d3")
+    ancla("H23", "caso: días que faltaban", caso["dias_para_cruzar"], "62", 0, donde="registro H23; gráfico d3")
+    ancla("H23", "caso: corte", caso["corte"], "2024-07-31", donde="registro H23 (31/07/2024)")
+    ancla("H23", "caso: cruzó en los 90 días", caso["cruzo_en_la_ventana"], True, donde="C 7.3")
+    ancla("A 2.1", "caso: umbral = máx(90; 1,5 × intervalo)",
+          max(PISO_DIAS, FACTOR_UMBRAL * caso["gap_mediano_dias"]), "243", 0, donde="definición del target")
+    ancla("H23", "caso: faltaban = umbral − días sin comprar",
+          caso["umbral_dias"] - caso["recency_dias"], "62", 0, donde="registro H23")
+    return caso
+
+
+def armar_tecnica(e2: dict, co: dict, c3: dict) -> dict:
+    puntajes = [p for _, _, p in CONDICIONES]
+    promedio = sum(puntajes) / len(puntajes)
+    nivel = next(n for lo, hi, n in ESCALA if lo <= round(promedio, 2) <= hi)
+    tec = {
+        "condiciones": [{"id": i, "nombre": n, "puntaje": p} for i, n, p in CONDICIONES],
+        "promedio": promedio, "nivel": nivel,
+        "escala": [{"desde": lo, "hasta": hi, "nivel": n} for lo, hi, n in ESCALA],
+        "positivos_entrenamiento": e2["particion"]["entrenamiento"]["positivos"],
+        "ventas_sin_cliente_pct": co["nulos"]["ventas_sin_cliente_pct"],
+    }
+    ancla("F16", "técnica: promedio", promedio, "2,25", 2, donde="A 1.2", c3="d4")
+    ancla("F16", "técnica: nivel", nivel, "Factibilidad media", donde="A 1.3 (2,1 a 2,5)")
+    filas_d4 = [f["rotulo"] for f in next(d for d in c3["DIAPOSITIVAS"] if d["n"] == 4)["filas"]]
+    rotulos = {"datos": "Datos", "calidad": "Calidad", "infraestructura": "Infraestructura",
+               "capacidad_humana": "Capacidad humana"}
+    for i, _, p in CONDICIONES:
+        ancla("F16", f"técnica: puntaje {i}", f"{rotulos[i]} · {p}" in filas_d4, True, donde="A 1.2 · C3 d4 filas")
+    ancla("G10", "técnica: positivos para entrenar", tec["positivos_entrenamiento"], "4.636", 0, donde="A 1.1", c3="d4")
+    ancla("C19", "técnica: ventas sin cliente (%)", tec["ventas_sin_cliente_pct"], "44,8", 1, donde="A 1.2", c3="d4")
+    return tec
+
+
+def _medidas(lst: dict) -> dict:
+    return {"precision": lst["precision"], "recall": lst["recall"], "aciertos": lst["aciertos"],
+            "largo": lst["largo"], "positivos": lst["positivos"]}
+
+
+def armar_modelos(e2: dict, e3: dict) -> dict:
+    pa, m = e2["particion"], e2["modelos"]
+    pr = next(f for f in e3["umbral"]["filas"]["practica_actual"] if f["umbral"] == "lista de 500 por corte")
+    tope = pa["maximo_lista_500"]["entrenamiento"]
+
+    def modelo(clave, id_, nombre, grupo):
+        mm = m[clave]
+        return {"id": id_, "nombre": nombre, "grupo": grupo,
+                "entrenamiento": _medidas(mm["entrenamiento"]["lista_500"]),
+                "validacion": _medidas(mm["validacion"]["lista_500"]),
+                "auc_pr_validacion": mm["validacion"]["auc_pr"]}
+
+    filas = [
+        {"id": "tasa_base", "nombre": "Lista sin orden (tasa base)", "grupo": "hoy",
+         "entrenamiento": {"precision": pa["entrenamiento"]["tasa"]},
+         "validacion": {"precision": pa["validacion"]["tasa"]}},
+        {"id": "practica_actual", "nombre": "Práctica actual: más días sin comprar", "grupo": "hoy",
+         "entrenamiento": None,
+         "validacion": {"precision": pr["precision"], "recall": pr["recall"], "aciertos": pr["vp"],
+                        "largo": pr["casos_marcados"], "positivos": pa["validacion"]["positivos"]}},
+        modelo("arbol", "arbol", "Árbol de decisión", "modelo"),
+        modelo("hgb", "hgb", "Gradient boosting", "modelo"),
+        modelo("regla_umbral", "regla_umbral", "Regla del umbral, sin modelo", "regla"),
+        modelo("logistica", "logistica", "Regresión logística", "modelo"),
+    ]
+    cr = e2["mejor"]["contra_regla"]
+    coef = {c["termino"]: c["coeficiente"] for c in e2["coeficientes_logistica"]}
+    mod = {
+        "validacion": {"desde": pa["validacion"]["desde"], "hasta": pa["validacion"]["hasta"],
+                       "cortes": pa["validacion"]["cortes"], "filas": pa["validacion"]["filas"],
+                       "positivos": pa["validacion"]["positivos"], "tasa": pa["validacion"]["tasa"],
+                       "largo_lista": pa["maximo_lista_500"]["validacion"]["largo"]},
+        "entrenamiento": {"desde": pa["entrenamiento"]["desde"], "hasta": pa["entrenamiento"]["hasta"],
+                          "cortes": pa["entrenamiento"]["cortes"], "filas": pa["entrenamiento"]["filas"],
+                          "positivos": pa["entrenamiento"]["positivos"], "tasa": pa["entrenamiento"]["tasa"],
+                          "largo_lista": tope["largo"], "techo_aciertos": tope["aciertos_maximos"],
+                          "techo_precision": tope["precision_maxima"]},
+        "filas": filas,
+        "contra_regla": {"modelo": e2["mejor"]["modelo"], "diferencia_pp": cr["diferencia_precision_pp"],
+                         "ic95_pp": [cr["bootstrap"]["ic95"][0] * 100, cr["bootstrap"]["ic95"][1] * 100],
+                         "aciertos_de_mas": cr["diferencia_aciertos"],
+                         "contactos": pa["maximo_lista_500"]["validacion"]["largo"],
+                         "replicas_a_favor": cr["bootstrap"]["replicas_con_a_mejor"]},
+        "coeficientes": [{"variable": "gap_mediano", "coeficiente": coef["gap_mediano"]},
+                         {"variable": "recency_dias", "coeficiente": coef["recency_dias"]}],
+    }
+    f = {r["id"]: r for r in filas}
+    ancla("F08", "modelos: tasa base en validación (%)", f["tasa_base"]["validacion"]["precision"], "23,9", 1, 100,
+          donde="A 2.5; gráfico d6")
+    ancla("F07", "modelos: práctica actual (%)", f["practica_actual"]["validacion"]["precision"], "36,2", 1, 100,
+          donde="A 2.5", c3="d6")
+    ancla("G14", "modelos: árbol en validación (%)", f["arbol"]["validacion"]["precision"], "80,5", 1, 100,
+          donde="B 4.1; gráfico d6")
+    ancla("G15", "modelos: gradient boosting en validación (%)", f["hgb"]["validacion"]["precision"], "81,5", 1, 100,
+          donde="B 4.1; gráfico d6")
+    ancla("G11", "modelos: regla en validación (%)", f["regla_umbral"]["validacion"]["precision"], "81,6", 1, 100,
+          donde="B 4.1", c3="d6")
+    ancla("G11", "modelos: aciertos de la regla", f["regla_umbral"]["validacion"]["aciertos"], "1.223,67", 2,
+          donde="B 4.1")
+    ancla("G13", "modelos: logística en validación (%)", f["logistica"]["validacion"]["precision"], "82,5", 1, 100,
+          donde="B 4.1", c3="d6")
+    ancla("G13", "modelos: logística en entrenamiento (%)", f["logistica"]["entrenamiento"]["precision"], "62,4", 1,
+          100, donde="B 4.1")
+    ancla("G14", "modelos: árbol en entrenamiento (%)", f["arbol"]["entrenamiento"]["precision"], "62,5", 1, 100,
+          donde="B 4.1")
+    ancla("G15", "modelos: gradient boosting en entrenamiento (%)", f["hgb"]["entrenamiento"]["precision"], "66,0", 1,
+          100, donde="B 4.1", c3="d6")
+    ancla("G12", "modelos: techo de la lista en entrenamiento (%)", tope["precision_maxima"], "66,3", 1, 100,
+          donde="B 4.1", c3="d6")
+    ancla("G17", "modelos: logística − regla (puntos)", mod["contra_regla"]["diferencia_pp"], "0,89", 2,
+          donde="B 4.2", c3="d6")
+    ancla("G17", "modelos: IC 95 % inferior (puntos)", mod["contra_regla"]["ic95_pp"][0], "−0,21", 2,
+          donde="B 4.2", c3="d6")
+    ancla("G17", "modelos: IC 95 % superior (puntos)", mod["contra_regla"]["ic95_pp"][1], "1,91", 2,
+          donde="B 4.2", c3="d6")
+    ancla("G17", "modelos: aciertos de más en 1.500", mod["contra_regla"]["aciertos_de_mas"], "13,3", 1,
+          donde="B 4.2", c3="d6")
+    ancla("G17", "modelos: contactos de validación", mod["contra_regla"]["contactos"], "1.500", 0,
+          donde="B 4.2", c3="d6")
+    ancla("G24", "modelos: coeficiente de gap_mediano", coef["gap_mediano"], "−5,07", 2, donde="B 4.2", c3="d6")
+    ancla("G24", "modelos: coeficiente de recency_dias", coef["recency_dias"], "2,34", 2, donde="B 4.2", c3="d6")
+    return mod
+
+
+METODOS = {"modelo": "logistica_ajustada", "regla_umbral": "regla", "practica_actual": "practica_actual"}
+
+# Importancia por permutación: las variables que escribe la C 7.3 y la etiqueta del gráfico de d7.
+ETIQUETAS_IMPORTANCIA = {
+    "gap_mediano": "gap_mediano (días entre compras)",
+    "recency_sobre_umbral": "recency_sobre_umbral",
+    "recency_dias": "recency_dias (días sin comprar)",
+    "ticket_90d": "ticket_90d",
+    "envios_acum": "envios_acum",
+    "edad": "edad",
+}
+DE_LA_REGLA = ("gap_mediano", "recency_sobre_umbral", "recency_dias")
+
+
+def _fila_lista(metodo: str, filtro: str, r: dict) -> dict:
+    tipo = {"lista": "lista", "lista filtrada": "lista", "umbral": "umbral"}[r["tipo"]]
+    if r["umbral"].startswith("regla como clasificador"):
+        tipo = "clasificador"
+    largo = r["por_corte"][0] if tipo == "lista" else None
+    if tipo == "lista" and len(set(r["por_corte"])) != 1:
+        sys.exit(f"lista con largo distinto por corte: {r['umbral']}")
+    c = r.get("contactables")
+    return {"metodo": metodo, "filtro": filtro, "tipo": tipo, "largo_mes": largo, "por_corte": r["por_corte"],
+            "casos": r["casos_marcados"], "vp": r["vp"], "fp": r["fp"], "precision": r["precision"],
+            "recall": r["recall"], "usd_anio": r["valor_neto_anual_usd"],
+            "contactables": None if not c else {"quedan": c["quedan"], "vp": c["vp"], "precision": c["precision"]}}
+
+
+def armar_lista(e3: dict) -> dict:
+    u = e3["umbral"]
+    filas = []
+    for grupo, filtro in (("filas", "sin_filtro"), ("filtradas", "contactables")):
+        for clave, metodo in METODOS.items():
+            filas.extend(_fila_lista(metodo, filtro, r) for r in u[grupo][clave])
+
+    def busca(metodo, filtro, largo=None, tipo="lista"):
+        return next(f for f in filas if f["metodo"] == metodo and f["filtro"] == filtro and f["tipo"] == tipo
+                    and (largo is None or f["largo_mes"] == largo))
+
+    m500c, r500c = busca("logistica_ajustada", "contactables", 500), busca("regla", "contactables", 500)
+    m500 = busca("logistica_ajustada", "sin_filtro", 500)
+    med = e3["medidos"]
+    imp = {r["variable"]: r for r in e3["importancia"]}
+    orden = sorted(e3["importancia"], key=lambda r: -r["caida_lista_500_pp"])
+    ultima = max(orden.index(imp[v]) for v in ETIQUETAS_IMPORTANCIA)
+    lista = {
+        "validacion": {"cortes": len(u["contactables_por_corte"]), "filas": e3["segmentos"]["global"]["filas"],
+                       "positivos": e3["segmentos"]["global"]["positivos"],
+                       "contactables": u["contactables_en_validacion"],
+                       "contactables_por_corte": u["contactables_por_corte"],
+                       "positivos_contactables": round(m500c["vp"] / m500c["recall"]),
+                       "sin_consentimiento": u["sin_consentimiento"], "con_baja": u["con_baja"]},
+        "filas": filas,
+        "elegida": {"metodo": "regla", "filtro": "contactables", "largo_mes": 500},
+        "elegida_modelo": {"metodo": "logistica_ajustada", "filtro": "contactables", "largo_mes": 500},
+        "regla_menos_modelo_500_contactables": {
+            "aciertos": r500c["vp"] - m500c["vp"],
+            "ic95_pp_modelo_menos_regla": [x * 100 for x in e3["contra"]["filtrada_logistica_ajustada_menos_regla"]["ic95"]]},
+        "no_contactables_lista_500": m500["casos"] - m500["contactables"]["quedan"],
+        "precision_de_equilibrio": u["precision_de_equilibrio"],
+        "ajuste": {
+            "pliegues": len(e3["pliegues"]),
+            "brecha_pp": [
+                {"id": "regla_umbral", "antes": med["regla_umbral"]["brecha"]["lista_proporcional_pp"], "despues": None},
+                {"id": "logistica", "antes": med["logistica_inicial"]["brecha"]["lista_proporcional_pp"],
+                 "despues": med["logistica_ajustada"]["brecha"]["lista_proporcional_pp"]},
+                {"id": "hgb", "antes": med["hgb_inicial"]["brecha"]["lista_proporcional_pp"],
+                 "despues": med["hgb_ajustado"]["brecha"]["lista_proporcional_pp"]}],
+            "precision_validacion": {"logistica_ajustada": med["logistica_ajustada"]["validacion"]["lista_500"]["precision"],
+                                     "hgb_ajustado": med["hgb_ajustado"]["validacion"]["lista_500"]["precision"],
+                                     "regla_umbral": med["regla_umbral"]["validacion"]["lista_500"]["precision"]},
+        },
+        "importancia": [
+            {"variable": r["variable"], "etiqueta": ETIQUETAS_IMPORTANCIA.get(r["variable"]),
+             "caida_pp": r["caida_lista_500_pp"], "desvio_pp": r["desvio_pp"],
+             "coeficiente": r["direccion"]["coeficiente"], "de_la_regla": r["variable"] in DE_LA_REGLA,
+             "en_diapositiva": r["variable"] in ETIQUETAS_IMPORTANCIA}
+            for r in orden[:ultima + 1]],
+        "variables_del_modelo": len(e3["importancia"]),
+    }
+
+    # anexo A2 (C 7.2): una fila por fila del anexo
+    a2 = [
+        (busca("logistica_ajustada", "sin_filtro", tipo="umbral"), "1.485", "82,4", "71,4", "301,17", "H11"),
+        (m500, "1.500", "82,6", "72,3", "305,68", "H11"),
+        (busca("logistica_ajustada", "sin_filtro", 700), "2.100", "75,3", "92,3", "366,00", "H11"),
+        (busca("logistica_ajustada", "contactables", 400), "1.200", "79,8", "81,5", "231,15", "H15"),
+        (m500c, "1.500", "73,9", "94,3", "252,84", "H15"),
+        (busca("logistica_ajustada", "contactables", 600), "1.800", "64,4", "98,6", "234,60", "H15"),
+        (r500c, "1.500", "75,8", "96,8", "264,54", "H16"),
+        (busca("practica_actual", "contactables", 500), "1.500", "32,8", "41,8", "4,15", "H13"),
+    ]
+    for f, casos, prec, rec, usd, id_ in a2:
+        q = f"{f['metodo']} {f['filtro']} {f['largo_mes'] or f['tipo']}"
+        ancla(id_, f"A2 {q}: casos", f["casos"], casos, 0, donde="C 7.2", c3="A2")
+        ancla(id_, f"A2 {q}: precisión", f["precision"], prec, 1, 100, donde="C 7.2", c3="A2")
+        ancla(id_, f"A2 {q}: recall", f["recall"], rec, 1, 100, donde="C 7.2", c3="A2")
+        ancla(id_, f"A2 {q}: USD por año", f["usd_anio"], usd, 2, donde="C 7.2", c3="A2")
+    ancla("H16", "lista: aciertos de más de la regla, 500 contactables",
+          lista["regla_menos_modelo_500_contactables"]["aciertos"], "29", 0, donde="C 7.2", c3="d7")
+    ancla("H45", "lista: no contactables en la de 500 sin filtro", lista["no_contactables_lista_500"], "483", 0,
+          donde="C 7.2", c3="A2")
+    ancla("H01", "lista: pliegues temporales", lista["ajuste"]["pliegues"], "4", 0, donde="C 7.1", c3="d7")
+    b = {x["id"]: x for x in lista["ajuste"]["brecha_pp"]}
+    ancla("H08", "lista: brecha del gradient boosting antes", b["hgb"]["antes"], "18,1", 1, donde="C 7.1", c3="d7")
+    ancla("H08", "lista: brecha del gradient boosting después", b["hgb"]["despues"], "6,4", 1, donde="C 7.1", c3="d7")
+    ancla("H08", "lista: brecha de la logística antes", b["logistica"]["antes"], "4,3", 1, donde="C 7.1")
+    ancla("H08", "lista: brecha de la logística después", b["logistica"]["despues"], "4,5", 1, donde="C 7.1")
+    ancla("H05", "lista: logística ajustada sin filtro (%)",
+          lista["ajuste"]["precision_validacion"]["logistica_ajustada"], "82,6", 1, 100, donde="C 7.1", c3="d7")
+    for v, doc in (("gap_mediano", "34,4"), ("recency_sobre_umbral", "24,0"), ("recency_dias", "7,6"),
+                   ("ticket_90d", "0,8"), ("envios_acum", "0,6"), ("edad", "0,4")):
+        ancla("H21", f"lista: importancia de {v}", imp[v]["caida_lista_500_pp"], doc, 1,
+              donde="C 7.3; gráfico d7")
+    return lista
+
+
+def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
+    p, te = eco["parametros"], eco["tasa_exito"]
+    S_OBS, (S_LO, S_HI) = te["tasa"], te["ic95_wilson"]
+    S_CRUZAN = eco["tasa_exito_cruzan"]["tasa"]
+    R = te["falsos_positivos"]["r_oferta_7_dias"]
+    M, D, T, C = p["m_base_ars"], p["descuento"], p["ticket_medio_ars"], p["costo_accion_ars"]
+    TC, ANU = eco["tipo_de_cambio"]["base_30_12_2025"], p["anualizar"]
+    REG, MOD = eco["celda_4_4"]["regla"]["matriz"], eco["celda_4_4"]["modelo"]["matriz"]
+    DIF = e2["mejor"]["contra_regla"]["diferencia_aciertos"]
+    LARGO = MOD["largo"]
+    ct = eco["costo_total_anio_1"]
+    C_PROY, C_MVP, C_INC = ct["proyecto"], ct["mvp"], ct["incremental"]
+    PRESUPUESTO = eco["costos_proyecto"]["presupuesto_C28"]
+    POR_PUNTO = LARGO / 100
+
+    # --- la fórmula de economia.py (valores, neto, regla_anual, inc_anual, roi), sin pandas
+    def valores(s, d=D, r=R):
+        return {"vp": s * (M - d * T) - C, "fp": -C - r * d * T, "fn": 0.0, "vn": 0.0}
+
+    def neto(mat, v):
+        return sum(mat[k] * v[k] for k in ("vp", "fp", "fn", "vn"))
+
+    def regla_usd(s, d=D, r=R):
+        return ANU * neto(REG, valores(s, d, r)) / TC
+
+    def modelo_usd(s):
+        v = valores(s)
+        return 1.0 * ANU * DIF * (v["vp"] - v["fp"]) / TC
+
+    def roi(b, c):
+        return (b - c) / c * 100
+
+    def punto_usd(s):
+        v = valores(s)
+        return POR_PUNTO * ANU * (v["vp"] - v["fp"]) / TC
+
+    def s_equilibrio(d, r):
+        vp, fp = REG["vp"] * ANU, REG["fp"] * ANU
+        fijo = vp * C + fp * (C + r * d * T)
+        return (C_MVP * TC / 1 + fijo) / (vp * (M - d * T))
+
+    s_eq_con, s_eq_sin = s_equilibrio(D, R), s_equilibrio(0.0, 0.0)
+    max_pp = (1 - REG["vp"] / LARGO) * 100
+
+    # --- grilla: s de 0 a 1 con los puntos notables insertados exactos
+    notables = [("cero", 0.0, "nadie vuelve"),
+                ("ic95_inferior", S_LO, "límite inferior del intervalo del 95 %"),
+                ("observada", S_OBS, "compra a 7 días después de un envío, sin grupo de control"),
+                ("solo_cruzan", S_CRUZAN, "la misma compra, solo en los que cruzaron el umbral"),
+                ("ic95_superior", S_HI, "límite superior del intervalo del 95 %"),
+                ("equilibrio_sin_descuento", s_eq_sin, "la regla se paga sin descuento"),
+                ("equilibrio_con_descuento", s_eq_con, "la regla se paga con 15 % de descuento"),
+                ("cien", 1.0, "vuelven todos los contactados que se iban a ir")]
+    puntos = set()
+    for lo, hi, paso in TRAMOS_GRILLA:
+        k0, k1 = round(lo / paso), round(hi / paso)
+        dec = len(str(paso).split(".")[1])
+        puntos.update(round(k * paso, dec) for k in range(k0, k1 + 1))
+    puntos.update(s for _, s, _ in notables)
+    ss = sorted(puntos)
+    col = {c: [] for c in ("s", "regla_usd", "regla_roi_pct", "regla_usd_sin", "regla_roi_pct_sin",
+                           "modelo_usd", "modelo_roi_pct", "acierto_ars", "punto_usd", "puntos_para_pagar",
+                           "veces")}
+    for s in ss:
+        ru, ru0, mu, pu = regla_usd(s), regla_usd(s, 0.0, 0.0), modelo_usd(s), punto_usd(s)
+        col["s"].append(s)
+        col["regla_usd"].append(r6(ru))
+        col["regla_roi_pct"].append(r6(roi(ru, C_MVP)))
+        col["regla_usd_sin"].append(r6(ru0))
+        col["regla_roi_pct_sin"].append(r6(roi(ru0, C_MVP)))
+        col["modelo_usd"].append(r6(mu))
+        col["modelo_roi_pct"].append(r6(roi(mu, C_INC)))
+        col["acierto_ars"].append(r6(valores(s)["vp"]))
+        col["punto_usd"].append(r6(pu))
+        col["puntos_para_pagar"].append(r6(C_INC / pu))
+        col["veces"].append(r6(s / S_OBS))
+    idx = {i: ss.index(s) for i, s, _ in notables}
+    grilla = {"tramos": [{"desde": lo, "hasta": hi, "paso": paso} for lo, hi, paso in TRAMOS_GRILLA],
+              "n": len(ss),
+              "notables": [{"id": i, "s": s, "i": idx[i], "rotulo": rot} for i, s, rot in notables],
+              **col}
+
+    def g(columna, notable):
+        return grilla[columna][idx[notable]]
+
+    cp, cm = eco["costos_proyecto"], eco["costos_mvp"]
+    fr = next(f for f in e3["umbral"]["filtradas"]["regla_umbral"]
+              if f["umbral"] == "lista de 500 por corte, solo contactables")
+    regla_cont = ANU * neto({"vp": fr["vp"], "fp": fr["fp"], "fn": 0.0, "vn": 0.0}, valores(S_OBS)) / TC
+    v_obs = valores(S_OBS)
+    econ = {
+        "parametros": {
+            "s_observada": S_OBS, "envios": te["envios_cerca_del_umbral"], "compras_7d": te["compras_7d"],
+            "s_ic95": [S_LO, S_HI], "s_solo_cruzan": S_CRUZAN,
+            "envios_solo_cruzan": eco["tasa_exito_cruzan"]["envios"],
+            "compras_7d_solo_cruzan": eco["tasa_exito_cruzan"]["compras_7d"],
+            "contactados_por_exito": 1 / S_OBS,
+            "r": R, "envios_no_cruzan": te["falsos_positivos"]["envios_a_los_que_no_cruzan"],
+            "compras_7d_no_cruzan": te["falsos_positivos"]["compras_7d"],
+            "margen_anual_ars": M, "descuento": D, "ticket_medio_ars": T, "costo_accion_ars": C,
+            "accion": p["accion"], "tipo_de_cambio": TC, "tipo_de_cambio_fecha": "2025-12-30",
+            "anualizar": ANU, "cortes_validacion": 3, "listas_por_anio": 12,
+            "aciertos_de_mas_modelo": DIF, "contactos_validacion": LARGO, "aciertos_por_punto": POR_PUNTO,
+        },
+        "valores_celda_ars": v_obs,
+        "matrices": {
+            "regla": {**{k: REG[k] for k in ("vp", "fp", "fn", "vn", "largo")},
+                      "neto_ars": eco["celda_4_4"]["regla"]["neto_ars"], "anual_usd": regla_usd(S_OBS)},
+            "modelo": {**{k: MOD[k] for k in ("vp", "fp", "fn", "vn", "largo")},
+                       "neto_ars": eco["celda_4_4"]["modelo"]["neto_ars"],
+                       "anual_usd": ANU * neto(MOD, v_obs) / TC},
+        },
+        "costos": {
+            "con_modelo": {"unicos_usd": cp["suma_unicos"], "contingencia_usd": cp["contingencia"],
+                           "inversion_inicial_usd": cp["inversion_inicial"], "recurrente_usd": cp["recurrente_anual"],
+                           "total_anio_1_usd": cp["total_anio_1"]},
+            "regla_sin_modelo": {"unicos_usd": cm["suma_unicos"], "contingencia_usd": cm["contingencia"],
+                                 "inversion_inicial_usd": cm["inversion_inicial"],
+                                 "recurrente_usd": cm["recurrente_anual"], "total_anio_1_usd": cm["total_anio_1"]},
+            "incremental_usd": C_INC, "presupuesto_usd": PRESUPUESTO,
+            "con_modelo_menos_presupuesto_usd": C_PROY - PRESUPUESTO,
+            "presupuesto_menos_regla_usd": PRESUPUESTO - C_MVP,
+        },
+        "observada": {"regla_usd": regla_usd(S_OBS), "regla_roi_pct": roi(regla_usd(S_OBS), C_MVP),
+                      "regla_usd_sin": regla_usd(S_OBS, 0.0, 0.0),
+                      "regla_roi_pct_sin": roi(regla_usd(S_OBS, 0.0, 0.0), C_MVP),
+                      "modelo_usd": modelo_usd(S_OBS), "modelo_roi_pct": roi(modelo_usd(S_OBS), C_INC),
+                      "punto_usd": punto_usd(S_OBS), "puntos_para_pagar": C_INC / punto_usd(S_OBS)},
+        "regla_contactables": {"vp": fr["vp"], "fp": fr["fp"], "usd_anio": regla_cont,
+                               "roi_pct": roi(regla_cont, C_MVP)},
+        "umbral": {"s_equilibrio_con_descuento": s_eq_con, "s_equilibrio_sin_descuento": s_eq_sin,
+                   "veces_con_descuento": s_eq_con / S_OBS, "veces_sin_descuento": s_eq_sin / S_OBS,
+                   "modelo_usd_con_s_100": modelo_usd(1.0), "modelo_roi_pct_con_s_100": roi(modelo_usd(1.0), C_INC),
+                   "modelo_se_paga_con_s_100": modelo_usd(1.0) >= C_INC,
+                   "maximo_pp": max_pp, "valor_del_maximo_usd": max_pp * punto_usd(S_OBS),
+                   "puntos_para_pagar_con_s_100": C_INC / punto_usd(1.0)},
+        "grilla": grilla,
+    }
+
+    # --- controles de reimplementación contra lo que escribió economia.py
+    def sens(variable, probado):
+        return next(x for x in eco["sensibilidad"]
+                    if x["variable"] == variable and x["probado"].startswith(probado))
+
+    s_lo_sens = sens("Tasa de éxito de la acción", "límite inferior del intervalo")
+    s_cr_sens = sens("Tasa de éxito de la acción", "compra a 7 días de los que cruzan")
+    control("VP unitario", v_obs["vp"], eco["celda_4_4"]["unitario_ars"]["vp"])
+    control("FP unitario", v_obs["fp"], eco["celda_4_4"]["unitario_ars"]["fp"])
+    control("regla anual USD", regla_usd(S_OBS), eco["celda_4_4"]["regla_anual_usd"])
+    control("regla ROI", roi(regla_usd(S_OBS), C_MVP), eco["escenarios"]["esperado"]["mvp_con_descuento"]["roi_pct"])
+    control("regla sin descuento USD", regla_usd(S_OBS, 0.0, 0.0),
+            eco["escenarios"]["esperado"]["mvp_sin_descuento"]["beneficio_usd"])
+    control("regla sin descuento ROI", roi(regla_usd(S_OBS, 0.0, 0.0), C_MVP),
+            eco["escenarios"]["esperado"]["mvp_sin_descuento"]["roi_pct"])
+    control("modelo USD", modelo_usd(S_OBS), eco["esperado"]["beneficio_usd"])
+    control("modelo ROI", roi(modelo_usd(S_OBS), C_INC), eco["esperado"]["roi_pct"])
+    control("s inferior: ROI modelo", roi(modelo_usd(S_LO), C_INC), s_lo_sens["roi_proyecto_pct"])
+    control("s inferior: ROI regla", roi(regla_usd(S_LO), C_MVP), s_lo_sens["roi_mvp_pct"])
+    control("s solo cruzan: ROI modelo", roi(modelo_usd(S_CRUZAN), C_INC), s_cr_sens["roi_proyecto_pct"])
+    control("s solo cruzan: ROI regla", roi(regla_usd(S_CRUZAN), C_MVP), s_cr_sens["roi_mvp_pct"])
+    control("equilibrio con descuento", s_eq_con, eco["umbral"]["mvp_s_equilibrio_con_descuento"])
+    control("equilibrio sin descuento", s_eq_sin, eco["umbral"]["mvp_s_equilibrio_sin_descuento"])
+    control("veces con descuento", s_eq_con / S_OBS, eco["umbral"]["veces_la_tasa_base_con_descuento"])
+    control("veces sin descuento", s_eq_sin / S_OBS, eco["umbral"]["veces_la_tasa_base"])
+    control("modelo con s = 100 %", modelo_usd(1.0), eco["umbral"]["proyecto_techo_incremental_usd"])
+    control("ROI del modelo con s = 100 %", roi(modelo_usd(1.0), C_INC), eco["umbral"]["proyecto_roi_con_exito_100_pct"])
+    control("valor de un punto", punto_usd(S_OBS), eco["mejora_minima"]["valor_por_punto_usd_anual"])
+    control("puntos para pagar", C_INC / punto_usd(S_OBS), eco["mejora_minima"]["puntos_para_pagar_costo_incremental"])
+    control("máximo posible", max_pp, eco["mejora_minima"]["maximo_posible_pp"])
+    control("valor de un punto con s = 100 %", punto_usd(1.0),
+            eco["mejora_minima"]["con_exito_100"]["valor_por_punto_usd_anual"])
+    control("regla 500 contactables USD", regla_cont, fr["valor_neto_anual_usd"])
+    control("costo incremental", C_PROY - C_MVP, C_INC)
+
+    # --- anclas (d8, d9, A3, A6 y la Parte B)
+    ancla("G31", "economía: s observada (%)", S_OBS, "1,02", 2, 100, donde="B supuestos", c3="d8")
+    ancla("G31", "economía: s, IC 95 % inferior (%)", S_LO, "0,63", 2, 100, donde="B 3.5", c3="A3")
+    ancla("G31", "economía: s, IC 95 % superior (%)", S_HI, "1,65", 2, 100, donde="B 3.5")
+    ancla("G52", "economía: s solo los que cruzan (%)", S_CRUZAN, "1,12", 2, 100, donde="B 3.5", c3="A3")
+    ancla("G31", "economía: contactados por cada uno que vuelve", 1 / S_OBS, "98", 0, donde="B 4.4", c3="d8")
+    ancla("G31", "economía: r (%)", R, "0,74", 2, 100, donde="B 4.4", c3="d8")
+    ancla("G08", "economía: margen anual por cliente (ARS)", M, "15.282", 0, donde="B 4.4", c3="d8")
+    ancla("G32", "economía: descuento (%)", D, "15", 0, 100, donde="B supuestos", c3="d8")
+    ancla("G32", "economía: costo de la acción (ARS)", C, "25", 0, donde="B supuestos", c3="d8")
+    ancla("G33", "economía: valor de un acierto (ARS)", g("acierto_ars", "observada"), "99,96", 2,
+          donde="B 4.4", c3="d8")
+    ancla("G33", "economía: valor de un falso positivo (ARS)", v_obs["fp"], "−47,21", 2, donde="B 4.4", c3="d8")
+    ancla("G40", "economía: modelo sobre la regla (USD/año)", g("modelo_usd", "observada"), "5,38", 2,
+          donde="B 3.4", c3="d8")
+    ancla("G40", "economía: ROI del modelo sobre la regla (%)", g("modelo_roi_pct", "observada"), "−99,95", 2,
+          donde="B 3.6", c3="A3")
+    ancla("G41", "economía: regla (USD/año)", g("regla_usd", "observada"), "299,49", 2, donde="B 3.6", c3="d9")
+    ancla("G41", "economía: ROI de la regla (%)", g("regla_roi_pct", "observada"), "−98,52", 2,
+          donde="B 3.6", c3="d9")
+    ancla("G41", "economía: regla sin descuento (USD/año)", g("regla_usd_sin", "observada"), "419,53", 2,
+          donde="B 3.4")
+    ancla("G42", "economía: ROI de la regla sin descuento (%)", g("regla_roi_pct_sin", "observada"), "−97,93", 2,
+          donde="B 3.5", c3="A3")
+    ancla("G42", "economía: s inferior, ROI del modelo (%)", g("modelo_roi_pct", "ic95_inferior"), "−99,97", 2,
+          donde="B 3.5", c3="A3")
+    ancla("G42", "economía: s inferior, ROI de la regla (%)", g("regla_roi_pct", "ic95_inferior"), "−99,32", 2,
+          donde="B 3.5", c3="A3")
+    ancla("G42", "economía: s solo cruzan, ROI del modelo (%)", g("modelo_roi_pct", "solo_cruzan"), "−99,94", 2,
+          donde="B 3.5", c3="A3")
+    ancla("G42", "economía: s solo cruzan, ROI de la regla (%)", g("regla_roi_pct", "solo_cruzan"), "−98,32", 2,
+          donde="B 3.5", c3="A3")
+    ancla("G43", "economía: s de equilibrio con descuento (%)", g("s", "equilibrio_con_descuento"), "49,6", 1, 100,
+          donde="B 3.6", c3="d9")
+    ancla("G43", "economía: s de equilibrio sin descuento (%)", g("s", "equilibrio_sin_descuento"), "39,7", 1, 100,
+          donde="B 3.6")
+    ancla("G43", "economía: veces lo observado, con descuento", g("veces", "equilibrio_con_descuento"), "48,6", 1,
+          donde="B 3.6", c3="d9")
+    ancla("G43", "economía: veces lo observado, sin descuento", g("veces", "equilibrio_sin_descuento"), "39,0", 1,
+          donde="registro G43")
+    ancla("G43", "economía: ROI de la regla en el equilibrio con descuento", g("regla_roi_pct", "equilibrio_con_descuento"),
+          "0,00", 2, donde="B 3.6 (ROI 0)")
+    ancla("G43", "economía: ROI de la regla en el equilibrio sin descuento",
+          g("regla_roi_pct_sin", "equilibrio_sin_descuento"), "0,00", 2, donde="B 3.6 (ROI 0)")
+    ancla("G36", "economía: modelo con s = 100 % (USD/año)", g("modelo_usd", "cien"), "448,90", 2, donde="B 3.1")
+    ancla("G36", "economía: ROI del modelo con s = 100 % (%)", g("modelo_roi_pct", "cien"), "−95,7", 1,
+          donde="registro G36 (la parte no lo escribe)")
+    ancla("G36", "economía: el modelo no se paga con s = 100 %", econ["umbral"]["modelo_se_paga_con_s_100"], False,
+          donde="B 3.6")
+    ancla("G46", "economía: valor de un punto (USD/año)", g("punto_usd", "observada"), "6,05", 2, donde="B 3.6",
+          c3="d8")
+    ancla("G46", "economía: puntos para pagar el modelo", g("puntos_para_pagar", "observada"), "1.719", 0,
+          donde="B 3.6", c3="d8")
+    ancla("G46", "economía: máximo posible sobre la regla (puntos)", max_pp, "18,4", 1, donde="B 3.6", c3="d8")
+    ancla("G46", "economía: valor del máximo (USD/año)", econ["umbral"]["valor_del_maximo_usd"], "111,46", 2,
+          donde="B 3.6")
+    ancla("G46", "economía: valor de un punto con s = 100 % (USD/año)", g("punto_usd", "cien"), "505,02", 2,
+          donde="B 3.6")
+    ancla("G46", "economía: puntos para pagar con s = 100 %", g("puntos_para_pagar", "cien"), "20,6", 1,
+          donde="B 3.6")
+    ancla("G38", "economía: año 1 con modelo (USD)", C_PROY, "30.660", 0, donde="B 3.2", c3="A6")
+    ancla("G38", "economía: inversión inicial con modelo (USD)", cp["inversion_inicial"], "23.460", 0,
+          donde="B 3.2", c3="A6")
+    ancla("G38", "economía: recurrente con modelo (USD/año)", cp["recurrente_anual"], "7.200", 0, donde="B 3.2")
+    ancla("G39", "economía: año 1 de la regla (USD)", C_MVP, "20.260", 0, donde="B 3.2", c3="A6")
+    ancla("G39", "economía: inversión inicial de la regla (USD)", cm["inversion_inicial"], "14.260", 0,
+          donde="B 3.2", c3="A6")
+    ancla("G40", "economía: costo incremental del modelo (USD)", C_INC, "10.400", 0, donde="B 3.2", c3="d8")
+    ancla("C28", "economía: presupuesto (USD)", PRESUPUESTO, "30.000", 0, donde="B 3.2", c3="d9")
+    ancla("G38", "economía: con modelo, sobre el presupuesto (USD)", C_PROY - PRESUPUESTO, "660", 0,
+          donde="B 3.2", c3="d9")
+    ancla("G39", "economía: regla, debajo del presupuesto (USD)", PRESUPUESTO - C_MVP, "9.740", 0,
+          donde="B 3.2", c3="d9")
+    ancla("G54", "economía: regla con contactables (USD/año)", regla_cont, "264,54", 2, donde="B 3.3", c3="d9")
+    ancla("G54", "economía: ROI de la regla con contactables (%)", roi(regla_cont, C_MVP), "−98,69", 2,
+          donde="B 3.3", c3="d9")
+    return econ
+
+
+def armar_piloto(eco: dict) -> dict:
+    pi = eco["piloto"]
+    pil = {
+        "meses": pi["meses"], "lista_mes": pi["lista_mes"], "control_mes": pi["control_mes"],
+        "contactados_mes": pi["lista_mes"] - pi["control_mes"],
+        "tratados": pi["tratados"], "control": pi["control"],
+        "diferencia_detectable_pp": pi["mde_pp"], "compra_7d_base": pi["p0_compra_7d"],
+        "horas_equipo": sum(pi["horas_equipo"].values()), "horas_operador": pi["horas_operador"],
+        "costo_horas_usd": pi["costo_horas_usd"],
+        "acciones_ars": pi["acciones_marketing_ars"], "acciones_usd": pi["acciones_marketing_usd"],
+        "costo_por_tratado_ars": pi["costo_por_tratado_ars"],
+    }
+    ancla("G49", "piloto: lista por mes", pil["lista_mes"], "500", 0, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: control por mes", pil["control_mes"], "80", 0, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: contactados por mes", pil["contactados_mes"], "420", 0, donde="gráfico d12 (500 − 80)")
+    ancla("G49", "piloto: tratados", pil["tratados"], "1.260", 0, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: control", pil["control"], "240", 0, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: diferencia detectable (puntos)", pil["diferencia_detectable_pp"], "2,87", 2,
+          donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: horas (USD)", pil["costo_horas_usd"], "1.350", 0, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: acciones (ARS)", pil["acciones_ars"], "68.289", 0, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: acciones (USD)", pil["acciones_usd"], "46,79", 2, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: meses", pil["meses"], 3, donde="B 3.6 (tres meses)")
+    return pil
+
+
+# ============================================================ main
+
+def main() -> int:
+    for n in ENTRADAS:
+        if not (DATOS / n).exists():
+            print(f"falta {DATOS / n}: corre antes entregas/entregable-3/_build/F/presentacion/exportar_web.py")
+            return 1
+    e2, e3, eco, co = (cargar(n) for n in ENTRADAS)
+    c3 = cargar_c3()
+    for d in c3["DIAPOSITIVAS"]:
+        C3_TEXTO[f"d{d['n']}"] = json.dumps(d, ensure_ascii=False)
+    for a in c3["ANEXOS"]:
+        C3_TEXTO[a["n"]] = json.dumps(a, ensure_ascii=False)
+
+    d3 = {
+        "meta": {
+            "version": "e3-1.0",
+            "fuentes": [{"archivo": f"data/e3/{n}", "sha256": sha256(DATOS / n)} for n in ENTRADAS],
+            "contenido": {"archivo": "e3/src/contenido_e3.js", "version": c3["VERSION"], "sha256": sha256(CONTENIDO)},
+        },
+        "caso": armar_caso(e3),
+        "tecnica": armar_tecnica(e2, co, c3),
+        "modelos": armar_modelos(e2, e3),
+        "lista": armar_lista(e3),
+        "economia": armar_economia(eco, e2, e3),
+        "piloto": armar_piloto(eco),
+    }
+
+    print(f"{'ID':6s}{'ANCLA':58s}{'DOCUMENTO':>14s}{'PANTALLA':>14s}  OK")
+    for a in ANCLAS:
+        print(f"{a['id']:6s}{a['nombre'][:57]:58s}{str(a['documento']):>14s}{str(a['mostrado']):>14s}  "
+              f"{'OK' if a['ok'] else 'FALLA ' + a['nota']}")
+    print(f"\n{'CONTROL DE REIMPLEMENTACIÓN':44s}{'build_e3':>22s}{'economia.json':>22s}  OK")
+    for c in CONTROLES:
+        print(f"{c['nombre']:44s}{c['valor']:22.12f}{c['json']:22.12f}  {'OK' if c['ok'] else 'FALLA'}")
+    fallan = [a for a in ANCLAS if not a["ok"]] + [c for c in CONTROLES if not c["ok"]]
+    if fallan:
+        print(f"\n{len(fallan)} anclas o controles no cierran. No se escribe {SALIDA.relative_to(APP)}.")
+        return 1
+
+    d3["anclas"] = [{k: a[k] for k in ("id", "nombre", "documento", "donde")} for a in ANCLAS]
+    # la grilla va con una columna por renglón; el resto, indentado
+    grilla = d3["economia"]["grilla"]
+    columnas = {k: v for k, v in grilla.items() if isinstance(v, list) and k not in ("tramos", "notables")}
+    for k in columnas:
+        grilla[k] = f"@@{k}@@"
+    texto = json.dumps(d3, ensure_ascii=False, indent=1)
+    for k, valores in columnas.items():
+        texto = texto.replace(f'"@@{k}@@"', json.dumps(valores, separators=(",", ":")))
+    js = ("// Generado por pipeline/build_e3.py desde data/e3/*.json (contrato: pipeline/CONTRACT_E3.md).\n"
+          "// No editar a mano.\n"
+          f"export const D3 = {texto};\n")
+    SALIDA.parent.mkdir(parents=True, exist_ok=True)
+    SALIDA.write_text(js, encoding="utf-8")
+    print(f"\n{len(ANCLAS)} anclas y {len(CONTROLES)} controles en verde. Escrito {SALIDA.relative_to(APP)} "
+          f"({len(js.encode('utf-8')) / 1024:.1f} KB; grilla de {grilla['n']} puntos).")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
