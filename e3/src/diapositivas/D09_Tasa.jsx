@@ -21,7 +21,7 @@
 import { useState } from 'react'
 import { D3 } from '../datos_e3.js'
 import { fijo, pct, pctDirecto, tasa, usd } from '../formato.js'
-import { Deslizante, Opciones } from '../controles.jsx'
+import { BotonExplorar, Deslizante, Opciones } from '../controles.jsx'
 import { escalaNice } from '../../../src/graficos.jsx'
 import { Rico } from '../texto.jsx'
 import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
@@ -47,7 +47,7 @@ const QUIEBRE = indiceDeS(G.tramos[0].hasta)
 const DESC = pct(E.parametros.descuento, 0)
 
 function Grafico({ i, desc, id }) {
-  const W = 840, x0 = 250, x1 = 780
+  const W = 740, x0 = 250, x1 = 690
   const x = (v) => x0 + (Math.max(0, Math.min(v, ESC.max)) / ESC.max) * (x1 - x0)
   const regla = desc === 'con' ? G.regla_usd[i] : G.regla_usd_sin[i]
   const fuera = regla > ESC.max
@@ -91,13 +91,13 @@ function Grafico({ i, desc, id }) {
       {ESC.ticks.map((v) => (
         <text key={v} x={x(v)} y={179} textAnchor="middle" className="e3-t e3-t-17 e3-t-lbl" data-escala="">{fijo(v, 0)}</text>
       ))}
-      <g className="e3-leyenda" transform="translate(96, 207)">
+      <g className="e3-leyenda" transform="translate(20, 207)">
         <rect x={0} y={-13} width={22} height={14} className="e3-barra-acc" />
         <text x={30} y={0} className="e3-t e3-t-19">inversión inicial</text>
-        <rect x={200} y={-13} width={22} height={14} className="e3-barra-azul3" />
-        <text x={230} y={0} className="e3-t e3-t-19">recurrente del año</text>
-        <rect x={418} y={-13} width={22} height={14} fill={`url(#${id}-sim)`} className="e3-barra-sim" />
-        <text x={448} y={0} className="e3-t e3-t-19">beneficio anual de la regla</text>
+        <rect x={190} y={-13} width={22} height={14} className="e3-barra-azul3" />
+        <text x={220} y={0} className="e3-t e3-t-19">recurrente del año</text>
+        <rect x={400} y={-13} width={22} height={14} fill={`url(#${id}-sim)`} className="e3-barra-sim" />
+        <text x={430} y={0} className="e3-t e3-t-19">beneficio anual de la regla</text>
       </g>
     </svg>
   )
@@ -114,27 +114,58 @@ function Lectura({ rotulo, valor, estado, malo, clase = '' }) {
   )
 }
 
+/** (27/10) La tasa de éxito, quieta: la observada (con su intervalo) contra la que paga la regla, en un
+ *  eje de 0 a 60 %. Es lo que se presenta; el deslizante queda para explorar. */
+function EscalaTasa() {
+  const W = 740, x0 = 30, x1 = 700, tope = 0.6
+  const x = (s) => x0 + (s / tope) * (x1 - x0)
+  const eq = EQ.con
+  return (
+    <figure className="e3-figura" style={caja(M, 484, 740, 244)}>
+      <svg width={W} height={240} className="e3-svg" role="img"
+           aria-label={`Tasa de éxito observada ${tasa(OBS.s)}; la regla se paga con ${tasa(eq.s)}`}>
+        <text x={x0} y={36} className="e3-t e3-t-20 e3-t-b">Tasa de éxito: lo que se ve contra lo que haría falta</text>
+        <rect x={x(IC[0].s)} y={92} width={Math.max(3, x(IC[1].s) - x(IC[0].s))} height={40} className="e3-banda" />
+        <line x1={x0} x2={x1} y1={132} y2={132} className="e3-eje" />
+        <line x1={x(OBS.s)} x2={x(OBS.s)} y1={82} y2={140} className="e3-linea-ink" />
+        <text x={x(OBS.s) + 8} y={114} className="e3-t e3-t-20 e3-t-b">{tasa(OBS.s)} observada</text>
+        <line x1={x(eq.s)} x2={x(eq.s)} y1={82} y2={140} className="e3-umbral" />
+        <text x={x(eq.s) - 8} y={114} textAnchor="end" className="e3-t e3-t-20 e3-t-b e3-t-terra">la regla se paga con {tasa(eq.s)}</text>
+        {[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6].map((v) => (
+          <text key={v} x={x(v)} y={160} textAnchor="middle" className="e3-t e3-t-17 e3-t-lbl" data-escala="">{pct(v, 0)}</text>
+        ))}
+        <text x={x0} y={200} className="e3-t e3-t-19 e3-t-lbl">Sin grupo de control, la observada es un techo.</text>
+      </svg>
+    </figure>
+  )
+}
+
 export default function Tasa({ d, estatico }) {
   const [i, setI] = useState(OBS.i)
   const [desc, setDesc] = useState('con')
+  const [explorar, setExplorar] = useState(false)
   const id = `e3-d9${estatico ? '-m' : ''}`
   const reglaRoi = desc === 'con' ? G.regla_roi_pct[i] : G.regla_roi_pct_sin[i]
   const modeloRoi = desc === 'con' ? G.modelo_roi_pct[i] : G.modelo_roi_pct_sin[i]
   const eq = EQ[desc]
-  const ancho = 804
+  const ancho = 704
   const xi = (k) => ((k - DESDE) / (G.n - 1 - DESDE)) * ancho
   const xq = xi(QUIEBRE)
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
-      <figure className="e3-figura" style={caja(M, Y0, 840, 214)}>
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
+      <figure className="e3-figura" style={caja(M, Y0, 740, 214)}>
         <Grafico i={i} desc={desc} id={id} />
       </figure>
-      <p className="e3-pie-figura" style={caja(M, Y0 + 218, 840)}><Rico t={d.pie_figura} /></p>
-      <div className="e3-sim" style={caja(M, 484, 840, 244)}>
+      <p className="e3-pie-figura" style={caja(M, Y0 + 218, 740)}><Rico t={d.pie_figura} /></p>
+      {/* (27/10) El simulador queda para explorar: se presenta la escala de la tasa de éxito, quieta. */}
+      <BotonExplorar abierto={explorar} onCambio={(v) => { setExplorar(v); if (!v) { setI(OBS.i); setDesc('con') } }}
+                     texto="Explorar la tasa de éxito" style={caja(M + 740 - 290, Y0 + 210, 290, 40)} className="e3-explorar-abs" />
+      {!explorar && <EscalaTasa />}
+      {explorar && <div className="e3-sim" style={caja(M, 484, 740, 244)}>
         <div className="e3-sim-cab">
-          <span className="e3-sim-marca">Simulación con la fórmula de la Parte B</span>
+          <span className="e3-sim-marca">Simulación (Parte B)</span>
           <Opciones etiqueta="Descuento de la oferta" valor={desc} onCambio={setDesc}
-                    opciones={[{ valor: 'con', texto: `Con ${DESC} de descuento` }, { valor: 'sin', texto: 'Sin descuento' }]} />
+                    opciones={[{ valor: 'con', texto: `${DESC} de descuento` }, { valor: 'sin', texto: 'Sin descuento' }]} />
         </div>
         <Deslizante n={G.n} desde={DESDE} valor={i} onCambio={setI} imanes={IMANES} ancho={ancho} alto={106}
                     etiqueta="Tasa de éxito" textoValor={tasa(G.s[i])}>
@@ -171,8 +202,8 @@ export default function Tasa({ d, estatico }) {
           <Lectura rotulo="ROI del modelo sobre la regla" valor={pctDirecto(modeloRoi, 2)} malo={modeloRoi < 0}
                    estado={modeloRoi < 0 ? 'no se paga' : 'se paga'} />
         </div>
-      </div>
-      <div className="e3-llamadas" style={caja(966, Y0, 562)}>
+      </div>}
+      <div className="e3-llamadas" style={caja(M + 780, Y0, ANCHO - 780)}>
         {d.callouts.map((c, k) => (
           <div key={c.titulo} className="e3-llamada" style={{ height: 236 }}>
             <p className="e3-llamada-titulo"><Rico t={c.titulo} /></p>

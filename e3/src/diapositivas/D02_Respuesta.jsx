@@ -16,7 +16,7 @@ export default function Respuesta({ d, ir, estatico }) {
   const sep = 30
   const w = (ANCHO - sep * (d.tarjetas.length - 1)) / d.tarjetas.length
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
       {d.tarjetas.map((t, k) => {
         const destino = DESTINO[t.area] ?? POR_ORDEN[k]
         const malo = MALO.has(t.area)
@@ -27,10 +27,6 @@ export default function Respuesta({ d, ir, estatico }) {
             <span className={`e3-veredicto-valor ${plano(t.valor).length > 6 && !t.valor.includes('[[') ? 'largo' : ''}`}><Rico t={t.valor} /></span>
             <span className="e3-veredicto-escala"><Rico t={t.escala} /></span>
             <span className="e3-veredicto-texto"><Rico t={t.texto} /></span>
-            <button type="button" className="e3-ir" tabIndex={estatico ? -1 : 0}
-                    onClick={() => ir?.(String(destino))} aria-label={`${t.area}: ir a la diapositiva ${destino}`}>
-              ver la <span data-escala="">{destino}</span> →
-            </button>
           </div>
         )
       })}

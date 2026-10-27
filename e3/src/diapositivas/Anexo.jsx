@@ -13,10 +13,10 @@ export default function Anexo({ a, origen, volver, estatico }) {
   const muyDenso = a.filas.length + 1 > 15
   const destacar = new Set(a.destacar ?? [])
   return (
-    <Marco kicker={`Anexo ${a.n} · respaldo para preguntas`} titulo={a.titulo} fuente={a.fuente}
+    <Marco titulo={a.titulo} anexo={a.n} fuente={a.fuente}
            derecha={<>Anexo {a.n}</>} clase="e3-es-anexo">
       {!estatico && (
-        <button type="button" className="e3-volver" style={caja(1128, 34, 400, 40)} onClick={volver}>
+        <button type="button" className="e3-volver" style={caja(1184, 160, 360, 40)} onClick={volver}>
           {origen ? '← Volver a la diapositiva ' : '← Ir a la diapositiva '}
           <span data-escala="">{origen || TOTAL}</span>
         </button>

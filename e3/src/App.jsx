@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ANEXOS, DIAPOSITIVAS, pagina } from './diapositivas/index.js'
 import { Ayuda, ListaAnexos, Notas, VistaGeneral } from './Capas.jsx'
+import { NavCtx } from './diapositivas/Marco.jsx'
 
 const W = 1600
 const H = 900
@@ -270,7 +271,7 @@ export default function App() {
 
   // Clic en la franja izquierda o derecha del escenario: retrocede o avanza. Nunca sobre un control.
   const alClic = (e) => {
-    if (capa || (e.target instanceof Element && e.target.closest(INTERACTIVO))) return
+    if (capa || (e.target instanceof Element && e.target.closest(INTERACTIVO + ', .e3-riel'))) return
     if (window.getSelection?.().toString()) return
     const r = e.currentTarget.getBoundingClientRect()
     const f = (e.clientX - r.left) / r.width
@@ -279,6 +280,8 @@ export default function App() {
   }
 
   const irDesdeCapa = (id) => { setCapa(null); ir(id, { dir: 0 }) }
+  // (27/10) El riel de capítulos (Marco.jsx) navega con esto: un salto, sin pasos.
+  const nav = { ir: (id) => ir(id, { dir: 0 }) }
   const Comp = pag.Componente
   const animacion = pos.dir == null ? '' : pos.dir > 0 ? 'adelante' : pos.dir < 0 ? 'atras' : 'salto'
   return (
@@ -287,8 +290,10 @@ export default function App() {
         <div className="e3-escenario" onClick={alClic}
              style={{ transform: `translate(${esc.x}px, ${esc.y}px) scale(${esc.s})`, visibility: esc.s ? 'visible' : 'hidden' }}>
           <div key={pos.id} className={`e3-pagina ${animacion}`}>
-            <Comp d={pag.d} a={pag.a} paso={pos.paso} ir={(id) => ir(id, { dir: 1 })}
-                  origen={pos.origen} volver={volver} />
+            <NavCtx.Provider value={nav}>
+              <Comp d={pag.d} a={pag.a} paso={pos.paso} ir={(id) => ir(id, { dir: 1 })}
+                    origen={pos.origen} volver={volver} />
+            </NavCtx.Provider>
           </div>
         </div>
         {buffer && <div className="e3-buffer" role="status">Ir a la diapositiva <b>{buffer}</b> · Enter</div>}

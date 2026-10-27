@@ -8,12 +8,12 @@ import { Rico } from '../texto.jsx'
 import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
 const C = D3.caso
-const FIG = { x: 726, y: Y0 + 6, w: 802, h: 276 }
+const FIG = { x: M + 560, y: Y0 + 6, w: ANCHO - 560, h: 276 }
 
 function Linea({ paso }) {
   const uid = 'e3' + useId().replace(/[^a-zA-Z0-9]/g, '')
   const ve = (k) => (paso >= k ? '' : 'e3-oculto')
-  const dx = 1.95                                   // px por día
+  const dx = 1.62                                   // px por día (27/10: la figura es más angosta)
   const x = (dias) => 24 + dias * dx
   const fin = C.recency_dias + C.ventana_dias
   const yb = 98, hb = 44                            // barra
@@ -71,18 +71,19 @@ function Linea({ paso }) {
   )
 }
 
-export default function Problema({ d, paso = 3 }) {
+export default function Problema({ d }) {
+  const paso = 3        // (27/10) sin pasos: la vista se presenta completa
   const defs = d.definicion.slice(0, -1)
   const firma = d.definicion[d.definicion.length - 1]
   const sep = 30
   const w = (ANCHO - sep * (d.cifras.length - 1)) / d.cifras.length
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} paso={paso} pasos={3}
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n}
            derecha={<QuienN quien={d.quien} n={d.n} />}>
-      <div className="e3-defs" style={caja(M, Y0, 600)}>
+      <div className="e3-defs" style={caja(M, Y0, 520)}>
         {defs.map((t, k) => <p key={k}><Rico t={t} /></p>)}
       </div>
-      <p className="e3-firma" style={caja(M, 588, 600)}><Rico t={firma} /></p>
+      <p className="e3-firma" style={caja(M, 588, 520)}><Rico t={firma} /></p>
       <figure className="e3-figura" style={caja(FIG.x, FIG.y, FIG.w, FIG.h)}>
         <Linea paso={paso} />
         <figcaption className="e3-figura-nota">

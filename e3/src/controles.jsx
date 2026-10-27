@@ -103,3 +103,16 @@ export function Deslizante({ n, desde = 0, valor, onCambio, imanes = [], etiquet
     </div>
   )
 }
+
+/** (27/10, pedido del usuario) Lo que el directorio puede tocar después, por su cuenta: la vista se
+ *  presenta sin tocarlo. Cerrado al llegar a cada vista (la vista se monta de nuevo); «Cerrar» vuelve
+ *  a lo que se presentó. */
+export function BotonExplorar({ abierto, onCambio, texto = 'Explorar', style, className = '' }) {
+  return (
+    <button type="button" className={`e3-explorar ${abierto ? 'on' : ''} ${className}`} style={style}
+            data-control="" aria-expanded={abierto} onClick={() => onCambio(!abierto)}>
+      {abierto ? 'Cerrar' : texto}
+    </button>
+  )
+}
+

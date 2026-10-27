@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { D3 } from '../datos_e3.js'
 import { fijo } from '../formato.js'
 import { Rico } from '../texto.jsx'
-import Marco, { M, QuienN, Y0, caja } from './Marco.jsx'
+import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
 const T = D3.tecnica
 const MEDIA = T.escala.find((e) => e.nivel === T.nivel)
@@ -16,7 +16,7 @@ const DESDE = T.escala[0].desde, HASTA = T.escala[T.escala.length - 1].hasta
 const MARCAS = Array.from({ length: HASTA - DESDE + 1 }, (_, k) => DESDE + k)
 
 function Grafico({ activa, setActiva, estatico }) {
-  const W = 672, H = 290, x0 = 196, x1 = 640
+  const W = 590, H = 290, x0 = 196, x1 = 560
   const tope = HASTA * 1.15
   const x = (v) => x0 + (v / tope) * (x1 - x0)
   const fila = (k) => 62 + k * 52
@@ -52,14 +52,14 @@ export default function Tecnica({ d, estatico }) {
   const [activa, setActiva] = useState(null)
   const filas = d.filas.map((f, k) => ({ ...f, id: T.condiciones[k]?.id, puntaje: T.condiciones[k]?.puntaje }))
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
-      <figure className="e3-figura" style={caja(M, Y0 + 12, 672, 290)}>
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
+      <figure className="e3-figura" style={caja(M, Y0 + 12, 590, 290)}>
         <Grafico activa={activa} setActiva={setActiva} estatico={estatico} />
       </figure>
-      <p className="e3-pie-figura" style={caja(M, Y0 + 316, 672)}>
+      <p className="e3-pie-figura" style={caja(M, Y0 + 316, 590)}>
         <i className="e3-muestra-banda" aria-hidden="true" /> <Rico t={d.pie_figura} />
       </p>
-      <div className="e3-filas" style={caja(798, Y0, 730)}>
+      <div className="e3-filas" style={caja(M + 630, Y0, ANCHO - 630)}>
         {filas.map((f) => (
           <div key={f.rotulo} className={`e3-fila ${activa === f.id ? 'on' : ''}`}
                onMouseEnter={() => setActiva(f.id)} onMouseLeave={() => setActiva(null)}>
@@ -69,7 +69,7 @@ export default function Tecnica({ d, estatico }) {
           </div>
         ))}
       </div>
-      <p className="e3-nota" style={caja(M, 762, 1456)}><Rico t={d.nota} /></p>
+      <p className="e3-nota" style={caja(M, 762, ANCHO)}><Rico t={d.nota} /></p>
     </Marco>
   )
 }

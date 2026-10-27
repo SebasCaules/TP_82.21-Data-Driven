@@ -7,10 +7,10 @@
 import { useState } from 'react'
 import { D3 } from '../datos_e3.js'
 import { entero, fijo, mesAnio, pct } from '../formato.js'
-import { Opciones } from '../controles.jsx'
+import { BotonExplorar, Opciones } from '../controles.jsx'
 import { escalaNice } from '../../../src/graficos.jsx'
 import { Rico } from '../texto.jsx'
-import Marco, { M, QuienN, Y0, caja } from './Marco.jsx'
+import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
 const MD = D3.modelos
 const LARGO_MES = D3.lista.elegida.largo_mes
@@ -20,7 +20,7 @@ const CLASE = (f) => (f.grupo === 'regla' ? 'e3-barra-acc' : f.grupo === 'modelo
   : f.id === 'tasa_base' ? 'e3-barra-gris2' : 'e3-barra-gris')
 
 function Barras({ conjunto, paso }) {
-  const W = 840, x0 = 352, x1 = 770
+  const W = 740, x0 = 352, x1 = 680
   const x = (v) => x0 + (v / 100) * (x1 - x0)
   const fila = (k) => 22 + k * 37
   const ent = conjunto === 'entrenamiento'
@@ -69,7 +69,7 @@ function Barras({ conjunto, paso }) {
 function Intervalo() {
   const cr = MD.contra_regla
   const [lo, hi] = cr.ic95_pp
-  const W = 840, x0 = 70, x1 = 790
+  const W = 740, x0 = 70, x1 = 690
   const desde = Math.floor(lo), hasta = Math.ceil(hi) + 1        // un punto de aire a la derecha
   const x = (v) => x0 + ((v - desde) / (hasta - desde)) * (x1 - x0)
   const y = 50
@@ -97,13 +97,15 @@ function Intervalo() {
   )
 }
 
-export default function Modelos({ d, paso = 3, estatico }) {
+export default function Modelos({ d, estatico }) {
+  const paso = 3        // (27/10) sin pasos: la vista se presenta completa
   const [conjunto, setConjunto] = useState('validacion')
+  const [explorar, setExplorar] = useState(false)
   const hc = 184
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} paso={paso} pasos={3}
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n}
            derecha={<QuienN quien={d.quien} n={d.n} />}>
-      <figure className="e3-figura e3-figura-ctl" style={caja(M, Y0, 840, 340)}>
+      <figure className="e3-figura e3-figura-ctl" style={caja(M, Y0, 740, 340)}>
         <div className="e3-figura-cab">
           {conjunto === 'entrenamiento' && paso >= 3 && (
             <span className="e3-techo" data-simulacion="">
@@ -111,13 +113,18 @@ export default function Modelos({ d, paso = 3, estatico }) {
             </span>
           )}
           <div className={`e3-figura-ctl-op ${paso >= 3 ? '' : 'e3-oculto'}`}>
-            <Opciones etiqueta="Conjunto" valor={conjunto} onCambio={setConjunto}
-                      opciones={[{ valor: 'validacion', texto: 'Validación' }, { valor: 'entrenamiento', texto: 'Entrenamiento' }]} />
+            {/* (27/10) Validación / Entrenamiento queda para explorar: se presenta validación. */}
+            {explorar && (
+              <Opciones etiqueta="Conjunto" valor={conjunto} onCambio={setConjunto}
+                        opciones={[{ valor: 'validacion', texto: 'Validación' }, { valor: 'entrenamiento', texto: 'Entrenamiento' }]} />
+            )}
+            <BotonExplorar abierto={explorar} onCambio={(v) => { setExplorar(v); if (!v) setConjunto('validacion') }}
+                           tabIndex={estatico ? -1 : 0} />
           </div>
         </div>
         <Barras conjunto={conjunto} paso={paso} />
       </figure>
-      <p className="e3-pie-figura" style={caja(M, Y0 + 350, 840)}>
+      <p className="e3-pie-figura" style={caja(M, Y0 + 350, 740)}>
         {conjunto === 'validacion' ? <Rico t={d.pie_figura} /> : (
           <span data-simulacion="">
             Precisión de la lista sin filtrar consentimiento ni bajas, entrenamiento de{' '}
@@ -125,11 +132,11 @@ export default function Modelos({ d, paso = 3, estatico }) {
           </span>
         )}
       </p>
-      <div className={`e3-figura e3-ic-caja ${paso >= 3 ? '' : 'e3-oculto'}`} style={caja(M, 636, 840, 164)}>
+      <div className={`e3-figura e3-ic-caja ${paso >= 3 ? '' : 'e3-oculto'}`} style={caja(M, 636, 740, 164)}>
         <p className="e3-rotulo-web">Logística menos regla en validación, en puntos · intervalo del 95 %</p>
         <Intervalo />
       </div>
-      <div className={`e3-llamadas ${paso >= 3 ? '' : 'e3-oculto'}`} style={caja(966, Y0, 562)}>
+      <div className={`e3-llamadas ${paso >= 3 ? '' : 'e3-oculto'}`} style={caja(M + 780, Y0, ANCHO - 780)}>
         {d.callouts.map((c) => (
           <div key={c.titulo} className="e3-llamada" style={{ height: hc }}>
             <p className="e3-llamada-titulo"><Rico t={c.titulo} /></p>

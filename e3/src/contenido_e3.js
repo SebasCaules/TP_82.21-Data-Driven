@@ -48,6 +48,7 @@ export const C3 = {
       "quien": "Sebastian C.",
       "tipo": "veredictos",
       "kicker": "La respuesta",
+      "pregunta": "¿Conviene anticipar a los clientes que dejan de comprar?",
       "titulo": "La lista sale con la regla del umbral y un piloto mide si contactar sirve",
       "tarjetas": [
         {
@@ -92,6 +93,7 @@ export const C3 = {
       "quien": "Sebastian C.",
       "tipo": "problema",
       "kicker": "El problema",
+      "pregunta": "¿Quién se va?",
       "titulo": "Un cliente se va cuando pasa más días sin comprar que su propio umbral",
       "definicion": [
         "**Umbral** = 1,5 × su ritmo de compra, con un piso de 90 días.",
@@ -126,7 +128,8 @@ export const C3 = {
       "quien": "Tomas F.",
       "tipo": "figura_filas",
       "kicker": "Parte A · Factibilidad técnica",
-      "titulo": "Técnicamente factible con condiciones: el límite es quién opera la lista",
+      "pregunta": "¿Se puede construir?",
+      "titulo": "Sí, con condiciones: los datos alcanzan y el límite es quién opera la lista",
       "figura": "tecnica.png",
       "pie_figura": "Escala de la cátedra: 2,1 a 2,5 es factibilidad media.",
       "filas": [
@@ -163,7 +166,8 @@ export const C3 = {
       "quien": "Tomas F.",
       "tipo": "flujo",
       "kicker": "Parte A · Stack del MVP",
-      "titulo": "El MVP es una planilla mensual hecha con software libre",
+      "pregunta": "¿Cómo funcionaría?",
+      "titulo": "Con una planilla mensual hecha con software libre",
       "pasos": [
         {
           "titulo": "Exportación",
@@ -213,6 +217,7 @@ export const C3 = {
       "quien": "Juan Manuel R.",
       "tipo": "figura_callouts",
       "kicker": "Modelado · Etapas 1 y 2",
+      "pregunta": "¿Un modelo acierta más que la regla?",
       "titulo": "Ningún modelo le gana a la regla por más que el ruido",
       "figura": "modelos.png",
       "pie_figura": "Lista de 500, sin filtrar. Entrena con enero de 2023 a abril de 2024, valida con julio a septiembre de 2024; el test de 2025 queda para la etapa 4.",
@@ -250,7 +255,8 @@ export const C3 = {
       "quien": "Juan Manuel R.",
       "tipo": "figura_callouts",
       "kicker": "Modelado · Etapa 3",
-      "titulo": "Con la lista que se puede mandar, el modelo queda debajo de la regla",
+      "pregunta": "¿Y con la lista que se puede mandar?",
+      "titulo": "El modelo queda debajo de la regla",
       "figura": "lista.png",
       "pie_figura": "Arriba, la lista de 500 contactables en validación. Abajo, la importancia por permutación de la logística ajustada.",
       "callouts": [
@@ -285,6 +291,7 @@ export const C3 = {
       "quien": "Francisco C.",
       "tipo": "economia",
       "kicker": "Parte B · Factibilidad económica",
+      "pregunta": "¿Cuánto vale acertar?",
       "titulo": "En su mejor caso, el modelo suma USD 5,38 al año y cuesta USD 10.400 más",
       "celdas": [
         {
@@ -329,9 +336,10 @@ export const C3 = {
       "quien": "Francisco C.",
       "tipo": "figura_callouts",
       "kicker": "Parte B · Factibilidad económica",
-      "titulo": "Ni la regla sola recupera su costo: falta medir la tasa de éxito",
+      "pregunta": "¿El proyecto se paga?",
+      "titulo": "No: ni la regla sola recupera su costo, y falta medir la tasa de éxito",
       "figura": "costos.png",
-      "pie_figura": "Costo del año 1 (inversión inicial más recurrente) y beneficio anual de la regla.",
+      "pie_figura": "Costo del año 1 y beneficio anual de la regla.",
       "callouts": [
         {
           "titulo": "ROI a un año: no recupera",
@@ -386,7 +394,8 @@ export const C3 = {
       "quien": "Matías S.",
       "tipo": "legal",
       "kicker": "Parte C · Factibilidad legal",
-      "titulo": "Legalmente viable con condiciones: el riesgo es contactar sin consentimiento",
+      "pregunta": "¿Lo permite la ley?",
+      "titulo": "Sí, con condiciones: el riesgo es contactar sin consentimiento",
       "dimensiones": [
         {
           "dimension": "Protección de datos personales",
@@ -478,6 +487,7 @@ export const C3 = {
       "quien": "Matías S.",
       "tipo": "riesgos",
       "kicker": "Parte C · Riesgos",
+      "pregunta": "¿Qué puede salir mal?",
       "titulo": "Tres riesgos críticos, cada uno con su señal y su umbral",
       "columnas": [
         {
@@ -552,6 +562,7 @@ export const C3 = {
       "quien": "Sebastian C.",
       "tipo": "piloto",
       "kicker": "La propuesta",
+      "pregunta": "¿Qué proponemos?",
       "titulo": "Un piloto de tres meses con grupo de control decide si se invierte más",
       "figura": "piloto.png",
       "hechos": [

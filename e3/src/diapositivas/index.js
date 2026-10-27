@@ -25,7 +25,8 @@ const COMPONENTES = {
 // figura_callouts tiene tres diapositivas distintas en la web: se eligen por número.
 const POR_NUMERO = { 6: Modelos, 7: Lista, 9: Tasa }
 
-export const PASOS = { 3: 3, 6: 3 }
+// (27/10, pedido del usuario) Sin pasos: la presentación se cuenta sin tocar nada, cada vista completa.
+export const PASOS = {}
 export const GUION_PASOS = {
   3: ['y al corte llevaba', 'En los 90 días siguientes'],
   6: ['La regla del umbral, sin modelo', 'Después entrenamos tres modelos'],
@@ -49,3 +50,16 @@ export function tramosDelGuion(n, guion) {
   const bordes = [0, ...cortes, guion.length]
   return bordes.slice(0, -1).map((b, k) => ({ paso: k + 1, texto: guion.slice(b, bordes[k + 1]).trim() }))
 }
+
+// (27/10) El riel cuenta la historia: cada capítulo es una pregunta y sus vistas la responden. Los
+// anexos van juntos al pie, como respaldo. Para sumar la Parte D, un capítulo más con sus números.
+export const CAPITULOS = [
+  { nombre: null, vistas: [[2, 'La respuesta']] },
+  { nombre: 'El problema', vistas: [[3, 'Quién se va']] },
+  { nombre: '¿Se puede hacer?', vistas: [[4, 'Técnica'], [5, 'Cómo funciona']] },
+  { nombre: '¿El modelo mejora?', vistas: [[6, 'Modelos'], [7, 'Lista que sale']] },
+  { nombre: '¿Se paga?', vistas: [[8, 'Valor de acertar'], [9, 'Costo y retorno']] },
+  { nombre: '¿Es legal y seguro?', vistas: [[10, 'Legal'], [11, 'Riesgos']] },
+  { nombre: 'La propuesta', vistas: [[12, 'El piloto']] },
+]
+

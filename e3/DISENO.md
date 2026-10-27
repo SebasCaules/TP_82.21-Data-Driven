@@ -116,3 +116,20 @@ gráficos de `D3` (`e3/src/datos_e3.js`); el contrato de los dos está en `pipel
   plan, en lugar del pie de genero.
 - **A7.** Matriz de confusión de la logística y la regla (B 4.3 y 4.4).
 
+## Decisiones (27/10): forma de tablero, contada como historia
+
+Pedido del usuario: «parecida al de las últimas entregas, con una forma de contar como storytelling y sin
+tanta interacción necesaria para presentar».
+
+- **Riel de capítulos** (`Marco.jsx`, `CAPITULOS` en `diapositivas/index.js`), como los tableros del E1 y el
+  E2. Cada capítulo es una pregunta (el problema, ¿se puede hacer?, ¿el modelo mejora?, ¿se paga?, ¿es legal y
+  seguro?, la propuesta) y los anexos van al pie como respaldo. El contenido arranca en x = 256: `M` y
+  `ANCHO` de `Marco.jsx` cambian, y los gráficos se angostaron en lugar de achicar la letra.
+- **Pregunta y respuesta.** Cada vista lleva arriba la pregunta grande (`pregunta` de C3) y la respuesta en una
+  línea (`titulo`). Sin rótulo de sección: el capítulo lo dice el riel.
+- **Sin pasos** (`PASOS = {}`): cada vista llega completa.
+- **Controles detrás de «Explorar»** (`BotonExplorar`, `controles.jsx`), cerrados al llegar: el selector de la 6, el
+  filtro y el largo de la 7, el simulador de la 9 y la matriz de la 11. La 9 presenta en su lugar la escala
+  quieta de la tasa de éxito (1,02 % contra 49,6 %). Salen los «ver la n →» de la 2: navega el riel.
+- **Reglas 6 y 7.** Las reglas transversales 6 (pasos) y 7 (controles) quedan reemplazadas por esto.
+

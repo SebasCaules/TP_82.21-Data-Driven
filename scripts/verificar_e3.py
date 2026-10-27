@@ -44,7 +44,7 @@ CAPTURAR = {(1280, 720), (1920, 1080)}
 DIAPOS = [str(i) for i in range(1, 13)]
 ANEXOS = [f"a{i}" for i in range(1, 8)]
 PAGINAS = DIAPOS + ANEXOS
-PASOS = {"3": 3, "6": 3}
+PASOS = {}            # (27/10) sin pasos: cada vista se presenta completa
 
 CHEQUEO = r"""() => {
   const p = []
@@ -74,6 +74,7 @@ CHEQUEO = r"""() => {
   // 2. fragmentos de texto, con su bloque y su caja
   const CAJAS = '.e3-tarjeta, .e3-panel, .e3-decision, .e3-figura, .e3-sim, .e3-celda, .e3-dim, .e3-accion, ' +
     '.e3-alerta, .e3-promedio, .e3-hecho, .e3-llamada, .e3-boton, .e3-volver, .e3-opciones button, td, th, ' +
+    '.e3-riel-item, .e3-riel-chip, .e3-explorar, ' +
     '.e3-pie, .e3-matriz-celda, .e3-chip, .e3-desliz, .e3-escala, .e3-fila'
   const frags = []
   const w = document.createTreeWalker(pag, NodeFilter.SHOW_TEXT)
@@ -237,17 +238,12 @@ def recorrido(p: Pagina):
         atras.append((e["hash"], e["paso"]))
     esperada_atras = [(f"#{d}", PASOS.get(d, 0)) for d in reversed(DIAPOS[:-1])]
     esperar(atras == esperada_atras, f"← hasta el inicio dio {atras}, se esperaba {esperada_atras}")
-    # mientras quedan pasos el pie lo dice; completa, no
+    # (27/10) sin pasos: → en la 2 lleva a la 3 completa y ← vuelve a la 2
     p.ir("2")
     p.tecla("ArrowRight")
-    esperar("paso 1 de 3" in p.estado()["aviso"], "el pie de la 3 en el paso 1 no dice «paso 1 de 3»")
-    p.tecla("ArrowRight", 2)
-    esperar(p.estado()["aviso"] == "", "con los pasos completos el pie sigue avisando")
-    # llegada con →: ← deshace un paso; con un paso solo, vuelve a la 2
+    esperar(p.estado()["hash"] == "#3" and p.estado()["aviso"] == "", "→ en la 2 no lleva a la 3 sin aviso de pasos")
     p.tecla("ArrowLeft")
-    esperar(p.estado()["paso"] == 2, "llegando con →, ← en el paso 3 no vuelve al paso 2")
-    p.tecla("ArrowLeft", 2)
-    esperar(p.estado()["hash"] == "#2", "llegando con →, ← desde el paso 1 no vuelve a la 2")
+    esperar(p.estado()["hash"] == "#2", "← en la 3 no vuelve a la 2")
     p.ir("1")
     p.tecla("PageDown")
     esperar(p.estado()["hash"] == "#2", "Av Pág desde la 1 no lleva a la 2")
@@ -269,15 +265,19 @@ def recorrido(p: Pagina):
     esperar(p.estado()["hash"] == "#12", "Fin no lleva a la 12")
     p.tecla("Home")
     esperar(p.estado()["hash"] == "#1", "Inicio no lleva a la 1")
-    # pasos: llegar hacia adelante muestra el paso 1; llegar hacia atrás, la diapositiva completa
+    # (27/10) el riel de capítulos lleva a cada vista y a cada anexo, y un clic en el riel no pasa de vista
     p.ir("2")
-    p.tecla("ArrowRight")
-    esperar(p.estado()["paso"] == 1, "al llegar a la 3 con → no arranca en el paso 1")
-    p.ir("4")
-    p.tecla("ArrowLeft")
-    esperar(p.estado()["paso"] == 3, "al volver a la 3 con ← no se ve completa")
-    p.tecla("ArrowLeft")
-    esperar(p.estado()["hash"] == "#2", "en la 3 completa (llegada hacia atrás), ← no pasa a la 2")
+    p.pg.locator(".e3-escenario .e3-riel-item", has_text="Costo y retorno").click()
+    p.quieto()
+    esperar(p.estado()["hash"] == "#9", "el riel no lleva a la 9")
+    p.pg.locator(".e3-escenario .e3-riel-chip", has_text="A3").click()
+    p.quieto()
+    esperar(p.estado()["hash"] == "#a3", "el riel no lleva al anexo A3")
+    p.ir("5")
+    r = p.pg.locator(".e3-escenario .e3-riel").bounding_box()
+    p.pg.mouse.click(r["x"] + r["width"] / 2, r["y"] + r["height"] * 0.96)
+    p.quieto()
+    esperar(p.estado()["hash"] == "#5", "un clic en el fondo del riel pasa de vista")
     # vista general
     p.ir("5")
     p.tecla("o")
@@ -290,8 +290,6 @@ def recorrido(p: Pagina):
         p.tecla("Enter")
         e = p.estado()
         esperar(not e["general"] and e["hash"] == "#6", "flecha y Enter en la vista general no llevan a la 6")
-        if e["hash"] == "#6":
-            esperar(e["paso"] == 3, "desde la vista general la 6 no se ve completa")
     p.tecla("Escape")
     esperar(not p.estado()["general"] and p.estado()["hash"] == "#6", "Esc abre la vista general o cambia la diapositiva")
     p.tecla("o")
@@ -337,10 +335,9 @@ def recorrido(p: Pagina):
     if p.estado()["notas"]:
         esc = p.pg.locator(".e3-escenario").bounding_box()
         notas = p.pg.locator(".e3-notas").bounding_box()
-        titulo = p.pg.locator(".e3-escenario .e3-titulo").bounding_box()
+        titulo = p.pg.locator(".e3-escenario .e3-pregunta").bounding_box()
         esperar(esc["y"] + esc["height"] <= notas["y"] + 1, "las notas tapan el escenario")
         esperar(titulo["y"] >= 0 and titulo["y"] + titulo["height"] <= notas["y"], "las notas tapan el título")
-        esperar(p.pg.locator(".e3-notas .e3-notas-paso").count() == 3, "las notas de la 3 no marcan sus tres pasos")
         p.chequear("3 con notas")
         p.tecla("n")
         esperar(not p.estado()["notas"], "N no cierra las notas")
@@ -371,11 +368,15 @@ def recorrido(p: Pagina):
     # un control tocado con el mouse no se queda con →
     for id_, que, nombre in (("6", "radio", "Entrenamiento"), ("7", "radio", "800"), ("9", "radio", "Sin descuento")):
         p.ir(id_)
+        p.pg.locator(".e3-escenario .e3-explorar").click()      # (27/10) los controles están detrás de Explorar
+        p.quieto()
         p.pg.get_by_role(que, name=nombre, exact=True).click()
         p.quieto()
         p.tecla("ArrowRight")
         esperar(p.estado()["hash"] == f"#{int(id_) + 1}", f"en la {id_}, después de un clic en «{nombre}», → no pasa de diapositiva")
     p.ir("9")
+    p.pg.locator(".e3-escenario .e3-explorar").click()
+    p.quieto()
     caja9 = p.pg.locator("[role=slider]").bounding_box()
     p.pg.mouse.click(caja9["x"] + caja9["width"] * 0.6, caja9["y"] + caja9["height"] / 2)
     p.quieto()
@@ -419,12 +420,10 @@ def recorrido(p: Pagina):
     p.tecla("ArrowRight")
     p.tecla("ArrowRight")
     otra.wait_for_timeout(300)
-    esperar(otra.evaluate("() => location.hash") == "#6" and
-            otra.evaluate("() => document.querySelector('.e3-escenario .e3-dia').dataset.paso") == "2",
-            "la otra ventana no sigue a la 6, paso 2")
+    esperar(otra.evaluate("() => location.hash") == "#7", "la otra ventana no sigue a la 7")
     otra.keyboard.press("ArrowLeft")
     otra.wait_for_timeout(300)
-    esperar(p.estado()["hash"] == "#6" and p.estado()["paso"] == 1, "la primera ventana no sigue a la otra")
+    esperar(p.estado()["hash"] == "#6", "la primera ventana no sigue a la otra")
     otra.close()
     # clic en las franjas y sobre un control
     p.ir("5")
@@ -432,19 +431,14 @@ def recorrido(p: Pagina):
     p.pg.mouse.click(caja["x"] + caja["width"] * 0.9, caja["y"] + caja["height"] * 0.12)
     p.quieto()
     esperar(p.estado()["hash"] == "#6", "clic en la franja derecha no avanza")
-    p.pg.mouse.click(caja["x"] + caja["width"] * 0.1, caja["y"] + caja["height"] * 0.12)
+    p.pg.mouse.click(caja["x"] + caja["width"] * 0.2, caja["y"] + caja["height"] * 0.12)
     p.quieto()
     esperar(p.estado()["hash"] == "#5", "clic en la franja izquierda no retrocede")
-    p.ir("2")
-    p.pg.locator(".e3-veredicto .e3-ir").nth(3).click()
-    p.quieto()
-    esperar(p.estado()["hash"] == "#9", "el botón de la tarjeta del riesgo más crítico no lleva a la 9")
-    p.ir("2")
-    p.pg.locator(".e3-veredicto .e3-ir").nth(1).click()
-    p.quieto()
-    esperar(p.estado()["hash"] == "#10", "el botón de la tarjeta Legal no lleva a la 10")
     # un control con foco atiende las flechas; Esc le saca el foco
     p.ir("6")
+    esperar(p.pg.locator(".e3-escenario .e3-opciones").count() == 0, "la 6 muestra el selector sin abrir Explorar")
+    p.pg.locator(".e3-escenario .e3-explorar").click()
+    p.quieto()
     p.pg.locator(".e3-opciones [role=radio]").first.focus()
     p.tecla("ArrowRight")
     e = p.estado()
@@ -465,13 +459,17 @@ def controles(p: Pagina):
         if p.pg.locator(".e3-fila.on").count() != 1:
             p.mal("4: pasar el puntero por una condición no resalta su fila")
         p.chequear(f"4 condición {k + 1}")
-    # 6: entrenamiento
+    # 6: entrenamiento (27/10: detrás de Explorar)
     p.ir("6")
+    p.pg.locator(".e3-escenario .e3-explorar").click()
     p.pg.get_by_role("radio", name="Entrenamiento").click()
     p.quieto()
     p.chequear("6 entrenamiento")
-    # 7: todos los filtros y largos
+    # 7: todos los filtros y largos (27/10: detrás de Explorar)
     p.ir("7")
+    if p.pg.locator(".e3-escenario .e3-opciones").count():
+        p.mal("7: los controles se ven sin abrir Explorar")
+    p.pg.locator(".e3-escenario .e3-explorar").click()
     for filtro in ("Sin filtro", "Solo contactables"):
         p.pg.get_by_role("radio", name=filtro).click()
         largos = p.pg.locator(".e3-opciones[aria-label='Largo de la lista por mes'] [role=radio]")
@@ -481,8 +479,12 @@ def controles(p: Pagina):
             largos.nth(k).click()
             p.quieto(20)
             p.chequear(f"7 {filtro} {largos.nth(k).inner_text()}")
-    # 9: la tasa de éxito en sus extremos, en cada marca, con y sin descuento
+    # 9: la tasa de éxito en sus extremos, en cada marca, con y sin descuento (27/10: detrás de Explorar)
     p.ir("9")
+    if p.pg.locator(".e3-escenario [role=slider]").count():
+        p.mal("9: el deslizante se ve sin abrir Explorar")
+    p.pg.locator(".e3-escenario .e3-explorar").click()
+    p.quieto()
     inicial = p.pg.locator(".e3-lectura.tasa b").inner_text()
     for desc in ("Sin descuento", None):
         if desc:
@@ -500,7 +502,7 @@ def controles(p: Pagina):
         p.tecla("End")
         p.chequear(f"9 s = 100 % {desc or ''}")
         if desc:
-            p.pg.get_by_role("radio", name="Con 15 % de descuento").click()
+            p.pg.get_by_role("radio", name="15 % de descuento").click()
     desl = p.pg.locator("[role=slider]")
     caja = desl.bounding_box()
     p.pg.mouse.click(caja["x"] + caja["width"] * 0.5, caja["y"] + caja["height"] / 2)
@@ -510,11 +512,11 @@ def controles(p: Pagina):
     if p.estado()["hash"] != "#10":
         p.mal("9: con foco en el deslizante, Av Pág no pasa de diapositiva")
     p.tecla("PageUp")
-    if p.pg.locator(".e3-lectura.tasa b").inner_text() != inicial:
-        p.mal(f"9: al volver, la tasa no vuelve a {inicial}")
+    if p.pg.locator(".e3-escenario [role=slider]").count():
+        p.mal("9: al volver, Explorar no está cerrado")
     # 11: la matriz y cada riesgo
     p.ir("11")
-    p.pg.locator(".e3-boton").click()
+    p.pg.locator(".e3-escenario .e3-explorar").click()
     p.quieto()
     chips = p.pg.locator(".e3-chip:not(.muestra)")
     if chips.count() != 13:

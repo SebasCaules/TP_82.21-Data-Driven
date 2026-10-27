@@ -10,7 +10,7 @@ export default function Mvp({ d }) {
   const m = d.hechos.length
   const w2 = (ANCHO - 30 * (m - 1)) / m
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
       {d.pasos.map((p, k) => (
         <Fragment key={p.titulo}>
           <div className="e3-tarjeta e3-paso" style={caja(M + k * (w + sep), Y0, w, 374)}>

@@ -2,12 +2,12 @@
 // la cátedra, la alerta del 30,1 % y el plan L1 a L6 con dueño en dos tramos. Todo de C3, como el PPTX.
 // (26/10) Las normas van abajo del plan, en la columna derecha, en lugar del pie de genero.
 import { Rico } from '../texto.jsx'
-import Marco, { M, QuienN, Y0, caja } from './Marco.jsx'
+import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
 export default function Legal({ d }) {
-  const wl = 600
-  const xr = M + wl + 50
-  const wr = 1600 - M - xr
+  const wl = 520
+  const xr = M + wl + 40
+  const wr = M + ANCHO - xr
   let y = Y0
   const tramos = d.plan.map((t) => {
     const top = y
@@ -15,7 +15,7 @@ export default function Legal({ d }) {
     return { ...t, top }
   })
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
       <p className="e3-rotulo e3-abs" style={caja(M, Y0, wl)}>Puntaje por dimensión (1 a 3)</p>
       {d.dimensiones.map((x, k) => (
         <div key={x.dimension} className="e3-dim" style={caja(M, Y0 + 44 + k * 52, wl, 46)}>

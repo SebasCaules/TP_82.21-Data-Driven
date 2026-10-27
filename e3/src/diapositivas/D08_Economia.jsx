@@ -7,14 +7,14 @@
 import { D3 } from '../datos_e3.js'
 import { puntos, fijo } from '../formato.js'
 import { Rico } from '../texto.jsx'
-import Marco, { M, QuienN, Y0, caja } from './Marco.jsx'
+import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
 const E = D3.economia
 
 function AEscala() {
   const falta = E.observada.puntos_para_pagar
   const hay = E.umbral.maximo_pp
-  const W = 420
+  const W = 380
   return (
     <div className="e3-escala" role="img"
          aria-label={`A escala: hacen falta ${puntos(falta)} puntos y hay ${fijo(hay, 1)}`}>
@@ -32,14 +32,14 @@ function AEscala() {
 }
 
 export default function Economia({ d }) {
-  const wl = 882
-  const xr = M + wl + 48
-  const wr = 1600 - M - xr
+  const wl = 760
+  const xr = M + wl + 40
+  const wr = M + ANCHO - xr
   const y0 = Y0 + 50
   const paso = 113
   const yc = y0 + 3 * paso
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
       <p className="e3-rotulo" style={{ ...caja(M, Y0, wl), position: 'absolute' }}>
         Valor esperado de cada celda, frente a no contactar
       </p>

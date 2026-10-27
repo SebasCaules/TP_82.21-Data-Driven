@@ -7,10 +7,10 @@
 import { useState } from 'react'
 import { D3 } from '../datos_e3.js'
 import { aciertos, entero, fijo, pct } from '../formato.js'
-import { Opciones } from '../controles.jsx'
+import { BotonExplorar, Opciones } from '../controles.jsx'
 import { escalaNice } from '../../../src/graficos.jsx'
 import { Rico } from '../texto.jsx'
-import Marco, { M, QuienN, Y0, caja } from './Marco.jsx'
+import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
 const L = D3.lista
 const METODOS = [
@@ -26,7 +26,7 @@ const IMP = L.importancia.filter((v) => v.en_diapositiva)
 const ESC_IMP = escalaNice(Math.max(...IMP.map((v) => v.caida_pp)), 7)
 
 function Comparacion({ filtro, largo }) {
-  const W = 812, x0 = 222, x1 = 690
+  const W = 712, x0 = 222, x1 = 600
   const x = (v) => x0 + (v / 100) * (x1 - x0)
   const sim = { 'data-simulacion': '' }
   return (
@@ -53,7 +53,7 @@ function Comparacion({ filtro, largo }) {
 }
 
 function Importancia() {
-  const W = 840, x0 = 340, x1 = 790
+  const W = 740, x0 = 340, x1 = 690
   const x = (v) => x0 + (v / ESC_IMP.max) * (x1 - x0)
   return (
     <svg width={W} height={262} className="e3-svg" role="img" aria-label="Importancia por permutación de la logística ajustada">
@@ -68,7 +68,7 @@ function Importancia() {
           </g>
         )
       })}
-      <g className="e3-leyenda" transform="translate(520, 134)">
+      <g className="e3-leyenda" transform="translate(440, 134)">
         <rect x={0} y={-14} width={22} height={16} className="e3-barra-acc" />
         <text x={30} y={0} className="e3-t e3-t-19">variables de la regla</text>
         <rect x={0} y={20} width={22} height={16} className="e3-barra-gris" />
@@ -88,6 +88,8 @@ function Importancia() {
 export default function Lista({ d }) {
   const [filtro, setFiltroCrudo] = useState(L.elegida.filtro)
   const [largo, setLargo] = useState(L.elegida.largo_mes)
+  const [explorar, setExplorar] = useState(false)
+  const cerrar = () => { setExplorar(false); setFiltroCrudo(L.elegida.filtro); setLargo(L.elegida.largo_mes) }
   const setFiltro = (f) => {
     setFiltroCrudo(f)
     if (!hay(f, largo)) setLargo(LARGOS.find((l) => hay(f, l) && l >= largo) ?? L.elegida.largo_mes)
@@ -99,9 +101,11 @@ export default function Lista({ d }) {
   const sim = { 'data-simulacion': '' }
   const hc = 184
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
-      <div className="e3-figura e3-lista" style={caja(M, Y0, 840, 258)}>
-        <div className="e3-lista-ctl">
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
+      <div className="e3-figura e3-lista" style={caja(M, Y0, 740, 258)}>
+        <BotonExplorar abierto={explorar} onCambio={(v) => (v ? setExplorar(true) : cerrar())} className="e3-explorar-esq" />
+        {/* (27/10) Filtro y largo quedan para explorar: se presenta la lista que sale. */}
+        {explorar && <div className="e3-lista-ctl">
           <div>
             <p className="e3-rotulo-web">Filtro</p>
             <Opciones etiqueta="Filtro de la lista" valor={filtro} onCambio={setFiltro}
@@ -112,7 +116,7 @@ export default function Lista({ d }) {
             <Opciones etiqueta="Largo de la lista por mes" valor={largo} onCambio={setLargo} escala
                       opciones={LARGOS.map((l) => ({ valor: l, texto: entero(l), deshabilitada: !hay(filtro, l) }))} />
           </div>
-        </div>
+        </div>}
         <Comparacion filtro={filtro} largo={largo} />
         <p className="e3-lista-res">
           {c.gana === 'empate'
@@ -122,11 +126,11 @@ export default function Lista({ d }) {
           {elegida && <span className="e3-etiqueta">la lista que sale</span>}
         </p>
       </div>
-      <figure className="e3-figura" style={caja(M, 506, 840, 262)}>
+      <figure className="e3-figura" style={caja(M, 506, 740, 262)}>
         <Importancia />
       </figure>
-      <p className="e3-pie-figura" style={caja(M, 776, 840)}><Rico t={d.pie_figura} /></p>
-      <div className="e3-llamadas" style={caja(966, Y0, 562)}>
+      <p className="e3-pie-figura" style={caja(M, 776, 740)}><Rico t={d.pie_figura} /></p>
+      <div className="e3-llamadas" style={caja(M + 780, Y0, ANCHO - 780)}>
         {d.callouts.map((x) => (
           <div key={x.titulo} className="e3-llamada" style={{ height: hc }}>
             <p className="e3-llamada-titulo"><Rico t={x.titulo} /></p>

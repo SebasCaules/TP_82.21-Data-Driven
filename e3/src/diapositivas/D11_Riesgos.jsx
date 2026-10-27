@@ -66,7 +66,7 @@ export default function Riesgos({ d, estatico }) {
   const sep = 36
   const w = (ANCHO - sep * (d.columnas.length - 1)) / d.columnas.length
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
       {matriz ? <Matriz estatico={estatico} /> : d.columnas.map((c, k) => (
         <div key={c.n} className={`e3-tarjeta e3-riesgo ${k === 0 ? 'malo' : ''}`} style={caja(M + k * (w + sep), Y0, w, 498)}>
           <div className="e3-riesgo-cab">
@@ -81,10 +81,11 @@ export default function Riesgos({ d, estatico }) {
           ))}
         </div>
       ))}
-      <p className="e3-nota" style={caja(M, 762, 1080)}><Rico t={d.nota} /></p>
-      <button type="button" className="e3-boton" style={caja(1196, 754, 332, 46)} tabIndex={estatico ? -1 : 0}
-              onClick={() => setMatriz((v) => !v)} aria-pressed={matriz}>
-        {matriz ? 'Ver los tres críticos' : 'Ver la matriz de riesgos'}
+      <p className="e3-nota" style={caja(M, 744, ANCHO - 300)}><Rico t={d.nota} /></p>
+      {/* (27/10) La matriz de los 13 queda para explorar. */}
+      <button type="button" className={`e3-explorar ${matriz ? 'on' : ''}`} style={caja(M + ANCHO - 270, 750, 270, 46)}
+              tabIndex={estatico ? -1 : 0} data-control="" onClick={() => setMatriz((v) => !v)} aria-pressed={matriz}>
+        {matriz ? 'Cerrar' : 'Explorar los 13 riesgos'}
       </button>
     </Marco>
   )

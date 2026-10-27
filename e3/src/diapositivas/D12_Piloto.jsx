@@ -6,13 +6,13 @@
 import { D3 } from '../datos_e3.js'
 import { fijo } from '../formato.js'
 import { Rico } from '../texto.jsx'
-import Marco, { M, QuienN, Y0, caja } from './Marco.jsx'
+import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
 const P = D3.piloto
 const TOPE = 56
 
 function Grafico() {
-  const W = 648, x0 = 18, x1 = 630
+  const W = 620, x0 = 18, x1 = 600
   const x = (v) => x0 + (v / TOPE) * (x1 - x0)
   const mde = P.diferencia_detectable_pp, paga = P.umbral_produccion_pp
   const y0 = 66, h = 168
@@ -50,14 +50,14 @@ function Grafico() {
 }
 
 export default function Piloto({ d }) {
-  const xr = 798
-  const wr = 1600 - M - xr
+  const xr = M + 660
+  const wr = M + ANCHO - xr
   return (
-    <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
-      <figure className="e3-figura" style={caja(M, Y0, 648, 300)}>
+    <Marco pregunta={d.pregunta} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
+      <figure className="e3-figura" style={caja(M, Y0, 620, 300)}>
         <Grafico />
       </figure>
-      <div className="e3-hechos" style={caja(M, Y0 + 318, 690)}>
+      <div className="e3-hechos" style={caja(M, Y0 + 318, 620)}>
         {d.hechos.map((h, k) => <p key={k}><Rico t={h} /></p>)}
       </div>
       <div className="e3-panel" style={caja(xr, Y0, wr, 538)}>
@@ -66,7 +66,7 @@ export default function Piloto({ d }) {
           {d.pedidos.map((t, k) => <li key={k}><Rico t={t} /></li>)}
         </ol>
       </div>
-      <p className="e3-nota" style={caja(M, 786, 1456)}><Rico t={d.nota} /></p>
+      <p className="e3-nota" style={caja(M, 790, ANCHO)}><Rico t={d.nota} /></p>
     </Marco>
   )
 }
