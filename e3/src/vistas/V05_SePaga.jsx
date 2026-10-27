@@ -25,6 +25,7 @@ import { NBSP, fijo, pct, pctDirecto, usd } from '../formato.js'
 import { plano } from '../texto.jsx'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
+import { Cifra } from '../cifra.jsx'
 
 const E = D3.economia
 const D8 = C3.DIAPOSITIVAS.find((d) => d.n === 8)
@@ -49,26 +50,9 @@ const S_OBS = E.parametros.s_observada
 const REGLA = E.observada.regla_usd
 const COSTO_REGLA = E.costos.regla_sin_modelo.total_anio_1_usd
 
-// «USD 5,38» con la moneda un escalón más chica, como los montos del E2 (ValorMonto, .par-unidad).
-function Monto({ v, d = 0, sec = false }) {
-  const [moneda, num] = usd(v, d).split(' ')
-  return (
-    <span className={`par-val tabular e2-cifra${sec ? ' sec' : ''}`}>
-      <span className="par-unidad">{moneda}{' '}</span>{num}
-    </span>
-  )
-}
-
-// «−99,95 %» con el signo un escalón más chico, igual que la moneda de Monto (W2.0): con la letra ×k, la
-// cifra entera no entra en la tarjeta central desde 1366 × 768.
-function Porcentaje({ texto, sec = false }) {
-  const i = texto.lastIndexOf(NBSP)
-  return (
-    <span className={`par-val tabular e2-cifra${sec ? ' sec' : ''}`}>
-      {texto.slice(0, i)}<span className="par-unidad">{texto.slice(i)}</span>
-    </span>
-  )
-}
+// La moneda y el «%» van un escalón más chicos (Cifra, e3/src/cifra.jsx), como los montos del E2
+// (ValorMonto, .par-unidad): con la letra ×k, el −99,95 % entero no entra en la tarjeta central desde
+// 1366 × 768 (W2.0).
 
 // Montos de las barras: centavos solo debajo de mil (USD 299,49; USD 30.660).
 const monto = (v) => usd(v, v < 1000 ? 2 : 0)
@@ -90,7 +74,7 @@ export default function V05SePaga() {
              title={`Lo que suma el modelo. ${plano(D8.cadena)} ${plano(D8.filtro)}`}>
           <span className="kpi-lbl"><span>Suma el modelo</span></span>
           <div className="ban-par">
-            <div className="par-item par-unico"><Monto v={SUMA} d={2} sec /></div>
+            <div className="par-item par-unico"><Cifra texto={usd(SUMA, 2)} sec /></div>
           </div>
           <p className="e2-linea">{`por año; cuesta ${usd(CUESTA)} más`}</p>
         </div>
@@ -100,7 +84,7 @@ export default function V05SePaga() {
           <span className="kpi-lbl"><span>ROI sobre la regla</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
-              <Porcentaje texto={pctDirecto(ROI, 2)} />
+              <Cifra texto={pctDirecto(ROI, 2)} />
             </div>
           </div>
           <p className="e2-linea">a un año, escenario esperado</p>
@@ -110,7 +94,7 @@ export default function V05SePaga() {
           <span className="kpi-lbl"><span>Éxito necesario</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
-              <Porcentaje texto={pct(S_PAGA, 1)} sec />
+              <Cifra texto={pct(S_PAGA, 1)} sec />
             </div>
           </div>
           <p className="e2-linea">{`tendría que volver; hoy${NBSP}se${NBSP}ve${NBSP}${pct(S_OBS, 2)}`}</p>

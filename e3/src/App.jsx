@@ -263,12 +263,44 @@ export default function App() {
   )
 }
 
+/** (27/10, W2, hallazgo T2 del verificador) De qué partes del documento sale la vista, juntando la
+ *  fuente de todas sus diapositivas de C3 (antes, solo la primera Parte de la última diapositiva: la 1
+ *  decía «Parte A 1.3» y sale de A, B y C). Con una sola Parte y una sola sección, el tramo de
+ *  subsecciones («Parte A 1.1 a 1.6»); con dos, las secciones de cada Parte («Partes B 3 y 4 · C 7»); con
+ *  tres o más, solo las letras («Partes A, B y C»): con las secciones, la pregunta de la vista 1 se parte
+ *  en dos renglones desde 1280 × 720. */
+function fuenteDe(ds) {
+  const partes = new Map()
+  for (const d of ds) {
+    for (const seg of String(d.fuente || '').split(' · ')) {
+      const m = seg.match(/^Parte ([A-D]) (.+)$/)
+      if (!m) continue
+      const subs = partes.get(m[1]) ?? []
+      for (const [, sec, sub] of m[2].matchAll(/(\d+)\.(\d+)/g)) subs.push([Number(sec), Number(sub)])
+      partes.set(m[1], subs)
+    }
+  }
+  if (!partes.size) return ''
+  const letras = [...partes.keys()].sort()
+  const secciones = (l) => [...new Set(partes.get(l).map(([s]) => s))].sort((a, b) => a - b)
+  if (letras.length === 1 && secciones(letras[0]).length === 1) {
+    const l = letras[0]
+    const sec = secciones(l)[0]
+    const subs = partes.get(l).map(([, x]) => x)
+    const [lo, hi] = [Math.min(...subs), Math.max(...subs)]
+    return `Parte ${l} ${sec}.${lo}${hi > lo ? ` a ${sec}.${hi}` : ''}`
+  }
+  const lista = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} y ${xs[xs.length - 1]}` : `${xs[0]}`)
+  if (letras.length >= 3) return `Partes ${lista(letras)}`
+  return `${letras.length > 1 ? 'Partes' : 'Parte'} ${letras.map((l) => `${l} ${lista(secciones(l))}`).join(' · ')}`
+}
+
 /** El encabezado del E2 (regla 12): la pregunta, grande, es el h1. A la derecha, chico, en qué vista se
  *  está y de qué parte del documento sale. */
 function Encabezado({ vista }) {
-  const fuente = diapositivasDe(vista).map((d) => d.fuente).filter(Boolean).pop()
+  const fuente = fuenteDe(diapositivasDe(vista))
   const donde = vista.respaldo ? `${vista.id} · ${vista.anexo.fuente}`
-    : `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}${fuente ? ` · ${fuente.split(' · ')[0]}` : ''}`
+    : `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}${fuente ? ` · ${fuente}` : ''}`
   return (
     <header className="e2-enc">
       <h1 className="e2-preg">{vista.pregunta}</h1>

@@ -73,8 +73,9 @@
 .e3-explorar.on { background: var(--acc); color: #fff; }
 .e3-explorar:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
 
-/* .e3-opciones y .e3-desliz*: sin uso en W1 (ninguna vista los monta) y sin verificar contra la
-   escala del E2; se ajustan en W2 con el simulador de la tasa de éxito de la vista 5. */
+/* .e3-opciones: el selector detrás de «Explorar» de la vista 4 (validación o entrenamiento) y de la 6
+   (plan o matriz de riesgos); verificar_e3.py lo abre en cada resolución y mira __fit (W2).
+   .e3-desliz*: sin uso todavía; es del simulador de la tasa de éxito de la vista 5. */
 .e3-opciones {
   display: inline-flex; gap: 2px; padding: 2px;
   border: 1px solid var(--bd); border-radius: 3px; background: var(--papel);

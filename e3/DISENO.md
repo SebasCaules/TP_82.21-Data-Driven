@@ -219,3 +219,30 @@ decisiones N0-5 y N0-6.
   recorrido de quien presenta, con cada rótulo de la banda en una línea y el guion de cada vista entero en el
   panel de notas a 1366 × 768 y 1536 × 864. Desde W3 y antes de exportar se corre con `--sin-esqueletos`, que
   falla si alguna vista sigue mostrando «se arma en la etapa siguiente».
+
+## Decisiones (27/10, W2): vistas 1 a 4 y 6
+
+- **Decisiones nuevas en `decisiones.js`**, con el mismo esquema (letra de la Parte y área) y el estado en
+  palabras: `A-UMB · vigente` (el umbral propio, vista 2; DEF-UMBRAL del registro de decisiones de los hitos),
+  `C-MOD · sale la regla` (vista 4; MOD-05, MOD-06 y VER-MVP) y `D-PRO · propuesta` (vistas 1 y 9; D6). Ninguna
+  vista arma su par ni cae en el id de otra.
+- **Encabezado.** La fuente junta todas las diapositivas de la vista: una Parte y una sección, el tramo
+  («Parte A 1.1 a 1.6»); dos Partes, sus secciones («Partes B 3 y 4 · C 7»); tres, solo las letras («Partes A,
+  B y C»), porque con las secciones la pregunta de la 1 se parte desde 1280 × 720.
+- **Piezas comunes del E3.** `cifra.jsx` (la cifra de la banda con la unidad un escalón más chica; reemplaza
+  las copias de cada vista), `medir.js` (ancho de un texto con canvas) y `PuntajeDimensiones.jsx`: las vistas 3
+  y 6 muestran lo mismo (puntaje por dimensión en la escala de la cátedra) y lo dibujan igual, con el tramo
+  sombreado y su plaqueta, el promedio punteado solo si no coincide con las barras y la que limita en `--acc`.
+- **Códigos internos fuera de pantalla** (regla 13 H13 del E2): `sinCodigos` (`texto.jsx`) saca «(envío N)» de
+  lo que se ve; el title lo conserva.
+- **Vista 1.** «no viable: ROI a un año» (el horizonte pegado a la cifra; «ROI anual sobre la regla» agranda la
+  banda a 1366 y 1536). La nota de la tasa dice la población («envíos cerca del umbral») y es más corta que la
+  de la fila vacía: `PuntosIC` no reserva el rótulo del valor y la nota más larga lo pisaba.
+- **Vista 3.** «casos positivos para entrenar» (G10 son positivos); arriba del gráfico, lo barato del MVP
+  («MVP: USD 0 en licencias y 1 computadora») al lado del botón que lo abre; el MVP, centrado en su tarjeta.
+- **Vista 6.** Banda 3 / 3 / 3 y «Sin consentimiento», el término de C18, L3 y el riesgo 6 (con 3 / 2 / 2 el
+  rótulo se parte; con 3 / 3 / 2, «Riesgos críticos» se parte y la banda crece de 12 a 20 px).
+- **Verificación.** `verificar_e3.py` revisa el contenido de las vistas 1 a 6 en cada resolución contra D3 y
+  C3 (decisión, cifras de la banda, una sola cifra grande en la central, valores del gráfico, palabras
+  prohibidas y códigos en pantalla, textos del gráfico que se pisan, «Explorar» en cada opción y el guion en
+  las notas) y, con `--hoja`, arma la hoja de contacto de las vistas a 1536 × 864.
