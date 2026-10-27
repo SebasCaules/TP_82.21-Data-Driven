@@ -35,9 +35,9 @@
 /* ---------- notas del orador (Notas.jsx), en px reales, fuera del zoom ---------- */
 .e3-notas {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  overflow: auto; padding: 12px 24px 14px;
+  overflow: auto; padding: 8px 24px 10px;
   background: var(--sup); border-top: 3px solid var(--ink);
-  font: 400 16px/1.45 var(--fuente); color: var(--ink);
+  font: 400 14px/1.35 var(--fuente); color: var(--ink);
 }
 .e3-notas-ventana { position: static; min-height: 100%; border-top: 0; padding: 24px 32px; font-size: 21px; }
 .e3-notas-cab { margin: 0 0 8px; color: var(--mut2); font-size: .9em; }
@@ -73,6 +73,8 @@
 .e3-explorar.on { background: var(--acc); color: #fff; }
 .e3-explorar:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
 
+/* .e3-opciones y .e3-desliz*: sin uso en W1 (ninguna vista los monta) y sin verificar contra la
+   escala del E2; se ajustan en W2 con el simulador de la tasa de éxito de la vista 5. */
 .e3-opciones {
   display: inline-flex; gap: 2px; padding: 2px;
   border: 1px solid var(--bd); border-radius: 3px; background: var(--papel);

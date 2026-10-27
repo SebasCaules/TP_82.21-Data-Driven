@@ -167,17 +167,24 @@ decisiones N0-5 y N0-6.
   sale el guion de las notas.
 - **Quien presenta (N0-6).** Las teclas del E2 (flechas con el foco libre o en el riel, Inicio, Fin, F, I)
   más Av Pág y Re Pág, que pasan de vista siempre (control remoto); F5 pide pantalla completa sin recargar;
-  N abre las notas debajo del tablero, que se achica para dejarles lugar (con las notas, k puede bajar de
-  1); desde el panel, «Abrir en otra ventana» abre `?notas`, solo las notas. «.» y B ponen la pantalla en
+  N abre las notas debajo del tablero, que se achica para dejarles lugar: el panel toma el 35 % del alto,
+  con letra de 14 px, para que el guion más largo (el de la 6) entre sin desplazar a 1366 × 768 (con las
+  notas, k baja a 0,78 a esa resolución: se ensaya, no se proyecta); desde el panel, «Abrir en otra ventana» abre `?notas`, solo las notas. «.» y B ponen la pantalla en
   negro y cualquier tecla vuelve. Una tecla mantenida no recorre. Dos ventanas con la misma dirección se
   siguen (`BroadcastChannel`).
+- **Decisiones: un id y un estado por decisión (`decisiones.js`).** La tarjeta del E2 muestra «id · estado»
+  (DC-04 · APLICADA). En el E3 el id es la letra de la Parte y el área (A-TEC, B-ECO, C-LEG) y el estado, el
+  veredicto de la tarjeta de la diapositiva 2 de C3 (factibilidad media, no viable, viable con condiciones).
+  Toda vista toma su par con `decision(id, …)`; ninguna lo arma con el kicker. La propuesta se suma ahí en W2.
 - **Sin controles a la vista.** Lo que una vista deje tocar va detrás de «Explorar» (`controles.jsx`),
   cerrado al llegar. En W1 ninguna vista tiene controles; el simulador de la tasa de éxito de la 5 queda para
   W2.
 - **Vista 5, de muestra.** Banda: lo que suma el modelo por año (USD 5,38, con los USD 10.400 de más en su
   frase), el ROI del modelo sobre la regla a un año (la cifra dominante) y la tasa de éxito que pagaría la
   regla (49,6 %, con la observada en su frase); con cuatro tarjetas, a 1152 × 640 las cifras no entran.
-  Decisión: «No viable tal como está planteado» (C3, diapositiva 9). Gráfico: `BarrasH` del costo del año 1
+  Rótulos cortos para que entren en una línea a 1152 × 640 («Suma el modelo», «ROI sobre la regla», «Para
+  pagar la regla»; el largo va al title). Decisión: «No viable tal como está planteado» (C3, diapositiva 9),
+  con «B-ECO · no viable». Gráfico: `BarrasH` del costo del año 1
   con modelo y solo la regla contra el beneficio anual de la regla, con el presupuesto marcado.
 
 ### Verificación (desde W1)
@@ -186,4 +193,6 @@ decisiones N0-5 y N0-6.
   1366 × 768, 1536 × 864 y 1920 × 1080, las reglas 11 y 12 en cada vista y la hoja de contacto
   `entregas/entregable-3/_build/workforce/fase-w1/e2-e3-1536.png` del vault.
 - `python3 scripts/verificar_e3.py`: cada vista a cinco resoluciones con `__fit`, consola y red limpias, y el
-  recorrido de quien presenta.
+  recorrido de quien presenta, con cada rótulo de la banda en una línea y el guion de cada vista entero en el
+  panel de notas a 1366 × 768 y 1536 × 864. Desde W3 y antes de exportar se corre con `--sin-esqueletos`, que
+  falla si alguna vista sigue mostrando «se arma en la etapa siguiente».

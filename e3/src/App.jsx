@@ -27,7 +27,7 @@ const TITULO_BASE = 'Casa Óga · Entregable 3'
 const CANAL = 'casa-oga-e3'
 const SOLO_NOTAS = /(^|[?&])notas\b/.test(location.search)
 // El panel de notas toma este tanto del alto de la ventana; el tablero, el resto.
-const NOTAS_ALTO = 0.3
+const NOTAS_ALTO = 0.35
 
 /** Ventana lógica al día con el tamaño real, descontando el panel de notas si está abierto. Con las
  *  notas, k puede bajar de 1 (zoom.js): se ensaya en una laptop, no se proyecta. */

@@ -8,6 +8,7 @@
 //   (G31). Tres tarjetas: con cuatro, a 1152 × 640 las cifras no entran (10.400 va en la frase de la
 //   primera y el gráfico muestra la diferencia entre los dos costos).
 // - Decisión: el veredicto de C3 (diapositiva 9), solo la frase corta en negrita; el resto, al title.
+//   Rótulos de la banda cortos para que entren en una línea a 1152 × 640 (el largo, al title).
 // - Gráfico: el costo del año 1 (con modelo y solo la regla) contra el beneficio anual de la regla, en
 //   el mismo eje, con el presupuesto marcado (G38, G39). La barra que hay que mirar, el beneficio, en
 //   --acc; los costos en gris (regla 12 del E2).
@@ -18,26 +19,25 @@ import { Lienzo, BarrasH } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
 import { C3 } from '../contenido_e3.js'
-import { fijo, pct, pctDirecto, usd } from '../formato.js'
+import { NBSP, fijo, pct, pctDirecto, usd } from '../formato.js'
 import { plano } from '../texto.jsx'
 import { useEscalaTextoLogica } from '../zoom.js'
+import { decision } from '../decisiones.js'
 
 const E = D3.economia
 const D8 = C3.DIAPOSITIVAS.find((d) => d.n === 8)
 const D9 = C3.DIAPOSITIVAS.find((d) => d.n === 9)
-const ECONOMICA = C3.DIAPOSITIVAS.find((d) => d.n === 2).tarjetas.find((t) => /econ/i.test(t.area))
 
 // La decisión de la diapositiva 9: «**No viable tal como está planteado.** Ningún supuesto…». La parte en
 // negrita es la frase corta de la tarjeta (≤ 60 caracteres, regla 11 del E2); el resto va al title.
+// El id y el estado («B-ECO · no viable») salen del vocabulario único de decisiones.js.
 const [, NEGRITA = '', RESTO = ''] = D9.decision.match(/^\*\*(.+?)\*\*\s*(.*)$/) ?? []
-const DECISION = {
-  id: D9.kicker.split(' · ')[0],
-  estado: ECONOMICA.area.toLowerCase(),
+const DECISION = decision('B-ECO', {
   llano_corto: NEGRITA.replace(/\.$/, ''),
   llano: plano(D9.decision),
   decision: NEGRITA.replace(/\.$/, ''),
   justificacion: RESTO,
-}
+})
 
 const SUMA = E.observada.modelo_usd
 const CUESTA = E.costos.incremental_usd
@@ -60,7 +60,7 @@ function Monto({ v, d = 0, sec = false }) {
 // Montos de las barras: centavos solo debajo de mil (USD 299,49; USD 30.660).
 const monto = (v) => usd(v, v < 1000 ? 2 : 0)
 
-export const meta = { id: 'V05' }
+export const meta = { id: 'V05', dc: 'B-ECO' }
 
 export default function V05SePaga() {
   const k = useEscalaTextoLogica()
@@ -74,8 +74,8 @@ export default function V05SePaga() {
     <section className="pant v05">
       <Banda dcs={[DECISION]}>
         <div className="tarjeta" style={{ gridColumn: 'span 3' }}
-             title={`${plano(D8.cadena)} ${plano(D8.filtro)}`}>
-          <span className="kpi-lbl"><span>Lo que suma el modelo</span></span>
+             title={`Lo que suma el modelo. ${plano(D8.cadena)} ${plano(D8.filtro)}`}>
+          <span className="kpi-lbl"><span>Suma el modelo</span></span>
           <div className="ban-par">
             <div className="par-item par-unico"><Monto v={SUMA} d={2} sec /></div>
           </div>
@@ -83,8 +83,8 @@ export default function V05SePaga() {
         </div>
 
         <div className="tarjeta e2-central" style={{ gridColumn: 'span 4' }}
-             title={plano(D9.callouts[0].titulo)}>
-          <span className="kpi-lbl"><span>ROI del modelo sobre la regla</span></span>
+             title={`ROI del modelo sobre la regla. ${plano(D9.callouts[0].titulo)}`}>
+          <span className="kpi-lbl"><span>ROI sobre la regla</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <span className="par-val tabular e2-cifra">{pctDirecto(ROI, 2)}</span>
@@ -93,14 +93,14 @@ export default function V05SePaga() {
           <p className="e2-linea">a un año, escenario esperado</p>
         </div>
 
-        <div className="tarjeta" style={{ gridColumn: 'span 3' }} title={plano(D9.callouts[1].texto)}>
+        <div className="tarjeta" style={{ gridColumn: 'span 3' }} title={`Tasa de éxito para pagar la regla. ${plano(D9.callouts[1].texto)}`}>
           <span className="kpi-lbl"><span>Para pagar la regla</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <span className="par-val tabular e2-cifra sec">{pct(S_PAGA, 1)}</span>
             </div>
           </div>
-          <p className="e2-linea">{`tendría que volver; hoy se ve ${pct(S_OBS, 2)}`}</p>
+          <p className="e2-linea">{`tendría que volver; hoy${NBSP}se${NBSP}ve${NBSP}${pct(S_OBS, 2)}`}</p>
         </div>
       </Banda>
 
