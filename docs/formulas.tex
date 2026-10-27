@@ -37,12 +37,12 @@
 \setcounter{tocdepth}{1}  % en el consolidado el índice interno lista solo secciones: los incisos están en la página de contenido global y en el pie
 \noindent{\small\bfseries\color[HTML]{B8433A} ANEXO 1}\\[1mm]
 {\Large\bfseries Formulación del tablero de riesgo de clientes}\\[1mm]
-{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.3 · 25/10/2026}
+{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.4 · 27/10/2026}
 \else
 \begin{center}
 {\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
 Materia 82.21 --- Factibilidad de Proyectos Data Driven\\
-Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v2.3\\[3mm]
+Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v2.4\\[3mm]
 \begin{tabular}{ll}
 Sebastián Caules & 64331 \\
 Tomás Ferreccio & 64934 \\
@@ -50,12 +50,12 @@ Matías Sola & 64322 \\
 Francisco Cattaneo & 64900 \\
 Juan Manuel Rilo & 64037 \\
 \end{tabular}\\[3mm]
-25/10/2026 (v1.0: 01/09/2026)
+27/10/2026 (v1.0: 01/09/2026)
 \end{center}
 \fi
 
 \vspace{4mm}
-\noindent Este documento fija la notación y la trazabilidad de las fórmulas del tablero de riesgo de clientes de Casa Óga. Cada fórmula indica la línea de código que la implementa y el valor que produce sobre el corte de referencia, 31/12/2025. La decisión D4 del proyecto vuelve móvil el mes de corte: por eso cada fórmula lleva el parámetro $t$ explícito en la notación, nunca implícito. El pipeline recalcula todo desde cero en cada corte, usando solo transacciones con \texttt{fecha}~$\le t$ (\texttt{pipeline/features.py:69}). Los valores citados corresponden a la corrida de \texttt{pipeline/build.py}, que verificó 134 anclas del contrato de datos (\texttt{pipeline/CONTRACT.md} sección 5) antes de escribir el payload. Desde la v2.3, las secciones~\ref{sec:anticipacion}, \ref{sec:experimento} y~\ref{sec:exposicion-recupero} definen también los términos y las cifras derivadas que usan las Partes A, B y C del Entregable 3; cada una dice su población y su corte, que no siempre es el 31/12/2025.
+\noindent Este documento fija la notación y la trazabilidad de las fórmulas del tablero de riesgo de clientes de Casa Óga. Cada fórmula indica la línea de código que la implementa y el valor que produce sobre el corte de referencia, 31/12/2025. El tablero del Entregable 1 tiene el mes de corte móvil (25 cortes): por eso cada fórmula lleva el parámetro $t$ explícito en la notación, nunca implícito. El pipeline recalcula todo desde cero en cada corte, usando solo transacciones con \texttt{fecha}~$\le t$ (\texttt{pipeline/features.py:69}). Los valores citados corresponden a la corrida de \texttt{pipeline/build.py}, que verificó 134 anclas del contrato de datos (\texttt{pipeline/CONTRACT.md} sección 5) antes de escribir el payload. Desde la v2.3, las secciones~\ref{sec:anticipacion}, \ref{sec:experimento} y~\ref{sec:exposicion-recupero} definen también los términos y las cifras derivadas que usan las Partes A a D del Entregable 3; cada una dice su población y su corte, que no siempre es el 31/12/2025. La v2.4 suma la evaluación en test de la Parte D del Entregable 3 (subsecciones~\ref{sec:evaluacion-test} a~\ref{sec:criterio-reemplazo}).
 
 \vspace{2mm}
 \tableofcontents
@@ -63,7 +63,7 @@ Juan Manuel Rilo & 64037 \\
 \newpage
 \section{Tabla de símbolos}
 
-Un símbolo tiene un único significado en todo el documento. La tabla cubre las 25 fechas de corte, los campos por cliente y los agregados de la tabla de contingencia, y desde la v2.3 los símbolos del Entregable 3. Los escalares $s$, $r$, $m$, $d$ y $c$ son los de la Parte B del Entregable 3; el ticket medio, que esa parte escribe $t$, va acá como $\bar t$ para no confundirlo con el corte.
+Un símbolo tiene un único significado en todo el documento. La tabla cubre las 25 fechas de corte, los campos por cliente y los agregados de la tabla de contingencia, y desde la v2.3 los símbolos del Entregable 3 (la v2.4 suma los de la evaluación en test). Los escalares $s$, $r$, $m$, $d$ y $c$ son los de la Parte B del Entregable 3; el ticket medio, que esa parte escribe $t$, va acá como $\bar t$ para no confundirlo con el corte.
 
 \begin{longtable}{@{}l p{10.7cm}@{}}
 \toprule
@@ -111,6 +111,11 @@ $s$, $r$ & Tasa de éxito de la acción y parte de los falsos positivos que usa 
 $m$, $d$, $\bar t$, $c$ & Margen que vuelve con un cliente, descuento, ticket medio y costo de la acción. \\
 $v_{VP}$, $v_{FP}$ & Valor esperado de un verdadero y de un falso positivo, frente a no hacer nada. \\
 $V$, $s^*$, $\Delta$ & Valor anual de la lista, tasa de éxito de equilibrio y diferencia de compra que mide el piloto. \\
+$\mathcal C$, $V_{\mathcal C}$ & Cortes evaluados (3 en validación, 5 en test) y valor de la lista en esos cortes llevado a un año. \\
+$P^{c}$, $R^{c}$, $\mathrm{F1}^{c}$ & Precisión, recall y F1 de la lista de 500 contactables, sumadas sobre los cortes de $\mathcal C$. \\
+$\pi_i(T)$, $\mathrm{AUC}^{c}$ & Puntaje con que se ordena la lista, y AUC-ROC de ese puntaje sobre todas las filas contactables. \\
+$D$, $D^{(b)}$ & Precisión del modelo menos la de la regla en la misma lista, y su valor en la réplica $b$ del bootstrap. \\
+$C_{\text{extra}}$, $a^*$ & Lo que el modelo agrega al costo del año 1 y aciertos de más por mes que lo pagan. \\
 \bottomrule
 \end{longtable}
 
@@ -548,19 +553,19 @@ Feature & $D(x)$ & Lectura \\
 
 $B_i(t)$ marca al cliente cuando su recencia \emph{ya superó} su umbral propio: $\rho_i(t) > \theta_i(t)$. Es la misma lógica que el segmento ``Inactivos 90d'' que Casa Óga usa hoy, con el umbral personalizado por el ritmo de cada cliente. Mejora la precisión de a quién se llama ``en riesgo''; no anticipa nada. Ninguna vista del tablero del Entregable 1 anticipa: todas describen el corte.
 
-La anticipación es trabajo del modelo del Entregable 3, con este target:
+La anticipación la da la lista ordenada por días para cruzar el umbral (subsecciones~\ref{sec:dias-cruzar} y~\ref{sec:regla-umbral}); un modelo la reemplaza solo si le gana (subsección~\ref{sec:criterio-reemplazo}). Lo que se anticipa es este target:
 
 \begin{equation}
 Y_i(T) = \mathbb{1}\bigl[\,E_i(T)=1 \ \wedge\ B_i(T)=0 \ \wedge\ \exists\, t \in (T,\ T+90]:\ B_i(t)=1\,\bigr]
 \label{eq:target}
 \end{equation}
 
-es decir, entre los clientes elegibles que al corte $T$ todavía no cruzaron su umbral, cuáles lo cruzan dentro de los 90 días siguientes. La condición $E_i(T)=1$ se agrega en la v2.1 (22/09/2026): un cliente con menos de tres compras no tiene umbral propio y no puede cruzarlo, así que sin esa condición la población del target mezclaría clientes que nunca pueden dar $Y_i(T)=1$ (sección~\ref{sec:proxy-churn}). El modelo puntúa en $T$ la probabilidad de $Y_i(T)=1$ con señales que se mueven \emph{antes} del cruce: caída de frecuencia y de ticket respecto del propio historial, y desde el 08/09 reclamos, consultas de soporte y devoluciones. Se valida con holdout temporal (entrenar hasta un corte, evaluar sobre los 90 días siguientes), contra la línea base de ordenar por $\rho_i(T)$. El dataset de entrenamiento del Entregable 2 materializa esta definición como una fila por cliente elegible y no en riesgo en cada corte mensual $T$, del 31/01/2023 al 30/09/2025, con las features calculadas solo con datos de fecha $\le T$ y el target medido en $(T,\,T+90]$; la partición es por corte (entrenamiento hasta 2024, prueba en 2025), nunca aleatoria, y la del Entregable 3 suma un embargo (subsección~\ref{sec:particion}). En la versión 0.1 del dataset la existencia se evalúa en tres puntos de la ventana, $t \in \{T+30,\,T+60,\,T+90\}$ días: un cliente que cruza su umbral y vuelve a comprar entre dos evaluaciones queda con $Y_i(T)=0$. Desde la v0.2 (Entregable 3) el target se evalúa cada día de la ventana, como dice la ecuación~\eqref{eq:target}: suma 885 positivos y ninguno pasa a 0.
+es decir, entre los clientes elegibles que al corte $T$ todavía no cruzaron su umbral, cuáles lo cruzan dentro de los 90 días siguientes. La condición $E_i(T)=1$ se agrega en la v2.1 (22/09/2026): un cliente con menos de tres compras no tiene umbral propio y no puede cruzarlo, así que sin esa condición la población del target mezclaría clientes que nunca pueden dar $Y_i(T)=1$ (sección~\ref{sec:proxy-churn}). Un modelo puntúa en $T$ la probabilidad de $Y_i(T)=1$ con señales que se mueven \emph{antes} del cruce: caída de frecuencia y de ticket respecto del propio historial, y desde el 08/09 reclamos, consultas de soporte y devoluciones. Se valida con holdout temporal (entrenar hasta un corte, evaluar sobre los 90 días siguientes), contra la línea base de ordenar por $\rho_i(T)$ y, desde el Entregable 3, contra la regla del umbral. El dataset de entrenamiento del Entregable 2 materializa esta definición como una fila por cliente elegible y no en riesgo en cada corte mensual $T$, del 31/01/2023 al 30/09/2025, con las features calculadas solo con datos de fecha $\le T$ y el target medido en $(T,\,T+90]$; la partición es por corte (entrenamiento hasta 2024, prueba en 2025), nunca aleatoria, y la del Entregable 3 suma un embargo (subsección~\ref{sec:particion}). En la versión 0.1 del dataset la existencia se evalúa en tres puntos de la ventana, $t \in \{T+30,\,T+60,\,T+90\}$ días: un cliente que cruza su umbral y vuelve a comprar entre dos evaluaciones queda con $Y_i(T)=0$. Desde la v0.2 (Entregable 3) el target se evalúa cada día de la ventana, como dice la ecuación~\eqref{eq:target}: suma 885 positivos y ninguno pasa a 0.
 % registro de cifras: F02
 
 \textbf{Las ``dos semanas de anticipación'' del alcance} (Parte C, sección 1.2) no son un horizonte de predicción: son el tiempo operativo entre el corte mensual en que se calcula la lista y la salida de la campaña, para que Marketing la reciba antes de que arme el envío del mes. El horizonte de predicción es el de la ecuación~\eqref{eq:target}: 90 días.
 
-En el Entregable 3 la anticipación no la da un modelo sino la regla del umbral de la subsección~\ref{sec:regla-umbral}: ordenar a los clientes por los días que les faltan para cruzar su umbral ya acierta 81,6\% de la lista mensual, y ningún modelo la supera con un intervalo que excluya el cero.
+En el Entregable 3 la anticipación no la da un modelo sino la regla del umbral de la subsección~\ref{sec:regla-umbral}: ordenar a los clientes por los días que les faltan para cruzar su umbral acierta 81,6\% de la lista mensual en validación y 86,1\% de la lista de contactables en test, y ningún modelo la supera con un intervalo que excluya el cero (subsección~\ref{sec:criterio-reemplazo}).
 
 \subsection{Días para cruzar el umbral y cercanía}
 \label{sec:dias-cruzar}
@@ -620,7 +625,7 @@ M_1 = \frac{1}{3}\sum_{T} \sum_{i \in L^{c}(T)} Y_i(T)
 \label{eq:meta-criterio-1}
 \end{equation}
 
-Se mide sobre el trimestre, no mes a mes. Un modelo reemplaza a la regla solo si suma aciertos por mes con un intervalo del 95\% (bootstrap por cliente, 1.000 réplicas) que excluye el cero, y si esos aciertos pagan lo que agrega al costo. En una lista de 500, un punto de precisión son 5 aciertos por mes. En producción, la precisión de cada lista se conoce a los 90 días, cuando se sabe quién cruzó; la alerta de la matriz de riesgos de la Parte C del Entregable 3 salta con dos meses seguidos debajo de
+Se mide sobre el trimestre, no mes a mes. Un modelo reemplaza a la regla solo si suma aciertos por mes con un intervalo del 95\% (bootstrap por cliente, 1.000 réplicas) que excluye el cero, y si esos aciertos pagan lo que agrega al costo (subsecciones~\ref{sec:bootstrap} y~\ref{sec:criterio-reemplazo}). En una lista de 500, un punto de precisión son 5 aciertos por mes. En producción, la precisión de cada lista se conoce a los 90 días, cuando se sabe quién cruzó; la alerta de la matriz de riesgos de la Parte C del Entregable 3 salta con dos meses seguidos debajo de
 
 \begin{equation}
 P_{\text{alerta}} = P^{c}_{500} - 1{,}96\sqrt{\frac{P^{c}_{500}\,(1-P^{c}_{500})}{500}}
@@ -662,6 +667,74 @@ Fuera de la evaluación & 2025-06 a 2025-09 & 11.294 & 3.031 (26,84\%) \\
 
 \impl{A-scripts\_etapa1.zip: etapa1.py, salida \texttt{etapa1.json} ($\to$ \texttt{particion}).}
 % registro de cifras: F02, F05, F17
+
+\subsection{Evaluación en test}
+\label{sec:evaluacion-test}
+
+\textbf{Población.} Las filas contactables de los cinco cortes de test, del 31/01 al 31/05/2025, con target medido hasta el 29/08/2025: clientes que aceptan marketing y no pidieron la baja con fecha $\le T$, el filtro L3 de la Parte C del Entregable 3. Son 9.962 de las 14.211 filas, con 2.521 positivos. $\mathcal C$ es el conjunto de cortes evaluados: 5 en test, 3 en validación. El test se abrió una sola vez, el 27/10/2026, con el modelo, la lista y el criterio de la subsección~\ref{sec:criterio-reemplazo} fijados antes en \texttt{preregistro.json} (v1.1).
+
+La tabla de la evaluación final de la Parte D del Entregable 3 mide la lista de contactables $L^{c}(T)$ de la subsección~\ref{sec:precision-lista}. Predicho positivo es estar en la lista de su corte. Con $VP$ los aciertos, $FP$ los lugares de la lista sin acierto y $FN$ los positivos contactables que quedan fuera, sumados sobre los cortes de $\mathcal C$,
+
+\begin{equation}
+P^{c} = \frac{VP}{VP + FP}, \qquad R^{c} = \frac{VP}{VP + FN}, \qquad \mathrm{F1}^{c} = \frac{2\,VP}{2\,VP + FP + FN}
+\label{eq:metricas-test}
+\end{equation}
+
+$P^{c}$ es la métrica principal: la lista tiene 500 lugares por corte, así que $VP + FP = 500\,|\mathcal C|$. $R^{c}$ es sobre los positivos contactables, no sobre todos. Con empates en el último lugar las cuatro celdas llevan decimales (subsección~\ref{sec:regla-umbral}).
+
+El AUC-ROC no corta la lista: mide el orden del puntaje $\pi_i(T)$ sobre todas las filas contactables de $\mathcal C$, con los cortes juntos. El puntaje es la probabilidad del modelo, $-h_i(T)$ para la regla y $\rho_i(T)$ para la práctica actual. Con $n_{+}$ filas positivas y $n_{-}$ negativas,
+
+\begin{equation}
+\mathrm{AUC}^{c} = \frac{1}{n_{+}\,n_{-}} \sum_{i:\,Y_i=1}\ \sum_{i':\,Y_{i'}=0} \Bigl(\mathbb{1}\bigl[\pi_i > \pi_{i'}\bigr] + \tfrac{1}{2}\,\mathbb{1}\bigl[\pi_i = \pi_{i'}\bigr]\Bigr)
+\label{eq:auc-contactables}
+\end{equation}
+
+la probabilidad de que una fila que cruza su umbral tenga más puntaje que una que no lo cruza. No es el AUC de las Partes B y C del Entregable 3, que se calcula sobre todas las filas, contactables o no.
+
+El valor neto de la lista suma el valor de cada celda (ecuación~\eqref{eq:valor-celda}) y se lleva a un año como si saliera una lista por mes con la composición de los cortes evaluados:
+
+\begin{equation}
+V_{\mathcal C} = \frac{12}{|\mathcal C|}\,\bigl(VP\,v_{VP} + FP\,v_{FP}\bigr)
+\label{eq:valor-anual-cortes}
+\end{equation}
+
+Con tres cortes el factor es 4, el de la ecuación~\eqref{eq:valor-lista}; con los cinco de test, 2,4. Pasa a dólares con TC.
+
+\impl{D-scripts\_etapa4.zip: etapa4.py (\texttt{lista\_contactables}, \texttt{medir}), salida \texttt{etapa4.json} ($\to$ \texttt{medicion.principal} y \texttt{tabla\_8\_1}); la columna de validación, en \texttt{etapa4\_validacion.json}.}
+\valoren{test, lista de 500 contactables}{la logística ajustada acierta 2.147 de 2.500 lugares: $P^{c}$ = 85,88\%, $R^{c}$ = 85,16\% y $\mathrm{F1}^{c}$ = 85,52\%, con $FN$ = 374 y $VN$ = 7.088. La regla del umbral, 2.153,35: 86,13\%, 85,42\% y 85,77\%. $\mathrm{AUC}^{c}$ = 0,974 para la logística, 0,979 para la regla y 0,660 para la práctica actual. $V_{\mathcal C}$ = USD 325,52 por año con la logística y USD 327,06 con la regla. En validación, la logística: 73,9\%, 94,3\%, 82,84\%, 0,966 y USD 252,84.}
+% registro de cifras: J02, J03, J04, J05, J06, J08, H15
+
+\subsection{Diferencia entre dos listas e intervalo por bootstrap de clientes}
+\label{sec:bootstrap}
+
+Para comparar dos puntajes se resta la precisión de sus listas en los mismos cortes, $D = P^{c}_{\text{modelo}} - P^{c}_{\text{regla}}$. Un mismo cliente aparece en varios cortes, así que el intervalo no se arma sorteando filas sino clientes. En cada réplica $b$, de 1 a 1.000 con semilla 42, se sortean con reposición tantos clientes como tiene el conjunto, se toman todas sus filas, se rehacen las listas de 500 de cada corte con los dos puntajes y se calcula $D^{(b)}$. El intervalo del 95\% va del percentil 2,5 al 97,5 de las réplicas:
+
+\begin{equation}
+\mathrm{IC}_{95} = \bigl[\,q_{0{,}025}\bigl(D^{(b)}\bigr),\ q_{0{,}975}\bigl(D^{(b)}\bigr)\,\bigr]
+\label{eq:bootstrap}
+\end{equation}
+
+La parte de las réplicas con $D^{(b)} > 0$ es la que se cita como réplicas a favor del modelo.
+
+\impl{B-scripts\_etapa2.zip: etapa2.py (\texttt{bootstrap\_diferencia}); D-scripts\_etapa4.zip: etapa4.py, salida \texttt{etapa4.json} ($\to$ \texttt{medicion.principal.diferencia\_logistica\_menos\_regla}).}
+\valoren{test, lista de 500 contactables}{$D = -0{,}25$ puntos (6,35 aciertos menos en los cinco cortes), con un intervalo de $-1{,}45$ a $+0{,}79$ y 31,0\% de las réplicas a favor del modelo. En validación, $-1{,}93$ (de $-3{,}25$ a $-1{,}07$). En la lista de 500 sin filtro de test, $+1{,}06$ (de $+0{,}41$ a $+1{,}95$).}
+% registro de cifras: J09, J11, H16
+
+\subsection{Criterio para reemplazar la regla por un modelo}
+\label{sec:criterio-reemplazo}
+
+Es el de la matriz de riesgos de la Parte C del Entregable 3 (fila 13), fijado antes de abrir el test. Un modelo reemplaza a la regla del umbral solo si se cumplen las dos condiciones, medidas en test sobre la lista de 500 contactables:
+
+\begin{equation}
+q_{0{,}025}\bigl(D^{(b)}\bigr) > 0 \qquad \text{y} \qquad \frac{VP_{\text{modelo}} - VP_{\text{regla}}}{|\mathcal C|} \;\ge\; a^{*} = \frac{C_{\text{extra}}\,\mathrm{TC}}{12\,\bigl(v_{VP} - v_{FP}\bigr)}
+\label{eq:criterio-reemplazo}
+\end{equation}
+
+La primera pide que la ventaja no sea azar: el intervalo de la ecuación~\eqref{eq:bootstrap} excluye el cero. La segunda pide que los aciertos de más por mes paguen lo que el modelo agrega al costo del año 1, $C_{\text{extra}}$ = USD 10.400: dos meses más de data scientist y la nube. Cada acierto de más reemplaza un falso positivo, y por eso vale $v_{VP} - v_{FP}$; $a^*$ son los puntos de la subsección~\ref{sec:valor-punto} pasados a aciertos por mes, 5 por punto.
+
+\impl{\texttt{preregistro.json} ($\to$ \texttt{criterio\_de\_decision.operativo}) y etapa4.py (\texttt{medir}, \texttt{decidir}), en D-scripts\_etapa4.zip; $a^*$ en \texttt{economia.json} ($\to$ \texttt{meta\_criterio\_1}), de B-scripts\_etapa2.zip.}
+\valoren{test}{el límite inferior es $-1{,}45$ puntos y la logística acierta 1,27 clientes menos por mes, cuando $a^*$ = 8.595. No se cumple ninguna de las dos condiciones: la lista sigue con la regla del umbral.}
+% registro de cifras: J09, J10, G40, G53, G56
 
 \section{Experimento propuesto y efecto mínimo detectable}
 \label{sec:experimento}
@@ -751,7 +824,7 @@ Un verdadero positivo vuelve con probabilidad $s$, compra con el descuento y dej
 \subsection{Valor anual de la lista y tasa de éxito de equilibrio}
 \label{sec:valor-lista}
 
-Las matrices de validación son de tres cortes. Para llevarlas a un año se multiplican por 4, como si saliera una lista de 500 por mes con la composición de validación. Con $VP$ y $FP$ los de la lista en los tres cortes y $C_1$ el costo del año 1 en dólares,
+Las matrices de validación son de tres cortes. Para llevarlas a un año se multiplican por 4, como si saliera una lista de 500 por mes con la composición de validación; con otro número de cortes el factor es 12 sobre esa cantidad (ecuación~\eqref{eq:valor-anual-cortes}). Con $VP$ y $FP$ los de la lista en los tres cortes y $C_1$ el costo del año 1 en dólares,
 
 \begin{equation}
 V = 4\,\bigl(VP\,v_{VP} + FP\,v_{FP}\bigr), \qquad \mathrm{ROI} = \frac{V/\mathrm{TC} - C_1}{C_1}\times 100
