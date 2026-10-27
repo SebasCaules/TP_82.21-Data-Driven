@@ -19,15 +19,21 @@ python3 -I pipeline/build_e3.py
 
 - **El navegador no calcula.** Busca en `D3` y formatea. Ninguna cifra se escribe en el JSX ni se
   deriva (ni una resta: `piloto.contactados_mes` ya viene). El texto sale de `C3` tal cual.
-- `build_e3.py` usa solo la biblioteca estándar y corre con `python3 -I`. Si una de sus 182 anclas
+- `build_e3.py` usa solo la biblioteca estándar y corre con `python3 -I`. Si una de sus 409 anclas
   no da el número del documento, sale con código 1 y no escribe nada. Además compara su fórmula
   económica con `economia.json` (26 controles).
 - Los dos scripts son deterministas: dos corridas, los mismos bytes.
 - `data/e3/` son copias byte a byte (el sha256 va en `D3.meta.fuentes`) de las salidas de las partes:
   `etapa2.json` ← `_build/B/modelado/salida/`, `etapa3.json` ← `_build/C/modelado/salida/`,
-  `economia.json` ← `_build/B/economia/salida/`, `condiciones.json` ← `_build/A/factibilidad/salida/`.
-  Se copian enteras: 242 KB en total, y una copia fiel se verifica con el hash. Un recorte sería un
-  formato más que mantener.
+  `economia.json` ← `_build/B/economia/salida/`, `condiciones.json` ← `_build/A/factibilidad/salida/`;
+  desde W3 (27/10), `etapa4.json` y `etapa4_validacion.json` ← `_build/D/modelado/salida/` (la etapa 4 de la
+  Parte D: el test, abierto una sola vez, y la misma medición en validación).
+  Se copian enteras: 340 KB en total, y una copia fiel se verifica con el hash. Un recorte sería un
+  formato más que mantener. `etapa4.json` además tiene que tener la huella que cita el registro (J01:
+  sha256 `0368611d…`): si cambia, el test se habría vuelto a correr, y el script sale con código 1.
+- Dos fuentes más, de la propia app (su sha256 también va en `D3.meta.fuentes`): `src/datos.js`, el payload
+  del tablero del E1 (C08, C14, C18 y el C03 de J52), y `data/raw/Campanias_marketing.csv`, la copia de los
+  datos de la cátedra (J51).
 
 ## 1. Formato de los números
 
@@ -99,7 +105,7 @@ Las diapositivas 2, 5, 10 y 11 y los anexos A1 a A6 salen solo de `C3`.
 
 ## 3. `D3` (datos)
 
-`{meta, caso, tecnica, modelos, lista, economia, piloto, anclas}`. Entre paréntesis: cómo lo escribe
+`{meta, caso, tecnica, modelos, lista, economia, piloto, encuadre, legal, test, plan, monitoreo, anclas}`. Entre paréntesis: cómo lo escribe
 el documento y la fila del registro (`wiki/entregables/cifras-entregable-3.md`).
 
 ### `caso`: diapositiva 3 (H23, C 7.3)
@@ -230,10 +236,88 @@ Precalculada en Python con la fórmula de `economia.py`. Columnas paralelas, tod
 `horas_operador` 4; `costo_horas_usd` «USD 1.350»; `acciones_ars` «ARS 68.289» (entero) y
 `acciones_usd` «USD 46,79»; `costo_por_tratado_ars` «ARS 54,20».
 
+### `encuadre` y `legal`: lo que las vistas 2 y 6 leían del texto (W3, 27/10)
+
+Hasta W2 estas cinco cifras solo estaban en el texto de `C3`. Ahora vienen con su fila y un ancla que comprueba
+que `C3` escribe lo mismo.
+
+- `encuadre`: `ventas_2024_ars` y `ventas_2025_ars` (ARS 349,7 M y 225,0 M), `variacion_ventas_2025_pct`
+  «−35,6 %» (C14); `capacidad_contacto_mes` [500, 800] (C08).
+- `legal`: `dimensiones[] = {id, nombre, puntaje}` (las cinco de la C 5.3, todas en 2), `promedio` «2,0»,
+  `tramo = {desde 1,6, hasta 2,5, nivel}` (H40); `envios_sin_consentimiento` 7.078,
+  `envios_sin_consentimiento_tasa` «30,1 %», `no_consintieron_contactados_tasa` «98,3 %» (C18); `riesgos` 13
+  y `riesgos_criticos` 3, contados en el anexo A4 de `C3` (J22).
+
+### `test`: la etapa 4 (J01 a J21, Parte D 8.1 a 8.3 y 11.2)
+
+Test: los 5 cortes del 31/01 al 31/05/2025. Validación: los 3 cortes de julio a septiembre de 2024. La lista es
+la de 500 contactables por corte, salvo en `sin_filtro`.
+
+- `apertura` (J01): `fecha` «2026-10-27T15:55:55-03:00», `lineas` 1, `preregistro_version` «1.1»,
+  `control_cifras` y `control_reproducen` 125, `etapa4_sha256`.
+- `conjunto` (J02, J18): `cortes`, `desde`, `hasta`, `filas` 14.211, `positivos` 3.602, `tasa` «25,35 %»,
+  `anualizar` 2,4, `contactables` 9.962, `contactables_por_corte`, `positivos_contactables` 2.521,
+  `positivos_contactables_tasa` «25,3 %», `positivos_contactables_por_corte` «504».
+- `validacion` (J18): `cortes`, `contactables` 5.038, `positivos_contactables` 1.175,
+  `positivos_contactables_por_corte` «392», `techo_precision` «78,3 %».
+- `entrenamiento` (J02, J20): `filas` 18.882, `cortes` 18, `desde`, `hasta`, `clientes` 2.921, `positivos` 5.698,
+  `tasa` «30,2 %».
+- `metodos.<logistica_ajustada | regla | practica_actual>.<test | validacion>` (J03 a J06, J08, J17):
+  `{precision, recall, f1, auc_roc_contactables, casos, vp, fp, fn, vn, usd, usd_anio, aciertos_por_mes,
+  precision_por_corte[]}`. `usd` es el valor neto del período (5 cortes en test); `usd_anio`, por año. Test:
+  logística 85,88 % y regla 86,13 % (la 8.1 los escribe con un decimal: 85,9 % y 86,1 %).
+- `tabla_8_1[] = {fila, baseline_test, modelo_validacion, modelo_test, diferencia_test_menos_validacion,
+  baseline_validacion}` (J03 a J07), en el orden de la tabla: `metrica_principal`, `precision`, `recall`, `f1`,
+  `auc_roc`, `valor_neto_anual_usd`. Las fracciones van sin multiplicar; el AUC con 3 decimales; el valor en USD.
+- `fuera_de_la_lista` (J18): `test` 374 y `test_tasa` «14,8 %»; `validacion` 67 y `validacion_tasa` «5,7 %».
+- `contra_regla` (J09): `diferencia_pp` «−0,25», `ic95_pp` «−1,45 a +0,79», `replicas_a_favor` «31,0 %»,
+  `aciertos_de_menos` «6,35», `aciertos_extra_por_mes` «−1,27»; `validacion_diferencia_pp` «−1,93» y
+  `validacion_ic95_pp` «−3,25 a −1,07» (H16).
+- `decision` (J10): `condicion_1` false, `ic95_inferior_pp`, `condicion_2` false, `aciertos_extra_por_mes`,
+  `aciertos_por_mes_para_pagar` «8.595», `costo_incremental_usd` 10.400, `valor_extra_anual_usd`,
+  **`sigue_la_regla` true** y `resultado` (texto de `etapa4.json`).
+- `sin_filtro` (J11, no decide): `logistica_ajustada` y `regla` con `{precision, aciertos, largo, recall,
+  usd_anio, auc_roc, decil_superior}`; `diferencia_pp` «+1,06», `ic95_pp` «+0,41 a +1,95», `replicas_a_favor`
+  «99,9 %», `aciertos_de_mas_por_mes` «5,32», `usd_anio_de_mas` «6,44».
+- `roi_b_3_4[]` (J12), filas `modelo_sobre_la_regla`, `proyecto_completo`, `regla_sin_modelo`:
+  `{fila, id, costo_usd, b_3_4, contactables, sin_filtro, cambia_el_veredicto}`, cada celda
+  `{usd, roi_pct, recupera_en_el_anio}`. Ninguna recupera; `cambia_el_veredicto` false en las tres.
+- `meta_y_alerta` (J13): `regla_aciertos_por_mes` «430,67», `meta_aciertos_por_mes` 379,
+  `regla_precision_por_corte[]`, `regla_precision_minima` «83,6 %», `regla_precision_maxima` «88,2 %»,
+  `alerta_precision` «72,0 %».
+- `calibracion` (J14): `brier` «0,066», `brier_tasa_base` «0,189», `probabilidad_media` «21,8 %»,
+  `tasa_observada` «25,3 %», `positivos_esperados` «3.104», `positivos_observados` 3.602, `ece_deciles` «0,058»,
+  `lista_500_probabilidad_media` «80,4 %», `lista_500_precision` «90,3 %».
+- `segmentos` (J15, J21): `lista_precision` «90,32 %», `lista_precision_regla` «89,26 %»; `filas[] = {id,
+  segmento, valor, en_lista, precision, ic95, diferencia_pp, precision_regla, diferencia_regla_pp,
+  validacion_diferencia_pp}` con `id` `mujeres`, `hombres`, `genero_x`, `alto_valor`, `menos_de_12_meses`,
+  `alta_online` y `alta_fisica` (lista de 500 sin filtro de la logística; `validacion_diferencia_pp` de
+  `etapa3.json`, H25 a H28).
+- `modelo` (J16, J20): `nombre`, `version` «1.1», `scikit_learn` «1.9.1», `C` 0,01, `min_frecuencia` 100,
+  `sin` [«genero»], `agrupadas` 3 (`agrupadas_etapa3` 5), `variables` 39, `terminos_con_intercepto` 75,
+  `iteraciones` 31, `pliegues` 4, `coeficientes[]` (los seis mayores: `gap_mediano` −2,47 … marca de vacío de
+  `ticket_90d` +0,18, con sus `filas`), `importancia[]` (C 7.3), `probabilidad_del_ultimo_puesto[]` y su
+  mínima y máxima (0,32 y 0,39).
+- `equilibrio` (J19): `s_equilibrio` «46,9 %», `precision_lista` (la de la regla en test),
+  `diferencia_compra_7d_pp` «40,4», `costo_anio_1_usd` 20.260. La fórmula es la de `economia.s_equilibrio_mvp`
+  con la matriz de la regla en test × 2,4.
+
+### `plan` (J50, D 12.1 y 12.2) y `monitoreo` (J51, J52)
+
+- `plan`: `semana_1` «2026-11-02» (lunes; la semana de la entrega del E3), `fases[] = {id, nombre,
+  desde_semana, hasta_semana, semanas, desde, hasta}` (fechas ISO: el piloto, semanas 6 a 18, del 2026-12-07
+  al 2027-03-07; la decisión termina el 2027-03-21), `semanas` 20 y `hitos_semana` (alcance 1, regla del target
+  y operador del piloto 2, acciones legales y control 4, extracto regenerado y go-live 6, operador de después
+  del piloto 13, decisión 20).
+- `monitoreo.campanias_noviembre[] = {anio, fecha, id_campania}` (J51): el primer envío de noviembre de cada año,
+  calculado del CSV. `monitoreo.drift` (J52): `verde_hasta_pct` 38 y `rojo_desde_pct` 42 (el semáforo del E1),
+  `referencia` «41,0 %» = `en_riesgo` 2.452 / `clientes` 5.978 al `referencia_corte` 2025-12-31 (C03).
+
 ### `meta` y `anclas`
 
-`meta.fuentes[] = {archivo, sha256}` de los cuatro JSON; `meta.contenido = {archivo, version, sha256}`
-del `contenido_e3.js` con que se armó `D3`. `anclas[] = {id, nombre, documento, donde}`: las 182
+`meta.fuentes[] = {archivo, sha256}` de los seis JSON, `src/datos.js` y `data/raw/Campanias_marketing.csv`;
+`meta.contenido = {archivo, version, sha256}`
+del `contenido_e3.js` con que se armó `D3`. `anclas[] = {id, nombre, documento, donde}`: las 409
 comprobaciones, con el texto del documento y dónde lo escribe («B 3.6 · C3 d9»). Cuando `donde` nombra
 una diapositiva o un anexo de `C3`, el script comprobó que ese texto está ahí. Sirven para un
 `title` de fuente.
@@ -244,12 +328,15 @@ una diapositiva o un anexo de `C3`, el script comprobó que ese texto está ahí
 |---|---|---|
 | Puntajes de las cuatro condiciones técnicas y la escala | `condiciones.json` trae inventario, cruces y nulos, no el puntaje | constantes de la A 1.2 en `build_e3.py`; el script comprueba que la diapositiva 4 escribe «Datos · 3», «Calidad · 2»… |
 | 1,5 y 90 días del umbral | es la definición del target (A 2.1), no un dato | constantes en `build_e3.py` |
-| −35,6 %, 16.052 positivos en 59.585 filas y 33 cortes, 500 a 800 contactos (diapositiva 3) | salen del pipeline del E1 y de `resumen_v0.2.json`, que no se copian | texto de `C3` (`cifras`, `definicion`) |
+| 16.052 positivos en 59.585 filas y 33 cortes (diapositiva 3) | salen de `resumen_v0.2.json`, que no se copia | texto de `C3` (`definicion`). Desde W3, el −35,6 % y los 500 a 800 contactos están en `D3.encuadre`, leídos del payload del E1 |
 | 1.431 clientes con positivo, señal de alerta de 50 a 100 (diapositiva 4) | `etapa1.json` no se copia | texto de `C3` |
 | Práctica actual en entrenamiento | `etapa2.json` y `etapa3.json` solo la miden en validación | `entrenamiento: null` |
 | ROI del modelo con s = 100 % en las partes | la B escribe USD 448,90; el −95,68 % está solo en el registro (G36) | `modelo_roi_pct_con_s_100`, anclado a G36 |
 | Diferencias de aciertos por largo y filtro (diapositiva 7) | las partes escriben solo la de 500 contactables (29) | `comparaciones`, anclado a la fila H48 del registro |
-| Legal, riesgos, sensibilidad, matriz, segmentos y costos por componente (10, 11, A3 a A6) | el pedido los deja en texto | `C3`; los números de A3 y A6 que también están en `D3` son anclas |
+| Legal, riesgos, sensibilidad, matriz, segmentos y costos por componente (10, 11, A3 a A6) | el pedido los deja en texto | `C3`; los números de A3 y A6 que también están en `D3` son anclas. Desde W3, el puntaje legal, el 30,1 % y los 13 riesgos (3 críticos) están en `D3.legal` |
+| Puntajes de las cinco dimensiones legales y su tramo (C 5.3) | ningún JSON los trae | constantes en `build_e3.py`; el script comprueba nombres y puntajes contra `C3` d10 |
+| Fases, semanas e hitos del plan (D 12) | `contenido_d_solucion.py` no escribe un JSON | constantes en `build_e3.py` (la tabla `FASES` de la D, con sus mismas comprobaciones de duración y orden); las fechas se calculan desde el lunes 02/11/2026 |
+| Texto de las vistas 7 y 8 (Parte D) | `contenido.py` de la presentación (v1.2) no tiene diapositivas de la D | los números ya están en `D3.test` y `D3.plan`; el texto entra a `C3` cuando `contenido.py` sume esas diapositivas y se vuelva a correr `exportar_web.py` |
 
 > **Nota.** En la importancia, `reclamos_90d` (0,5 puntos, H21) pesa más que `edad` (0,4) y no está ni
 > en el gráfico de la diapositiva 7 ni en la tabla de la C 7.3, que eligen variables con lectura de

@@ -5,8 +5,10 @@ Build E3: capa de datos de la presentación interactiva /e3/ (contrato en pipeli
 
 Lee, sin modificarlos:
 - data/e3/etapa2.json, etapa3.json, economia.json y condiciones.json: copias byte a byte de la salida
-  de los generadores de las partes A, B y C del Entregable 3. Las deja
+  de los generadores de las partes A, B y C del Entregable 3; etapa4.json y etapa4_validacion.json, de la
+  etapa 4 de la Parte D (el test, abierto una sola vez). Las deja
   entregas/entregable-3/_build/F/presentacion/exportar_web.py.
+- src/datos.js (payload del tablero del E1) y data/raw/Campanias_marketing.csv (copia de la cátedra).
 - e3/src/contenido_e3.js: el texto de la presentación (C3), para comprobar que cada ancla que la
   diapositiva escribe está escrita igual ahí.
 
@@ -33,7 +35,11 @@ APP = Path(__file__).resolve().parents[1]
 DATOS = APP / "data" / "e3"
 CONTENIDO = APP / "e3" / "src" / "contenido_e3.js"
 SALIDA = APP / "e3" / "src" / "datos_e3.js"
-ENTRADAS = ("etapa2.json", "etapa3.json", "economia.json", "condiciones.json")
+ENTRADAS = ("etapa2.json", "etapa3.json", "economia.json", "condiciones.json", "etapa4.json", "etapa4_validacion.json")
+# (27/10, W3) dos fuentes de la app que no son de las partes del E3: el payload del tablero del E1 (C08, C14, C18,
+# C03 de J52) y la copia de los datos crudos de la cátedra (J51). Su sha256 también va en D3.meta.fuentes.
+E1_PAYLOAD = APP / "src" / "datos.js"
+CAMPANIAS = APP / "data" / "raw" / "Campanias_marketing.csv"
 
 # Constantes que no vienen en los JSON: salen del texto de la Parte A y se dicen en el contrato.
 # A 2.1, definición del target: θ = máx(90 días; 1,5 × intervalo mediano), ventana de 90 días.
@@ -713,6 +719,537 @@ def armar_piloto(eco: dict, e2: dict) -> dict:
     return pil
 
 
+# ============================================================ Parte D y lo que faltaba (27/10, W3)
+#
+# test: la etapa 4 (el test, abierto una sola vez el 27/10/2026), J01 a J21. encuadre y legal: las cifras de las
+# vistas 2 y 6 que hasta W2 solo estaban en el texto de C3 (C14, C08, H40, C18 y J22). plan: el plan del proyecto
+# de la sección 12 de la D (J50). monitoreo: la campaña de noviembre (J51) y la alerta de drift (J52).
+
+# huella de etapa4.json que cita el registro (J01) y etapa4-resumen.md: si cambia, el test se habría vuelto a correr
+ETAPA4_SHA256 = "0368611d7d797b3bec39f19764d2e3496d9c74e539a8b6c2e8cdf03099844fbd"
+# C 5.3 (H40): puntaje de cada dimensión legal y tramo de la escala. etapa3.json no trae los puntajes.
+LEGAL = [("proteccion_datos", "Protección de datos personales", 2),
+         ("seguridad_accesos", "Seguridad y control de accesos", 2),
+         ("conservacion_fiscal", "Conservación y trazabilidad fiscal", 2),
+         ("contratos_proveedores", "Contratos con proveedores externos", 2),
+         ("explicabilidad", "Explicabilidad del modelo", 2)]
+TRAMO_LEGAL = (1.6, 2.5, "Viable con condiciones")
+# D 12 (J50): fases del plan en semanas (primera, última); la semana 1 empieza el lunes 02/11/2026. Es la tabla
+# FASES de _build/D/contenido_d_solucion.py, con sus mismos asserts de duración y orden.
+SEMANA_1 = "2026-11-02"
+FASES_PLAN = [("gobierno", "Precondiciones de gobierno", 1, 2),
+              ("datos", "Integración y limpieza de datos", 1, 3),
+              ("planilla", "Planilla, tablero y guía de corrida", 1, 4),
+              ("prueba", "Corrida de prueba y capacitación", 5, 5),
+              ("piloto", "Piloto", 6, 18),
+              ("decision", "Informe y decisión", 19, 20)]
+HITOS_PLAN = {"alcance": 1, "regla_y_operador_del_piloto": 2, "acciones_legales_y_control": 4,
+              "extracto_regenerado": 6, "go_live": 6, "operador_despues_del_piloto": 13, "decision": 20}
+
+
+def cargar_e1() -> dict:
+    texto = E1_PAYLOAD.read_text(encoding="utf-8")
+    marca = "export const D = "
+    return json.loads(texto[texto.index(marca) + len(marca):].strip().rstrip(";"))
+
+
+def armar_encuadre(e1: dict) -> dict:
+    va = {r["anio"]: r["ventas"] for r in e1["series"]["ventas_anuales"]}
+    enc = {"ventas_2024_ars": va[2024], "ventas_2025_ars": va[2025],
+           "variacion_ventas_2025_pct": (va[2025] / va[2024] - 1) * 100,
+           "capacidad_contacto_mes": e1["meta"]["capacidad_contacto"]}
+    ancla("C14", "encuadre: ventas 2025 contra 2024 (%)", enc["variacion_ventas_2025_pct"], "−35,6", 1,
+          donde="A 1.1", c3="d3")
+    ancla("C14", "encuadre: ventas 2025 (ARS M)", va[2025] / 1e6, "225,0", 1, donde="registro C14")
+    ancla("C14", "encuadre: ventas 2024 (ARS M)", va[2024] / 1e6, "349,7", 1, donde="registro C14")
+    ancla("C08", "encuadre: capacidad de contacto, piso", enc["capacidad_contacto_mes"][0], "500", 0, donde="A 1.5",
+          c3="d3")
+    ancla("C08", "encuadre: capacidad de contacto, techo", enc["capacidad_contacto_mes"][1], "800", 0, donde="A 1.5",
+          c3="d3")
+    return enc
+
+
+def armar_legal(e1: dict, c3: dict) -> dict:
+    d10 = next(d for d in c3["DIAPOSITIVAS"] if d["n"] == 10)
+    a4 = next(a for a in c3["ANEXOS"] if a["n"] == "A4")
+    co = e1["series"]["consentimiento"]
+    puntajes = [p for _, _, p in LEGAL]
+    leg = {
+        "dimensiones": [{"id": i, "nombre": n, "puntaje": p} for i, n, p in LEGAL],
+        "promedio": sum(puntajes) / len(puntajes),
+        "tramo": {"desde": TRAMO_LEGAL[0], "hasta": TRAMO_LEGAL[1], "nivel": TRAMO_LEGAL[2]},
+        "envios_sin_consentimiento": co["envios_a_no_acepta"],
+        "envios_sin_consentimiento_tasa": co["pct_envios_a_no_acepta"],
+        "no_consintieron_contactados_tasa": co["pct_alcance"],
+        "riesgos": len(a4["filas"]), "riesgos_criticos": len(a4["destacar"]),
+    }
+    ancla("H40", "legal: promedio", leg["promedio"], "2,0", 1, donde="C 5.3", c3="d10")
+    ancla("H40", "legal: nombres y puntajes de las dimensiones",
+          [(x["dimension"], x["puntaje"]) for x in d10["dimensiones"]] == [(n, str(p)) for _, n, p in LEGAL], True,
+          donde="C 5.3 · C3 d10 dimensiones")
+    ancla("H40", "legal: tramo de la escala", f"{es(TRAMO_LEGAL[0], 1)} a {es(TRAMO_LEGAL[1], 1)}", "1,6 a 2,5",
+          donde="C 5.3", c3="d10")
+    ancla("C18", "legal: envíos sin consentimiento", leg["envios_sin_consentimiento"], "7.078", 0,
+          donde="registro C18")
+    ancla("C18", "legal: envíos sin consentimiento (%)", leg["envios_sin_consentimiento_tasa"], "30,1", 1, 100,
+          donde="C 5.1", c3="d10")
+    ancla("C18", "legal: no consintieron y fueron contactados (%)", leg["no_consintieron_contactados_tasa"], "98,3",
+          1, 100, donde="registro C18")
+    ancla("J22", "legal: riesgos en la matriz", leg["riesgos"], "13", 0, donde="C 6.2", c3="A4")
+    ancla("J22", "legal: riesgos críticos (destacados en A4)", leg["riesgos_criticos"], "3", 0,
+          donde="C 6.2 · C3 A4 destacar")
+    return leg
+
+
+def _medidas_test(p: dict) -> dict:
+    return {"precision": p["precision"], "recall": p["recall"], "f1": p["f1"],
+            "auc_roc_contactables": p["auc_roc_contactables"], "casos": p["casos_marcados"],
+            "vp": p["vp"], "fp": p["fp"], "fn": p["fn"], "vn": p["vn"],
+            "usd": p["valor_neto_usd"], "usd_anio": p["valor_neto_anual_usd"], "aciertos_por_mes": p["aciertos_por_mes"],
+            "precision_por_corte": [x["precision"] for x in p["precision_por_corte"]]}
+
+
+# segmentos de la lista de 500 sin filtro que cita el registro (J15, J21): id → (segmento, valor) de etapa4.json
+SEGMENTOS_TEST = {"mujeres": ("genero", "F"), "hombres": ("genero", "M"), "genero_x": ("genero", "X"),
+                  "alto_valor": ("alto valor", "20 % de mayor facturación"),
+                  "menos_de_12_meses": ("antigüedad", "menos de 12 meses"),
+                  "alta_online": ("canal de alta", "online"), "alta_fisica": ("canal de alta", "fisico")}
+
+
+def armar_test(e4: dict, v4: dict, eco: dict, e3: dict) -> dict:
+    M, MV = e4["medicion"], v4["medicion"]
+    P, PV = M["principal"], MV["principal"]
+    SEC, CR = M["secundarias"], M["criterio"]
+    SF = SEC["sin_filtro"]
+    lt, rt = P["logistica_ajustada"], P["regla_umbral"]
+    lv, rv = PV["logistica_ajustada"], PV["regla_umbral"]
+    n_t, n_v = len(M["cortes"]), len(MV["cortes"])
+    pos_t, pos_v = M["contactables"]["positivos"], MV["contactables"]["positivos"]
+    fi = e4["ficha_8_3"]
+    mo = fi["modelo"]
+    linea = e4["apertura"][0].split("\t")
+    # J19: la fórmula de economia.s_equilibrio_mvp con la matriz de la regla en la lista de test, llevada a un año
+    pa = eco["parametros"]
+    t_, d_, c_ = pa["ticket_medio_ars"], pa["descuento"], pa["costo_accion_ars"]
+    r_ = eco["tasa_exito"]["falsos_positivos"]["r_oferta_7_dias"]
+    vp_a, fp_a = rt["vp"] * M["anualizar"], rt["fp"] * M["anualizar"]
+    costo_ars = eco["costo_total_anio_1"]["mvp"] * eco["tipo_de_cambio"]["base_30_12_2025"]
+    s_eq = (costo_ars + vp_a * c_ + fp_a * (c_ + r_ * d_ * t_)) / (vp_a * (pa["m_base_ars"] - d_ * t_))
+    seg_t = {(r["segmento"], r["valor"]): r for r in SEC["segmentos"]["filas"]}
+    seg_v = {(r["segmento"], r["valor"]): r for r in e3["segmentos"]["filas"]}
+    sfl, sfr = SF["logistica_ajustada"], SF["regla_umbral"]
+    dsf = SEC["diferencia_sin_filtro_logistica_menos_regla"]
+    cal = SEC["calibracion"]
+    coef = {c["termino"]: c for c in mo["coeficientes"]}
+    test = {
+        "apertura": {"fecha": linea[0], "lineas": len(e4["apertura"]), "preregistro_version": fi["preregistro_version"],
+                     "control_cifras": e4["validacion"]["control"]["cifras"],
+                     "control_reproducen": e4["validacion"]["control"]["reproducen"],
+                     "etapa4_sha256": sha256(DATOS / "etapa4.json")},
+        "conjunto": {"cortes": M["cortes"], "desde": M["cortes"][0], "hasta": M["cortes"][-1], "filas": M["filas"],
+                     "positivos": M["positivos"], "tasa": M["tasa_base"], "anualizar": M["anualizar"],
+                     "contactables": M["contactables"]["filas"], "contactables_por_corte": M["contactables"]["por_corte"],
+                     "positivos_contactables": pos_t, "positivos_contactables_tasa": pos_t / M["contactables"]["filas"],
+                     "positivos_contactables_por_corte": pos_t / n_t},
+        "validacion": {"cortes": MV["cortes"], "contactables": MV["contactables"]["filas"],
+                       "positivos_contactables": pos_v, "positivos_contactables_por_corte": pos_v / n_v,
+                       "techo_precision": pos_v / (500 * n_v)},
+        "entrenamiento": {**M["entrenamiento"], "tasa": M["entrenamiento"]["positivos"] / M["entrenamiento"]["filas"]},
+        "metodos": {
+            "logistica_ajustada": {"test": _medidas_test(lt), "validacion": _medidas_test(lv)},
+            "regla": {"test": _medidas_test(rt), "validacion": _medidas_test(rv)},
+            "practica_actual": {"test": _medidas_test(SEC["practica_actual_contactables"]),
+                                "validacion": _medidas_test(MV["secundarias"]["practica_actual_contactables"])},
+        },
+        "tabla_8_1": [{k: r[k] for k in ("fila", "baseline_test", "modelo_validacion", "modelo_test",
+                                         "diferencia_test_menos_validacion", "baseline_validacion")}
+                      for r in e4["tabla_8_1"]],
+        "fuera_de_la_lista": {"test": lt["fn"], "test_tasa": lt["fn"] / pos_t,
+                              "validacion": lv["fn"], "validacion_tasa": lv["fn"] / pos_v},
+        "contra_regla": {"diferencia_pp": (lt["precision"] - rt["precision"]) * 100,
+                         "ic95_pp": [x * 100 for x in P["diferencia_logistica_menos_regla"]["ic95"]],
+                         "replicas_a_favor": P["diferencia_logistica_menos_regla"]["replicas_con_a_mejor"],
+                         "aciertos_de_menos": rt["vp"] - lt["vp"],
+                         "aciertos_extra_por_mes": CR["aciertos_extra_por_mes"],
+                         "validacion_diferencia_pp": (lv["precision"] - rv["precision"]) * 100,
+                         "validacion_ic95_pp": [x * 100 for x in PV["diferencia_logistica_menos_regla"]["ic95"]]},
+        "decision": {"condicion_1": CR["condicion_1_intervalo_excluye_el_cero"],
+                     "ic95_inferior_pp": CR["ic95_limite_inferior"] * 100,
+                     "condicion_2": CR["condicion_2_paga_lo_que_agrega"],
+                     "aciertos_extra_por_mes": CR["aciertos_extra_por_mes"],
+                     "aciertos_por_mes_para_pagar": CR["aciertos_extra_por_mes_para_pagar"],
+                     "costo_incremental_usd": CR["costo_incremental_usd"],
+                     "valor_extra_anual_usd": CR["valor_extra_anual_usd"],
+                     "sigue_la_regla": e4["decision"]["resultado"] == "la lista sigue con la regla del umbral",
+                     "resultado": e4["decision"]["resultado"]},
+        "sin_filtro": {
+            "logistica_ajustada": {"precision": sfl["lista_500"]["precision"], "aciertos": sfl["lista_500"]["aciertos"],
+                                   "largo": sfl["lista_500"]["largo"], "recall": sfl["lista_500"]["recall"],
+                                   "usd_anio": sfl["lista_500"]["valor_neto_anual_usd"], "auc_roc": sfl["auc_roc"],
+                                   "decil_superior": sfl["decil_superior"]},
+            "regla": {"precision": sfr["lista_500"]["precision"], "aciertos": sfr["lista_500"]["aciertos"],
+                      "largo": sfr["lista_500"]["largo"], "recall": sfr["lista_500"]["recall"],
+                      "usd_anio": sfr["lista_500"]["valor_neto_anual_usd"], "auc_roc": sfr["auc_roc"],
+                      "decil_superior": sfr["decil_superior"]},
+            "diferencia_pp": (sfl["lista_500"]["precision"] - sfr["lista_500"]["precision"]) * 100,
+            "ic95_pp": [x * 100 for x in dsf["ic95"]], "replicas_a_favor": dsf["replicas_con_a_mejor"],
+            "aciertos_de_mas_por_mes": (sfl["lista_500"]["aciertos"] - sfr["lista_500"]["aciertos"]) / n_t,
+            "usd_anio_de_mas": sfl["lista_500"]["valor_neto_anual_usd"] - sfr["lista_500"]["valor_neto_anual_usd"]},
+        "roi_b_3_4": [{"fila": r["fila"], "id": r["id"], "costo_usd": r["costo_usd"],
+                       **{k: {"usd": r[k]["beneficio_usd"], "roi_pct": r[k]["roi_pct"],
+                              "recupera_en_el_anio": r[k]["recupera_en_el_anio"]}
+                          for k in ("b_3_4", "contactables", "sin_filtro")},
+                       "cambia_el_veredicto": r["cambia_el_veredicto"]}
+                      for r in e4["contra_roi_b_3_4"]["evaluado"]],
+        "meta_y_alerta": {"regla_aciertos_por_mes": SEC["meta_criterio_1"]["regla_aciertos_por_mes"],
+                          "meta_aciertos_por_mes": SEC["meta_criterio_1"]["meta"],
+                          "regla_precision_por_corte": SEC["alerta_fila_10"]["regla_precision_por_corte"],
+                          "regla_precision_minima": min(SEC["alerta_fila_10"]["regla_precision_por_corte"]),
+                          "regla_precision_maxima": max(SEC["alerta_fila_10"]["regla_precision_por_corte"]),
+                          "alerta_precision": SEC["alerta_fila_10"]["umbral"]},
+        "calibracion": {"brier": cal["brier"], "brier_tasa_base": cal["brier_tasa_base"],
+                        "probabilidad_media": cal["probabilidad_media"], "tasa_observada": cal["tasa_observada"],
+                        "positivos_esperados": cal["positivos_esperados"],
+                        "positivos_observados": cal["positivos_observados"], "ece_deciles": cal["ece_deciles"],
+                        "lista_500_probabilidad_media": cal["lista_500"]["probabilidad_media"],
+                        "lista_500_precision": cal["lista_500"]["precision_observada"]},
+        "segmentos": {
+            "lista_precision": SEC["segmentos"]["global"]["precision"],
+            "lista_precision_regla": SEC["segmentos"]["global"]["precision_regla"],
+            "filas": [{"id": i, "segmento": s, "valor": v, "en_lista": seg_t[(s, v)]["en_lista"],
+                       "precision": seg_t[(s, v)]["precision"], "ic95": seg_t[(s, v)]["ic95"],
+                       "diferencia_pp": seg_t[(s, v)]["diferencia_pp"],
+                       "precision_regla": seg_t[(s, v)]["precision_regla"],
+                       "diferencia_regla_pp": (seg_t[(s, v)]["precision_regla"]
+                                               - SEC["segmentos"]["global"]["precision_regla"]) * 100,
+                       "validacion_diferencia_pp": seg_v[(s, v)]["diferencia_pp"]}
+                      for i, (s, v) in SEGMENTOS_TEST.items()]},
+        "modelo": {"nombre": fi["nombre"], "version": fi["preregistro_version"], "scikit_learn": fi["scikit_learn"],
+                   "C": fi["configuracion"]["C"], "min_frecuencia": fi["configuracion"]["min_frecuencia"],
+                   "sin": fi["sin"],
+                   "agrupadas": len(mo["agrupadas_min_frecuencia"]["motivo_ultima_devolucion"]),
+                   "agrupadas_etapa3": len(e3["agrupadas_min_frecuencia"]["motivo_ultima_devolucion"]),
+                   "variables": mo["variables"], "terminos_con_intercepto": mo["terminos_con_intercepto"],
+                   "iteraciones": mo["iteraciones"], "pliegues": len(e3["pliegues"]),
+                   "coeficientes": [{k: c[k] for k in ("termino", "variable", "valor", "coeficiente", "filas", "sentido")}
+                                    for c in mo["coeficientes"][:6]],
+                   "importancia": [{"variable": x["variable"], "caida_pp": x["caida_lista_500_pp"],
+                                    "desvio_pp": x["desvio_pp"]} for x in fi["importancia_c_7_3"]],
+                   "probabilidad_del_ultimo_puesto": fi["probabilidad_del_ultimo_puesto"],
+                   "probabilidad_del_ultimo_puesto_minima": min(fi["probabilidad_del_ultimo_puesto"]),
+                   "probabilidad_del_ultimo_puesto_maxima": max(fi["probabilidad_del_ultimo_puesto"])},
+        "equilibrio": {"s_equilibrio": s_eq, "precision_lista": rt["precision"],
+                       "diferencia_compra_7d_pp": s_eq * rt["precision"] * 100,
+                       "costo_anio_1_usd": eco["costo_total_anio_1"]["mvp"]},
+    }
+
+    T, D, CO = test, test["conjunto"], test["contra_regla"]
+    L, R, PA = (test["metodos"][k] for k in ("logistica_ajustada", "regla", "practica_actual"))
+    lista = lambda xs, dec, x=100: " · ".join(es(v * x, dec) for v in xs)  # noqa: E731
+    # J01
+    ancla("J01", "test: huella de etapa4.json", T["apertura"]["etapa4_sha256"] == ETAPA4_SHA256, True,
+          donde="registro J01 (sha256 0368611d…)")
+    ancla("J01", "test: líneas de apertura", T["apertura"]["lineas"], "1", 0, donde="D 8.1")
+    ancla("J01", "test: fecha de apertura", T["apertura"]["fecha"], "2026-10-27T15:55:55-03:00",
+          donde="registro J01 (27/10/2026 15:55:55)")
+    ancla("J01", "test: cifras de validación que reproducen", T["apertura"]["control_reproducen"], "125", 0,
+          donde="registro J01 (125 de 125)")
+    # J02
+    ancla("J02", "test: cortes", len(D["cortes"]), "5", 0, donde="D 8.1")
+    ancla("J02", "test: primer y último corte", f"{D['desde']} a {D['hasta']}", "2025-01-31 a 2025-05-31",
+          donde="registro J02 (31/01 a 31/05/2025)")
+    ancla("J02", "test: filas", D["filas"], "14.211", 0, donde="D 8.1")
+    ancla("J02", "test: positivos", D["positivos"], "3.602", 0, donde="D 8.1")
+    ancla("J02", "test: tasa de positivos (%)", D["tasa"], "25,35", 2, 100, donde="registro J02")
+    ancla("J02", "test: contactables", D["contactables"], "9.962", 0, donde="D 8.1")
+    ancla("J02", "test: contactables por corte", " · ".join(es(x, 0) for x in D["contactables_por_corte"]),
+          "1.973 · 1.969 · 2.005 · 2.016 · 1.999", donde="registro J02")
+    ancla("J02", "test: positivos contactables", D["positivos_contactables"], "2.521", 0, donde="D 8.2")
+    ancla("J02", "test: positivos contactables (%)", D["positivos_contactables_tasa"], "25,3", 1, 100,
+          donde="registro J02")
+    ancla("J02", "entrenamiento final: filas", T["entrenamiento"]["filas"], "18.882", 0, donde="D 8.3")
+    ancla("J02", "entrenamiento final: cortes", T["entrenamiento"]["cortes"], "18", 0, donde="D 8.3")
+    ancla("J02", "entrenamiento final: clientes", T["entrenamiento"]["clientes"], "2.921", 0, donde="D 8.3")
+    ancla("J02", "entrenamiento final: positivos", T["entrenamiento"]["positivos"], "5.698", 0, donde="D 8.3")
+    ancla("J02", "entrenamiento final: período", f"{T['entrenamiento']['desde']} a {T['entrenamiento']['hasta']}",
+          "2023-01-31 a 2024-06-30", donde="registro J02")
+    # J03
+    ancla("J03", "test: precisión de la logística (%)", L["test"]["precision"], "85,88", 2, 100, donde="D 8.1")
+    ancla("J03", "test: aciertos de la logística", L["test"]["vp"], "2.147", 0, donde="D 8.1")
+    ancla("J03", "test: precisión de la regla (%)", R["test"]["precision"], "86,13", 2, 100, donde="D 8.1")
+    ancla("J03", "test: aciertos de la regla", R["test"]["vp"], "2.153,35", 2, donde="D 8.1")
+    ancla("J03", "test: precisión por corte, logística (%)", lista(L["test"]["precision_por_corte"], 1),
+          "84,6 · 87,2 · 86,6 · 87,0 · 84,0", donde="registro J03")
+    ancla("J03", "test: precisión por corte, regla (%)", lista(R["test"]["precision_por_corte"], 2),
+          "83,60 · 86,72 · 87,00 · 88,20 · 85,15", donde="registro J03 (83,6; 86,72; 87,0; 88,2 y 85,15)")
+    ancla("J03", "tabla 8.1: métrica principal = precisión", T["tabla_8_1"][0]["modelo_test"], "85,9", 1, 100,
+          donde="D 8.1")
+    # J04
+    ancla("J04", "test: recall de la logística (%)", L["test"]["recall"], "85,16", 2, 100, donde="D 8.1")
+    ancla("J04", "test: F1 de la logística (%)", L["test"]["f1"], "85,52", 2, 100, donde="D 8.1")
+    ancla("J04", "test: recall de la regla (%)", R["test"]["recall"], "85,42", 2, 100, donde="D 8.1")
+    ancla("J04", "test: F1 de la regla (%)", R["test"]["f1"], "85,77", 2, 100, donde="D 8.1")
+    ancla("J04", "validación: recall de la logística (%)", L["validacion"]["recall"], "94,30", 2, 100,
+          donde="registro J04 (H15)")
+    ancla("J04", "validación: F1 de la logística (%)", L["validacion"]["f1"], "82,84", 2, 100, donde="registro J04")
+    # J05
+    ancla("J05", "test: AUC-ROC de la logística", L["test"]["auc_roc_contactables"], "0,974", 3, donde="D 8.1")
+    ancla("J05", "test: AUC-ROC de la regla", R["test"]["auc_roc_contactables"], "0,979", 3, donde="D 8.1")
+    ancla("J05", "validación: AUC-ROC de la logística", L["validacion"]["auc_roc_contactables"], "0,966", 3,
+          donde="D 8.1")
+    ancla("J05", "validación: AUC-ROC de la regla", R["validacion"]["auc_roc_contactables"], "0,970", 3,
+          donde="registro J05")
+    ancla("J05", "test: AUC-ROC de la práctica actual", PA["test"]["auc_roc_contactables"], "0,660", 3,
+          donde="registro J05")
+    # J06
+    ancla("J06", "test: valor neto de la logística (USD, 5 cortes)", L["test"]["usd"], "135,64", 2,
+          donde="registro J06")
+    ancla("J06", "test: valor neto de la logística (USD/año)", L["test"]["usd_anio"], "325,52", 2, donde="D 8.1")
+    ancla("J06", "test: valor neto de la regla (USD, 5 cortes)", R["test"]["usd"], "136,28", 2, donde="registro J06")
+    ancla("J06", "test: valor neto de la regla (USD/año)", R["test"]["usd_anio"], "327,06", 2, donde="D 8.1")
+    ancla("J06", "test: logística menos regla (USD/año)", L["test"]["usd_anio"] - R["test"]["usd_anio"], "−1,54", 2,
+          donde="D 8.2")
+    ancla("J06", "validación: valor neto de la logística (USD/año)", L["validacion"]["usd_anio"], "252,84", 2,
+          donde="D 8.1")
+    ancla("J06", "validación: valor neto de la regla (USD/año)", R["validacion"]["usd_anio"], "264,54", 2,
+          donde="registro J06 (H16)")
+    # J07: test − validación, columna de la 8.1
+    tb = {r["fila"]: r["diferencia_test_menos_validacion"] for r in T["tabla_8_1"]}
+    ancla("J07", "8.1: precisión, test − validación (puntos)", tb["precision"], "12,0", 1, 100, donde="D 8.1")
+    ancla("J07", "8.1: recall, test − validación (puntos)", tb["recall"], "−9,1", 1, 100, donde="D 8.1")
+    ancla("J07", "8.1: F1, test − validación (puntos)", tb["f1"], "2,7", 1, 100, donde="D 8.1")
+    ancla("J07", "8.1: AUC-ROC, test − validación", tb["auc_roc"], "0,008", 3, donde="D 8.1")
+    ancla("J07", "8.1: valor neto, test − validación (USD/año)", tb["valor_neto_anual_usd"], "72,68", 2,
+          donde="D 8.1")
+    # J08
+    for metodo, cel, docs in (("logistica_ajustada", "test", ("2.147", "374", "353", "7.088")),
+                              ("regla", "test", ("2.153,35", "367,65", "346,65", "7.094,35")),
+                              ("logistica_ajustada", "validacion", ("1.108", "67", "392", "3.471"))):
+        m = test["metodos"][metodo][cel]
+        for k, doc in zip(("vp", "fn", "fp", "vn"), docs):
+            ancla("J08", f"matriz {cel}, {metodo}: {k.upper()}", m[k], doc, 2 if "," in doc else 0,
+                  donde="D 8.1" if metodo == "logistica_ajustada" and cel == "test" else "registro J08")
+    ancla("J08", "matriz test: filas contactables", sum(L["test"][k] for k in ("vp", "fn", "fp", "vn")), "9.962", 0,
+          donde="D 8.1")
+    # J09
+    ancla("J09", "test: logística − regla (puntos)", CO["diferencia_pp"], "−0,25", 2, donde="D 8.2")
+    ancla("J09", "test: IC 95 % inferior (puntos)", CO["ic95_pp"][0], "−1,45", 2, donde="D 8.2")
+    ancla("J09", "test: IC 95 % superior (puntos)", CO["ic95_pp"][1], "0,79", 2, donde="D 8.2")
+    ancla("J09", "test: réplicas a favor del modelo (%)", CO["replicas_a_favor"], "31,0", 1, 100, donde="D 8.2")
+    ancla("J09", "test: aciertos de menos de la logística (5 cortes)", CO["aciertos_de_menos"], "6,35", 2,
+          donde="D 8.2")
+    ancla("J09", "test: aciertos extra por mes", CO["aciertos_extra_por_mes"], "−1,27", 2, donde="D 8.2")
+    ancla("J09", "validación: logística − regla (puntos)", CO["validacion_diferencia_pp"], "−1,93", 2,
+          donde="registro J09 (H16)")
+    ancla("J09", "validación: IC 95 % (puntos)", " a ".join(es(x, 2) for x in CO["validacion_ic95_pp"]),
+          "−3,25 a −1,07", donde="registro J09 (H16)")
+    # J10
+    DE = test["decision"]
+    ancla("J10", "decisión: condición 1 (el intervalo excluye el cero)", DE["condicion_1"], False, donde="D 8.2")
+    ancla("J10", "decisión: límite inferior del intervalo (puntos)", DE["ic95_inferior_pp"], "−1,45", 2,
+          donde="D 8.2")
+    ancla("J10", "decisión: condición 2 (paga lo que agrega)", DE["condicion_2"], False, donde="D 8.2")
+    ancla("J10", "decisión: aciertos extra por mes", DE["aciertos_extra_por_mes"], "−1,27", 2, donde="D 8.2")
+    ancla("J10", "decisión: aciertos por mes que pagan el costo", DE["aciertos_por_mes_para_pagar"], "8.595", 0,
+          donde="D 8.2")
+    ancla("J10", "decisión: costo incremental (USD)", DE["costo_incremental_usd"], "10.400", 0, donde="D 8.2")
+    ancla("J10", "decisión: la lista sigue con la regla", DE["sigue_la_regla"], True, donde="D 8.2")
+    # J11
+    S = test["sin_filtro"]
+    ancla("J11", "sin filtro: precisión de la logística (%)", S["logistica_ajustada"]["precision"], "90,32", 2, 100,
+          donde="D 8.2")
+    ancla("J11", "sin filtro: aciertos de la logística", S["logistica_ajustada"]["aciertos"], "2.258", 0,
+          donde="registro J11")
+    ancla("J11", "sin filtro: recall de la logística (%)", S["logistica_ajustada"]["recall"], "62,7", 1, 100,
+          donde="registro J11")
+    ancla("J11", "sin filtro: precisión de la regla (%)", S["regla"]["precision"], "89,26", 2, 100,
+          donde="registro J11")
+    ancla("J11", "sin filtro: aciertos de la regla", S["regla"]["aciertos"], "2.231,4", 1, donde="registro J11")
+    ancla("J11", "sin filtro: logística − regla (puntos)", S["diferencia_pp"], "1,06", 2, donde="D 8.2")
+    ancla("J11", "sin filtro: IC 95 % (puntos)", " a ".join(es(x, 2) for x in S["ic95_pp"]), "0,41 a 1,95",
+          donde="D 8.2 (+0,41 a +1,95)")
+    ancla("J11", "sin filtro: réplicas a favor del modelo (%)", S["replicas_a_favor"], "99,9", 1, 100,
+          donde="registro J11")
+    ancla("J11", "sin filtro: aciertos de más por mes", S["aciertos_de_mas_por_mes"], "5,32", 2, donde="D 8.2")
+    ancla("J11", "sin filtro: valor neto de la logística (USD/año)", S["logistica_ajustada"]["usd_anio"], "352,39",
+          2, donde="D 8.2")
+    ancla("J11", "sin filtro: valor neto de la regla (USD/año)", S["regla"]["usd_anio"], "345,95", 2, donde="D 8.2")
+    ancla("J11", "sin filtro: logística − regla (USD/año)", S["usd_anio_de_mas"], "6,44", 2, donde="D 8.2")
+    ancla("J11", "sin filtro: AUC-ROC de la logística", S["logistica_ajustada"]["auc_roc"], "0,972", 3,
+          donde="registro J11")
+    ancla("J11", "sin filtro: AUC-ROC de la regla", S["regla"]["auc_roc"], "0,977", 3, donde="registro J11")
+    ancla("J11", "sin filtro: decil superior de la logística (%)", S["logistica_ajustada"]["decil_superior"], "93,2",
+          1, 100, donde="registro J11")
+    ancla("J11", "sin filtro: decil superior de la regla (%)", S["regla"]["decil_superior"], "93,7", 1, 100,
+          donde="registro J11")
+    # J12
+    J12 = {"modelo_sobre_la_regla": ("10.400", ("5,38", "−99,95"), ("−1,54", "−100,01"), ("6,44", "−99,94")),
+           "proyecto_completo": ("30.660", ("304,87", "−99,01"), ("325,52", "−98,94"), ("352,39", "−98,85")),
+           "regla_sin_modelo": ("20.260", ("299,49", "−98,52"), ("327,06", "−98,39"), ("345,95", "−98,29"))}
+    if [r["fila"] for r in test["roi_b_3_4"]] != list(J12):
+        sys.exit(f"contra_roi_b_3_4: filas {[r['fila'] for r in test['roi_b_3_4']]}, el registro J12 trae {list(J12)}")
+    for r in test["roi_b_3_4"]:
+        costo, *celdas = J12[r["fila"]]
+        ancla("J12", f"8.2 {r['fila']}: costo del año 1 (USD)", r["costo_usd"], costo, 0, donde="D 8.2")
+        for k, (u, roi_) in zip(("b_3_4", "contactables", "sin_filtro"), celdas):
+            ancla("J12", f"8.2 {r['fila']}, {k}: USD/año", r[k]["usd"], u, 2, donde="D 8.2")
+            ancla("J12", f"8.2 {r['fila']}, {k}: ROI (%)", r[k]["roi_pct"], roi_, 2, donde="D 8.2")
+            ancla("J12", f"8.2 {r['fila']}, {k}: recupera en el año", r[k]["recupera_en_el_anio"], False,
+                  donde="D 8.2")
+        ancla("J12", f"8.2 {r['fila']}: cambia el veredicto", r["cambia_el_veredicto"], False, donde="D 8.2")
+    # J13
+    MA = test["meta_y_alerta"]
+    ancla("J13", "regla en test: aciertos por mes", MA["regla_aciertos_por_mes"], "430,67", 2, donde="D 8.2")
+    ancla("J13", "meta del criterio 1 (aciertos por mes)", MA["meta_aciertos_por_mes"], "379", 0, donde="D 8.2")
+    ancla("J13", "regla en test: precisión por corte, mínima (%)", MA["regla_precision_minima"], "83,6", 1, 100,
+          donde="D 8.2")
+    ancla("J13", "regla en test: precisión por corte, máxima (%)", MA["regla_precision_maxima"], "88,2", 1, 100,
+          donde="D 8.2")
+    ancla("J13", "alerta de la fila 10 (%)", MA["alerta_precision"], "72,0", 1, 100, donde="D 8.2 (H44)")
+    # J14
+    CA = test["calibracion"]
+    ancla("J14", "calibración: Brier", CA["brier"], "0,066", 3, donde="registro J14")
+    ancla("J14", "calibración: Brier con la tasa base", CA["brier_tasa_base"], "0,189", 3, donde="registro J14")
+    ancla("J14", "calibración: probabilidad media (%)", CA["probabilidad_media"], "21,8", 1, 100, donde="D 8.2")
+    ancla("J14", "calibración: tasa observada (%)", CA["tasa_observada"], "25,3", 1, 100, donde="D 8.2")
+    ancla("J14", "calibración: positivos esperados", CA["positivos_esperados"], "3.104", 0, donde="registro J14")
+    ancla("J14", "calibración: error por deciles", CA["ece_deciles"], "0,058", 3, donde="registro J14")
+    ancla("J14", "calibración: la lista promete (%)", CA["lista_500_probabilidad_media"], "80,4", 1, 100,
+          donde="registro J14")
+    ancla("J14", "calibración: la lista acierta (%)", CA["lista_500_precision"], "90,3", 1, 100, donde="registro J14")
+    # J15 y J21
+    SG = {s["id"]: s for s in test["segmentos"]["filas"]}
+    J15 = {"mujeres": ("1.132", "91,3", "89,5 a 92,8", "89,9"), "hombres": ("1.175", "90,0", "88,2 a 91,6", "89,0"),
+           "genero_x": ("66", "80,3", "69,2 a 88,1", None), "alto_valor": ("727", "87,6", "85,0 a 89,8", "86,5"),
+           "menos_de_12_meses": ("62", "91,9", "82,5 a 96,5", None), "alta_online": ("1.034", "91,3", None, None),
+           "alta_fisica": ("1.466", "89,6", None, None)}
+    for i, (lug, prec, ic, regla) in J15.items():
+        s = SG[i]
+        ancla("J15", f"segmento {i}: lugares en la lista", s["en_lista"], lug, 0, donde="D 8.2")
+        ancla("J15", f"segmento {i}: precisión (%)", s["precision"], prec, 1, 100, donde="D 8.2")
+        if ic:
+            ancla("J15", f"segmento {i}: intervalo de Wilson (%)", " a ".join(es(x * 100, 1) for x in s["ic95"]), ic,
+                  donde="registro J15")
+        if regla:
+            ancla("J15", f"segmento {i}: precisión de la regla (%)", s["precision_regla"], regla, 1, 100,
+                  donde="registro J15")
+    for i, (t_doc, v_doc) in {"menos_de_12_meses": ("1,6", "−4,0"), "alta_online": ("1,0", "−1,9"),
+                              "alto_valor": ("−2,7", "−3,0")}.items():
+        ancla("J21", f"segmento {i}: diferencia en test (puntos)", SG[i]["diferencia_pp"], t_doc, 1, donde="D 8.3")
+        ancla("J21", f"segmento {i}: diferencia en validación (puntos)", SG[i]["validacion_diferencia_pp"], v_doc, 1,
+              donde="registro J21 (H25 a H27)")
+    ancla("J21", "segmento alto_valor: la regla contra su lista (puntos)", SG["alto_valor"]["diferencia_regla_pp"],
+          "−2,8", 1, donde="D 8.3")
+    ancla("J21", "segmentos: precisión de toda la lista (%)", test["segmentos"]["lista_precision"], "90,32", 2, 100,
+          donde="registro J21")
+    # J16 y J20
+    MO = test["modelo"]
+    ancla("J16", "modelo: C", MO["C"], "0,01", 2, donde="D 8.3")
+    ancla("J16", "modelo: min_frecuencia", MO["min_frecuencia"], "100", 0, donde="D 8.3")
+    ancla("J16", "modelo: motivos agrupados (18 cortes)", MO["agrupadas"], "3", 0, donde="D 8.3")
+    ancla("J16", "modelo: motivos agrupados (16 cortes, etapa 3)", MO["agrupadas_etapa3"], "5", 0, donde="D 8.3")
+    ancla("J16", "modelo: variables", MO["variables"], "39", 0, donde="D 8.3")
+    ancla("J16", "modelo: términos con el intercepto", MO["terminos_con_intercepto"], "75", 0, donde="D 8.3")
+    ancla("J16", "modelo: iteraciones", MO["iteraciones"], "31", 0, donde="D 8.3")
+    ancla("J16", "modelo: variable que sale", MO["sin"], ["genero"], donde="D 8.3")
+    for c, doc in zip(MO["coeficientes"], ("−2,47", "1,31", "0,68", "0,24", "−0,18", "0,18")):
+        ancla("J16", f"modelo: coeficiente de {c['termino']}", c["coeficiente"], doc, 2, donde="D 8.3")
+    ancla("J16", "modelo: filas con ticket_90d vacío", MO["coeficientes"][5]["filas"], "5.173", 0,
+          donde="registro J16")
+    ancla("J16", "modelo: probabilidad del último puesto, mínima", MO["probabilidad_del_ultimo_puesto_minima"], "0,32",
+          2, donde="D 8.3")
+    ancla("J16", "modelo: probabilidad del último puesto, máxima", MO["probabilidad_del_ultimo_puesto_maxima"], "0,39",
+          2, donde="D 8.3")
+    ancla("J20", "modelo: versión", MO["version"], "1.1", donde="D 8.3")
+    ancla("J20", "modelo: scikit-learn", MO["scikit_learn"], "1.9.1", donde="D 8.3")
+    ancla("J20", "entrenamiento final: positivos (%)", T["entrenamiento"]["tasa"], "30,2", 1, 100, donde="D 8.3")
+    ancla("J20", "modelo: pliegues temporales", MO["pliegues"], "4", 0, donde="D 8.3 (C 7.1)")
+    # J17
+    ancla("J17", "práctica actual en test: precisión (%)", PA["test"]["precision"], "37,6", 1, 100, donde="D 8.2")
+    ancla("J17", "práctica actual en test: USD/año", PA["test"]["usd_anio"], "33,35", 2, donde="D 8.2")
+    # J18
+    V = test["validacion"]
+    F = test["fuera_de_la_lista"]
+    ancla("J18", "validación: positivos contactables", V["positivos_contactables"], "1.175", 0, donde="D 8.2")
+    ancla("J18", "validación: positivos contactables por corte", V["positivos_contactables_por_corte"], "392", 0,
+          donde="D 8.2")
+    ancla("J18", "test: positivos contactables por corte", D["positivos_contactables_por_corte"], "504", 0,
+          donde="D 8.2")
+    ancla("J18", "validación: techo de la lista (%)", V["techo_precision"], "78,3", 1, 100, donde="D 8.2")
+    ancla("J18", "test: positivos contactables fuera de la lista", F["test"], "374", 0, donde="D 8.2")
+    ancla("J18", "test: fuera de la lista (%)", F["test_tasa"], "14,8", 1, 100, donde="D 8.2")
+    ancla("J18", "validación: positivos contactables fuera de la lista", F["validacion"], "67", 0, donde="D 8.2")
+    ancla("J18", "validación: fuera de la lista (%)", F["validacion_tasa"], "5,7", 1, 100, donde="registro J18")
+    # J19
+    EQ = test["equilibrio"]
+    ancla("J19", "test: s de equilibrio de la regla (%)", EQ["s_equilibrio"], "46,9", 1, 100, donde="D 11.2")
+    ancla("J19", "test: diferencia de compra a 7 días que paga la regla (puntos)", EQ["diferencia_compra_7d_pp"],
+          "40,4", 1, donde="D 11.2 (igual que H49)")
+    return test
+
+
+def armar_plan() -> dict:
+    from datetime import date, timedelta
+    lunes = date.fromisoformat(SEMANA_1)
+
+    def inicio(sem):
+        return (lunes + timedelta(weeks=sem - 1)).isoformat()
+
+    def fin(sem):
+        return (lunes + timedelta(weeks=sem, days=-1)).isoformat()
+
+    fases = [{"id": i, "nombre": n, "desde_semana": a, "hasta_semana": b, "semanas": b - a + 1,
+              "desde": inicio(a), "hasta": fin(b)} for i, n, a, b in FASES_PLAN]
+    plan = {"semana_1": SEMANA_1, "fases": fases, "semanas": max(f["hasta_semana"] for f in fases),
+            "hitos_semana": HITOS_PLAN}
+    f = {x["id"]: x for x in fases}
+    ancla("J50", "plan: semanas de cada fase", " · ".join(str(x["semanas"]) for x in fases), "2 · 3 · 4 · 1 · 13 · 2",
+          donde="D 12.1")
+    ancla("J50", "plan: semanas en total", plan["semanas"], "20", 0, donde="D 12.1")
+    ancla("J50", "plan: el piloto empieza en el go-live", f["piloto"]["desde_semana"] == HITOS_PLAN["go_live"], True,
+          donde="D 12.1")
+    ancla("J50", "plan: semana 1", f"{SEMANA_1} a {fin(1)}", "2026-11-02 a 2026-11-08", donde="registro J50")
+    ancla("J50", "plan: piloto", f"{f['piloto']['desde']} a {f['piloto']['hasta']}", "2026-12-07 a 2027-03-07",
+          donde="D 12.1 (07/12/2026 a 07/03/2027)")
+    ancla("J50", "plan: decisión hasta", f["decision"]["hasta"], "2027-03-21", donde="D 12.1 (21/03/2027)")
+    ancla("J50", "plan: operador antes del tercer mes del piloto",
+          f["piloto"]["desde_semana"] < HITOS_PLAN["operador_despues_del_piloto"] < f["piloto"]["desde_semana"] + 8 + 1,
+          True, donde="D 12.2 (C 6.3, riesgo 2)")
+    return plan
+
+
+def armar_monitoreo(e1: dict) -> dict:
+    import csv
+    from collections import defaultdict
+    primero: dict[str, str] = {}
+    with CAMPANIAS.open(encoding="utf-8", newline="") as fh:
+        for r in csv.DictReader(fh):
+            c, f_ = r["id_campania"], r["fecha_envio"]
+            if c not in primero or f_ < primero[c]:
+                primero[c] = f_
+    nov = defaultdict(list)
+    for c, f_ in primero.items():
+        if f_[5:7] == "11":
+            nov[f_[:4]].append((f_, c))
+    campanias = [{"anio": int(a), "fecha": min(v)[0], "id_campania": min(v)[1]} for a, v in sorted(nov.items())]
+    an = {a["nombre"]: a["real"] for a in e1["anclas"]}
+    sem = e1["meta"]["umbral_en_riesgo"]
+    mon = {"campanias_noviembre": campanias,
+           "drift": {"verde_hasta_pct": sem[0], "rojo_desde_pct": sem[1],
+                     "referencia": an["clientes en riesgo (corte ref)"] / an["clientes con compra valida"],
+                     "referencia_corte": e1["meta"]["corte_ref"],
+                     "en_riesgo": an["clientes en riesgo (corte ref)"], "clientes": an["clientes con compra valida"]}}
+    ancla("J51", "campañas: primer envío de noviembre por año",
+          " · ".join(f"{c['fecha']} {c['id_campania']}" for c in campanias),
+          "2022-11-02 CAMP015 · 2023-11-16 CAMP039 · 2024-11-04 CAMP027 · 2025-11-12 CAMP018", donde="D 12.2")
+    ancla("J52", "drift: rojo del semáforo (%)", sem[1], "42", 0, donde="D 10.2")
+    ancla("J52", "drift: verde del semáforo, hasta (%)", sem[0], "38", 0, donde="registro J52 (E1 D 10.1)")
+    ancla("J52", "drift: referencia al corte (%)", mon["drift"]["referencia"], "41,0", 1, 100, donde="D 10.2 (C03)")
+    ancla("J52", "drift: corte de la referencia", mon["drift"]["referencia_corte"], "2025-12-31",
+          donde="registro J52 (31/12/2025)")
+    return mon
+
+
 # ============================================================ main
 
 def main() -> int:
@@ -720,7 +1257,8 @@ def main() -> int:
         if not (DATOS / n).exists():
             print(f"falta {DATOS / n}: corre antes entregas/entregable-3/_build/F/presentacion/exportar_web.py")
             return 1
-    e2, e3, eco, co = (cargar(n) for n in ENTRADAS)
+    e2, e3, eco, co, e4, v4 = (cargar(n) for n in ENTRADAS)
+    e1 = cargar_e1()
     c3 = cargar_c3()
     for d in c3["DIAPOSITIVAS"]:
         C3_TEXTO[f"d{d['n']}"] = json.dumps(d, ensure_ascii=False)
@@ -729,8 +1267,9 @@ def main() -> int:
 
     d3 = {
         "meta": {
-            "version": "e3-1.0",
-            "fuentes": [{"archivo": f"data/e3/{n}", "sha256": sha256(DATOS / n)} for n in ENTRADAS],
+            "version": "e3-1.1",
+            "fuentes": [{"archivo": f"data/e3/{n}", "sha256": sha256(DATOS / n)} for n in ENTRADAS]
+            + [{"archivo": str(f.relative_to(APP)), "sha256": sha256(f)} for f in (E1_PAYLOAD, CAMPANIAS)],
             "contenido": {"archivo": "e3/src/contenido_e3.js", "version": c3["VERSION"], "sha256": sha256(CONTENIDO)},
         },
         "caso": armar_caso(e3),
@@ -739,6 +1278,11 @@ def main() -> int:
         "lista": armar_lista(e3),
         "economia": armar_economia(eco, e2, e3),
         "piloto": armar_piloto(eco, e2),
+        "encuadre": armar_encuadre(e1),
+        "legal": armar_legal(e1, c3),
+        "test": armar_test(e4, v4, eco, e3),
+        "plan": armar_plan(),
+        "monitoreo": armar_monitoreo(e1),
     }
 
     print(f"{'ID':6s}{'ANCLA':58s}{'DOCUMENTO':>14s}{'PANTALLA':>14s}  OK")

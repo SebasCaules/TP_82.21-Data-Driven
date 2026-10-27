@@ -2,7 +2,7 @@
 // No editar a mano.
 export const D3 = {
  "meta": {
-  "version": "e3-1.0",
+  "version": "e3-1.1",
   "fuentes": [
    {
     "archivo": "data/e3/etapa2.json",
@@ -19,12 +19,28 @@ export const D3 = {
    {
     "archivo": "data/e3/condiciones.json",
     "sha256": "a1ba7efdc2912e6001e1aa26c1736d636d4041289e58cfceeb22ea1cbdf86256"
+   },
+   {
+    "archivo": "data/e3/etapa4.json",
+    "sha256": "0368611d7d797b3bec39f19764d2e3496d9c74e539a8b6c2e8cdf03099844fbd"
+   },
+   {
+    "archivo": "data/e3/etapa4_validacion.json",
+    "sha256": "494f260239ea95722c8976de5b62b361ae668eeb735e8ad89f7443ed93f0d6c2"
+   },
+   {
+    "archivo": "src/datos.js",
+    "sha256": "29a919a236f672c73179ff03d9228d96a5311a788b62aacdb0b6e9b9f98843ee"
+   },
+   {
+    "archivo": "data/raw/Campanias_marketing.csv",
+    "sha256": "ee5420b2377a2e3187ff3b0503a5c97ce58d1642053bf9c1c846887872ca7939"
    }
   ],
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "07dcd07b3115f76949ff418569cfc94ff11190d9fe74ecf4ff9dea77ead68d3f"
+   "sha256": "00904eb5e2106050f6231f917790c547fc44e1e1f0c57acd062be391e1205d96"
   }
  },
  "caso": {
@@ -1256,6 +1272,759 @@ export const D3 = {
   "costo_por_tratado_ars": 54.19753828875666,
   "umbral_produccion_pp": 40.427515009982606
  },
+ "encuadre": {
+  "ventas_2024_ars": 349704254,
+  "ventas_2025_ars": 225048054,
+  "variacion_ventas_2025_pct": -35.6461777556758,
+  "capacidad_contacto_mes": [
+   500,
+   800
+  ]
+ },
+ "legal": {
+  "dimensiones": [
+   {
+    "id": "proteccion_datos",
+    "nombre": "Protección de datos personales",
+    "puntaje": 2
+   },
+   {
+    "id": "seguridad_accesos",
+    "nombre": "Seguridad y control de accesos",
+    "puntaje": 2
+   },
+   {
+    "id": "conservacion_fiscal",
+    "nombre": "Conservación y trazabilidad fiscal",
+    "puntaje": 2
+   },
+   {
+    "id": "contratos_proveedores",
+    "nombre": "Contratos con proveedores externos",
+    "puntaje": 2
+   },
+   {
+    "id": "explicabilidad",
+    "nombre": "Explicabilidad del modelo",
+    "puntaje": 2
+   }
+  ],
+  "promedio": 2.0,
+  "tramo": {
+   "desde": 1.6,
+   "hasta": 2.5,
+   "nivel": "Viable con condiciones"
+  },
+  "envios_sin_consentimiento": 7078,
+  "envios_sin_consentimiento_tasa": 0.3008202643546262,
+  "no_consintieron_contactados_tasa": 0.9828634604754007,
+  "riesgos": 13,
+  "riesgos_criticos": 3
+ },
+ "test": {
+  "apertura": {
+   "fecha": "2026-10-27T15:55:55-03:00",
+   "lineas": 1,
+   "preregistro_version": "1.1",
+   "control_cifras": 125,
+   "control_reproducen": 125,
+   "etapa4_sha256": "0368611d7d797b3bec39f19764d2e3496d9c74e539a8b6c2e8cdf03099844fbd"
+  },
+  "conjunto": {
+   "cortes": [
+    "2025-01-31",
+    "2025-02-28",
+    "2025-03-31",
+    "2025-04-30",
+    "2025-05-31"
+   ],
+   "desde": "2025-01-31",
+   "hasta": "2025-05-31",
+   "filas": 14211,
+   "positivos": 3602,
+   "tasa": 0.25346562521990007,
+   "anualizar": 2.4,
+   "contactables": 9962,
+   "contactables_por_corte": [
+    1973,
+    1969,
+    2005,
+    2016,
+    1999
+   ],
+   "positivos_contactables": 2521,
+   "positivos_contactables_tasa": 0.253061634209998,
+   "positivos_contactables_por_corte": 504.2
+  },
+  "validacion": {
+   "cortes": [
+    "2024-07-31",
+    "2024-08-31",
+    "2024-09-30"
+   ],
+   "contactables": 5038,
+   "positivos_contactables": 1175,
+   "positivos_contactables_por_corte": 391.6666666666667,
+   "techo_precision": 0.7833333333333333
+  },
+  "entrenamiento": {
+   "filas": 18882,
+   "cortes": 18,
+   "desde": "2023-01-31",
+   "hasta": "2024-06-30",
+   "clientes": 2921,
+   "positivos": 5698,
+   "tasa": 0.30176888041521027
+  },
+  "metodos": {
+   "logistica_ajustada": {
+    "test": {
+     "precision": 0.8588,
+     "recall": 0.8516461721539071,
+     "f1": 0.8552081258713403,
+     "auc_roc_contactables": 0.9744690494217609,
+     "casos": 2500,
+     "vp": 2147.0,
+     "fp": 353.0,
+     "fn": 374.0,
+     "vn": 7088.0,
+     "usd": 135.63507129198277,
+     "usd_anio": 325.5241711007587,
+     "aciertos_por_mes": 429.4,
+     "precision_por_corte": [
+      0.846,
+      0.872,
+      0.866,
+      0.87,
+      0.84
+     ]
+    },
+    "validacion": {
+     "precision": 0.7386666666666667,
+     "recall": 0.9429787234042554,
+     "f1": 0.8284112149532711,
+     "auc_roc_contactables": 0.9660145075208882,
+     "casos": 1500,
+     "vp": 1108.0,
+     "fp": 392.0,
+     "fn": 67.0,
+     "vn": 3471.0,
+     "usd": 63.21007764349775,
+     "usd_anio": 252.840310573991,
+     "aciertos_por_mes": 369.3333333333333,
+     "precision_por_corte": [
+      0.702,
+      0.744,
+      0.77
+     ]
+    }
+   },
+   "regla": {
+    "test": {
+     "precision": 0.86134,
+     "recall": 0.8541650138833796,
+     "f1": 0.8577375024895441,
+     "auc_roc_contactables": 0.9787815144081211,
+     "casos": 2500,
+     "vp": 2153.35,
+     "fp": 346.65,
+     "fn": 367.65,
+     "vn": 7094.35,
+     "usd": 136.27539109545802,
+     "usd_anio": 327.06093862909927,
+     "aciertos_por_mes": 430.66999999999996,
+     "precision_por_corte": [
+      0.836,
+      0.8672000000000001,
+      0.87,
+      0.882,
+      0.8515
+     ]
+    },
+    "validacion": {
+     "precision": 0.758,
+     "recall": 0.9676595744680851,
+     "f1": 0.8500934579439252,
+     "auc_roc_contactables": 0.9697447138978086,
+     "casos": 1500,
+     "vp": 1137.0,
+     "fp": 363.0,
+     "fn": 38.0,
+     "vn": 3500.0,
+     "usd": 66.13437280897537,
+     "usd_anio": 264.5374912359015,
+     "aciertos_por_mes": 379.0,
+     "precision_por_corte": [
+      0.728,
+      0.766,
+      0.78
+     ]
+    }
+   },
+   "practica_actual": {
+    "test": {
+     "precision": 0.37588363636363636,
+     "recall": 0.37275251523565683,
+     "f1": 0.3743115279462621,
+     "auc_roc_contactables": 0.6602026914250894,
+     "casos": 2500,
+     "vp": 939.709090909091,
+     "fp": 1560.290909090909,
+     "fn": 1581.290909090909,
+     "vn": 5880.709090909091,
+     "usd": 13.894555127168507,
+     "usd_anio": 33.34693230520441,
+     "aciertos_por_mes": 187.94181818181818,
+     "precision_por_corte": [
+      0.37581818181818183,
+      0.398,
+      0.364,
+      0.39,
+      0.3516
+     ]
+    },
+    "validacion": {
+     "precision": 0.32761904761904764,
+     "recall": 0.4182370820668693,
+     "f1": 0.36742323097463286,
+     "auc_roc_contactables": 0.6449346500625135,
+     "casos": 1500,
+     "vp": 491.42857142857144,
+     "fp": 1008.5714285714286,
+     "fn": 683.5714285714286,
+     "vn": 2854.4285714285716,
+     "usd": 1.0363932385649348,
+     "usd_anio": 4.145572954259739,
+     "aciertos_por_mes": 163.80952380952382,
+     "precision_por_corte": [
+      0.32425,
+      0.33575,
+      0.32285714285714284
+     ]
+    }
+   }
+  },
+  "tabla_8_1": [
+   {
+    "fila": "metrica_principal",
+    "baseline_test": 0.86134,
+    "modelo_validacion": 0.7386666666666667,
+    "modelo_test": 0.8588,
+    "diferencia_test_menos_validacion": 0.12013333333333331,
+    "baseline_validacion": 0.758
+   },
+   {
+    "fila": "precision",
+    "baseline_test": 0.86134,
+    "modelo_validacion": 0.7386666666666667,
+    "modelo_test": 0.8588,
+    "diferencia_test_menos_validacion": 0.12013333333333331,
+    "baseline_validacion": 0.758
+   },
+   {
+    "fila": "recall",
+    "baseline_test": 0.8541650138833796,
+    "modelo_validacion": 0.9429787234042554,
+    "modelo_test": 0.8516461721539071,
+    "diferencia_test_menos_validacion": -0.09133255125034823,
+    "baseline_validacion": 0.9676595744680851
+   },
+   {
+    "fila": "f1",
+    "baseline_test": 0.8577375024895441,
+    "modelo_validacion": 0.8284112149532711,
+    "modelo_test": 0.8552081258713403,
+    "diferencia_test_menos_validacion": 0.02679691091806924,
+    "baseline_validacion": 0.8500934579439252
+   },
+   {
+    "fila": "auc_roc",
+    "baseline_test": 0.9787815144081211,
+    "modelo_validacion": 0.9660145075208882,
+    "modelo_test": 0.9744690494217609,
+    "diferencia_test_menos_validacion": 0.008454541900872692,
+    "baseline_validacion": 0.9697447138978086
+   },
+   {
+    "fila": "valor_neto_anual_usd",
+    "baseline_test": 327.06093862909927,
+    "modelo_validacion": 252.840310573991,
+    "modelo_test": 325.5241711007587,
+    "diferencia_test_menos_validacion": 72.68386052676769,
+    "baseline_validacion": 264.5374912359015
+   }
+  ],
+  "fuera_de_la_lista": {
+   "test": 374.0,
+   "test_tasa": 0.14835382784609283,
+   "validacion": 67.0,
+   "validacion_tasa": 0.05702127659574468
+  },
+  "contra_regla": {
+   "diferencia_pp": -0.25399999999999867,
+   "ic95_pp": [
+    -1.4505476190476299,
+    0.7871333333333459
+   ],
+   "replicas_a_favor": 0.31,
+   "aciertos_de_menos": 6.349999999999909,
+   "aciertos_extra_por_mes": -1.2699999999999818,
+   "validacion_diferencia_pp": -1.9333333333333313,
+   "validacion_ic95_pp": [
+    -3.2534444444444413,
+    -1.0709999999999895
+   ]
+  },
+  "decision": {
+   "condicion_1": false,
+   "ic95_inferior_pp": -1.4505476190476299,
+   "condicion_2": false,
+   "aciertos_extra_por_mes": -1.2699999999999818,
+   "aciertos_por_mes_para_pagar": 8594.663640675424,
+   "costo_incremental_usd": 10400.0,
+   "valor_extra_anual_usd": -1.5367675283406255,
+   "sigue_la_regla": true,
+   "resultado": "la lista sigue con la regla del umbral"
+  },
+  "sin_filtro": {
+   "logistica_ajustada": {
+    "precision": 0.9032,
+    "aciertos": 2258.0,
+    "largo": 2500,
+    "recall": 0.6268739589117157,
+    "usd_anio": 352.38735151742196,
+    "auc_roc": 0.972488446396256,
+    "decil_superior": 0.932441942294159
+   },
+   "regla": {
+    "precision": 0.89256,
+    "aciertos": 2231.4,
+    "largo": 2500,
+    "recall": 0.6194891726818434,
+    "usd_anio": 345.9498686427981,
+    "auc_roc": 0.9772318077811947,
+    "decil_superior": 0.9367346938775509
+   },
+   "diferencia_pp": 1.0639999999999983,
+   "ic95_pp": [
+    0.4056380952380856,
+    1.9486249999999854
+   ],
+   "replicas_a_favor": 0.999,
+   "aciertos_de_mas_por_mes": 5.319999999999982,
+   "usd_anio_de_mas": 6.437482874623868
+  },
+  "roi_b_3_4": [
+   {
+    "fila": "modelo_sobre_la_regla",
+    "id": "G40",
+    "costo_usd": 10400.0,
+    "b_3_4": {
+     "usd": 5.378014097430056,
+     "roi_pct": -99.94828832598624,
+     "recupera_en_el_anio": false
+    },
+    "contactables": {
+     "usd": -1.5367675283405902,
+     "roi_pct": -100.01477661084944,
+     "recupera_en_el_anio": false
+    },
+    "sin_filtro": {
+     "usd": 6.437482874623868,
+     "roi_pct": -99.93810112620554,
+     "recupera_en_el_anio": false
+    },
+    "cambia_el_veredicto": false
+   },
+   {
+    "fila": "proyecto_completo",
+    "id": "G40 (beneficio de G34)",
+    "costo_usd": 30660.0,
+    "b_3_4": {
+     "usd": 304.87259696662704,
+     "roi_pct": -99.00563406077421,
+     "recupera_en_el_anio": false
+    },
+    "contactables": {
+     "usd": 325.5241711007587,
+     "roi_pct": -98.93827732843849,
+     "recupera_en_el_anio": false
+    },
+    "sin_filtro": {
+     "usd": 352.38735151742196,
+     "roi_pct": -98.85066095395491,
+     "recupera_en_el_anio": false
+    },
+    "cambia_el_veredicto": false
+   },
+   {
+    "fila": "regla_sin_modelo",
+    "id": "G41",
+    "costo_usd": 20260.0,
+    "b_3_4": {
+     "usd": 299.49458286919696,
+     "roi_pct": -98.52174440834553,
+     "recupera_en_el_anio": false
+    },
+    "contactables": {
+     "usd": 327.06093862909927,
+     "roi_pct": -98.3856814480301,
+     "recupera_en_el_anio": false
+    },
+    "sin_filtro": {
+     "usd": 345.9498686427981,
+     "roi_pct": -98.29244882209873,
+     "recupera_en_el_anio": false
+    },
+    "cambia_el_veredicto": false
+   }
+  ],
+  "meta_y_alerta": {
+   "regla_aciertos_por_mes": 430.66999999999996,
+   "meta_aciertos_por_mes": 379,
+   "regla_precision_por_corte": [
+    0.836,
+    0.8672000000000001,
+    0.87,
+    0.882,
+    0.8515
+   ],
+   "regla_precision_minima": 0.836,
+   "regla_precision_maxima": 0.882,
+   "alerta_precision": 0.72
+  },
+  "calibracion": {
+   "brier": 0.06583603373013877,
+   "brier_tasa_base": 0.18922080205178526,
+   "probabilidad_media": 0.2184437874191773,
+   "tasa_observada": 0.25346562521990007,
+   "positivos_esperados": 3104.304663013929,
+   "positivos_observados": 3602,
+   "ece_deciles": 0.058299009520404045,
+   "lista_500_probabilidad_media": 0.8036556665719007,
+   "lista_500_precision": 0.9032
+  },
+  "segmentos": {
+   "lista_precision": 0.9032,
+   "lista_precision_regla": 0.89256,
+   "filas": [
+    {
+     "id": "mujeres",
+     "segmento": "genero",
+     "valor": "F",
+     "en_lista": 1132.0,
+     "precision": 0.9125441696113075,
+     "ic95": [
+      0.8946604564704642,
+      0.9276373005407247
+     ],
+     "diferencia_pp": 0.9344169611307462,
+     "precision_regla": 0.8988603988603989,
+     "diferencia_regla_pp": 0.6300398860398904,
+     "validacion_diferencia_pp": -2.8919708029197078
+    },
+    {
+     "id": "hombres",
+     "segmento": "genero",
+     "valor": "M",
+     "en_lista": 1175.0,
+     "precision": 0.9004255319148936,
+     "ic95": [
+      0.8819775795201211,
+      0.9162636769811764
+     ],
+     "diferencia_pp": -0.27744680851063963,
+     "precision_regla": 0.8899051490514905,
+     "diferencia_regla_pp": -0.26548509485094796,
+     "validacion_diferencia_pp": 3.154985754985762
+    },
+    {
+     "id": "genero_x",
+     "segmento": "genero",
+     "valor": "X",
+     "en_lista": 66.0,
+     "precision": 0.803030303030303,
+     "ic95": [
+      0.6916098449524694,
+      0.8811147203495856
+     ],
+     "diferencia_pp": -10.016969696969703,
+     "precision_regla": 0.8428571428571429,
+     "diferencia_regla_pp": -4.9702857142857155,
+     "validacion_diferencia_pp": -4.221621621621619
+    },
+    {
+     "id": "alto_valor",
+     "segmento": "alto valor",
+     "valor": "20 % de mayor facturación",
+     "en_lista": 727.0,
+     "precision": 0.8762035763411279,
+     "ic95": [
+      0.8502661869298945,
+      0.8981860084569034
+     ],
+     "diferencia_pp": -2.6996423658872115,
+     "precision_regla": 0.8645894001164822,
+     "diferencia_regla_pp": -2.79705998835178,
+     "validacion_diferencia_pp": -2.9619909502262454
+    },
+    {
+     "id": "menos_de_12_meses",
+     "segmento": "antigüedad",
+     "valor": "menos de 12 meses",
+     "en_lista": 62.0,
+     "precision": 0.9193548387096774,
+     "ic95": [
+      0.824712077925188,
+      0.9650621681441662
+     ],
+     "diferencia_pp": 1.6154838709677377,
+     "precision_regla": 0.9196787148594378,
+     "diferencia_regla_pp": 2.711871485943773,
+     "validacion_diferencia_pp": -3.97931034482758
+    },
+    {
+     "id": "alta_online",
+     "segmento": "canal de alta",
+     "valor": "online",
+     "en_lista": 1034.0,
+     "precision": 0.9129593810444874,
+     "ic95": [
+      0.894212297552884,
+      0.9286493029071475
+     ],
+     "diferencia_pp": 0.975938104448737,
+     "precision_regla": 0.8999527186761229,
+     "diferencia_regla_pp": 0.73927186761229,
+     "validacion_diferencia_pp": -1.8982456140350878
+    },
+    {
+     "id": "alta_fisica",
+     "segmento": "canal de alta",
+     "valor": "fisico",
+     "en_lista": 1466.0,
+     "precision": 0.8963165075034106,
+     "ic95": [
+      0.8796613228760108,
+      0.9109000546220813
+     ],
+     "diferencia_pp": -0.6883492496589372,
+     "precision_regla": 0.8871403812824955,
+     "diferencia_regla_pp": -0.5419618717504515,
+     "validacion_diferencia_pp": 1.363344788087062
+    }
+   ]
+  },
+  "modelo": {
+   "nombre": "logistica_ajustada",
+   "version": "1.1",
+   "scikit_learn": "1.9.1",
+   "C": 0.01,
+   "min_frecuencia": 100,
+   "sin": [
+    "genero"
+   ],
+   "agrupadas": 3,
+   "agrupadas_etapa3": 5,
+   "variables": 39,
+   "terminos_con_intercepto": 75,
+   "iteraciones": 31,
+   "pliegues": 4,
+   "coeficientes": [
+    {
+     "termino": "gap_mediano",
+     "variable": "gap_mediano",
+     "valor": null,
+     "coeficiente": -2.473391115651766,
+     "filas": 18882,
+     "sentido": "baja el riesgo"
+    },
+    {
+     "termino": "recency_sobre_umbral",
+     "variable": "recency_sobre_umbral",
+     "valor": null,
+     "coeficiente": 1.3080536123813977,
+     "filas": 18882,
+     "sentido": "sube el riesgo"
+    },
+    {
+     "termino": "recency_dias",
+     "variable": "recency_dias",
+     "valor": null,
+     "coeficiente": 0.68414727466194,
+     "filas": 18882,
+     "sentido": "sube el riesgo"
+    },
+    {
+     "termino": "compras_90d",
+     "variable": "compras_90d",
+     "valor": null,
+     "coeficiente": 0.2383252573861128,
+     "filas": 18882,
+     "sentido": "sube el riesgo"
+    },
+    {
+     "termino": "envios_acum",
+     "variable": "envios_acum",
+     "valor": null,
+     "coeficiente": -0.18458456848753,
+     "filas": 18882,
+     "sentido": "baja el riesgo"
+    },
+    {
+     "termino": "missingindicator_ticket_90d",
+     "variable": "ticket_90d",
+     "valor": "vacío",
+     "coeficiente": 0.18144013075213677,
+     "filas": 5173,
+     "sentido": "sube el riesgo"
+    }
+   ],
+   "importancia": [
+    {
+     "variable": "gap_mediano",
+     "caida_pp": 34.39333333333333,
+     "desvio_pp": 0.7148858149348475
+    },
+    {
+     "variable": "recency_sobre_umbral",
+     "caida_pp": 23.97333333333333,
+     "desvio_pp": 0.8250402160044655
+    },
+    {
+     "variable": "recency_dias",
+     "caida_pp": 7.566666666666663,
+     "desvio_pp": 0.5050363634383793
+    },
+    {
+     "variable": "ticket_90d",
+     "caida_pp": 0.7666666666666633,
+     "desvio_pp": 0.21602468994692983
+    },
+    {
+     "variable": "envios_acum",
+     "caida_pp": 0.5533333333333312,
+     "desvio_pp": 0.2573367875415858
+    }
+   ],
+   "probabilidad_del_ultimo_puesto": [
+    0.38888380146765955,
+    0.3787182124087106,
+    0.36214351620283586,
+    0.33225871862161266,
+    0.31750649496166833
+   ],
+   "probabilidad_del_ultimo_puesto_minima": 0.31750649496166833,
+   "probabilidad_del_ultimo_puesto_maxima": 0.38888380146765955
+  },
+  "equilibrio": {
+   "s_equilibrio": 0.46926026638763696,
+   "precision_lista": 0.86134,
+   "diferencia_compra_7d_pp": 40.41926378503272,
+   "costo_anio_1_usd": 20260.0
+  }
+ },
+ "plan": {
+  "semana_1": "2026-11-02",
+  "fases": [
+   {
+    "id": "gobierno",
+    "nombre": "Precondiciones de gobierno",
+    "desde_semana": 1,
+    "hasta_semana": 2,
+    "semanas": 2,
+    "desde": "2026-11-02",
+    "hasta": "2026-11-15"
+   },
+   {
+    "id": "datos",
+    "nombre": "Integración y limpieza de datos",
+    "desde_semana": 1,
+    "hasta_semana": 3,
+    "semanas": 3,
+    "desde": "2026-11-02",
+    "hasta": "2026-11-22"
+   },
+   {
+    "id": "planilla",
+    "nombre": "Planilla, tablero y guía de corrida",
+    "desde_semana": 1,
+    "hasta_semana": 4,
+    "semanas": 4,
+    "desde": "2026-11-02",
+    "hasta": "2026-11-29"
+   },
+   {
+    "id": "prueba",
+    "nombre": "Corrida de prueba y capacitación",
+    "desde_semana": 5,
+    "hasta_semana": 5,
+    "semanas": 1,
+    "desde": "2026-11-30",
+    "hasta": "2026-12-06"
+   },
+   {
+    "id": "piloto",
+    "nombre": "Piloto",
+    "desde_semana": 6,
+    "hasta_semana": 18,
+    "semanas": 13,
+    "desde": "2026-12-07",
+    "hasta": "2027-03-07"
+   },
+   {
+    "id": "decision",
+    "nombre": "Informe y decisión",
+    "desde_semana": 19,
+    "hasta_semana": 20,
+    "semanas": 2,
+    "desde": "2027-03-08",
+    "hasta": "2027-03-21"
+   }
+  ],
+  "semanas": 20,
+  "hitos_semana": {
+   "alcance": 1,
+   "regla_y_operador_del_piloto": 2,
+   "acciones_legales_y_control": 4,
+   "extracto_regenerado": 6,
+   "go_live": 6,
+   "operador_despues_del_piloto": 13,
+   "decision": 20
+  }
+ },
+ "monitoreo": {
+  "campanias_noviembre": [
+   {
+    "anio": 2022,
+    "fecha": "2022-11-02",
+    "id_campania": "CAMP015"
+   },
+   {
+    "anio": 2023,
+    "fecha": "2023-11-16",
+    "id_campania": "CAMP039"
+   },
+   {
+    "anio": 2024,
+    "fecha": "2024-11-04",
+    "id_campania": "CAMP027"
+   },
+   {
+    "anio": 2025,
+    "fecha": "2025-11-12",
+    "id_campania": "CAMP018"
+   }
+  ],
+  "drift": {
+   "verde_hasta_pct": 38.0,
+   "rojo_desde_pct": 42.0,
+   "referencia": 0.4101706256273001,
+   "referencia_corte": "2025-12-31",
+   "en_riesgo": 2452,
+   "clientes": 5978
+  }
+ },
  "anclas": [
   {
    "id": "H23",
@@ -2354,6 +3123,1364 @@ export const D3 = {
    "nombre": "piloto: umbral de producción (puntos)",
    "documento": "40,4",
    "donde": "C 6.2 y 6.3; gráfico d12 · C3 d12"
+  },
+  {
+   "id": "C14",
+   "nombre": "encuadre: ventas 2025 contra 2024 (%)",
+   "documento": "−35,6",
+   "donde": "A 1.1 · C3 d3"
+  },
+  {
+   "id": "C14",
+   "nombre": "encuadre: ventas 2025 (ARS M)",
+   "documento": "225,0",
+   "donde": "registro C14"
+  },
+  {
+   "id": "C14",
+   "nombre": "encuadre: ventas 2024 (ARS M)",
+   "documento": "349,7",
+   "donde": "registro C14"
+  },
+  {
+   "id": "C08",
+   "nombre": "encuadre: capacidad de contacto, piso",
+   "documento": "500",
+   "donde": "A 1.5 · C3 d3"
+  },
+  {
+   "id": "C08",
+   "nombre": "encuadre: capacidad de contacto, techo",
+   "documento": "800",
+   "donde": "A 1.5 · C3 d3"
+  },
+  {
+   "id": "H40",
+   "nombre": "legal: promedio",
+   "documento": "2,0",
+   "donde": "C 5.3 · C3 d10"
+  },
+  {
+   "id": "H40",
+   "nombre": "legal: nombres y puntajes de las dimensiones",
+   "documento": true,
+   "donde": "C 5.3 · C3 d10 dimensiones"
+  },
+  {
+   "id": "H40",
+   "nombre": "legal: tramo de la escala",
+   "documento": "1,6 a 2,5",
+   "donde": "C 5.3 · C3 d10"
+  },
+  {
+   "id": "C18",
+   "nombre": "legal: envíos sin consentimiento",
+   "documento": "7.078",
+   "donde": "registro C18"
+  },
+  {
+   "id": "C18",
+   "nombre": "legal: envíos sin consentimiento (%)",
+   "documento": "30,1",
+   "donde": "C 5.1 · C3 d10"
+  },
+  {
+   "id": "C18",
+   "nombre": "legal: no consintieron y fueron contactados (%)",
+   "documento": "98,3",
+   "donde": "registro C18"
+  },
+  {
+   "id": "J22",
+   "nombre": "legal: riesgos en la matriz",
+   "documento": "13",
+   "donde": "C 6.2 · C3 A4"
+  },
+  {
+   "id": "J22",
+   "nombre": "legal: riesgos críticos (destacados en A4)",
+   "documento": "3",
+   "donde": "C 6.2 · C3 A4 destacar"
+  },
+  {
+   "id": "J01",
+   "nombre": "test: huella de etapa4.json",
+   "documento": true,
+   "donde": "registro J01 (sha256 0368611d…)"
+  },
+  {
+   "id": "J01",
+   "nombre": "test: líneas de apertura",
+   "documento": "1",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J01",
+   "nombre": "test: fecha de apertura",
+   "documento": "2026-10-27T15:55:55-03:00",
+   "donde": "registro J01 (27/10/2026 15:55:55)"
+  },
+  {
+   "id": "J01",
+   "nombre": "test: cifras de validación que reproducen",
+   "documento": "125",
+   "donde": "registro J01 (125 de 125)"
+  },
+  {
+   "id": "J02",
+   "nombre": "test: cortes",
+   "documento": "5",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J02",
+   "nombre": "test: primer y último corte",
+   "documento": "2025-01-31 a 2025-05-31",
+   "donde": "registro J02 (31/01 a 31/05/2025)"
+  },
+  {
+   "id": "J02",
+   "nombre": "test: filas",
+   "documento": "14.211",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J02",
+   "nombre": "test: positivos",
+   "documento": "3.602",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J02",
+   "nombre": "test: tasa de positivos (%)",
+   "documento": "25,35",
+   "donde": "registro J02"
+  },
+  {
+   "id": "J02",
+   "nombre": "test: contactables",
+   "documento": "9.962",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J02",
+   "nombre": "test: contactables por corte",
+   "documento": "1.973 · 1.969 · 2.005 · 2.016 · 1.999",
+   "donde": "registro J02"
+  },
+  {
+   "id": "J02",
+   "nombre": "test: positivos contactables",
+   "documento": "2.521",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J02",
+   "nombre": "test: positivos contactables (%)",
+   "documento": "25,3",
+   "donde": "registro J02"
+  },
+  {
+   "id": "J02",
+   "nombre": "entrenamiento final: filas",
+   "documento": "18.882",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J02",
+   "nombre": "entrenamiento final: cortes",
+   "documento": "18",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J02",
+   "nombre": "entrenamiento final: clientes",
+   "documento": "2.921",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J02",
+   "nombre": "entrenamiento final: positivos",
+   "documento": "5.698",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J02",
+   "nombre": "entrenamiento final: período",
+   "documento": "2023-01-31 a 2024-06-30",
+   "donde": "registro J02"
+  },
+  {
+   "id": "J03",
+   "nombre": "test: precisión de la logística (%)",
+   "documento": "85,88",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J03",
+   "nombre": "test: aciertos de la logística",
+   "documento": "2.147",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J03",
+   "nombre": "test: precisión de la regla (%)",
+   "documento": "86,13",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J03",
+   "nombre": "test: aciertos de la regla",
+   "documento": "2.153,35",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J03",
+   "nombre": "test: precisión por corte, logística (%)",
+   "documento": "84,6 · 87,2 · 86,6 · 87,0 · 84,0",
+   "donde": "registro J03"
+  },
+  {
+   "id": "J03",
+   "nombre": "test: precisión por corte, regla (%)",
+   "documento": "83,60 · 86,72 · 87,00 · 88,20 · 85,15",
+   "donde": "registro J03 (83,6; 86,72; 87,0; 88,2 y 85,15)"
+  },
+  {
+   "id": "J03",
+   "nombre": "tabla 8.1: métrica principal = precisión",
+   "documento": "85,9",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J04",
+   "nombre": "test: recall de la logística (%)",
+   "documento": "85,16",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J04",
+   "nombre": "test: F1 de la logística (%)",
+   "documento": "85,52",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J04",
+   "nombre": "test: recall de la regla (%)",
+   "documento": "85,42",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J04",
+   "nombre": "test: F1 de la regla (%)",
+   "documento": "85,77",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J04",
+   "nombre": "validación: recall de la logística (%)",
+   "documento": "94,30",
+   "donde": "registro J04 (H15)"
+  },
+  {
+   "id": "J04",
+   "nombre": "validación: F1 de la logística (%)",
+   "documento": "82,84",
+   "donde": "registro J04"
+  },
+  {
+   "id": "J05",
+   "nombre": "test: AUC-ROC de la logística",
+   "documento": "0,974",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J05",
+   "nombre": "test: AUC-ROC de la regla",
+   "documento": "0,979",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J05",
+   "nombre": "validación: AUC-ROC de la logística",
+   "documento": "0,966",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J05",
+   "nombre": "validación: AUC-ROC de la regla",
+   "documento": "0,970",
+   "donde": "registro J05"
+  },
+  {
+   "id": "J05",
+   "nombre": "test: AUC-ROC de la práctica actual",
+   "documento": "0,660",
+   "donde": "registro J05"
+  },
+  {
+   "id": "J06",
+   "nombre": "test: valor neto de la logística (USD, 5 cortes)",
+   "documento": "135,64",
+   "donde": "registro J06"
+  },
+  {
+   "id": "J06",
+   "nombre": "test: valor neto de la logística (USD/año)",
+   "documento": "325,52",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J06",
+   "nombre": "test: valor neto de la regla (USD, 5 cortes)",
+   "documento": "136,28",
+   "donde": "registro J06"
+  },
+  {
+   "id": "J06",
+   "nombre": "test: valor neto de la regla (USD/año)",
+   "documento": "327,06",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J06",
+   "nombre": "test: logística menos regla (USD/año)",
+   "documento": "−1,54",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J06",
+   "nombre": "validación: valor neto de la logística (USD/año)",
+   "documento": "252,84",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J06",
+   "nombre": "validación: valor neto de la regla (USD/año)",
+   "documento": "264,54",
+   "donde": "registro J06 (H16)"
+  },
+  {
+   "id": "J07",
+   "nombre": "8.1: precisión, test − validación (puntos)",
+   "documento": "12,0",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J07",
+   "nombre": "8.1: recall, test − validación (puntos)",
+   "documento": "−9,1",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J07",
+   "nombre": "8.1: F1, test − validación (puntos)",
+   "documento": "2,7",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J07",
+   "nombre": "8.1: AUC-ROC, test − validación",
+   "documento": "0,008",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J07",
+   "nombre": "8.1: valor neto, test − validación (USD/año)",
+   "documento": "72,68",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz test, logistica_ajustada: VP",
+   "documento": "2.147",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz test, logistica_ajustada: FN",
+   "documento": "374",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz test, logistica_ajustada: FP",
+   "documento": "353",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz test, logistica_ajustada: VN",
+   "documento": "7.088",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz test, regla: VP",
+   "documento": "2.153,35",
+   "donde": "registro J08"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz test, regla: FN",
+   "documento": "367,65",
+   "donde": "registro J08"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz test, regla: FP",
+   "documento": "346,65",
+   "donde": "registro J08"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz test, regla: VN",
+   "documento": "7.094,35",
+   "donde": "registro J08"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz validacion, logistica_ajustada: VP",
+   "documento": "1.108",
+   "donde": "registro J08"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz validacion, logistica_ajustada: FN",
+   "documento": "67",
+   "donde": "registro J08"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz validacion, logistica_ajustada: FP",
+   "documento": "392",
+   "donde": "registro J08"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz validacion, logistica_ajustada: VN",
+   "documento": "3.471",
+   "donde": "registro J08"
+  },
+  {
+   "id": "J08",
+   "nombre": "matriz test: filas contactables",
+   "documento": "9.962",
+   "donde": "D 8.1"
+  },
+  {
+   "id": "J09",
+   "nombre": "test: logística − regla (puntos)",
+   "documento": "−0,25",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J09",
+   "nombre": "test: IC 95 % inferior (puntos)",
+   "documento": "−1,45",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J09",
+   "nombre": "test: IC 95 % superior (puntos)",
+   "documento": "0,79",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J09",
+   "nombre": "test: réplicas a favor del modelo (%)",
+   "documento": "31,0",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J09",
+   "nombre": "test: aciertos de menos de la logística (5 cortes)",
+   "documento": "6,35",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J09",
+   "nombre": "test: aciertos extra por mes",
+   "documento": "−1,27",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J09",
+   "nombre": "validación: logística − regla (puntos)",
+   "documento": "−1,93",
+   "donde": "registro J09 (H16)"
+  },
+  {
+   "id": "J09",
+   "nombre": "validación: IC 95 % (puntos)",
+   "documento": "−3,25 a −1,07",
+   "donde": "registro J09 (H16)"
+  },
+  {
+   "id": "J10",
+   "nombre": "decisión: condición 1 (el intervalo excluye el cero)",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J10",
+   "nombre": "decisión: límite inferior del intervalo (puntos)",
+   "documento": "−1,45",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J10",
+   "nombre": "decisión: condición 2 (paga lo que agrega)",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J10",
+   "nombre": "decisión: aciertos extra por mes",
+   "documento": "−1,27",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J10",
+   "nombre": "decisión: aciertos por mes que pagan el costo",
+   "documento": "8.595",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J10",
+   "nombre": "decisión: costo incremental (USD)",
+   "documento": "10.400",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J10",
+   "nombre": "decisión: la lista sigue con la regla",
+   "documento": true,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: precisión de la logística (%)",
+   "documento": "90,32",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: aciertos de la logística",
+   "documento": "2.258",
+   "donde": "registro J11"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: recall de la logística (%)",
+   "documento": "62,7",
+   "donde": "registro J11"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: precisión de la regla (%)",
+   "documento": "89,26",
+   "donde": "registro J11"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: aciertos de la regla",
+   "documento": "2.231,4",
+   "donde": "registro J11"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: logística − regla (puntos)",
+   "documento": "1,06",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: IC 95 % (puntos)",
+   "documento": "0,41 a 1,95",
+   "donde": "D 8.2 (+0,41 a +1,95)"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: réplicas a favor del modelo (%)",
+   "documento": "99,9",
+   "donde": "registro J11"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: aciertos de más por mes",
+   "documento": "5,32",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: valor neto de la logística (USD/año)",
+   "documento": "352,39",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: valor neto de la regla (USD/año)",
+   "documento": "345,95",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: logística − regla (USD/año)",
+   "documento": "6,44",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: AUC-ROC de la logística",
+   "documento": "0,972",
+   "donde": "registro J11"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: AUC-ROC de la regla",
+   "documento": "0,977",
+   "donde": "registro J11"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: decil superior de la logística (%)",
+   "documento": "93,2",
+   "donde": "registro J11"
+  },
+  {
+   "id": "J11",
+   "nombre": "sin filtro: decil superior de la regla (%)",
+   "documento": "93,7",
+   "donde": "registro J11"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla: costo del año 1 (USD)",
+   "documento": "10.400",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla, b_3_4: USD/año",
+   "documento": "5,38",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla, b_3_4: ROI (%)",
+   "documento": "−99,95",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla, b_3_4: recupera en el año",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla, contactables: USD/año",
+   "documento": "−1,54",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla, contactables: ROI (%)",
+   "documento": "−100,01",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla, contactables: recupera en el año",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla, sin_filtro: USD/año",
+   "documento": "6,44",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla, sin_filtro: ROI (%)",
+   "documento": "−99,94",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla, sin_filtro: recupera en el año",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 modelo_sobre_la_regla: cambia el veredicto",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo: costo del año 1 (USD)",
+   "documento": "30.660",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo, b_3_4: USD/año",
+   "documento": "304,87",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo, b_3_4: ROI (%)",
+   "documento": "−99,01",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo, b_3_4: recupera en el año",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo, contactables: USD/año",
+   "documento": "325,52",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo, contactables: ROI (%)",
+   "documento": "−98,94",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo, contactables: recupera en el año",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo, sin_filtro: USD/año",
+   "documento": "352,39",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo, sin_filtro: ROI (%)",
+   "documento": "−98,85",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo, sin_filtro: recupera en el año",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 proyecto_completo: cambia el veredicto",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo: costo del año 1 (USD)",
+   "documento": "20.260",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo, b_3_4: USD/año",
+   "documento": "299,49",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo, b_3_4: ROI (%)",
+   "documento": "−98,52",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo, b_3_4: recupera en el año",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo, contactables: USD/año",
+   "documento": "327,06",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo, contactables: ROI (%)",
+   "documento": "−98,39",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo, contactables: recupera en el año",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo, sin_filtro: USD/año",
+   "documento": "345,95",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo, sin_filtro: ROI (%)",
+   "documento": "−98,29",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo, sin_filtro: recupera en el año",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J12",
+   "nombre": "8.2 regla_sin_modelo: cambia el veredicto",
+   "documento": false,
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J13",
+   "nombre": "regla en test: aciertos por mes",
+   "documento": "430,67",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J13",
+   "nombre": "meta del criterio 1 (aciertos por mes)",
+   "documento": "379",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J13",
+   "nombre": "regla en test: precisión por corte, mínima (%)",
+   "documento": "83,6",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J13",
+   "nombre": "regla en test: precisión por corte, máxima (%)",
+   "documento": "88,2",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J13",
+   "nombre": "alerta de la fila 10 (%)",
+   "documento": "72,0",
+   "donde": "D 8.2 (H44)"
+  },
+  {
+   "id": "J14",
+   "nombre": "calibración: Brier",
+   "documento": "0,066",
+   "donde": "registro J14"
+  },
+  {
+   "id": "J14",
+   "nombre": "calibración: Brier con la tasa base",
+   "documento": "0,189",
+   "donde": "registro J14"
+  },
+  {
+   "id": "J14",
+   "nombre": "calibración: probabilidad media (%)",
+   "documento": "21,8",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J14",
+   "nombre": "calibración: tasa observada (%)",
+   "documento": "25,3",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J14",
+   "nombre": "calibración: positivos esperados",
+   "documento": "3.104",
+   "donde": "registro J14"
+  },
+  {
+   "id": "J14",
+   "nombre": "calibración: error por deciles",
+   "documento": "0,058",
+   "donde": "registro J14"
+  },
+  {
+   "id": "J14",
+   "nombre": "calibración: la lista promete (%)",
+   "documento": "80,4",
+   "donde": "registro J14"
+  },
+  {
+   "id": "J14",
+   "nombre": "calibración: la lista acierta (%)",
+   "documento": "90,3",
+   "donde": "registro J14"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento mujeres: lugares en la lista",
+   "documento": "1.132",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento mujeres: precisión (%)",
+   "documento": "91,3",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento mujeres: intervalo de Wilson (%)",
+   "documento": "89,5 a 92,8",
+   "donde": "registro J15"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento mujeres: precisión de la regla (%)",
+   "documento": "89,9",
+   "donde": "registro J15"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento hombres: lugares en la lista",
+   "documento": "1.175",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento hombres: precisión (%)",
+   "documento": "90,0",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento hombres: intervalo de Wilson (%)",
+   "documento": "88,2 a 91,6",
+   "donde": "registro J15"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento hombres: precisión de la regla (%)",
+   "documento": "89,0",
+   "donde": "registro J15"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento genero_x: lugares en la lista",
+   "documento": "66",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento genero_x: precisión (%)",
+   "documento": "80,3",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento genero_x: intervalo de Wilson (%)",
+   "documento": "69,2 a 88,1",
+   "donde": "registro J15"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento alto_valor: lugares en la lista",
+   "documento": "727",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento alto_valor: precisión (%)",
+   "documento": "87,6",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento alto_valor: intervalo de Wilson (%)",
+   "documento": "85,0 a 89,8",
+   "donde": "registro J15"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento alto_valor: precisión de la regla (%)",
+   "documento": "86,5",
+   "donde": "registro J15"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento menos_de_12_meses: lugares en la lista",
+   "documento": "62",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento menos_de_12_meses: precisión (%)",
+   "documento": "91,9",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento menos_de_12_meses: intervalo de Wilson (%)",
+   "documento": "82,5 a 96,5",
+   "donde": "registro J15"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento alta_online: lugares en la lista",
+   "documento": "1.034",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento alta_online: precisión (%)",
+   "documento": "91,3",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento alta_fisica: lugares en la lista",
+   "documento": "1.466",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J15",
+   "nombre": "segmento alta_fisica: precisión (%)",
+   "documento": "89,6",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J21",
+   "nombre": "segmento menos_de_12_meses: diferencia en test (puntos)",
+   "documento": "1,6",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J21",
+   "nombre": "segmento menos_de_12_meses: diferencia en validación (puntos)",
+   "documento": "−4,0",
+   "donde": "registro J21 (H25 a H27)"
+  },
+  {
+   "id": "J21",
+   "nombre": "segmento alta_online: diferencia en test (puntos)",
+   "documento": "1,0",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J21",
+   "nombre": "segmento alta_online: diferencia en validación (puntos)",
+   "documento": "−1,9",
+   "donde": "registro J21 (H25 a H27)"
+  },
+  {
+   "id": "J21",
+   "nombre": "segmento alto_valor: diferencia en test (puntos)",
+   "documento": "−2,7",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J21",
+   "nombre": "segmento alto_valor: diferencia en validación (puntos)",
+   "documento": "−3,0",
+   "donde": "registro J21 (H25 a H27)"
+  },
+  {
+   "id": "J21",
+   "nombre": "segmento alto_valor: la regla contra su lista (puntos)",
+   "documento": "−2,8",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J21",
+   "nombre": "segmentos: precisión de toda la lista (%)",
+   "documento": "90,32",
+   "donde": "registro J21"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: C",
+   "documento": "0,01",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: min_frecuencia",
+   "documento": "100",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: motivos agrupados (18 cortes)",
+   "documento": "3",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: motivos agrupados (16 cortes, etapa 3)",
+   "documento": "5",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: variables",
+   "documento": "39",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: términos con el intercepto",
+   "documento": "75",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: iteraciones",
+   "documento": "31",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: variable que sale",
+   "documento": [
+    "genero"
+   ],
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: coeficiente de gap_mediano",
+   "documento": "−2,47",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: coeficiente de recency_sobre_umbral",
+   "documento": "1,31",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: coeficiente de recency_dias",
+   "documento": "0,68",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: coeficiente de compras_90d",
+   "documento": "0,24",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: coeficiente de envios_acum",
+   "documento": "−0,18",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: coeficiente de missingindicator_ticket_90d",
+   "documento": "0,18",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: filas con ticket_90d vacío",
+   "documento": "5.173",
+   "donde": "registro J16"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: probabilidad del último puesto, mínima",
+   "documento": "0,32",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J16",
+   "nombre": "modelo: probabilidad del último puesto, máxima",
+   "documento": "0,39",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J20",
+   "nombre": "modelo: versión",
+   "documento": "1.1",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J20",
+   "nombre": "modelo: scikit-learn",
+   "documento": "1.9.1",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J20",
+   "nombre": "entrenamiento final: positivos (%)",
+   "documento": "30,2",
+   "donde": "D 8.3"
+  },
+  {
+   "id": "J20",
+   "nombre": "modelo: pliegues temporales",
+   "documento": "4",
+   "donde": "D 8.3 (C 7.1)"
+  },
+  {
+   "id": "J17",
+   "nombre": "práctica actual en test: precisión (%)",
+   "documento": "37,6",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J17",
+   "nombre": "práctica actual en test: USD/año",
+   "documento": "33,35",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J18",
+   "nombre": "validación: positivos contactables",
+   "documento": "1.175",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J18",
+   "nombre": "validación: positivos contactables por corte",
+   "documento": "392",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J18",
+   "nombre": "test: positivos contactables por corte",
+   "documento": "504",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J18",
+   "nombre": "validación: techo de la lista (%)",
+   "documento": "78,3",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J18",
+   "nombre": "test: positivos contactables fuera de la lista",
+   "documento": "374",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J18",
+   "nombre": "test: fuera de la lista (%)",
+   "documento": "14,8",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J18",
+   "nombre": "validación: positivos contactables fuera de la lista",
+   "documento": "67",
+   "donde": "D 8.2"
+  },
+  {
+   "id": "J18",
+   "nombre": "validación: fuera de la lista (%)",
+   "documento": "5,7",
+   "donde": "registro J18"
+  },
+  {
+   "id": "J19",
+   "nombre": "test: s de equilibrio de la regla (%)",
+   "documento": "46,9",
+   "donde": "D 11.2"
+  },
+  {
+   "id": "J19",
+   "nombre": "test: diferencia de compra a 7 días que paga la regla (puntos)",
+   "documento": "40,4",
+   "donde": "D 11.2 (igual que H49)"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: semanas de cada fase",
+   "documento": "2 · 3 · 4 · 1 · 13 · 2",
+   "donde": "D 12.1"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: semanas en total",
+   "documento": "20",
+   "donde": "D 12.1"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: el piloto empieza en el go-live",
+   "documento": true,
+   "donde": "D 12.1"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: semana 1",
+   "documento": "2026-11-02 a 2026-11-08",
+   "donde": "registro J50"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: piloto",
+   "documento": "2026-12-07 a 2027-03-07",
+   "donde": "D 12.1 (07/12/2026 a 07/03/2027)"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: decisión hasta",
+   "documento": "2027-03-21",
+   "donde": "D 12.1 (21/03/2027)"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: operador antes del tercer mes del piloto",
+   "documento": true,
+   "donde": "D 12.2 (C 6.3, riesgo 2)"
+  },
+  {
+   "id": "J51",
+   "nombre": "campañas: primer envío de noviembre por año",
+   "documento": "2022-11-02 CAMP015 · 2023-11-16 CAMP039 · 2024-11-04 CAMP027 · 2025-11-12 CAMP018",
+   "donde": "D 12.2"
+  },
+  {
+   "id": "J52",
+   "nombre": "drift: rojo del semáforo (%)",
+   "documento": "42",
+   "donde": "D 10.2"
+  },
+  {
+   "id": "J52",
+   "nombre": "drift: verde del semáforo, hasta (%)",
+   "documento": "38",
+   "donde": "registro J52 (E1 D 10.1)"
+  },
+  {
+   "id": "J52",
+   "nombre": "drift: referencia al corte (%)",
+   "documento": "41,0",
+   "donde": "D 10.2 (C03)"
+  },
+  {
+   "id": "J52",
+   "nombre": "drift: corte de la referencia",
+   "documento": "2025-12-31",
+   "donde": "registro J52 (31/12/2025)"
   }
  ]
 };

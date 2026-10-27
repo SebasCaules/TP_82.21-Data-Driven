@@ -41,6 +41,10 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
 
 6. (W2) Con --hoja, una hoja de contacto de las vistas con contenido (por defecto, de la 1 a la 6) a
    1536 × 864, dos por fila, para mirarla de una vez.
+7. (27/10, W3) Datos de la Parte D, sin navegador: D3 trae las filas J01 a J22, J50 a J52 y las cinco cifras de las
+   vistas 2 y 6 que antes solo tenía C3 (C14, C08, H40, C18, J22); cada valor, escrito con formato.js, da lo que
+   dice el registro, y los del test coinciden con data/e3/etapa4.json. En pantalla, la vista 7 (si ya no es
+   esqueleto) escribe la precisión del test del modelo y de la regla (J03).
 
 Termina con «E3 OK» o con la lista de problemas y código 1.
 """
@@ -312,6 +316,110 @@ def guion_en_notas(p: Pagina, w, h, guion):
     p.tecla("n")
 
 
+# ---------------------------------------------------------------- 6. datos de la Parte D (W3)
+
+# Filas del registro que D3 tiene que traer desde W3: la etapa 4 (J01 a J21), la matriz de riesgos (J22), el plan
+# (J50), la campaña de noviembre (J51), la alerta de drift (J52) y las cinco cifras de las vistas 2 y 6 que hasta W2
+# solo estaban en el texto de C3 (C14, C08, H40, C18; J22 es la quinta).
+IDS_D = [f"J{i:02d}" for i in range(1, 23)] + ["J50", "J51", "J52", "C14", "C08", "H40", "C18"]
+
+
+def anclas_datos():
+    """Sin navegador. D3 trae cada fila de IDS_D en D3.anclas; sus valores, escritos con formato.js, dan lo que dice
+    el registro (wiki/entregables/cifras-entregable-3.md), y los del test coinciden con data/e3/etapa4.json leído
+    acá, no a través de build_e3.py."""
+    D3 = leer_js("datos_e3.js", "D3")
+    mal = []
+    faltan = [k for k in ("encuadre", "legal", "test", "plan", "monitoreo") if k not in D3]
+    if faltan:
+        return [f"datos: D3 no trae {', '.join(faltan)}: corre «python3 -I pipeline/build_e3.py»"]
+    ids = {a["id"] for a in D3["anclas"]}
+    mal += [f"datos: D3.anclas no tiene la fila {i}" for i in IDS_D if i not in ids]
+    T, EN, LE, PL, MO = D3["test"], D3["encuadre"], D3["legal"], D3["plan"], D3["monitoreo"]
+    L, R, PA = (T["metodos"][k]["test"] for k in ("logistica_ajustada", "regla", "practica_actual"))
+    CO, DE, SF = T["contra_regla"], T["decision"], T["sin_filtro"]
+    e4 = json.loads((APP / "data" / "e3" / "etapa4.json").read_text(encoding="utf-8"))
+    P4 = e4["medicion"]["principal"]
+    registro = [
+        ("J02", "filas de test", fijo(T["conjunto"]["filas"]), "14.211"),
+        ("J02", "contactables de test", fijo(T["conjunto"]["contactables"]), "9.962"),
+        ("J03", "precisión de la logística en test", pct(L["precision"], 1), "85,9 %"),
+        ("J03", "precisión de la regla en test", pct(R["precision"], 1), "86,1 %"),
+        ("J04", "recall de la logística en test", pct(L["recall"], 1), "85,2 %"),
+        ("J04", "F1 de la logística en test", pct(L["f1"], 1), "85,5 %"),
+        ("J05", "AUC-ROC de la logística en test", fijo(L["auc_roc_contactables"], 3), "0,974"),
+        ("J06", "valor neto de la logística", usd(L["usd_anio"], 2), "USD 325,52"),
+        ("J06", "valor neto de la regla", usd(R["usd_anio"], 2), "USD 327,06"),
+        ("J07", "precisión, test − validación", fijo(T["tabla_8_1"][0]["diferencia_test_menos_validacion"] * 100, 1,
+                                                     True), "+12,0"),
+        ("J08", "matriz de la logística en test", " ".join(fijo(L[k]) for k in ("vp", "fn", "fp", "vn")),
+         "2.147 374 353 7.088"),
+        ("J09", "logística − regla en test", fijo(CO["diferencia_pp"], 2, True), "−0,25"),
+        ("J09", "intervalo del 95 %", " a ".join(fijo(x, 2, True) for x in CO["ic95_pp"]), "−1,45 a +0,79"),
+        ("J10", "aciertos por mes que pagan el costo", fijo(DE["aciertos_por_mes_para_pagar"]), "8.595"),
+        ("J10", "la lista sigue con la regla", str(DE["sigue_la_regla"] and not DE["condicion_1"]
+                                                    and not DE["condicion_2"]), "True"),
+        ("J11", "sin filtro, logística − regla", fijo(SF["diferencia_pp"], 2, True), "+1,06"),
+        ("J11", "sin filtro, intervalo", " a ".join(fijo(x, 2, True) for x in SF["ic95_pp"]), "+0,41 a +1,95"),
+        ("J12", "proyecto completo con contactables", usd(T["roi_b_3_4"][1]["contactables"]["usd"], 2), "USD 325,52"),
+        ("J13", "aciertos de la regla por mes", fijo(T["meta_y_alerta"]["regla_aciertos_por_mes"], 2), "430,67"),
+        ("J14", "calibración, la lista promete", pct(T["calibracion"]["lista_500_probabilidad_media"], 1), "80,4 %"),
+        ("J15", "mujeres en la lista sin filtro", pct(next(x for x in T["segmentos"]["filas"]
+                                                           if x["id"] == "mujeres")["precision"], 1), "91,3 %"),
+        ("J16", "variables del modelo final", fijo(T["modelo"]["variables"]), "39"),
+        ("J17", "práctica actual en test", pct(PA["precision"], 1), "37,6 %"),
+        ("J18", "positivos contactables por corte, test y validación",
+         f"{fijo(T['conjunto']['positivos_contactables_por_corte'])} y "
+         f"{fijo(T['validacion']['positivos_contactables_por_corte'])}", "504 y 392"),
+        ("J19", "equilibrio de la regla en test", pct(T["equilibrio"]["s_equilibrio"], 1), "46,9 %"),
+        ("J20", "versión del modelo final", T["modelo"]["version"], "1.1"),
+        ("J21", "alto valor en test", fijo(next(x for x in T["segmentos"]["filas"]
+                                               if x["id"] == "alto_valor")["diferencia_pp"], 1, True), "−2,7"),
+        ("J22", "riesgos de la matriz", fijo(LE["riesgos"]), "13"),
+        ("J50", "semanas del plan", fijo(PL["semanas"]), "20"),
+        ("J51", "campaña de noviembre de 2025", MO["campanias_noviembre"][-1]["fecha"], "2025-11-12"),
+        ("J52", "rojo de la alerta de drift", fijo(MO["drift"]["rojo_desde_pct"]) + " %", "42 %"),
+        ("C14", "ventas de 2025 contra 2024", pct_directo(EN["variacion_ventas_2025_pct"], 1), "−35,6 %"),
+        ("C08", "capacidad de contacto", " a ".join(fijo(x) for x in EN["capacidad_contacto_mes"]), "500 a 800"),
+        ("H40", "puntaje legal", fijo(LE["promedio"], 1), "2,0"),
+        ("C18", "envíos sin consentimiento", pct(LE["envios_sin_consentimiento_tasa"], 1), "30,1 %"),
+    ]
+    for id_, que, d3, doc in registro:
+        if norm(d3) != norm(doc):
+            mal.append(f"datos {id_}: {que} da «{d3}» y el registro dice «{doc}»")
+    # el test, leído de nuevo del JSON copiado
+    for clave, k4 in (("logistica_ajustada", "logistica_ajustada"), ("regla", "regla_umbral")):
+        for k in ("precision", "recall", "vp", "fp", "fn", "vn", "valor_neto_anual_usd"):
+            d3 = T["metodos"][clave]["test"]["usd_anio" if k == "valor_neto_anual_usd" else k]
+            if d3 != P4[k4][k]:
+                mal.append(f"datos: test.metodos.{clave}.test.{k} = {d3}, etapa4.json dice {P4[k4][k]}")
+    if any(abs(a / 100 - b) > 1e-12 for a, b in zip(CO["ic95_pp"], P4["diferencia_logistica_menos_regla"]["ic95"])):
+        mal.append("datos: test.contra_regla.ic95_pp no es el intervalo de etapa4.json")
+    if e4["decision"]["resultado"] != DE["resultado"]:
+        mal.append("datos: test.decision.resultado no es el de etapa4.json")
+    return mal
+
+
+# Lo que la vista 7 tiene que escribir cuando deja de ser esqueleto: la métrica principal del test del modelo y de
+# la regla (J03). La banda, la decisión y el gráfico los fija quien la construye; esto es lo mínimo.
+def pantalla_d_esperada():
+    T = leer_js("datos_e3.js", "D3")["test"]["metodos"]
+    return {"v07": [pct(T["logistica_ajustada"]["test"]["precision"], 1), pct(T["regla"]["test"]["precision"], 1)]}
+
+
+def contenido_d(p: Pagina, esperado_d):
+    for id_, textos in esperado_d.items():
+        p.ir(id_)
+        if p.pg.evaluate(CHEQUEO)["esqueleto"]:
+            continue
+        r = p.pg.evaluate(LEER_VISTA)
+        pantalla = norm(r["pantalla"])
+        for x in textos:
+            if norm(x) not in pantalla:
+                p.mal(f"{id_}: en pantalla no está «{norm(x)}» (etapa 4, J03)")
+        revisar_estado(p, id_, "al llegar", r)
+
+
 def abrir_navegador(pw):
     """Chromium de Playwright; si no está instalado para esta versión, el Chrome del sistema o el
     último Chromium que haya en la caché de Playwright."""
@@ -548,6 +656,7 @@ def hoja(nav, destino: Path, ids):
 
 def main():
     esperado, guion = contenido_esperado()
+    esperado_d = pantalla_d_esperada()
     ap = argparse.ArgumentParser()
     ap.add_argument("--capturas", default=str(APP / "e3" / "capturas-verif"))
     ap.add_argument("--sin-capturas", action="store_true")
@@ -561,7 +670,7 @@ def main():
     out = Path(a.capturas)
     if not a.sin_capturas:
         out.mkdir(parents=True, exist_ok=True)
-    problemas: list[str] = []
+    problemas: list[str] = anclas_datos()
     with sync_playwright() as pw:
         nav = abrir_navegador(pw)
         for w, h in RES:
@@ -569,6 +678,7 @@ def main():
             try:
                 vistas(p, w, h, out, (w, h) in CAPTURAR and not a.sin_capturas, a.sin_esqueletos)
                 contenido(p, esperado)
+                contenido_d(p, esperado_d)
                 if (w, h) in NOTAS_RES:
                     notas_entran(p, w, h)
                     guion_en_notas(p, w, h, guion)
