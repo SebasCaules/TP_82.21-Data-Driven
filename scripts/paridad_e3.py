@@ -1,30 +1,37 @@
-"""Paridad de /e3/ con /e2/ (27/10, W1; PLAN.md del E3, «Frente web», y decisión N0-5).
+"""Paridad de /e3/ con /e2/ (27/10, W1 y W2.0; PLAN.md del E3, «Frente web», decisiones N0-5 y N0-13).
 
     npm run build:e2 && npm run build:e3 && python3 scripts/paridad_e3.py [--hoja RUTA]
 
 /e3/ es el tablero del E2 con la letra más grande: un zoom uniforme de factor k sobre toda la página
-(e3/src/zoom.js), k = máx(1; mín(1,2; ancho / 1152; alto / 640)). Lo que se declara y se mide:
+(e3/src/zoom.js), k = máx(1; mín(1,2; ancho / 1152; alto / 640)), con la letra medida contra la ventana
+real (vite.e3.config.js). Lo que se declara y se mide:
 
-    /e3/ en una ventana W × H se ve igual que /e2/ en una ventana W/k × H/k, ampliado k veces.
+    cada texto de /e3/ en una ventana W × H mide k veces lo que mide en /e2/ en la misma ventana W × H;
+    las cajas de /e3/ en W × H son las de /e2/ en W/k × H/k, ampliadas k veces.
 
 1. Estático. e3/src/main.jsx importa src/estilos.css, e2/src/estilos_e2.css y src/fit.js; las vistas
    importan los componentes compartidos (e2/src/Banda.jsx, src/graficos.jsx); e3/src/estilos_e3.css no
    nombra ninguna clase del armazón (.lat*, .cuerpo, .e2-enc*, .e2-preg, .tarjeta, .kpi-*, .ban-*,
    .e2-banda, .tarjeta-dec, :root y otras del E2) ni usa !important fuera de @media print; y src/** y
    e2/** no cambian contra main.
-2. Estilos calculados, dist-e2 contra dist-e3, a 1152×640, 1366×768, 1536×864 y 1920×1080: /e2/ abre en
-   la ventana lógica (W/k × H/k) en la vista 4, /e3/ en W × H en la vista 5. Del riel, el encabezado, la
-   pregunta, la banda, la tarjeta de decisión, la tarjeta central, la tarjeta del gráfico y el cuerpo:
-   familia, peso, tamaño, interlineado, espaciado, mayúsculas, colores, bordes y padding iguales (los
-   valores calculados son lógicos: el zoom no los cambia). Cajas del riel, el encabezado, la banda, la
-   tarjeta de decisión y el cuerpo iguales, medidas en pantalla y divididas por k, con 0,5 px de
-   tolerancia. k medido: el cociente del alto en pantalla de cada texto de un renglón (e3 / e2) y el del
-   tamaño de letra efectivo (tamaño × zoom); tiene que dar el k declarado en todos.
-3. Reglas 11 y 12 del E2, en cada vista de /e3/ y cada resolución: la pregunta en un renglón y de 74
-   caracteres o menos; sin título (.titulo) ni pie (.pie-vista); a lo sumo un gráfico por vista (las
-   vistas con contenido, exactamente uno); la tarjeta de decisión con una frase corta de 60 caracteres o
-   menos; window.__fit() sin problemas. Las vistas esqueleto solo se montan (sin gráfico).
-4. Hoja de contacto: /e2/ (vista 4) y /e3/ (vista 5) lado a lado, las dos a 1536 × 864, en
+2. Letra, /e2/ y /e3/ en la misma ventana, a 1152×640, 1366×768, 1536×864 y 1920×1080 (/e2/ en la vista 4
+   o la 7b, /e3/ en la 5): de cada texto (riel, pregunta, encabezado, banda con sus cifras grandes,
+   tarjeta de decisión, rótulo y textos del gráfico), el cociente e3 / e2 del tamaño de letra efectivo
+   (tamaño × zoom), del interlineado y del espaciado tiene que dar el k declarado; el del ancho en
+   pantalla de una misma muestra escrita con la letra de cada pieza, también. Familia, peso, mayúsculas
+   y color, iguales. Imprime la tabla de cocientes por texto y resolución.
+3. Armazón, /e2/ en la ventana lógica (W/k × H/k) contra /e3/ en W × H: del riel, el encabezado, la
+   banda, la tarjeta de decisión, la tarjeta central, la tarjeta del gráfico y el cuerpo, colores, fondo,
+   bordes, radio y padding iguales (los valores calculados son lógicos: el zoom no los cambia); cajas
+   medidas en pantalla y divididas por k, iguales con 0,5 px de tolerancia en lo que no depende de la
+   letra (posición y ancho; el alto del riel, la banda, la tarjeta de decisión y el avance).
+4. Reglas 11 y 12 del E2 y desbordes, en cada vista de /e3/ y cada resolución: la pregunta en un renglón
+   y de 74 caracteres o menos; sin título (.titulo) ni pie (.pie-vista); a lo sumo un gráfico por vista
+   (las vistas con contenido, exactamente uno); la tarjeta de decisión con una frase corta de 60
+   caracteres o menos; window.__fit() sin problemas; ninguna tarjeta de la banda, ni el encabezado, ni el
+   riel con contenido que no entra (scroll interno), y el último ítem del riel arriba de su pie. Las
+   vistas esqueleto solo se montan (sin gráfico).
+5. Hoja de contacto: /e2/ (vista 4) y /e3/ (vista 5) lado a lado, las dos a 1536 × 864, en
    entregas/entregable-3/_build/workforce/fase-w1/e2-e3-1536.png del vault.
 
 Termina con «PARIDAD OK» o con la lista de diferencias y código 1.
@@ -58,7 +65,69 @@ ARMAZON = re.compile(
     r"|\.e2-[\w-]+|\.tarjeta(?:-dec)?\b|\.kpi-[\w-]+|\.ban-[\w-]+|\.par-[\w-]+|\.dec-[\w-]+|\.lienzo[\w-]*"
     r"|\.titulo\b|\.chico\b)")
 
-PROPS = ["fontFamily", "fontWeight", "fontSize", "lineHeight", "letterSpacing", "textTransform", "color",
+# ---- 2. Letra: /e2/ y /e3/ en la misma ventana. (nombre, vista de /e2/, selector en /e2/, selector en /e3/,
+# opciones). La vista de /e3/ es siempre la 5, salvo «vista3». «solo_tam»: solo el tamaño y la muestra (el
+# interlineado y el color de la regla son otros); «opcional»: si /e3/ no lo tiene (el esqueleto, cuando ya
+# no quede ninguno), no se mide.
+TEXTOS = [
+    ("riel · nombre", "v04", ".lat-oga", ".lat-oga", {}),
+    ("riel · subtítulo", "v04", ".lat-sub", ".lat-sub", {}),
+    ("riel · grupo", "v04", ".lat-grupo span", ".lat-grupo span", {}),
+    ("riel · ítem", "v04", ".lat-item:not(.on) .lat-txt", ".lat-item:not(.on) .lat-txt", {}),
+    ("riel · ítem activo", "v04", ".lat-item.on .lat-txt", ".lat-item.on .lat-txt", {}),
+    ("riel · número", "v04", ".lat-item:not(.on) .lat-n", ".lat-item:not(.on) .lat-n", {}),
+    ("riel · pie", "v04", ".lat-pie span", ".lat-pie span", {}),
+    ("pregunta", "v04", ".e2-preg", ".e2-preg", {}),
+    ("encabezado · dónde", "v04", ".e2-enc-corte", ".e2-enc-corte", {}),
+    ("banda · rótulo", "v04", ".e2-central .kpi-lbl > span", ".e2-central .kpi-lbl > span", {}),
+    # en la vista 4 del E2 la tarjeta central es un par antes → después: se mide la cifra de después
+    ("banda · cifra grande", "v04", ".e2-central .par-despues .e2-cifra", ".e2-central .e2-cifra", {}),
+    ("banda · cifra secundaria", "v07b", ".e2-banda .e2-cifra.sec", ".e2-banda .e2-cifra.sec", {}),
+    ("banda · frase", "v04", ".e2-central .e2-linea", ".e2-central .e2-linea", {}),
+    ("decisión · rótulo", "v04", ".tarjeta-dec .kpi-lbl > span", ".tarjeta-dec .kpi-lbl > span", {}),
+    ("decisión · id y estado", "v04", ".tarjeta-dec .kpi-lbl > b", ".tarjeta-dec .kpi-lbl > b", {}),
+    ("decisión · frase", "v04", ".tarjeta-dec .dec-llano", ".tarjeta-dec .dec-llano", {}),
+    ("gráfico · rótulo", "v04", ".pant > .tarjeta > .kpi-lbl > span", ".pant > .tarjeta > .kpi-lbl > span", {}),
+    ("gráfico · cifra del rótulo", "v04", ".pant > .tarjeta > .kpi-lbl > b", ".pant > .tarjeta > .kpi-lbl > b", {}),
+    # BarrasH: la barra que se destaca va en negrita; se miden las otras
+    ("gráfico · etiqueta de barra", "v04", ".lienzo svg text[text-anchor=end][font-weight='400']",
+     ".lienzo svg text[text-anchor=end][font-weight='400']", {}),
+    ("gráfico · valor de barra", "v04", ".lienzo svg text:not([text-anchor])[font-weight='500']",
+     ".lienzo svg text:not([text-anchor])[font-weight='500']", {}),
+    ("gráfico · marca del eje", "v04", ".lienzo svg text[font-size='10.5']", ".lienzo svg text[font-size='10.5']", {}),
+    ("gráfico · título del eje", "v04", ".lienzo svg text[font-size='11']", ".lienzo svg text[font-size='11']", {}),
+    # el esqueleto: 400 y --e2-txt2, como la leyenda de la vista 11b del E2
+    ("esqueleto", "v11b", ".v11b-leyenda", ".e3-esqueleto-caja", {"vista3": "esqueleto", "solo_tam": True, "opcional": True}),
+]
+PROPS_IGUALES = ["fontFamily", "fontWeight", "textTransform", "color"]
+# Muestra: un mismo texto escrito con la letra de cada pieza, medido en pantalla. Su ancho es la letra tal
+# como se dibuja (el alto de un renglón no sirve: Chrome redondea al píxel el ascenso y el descenso).
+MUESTRA = "Casa Óga 2026 · −99,95 % · USD 30.660"
+
+LETRA = r"""(sels) => sels.map((sel) => {
+  const el = document.querySelector(sel)
+  if (!el) return null
+  const cs = getComputedStyle(el)
+  const z = el.currentCSSZoom ?? 1
+  const px = (v) => (/px$/.test(v) ? parseFloat(v) * z : null)
+  // la muestra, con la letra de la pieza: un <span> fuera del flujo, o un <text> hermano en un SVG
+  let m
+  if (el instanceof SVGElement) {
+    m = el.cloneNode(false); m.textContent = %s; el.parentNode.appendChild(m)
+  } else {
+    m = document.createElement('span'); m.textContent = %s
+    m.style.cssText = 'position:absolute;left:0;top:0;white-space:nowrap;visibility:hidden'
+    el.appendChild(m)
+  }
+  const ancho = m.getBoundingClientRect().width
+  m.remove()
+  const est = {}
+  for (const p of %s) est[p] = cs[p]
+  return { tam: parseFloat(cs.fontSize) * z, interlineado: px(cs.lineHeight), espaciado: px(cs.letterSpacing), ancho, est }
+})""" % (repr(MUESTRA), repr(MUESTRA), str(PROPS_IGUALES).replace("'", '"'))
+
+# ---- 3. Armazón: /e2/ en la ventana lógica contra /e3/ en la real. Sin las propiedades de letra.
+PROPS = ["fontFamily", "fontWeight", "textTransform", "color",
          "backgroundColor", "borderTopWidth", "borderTopStyle", "borderTopColor", "borderRightWidth",
          "borderRightStyle", "borderRightColor", "borderBottomWidth", "borderBottomColor", "borderLeftWidth",
          "borderLeftColor", "borderRadius", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft"]
@@ -84,7 +153,6 @@ PIEZAS = [
     ("banda · cifras", ".e2-banda-cifras"),
     ("tarjeta central", ".e2-banda-cifras > .tarjeta.e2-central"),
     ("tarjeta central · rótulo", ".e2-central .kpi-lbl"),
-    # en la vista 4 del E2 la tarjeta central es un par antes → después: se compara la cifra de después
     ("tarjeta central · cifra", ".e2-central .par-despues .e2-cifra", ".e2-central .e2-cifra"),
     ("tarjeta central · frase", ".e2-central .e2-linea"),
     ("decisión", ".e2-banda > .tarjeta-dec"),
@@ -93,17 +161,13 @@ PIEZAS = [
     ("tarjeta del gráfico", ".pant > .tarjeta"),
     ("tarjeta del gráfico · rótulo", ".pant > .tarjeta > .kpi-lbl"),
 ]
-# Cajas que tienen que medir lo mismo (en px lógicos): no dependen del texto de la vista.
-CAJAS = {"riel", "riel · marca", "riel · ítem", "encabezado", "encabezado · avance", "cuerpo", "vista", "banda",
-         "decisión"}
-# Para la caja del encabezado y de la marca, solo el alto y la posición: el ancho es el mismo por construcción.
-# Textos de un renglón en las dos páginas: el cociente de sus altos en pantalla es k.
-# Piezas sin texto (la miniatura y el avance): solo marco, fondo, relleno y caja.
+# Cajas que miden lo mismo en px lógicos, y en qué ejes: lo que no depende de la letra. La posición y el
+# ancho no dependen; el alto del encabezado sí (la pregunta crece ×k), y con él la posición vertical de lo
+# que va debajo; el de la marca y los ítems del riel, también.
+CAJAS = {"riel": "xywh", "riel · marca": "xw", "riel · ítem": "xw", "encabezado": "xw",
+         "encabezado · avance": "xwh", "cuerpo": "xw", "vista": "xw", "banda": "xwh", "decisión": "xwh"}
 SIN_TEXTO = {"encabezado · avance"}
-PROPS_TEXTO = {"fontFamily", "fontWeight", "fontSize", "lineHeight", "letterSpacing", "textTransform", "color"}
-# (El número del riel es un span en línea con interlineado normal: su alto se redondea y no sirve.)
-UN_RENGLON = ["riel · nombre", "riel · ítem", "pregunta", "encabezado · dónde",
-              "decisión · rótulo", "tarjeta central · cifra", "tarjeta del gráfico · rótulo"]
+PROPS_TEXTO = {"fontFamily", "fontWeight", "textTransform", "color"}
 
 LEER = r"""(piezas) => {
   const out = {}
@@ -145,6 +209,22 @@ REGLAS = r"""() => {
   }
   const fit = window.__fit ? window.__fit() : { ok: false, problemas: [{ tipo: 'sin __fit' }] }
   for (const x of fit.problemas) p.push(`__fit: ${x.tipo} ${x.detalle ?? ''}`)
+  // (W2.0) Lo que __fit no ve: texto que no entra en su caja (las tarjetas de la banda y la de decisión
+  // cortan con overflow:hidden; una cifra grande más ancha que su tarjeta invade el relleno; un ítem del
+  // riel en dos renglones empuja la lista sobre el pie).
+  const nombre = (el) => '.' + String(el.className).split(' ').filter(Boolean).slice(0, 2).join('.')
+  for (const el of document.querySelectorAll('.lat, .lat-marca, .lat-item, .e2-enc, .e2-banda, .e2-banda .tarjeta, ' +
+                                             '.e2-banda .par-val, .cuerpo > .pant, .pant > .tarjeta, .e3-esqueleto-caja')) {
+    // de la cifra, solo el ancho: con interlineado 1,08 el descendente siempre pasa unos píxeles (también en /e2/)
+    const dh = el.matches('.par-val') ? 0 : el.scrollHeight - el.clientHeight, dw = el.scrollWidth - el.clientWidth
+    if (dh > 1 || dw > 1) p.push(`no entra en ${nombre(el)}: ${dw > 1 ? dw + ' px de ancho' : ''}${dw > 1 && dh > 1 ? ' y ' : ''}${dh > 1 ? dh + ' px de alto' : ''}`)
+  }
+  const items = [...document.querySelectorAll('.lat-item')]
+  const pie = document.querySelector('.lat-pie')
+  if (items.length && pie) {
+    const falta = items[items.length - 1].getBoundingClientRect().bottom - pie.getBoundingClientRect().top
+    if (falta > 1) p.push(`el riel se encima con su pie (${falta.toFixed(1)} px)`)
+  }
   return { problemas: p, esqueleto, id: location.hash }
 }"""
 
@@ -212,31 +292,116 @@ def estatico(problemas):
     print("1. estático: " + ("bien" if not [p for p in problemas if p.startswith("estático")] else "con problemas"))
 
 
-# ---------------------------------------------------------------- 2. estilos calculados
+# ---------------------------------------------------------------- 2. letra (misma ventana)
 
-def calculados(nav, problemas):
+def fmt(v, d=4):
+    return "—" if v is None else f"{v:.{d}f}".replace(".", ",")
+
+
+def letra(nav, problemas):
+    tabla = {}      # nombre → {res: (cociente de tamaño, cociente de alto)}
+    for w, h in RES:
+        k = k_de(w, h)
+        res = f"{w}x{h}"
+        medidas = {}
+        for lado, html, vistas in (("e2", E2, {t[1] for t in TEXTOS}),
+                                   ("e3", E3, {t[4].get("vista3", VISTA_E3) for t in TEXTOS})):
+            for v in sorted(vistas):
+                if v == "esqueleto":
+                    v_real = primer_esqueleto(nav, w, h)
+                    if v_real is None:
+                        continue
+                else:
+                    v_real = v
+                ctx, pg, err = abrir(nav, html, v_real, w, h)
+                try:
+                    sel = [t[2] if lado == "e2" else t[3] for t in TEXTOS]
+                    medidas[(lado, v)] = pg.evaluate(LETRA, sel)
+                finally:
+                    ctx.close()
+                for x in err:
+                    problemas.append(f"[{res}] consola /{lado}/ #{v_real}: {x}")
+        for i, (nombre, v2, _, _, op) in enumerate(TEXTOS):
+            v3 = op.get("vista3", VISTA_E3)
+            x = (medidas.get(("e2", v2)) or [None] * len(TEXTOS))[i]
+            y = (medidas.get(("e3", v3)) or [None] * len(TEXTOS))[i]
+            if y is None and op.get("opcional"):
+                continue
+            if x is None or y is None:
+                problemas.append(f"[{res}] letra de {nombre}: falta en {'/e2/' if x is None else '/e3/'}")
+                continue
+            ct = y["tam"] / x["tam"]
+            ca = y["ancho"] / x["ancho"] if x["ancho"] else None
+            tabla.setdefault(nombre, {})[res] = (ct, ca)
+            if abs(ct - k) > 0.01:
+                problemas.append(f"[{res}] {nombre}: la letra mide {fmt(ct)} veces la de /e2/, se declaró k = {fmt(k)}")
+            if ca is None or abs(ca - k) > 0.01:
+                problemas.append(f"[{res}] {nombre}: la muestra mide {fmt(ca)} veces la de /e2/ de ancho, k = {fmt(k)}")
+            if op.get("solo_tam"):
+                continue
+            for prop in ("interlineado", "espaciado"):
+                a, b = x[prop], y[prop]
+                if a is None and b is None:
+                    continue
+                if a is None or b is None or (abs(a) < 1e-6 and abs(b) > 1e-6):
+                    problemas.append(f"[{res}] {nombre} · {prop}: /e2/ {a} · /e3/ {b}")
+                elif abs(a) > 1e-6 and abs(b / a - k) > 0.01:
+                    problemas.append(f"[{res}] {nombre} · {prop}: {fmt(b / a)} veces el de /e2/, k = {fmt(k)}")
+            for prop in PROPS_IGUALES:
+                if x["est"][prop] != y["est"][prop]:
+                    problemas.append(f"[{res}] {nombre} · {prop}: /e2/ {x['est'][prop]} · /e3/ {y['est'][prop]}")
+    cab = ["texto"] + [f"{w}×{h}" for w, h in RES]
+    filas = [["k declarado"] + [fmt(k_de(w, h)) for w, h in RES]]
+    for nombre, *_ in TEXTOS:
+        if nombre not in tabla:
+            continue
+        fila = [nombre]
+        for w, h in RES:
+            ct, ca = tabla[nombre].get(f"{w}x{h}", (None, None))
+            fila.append(fmt(ct) + (f" ({fmt(ca)})" if ca is not None else ""))
+        filas.append(fila)
+    anchos = [max(len(f[i]) for f in [cab] + filas) for i in range(len(cab))]
+    print("2. letra, /e3/ contra /e2/ en la misma ventana: tamaño × zoom (entre paréntesis, ancho de la muestra en pantalla)")
+    for f in [cab] + filas:
+        print("   " + "  ".join(c.ljust(anchos[i]) for i, c in enumerate(f)))
+
+
+def primer_esqueleto(nav, w, h):
+    """La primera vista de /e3/ que todavía es esqueleto, o None."""
+    ctx, pg, _ = abrir(nav, E3, VISTA_E3, w, h)
+    try:
+        for et in pg.evaluate(IDS_E3):
+            vid = ("v" + et) if et[0].isdigit() else et.lower()
+            pg.evaluate(f"() => {{ location.hash = '#{vid}' }}")
+            pg.wait_for_timeout(80)
+            if pg.evaluate("() => !!document.querySelector('.cuerpo .e3-esqueleto')"):
+                return vid
+    finally:
+        ctx.close()
+    return None
+
+
+# ---------------------------------------------------------------- 3. armazón (ventana lógica)
+
+def armazon(nav, problemas):
     filas = []
     for w, h in RES:
         k = k_de(w, h)
         wl, hl = round(w / k), round(h / k)
         c2, p2, e2err = abrir(nav, E2, VISTA_E2, wl, hl)
         c3, p3, e3err = abrir(nav, E3, VISTA_E3, w, h)
-        c2b, p2b, _ = abrir(nav, E2, VISTA_E2, w, h)          # /e2/ en la misma ventana: cuánto más grande
         try:
-            s2 = [[x[0], x[1]] for x in PIEZAS]
-            s3 = [[x[0], x[-1]] for x in PIEZAS]
-            a = p2.evaluate(LEER, s2)
-            b = p3.evaluate(LEER, s3)
-            mismo = p2b.evaluate(LEER, s2)
+            a = p2.evaluate(LEER, [[x[0], x[1]] for x in PIEZAS])
+            b = p3.evaluate(LEER, [[x[0], x[-1]] for x in PIEZAS])
             zoom = p3.evaluate("() => document.querySelector('.e3-vp')?.currentCSSZoom ?? 1")
         finally:
-            c2.close(); c3.close(); c2b.close()
+            c2.close(); c3.close()
         res = f"{w}x{h}"
         for x in e2err + e3err:
             problemas.append(f"[{res}] consola: {x}")
         if abs(zoom - k) > 1e-3:
             problemas.append(f"[{res}] zoom de /e3/ {zoom:.4f}, se declaró k = {k:.4f}")
-        ks = []
+        n_cajas = 0
         for nombre, *_ in PIEZAS:
             x, y = a.get(nombre), b.get(nombre)
             if x is None or y is None:
@@ -254,7 +419,7 @@ def calculados(nav, problemas):
                     except ValueError:
                         pass
                 if x["est"][prop] != y["est"][prop]:
-                    if prop in ("fontSize", "lineHeight", "letterSpacing") or prop.startswith("padding") or prop.endswith("Width"):
+                    if prop.startswith("padding") or prop.endswith("Width"):
                         try:
                             if abs(float(x["est"][prop].rstrip("px")) - float(y["est"][prop].rstrip("px"))) <= TOL:
                                 continue
@@ -263,37 +428,18 @@ def calculados(nav, problemas):
                     problemas.append(f"[{res}] {nombre} · {prop}: /e2/ {x['est'][prop]} · /e3/ {y['est'][prop]}")
             if nombre in CAJAS:
                 ce = [v / k for v in y["caja"]]
-                cmp = range(4) if nombre not in ("encabezado", "riel · marca") else (1, 3)
-                for i in cmp:
+                for eje in CAJAS[nombre]:
+                    i = "xywh".index(eje)
+                    n_cajas += 1
                     if abs(ce[i] - x["caja"][i]) > TOL:
-                        eje = "xywh"[i]
                         problemas.append(f"[{res}] caja de {nombre} · {eje}: /e2/ {x['caja'][i]:.2f} · /e3/ ÷ k {ce[i]:.2f}")
-            if nombre in UN_RENGLON and x["caja"][3] > 0:
-                ks.append(("alto", nombre, y["caja"][3] / x["caja"][3]))
-            if nombre in SIN_TEXTO:
-                continue
-            fs2 = float(x["est"]["fontSize"].rstrip("px")) * x["zoom"]
-            fs3 = float(y["est"]["fontSize"].rstrip("px")) * y["zoom"] * (zoom if y["zoom"] == 1 else 1)
-            ks.append(("letra", nombre, fs3 / fs2))
-        fuera = [(t, n, v) for t, n, v in ks if abs(v - k) > 0.01]
-        for t, n, v in fuera:
-            problemas.append(f"[{res}] k medido por {t} de {n}: {v:.4f}, se declaró {k:.4f}")
-        kl = [v for t, _, v in ks if t == "letra"]
-        ka = [v for t, _, v in ks if t == "alto"]
-        # cuánto más grande que /e2/ en la misma ventana (informativo)
-        mas = []
-        for n in ("pregunta", "riel · ítem", "tarjeta central · cifra", "decisión · frase"):
-            if mismo.get(n) and b.get(n):
-                mas.append(f"{n} {float(b[n]['est']['fontSize'].rstrip('px')) * zoom / float(mismo[n]['est']['fontSize'].rstrip('px')):.2f}")
-        filas.append(f"   {res}: k declarado {k:.4f} · ventana lógica {w / k:.1f} × {h / k:.1f} · "
-                     f"k por letra {min(kl):.4f} a {max(kl):.4f} ({len(kl)} textos) · "
-                     f"k por alto {min(ka):.4f} a {max(ka):.4f} ({len(ka)} renglones)\n"
-                     f"      contra /e2/ en la misma ventana: {', '.join(mas)}")
-    print("2. estilos calculados (/e2/ a W/k × H/k contra /e3/ a W × H):")
+        filas.append(f"   {res}: ventana lógica {w / k:.1f} × {h / k:.1f} · zoom {zoom:.4f} · "
+                     f"{len(PIEZAS)} piezas, {n_cajas} medidas de caja")
+    print("3. armazón (/e2/ a W/k × H/k contra /e3/ a W × H, sin la letra):")
     print("\n".join(filas))
 
 
-# ---------------------------------------------------------------- 3. reglas 11 y 12
+# ---------------------------------------------------------------- 4. reglas 11 y 12 y desbordes
 
 def reglas(nav, problemas):
     vistos = 0
@@ -320,10 +466,10 @@ def reglas(nav, problemas):
                 problemas.append(f"[{w}x{h}] consola: {x}")
         finally:
             ctx.close()
-    print(f"3. reglas 11 y 12: {vistos} vistas revisadas ({vistos - esqueletos} con contenido, {esqueletos} esqueletos) en {len(RES)} resoluciones")
+    print(f"4. reglas 11 y 12 y desbordes: {vistos} vistas revisadas ({vistos - esqueletos} con contenido, {esqueletos} esqueletos) en {len(RES)} resoluciones")
 
 
-# ---------------------------------------------------------------- 4. hoja de contacto
+# ---------------------------------------------------------------- 5. hoja de contacto
 
 def hoja(nav, destino: Path):
     from PIL import Image, ImageDraw, ImageFont
@@ -352,7 +498,7 @@ def hoja(nav, destino: Path):
     lienzo.save(destino)
     for f in tmp:
         f.unlink()
-    print(f"4. hoja de contacto: {destino}")
+    print(f"5. hoja de contacto: {destino}")
 
 
 def main():
@@ -368,7 +514,8 @@ def main():
     with sync_playwright() as pw:
         nav = abrir_navegador(pw)
         try:
-            calculados(nav, problemas)
+            letra(nav, problemas)
+            armazon(nav, problemas)
             reglas(nav, problemas)
             if not a.sin_hoja:
                 hoja(nav, Path(a.hoja))

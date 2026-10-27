@@ -150,14 +150,30 @@ decisiones N0-5 y N0-6.
   `TarjetaDecision`) y las primitivas de `src/graficos.jsx`. Rigen las reglas 11 (banda de cifras y tarjeta
   de decisión), 12 (la pregunta en el encabezado, sin título ni pie) y 13 H1 (una cifra dominante) del
   `e2/DISENO.md`. `estilos_e3.css` no nombra ninguna clase del armazón; ni `src/**` ni `e2/**` cambian.
-- **Letra más grande (N0-5): zoom uniforme.** k = máx(1; mín(1,2; ancho / 1152; alto / 640)) (`zoom.js`). El
-  tablero va en `.e3-vp`, una caja del tamaño de la ventana lógica (ancho / k × alto / k) con `zoom: k`. Para
-  que las hojas compartidas, que miden en vw, vh y `@media`, midan contra esa caja, `vite.e3.config.js`
-  reescribe al empaquetar el E3 vw → cqw, vh → cqh y los `@media` de ancho o alto → `@container`. Resultado:
-  /e3/ a W × H es /e2/ a W/k × H/k ampliado k veces, como el zoom del navegador.
-  - Consecuencia medida (`paridad_e3.py`): contra /e2/ en la misma ventana, la letra fija crece hasta k (riel: 1,14 a 1,20; la
-    frase de la decisión: 1,02), pero la pregunta y las cifras grandes miden lo mismo,
-    porque en el E2 ya son proporcionales a la ventana.
+- **Letra más grande (N0-5 y N0-13): zoom uniforme, letra contra la ventana real.** k = máx(1; mín(1,2;
+  ancho / 1152; alto / 640)) (`zoom.js`): 1 a 1152 × 640, 1,186 a 1366 × 768 y 1,2 desde 1536 × 864. El tablero
+  va en `.e3-vp`, una caja del tamaño de la ventana lógica (ancho / k × alto / k) con `zoom: k`. Para que las
+  hojas compartidas, que miden en vw, vh y `@media`, midan contra esa caja, `vite.e3.config.js` reescribe al
+  empaquetar el E3 vw → cqw, vh → cqh y los `@media` de ancho o alto → `@container`. Así las cajas de /e3/ a
+  W × H son las de /e2/ a W/k × H/k, ampliadas k veces.
+  - (W2.0, N0-13) La letra no sigue esa regla. En W1 la pregunta y las cifras grandes medían lo mismo que en
+    /e2/ en la misma ventana (el E2 ya las escala con la ventana y el zoom solo devolvía lo que la ventana
+    lógica quitaba) y el resto crecía entre 1,02 y 1,20. Ahora las declaraciones de letra (`font`,
+    `font-size`, `line-height`, `letter-spacing` y las variables que alguna hoja usa en ellas: `--e2-txt`,
+    `--e2-txt2`, `--e2-rot`) conservan sus vw y vh, que bajo el zoom valen k veces lo de /e2/; dentro de un
+    `@media` de ancho o alto quedan en un `@media` aparte, contra la ventana real (el riel de 11,5 px de
+    `max-height: 730px` del E1 se aplica según la ventana real, como en /e2/), y el resto pasa al
+    `@container`. Resultado medido: **cada texto de /e3/ a W × H mide k veces lo que mide en /e2/ en la misma
+    ventana**, la pregunta y las cifras grandes incluidas (tabla en `paridad_e3.py`, sección 2).
+  - Los SVG de las vistas escalan su letra con `useEscalaTexto` del E2 (`e2/src/escala.js`), que mide la
+    ventana real; el zoom la multiplica por k. En estilos en línea, la letra va en px, vw o vh (crece ×k como
+    en /e2/) y los largos de la caja en cqw o cqh, que miden la ventana lógica.
+  - Precio: la caja sigue siendo la del E2 en la ventana lógica y la letra es k veces más grande, así que lo
+    que en el E2 entraba justo no entra. La ventana más angosta para el texto es 1366 × 768 (lógica 1152 ×
+    648, letra ×1,186). Medido en la vista 5: el riel entra con 13 px de aire sobre su pie si ningún nombre
+    se parte (por eso la 8 es «Paso a producción»); en la banda entran tres cifras con anchos 2 / 3 / 2 y
+    rótulos de hasta unos 125 px lógicos. A 1440 × 900 (16:10, fuera del rango verificado) la cifra grande
+    de la 5 invade 5 px el relleno de su tarjeta: crece con el alto de la ventana.
 - **El encabezado.** A la derecha, «5 / 9 · Parte B 3.2…» (vista y fuente en C3) y, en el lugar de la
   miniatura del mapa de calidad del E2, el avance de la historia: una barra por vista, mismo marco y medidas
   (118 × 46), así el encabezado tiene el alto del E2.
@@ -182,15 +198,22 @@ decisiones N0-5 y N0-6.
 - **Vista 5, de muestra.** Banda: lo que suma el modelo por año (USD 5,38, con los USD 10.400 de más en su
   frase), el ROI del modelo sobre la regla a un año (la cifra dominante) y la tasa de éxito que pagaría la
   regla (49,6 %, con la observada en su frase); con cuatro tarjetas, a 1152 × 640 las cifras no entran.
-  Rótulos cortos para que entren en una línea a 1152 × 640 («Suma el modelo», «ROI sobre la regla», «Para
-  pagar la regla»; el largo va al title). Decisión: «No viable tal como está planteado» (C3, diapositiva 9),
+  Desde W2.0, anchos 2 / 3 / 2 (con 3 / 4 / 3 el −99,95 % no entra en la central a 1366 × 768) y la moneda y
+  el «%» un escalón más chicos (`.par-unidad`). Rótulos cortos para que entren en una línea de 1152 × 640 a
+  1920 × 1080 («Suma el modelo», «ROI sobre la regla», «Éxito necesario», que reemplaza a «Para pagar la
+  regla» porque a 1366 × 768 se partía; el largo va al title). Decisión: «No viable tal como está planteado» (C3, diapositiva 9),
   con «B-ECO · no viable». Gráfico: `BarrasH` del costo del año 1
   con modelo y solo la regla contra el beneficio anual de la regla, con el presupuesto marcado.
 
 ### Verificación (desde W1)
 
-- `python3 scripts/paridad_e3.py`: lo estático, los estilos calculados de /e2/ contra /e3/ a 1152 × 640,
-  1366 × 768, 1536 × 864 y 1920 × 1080, las reglas 11 y 12 en cada vista y la hoja de contacto
+- `python3 scripts/paridad_e3.py`, a 1152 × 640, 1366 × 768, 1536 × 864 y 1920 × 1080: lo estático; la letra
+  (desde W2.0), /e3/ contra /e2/ en la misma ventana, donde el cociente de tamaño, interlineado, espaciado y
+  ancho dibujado de cada texto (riel, pregunta, encabezado, cifras y frases de la banda, tarjeta de decisión,
+  textos del gráfico y esqueleto) tiene que dar k, con la tabla impresa; el armazón, /e2/ en la ventana
+  lógica contra /e3/, sin la letra (colores, bordes, relleno y la posición y el ancho de las cajas); las
+  reglas 11 y 12 y los desbordes que `__fit` no ve (texto cortado en la banda, cifra más ancha que su
+  tarjeta, riel encimado con su pie) en cada vista, y la hoja de contacto
   `entregas/entregable-3/_build/workforce/fase-w1/e2-e3-1536.png` del vault.
 - `python3 scripts/verificar_e3.py`: cada vista a cinco resoluciones con `__fit`, consola y red limpias, y el
   recorrido de quien presenta, con cada rótulo de la banda en una línea y el guion de cada vista entero en el

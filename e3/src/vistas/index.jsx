@@ -25,7 +25,7 @@ const HISTORIA = [
   { id: 'V05', corto: 'Se paga', pregunta: '¿Se paga?', de: [8, 9] },
   { id: 'V06', corto: 'Legal y seguro', pregunta: '¿Es legal y seguro?', de: [10, 11] },
   { id: 'V07', corto: 'Qué dice el test', pregunta: '¿Qué dice el test?', de: [] },
-  { id: 'V08', corto: 'Cómo llega a producción', pregunta: '¿Cómo llega a producción?', de: [] },
+  { id: 'V08', corto: 'Paso a producción', pregunta: '¿Cómo llega a producción?', de: [] },
   { id: 'V09', corto: 'Qué decide María G.', pregunta: '¿Qué decide María G.?', de: [12] },
 ]
 // El respaldo: un anexo de C3 por vista. El nombre corto es el título del anexo hasta los dos puntos.
