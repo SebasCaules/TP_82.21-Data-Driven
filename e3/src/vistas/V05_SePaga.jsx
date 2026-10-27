@@ -15,17 +15,17 @@
 //   el mismo eje, con el presupuesto marcado (G38, G39). La barra que hay que mirar, el beneficio, en
 //   --acc; los costos en gris (regla 12 del E2).
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y el texto de C3 (contenido_e3.js).
-// El simulador de la tasa de éxito (detrás de «Explorar») queda para W2.
+// (W3) La tarjeta del gráfico vive en V05_Simulador.jsx (TarjetaCostoBeneficio): el mismo gráfico al
+// llegar y, detrás de «Explorar», el simulador de la tasa de éxito sobre la grilla de D3.
 
-import { Lienzo, BarrasH } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
 import { C3 } from '../contenido_e3.js'
-import { NBSP, fijo, pct, pctDirecto, usd } from '../formato.js'
+import { NBSP, pct, pctDirecto, usd } from '../formato.js'
 import { plano } from '../texto.jsx'
-import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
 import { Cifra } from '../cifra.jsx'
+import { TarjetaCostoBeneficio } from './V05_Simulador.jsx'
 
 const E = D3.economia
 const D8 = C3.DIAPOSITIVAS.find((d) => d.n === 8)
@@ -47,26 +47,14 @@ const CUESTA = E.costos.incremental_usd
 const ROI = E.observada.modelo_roi_pct
 const S_PAGA = E.umbral.s_equilibrio_con_descuento
 const S_OBS = E.parametros.s_observada
-const REGLA = E.observada.regla_usd
-const COSTO_REGLA = E.costos.regla_sin_modelo.total_anio_1_usd
 
 // La moneda y el «%» van un escalón más chicos (Cifra, e3/src/cifra.jsx), como los montos del E2
 // (ValorMonto, .par-unidad): con la letra ×k, el −99,95 % entero no entra en la tarjeta central desde
 // 1366 × 768 (W2.0).
 
-// Montos de las barras: centavos solo debajo de mil (USD 299,49; USD 30.660).
-const monto = (v) => usd(v, v < 1000 ? 2 : 0)
-
 export const meta = { id: 'V05', dc: 'B-ECO' }
 
 export default function V05SePaga() {
-  const k = useEscalaTexto()
-  const tope = Math.round((3 * 80 + 56) * k)
-  const barras = [
-    { etiqueta: 'Costo del año 1, con modelo', valor: E.costos.con_modelo.total_anio_1_usd },
-    { etiqueta: 'Costo del año 1, solo la regla', valor: COSTO_REGLA },
-    { etiqueta: 'Beneficio anual de la regla', valor: REGLA, enfasis: true, anchoMin: 3 },
-  ]
   return (
     <section className="pant v05">
       <Banda dcs={[DECISION]}>
@@ -101,27 +89,9 @@ export default function V05SePaga() {
         </div>
       </Banda>
 
-      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
-        <span className="kpi-lbl frase">
-          <span>{D9.pie_figura.replace(/\.$/, '')}</span>
-          <b className="tabular">{`${monto(REGLA)} por año contra ${monto(COSTO_REGLA)}`}</b>
-        </span>
-        <div style={{ flex: '1 1 0', minHeight: 0, maxHeight: tope, marginTop: 'clamp(6px, 1.6cqh, 20px)',
-                      display: 'flex', flexDirection: 'column' }}>
-          <Lienzo className="lienzo">
-            {({ w, h }) => (
-              <BarrasH
-                datos={barras} w={w} h={h}
-                formato={monto}
-                formatoEje={(v) => fijo(v, 0)}
-                anchoEtiqueta={Math.round(220 * k)}
-                tituloEje="Dólares"
-                referencia={{ valor: E.costos.presupuesto_usd, etiqueta: `presupuesto ${monto(E.costos.presupuesto_usd)}` }}
-              />
-            )}
-          </Lienzo>
-        </div>
-      </div>
+      {/* (W3) La tarjeta del gráfico con el simulador de la tasa de éxito detrás de «Explorar»: al llegar
+          es el mismo gráfico de antes (V05_Simulador.jsx). */}
+      <TarjetaCostoBeneficio />
     </section>
   )
 }

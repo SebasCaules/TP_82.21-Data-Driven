@@ -24,7 +24,7 @@ function Cuerpo({ vista }) {
         <span>{` · total ${mmss(C3.TIEMPOS.total_s)}`}</span>
       </p>
       <div className="e3-notas-txt">
-        {vista.respaldo && <p>Respaldo para preguntas. Fuente: {vista.anexo.fuente}.</p>}
+        {vista.respaldo && <p>Respaldo para preguntas. Fuente: {vista.fuente}.</p>}
         {!vista.respaldo && ds.length === 0 && <p>Esta vista todavía no tiene guion en C3.</p>}
         {ds.map((d) => (
           <p key={d.n}><span className="e3-notas-quien">{d.quien}</span><Rico t={d.guion} /></p>

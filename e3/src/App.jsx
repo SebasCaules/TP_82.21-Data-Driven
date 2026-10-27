@@ -298,8 +298,10 @@ function fuenteDe(ds) {
 /** El encabezado del E2 (regla 12): la pregunta, grande, es el h1. A la derecha, chico, en qué vista se
  *  está y de qué parte del documento sale. */
 function Encabezado({ vista }) {
-  const fuente = fuenteDe(diapositivasDe(vista))
-  const donde = vista.respaldo ? `${vista.id} · ${vista.anexo.fuente}`
+  // (W3) `vista.fuente`, cuando la trae (vistas/index.jsx), pisa la de las diapositivas: la V07 y los anexos
+  // con lo medido en test salen de la Parte D, que C3 todavía no tiene.
+  const fuente = vista.fuente ?? fuenteDe(diapositivasDe(vista))
+  const donde = vista.respaldo ? `${vista.id} · ${fuente}`
     : `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}${fuente ? ` · ${fuente}` : ''}`
   return (
     <header className="e2-enc">

@@ -6,7 +6,7 @@
 (27/10, W1) Rehecho para el armazón del E2 (riel, encabezado con la pregunta, banda de cifras, zoom
 uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; esto cubre lo demás:
 
-1. Cada vista del riel (V01 a V09 y A1 a A7) a 1152×640, 1280×720, 1366×768, 1536×864 y 1920×1080:
+1. Cada vista del riel (V01 a V07 y A1 a A7) a 1152×640, 1280×720, 1366×768, 1536×864 y 1920×1080:
    - monta, la página no scrollea y window.__fit() (src/fit.js) no encuentra desbordes;
    - el zoom es el declarado: k = máx(1; mín(1,2; ancho / 1152; alto / 640));
    - las vistas con contenido no muestran controles sin abrir «Explorar» (W1: solo la 5). Las vistas
@@ -24,7 +24,7 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
    notas sin desplazar.
 4. Capturas de cada vista con contenido a 1280×720 y 1920×1080 en e3/capturas-verif/ (fuera del
    control de versiones).
-5. (27/10, W2) Contenido de las vistas 1 a 6, en cada resolución, contra lo que dicen D3 y C3 (leídos de
+5. (27/10, W2 y W3) Contenido de las vistas 1 a 7, en cada resolución, contra lo que dicen D3 y C3 (leídos de
    e3/src/datos_e3.js y contenido_e3.js y escritos con las mismas reglas de e3/src/formato.js):
    - la tarjeta de decisión dice el «id · estado» de su decisión en e3/src/decisiones.js;
    - las cifras de la banda, en orden, son las de su fila del registro, y hay una sola al tamaño máximo,
@@ -39,7 +39,7 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
    - (a 1366×768 y 1536×864, con N) las notas traen el guion de cada diapositiva de la vista, con quién
      lo dice.
 
-6. (W2) Con --hoja, una hoja de contacto de las vistas con contenido (por defecto, de la 1 a la 6) a
+6. (W2) Con --hoja, una hoja de contacto de las vistas con contenido (por defecto, de la 1 a la 7) a
    1536 × 864, dos por fila, para mirarla de una vez.
 7. (27/10, W3) Datos de la Parte D, sin navegador: D3 trae las filas J01 a J22, J50 a J52 y las cinco cifras de las
    vistas 2 y 6 que antes solo tenía C3 (C14, C08, H40, C18, J22); cada valor, escrito con formato.js, da lo que
@@ -66,7 +66,7 @@ HTML = APP / "dist-e3" / "index.html"
 RES = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
 CAPTURAR = {(1280, 720), (1920, 1080)}
 NOTAS_RES = {(1366, 768), (1536, 864)}   # laptops donde se ensaya con el panel de notas
-HISTORIA = [f"v{i:02d}" for i in range(1, 10)]
+HISTORIA = [f"v{i:02d}" for i in range(1, 8)]   # W3: las vistas 7 a 9 del plan van en una, la V07
 RESPALDO = [f"a{i}" for i in range(1, 8)]
 VISTAS = HISTORIA + RESPALDO
 SRC = APP / "e3" / "src"
@@ -165,13 +165,10 @@ def contenido_esperado():
     for id_, est in re.findall(r"\{ id: '([A-Z]-[A-Z]{3})', area: '[^']*', estado: '([^']*)' \}",
                                (SRC / "decisiones.js").read_text()):
         estados[id_] = est
-    T, E, C, MD, L = D3["tecnica"], D3["economia"], D3["caso"], D3["modelos"], D3["lista"]
+    T, E, C, MD = D3["tecnica"], D3["economia"], D3["caso"], D3["modelos"]
+    TE, P, PL = D3["test"], D3["piloto"], D3["plan"]   # W3: la etapa 4, el piloto y el plan (Parte D)
     tope = fijo(T["escala"][-1]["hasta"], 0)
     leg = next(t for t in dia[2]["tarjetas"] if t["area"] == "Legal")
-
-    def lista(metodo, filtro):
-        return next(f for f in L["filas"] if f.get("tipo") == "lista" and f["metodo"] == metodo
-                    and f["filtro"] == filtro and f["largo_mes"] == L["elegida"]["largo_mes"])
 
     a4 = next(a for a in C3["ANEXOS"] if a["n"] == "A4")
     regla = E["observada"]["regla_usd"]
@@ -188,16 +185,25 @@ def contenido_esperado():
                           pct_directo(T["ventas_sin_cliente_pct"], 1)],
                 [f"promedio {fijo(T['promedio'], 2)}",
                  f"{tramo_t['nivel'].lower()} · {fijo(tramo_t['desde'], 1)} a {fijo(tramo_t['hasta'], 1)}"]),
-        "v04": ("C-MOD", [fijo(MD["contra_regla"]["diferencia_pp"], 2, True),
-                          pct(lista(L["elegida"]["metodo"], L["elegida"]["filtro"])["precision"], 1),
-                          pct(lista(L["elegida_modelo"]["metodo"], L["elegida_modelo"]["filtro"])["precision"], 1)],
-                [pct(f["validacion"]["precision"], 1) for f in MD["filas"] if f.get("validacion")]),
+        # W3: la vista 4 decide con el test (Parte D 8.2 y 11.1): sin filtrar, en la lista que sale y lo que tendría
+        # que dar para pagarse; el gráfico, la diferencia con su intervalo en validación y en test.
+        "v04": ("C-MOD", [fijo(TE["sin_filtro"]["diferencia_pp"], 2, True),
+                          fijo(TE["contra_regla"]["diferencia_pp"], 2, True),
+                          fijo(TE["decision"]["aciertos_por_mes_para_pagar"])],
+                [fijo(x, 2, True) for x in (MD["contra_regla"]["diferencia_pp"], TE["sin_filtro"]["diferencia_pp"],
+                                            TE["contra_regla"]["validacion_diferencia_pp"],
+                                            TE["contra_regla"]["diferencia_pp"])]),
         "v05": ("B-ECO", [usd(E["observada"]["modelo_usd"], 2), pct_directo(E["observada"]["modelo_roi_pct"], 2),
                           pct(E["umbral"]["s_equilibrio_con_descuento"], 1)],
                 [usd(regla, 2 if regla < 1000 else 0)]),
         "v06": ("C-LEG", [plano(dia[10]["promedio"]["valor"]), plano(dia[10]["alerta"]["valor"]),
                           f"{len(a4['destacar'])} de {len(a4['filas'])}"],
                 [f"{m.group(3)} · {m.group(1)} a {m.group(2)}"] if m else []),
+        # W3: la Parte D y el piloto. La regla en test (J03), lo que el piloto tiene que dar para ir a producción
+        # (H49) y las semanas hasta decidir (J50); el gráfico, la regla de decisión del piloto (G49, H49).
+        "v07": ("D-PRO", [pct(TE["metodos"]["regla"]["test"]["precision"], 1), fijo(P["umbral_produccion_pp"], 1),
+                          f"{fijo(PL['semanas'])} semanas"],
+                [fijo(P["diferencia_detectable_pp"], 2), fijo(P["umbral_produccion_pp"], 1)]),
     }
     out = {}
     for v, (id_, cifras, grafico) in esperado.items():
@@ -663,7 +669,7 @@ def main():
     ap.add_argument("--sin-esqueletos", action="store_true",
                     help="falla si alguna vista sigue como esqueleto (obligatorio desde W3 y antes de exportar)")
     ap.add_argument("--hoja", help="arma una hoja de contacto de las vistas a 1536 × 864 en esta ruta")
-    ap.add_argument("--hoja-vistas", default=",".join(HISTORIA[:6]), help="vistas de la hoja, separadas por coma")
+    ap.add_argument("--hoja-vistas", default=",".join(HISTORIA), help="vistas de la hoja, separadas por coma")
     a = ap.parse_args()
     if not HTML.exists():
         sys.exit(f"Falta {HTML.relative_to(APP)}: corre «npm run build:e3».")
