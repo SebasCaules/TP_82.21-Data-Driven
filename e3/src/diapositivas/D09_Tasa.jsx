@@ -97,7 +97,7 @@ function Grafico({ i, desc, id }) {
         <rect x={200} y={-13} width={22} height={14} className="e3-barra-azul3" />
         <text x={230} y={0} className="e3-t e3-t-19">recurrente del año</text>
         <rect x={418} y={-13} width={22} height={14} fill={`url(#${id}-sim)`} className="e3-barra-sim" />
-        <text x={448} y={0} className="e3-t e3-t-19">beneficio simulado</text>
+        <text x={448} y={0} className="e3-t e3-t-19">beneficio anual de la regla</text>
       </g>
     </svg>
   )
@@ -143,9 +143,9 @@ export default function Tasa({ d, estatico }) {
           <span className="e3-desliz-arriba izq obs" style={{ left: xi(OBS.i) - 4 }} data-escala="">
             <b>{tasa(OBS.s)} observada</b> · banda: IC 95 %
           </span>
-          {Object.entries(EQ).map(([k, n]) => (
-            <i key={k} className={`e3-desliz-marca ${k === desc ? 'on' : ''}`} style={{ left: xi(n.i) }} />
-          ))}
+          {/* (26/10) Solo la marca del equilibrio que corresponde al descuento elegido: la otra quedaba
+              gris y sin rótulo. */}
+          <i className="e3-desliz-marca on" style={{ left: xi(eq.i) }} />
           <span className="e3-desliz-arriba izq fuerte" style={{ left: xi(eq.i) - 2 }} data-escala="">
             {tasa(eq.s)}: la regla se paga
           </span>
@@ -174,7 +174,7 @@ export default function Tasa({ d, estatico }) {
       </div>
       <div className="e3-llamadas" style={caja(966, Y0, 562)}>
         {d.callouts.map((c) => (
-          <div key={c.titulo} className="e3-llamada" style={{ height: 160 }}>
+          <div key={c.titulo} className="e3-llamada" style={{ height: 236 }}>
             <p className="e3-llamada-titulo"><Rico t={c.titulo} /></p>
             <p className="e3-llamada-texto"><Rico t={c.texto} /></p>
           </div>

@@ -9,6 +9,8 @@ const NUMERO = /^[−+\-]?[\d.,]+( %)?$/
 export default function Anexo({ a, origen, volver, estatico }) {
   const total = a.anchos.reduce((s, x) => s + x, 0)
   const denso = a.filas.length + 1 > 10
+  // (26/10) Con 16 filas (A3, con la fila base) la tabla y su pie no entraban sobre la línea del pie de página.
+  const muyDenso = a.filas.length + 1 > 15
   const destacar = new Set(a.destacar ?? [])
   return (
     <Marco kicker={`Anexo ${a.n} · respaldo para preguntas`} titulo={a.titulo} fuente={a.fuente}
@@ -20,7 +22,7 @@ export default function Anexo({ a, origen, volver, estatico }) {
         </button>
       )}
       <div className="e3-anexo-cuerpo" style={caja(M, 216, ANCHO)}>
-      <table className={`e3-tabla ${denso ? 'densa' : ''}`}>
+      <table className={`e3-tabla ${denso ? 'densa' : ''} ${muyDenso ? 'muy-densa' : ''}`}>
         <colgroup>{a.anchos.map((w, k) => <col key={k} style={{ width: `${(100 * w) / total}%` }} />)}</colgroup>
         <thead><tr>{a.columnas.map((c) => <th key={c}>{c}</th>)}</tr></thead>
         <tbody>

@@ -175,7 +175,7 @@ def armar_modelos(e2: dict, e3: dict) -> dict:
                 "auc_pr_validacion": mm["validacion"]["auc_pr"]}
 
     filas = [
-        {"id": "tasa_base", "nombre": "Lista sin orden (tasa base)", "grupo": "hoy",
+        {"id": "tasa_base", "nombre": "Clase mayoritaria (lista sin orden)", "grupo": "hoy",
          "entrenamiento": {"precision": pa["entrenamiento"]["tasa"]},
          "validacion": {"precision": pa["validacion"]["tasa"]}},
         {"id": "practica_actual", "nombre": "Práctica actual: más días sin comprar", "grupo": "hoy",
@@ -254,11 +254,11 @@ METODOS = {"modelo": "logistica_ajustada", "regla_umbral": "regla", "practica_ac
 
 # Importancia por permutación: las variables que escribe la C 7.3 y la etiqueta del gráfico de d7.
 ETIQUETAS_IMPORTANCIA = {
-    "gap_mediano": "gap_mediano (días entre compras)",
-    "recency_sobre_umbral": "recency_sobre_umbral",
-    "recency_dias": "recency_dias (días sin comprar)",
-    "ticket_90d": "ticket_90d",
-    "envios_acum": "envios_acum",
+    "gap_mediano": "días entre compras",
+    "recency_sobre_umbral": "días sin comprar ÷ umbral",
+    "recency_dias": "días sin comprar",
+    "ticket_90d": "ticket de 90 días",
+    "envios_acum": "envíos acumulados",
     "edad": "edad",
 }
 DE_LA_REGLA = ("gap_mediano", "recency_sobre_umbral", "recency_dias")
@@ -599,14 +599,14 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
     control("costo incremental", C_PROY - C_MVP, C_INC)
 
     # --- anclas (d8, d9, A3, A6 y la Parte B)
-    ancla("G31", "economía: s observada (%)", S_OBS, "1,02", 2, 100, donde="B supuestos", c3="d8")
+    ancla("G31", "economía: s observada (%)", S_OBS, "1,02", 2, 100, donde="B supuestos")
     ancla("G31", "economía: s, IC 95 % inferior (%)", S_LO, "0,63", 2, 100, donde="B 3.5", c3="A3")
     ancla("G31", "economía: s, IC 95 % superior (%)", S_HI, "1,65", 2, 100, donde="B 3.5")
     ancla("G52", "economía: s solo los que cruzan (%)", S_CRUZAN, "1,12", 2, 100, donde="B 3.5", c3="A3")
     ancla("G31", "economía: contactados por cada uno que vuelve", 1 / S_OBS, "98", 0, donde="B 4.4", c3="d8")
-    ancla("G31", "economía: r (%)", R, "0,74", 2, 100, donde="B 4.4", c3="d8")
-    ancla("G08", "economía: margen anual por cliente (ARS)", M, "15.282", 0, donde="B 4.4", c3="d8")
-    ancla("G32", "economía: descuento (%)", D, "15", 0, 100, donde="B supuestos", c3="d8")
+    ancla("G31", "economía: r (%)", R, "0,74", 2, 100, donde="B 4.4")
+    ancla("G08", "economía: margen anual por cliente (ARS)", M, "15.282", 0, donde="B 4.4")
+    ancla("G32", "economía: descuento (%)", D, "15", 0, 100, donde="B supuestos")
     ancla("G32", "economía: costo de la acción (ARS)", C, "25", 0, donde="B supuestos", c3="d8")
     ancla("G33", "economía: valor de un acierto (ARS)", g("acierto_ars", "observada"), "99,96", 2,
           donde="B 4.4", c3="d8")
@@ -668,19 +668,22 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
     ancla("G39", "economía: inversión inicial de la regla (USD)", cm["inversion_inicial"], "14.260", 0,
           donde="B 3.2", c3="A6")
     ancla("G40", "economía: costo incremental del modelo (USD)", C_INC, "10.400", 0, donde="B 3.2", c3="d8")
-    ancla("C28", "economía: presupuesto (USD)", PRESUPUESTO, "30.000", 0, donde="B 3.2", c3="d9")
+    ancla("C28", "economía: presupuesto (USD)", PRESUPUESTO, "30.000", 0, donde="B 3.2")
     ancla("G38", "economía: con modelo, sobre el presupuesto (USD)", C_PROY - PRESUPUESTO, "660", 0,
-          donde="B 3.2", c3="d9")
+          donde="B 3.2")
     ancla("G39", "economía: regla, debajo del presupuesto (USD)", PRESUPUESTO - C_MVP, "9.740", 0,
-          donde="B 3.2", c3="d9")
-    ancla("G54", "economía: regla con contactables (USD/año)", regla_cont, "264,54", 2, donde="B 3.3", c3="d9")
+          donde="B 3.2")
+    ancla("G54", "economía: regla con contactables (USD/año)", regla_cont, "264,54", 2, donde="B 3.3")
     ancla("G54", "economía: ROI de la regla con contactables (%)", roi(regla_cont, C_MVP), "−98,69", 2,
-          donde="B 3.3", c3="d9")
+          donde="B 3.3")
     return econ
 
 
-def armar_piloto(eco: dict) -> dict:
+def armar_piloto(eco: dict, e2: dict) -> dict:
     pi = eco["piloto"]
+    # (26/10) Umbral de producción del piloto (H49): la tasa de éxito que paga la regla (49,56 %), llevada a
+    # todos los contactados con la precisión de la regla en validación (81,58 %).
+    prec_regla = e2["modelos"]["regla_umbral"]["validacion"]["lista_500"]["precision"]
     pil = {
         "meses": pi["meses"], "lista_mes": pi["lista_mes"], "control_mes": pi["control_mes"],
         "contactados_mes": pi["lista_mes"] - pi["control_mes"],
@@ -690,8 +693,9 @@ def armar_piloto(eco: dict) -> dict:
         "costo_horas_usd": pi["costo_horas_usd"],
         "acciones_ars": pi["acciones_marketing_ars"], "acciones_usd": pi["acciones_marketing_usd"],
         "costo_por_tratado_ars": pi["costo_por_tratado_ars"],
+        "umbral_produccion_pp": eco["umbral"]["mvp_s_equilibrio_con_descuento"] * prec_regla * 100,
     }
-    ancla("G49", "piloto: lista por mes", pil["lista_mes"], "500", 0, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: lista por mes", pil["lista_mes"], "500", 0, donde="B 3.6")
     ancla("G49", "piloto: control por mes", pil["control_mes"], "80", 0, donde="B 3.6", c3="d12")
     ancla("G49", "piloto: contactados por mes", pil["contactados_mes"], "420", 0, donde="gráfico d12 (500 − 80)")
     ancla("G49", "piloto: tratados", pil["tratados"], "1.260", 0, donde="B 3.6", c3="d12")
@@ -699,9 +703,11 @@ def armar_piloto(eco: dict) -> dict:
     ancla("G49", "piloto: diferencia detectable (puntos)", pil["diferencia_detectable_pp"], "2,87", 2,
           donde="B 3.6", c3="d12")
     ancla("G49", "piloto: horas (USD)", pil["costo_horas_usd"], "1.350", 0, donde="B 3.6", c3="d12")
-    ancla("G49", "piloto: acciones (ARS)", pil["acciones_ars"], "68.289", 0, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: acciones (ARS)", pil["acciones_ars"], "68.289", 0, donde="B 3.6")
     ancla("G49", "piloto: acciones (USD)", pil["acciones_usd"], "46,79", 2, donde="B 3.6", c3="d12")
     ancla("G49", "piloto: meses", pil["meses"], 3, donde="B 3.6 (tres meses)")
+    ancla("H49", "piloto: umbral de producción (puntos)", pil["umbral_produccion_pp"], "40,4", 1,
+          donde="C 6.2 y 6.3; gráfico d12", c3="d12")
     return pil
 
 
@@ -730,7 +736,7 @@ def main() -> int:
         "modelos": armar_modelos(e2, e3),
         "lista": armar_lista(e3),
         "economia": armar_economia(eco, e2, e3),
-        "piloto": armar_piloto(eco),
+        "piloto": armar_piloto(eco, e2),
     }
 
     print(f"{'ID':6s}{'ANCLA':58s}{'DOCUMENTO':>14s}{'PANTALLA':>14s}  OK")

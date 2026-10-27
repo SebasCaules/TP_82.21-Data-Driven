@@ -1,8 +1,8 @@
 # Diseño de la presentación E3 (`/e3/`)
 
-La presentación del Entregable 3 (27/10/2026) en el navegador. Mismo orden, títulos y textos que el
-PPTX del equipo (`entregas/entregable-3/equipo/presentacion-e3.pptx` del vault): quien ensayó con el
-PPTX reconoce cada diapositiva. El texto sale de `C3` (`e3/src/contenido_e3.js`) y los valores de los
+La presentación del Entregable 3 (27/10/2026) en el navegador. Desde el 27/10 es la única versión: el
+PPTX del equipo se borró a pedido del usuario. El texto sigue saliendo de
+`entregas/entregable-3/_build/F/presentacion/contenido.py` del vault. El texto sale de `C3` (`e3/src/contenido_e3.js`) y los valores de los
 gráficos de `D3` (`e3/src/datos_e3.js`); el contrato de los dos está en `pipeline/CONTRACT_E3.md`.
 
 ## Reglas transversales
@@ -56,18 +56,18 @@ gráficos de `D3` (`e3/src/datos_e3.js`); el contrato de los dos está en `pipel
 | # | Mensaje | Pieza | Interacción | Estado inicial | Cifras |
 |---|---|---|---|---|---|
 | 1 | ¿Conviene anticipar a los clientes que dejan de comprar? | portada en tinta, equipo | — | como el PPTX | C3; el pie es `C3.PIE` y no la línea fija de `armar.py` |
-| 2 | La lista sale con la regla y un piloto mide si contactar sirve | cuatro tarjetas y la decisión | «ver la n →» en cada tarjeta: Técnica a la 4, Legal a la 10, Económica a la 8, riesgo más crítico a la 9 | como el PPTX | C3 |
+| 2 | La lista sale con la regla y un piloto mide si contactar sirve | cuatro tarjetas y la decisión; solo «No viable» en terracota, la tasa de éxito avisa con la banda | «ver la n →» en cada tarjeta: Técnica a la 4, Legal a la 10, Económica a la 8, tasa de éxito a la 9 | como el PPTX | C3 |
 | 3 | Un cliente se va cuando pasa su propio umbral | definiciones, línea de tiempo de CLI03296, tres cifras | tres pasos: ritmo y umbral; corte y lo que faltaba; los 90 días siguientes | completa salvo al llegar con → | `D3.caso` (H23); tarjetas de C3 |
 | 4 | Técnicamente factible; el límite es quién opera | barras de 1 a 3, promedio, banda de factibilidad media; cuatro filas | puntero o foco en una condición resalta su fila, y al revés | sin resaltado | `D3.tecnica` (F16); filas de C3 |
 | 5 | El MVP es una planilla mensual | flujo de cinco pasos, tres hechos | — | como el PPTX | C3 |
 | 6 | Ningún modelo le gana a la regla por más que el ruido | precisión de la lista de 500 por modelo; intervalo de la logística menos la regla | tres pasos: el piso, la regla, los modelos; en el paso 3, Validación / Entrenamiento (en entrenamiento, el techo de 66,3 %) | Validación, completa | `D3.modelos` (F07, F08, G10 a G17, G24) |
 | 7 | Con la lista que se puede mandar, el modelo queda debajo | precisión de regla y logística ajustada para un largo y un filtro; importancia por permutación con leyenda (variables de la regla, las demás) | filtro (sin filtro, solo contactables) y largo (300 a 800; sin filtro, desde 500) | 500 contactables: 75,8 %, 73,9 %, 29 más para la regla | `D3.lista.filas` (H11, H12, H15, H16) y `.comparaciones` (H48), `.importancia` (H21) |
-| 8 | El modelo suma USD 5,38 y cuesta USD 10.400 más | dos números, matriz valorizada con su fórmula, umbral de viabilidad dibujado a escala | — | como el PPTX | C3; 1.719 y 18,4 de `D3.economia` (G46) |
+| 8 | Aun en su mejor caso, el modelo suma USD 5,38 y cuesta USD 10.400 más | valor de cada celda, la cuenta del modelo contra la regla, la lista contactable (USD 11,70 debajo), umbral de viabilidad dibujado a escala | — | como el PPTX | C3; 1.719 y 18,4 de `D3.economia` (G46) |
 | 9 | Ni la regla sola recupera su costo | costo del año 1 y, en el mismo eje, el beneficio anual simulado de la regla; deslizante de la tasa de éxito; tres lecturas: s, ROI de la regla, ROI del modelo sobre la regla | s de 0,63 % (borde inferior del IC 95 %) a 100 % por la grilla, con el tramo de 0,63 a 5 % ampliado y rotulado (marcas en el IC, en la observada y en los dos equilibrios; ↑ ↓ saltan entre marcas); con / sin descuento, que cambia la regla y el modelo | s = 1,02 %, con 15 % de descuento | `D3.economia.costos` (G38, G39, C28) y `.grilla` (G31 a G54); llamadas y veredicto de C3 |
 | 10 | Legalmente viable con condiciones | cinco dimensiones, promedio, alerta del 30,1 %, plan L1 a L6 en dos tramos | — | como el PPTX | C3 |
 | 11 | Tres riesgos críticos, con señal y umbral | tres tarjetas; matriz de los 13 | un botón alterna la matriz; clic o foco en un riesgo muestra su texto (el puntero solo lo marca) | las tres tarjetas | C3 y su anexo A4 |
-| 12 | Un piloto de tres meses decide si se invierte más | lista de 500 por mes con el control rayado; hechos; lo que se presenta a María G. | — | como el PPTX | `D3.piloto` (G49); C3 |
-| A1 a A6 | respaldo para preguntas | tabla con las filas que C3 destaca | «Volver a la diapositiva N» | — | C3 |
+| 12 | Un piloto de tres meses decide si se invierte más | la regla de decisión: hasta 2,87 puntos no se distingue de cero, de 2,87 a 40,4 el contacto funciona y la lista no se paga, desde 40,4 se invierte; hechos; lo que se presenta a María G. | — | como el PPTX | `D3.piloto` (G49, H49); C3 |
+| A1 a A7 | respaldo para preguntas | tabla con las filas que C3 destaca | «Volver a la diapositiva N» | — | C3 |
 
 ## Decisiones (24/10)
 
@@ -104,3 +104,15 @@ gráficos de `D3` (`e3/src/datos_e3.js`); el contrato de los dos está en `pipel
 - `python3 verificar.py --web <app>/dist-e3/index.html` (vault, carpeta de la presentación): cada
   número visible en el estado inicial, salvo `data-escala` y `data-simulacion`, contra el texto de
   las partes A, B y C, con las mismas excepciones que el PPTX.
+
+## Decisiones (26/10)
+
+- **Letra.** Arial también en la web (`.e3-app` redefine `--fuente`): con Segoe UI o Tahoma los cortes de
+  línea no eran los del PPTX que ensayó el equipo. El cuerpo sube a 23,5-26,5 px, y las notas y los pies
+  pasan a letra recta; el recorte de texto de `contenido.py` deja lugar para eso.
+- **9.** Dos llamadas: el ROI por escenario y el 49,6 %. Sale «USD 660», que ya muestra el gráfico. El
+  deslizante marca solo el equilibrio del descuento elegido.
+- **10.** La escala de la cátedra va debajo del promedio, y las normas en la columna derecha, debajo del
+  plan, en lugar del pie de genero.
+- **A7.** Matriz de confusión de la logística y la regla (B 4.3 y 4.4).
+

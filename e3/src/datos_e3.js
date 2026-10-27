@@ -23,8 +23,8 @@ export const D3 = {
   ],
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
-   "version": "v1.1",
-   "sha256": "cbf74899350579ca8c26ca0fc55ab8b3f60132ea0ae39756a87c9aec1df6c193"
+   "version": "v1.2",
+   "sha256": "0512ceb0e364e037fd0f63518558a138d914543459b24da4e46b5dc2c10e6ab6"
   }
  },
  "caso": {
@@ -117,7 +117,7 @@ export const D3 = {
   "filas": [
    {
     "id": "tasa_base",
-    "nombre": "Lista sin orden (tasa base)",
+    "nombre": "Clase mayoritaria (lista sin orden)",
     "grupo": "hoy",
     "entrenamiento": {
      "precision": 0.3142411712871958
@@ -930,7 +930,7 @@ export const D3 = {
   "importancia": [
    {
     "variable": "gap_mediano",
-    "etiqueta": "gap_mediano (días entre compras)",
+    "etiqueta": "días entre compras",
     "caida_pp": 34.39333333333333,
     "desvio_pp": 0.7148858149348475,
     "coeficiente": -2.247185852280461,
@@ -939,7 +939,7 @@ export const D3 = {
    },
    {
     "variable": "recency_sobre_umbral",
-    "etiqueta": "recency_sobre_umbral",
+    "etiqueta": "días sin comprar ÷ umbral",
     "caida_pp": 23.97333333333333,
     "desvio_pp": 0.8250402160044655,
     "coeficiente": 1.279076722771225,
@@ -948,7 +948,7 @@ export const D3 = {
    },
    {
     "variable": "recency_dias",
-    "etiqueta": "recency_dias (días sin comprar)",
+    "etiqueta": "días sin comprar",
     "caida_pp": 7.566666666666663,
     "desvio_pp": 0.5050363634383793,
     "coeficiente": 0.600442559025099,
@@ -957,7 +957,7 @@ export const D3 = {
    },
    {
     "variable": "ticket_90d",
-    "etiqueta": "ticket_90d",
+    "etiqueta": "ticket de 90 días",
     "caida_pp": 0.7666666666666633,
     "desvio_pp": 0.21602468994692983,
     "coeficiente": 0.007756463934009689,
@@ -966,7 +966,7 @@ export const D3 = {
    },
    {
     "variable": "envios_acum",
-    "etiqueta": "envios_acum",
+    "etiqueta": "envíos acumulados",
     "caida_pp": 0.5533333333333312,
     "desvio_pp": 0.2573367875415858,
     "coeficiente": -0.19248013520348373,
@@ -1253,7 +1253,8 @@ export const D3 = {
   "costo_horas_usd": 1350.0,
   "acciones_ars": 68288.89824383339,
   "acciones_usd": 46.79191230567211,
-  "costo_por_tratado_ars": 54.19753828875666
+  "costo_por_tratado_ars": 54.19753828875666,
+  "umbral_produccion_pp": 40.427515009982606
  },
  "anclas": [
   {
@@ -2004,7 +2005,7 @@ export const D3 = {
    "id": "G31",
    "nombre": "economía: s observada (%)",
    "documento": "1,02",
-   "donde": "B supuestos · C3 d8"
+   "donde": "B supuestos"
   },
   {
    "id": "G31",
@@ -2034,19 +2035,19 @@ export const D3 = {
    "id": "G31",
    "nombre": "economía: r (%)",
    "documento": "0,74",
-   "donde": "B 4.4 · C3 d8"
+   "donde": "B 4.4"
   },
   {
    "id": "G08",
    "nombre": "economía: margen anual por cliente (ARS)",
    "documento": "15.282",
-   "donde": "B 4.4 · C3 d8"
+   "donde": "B 4.4"
   },
   {
    "id": "G32",
    "nombre": "economía: descuento (%)",
    "documento": "15",
-   "donde": "B supuestos · C3 d8"
+   "donde": "B supuestos"
   },
   {
    "id": "G32",
@@ -2262,37 +2263,37 @@ export const D3 = {
    "id": "C28",
    "nombre": "economía: presupuesto (USD)",
    "documento": "30.000",
-   "donde": "B 3.2 · C3 d9"
+   "donde": "B 3.2"
   },
   {
    "id": "G38",
    "nombre": "economía: con modelo, sobre el presupuesto (USD)",
    "documento": "660",
-   "donde": "B 3.2 · C3 d9"
+   "donde": "B 3.2"
   },
   {
    "id": "G39",
    "nombre": "economía: regla, debajo del presupuesto (USD)",
    "documento": "9.740",
-   "donde": "B 3.2 · C3 d9"
+   "donde": "B 3.2"
   },
   {
    "id": "G54",
    "nombre": "economía: regla con contactables (USD/año)",
    "documento": "264,54",
-   "donde": "B 3.3 · C3 d9"
+   "donde": "B 3.3"
   },
   {
    "id": "G54",
    "nombre": "economía: ROI de la regla con contactables (%)",
    "documento": "−98,69",
-   "donde": "B 3.3 · C3 d9"
+   "donde": "B 3.3"
   },
   {
    "id": "G49",
    "nombre": "piloto: lista por mes",
    "documento": "500",
-   "donde": "B 3.6 · C3 d12"
+   "donde": "B 3.6"
   },
   {
    "id": "G49",
@@ -2334,7 +2335,7 @@ export const D3 = {
    "id": "G49",
    "nombre": "piloto: acciones (ARS)",
    "documento": "68.289",
-   "donde": "B 3.6 · C3 d12"
+   "donde": "B 3.6"
   },
   {
    "id": "G49",
@@ -2347,6 +2348,12 @@ export const D3 = {
    "nombre": "piloto: meses",
    "documento": 3,
    "donde": "B 3.6 (tres meses)"
+  },
+  {
+   "id": "H49",
+   "nombre": "piloto: umbral de producción (puntos)",
+   "documento": "40,4",
+   "donde": "C 6.2 y 6.3; gráfico d12 · C3 d12"
   }
  ]
 };

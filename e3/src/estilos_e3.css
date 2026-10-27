@@ -9,6 +9,8 @@
 /* ---------- armazón ---------- */
 
 .e3-app {
+  /* (26/10) Arial, como el PPTX: con Segoe UI o Tahoma los cortes de línea no eran los que ensayó el equipo. */
+  --fuente: Arial, Helvetica, sans-serif;
   position: fixed; inset: 0;
   display: flex; flex-direction: column;
   background: var(--papel);
@@ -112,8 +114,9 @@
 }
 /* rótulo de lo que el PPTX no tiene (controles, el intervalo de la 6): 19 px como mínimo (24/10) */
 .e3-rotulo-web { font: 600 19px/1.25 var(--fuente); color: var(--lbl); }
-.e3-nota { font: italic 400 21px/1.35 var(--fuente); color: var(--mut); }
-.e3-pie-figura { font: italic 400 17.5px/1.35 var(--fuente); color: var(--mut); }
+/* (26/10) Notas y pies en letra recta: la itálica gris no se leía proyectada. */
+.e3-nota { font: 400 21.5px/1.35 var(--fuente); color: var(--ink); }
+.e3-pie-figura { font: 400 20px/1.35 var(--fuente); color: var(--mut); }
 .e3-figura { background: var(--sup); }
 .e3-figura-ctl { display: flex; flex-direction: column; }
 .e3-figura-cab { display: flex; align-items: center; padding: 10px 14px 0 22px; height: 54px; }
@@ -134,9 +137,9 @@
   background: var(--azul1);
   border-left: 11px solid var(--acc);
   padding: 0 36px;
-  font: 400 25px/1.36 var(--fuente);
+  font: 400 31px/1.36 var(--fuente);
 }
-.e3-decision.malo { border-left-color: var(--terra); font-size: 23px; }
+.e3-decision.malo { border-left-color: var(--terra); font-size: 26px; }
 
 .e3-llamadas { display: flex; flex-direction: column; }
 .e3-llamada { position: relative; padding: 6px 0 0 26px; }
@@ -144,7 +147,7 @@
   content: ""; position: absolute; left: 0; top: 12px; bottom: 26px; width: 7px; background: var(--acc);
 }
 .e3-llamada-titulo { font: 700 33px/1.15 var(--fuente); color: var(--acc); margin-bottom: 10px !important; }
-.e3-llamada-texto { font: 400 22px/1.36 var(--fuente); }
+.e3-llamada-texto { font: 400 24px/1.36 var(--fuente); }
 
 .e3-panel {
   background: var(--azul1);
@@ -202,6 +205,8 @@
 .e3-barra-azul3 { fill: var(--azul3); }
 .e3-barra-gris { fill: var(--gris); }
 .e3-barra-gris2 { fill: var(--gris2); }
+.e3-zona-gris { fill: var(--gris2); }
+.e3-zona-azul1 { fill: var(--azul1); }
 .e3-barra-ink { fill: var(--ink); }
 .e3-barra-sim { stroke: var(--acc); stroke-width: 1.5; }
 .e3-barra-control { stroke: var(--acc); stroke-width: 1.5; }
@@ -252,8 +257,10 @@
 }
 .e3-veredicto-valor.largo { font-size: 50px; }
 .e3-veredicto.malo .e3-veredicto-valor { color: var(--terra); }
-.e3-veredicto-escala { margin-top: 8px; min-height: 56px; font: 400 20px/1.32 var(--fuente); color: var(--mut); }
-.e3-veredicto-texto { margin-top: 12px; font: 400 23px/1.34 var(--fuente); }
+/* (26/10) La tasa de éxito avisa con la banda; la cifra va en tinta para que el rojo quede solo en «No viable». */
+.e3-veredicto.alerta { border-top-color: var(--terra); }
+.e3-veredicto-escala { margin-top: 8px; min-height: 58px; font: 400 21.5px/1.32 var(--fuente); color: var(--mut); }
+.e3-veredicto-texto { margin-top: 12px; font: 400 26.5px/1.3 var(--fuente); }
 .e3-ir {
   position: absolute; right: 14px; bottom: 12px; height: 44px; padding: 0 14px;
   background: var(--sup); color: var(--acc);
@@ -265,13 +272,13 @@
 
 /* ---------- 3: el problema ---------- */
 
-.e3-defs p { font: 400 23px/1.36 var(--fuente); margin-bottom: 15px; }
-.e3-firma { font: italic 400 21px/1.36 var(--fuente); color: var(--mut); }
+.e3-defs p { font: 400 26.5px/1.34 var(--fuente); margin-bottom: 18px; }
+.e3-firma { font: 400 21.5px/1.36 var(--fuente); color: var(--mut); }
 .e3-figura-nota { margin: 6px 0 0; padding: 0 22px; font: 400 17px/1.4 var(--fuente); color: var(--mut); }
-.e3-cifra { padding: 18px 30px; }
-.e3-cifra-valor { display: block; font: 700 40px/1.1 var(--fuente); color: var(--ink); }
+.e3-cifra { padding: 18px 30px; display: flex; align-items: center; gap: 34px; }
+.e3-cifra-valor { display: block; flex: none; font: 700 46px/1.1 var(--fuente); color: var(--ink); }
 .e3-cifra-valor.malo { color: var(--terra); }
-.e3-cifra-texto { display: block; margin-top: 8px; font: 400 20px/1.3 var(--fuente); color: var(--lbl); }
+.e3-cifra-texto { display: block; font: 400 25px/1.3 var(--fuente); color: var(--ink); }
 
 /* ---------- 4: técnica ---------- */
 
@@ -286,8 +293,8 @@
 .e3-filas { display: flex; flex-direction: column; gap: 10px; }
 .e3-fila { border-left: 7px solid var(--acc); padding: 2px 6px 8px 20px; min-height: 117px; transition: background 150ms; }
 .e3-fila.on { background: var(--realce); }
-.e3-fila-rotulo { font: 700 22px/1.3 var(--fuente); color: var(--acc); margin-bottom: 6px !important; }
-.e3-fila-texto { font: 400 21.5px/1.36 var(--fuente); }
+.e3-fila-rotulo { font: 700 25px/1.3 var(--fuente); color: var(--acc); margin-bottom: 6px !important; }
+.e3-fila-texto { font: 400 23.5px/1.34 var(--fuente); }
 
 /* ---------- 5: MVP ---------- */
 
@@ -296,12 +303,12 @@
   display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%;
   background: var(--acc); color: #fff; font: 700 22px/1 var(--fuente);
 }
-.e3-paso-titulo { margin: 22px 0 12px !important; min-height: 56px; font: 700 25px/1.12 var(--fuente); }
-.e3-paso-texto { font: 400 20px/1.32 var(--fuente); color: var(--lbl); }
+.e3-paso-titulo { margin: 22px 0 12px !important; min-height: 58px; font: 700 26.5px/1.1 var(--fuente); }
+.e3-paso-texto { font: 400 23.5px/1.3 var(--fuente); color: var(--ink); }
 .e3-flecha-paso path { fill: var(--azul3); }
 .e3-hecho { background: var(--azul1); padding: 16px 30px; }
 .e3-hecho-valor { font: 700 37px/1.15 var(--fuente); color: var(--acc); }
-.e3-hecho-texto { margin-top: 8px !important; font: 400 22px/1.32 var(--fuente); }
+.e3-hecho-texto { margin-top: 8px !important; font: 400 24px/1.3 var(--fuente); }
 
 /* ---------- 6 y 7: modelado ---------- */
 
@@ -324,14 +331,16 @@
   background: var(--sup); border: 1px solid var(--bd); box-shadow: 0 1px 3px rgba(22, 35, 58, .12);
   padding: 9px 24px;
 }
-.e3-celda-rot { font: 700 20px/1.25 var(--fuente); color: var(--lbl); }
-.e3-celda-valor { grid-column: 1; font: 700 27px/1.25 var(--fuente); }
+.e3-celda-rot { font: 700 21.5px/1.25 var(--fuente); color: var(--lbl); }
+.e3-celda-valor { grid-column: 1; font: 700 31px/1.25 var(--fuente); }
 .e3-celda-valor.malo { color: var(--terra); }
-.e3-celda-texto { grid-column: 2; grid-row: 1 / 3; align-self: center; font: 400 21px/1.34 var(--fuente); }
+.e3-celda-texto { grid-column: 2; grid-row: 1 / 3; align-self: center; font: 400 25px/1.3 var(--fuente); }
+.e3-cadena { font: 400 25px/1.34 var(--fuente); }
+.e3-filtro { border-left: 7px solid var(--terra); padding-left: 20px; font: 400 25px/1.34 var(--fuente); }
 .e3-formula { font: italic 400 20px/1.3 var(--fuente); color: var(--mut); white-space: pre; }
 .e3-panel-grande { margin-top: 14px !important; font: 700 60px/1.05 var(--fuente); color: var(--acc); }
 .e3-panel-sub { margin-top: 6px !important; font: 400 22px/1.3 var(--fuente); color: var(--lbl); }
-.e3-panel-texto { margin-top: 20px !important; font: 400 23px/1.36 var(--fuente); }
+.e3-panel-texto { margin-top: 18px !important; font: 400 25px/1.34 var(--fuente); }
 .e3-escala { margin-top: 18px; }
 .e3-escala .e3-rotulo { margin-bottom: 6px !important; }
 .e3-escala-fila { margin-top: 6px; }
@@ -406,7 +415,7 @@
 .e3-dim {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--sup); border: 1px solid var(--bd); padding: 0 18px 0 22px;
-  font: 400 22px/1.2 var(--fuente);
+  font: 400 23.5px/1.2 var(--fuente);
 }
 .e3-dim-p {
   display: grid; place-items: center; width: 54px; height: 34px; border-radius: 6px;
@@ -415,18 +424,19 @@
 .e3-promedio {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--ink); color: #fff; padding: 0 22px;
-  font: 700 23px/1.2 var(--fuente);
+  font: 700 25px/1.2 var(--fuente);
 }
 .e3-promedio b { font-size: 30px; }
 .e3-alerta {
   background: var(--sup); border: 1.5px solid var(--terra); border-left: 11px solid var(--terra);
   padding: 10px 24px;
 }
-.e3-alerta-valor { font: 700 38px/1.1 var(--fuente); color: var(--terra); }
-.e3-alerta-texto { margin-top: 4px !important; font: 400 19.5px/1.3 var(--fuente); }
+.e3-alerta-valor { font: 700 43px/1.1 var(--fuente); color: var(--terra); }
+.e3-escala-legal { font: 400 19px/1.3 var(--fuente); color: var(--mut); }
+.e3-alerta-texto { margin-top: 4px !important; font: 400 22.5px/1.3 var(--fuente); }
 .e3-tramo .e3-rotulo { margin-bottom: 12px !important; }
 .e3-accion {
-  display: grid; grid-template-columns: 58px 1fr 236px; gap: 16px; align-items: center;
+  display: grid; grid-template-columns: 52px 1fr 268px; gap: 14px; align-items: center;
   height: 60px; margin-bottom: 7px; padding: 0 14px;
   background: var(--sup); border: 1px solid var(--bd);
 }
@@ -435,8 +445,8 @@
   background: var(--acc); color: #fff; font: 700 19px/1 var(--fuente);
 }
 .e3-accion-id.ultimo { background: var(--ink); }
-.e3-accion-que { font: 400 20px/1.22 var(--fuente); }
-.e3-accion-quien { font: 400 18px/1.22 var(--fuente); color: var(--lbl); }
+.e3-accion-que { font: 400 23.5px/1.3 var(--fuente); }
+.e3-accion-quien { font: 400 20.5px/1.3 var(--fuente); color: var(--lbl); }
 
 /* ---------- 11: riesgos ---------- */
 
@@ -444,10 +454,10 @@
 .e3-riesgo-cab { display: flex; gap: 24px; align-items: flex-start; min-height: 104px; }
 .e3-riesgo-n { font: 700 57px/1 var(--fuente); color: var(--acc); }
 .e3-riesgo.malo .e3-riesgo-n { color: var(--terra); }
-.e3-riesgo-titulo { margin-top: 6px !important; font: 700 27px/1.14 var(--fuente); }
+.e3-riesgo-titulo { margin-top: 6px !important; font: 700 28px/1.14 var(--fuente); }
 .e3-riesgo-par { margin-top: 16px; }
-.e3-riesgo-par .e3-rotulo { font-size: 17px; }
-.e3-riesgo-texto { margin-top: 4px !important; font: 400 22px/1.34 var(--fuente); }
+.e3-riesgo-par .e3-rotulo { font-size: 19px; }
+.e3-riesgo-texto { margin-top: 4px !important; font: 400 23.5px/1.3 var(--fuente); }
 
 .e3-matriz { display: flex; gap: 44px; }
 .e3-matriz-grilla {
@@ -488,8 +498,8 @@
 
 /* ---------- 12: la propuesta ---------- */
 
-.e3-hechos p { margin-bottom: 10px !important; font: 400 21px/1.36 var(--fuente); }
-.e3-pedidos { margin: 22px 0 0; padding-left: 30px; font: 400 22px/1.36 var(--fuente); }
+.e3-hechos p { margin-bottom: 12px !important; font: 400 24px/1.34 var(--fuente); }
+.e3-pedidos { margin: 22px 0 0; padding-left: 30px; font: 400 25px/1.32 var(--fuente); }
 .e3-pedidos li { margin-bottom: 12px; padding-left: 4px; }
 
 /* ---------- anexos ---------- */
@@ -515,6 +525,7 @@
 .e3-tabla td.num { text-align: right; font-variant-numeric: tabular-nums; }
 .e3-tabla.densa { font-size: 18px; }
 .e3-tabla.densa th, .e3-tabla.densa td { height: 37px; padding-top: 3px; padding-bottom: 3px; }
+.e3-tabla.muy-densa th, .e3-tabla.muy-densa td { height: 34px; padding-top: 2px; padding-bottom: 2px; }
 .e3-anexo-pie { margin-top: 14px !important; font-size: 19px; }
 
 /* ---------- capas fuera del escenario ---------- */

@@ -42,7 +42,7 @@ HTML = APP / "dist-e3" / "index.html"
 RES = [(1024, 768), (1280, 720), (1366, 768), (1440, 900), (1920, 1080)]
 CAPTURAR = {(1280, 720), (1920, 1080)}
 DIAPOS = [str(i) for i in range(1, 13)]
-ANEXOS = [f"a{i}" for i in range(1, 7)]
+ANEXOS = [f"a{i}" for i in range(1, 8)]
 PAGINAS = DIAPOS + ANEXOS
 PASOS = {"3": 3, "6": 3}
 
@@ -394,7 +394,7 @@ def recorrido(p: Pagina):
     p.quieto()
     esperar(p.estado()["hash"] == "#3", "clic al 20 % de la 4, sobre el gráfico, no retrocede")
     # hash mal formado o inválido: la portada, sin error y con la URL corregida
-    for h in ("%", "0", "a7"):
+    for h in ("%", "0", "a8"):
         p.ir("1")
         p.pg.evaluate(f"() => {{ location.hash = '{h}' }}")
         p.quieto(80)
