@@ -1,5 +1,10 @@
 # Diseño de la presentación E3 (`/e3/`)
 
+> **Desde el 27/10 (W1) manda la última sección, «Decisiones (27/10, W1): el armazón del E2».** Las reglas
+> transversales y la tabla por diapositiva de abajo describen el escenario fijo de 1600 × 900, que se fue;
+> quedan como referencia del contenido de cada diapositiva (el código está en el commit `a06f88c`,
+> `e3/src/diapositivas/`).
+
 La presentación del Entregable 3 (27/10/2026) en el navegador. Desde el 27/10 es la única versión: el
 PPTX del equipo se borró a pedido del usuario. El texto sigue saliendo de
 `entregas/entregable-3/_build/F/presentacion/contenido.py` del vault. El texto sale de `C3` (`e3/src/contenido_e3.js`) y los valores de los
@@ -133,3 +138,52 @@ tanta interacción necesaria para presentar».
   quieta de la tasa de éxito (1,02 % contra 49,6 %). Salen los «ver la n →» de la 2: navega el riel.
 - **Reglas 6 y 7.** Las reglas transversales 6 (pasos) y 7 (controles) quedan reemplazadas por esto.
 
+
+## Decisiones (27/10, W1): el armazón del E2
+
+Pedido del usuario: «/e3/ estéticamente exactamente igual a /e1/ y /e2/», más corta. Plan del E3 (frente web) y
+decisiones N0-5 y N0-6.
+
+- **El armazón es el del E2.** `e3/src/App.jsx` es `e2/src/App.jsx` (riel `.lat`, encabezado `.e2-enc` con la
+  pregunta como `h1`, `.cuerpo`, flujo de impresión, transición entre vistas) y `main.jsx` importa
+  `src/estilos.css`, `e2/src/estilos_e2.css` y `src/fit.js` tal cual. Las vistas usan `e2/src/Banda.jsx` (con
+  `TarjetaDecision`) y las primitivas de `src/graficos.jsx`. Rigen las reglas 11 (banda de cifras y tarjeta
+  de decisión), 12 (la pregunta en el encabezado, sin título ni pie) y 13 H1 (una cifra dominante) del
+  `e2/DISENO.md`. `estilos_e3.css` no nombra ninguna clase del armazón; ni `src/**` ni `e2/**` cambian.
+- **Letra más grande (N0-5): zoom uniforme.** k = máx(1; mín(1,2; ancho / 1152; alto / 640)) (`zoom.js`). El
+  tablero va en `.e3-vp`, una caja del tamaño de la ventana lógica (ancho / k × alto / k) con `zoom: k`. Para
+  que las hojas compartidas, que miden en vw, vh y `@media`, midan contra esa caja, `vite.e3.config.js`
+  reescribe al empaquetar el E3 vw → cqw, vh → cqh y los `@media` de ancho o alto → `@container`. Resultado:
+  /e3/ a W × H es /e2/ a W/k × H/k ampliado k veces, como el zoom del navegador.
+  - Consecuencia medida (`paridad_e3.py`): contra /e2/ en la misma ventana, la letra fija crece hasta k (riel: 1,14 a 1,20; la
+    frase de la decisión: 1,02), pero la pregunta y las cifras grandes miden lo mismo,
+    porque en el E2 ya son proporcionales a la ventana.
+- **El encabezado.** A la derecha, «5 / 9 · Parte B 3.2…» (vista y fuente en C3) y, en el lugar de la
+  miniatura del mapa de calidad del E2, el avance de la historia: una barra por vista, mismo marco y medidas
+  (118 × 46), así el encabezado tiene el alto del E2.
+- **El riel.** Nueve vistas y el grupo «Respaldo» con los anexos A1 a A7 de C3 (`vistas/index.jsx`). Una vista
+  es un archivo `Vnn_*.jsx` (o `An_*.jsx`) que exporta `default` y `meta = { id }`; sin archivo, la vista se
+  muestra como esqueleto con su pregunta. Cada vista declara de qué diapositivas de C3 sale (`de`): de ahí
+  sale el guion de las notas.
+- **Quien presenta (N0-6).** Las teclas del E2 (flechas con el foco libre o en el riel, Inicio, Fin, F, I)
+  más Av Pág y Re Pág, que pasan de vista siempre (control remoto); F5 pide pantalla completa sin recargar;
+  N abre las notas debajo del tablero, que se achica para dejarles lugar (con las notas, k puede bajar de
+  1); desde el panel, «Abrir en otra ventana» abre `?notas`, solo las notas. «.» y B ponen la pantalla en
+  negro y cualquier tecla vuelve. Una tecla mantenida no recorre. Dos ventanas con la misma dirección se
+  siguen (`BroadcastChannel`).
+- **Sin controles a la vista.** Lo que una vista deje tocar va detrás de «Explorar» (`controles.jsx`),
+  cerrado al llegar. En W1 ninguna vista tiene controles; el simulador de la tasa de éxito de la 5 queda para
+  W2.
+- **Vista 5, de muestra.** Banda: lo que suma el modelo por año (USD 5,38, con los USD 10.400 de más en su
+  frase), el ROI del modelo sobre la regla a un año (la cifra dominante) y la tasa de éxito que pagaría la
+  regla (49,6 %, con la observada en su frase); con cuatro tarjetas, a 1152 × 640 las cifras no entran.
+  Decisión: «No viable tal como está planteado» (C3, diapositiva 9). Gráfico: `BarrasH` del costo del año 1
+  con modelo y solo la regla contra el beneficio anual de la regla, con el presupuesto marcado.
+
+### Verificación (desde W1)
+
+- `python3 scripts/paridad_e3.py`: lo estático, los estilos calculados de /e2/ contra /e3/ a 1152 × 640,
+  1366 × 768, 1536 × 864 y 1920 × 1080, las reglas 11 y 12 en cada vista y la hoja de contacto
+  `entregas/entregable-3/_build/workforce/fase-w1/e2-e3-1536.png` del vault.
+- `python3 scripts/verificar_e3.py`: cada vista a cinco resoluciones con `__fit`, consola y red limpias, y el
+  recorrido de quien presenta.

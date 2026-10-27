@@ -1,253 +1,224 @@
-// Presentación interactiva del Entregable 3 (27/10/2026). Las 12 diapositivas del PPTX, en el mismo
-// orden y con el mismo texto (C3), más los anexos A1 a A6.
-//
-// (24/10) Escenario 16:9 de 1600 × 900 lógicos, escalado para entrar entero en la ventana: lo que
-// sobra queda como banda color papel. Nada scrollea. La página va en la URL (#3, #a2): recargar no
-// pierde el lugar y Atrás del navegador recorre. Navegación para cinco oradores con un control remoto
-// (Avance y Retroceso de página, F5, Esc, «.») o el teclado; los atajos están en Capas.jsx (Ayuda).
-// Dos ventanas abiertas en la misma presentación se siguen (BroadcastChannel): una en el proyector y
-// otra con las notas (N) en la laptop.
+// Armazón de /e3/ (27/10, W1). Es el App.jsx del E2 (e2/src/App.jsx: riel lateral, encabezado con la
+// pregunta, .cuerpo, flujo de impresión) con tres cambios, nada más:
+// 1. Letra más grande (N0-5): todo el tablero va dentro de .e3-vp, una caja del tamaño de la ventana
+//    lógica con `zoom: k` (zoom.js). Las hojas compartidas miden contra esa caja (vite.e3.config.js).
+// 2. Las teclas de quien presenta (N0-6): Av Pág y Re Pág del control remoto pasan de vista siempre;
+//    F5 pide pantalla completa sin recargar; N abre las notas del orador (Notas.jsx); «.» y B ponen la
+//    pantalla en negro hasta la próxima tecla; una tecla mantenida no recorre el tablero.
+// 3. Dos ventanas con la misma dirección se siguen (BroadcastChannel): la del proyector y la de la
+//    laptop con las notas, en panel (N) o solas (?notas).
+// Sin controles a la vista: lo que una vista deje tocar va detrás de «Explorar» (controles.jsx),
+// cerrado al llegar.
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { ANEXOS, DIAPOSITIVAS, pagina } from './diapositivas/index.js'
-import { Ayuda, ListaAnexos, Notas, VistaGeneral } from './Capas.jsx'
-import { NavCtx } from './diapositivas/Marco.jsx'
+import { flushSync } from 'react-dom'
+import { VISTAS, etiquetaDe, grupoDe, TOTAL_VISTAS, diapositivasDe } from './vistas/index.jsx'
+import MarcaInicio from './MarcaInicio.jsx'
+import { ImpresionCtx } from '../../e2/src/escala.js'
+import { VentanaCtx, medir } from './zoom.js'
+import { PanelNotas, VentanaNotas } from './Notas.jsx'
 
-const W = 1600
-const H = 900
-const TOTAL = DIAPOSITIVAS.length
-const ULTIMA = String(TOTAL)
-const SIGUIENTE = new Set(['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'Enter'])
-const ANTERIOR = new Set(['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'])
-const INTERACTIVO = 'button, a, input, select, textarea, [role=slider], [role=radio], [role=button], [data-control]'
+const hashDe = (i) => `#${VISTAS[i].id.toLowerCase()}`
+function indiceDeHash() {
+  const i = VISTAS.findIndex((v) => `#${v.id.toLowerCase()}` === location.hash.toLowerCase())
+  return i >= 0 ? i : 0
+}
+const TITULO_BASE = 'Casa Óga · Entregable 3'
 const CANAL = 'casa-oga-e3'
+const SOLO_NOTAS = /(^|[?&])notas\b/.test(location.search)
+// El panel de notas toma este tanto del alto de la ventana; el tablero, el resto.
+const NOTAS_ALTO = 0.3
 
-// (24/10) Un hash con un escape mal formado (#%) hace fallar decodeURIComponent: va a la portada.
-const idDeHash = () => {
-  let id
-  try {
-    id = decodeURIComponent(location.hash.slice(1)).toLowerCase()
-  } catch {
-    return '1'
-  }
-  return pagina(id) ? id : '1'
-}
-// El origen de un anexo (la diapositiva a la que vuelve) va en history.state: sobrevive a recargar.
-const origenGuardado = () => {
-  try {
-    const o = history.state?.origen
-    return o && pagina(String(o))?.tipo === 'diapositiva' ? String(o) : null
-  } catch {
-    return null
-  }
-}
-
-/** Escala del escenario para que entre entero en la zona, centrado. */
-function useEscala(ref) {
-  const [e, setE] = useState({ s: 0, x: 0, y: 0 })
+/** Ventana lógica al día con el tamaño real, descontando el panel de notas si está abierto. Con las
+ *  notas, k puede bajar de 1 (zoom.js): se ensaya en una laptop, no se proyecta. */
+function useVentana(notas) {
+  const calc = useCallback(() => {
+    const alto = notas ? Math.round(window.innerHeight * NOTAS_ALTO) : 0
+    return { ...medir(window.innerWidth, window.innerHeight - alto, notas ? 0.5 : 1), notasAlto: alto }
+  }, [notas])
+  const [v, setV] = useState(calc)
   useLayoutEffect(() => {
-    const el = ref.current
-    const medir = () => {
-      const w = el.clientWidth
-      const h = el.clientHeight
-      const s = Math.min(w / W, h / H)
-      setE({ s, x: (w - W * s) / 2, y: (h - H * s) / 2 })
-    }
-    medir()
-    const ro = new ResizeObserver(medir)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [ref])
-  return e
+    setV(calc())
+    const al = () => setV(calc())
+    window.addEventListener('resize', al)
+    return () => window.removeEventListener('resize', al)
+  }, [calc])
+  return v
 }
 
 function pantallaCompleta() {
   try {
     if (document.fullscreenElement) document.exitFullscreen?.()?.catch?.(() => {})
     else document.documentElement.requestFullscreen?.()?.catch?.(() => {})
-  } catch { /* sin pantalla completa (vista previa, iframe): no pasa nada */ }
+  } catch { /* sin pantalla completa (vista previa, iframe) */ }
 }
 
 export default function App() {
-  const [pos, setPos] = useState(() => {
-    const id = idDeHash()
-    return { id, paso: pagina(id).pasos, dir: null, origen: origenGuardado() }
-  })
-  const [capa, setCapa] = useState(null)          // 'general' | 'anexos' | 'ayuda'
+  const [indice, setIndiceCrudo] = useState(indiceDeHash)
+  const [imprimiendo, setImprimiendo] = useState(false)
   const [notas, setNotas] = useState(false)
-  const [negro, setNegro] = useState(false)       // pantalla en negro («.» o B, como PowerPoint)
-  const [buffer, setBuffer] = useState('')
-  const [pista, setPista] = useState(() => pos.id === '1')
-  const zona = useRef(null)
-  const esc = useEscala(zona)
-  const pag = pagina(pos.id)
-  const posRef = useRef(pos)
-  posRef.current = pos
+  const [negro, setNegro] = useState(false)
+  const ventana = useVentana(notas)
+  const vista = VISTAS[indice]
 
-  // Ir a una página. Al llegar a un anexo se recuerda de qué diapositiva se vino; de un anexo a otro,
-  // se conserva. Sin paso, la diapositiva se ve completa (al volver, desde la vista general o al saltar).
-  const ir = useCallback((id, { paso, dir = 0 } = {}) => {
-    const p = pagina(id)
-    if (!p) return
-    setPos((prev) => {
-      const antes = pagina(prev.id)
-      const origen = p.tipo !== 'anexo' ? null : antes.tipo === 'diapositiva' ? prev.id : prev.origen
-      return { id, paso: paso ?? p.pasos, dir, origen }
-    })
+  // Cambio de vista con la transición del E2 (View Transitions con dirección; si no hay, WAAPI).
+  const actual = useRef(indice)
+  const setIndice = useCallback((i) => {
+    if (i === actual.current) return
+    const dir = i > actual.current ? 'adelante' : 'atras'
+    actual.current = i
+    document.documentElement.dataset.dir = dir
+    if (!SOLO_NOTAS && document.startViewTransition && document.visibilityState === 'visible') {
+      document.startViewTransition(() => flushSync(() => setIndiceCrudo(i)))
+    } else setIndiceCrudo(i)
   }, [])
-  const volver = useCallback(() => {
-    setPos((prev) => {
-      const id = prev.origen ?? ULTIMA
-      return { id, paso: pagina(id).pasos, dir: -1, origen: null }
-    })
+  const irA = useCallback((i) => setIndice(Math.max(0, Math.min(VISTAS.length - 1, i))), [setIndice])
+  const irAVista = useCallback((id) => {
+    const i = VISTAS.findIndex((v) => v.id === id)
+    if (i >= 0) setIndice(i)
+  }, [setIndice])
+
+  const cuerpo = useRef(null)
+  const montada = useRef(false)
+  useLayoutEffect(() => {
+    if (!montada.current) { montada.current = true; return }
+    if (document.startViewTransition || !cuerpo.current?.animate) return
+    const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches
+    const dy = document.documentElement.dataset.dir === 'atras' ? -18 : 18
+    cuerpo.current.animate(
+      quieto ? [{ opacity: 0 }, { opacity: 1 }]
+        : [{ opacity: 0, transform: `translateY(${dy}px)` }, { opacity: 1, transform: 'none' }],
+      { duration: quieto ? 140 : 340, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+    )
+  }, [indice])
+
+  const imprimirTodo = useCallback(() => {
+    if (document.visibilityState === 'hidden') return
+    setImprimiendo(true)
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      window.print()
+      setImprimiendo(false)
+    }))
   }, [])
 
-  const siguiente = useCallback(() => {
-    const p = pagina(pos.id)
-    if (p.tipo === 'diapositiva') {
-      if (pos.paso < p.pasos) setPos({ ...pos, paso: pos.paso + 1 })
-      else if (p.n < TOTAL) ir(DIAPOSITIVAS[p.n].id, { paso: 1, dir: 1 })
-      return
-    }
-    const k = ANEXOS.findIndex((a) => a.id === p.id)
-    if (k < ANEXOS.length - 1) ir(ANEXOS[k + 1].id, { dir: 1 })
-    else volver()
-  }, [pos, ir, volver])
-  // (24/10) ← deshace un paso solo si a la diapositiva se llegó con → (pos.dir > 0) y los pasos se
-  // fueron mostrando. Llegada hacia atrás, por salto o por la URL: ← pasa a la anterior, como en un PDF.
-  const anterior = useCallback(() => {
-    const p = pagina(pos.id)
-    if (p.tipo === 'anexo') return volver()
-    if (pos.paso > 1 && pos.dir > 0) setPos({ ...pos, paso: pos.paso - 1 })
-    else if (p.n > 1) ir(DIAPOSITIVAS[p.n - 2].id, { dir: -1 })
-  }, [pos, ir, volver])
-
-  // URL y título. La primera vez reemplaza la entrada del historial; después cada página agrega una.
+  // URL y título siguen a la vista, como en el E2.
   const primera = useRef(true)
   useEffect(() => {
-    const h = '#' + pos.id
-    const estado = { origen: pos.origen }
-    try {
-      if (primera.current || location.hash.toLowerCase() === h) history.replaceState(estado, '', h)
-      else history.pushState(estado, '', h)
-    } catch {
-      if (location.hash.toLowerCase() !== h) location.hash = h
+    const h = hashDe(indice)
+    if (location.hash.toLowerCase() !== h) {
+      try {
+        if (primera.current) history.replaceState(null, '', location.search + h)
+        else history.pushState(null, '', location.search + h)
+      } catch {
+        location.hash = h
+      }
     }
     primera.current = false
-    const p = pagina(pos.id)
-    document.title = (p.tipo === 'anexo' ? `Anexo ${p.a.n}` : `${p.n} / ${TOTAL}`) + ' · Casa Óga · Entregable 3'
-  }, [pos.id, pos.origen])
+    document.title = `${SOLO_NOTAS ? 'Notas · ' : ''}${vista.pregunta} · ${TITULO_BASE}`
+  }, [indice, vista])
   useEffect(() => {
-    const alVolver = () => {
-      const id = idDeHash()
-      const origen = origenGuardado()
-      // (24/10) Un hash inválido (#0, #a7, #%) lleva a la portada; si la portada ya estaba, el efecto de
-      // la URL no vuelve a correr y la barra quedaría con el hash inválido: se corrige acá.
-      if (location.hash.toLowerCase() !== '#' + id) {
-        try { history.replaceState({ origen }, '', '#' + id) } catch { /* sin historial */ }
-      }
-      setPos({ id, paso: pagina(id).pasos, dir: 0, origen })
-    }
+    const alVolver = () => setIndice(indiceDeHash())
     window.addEventListener('popstate', alVolver)
     return () => window.removeEventListener('popstate', alVolver)
+  }, [setIndice])
+
+  useEffect(() => {
+    const activo = document.activeElement
+    if (activo && activo.classList && activo.classList.contains('lat-item')) {
+      document.querySelector('.lat-item.on')?.focus()
+    }
+  }, [indice])
+
+  useEffect(() => {
+    const antes = () => flushSync(() => setImprimiendo(true))
+    const despues = () => setImprimiendo(false)
+    window.addEventListener('beforeprint', antes)
+    window.addEventListener('afterprint', despues)
+    return () => {
+      window.removeEventListener('beforeprint', antes)
+      window.removeEventListener('afterprint', despues)
+    }
   }, [])
 
-  // Dos ventanas, una sola presentación. La que se abre pide la posición a las que ya están y la sigue;
-  // después, cada cambio local se publica y las demás lo siguen. Lo que llega no se vuelve a publicar.
+  // Dos ventanas, un solo tablero. La que se abre pide la vista a las que ya están y la toma; después,
+  // cada cambio local se publica y las demás lo siguen. Lo que llega no se vuelve a publicar.
   const canal = useRef(null)
   const recibido = useRef(null)
+  const indiceRef = useRef(indice)
+  indiceRef.current = indice
   useEffect(() => {
     let c
     try { c = new BroadcastChannel(CANAL) } catch { return undefined }
     canal.current = c
     c.onmessage = (m) => {
       const d = m.data || {}
-      const p = posRef.current
-      if (d.tipo === 'pide') return c.postMessage({ tipo: 'pos', id: p.id, paso: p.paso, dir: p.dir, origen: p.origen })
-      if (d.tipo !== 'pos' || !pagina(d.id)) return
-      if (p.id === d.id && p.paso === d.paso) return
-      recibido.current = `${d.id}:${d.paso}`
-      // dir viaja con la posición: ← en la otra ventana deshace el paso igual que en esta
-      setPos({ id: d.id, paso: d.paso, dir: d.dir ?? 0, origen: d.origen ?? null })
+      if (d.tipo === 'pide') return c.postMessage({ tipo: 'pos', id: VISTAS[indiceRef.current].id })
+      if (d.tipo !== 'pos') return
+      const i = VISTAS.findIndex((v) => v.id === d.id)
+      if (i < 0 || i === indiceRef.current) return
+      recibido.current = d.id
+      setIndice(i)
     }
     c.postMessage({ tipo: 'pide' })
     return () => { c.close(); canal.current = null }
-  }, [])
+  }, [setIndice])
   const publicada = useRef(false)
   useEffect(() => {
-    const clave = `${pos.id}:${pos.paso}`
-    if (!publicada.current) { publicada.current = true; return }   // al abrir, no mueve a las otras
-    if (recibido.current === clave) { recibido.current = null; return }
+    const id = VISTAS[indice].id
+    if (!publicada.current) { publicada.current = true; return }      // al abrir, no mueve a las otras
+    if (recibido.current === id) { recibido.current = null; return }
     recibido.current = null
-    try { canal.current?.postMessage({ tipo: 'pos', id: pos.id, paso: pos.paso, dir: pos.dir, origen: pos.origen }) } catch { /* cerrado */ }
-  }, [pos.id, pos.paso, pos.origen])
+    try { canal.current?.postMessage({ tipo: 'pos', id }) } catch { /* cerrado */ }
+  }, [indice])
 
-  // Número y Enter: salta a esa diapositiva. El número tipeado dura 8 s, o hasta otra tecla de navegación.
-  useEffect(() => {
-    if (!buffer) return undefined
-    const t = setTimeout(() => setBuffer(''), 8000)
-    return () => clearTimeout(t)
-  }, [buffer])
+  const abrirVentanaNotas = useCallback(() => {
+    const url = `${location.pathname}?notas${hashDe(actual.current)}`
+    try { window.open(url, 'casa-oga-e3-notas', 'width=900,height=640') } catch { /* sin ventanas */ }
+  }, [])
 
-  // La pista de atajos de la portada: se apaga a los 4 s o con la primera tecla o clic.
-  useEffect(() => {
-    if (!pista) return undefined
-    const t = setTimeout(() => setPista(false), 4000)
-    return () => clearTimeout(t)
-  }, [pista])
-
-  // Teclado. Las capas (vista general, anexos) atienden sus propias teclas; un control con foco atiende
-  // las flechas y llama preventDefault. Las teclas con Cmd, Ctrl o Alt no se capturan; una tecla
-  // mantenida apretada (repeat) no recorre la presentación.
+  // Teclado: las teclas del E2 (flechas, Inicio, Fin, F, I) y las de quien presenta.
   const teclas = useRef(null)
   teclas.current = (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return
-    if (pista) setPista(false)
-    if (e.repeat) return
     const k = e.key
     if (negro) {                                   // cualquier tecla vuelve de la pantalla en negro
       if (!['Shift', 'Control', 'Alt', 'Meta'].includes(k)) { e.preventDefault(); setNegro(false) }
       return
     }
-    if (k === 'F5') { e.preventDefault(); return pantallaCompleta() }   // el botón del control remoto
-    if (capa === 'ayuda') {
-      if (k === 'Escape' || k === '?') { e.preventDefault(); setCapa(null) }
-      return
-    }
-    if (capa) return
-    const t = e.target instanceof Element ? e.target : null
-    const enControl = t?.closest('[data-control]')
-    const enBoton = t?.closest('button, a')          // los que el navegador activa con Espacio o Enter
-    if (k === 'Escape') {
-      // (24/10) Esc ya no abre la vista general: el botón de los controles remotos que manda F5 manda
-      // Esc la vez siguiente, y en el aula la grilla de miniaturas no tiene que aparecer por reflejo.
+    if (k === 'F5') { e.preventDefault(); return pantallaCompleta() }      // botón del control remoto
+    // Av Pág y Re Pág (el control remoto) pasan de vista aunque el foco esté en un control.
+    if (k === 'PageDown' || k === 'PageUp') {
       e.preventDefault()
-      if (buffer) return setBuffer('')
-      if (enControl || enBoton) t.blur()
+      if (!e.repeat) irA(indiceRef.current + (k === 'PageDown' ? 1 : -1))
       return
     }
-    if (/^[0-9]$/.test(k)) { e.preventDefault(); return setBuffer((b) => (b + k).slice(-2)) }
-    if (buffer && k === 'Enter') {
+    const t = e.target
+    if (t.tagName === 'SELECT' || t.tagName === 'INPUT' || t.isContentEditable) return
+    if (t.getAttribute && (t.getAttribute('role') === 'slider' || t.closest?.('[data-control]'))) {
+      if (k === 'Escape') t.blur?.()
+      return
+    }
+    const suelto = t === document.body || t === document.documentElement ||
+      (t.classList && t.classList.contains('lat-item'))
+    if (k === 'Escape') { if (!suelto) t.blur?.(); return }
+    if (!suelto && ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'].includes(k)) return
+    if (['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'].includes(k)) {
       e.preventDefault()
-      const n = Number(buffer)
-      setBuffer('')
-      if (n >= 1 && n <= TOTAL) ir(String(n), { dir: 0 })
+      if (e.repeat) return                         // una tecla mantenida no recorre el tablero
+      if (k === 'ArrowDown' || k === 'ArrowRight') irA(indiceRef.current + 1)
+      else if (k === 'ArrowUp' || k === 'ArrowLeft') irA(indiceRef.current - 1)
+      else if (k === 'Home') irA(0)
+      else irA(VISTAS.length - 1)
       return
     }
-    if (buffer && k === 'Backspace') { e.preventDefault(); return setBuffer((b) => b.slice(0, -1)) }
-    if ((k === ' ' || k === 'Enter') && enBoton) return        // activa el botón con foco
-    if (buffer) setBuffer('')
-    if (SIGUIENTE.has(k)) { e.preventDefault(); return siguiente() }
-    if (ANTERIOR.has(k)) { e.preventDefault(); return anterior() }
-    if (k === 'Home') { e.preventDefault(); return ir('1', { dir: -1 }) }
-    if (k === 'End') { e.preventDefault(); return ir(ULTIMA, { dir: 1 }) }
+    if (!suelto || e.repeat) return
     const l = k.toLowerCase()
-    if (l === 'f') { e.preventDefault(); return pantallaCompleta() }
-    if (l === 'n') { e.preventDefault(); return setNotas((v) => !v) }
-    if (l === 'o') { e.preventDefault(); return setCapa('general') }
-    if (l === 'a') { e.preventDefault(); return setCapa('anexos') }
-    if (l === 'b' || k === '.') { e.preventDefault(); return setNegro(true) }
-    if (k === '?') { e.preventDefault(); return setCapa('ayuda') }
+    if (l === 'f') pantallaCompleta()
+    else if (l === 'i' && !SOLO_NOTAS) imprimirTodo()
+    else if (l === 'n' && !SOLO_NOTAS) setNotas((x) => !x)
+    else if ((l === 'b' || k === '.') && !SOLO_NOTAS) setNegro(true)
+    else return
+    e.preventDefault()
   }
   useEffect(() => {
     const h = (e) => teclas.current(e)
@@ -255,60 +226,136 @@ export default function App() {
     return () => window.removeEventListener('keydown', h)
   }, [])
 
-  // (24/10) Un control tocado con el mouse suelta el foco, también los botones de opción: así →, ←,
-  // Espacio y Enter siguen pasando de diapositiva. Con el teclado (Tab) el foco queda y las flechas
-  // mueven el control. El deslizante lo suelta al levantar el puntero (controles.jsx).
-  useEffect(() => {
-    const h = (e) => {
-      if (pista) setPista(false)
-      if (e.detail === 0) return
-      const b = e.target instanceof Element ? e.target.closest('button, a') : null
-      if (b && !b.closest('.e3-capa')) b.blur()
-    }
-    window.addEventListener('click', h)
-    return () => window.removeEventListener('click', h)
-  }, [pista])
+  if (SOLO_NOTAS) return <VentanaNotas vista={vista} />
 
-  // Clic en la franja izquierda o derecha del escenario: retrocede o avanza. Nunca sobre un control.
-  const alClic = (e) => {
-    if (capa || (e.target instanceof Element && e.target.closest(INTERACTIVO + ', .e3-riel'))) return
-    if (window.getSelection?.().toString()) return
-    const r = e.currentTarget.getBoundingClientRect()
-    const f = (e.clientX - r.left) / r.width
-    if (f < 0.3) anterior()
-    else if (f > 0.7) siguiente()
-  }
-
-  const irDesdeCapa = (id) => { setCapa(null); ir(id, { dir: 0 }) }
-  // (27/10) El riel de capítulos (Marco.jsx) navega con esto: un salto, sin pasos.
-  const nav = { ir: (id) => ir(id, { dir: 0 }) }
-  const Comp = pag.Componente
-  const animacion = pos.dir == null ? '' : pos.dir > 0 ? 'adelante' : pos.dir < 0 ? 'atras' : 'salto'
+  const Vista = vista.Componente
   return (
-    <div className={`e3-app ${notas ? 'con-notas' : ''}`}>
-      <main className="e3-zona" ref={zona}>
-        <div className="e3-escenario" onClick={alClic}
-             style={{ transform: `translate(${esc.x}px, ${esc.y}px) scale(${esc.s})`, visibility: esc.s ? 'visible' : 'hidden' }}>
-          <div key={pos.id} className={`e3-pagina ${animacion}`}>
-            <NavCtx.Provider value={nav}>
-              <Comp d={pag.d} a={pag.a} paso={pos.paso} ir={(id) => ir(id, { dir: 1 })}
-                    origen={pos.origen} volver={volver} />
-            </NavCtx.Provider>
-          </div>
+    <>
+      <div className="e3-vp" style={{ zoom: ventana.k, width: ventana.w, height: ventana.h }}>
+        <div className="e3-vp-dentro">
+          <VentanaCtx.Provider value={ventana}>
+            <div className="app">
+              <div className="chico">
+                <h1>Este tablero necesita una pantalla más grande</h1>
+                <p>
+                  Está hecho para leerse sin desplazar la página, en proyector y en laptop, de
+                  1152&nbsp;×&nbsp;640 a 1920&nbsp;×&nbsp;1080. Amplíe la ventana o ábralo en una
+                  pantalla más grande.
+                </p>
+              </div>
+
+              <Lateral indice={indice} irA={irA} />
+
+              <div className="principal">
+                <p className="solo-lector" aria-live="polite">{`Vista ${etiquetaDe(vista)}: ${vista.pregunta}`}</p>
+                <Encabezado vista={vista} />
+                <main className="cuerpo" ref={cuerpo}>
+                  {imprimiendo ? <Impresion /> : <Vista vista={vista} irAVista={irAVista} />}
+                </main>
+              </div>
+            </div>
+          </VentanaCtx.Provider>
         </div>
-        {buffer && <div className="e3-buffer" role="status">Ir a la diapositiva <b>{buffer}</b> · Enter</div>}
-        {pista && pos.id === '1' && (
-          <p className="e3-pista" role="note">→ siguiente · O vista general · A anexos · ? atajos</p>
-        )}
-      </main>
-      {notas && <Notas pag={pag} paso={pos.paso} />}
-      {capa === 'general' && <VistaGeneral actual={pos.id} onIr={irDesdeCapa} onCerrar={() => setCapa(null)} />}
-      {capa === 'anexos' && (
-        <ListaAnexos actual={pos.id} origen={pag.tipo === 'anexo' ? pos.origen : null} enAnexo={pag.tipo === 'anexo'}
-                     onIr={irDesdeCapa} onVolver={() => { setCapa(null); volver() }} onCerrar={() => setCapa(null)} />
-      )}
-      {capa === 'ayuda' && <Ayuda onCerrar={() => setCapa(null)} />}
+      </div>
+      {notas && <PanelNotas vista={vista} alto={ventana.notasAlto} onVentana={abrirVentanaNotas} />}
       {negro && <div className="e3-negro" role="presentation" onClick={() => setNegro(false)} />}
-    </div>
+    </>
+  )
+}
+
+/** El encabezado del E2 (regla 12): la pregunta, grande, es el h1. A la derecha, chico, en qué vista se
+ *  está y de qué parte del documento sale. */
+function Encabezado({ vista }) {
+  const fuente = diapositivasDe(vista).map((d) => d.fuente).filter(Boolean).pop()
+  const donde = vista.respaldo ? `${vista.id} · ${vista.anexo.fuente}`
+    : `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}${fuente ? ` · ${fuente.split(' · ')[0]}` : ''}`
+  return (
+    <header className="e2-enc">
+      <h1 className="e2-preg">{vista.pregunta}</h1>
+      <div className="e2-enc-der">
+        <span className="e2-enc-corte">{donde}</span>
+        <Avance vista={vista} />
+      </div>
+    </header>
+  )
+}
+
+/** (27/10, W1) En el lugar de la miniatura del mapa de calidad del E2, el avance de la historia: una
+ *  barra por vista presentada, las ya vistas en azul claro y la actual en tinta. Mide lo mismo que la
+ *  miniatura (118 × 46 con su marco), así el encabezado tiene el alto del E2. En el respaldo, ninguna
+ *  barra se marca. */
+function Avance({ vista }) {
+  const historia = VISTAS.filter((v) => !v.respaldo)
+  const i = historia.indexOf(vista)
+  return (
+    <span className="e3-avance" aria-hidden="true"
+          title={i >= 0 ? `Vista ${i + 1} de ${historia.length}` : `Respaldo · ${vista.id}`}>
+      <span className="e3-avance-barras" style={{ gridTemplateColumns: `repeat(${historia.length}, minmax(0, 1fr))` }}>
+        {historia.map((v, j) => (
+          <i key={v.id} className={i < 0 ? '' : j < i ? 'vista' : j === i ? 'actual' : ''} />
+        ))}
+      </span>
+    </span>
+  )
+}
+
+/** El favicon 4b, igual que en el E1 y el E2. */
+const Marca = () => (
+  <svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true" style={{ flexShrink: 0 }}>
+    <path d="M16 1.5 L31 13 L31 30.5 L1 30.5 L1 13 Z" fill="var(--ink)" />
+    <rect x="6" y="17" width="5" height="9" fill="var(--azul1)" />
+    <rect x="13.5" y="20" width="5" height="6" fill="var(--azul3)" />
+    <rect x="21" y="23.5" width="5" height="2.5" fill="var(--terra)" />
+  </svg>
+)
+
+function Lateral({ indice, irA }) {
+  return (
+    <nav className="lat" aria-label="Vistas del tablero">
+      <div className="lat-marca">
+        <MarcaInicio><Marca /><span className="lat-oga">Casa Óga</span></MarcaInicio>
+        <span className="lat-sub">factibilidad: de la idea al piloto</span>
+      </div>
+
+      <ol className="lat-lista">
+        {VISTAS.map((v, i) => {
+          const grupo = grupoDe(v)
+          const abre = grupo.nombre && (i === 0 || grupoDe(VISTAS[i - 1]) !== grupo)
+          return (
+            <li key={v.id}>
+              {abre && <div className="lat-grupo"><span>{grupo.nombre}</span></div>}
+              <button type="button" onClick={() => irA(i)}
+                      className={`lat-item${i === indice ? ' on' : ''}`}
+                      aria-current={i === indice ? 'page' : undefined}>
+                <span className="lat-n tabular">{etiquetaDe(v)}</span>
+                <span className="lat-txt">{v.corto}</span>
+              </button>
+            </li>
+          )
+        })}
+      </ol>
+
+      <div className="lat-pie" title="↑ ↓ o Av Pág y Re Pág: cambiar de vista · Inicio / Fin: primera y última · N: notas del orador · B o «.»: pantalla en negro · F: pantalla completa · I: imprimir">
+        <span>↑ ↓ cambiar de vista</span>
+        <span>N: notas · B: negro</span>
+        <span>F: pantalla completa</span>
+      </div>
+    </nav>
+  )
+}
+
+/** Flujo de impresión del E2: una hoja A4 apaisada por vista. */
+function Impresion() {
+  return (
+    <ImpresionCtx.Provider value={true}>
+      <div className="impresion-flujo">
+        {VISTAS.map((v) => (
+          <div className="hoja" key={v.id}>
+            <h1 className="e2-preg">{v.pregunta}</h1>
+            <v.Componente vista={v} />
+          </div>
+        ))}
+      </div>
+    </ImpresionCtx.Provider>
   )
 }
