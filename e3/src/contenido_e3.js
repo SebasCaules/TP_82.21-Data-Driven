@@ -48,31 +48,31 @@ export const C3 = {
       "quien": "Sebastian C.",
       "tipo": "veredictos",
       "kicker": "La respuesta",
-      "titulo": "La lista mensual sale con la regla del umbral y un piloto mide si contactar sirve",
+      "titulo": "La lista sale con la regla del umbral y un piloto mide si contactar sirve",
       "tarjetas": [
         {
           "area": "Técnica",
-          "valor": "2,25",
-          "escala": "sobre 3 · factibilidad media",
-          "texto": "El límite es quién opera la lista."
+          "valor": "2,25[[/3]]",
+          "escala": "factibilidad media",
+          "texto": "El límite: quién opera la lista."
         },
         {
           "area": "Legal",
-          "valor": "2,0",
-          "escala": "sobre 3 · viable con condiciones",
+          "valor": "2,0[[/3]]",
+          "escala": "viable con condiciones",
           "texto": "Seis acciones; la lista sale filtrada."
         },
         {
           "area": "Económica",
           "valor": "No viable",
-          "escala": "ROI −99,95 % a un año · no recupera",
+          "escala": "ROI −99,95 % a un año",
           "texto": "Ni la regla sola recupera su costo."
         },
         {
           "area": "Tasa de éxito",
           "valor": "1,02 %",
-          "escala": "observada, sin grupo de control",
-          "texto": "Un techo: nadie midió el efecto del contacto."
+          "escala": "sin grupo de control",
+          "texto": "Un techo: el efecto no está medido."
         }
       ],
       "decision": "**Decisión.** La lista de 500 por mes sale con la regla del umbral, sin modelo. Un piloto de tres meses con grupo de control mide la tasa de éxito antes de invertir más.",
@@ -94,21 +94,21 @@ export const C3 = {
       "kicker": "El problema",
       "titulo": "Un cliente se va cuando pasa más días sin comprar que su propio umbral",
       "definicion": [
-        "**Umbral de cada cliente:** 1,5 veces su intervalo habitual entre compras, con un piso de 90 días.",
-        "**Se va** si en los 90 días siguientes al corte pasa su umbral. Cuenta para clientes con tres compras o más que al corte no lo pasaron.",
-        "**La pregunta del modelo:** ¿quiénes van a pasar su umbral en los próximos 90 días?",
-        "«Envío N» es la pregunta N del relevamiento que respondió Casa Óga."
+        "**Umbral** = 1,5 × su ritmo de compra, con un piso de 90 días.",
+        "**Se va** si pasa su umbral en los 90 días siguientes al corte.",
+        "**El modelo** busca a los que lo van a pasar.",
+        "«Envío N»: pregunta N del relevamiento a Casa Óga."
       ],
       "figura": "cliente.png",
       "pie_figura": "Un cliente real de validación (Parte C 7.3).",
       "cifras": [
         {
           "valor": "−35,6 %",
-          "texto": "ventas de 2025 contra 2024. El rubro: +0,3 % en 2025 y −15,0 % interanual en diciembre (CAME)"
+          "texto": "ventas de 2025 contra 2024. Rubro: +0,3 % en el año, −15,0 % en diciembre (CAME)"
         },
         {
-          "valor": "500 por mes",
-          "texto": "la lista: Marketing puede contactar de 500 a 800 (envío 29)"
+          "valor": "500[[/mes]]",
+          "texto": "clientes que Marketing puede contactar: de 500 a 800 (envío 29)"
         }
       ],
       "fuente": "Parte A 2.1 · Parte C 6.5 y 7.3",
@@ -131,20 +131,20 @@ export const C3 = {
       "pie_figura": "Escala de la cátedra: 2,1 a 2,5 es factibilidad media.",
       "filas": [
         {
-          "rotulo": "Datos · 3",
-          "texto": "4.636 positivos para entrenar; la alerta es 50 a 100. Críticas: transacciones e identidad unificada."
+          "rotulo": "Datos",
+          "texto": "4.636 casos para entrenar; la alerta es 50 a 100. Críticas: transacciones e identidad."
         },
         {
-          "rotulo": "Calidad · 2",
-          "texto": "44,8 % de las ventas no tiene cliente: el modelo solo ve a quien se identifica."
+          "rotulo": "Calidad",
+          "texto": "44,8 % de las ventas no tiene cliente identificado."
         },
         {
-          "rotulo": "Infraestructura · 2",
-          "texto": "Sin servidor ni BI: cada sistema se exporta a mano una vez por mes."
+          "rotulo": "Infraestructura",
+          "texto": "Sin servidor ni BI: exportación manual cada mes."
         },
         {
-          "rotulo": "Capacidad humana · 2",
-          "texto": "El piloto lo opera el equipo consultor (inferido del envío 71); antes del tercer mes, Casa Óga elige analista o soporte."
+          "rotulo": "Capacidad humana",
+          "texto": "Casa Óga no tiene quien opere la lista: en el piloto, el equipo (envío 71)."
         }
       ],
       "nota": "El proyecto anterior se cortó porque «no quedó un responsable claro de mantenerlos» (envío 15).",
@@ -166,38 +166,38 @@ export const C3 = {
       "titulo": "El MVP es una planilla mensual hecha con software libre",
       "pasos": [
         {
-          "titulo": "Exportación mensual",
-          "texto": "Operaciones o Marketing exportan a mano, con un mismo corte."
+          "titulo": "Exportación",
+          "texto": "A mano, cada mes, con un mismo corte."
         },
         {
           "titulo": "Control del mes",
-          "texto": "Un mes con menos del 60 % de las operaciones del año anterior no se usa."
+          "texto": "Con menos del 60 % de las operaciones, no se usa."
         },
         {
-          "titulo": "Pipeline en Python",
-          "texto": "Las 15 decisiones de calidad del Entregable 2 arman el dataset."
+          "titulo": "Pipeline",
+          "texto": "Las 15 decisiones de calidad del E2."
         },
         {
-          "titulo": "Regla del umbral",
-          "texto": "Ordena por los días que faltan para pasar el umbral; salen 500."
+          "titulo": "Regla",
+          "texto": "Ordena por días para pasar el umbral: salen 500."
         },
         {
-          "titulo": "Planilla para Marketing",
-          "texto": "Sin quien no aceptó marketing o pidió la baja. Sofía R. decide a quién se contacta."
+          "titulo": "Planilla",
+          "texto": "Sin bajas ni sin consentimiento. Decide Sofía R."
         }
       ],
       "hechos": [
         {
           "valor": "USD 0",
-          "texto": "en licencias: Python, una planilla y un tablero HTML"
+          "texto": "en licencias"
         },
         {
           "valor": "1 computadora",
-          "texto": "para el operador, con acceso restringido"
+          "texto": "para el operador"
         },
         {
           "valor": "Después del piloto",
-          "texto": "la exportación automática, si el piloto demuestra valor (envío 14)"
+          "texto": "la exportación automática (envío 14)"
         }
       ],
       "fuente": "Parte A 1.5 y 1.6",
@@ -215,19 +215,19 @@ export const C3 = {
       "kicker": "Modelado · Etapas 1 y 2",
       "titulo": "Ningún modelo le gana a la regla por más que el ruido",
       "figura": "modelos.png",
-      "pie_figura": "Precisión de la lista de 500 sin filtrar. Entrenamiento de enero de 2023 a abril de 2024, validación de julio a septiembre de 2024; el test de 2025 queda para la etapa 4.",
+      "pie_figura": "Lista de 500, sin filtrar. Entrena con enero de 2023 a abril de 2024, valida con julio a septiembre de 2024; el test de 2025 queda para la etapa 4.",
       "callouts": [
         {
           "titulo": "+0,89 puntos",
-          "texto": "La logística sobre la regla: 13,3 aciertos más en 1.500 contactos. El intervalo del 95 %, de −0,21 a +1,91, incluye el cero."
+          "texto": "13,3 aciertos más en 1.500 contactos. El intervalo, de −0,21 a +1,91, incluye el 0."
         },
         {
           "titulo": "Candidata: la logística",
-          "texto": "Es interpretable. Pesan los días entre compras (−5,07) y los días sin comprar (+2,34): la regla."
+          "texto": "Interpretable: pesan las variables de la regla (−5,07 y +2,34)."
         },
         {
           "titulo": "Memoriza",
-          "texto": "En entrenamiento ni una lista perfecta pasa de 66,3 %. El gradient boosting llega a 66,0 % y en validación empata con la regla."
+          "texto": "El boosting llega a 66,0 % en entrenamiento, con un techo de 66,3 %, y en validación empata."
         }
       ],
       "fuente": "Parte A 2.2 y 2.5 · Parte B 4.1 a 4.5",
@@ -256,15 +256,15 @@ export const C3 = {
       "callouts": [
         {
           "titulo": "Ajuste",
-          "texto": "Cuatro pliegues temporales con embargo. El gradient boosting baja de 18,1 a 6,4 puntos la diferencia entre entrenamiento y validación. La logística queda en 82,6 % sin filtro."
+          "texto": "4 pliegues temporales con embargo. Sobreajuste del boosting: de 18,1 a 6,4 puntos. Logística: 82,6 % sin filtro."
         },
         {
-          "titulo": "La lista que se puede mandar",
-          "texto": "Sin filtro, 483 de 1.500 lugares no aceptan marketing o pidieron la baja. Con 500 contactables por mes, la regla acierta 75,8 % y la logística 73,9 %."
+          "titulo": "Lista contactable",
+          "texto": "483 de 1.500 lugares no se pueden contactar. Con 500 contactables: regla 75,8 %, logística 73,9 %."
         },
         {
           "titulo": "Control de fuga",
-          "texto": "De 43 variables, 3 salen (la foto de fidelización) y 3 se recalculan con envíos hasta T − 7: las 40 que quedan no usan datos posteriores al corte."
+          "texto": "De 43 variables, 3 salen y 3 se recalculan: las 40 que quedan no miran después del corte."
         }
       ],
       "fuente": "Parte A 2.3 · Parte C 7.1 a 7.3",
@@ -285,29 +285,29 @@ export const C3 = {
       "quien": "Francisco C.",
       "tipo": "economia",
       "kicker": "Parte B · Factibilidad económica",
-      "titulo": "Aun en su mejor caso, el modelo suma USD 5,38 por año y cuesta USD 10.400 más",
+      "titulo": "En su mejor caso, el modelo suma USD 5,38 al año y cuesta USD 10.400 más",
       "celdas": [
         {
           "celda": "Acierto",
           "valor": "ARS 99,96",
-          "texto": "Vuelve 1 de cada 98 que se iban a ir, con su margen anual menos el descuento."
+          "texto": "Vuelve 1 de cada 98, con su margen menos el descuento."
         },
         {
           "celda": "Falso positivo",
           "valor": "ARS −47,21",
-          "texto": "El WhatsApp (ARS 25) y el descuento que usa quien iba a comprar igual."
+          "texto": "WhatsApp (ARS 25) y descuento a quien iba a comprar igual."
         },
         {
           "celda": "Falso negativo",
           "valor": "0",
-          "texto": "Ese cliente se pierde igual sin el proyecto."
+          "texto": "Se pierde igual sin proyecto."
         }
       ],
-      "cadena": "**Modelo contra regla:** 13,3 aciertos más en tres meses, cada uno con un falso positivo menos, valen USD 5,38 por año (lista sin filtrar).",
-      "filtro": "Con la lista que se puede mandar, la regla deja USD 264,54 por año y la logística 252,84: el modelo queda USD 11,70 debajo (anexo A2).",
+      "cadena": "**Modelo − regla:** 13,3 aciertos más en tres meses = USD 5,38 por año (lista sin filtrar).",
+      "filtro": "**Lista contactable:** regla USD 264,54 contra logística 252,84 por año. El modelo queda USD 11,70 abajo.",
       "callout": {
         "titulo": "Umbral de viabilidad",
-        "texto": "Cada punto de precisión sobre la regla vale USD 6,05 por año. Pagar USD 10.400 pide 1.719 puntos; con la regla en 81,6 %, hasta una lista perfecta quedan 18,4."
+        "texto": "1 punto de precisión = USD 6,05 por año. Hasta una lista perfecta quedan 18,4 puntos."
       },
       "fuente": "Parte B 3.3, 3.5 y 4.4 · Parte C 7.2",
       "ids": [
@@ -335,14 +335,39 @@ export const C3 = {
       "callouts": [
         {
           "titulo": "ROI a un año: no recupera",
-          "texto": "Modelo sobre la regla: −100,00 %, −99,95 % y −99,81 %. Regla sola: −100,12 %, −98,52 % y −96,76 %. Del escenario conservador al optimista."
+          "texto": ""
         },
         {
           "titulo": "49,6 %",
-          "texto": "de los contactados que se iban a ir tendría que volver para que la regla se pague: 48,6 veces el 1,02 % observado."
+          "texto": "de los que se iban tendría que volver para pagar la regla. Hoy se ve 1,02 %."
         }
       ],
-      "decision": "**Veredicto: no viable tal como está planteado.** Ningún supuesto de la sensibilidad lleva el ROI a 0. El de la regla depende de la tasa de éxito, que no está medida.",
+      "roi": {
+        "columnas": [
+          "Conservador",
+          "Esperado",
+          "Optimista"
+        ],
+        "filas": [
+          [
+            "Modelo − regla",
+            [
+              "−100,00 %",
+              "−99,95 %",
+              "−99,81 %"
+            ]
+          ],
+          [
+            "Regla sola",
+            [
+              "−100,12 %",
+              "−98,52 %",
+              "−96,76 %"
+            ]
+          ]
+        ]
+      },
+      "decision": "**No viable tal como está planteado.** Ningún supuesto lleva el ROI a 0; el de la regla depende de la tasa de éxito, que no está medida.",
       "fuente": "Parte B 3.2 y 3.4 a 3.6",
       "ids": [
         "G38",
@@ -385,13 +410,13 @@ export const C3 = {
         }
       ],
       "promedio": {
-        "valor": "2,0",
+        "valor": "2,0[[/3]]",
         "texto": "viable con condiciones"
       },
       "escala": "Escala de la cátedra: 1,6 a 2,5 es viable con condiciones.",
       "alerta": {
         "valor": "30,1 %",
-        "texto": "de los envíos de 2022 a 2025 fue a clientes que no aceptaron marketing; la plataforma no los filtra."
+        "texto": "de los envíos de 2022 a 2025 fue a quien no aceptó marketing."
       },
       "plan": [
         {
@@ -435,7 +460,7 @@ export const C3 = {
           ]
         }
       ],
-      "nota": "Normas: Ley 25.326, Res. AAIP 161/2023, ARCA y seguridad de la información. El equipo sumó la transferencia internacional (el CRM está fuera del país) y el registro No Llame (Ley 26.951).",
+      "nota": "**Normas:** Ley 25.326 · Res. AAIP 161/2023 · ARCA · seguridad de la información · **+** transferencia internacional · **+** No Llame (Ley 26.951). **+** las sumó el equipo.",
       "fuente": "Parte C 5.1 a 5.4",
       "ids": [
         "H40",
@@ -461,15 +486,15 @@ export const C3 = {
           "filas": [
             {
               "rotulo": "Qué se mide",
-              "texto": "compra a 7 días de los contactados menos la del grupo de control"
+              "texto": "compra a 7 días: contactados menos control"
             },
             {
               "rotulo": "Umbral",
-              "texto": "40,4 puntos al tercer mes: el 49,6 % de la diapositiva 9, sobre todos los contactados"
+              "texto": "**40,4 puntos** al tercer mes (el 49,6 % de la 9, sobre todos los contactados)"
             },
             {
               "rotulo": "Quién",
-              "texto": "Juan Manuel R., al cierre de cada mes"
+              "texto": "Juan Manuel R., cada mes"
             }
           ]
         },
@@ -479,11 +504,11 @@ export const C3 = {
           "filas": [
             {
               "rotulo": "Qué se mide",
-              "texto": "la opción que elige María G. por escrito: analista part-time o soporte"
+              "texto": "la opción que elige María G.: analista part-time o soporte"
             },
             {
               "rotulo": "Umbral",
-              "texto": "elegida antes del tercer mes, para que no quede un mes sin lista"
+              "texto": "**antes del mes 3**, para no quedar un mes sin lista"
             },
             {
               "rotulo": "Quién",
@@ -497,11 +522,11 @@ export const C3 = {
           "filas": [
             {
               "rotulo": "Qué se mide",
-              "texto": "clientes de la planilla sin consentimiento o con pedido de baja"
+              "texto": "clientes sin consentimiento o con baja en la planilla"
             },
             {
               "rotulo": "Umbral",
-              "texto": "1 cliente y la planilla no sale"
+              "texto": "**1 cliente** y la planilla no sale"
             },
             {
               "rotulo": "Quién",
@@ -510,7 +535,7 @@ export const C3 = {
           ]
         }
       ],
-      "nota": "Limitaciones: solo ve clientes identificados, no distingue compradores profesionales, usa datos hasta el 31/12/2025 y el efecto del piloto no vale para el 20 % de mayor facturación. Los 13 riesgos, en el anexo A4.",
+      "nota": "**Límites:** solo clientes identificados · no distingue compradores profesionales · datos al 31/12/2025 · el piloto no mide al 20 % de mayor facturación. Los 13 riesgos: anexo A4.",
       "fuente": "Parte C 6.2 a 6.5",
       "ids": [
         "H49",
@@ -530,15 +555,15 @@ export const C3 = {
       "titulo": "Un piloto de tres meses con grupo de control decide si se invierte más",
       "figura": "piloto.png",
       "hechos": [
-        "**1.260 contactados y 240 sin contactar** en tres meses: 80 por mes de control, fuera de los de mayor valor (envío 45), que el equipo define como el 20 % de mayor facturación.",
-        "**Costo:** USD 1.350 de horas, dentro del presupuesto, y USD 46,79 de acciones, que paga Marketing."
+        "**1.260** contactados · **240** de control: 80 por mes, fuera de los de mayor valor (envío 45)",
+        "**USD 1.350** de horas + **USD 46,79** de acciones, que paga Marketing"
       ],
-      "pedidos_titulo": "Lo que Sebastian C. presenta a María G. con esta entrega",
+      "pedidos_titulo": "Para que decida María G.",
       "pedidos": [
-        "La definición del target, que revisa Sofía R. (envío 17).",
-        "El alcance: regla sin modelo y piloto. De lo que siga, Casa Óga dijo «lo evaluaríamos como una segunda etapa si el piloto demuestra valor» (envío 14).",
-        "Quién opera: el equipo consultor en el piloto (inferido del envío 71); Casa Óga elige operador antes del tercer mes.",
-        "El grupo de control, que revisa Sofía R.",
+        "El target (lo revisa Sofía R., envío 17).",
+        "El alcance: regla y piloto; lo que siga, «si el piloto demuestra valor» (envío 14).",
+        "Quién opera: el equipo en el piloto (inferido del envío 71); después, quien elija Casa Óga.",
+        "El grupo de control (lo revisa Sofía R.).",
         "Quién inscribe las bases en la AAIP (L1)."
       ],
       "nota": "Sigue la Parte D: evaluación en test (etapa 4), diseño de la solución y go-live.",

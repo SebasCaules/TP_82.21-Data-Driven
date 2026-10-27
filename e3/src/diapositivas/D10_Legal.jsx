@@ -23,7 +23,7 @@ export default function Legal({ d }) {
         </div>
       ))}
       <div className="e3-promedio" style={caja(M, Y0 + 44 + 5 * 52 + 4, wl, 64)}>
-        <span>Promedio: {d.promedio.texto}</span><b>{d.promedio.valor}</b>
+        <span>Promedio: {d.promedio.texto}</span><b><Rico t={d.promedio.valor} /></b>
       </div>
       <p className="e3-escala-legal" style={caja(M, Y0 + 44 + 5 * 52 + 74, wl)}><Rico t={d.escala} /></p>
       <div className="e3-alerta" style={caja(M, Y0 + 44 + 5 * 52 + 110, wl, 148)}>

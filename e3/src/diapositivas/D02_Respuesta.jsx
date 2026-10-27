@@ -2,7 +2,7 @@
 // a la 4, Legal a la 10, Económica a la 8 y la tasa de éxito a la 9. La tarjeta no es un botón:
 // el clic en la franja derecha o izquierda pasa de diapositiva, como en las demás. (26/10) La tasa de
 // éxito avisa con la banda terracota y la cifra en tinta: el rojo de la cifra queda solo para «No viable».
-import { Rico } from '../texto.jsx'
+import { Rico, plano } from '../texto.jsx'
 import Marco, { ANCHO, M, QuienN, Y0, caja } from './Marco.jsx'
 
 // Por el área de C3; si el texto cambia, por el orden de las tarjetas.
@@ -24,7 +24,7 @@ export default function Respuesta({ d, ir, estatico }) {
           <div key={t.area} className={`e3-tarjeta e3-veredicto ${malo ? 'malo' : ''} ${ALERTA.has(t.area) ? 'alerta' : ''}`}
                style={caja(M + k * (w + sep), Y0, w, 396)}>
             <span className="e3-rotulo">{t.area}</span>
-            <span className={`e3-veredicto-valor ${t.valor.length > 6 ? 'largo' : ''}`}><Rico t={t.valor} /></span>
+            <span className={`e3-veredicto-valor ${plano(t.valor).length > 6 && !t.valor.includes('[[') ? 'largo' : ''}`}><Rico t={t.valor} /></span>
             <span className="e3-veredicto-escala"><Rico t={t.escala} /></span>
             <span className="e3-veredicto-texto"><Rico t={t.texto} /></span>
             <button type="button" className="e3-ir" tabIndex={estatico ? -1 : 0}

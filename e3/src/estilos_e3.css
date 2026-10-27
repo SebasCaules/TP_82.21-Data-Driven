@@ -602,3 +602,19 @@
   color: var(--acc); border: 1px solid var(--acc); border-radius: 3px;
 }
 .e3-notas-ayuda { margin: 6px 0 0; color: var(--mut); font-size: 14px; }
+
+/* ---------- 27/10: cifra grande, unidad chica ---------- */
+/* «2,25/3», «500/mes»: la cifra lleva el mensaje y la unidad la acompaña, más chica y en gris. */
+small.e3-chico { font-size: max(.42em, 18px); font-weight: 600; color: var(--mut); margin-left: .06em; letter-spacing: 0; }
+.e3-promedio small.e3-chico { color: var(--azul3); }
+.e3-fila-p { display: inline-block; min-width: 64px; margin-right: 8px; font: 700 40px/1 var(--fuente); color: var(--acc); }
+.e3-riesgo-texto strong { font-size: 1.35em; color: var(--acc); }
+.e3-riesgo.malo .e3-riesgo-texto strong { color: var(--terra); }
+.e3-hechos strong { font-size: 1.55em; color: var(--acc); }
+.e3-roi { width: 100%; margin-top: 8px; border-collapse: collapse; font: 400 20px/1.25 var(--fuente); font-variant-numeric: tabular-nums; }
+.e3-roi td, .e3-roi thead th { white-space: nowrap; }
+.e3-roi th { font-weight: 600; color: var(--lbl); text-align: right; padding: 4px 8px; font-size: 18px; }
+.e3-roi tbody th { text-align: left; color: var(--ink); font-size: 19px; }
+.e3-roi td { text-align: right; padding: 5px 8px; color: var(--terra); border-top: 1px solid var(--bd); }
+.e3-roi td.base { font-weight: 700; }
+

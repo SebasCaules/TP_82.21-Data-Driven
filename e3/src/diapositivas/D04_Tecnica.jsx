@@ -50,7 +50,7 @@ function Grafico({ activa, setActiva, estatico }) {
 
 export default function Tecnica({ d, estatico }) {
   const [activa, setActiva] = useState(null)
-  const filas = d.filas.map((f, k) => ({ ...f, id: T.condiciones[k]?.id }))
+  const filas = d.filas.map((f, k) => ({ ...f, id: T.condiciones[k]?.id, puntaje: T.condiciones[k]?.puntaje }))
   return (
     <Marco kicker={d.kicker} titulo={d.titulo} fuente={d.fuente} n={d.n} derecha={<QuienN quien={d.quien} n={d.n} />}>
       <figure className="e3-figura" style={caja(M, Y0 + 12, 672, 290)}>
@@ -63,7 +63,8 @@ export default function Tecnica({ d, estatico }) {
         {filas.map((f) => (
           <div key={f.rotulo} className={`e3-fila ${activa === f.id ? 'on' : ''}`}
                onMouseEnter={() => setActiva(f.id)} onMouseLeave={() => setActiva(null)}>
-            <p className="e3-fila-rotulo"><Rico t={f.rotulo} /></p>
+            {/* (27/10) El puntaje grande, con «/3» chico, en lugar de «Datos · 3». */}
+            <p className="e3-fila-rotulo"><b className="e3-fila-p">{f.puntaje}<small className="e3-chico">/3</small></b> <Rico t={f.rotulo} /></p>
             <p className="e3-fila-texto"><Rico t={f.texto} /></p>
           </div>
         ))}

@@ -173,10 +173,20 @@ export default function Tasa({ d, estatico }) {
         </div>
       </div>
       <div className="e3-llamadas" style={caja(966, Y0, 562)}>
-        {d.callouts.map((c) => (
+        {d.callouts.map((c, k) => (
           <div key={c.titulo} className="e3-llamada" style={{ height: 236 }}>
             <p className="e3-llamada-titulo"><Rico t={c.titulo} /></p>
-            <p className="e3-llamada-texto"><Rico t={c.texto} /></p>
+            {/* (27/10) El ROI por escenario en tabla, no en una frase con seis porcentajes. */}
+            {k === 0 && d.roi ? (
+              <table className="e3-roi">
+                <thead><tr><th />{d.roi.columnas.map((x) => <th key={x}>{x}</th>)}</tr></thead>
+                <tbody>
+                  {d.roi.filas.map(([nombre, vals]) => (
+                    <tr key={nombre}><th>{nombre}</th>{vals.map((v, j) => <td key={j} className={j === 1 ? 'base' : ''}>{v}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : <p className="e3-llamada-texto"><Rico t={c.texto} /></p>}
           </div>
         ))}
       </div>

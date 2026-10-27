@@ -24,7 +24,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "0512ceb0e364e037fd0f63518558a138d914543459b24da4e46b5dc2c10e6ab6"
+   "sha256": "07dcd07b3115f76949ff418569cfc94ff11190d9fe74ecf4ff9dea77ead68d3f"
   }
  },
  "caso": {
@@ -1319,25 +1319,25 @@ export const D3 = {
   },
   {
    "id": "F16",
-   "nombre": "técnica: puntaje datos",
+   "nombre": "técnica: rótulo datos",
    "documento": true,
    "donde": "A 1.2 · C3 d4 filas"
   },
   {
    "id": "F16",
-   "nombre": "técnica: puntaje calidad",
+   "nombre": "técnica: rótulo calidad",
    "documento": true,
    "donde": "A 1.2 · C3 d4 filas"
   },
   {
    "id": "F16",
-   "nombre": "técnica: puntaje infraestructura",
+   "nombre": "técnica: rótulo infraestructura",
    "documento": true,
    "donde": "A 1.2 · C3 d4 filas"
   },
   {
    "id": "F16",
-   "nombre": "técnica: puntaje capacidad_humana",
+   "nombre": "técnica: rótulo capacidad_humana",
    "documento": true,
    "donde": "A 1.2 · C3 d4 filas"
   },

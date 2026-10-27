@@ -12,13 +12,16 @@ export function sinCortes(t) {
     .replace(/\b(USD|ARS) /g, `$1${NBSP}`)
 }
 
-/** Texto de C3 con sus negritas. */
+/** Texto de C3 con sus negritas y, desde el 27/10, [[unidad chica]] pegada a una cifra grande («2,25[[/3]]»). */
 export function Rico({ t }) {
   if (!t) return null
-  const partes = sinCortes(t).split(/(\*\*.+?\*\*)/)
-  return partes.map((p, i) =>
-    p.startsWith('**') && p.endsWith('**') ? <strong key={i}>{p.slice(2, -2)}</strong> : p || null)
+  const partes = sinCortes(t).split(/(\*\*.+?\*\*|\[\[.+?\]\])/)
+  return partes.map((p, i) => {
+    if (p.startsWith('**') && p.endsWith('**')) return <strong key={i}>{p.slice(2, -2)}</strong>
+    if (p.startsWith('[[') && p.endsWith(']]')) return <small key={i} className="e3-chico">{p.slice(2, -2)}</small>
+    return p || null
+  })
 }
 
 /** El texto sin marcado, para un title o un aria-label. */
-export const plano = (t) => (t || '').replace(/\*\*/g, '')
+export const plano = (t) => (t || '').replace(/\*\*/g, '').replace(/\[\[|\]\]/g, '')

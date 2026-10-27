@@ -150,8 +150,10 @@ def armar_tecnica(e2: dict, co: dict, c3: dict) -> dict:
     filas_d4 = [f["rotulo"] for f in next(d for d in c3["DIAPOSITIVAS"] if d["n"] == 4)["filas"]]
     rotulos = {"datos": "Datos", "calidad": "Calidad", "infraestructura": "Infraestructura",
                "capacidad_humana": "Capacidad humana"}
-    for i, _, p in CONDICIONES:
-        ancla("F16", f"técnica: puntaje {i}", f"{rotulos[i]} · {p}" in filas_d4, True, donde="A 1.2 · C3 d4 filas")
+    # (27/10) El puntaje de cada fila de la 4 lo dibuja la web desde D3 («3/3»); C3 solo trae el rótulo, en el
+    # mismo orden que las condiciones.
+    for k, (i, _, p) in enumerate(CONDICIONES):
+        ancla("F16", f"técnica: rótulo {i}", filas_d4[k] == rotulos[i], True, donde="A 1.2 · C3 d4 filas")
     ancla("G10", "técnica: positivos para entrenar", tec["positivos_entrenamiento"], "4.636", 0, donde="A 1.1", c3="d4")
     ancla("C19", "técnica: ventas sin cliente (%)", tec["ventas_sin_cliente_pct"], "44,8", 1, donde="A 1.2", c3="d4")
     return tec
