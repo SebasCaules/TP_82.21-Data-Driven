@@ -43,8 +43,12 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
    1536 × 864, dos por fila, para mirarla de una vez.
 7. (27/10, W3) Datos de la Parte D, sin navegador: D3 trae las filas J01 a J22, J50 a J52 y las cinco cifras de las
    vistas 2 y 6 que antes solo tenía C3 (C14, C08, H40, C18, J22); cada valor, escrito con formato.js, da lo que
-   dice el registro, y los del test coinciden con data/e3/etapa4.json. En pantalla, la vista 7 (si ya no es
-   esqueleto) escribe la precisión del test del modelo y de la regla (J03).
+   dice el registro, y los del test coinciden con data/e3/etapa4.json.
+8. (27/10, crítica del W3, hallazgo 13) El respaldo y los paneles de «Explorar», en cada resolución: cada anexo A1
+   a A7 y los paneles que la crítica encontró mal (la vista 4 en test y en validación, la 7 al llegar, la A2 y la
+   A7 en cada medición) escriben lo que dicen D3 y C3, y no escriben lo que la crítica sacó (la logística de la
+   Parte B rotulada «ajustada», la fila 12 de la C 6.2 sin la D 11.2, «diapositivas», «(L3 a L5)», el grupo de
+   control como decisión de María G.). La precisión del test (J03) se lee ahora en la vista 4, «Explorar», «Test».
 
 Termina con «E3 OK» o con la lista de problemas y código 1.
 """
@@ -187,10 +191,12 @@ def contenido_esperado():
                  f"{tramo_t['nivel'].lower()} · {fijo(tramo_t['desde'], 1)} a {fijo(tramo_t['hasta'], 1)}"]),
         # W3: la vista 4 decide con el test (Parte D 8.2 y 11.1): sin filtrar, en la lista que sale y lo que tendría
         # que dar para pagarse; el gráfico, la diferencia con su intervalo en validación y en test.
+        # (crítica del W3, hallazgo 3) la fila «Sin filtrar · validación» es H06, la logística ajustada, no G17.
         "v04": ("C-MOD", [fijo(TE["sin_filtro"]["diferencia_pp"], 2, True),
                           fijo(TE["contra_regla"]["diferencia_pp"], 2, True),
                           fijo(TE["decision"]["aciertos_por_mes_para_pagar"])],
-                [fijo(x, 2, True) for x in (MD["contra_regla"]["diferencia_pp"], TE["sin_filtro"]["diferencia_pp"],
+                [fijo(x, 2, True) for x in (D3["lista"]["modelo_menos_regla_500_sin_filtro"]["diferencia_pp"],
+                                            TE["sin_filtro"]["diferencia_pp"],
                                             TE["contra_regla"]["validacion_diferencia_pp"],
                                             TE["contra_regla"]["diferencia_pp"])]),
         "v05": ("B-ECO", [usd(E["observada"]["modelo_usd"], 2), pct_directo(E["observada"]["modelo_roi_pct"], 2),
@@ -199,11 +205,12 @@ def contenido_esperado():
         "v06": ("C-LEG", [plano(dia[10]["promedio"]["valor"]), plano(dia[10]["alerta"]["valor"]),
                           f"{len(a4['destacar'])} de {len(a4['filas'])}"],
                 [f"{m.group(3)} · {m.group(1)} a {m.group(2)}"] if m else []),
-        # W3: la Parte D y el piloto. La regla en test (J03), lo que el piloto tiene que dar para ir a producción
-        # (H49) y las semanas hasta decidir (J50); el gráfico, la regla de decisión del piloto (G49, H49).
-        "v07": ("D-PRO", [pct(TE["metodos"]["regla"]["test"]["precision"], 1), fijo(P["umbral_produccion_pp"], 1),
-                          f"{fijo(PL['semanas'])} semanas"],
-                [fijo(P["diferencia_detectable_pp"], 2), fijo(P["umbral_produccion_pp"], 1)]),
+        # W3: la Parte D y el piloto. Desde la crítica del W3 (hallazgo 5), el tamaño del piloto (G49) en lugar de la
+        # regla en test, lo que tiene que dar para ir a producción (H49) y las semanas hasta decidir (J50); el
+        # gráfico, la regla de decisión del piloto (G49, H49). La decisión es D-PIL (hallazgo 12).
+        "v07": ("D-PIL", [fijo(P["tratados"]), fijo(P["umbral_produccion_pp"], 1), f"{fijo(PL['semanas'])} semanas"],
+                [fijo(P["diferencia_detectable_pp"], 2), fijo(P["umbral_produccion_pp"], 1),
+                 "no se distingue de cero", "María G. elige"]),
     }
     out = {}
     for v, (id_, cifras, grafico) in esperado.items():
@@ -406,24 +413,97 @@ def anclas_datos():
     return mal
 
 
-# Lo que la vista 7 tiene que escribir cuando deja de ser esqueleto: la métrica principal del test del modelo y de
-# la regla (J03). La banda, la decisión y el gráfico los fija quien la construye; esto es lo mínimo.
-def pantalla_d_esperada():
-    T = leer_js("datos_e3.js", "D3")["test"]["metodos"]
-    return {"v07": [pct(T["logistica_ajustada"]["test"]["precision"], 1), pct(T["regla"]["test"]["precision"], 1)]}
+# ---------------------------------------------------------------- 8. respaldo y «Explorar» (crítica del W3)
+
+def respaldo_esperado():
+    """(vista, opción de «Explorar» o None, textos que tiene que escribir, textos que no puede escribir), calculado
+    desde D3 y C3. Con opción, se abre «Explorar» y se elige la opción con ese texto ("" = solo abrir)."""
+    D3 = leer_js("datos_e3.js", "D3")
+    C3 = leer_js("contenido_e3.js", "C3")
+    anexo = {a["n"]: a for a in C3["ANEXOS"]}
+    T, MD, E, P, PL, LE = D3["test"], D3["modelos"], D3["economia"], D3["piloto"], D3["plan"], D3["legal"]
+    M = {k: T["metodos"][k]["test"] for k in ("regla", "logistica_ajustada", "practica_actual")}
+    seg = {f["id"]: f for f in T["segmentos"]["filas"]}
+    roi = {f["fila"]: f for f in T["roi_b_3_4"]}
+    logb = next(f for f in MD["filas"] if f["id"] == "logistica")
+    hs = PL["hitos_semana"]
+    a1 = anexo["A1"]
+    filas_a1 = [f[a1["columnas"].index("Filas")] for f in a1["filas"]]
+    a2 = anexo["A2"]
+    prec_a2 = [f[a2["columnas"].index("Precisión")] for f in a2["filas"]]
+    a6 = anexo["A6"]
+    return [
+        # la vista 4: el test que antes estaba en la 7 (J03, J17) y la logística de la Parte B con su nombre
+        ("v04", "Test", ["Precisión de la lista de 500 contactables por mes, en test"]
+         + [pct(m["precision"], 1) for m in M.values()], []),
+        ("v04", "Validación", ["Logística de la Parte B", pct(logb["validacion"]["precision"], 1), "lugares"],
+         ["contactos"]),
+        # la vista 7 al llegar: lo que decide María G. con su semana (D 12.3 y 12.4)
+        ("v07", None, ["Lo que decide María G."] + [f"· semana {hs[k]}\n" for k in (
+            "alcance", "regla_y_operador_del_piloto", "acciones_legales_y_control", "operador_despues_del_piloto",
+            "decision")], ["El grupo de control", "lo revisa Sofía R.", "quien elija Casa Óga"]),
+        ("v07", "", ["El equipo; el resumen por local, Sofía R."], [f"{P['meses']} listas, del"]),
+        # la vista 5: de qué lista es el beneficio de la regla (G41)
+        ("v05", None, ["lista de 500 sin filtro en validación"], []),
+        # el respaldo
+        ("a1", None, [f"test medido una vez, el {T['apertura']['fecha'][8:10]}/{T['apertura']['fecha'][5:7]}/"
+                      f"{T['apertura']['fecha'][:4]}"] + filas_a1
+         + [fijo(T["entrenamiento"]["filas"]), fijo(T["entrenamiento"]["positivos"]), pct(T["entrenamiento"]["tasa"], 2)],
+         [pct(T["entrenamiento"]["tasa"], 1)]),
+        ("a2", None, ["la que sale: " + a2["filas"][a2["destacar"][0]][a2["columnas"].index("Precisión")],
+                      "Logística, lista de 500 contactables"] + prec_a2, []),
+        ("a2", "", ["lugares"], ["contactos"]),
+        ("a3", None, ["escenario base de la B 3.4 (vista 5)",
+                      pct_directo(roi["modelo_sobre_la_regla"]["contactables"]["roi_pct"], 2),
+                      pct_directo(roi["regla_sin_modelo"]["contactables"]["roi_pct"], 2)], ["diapositiva"]),
+        ("a4", None, [f"{fijo(LE['riesgos_criticos'])} críticos de {fijo(LE['riesgos'])}",
+                      f"La lista acierta menos en el 20 % de mayor facturación "
+                      f"({fijo(seg['alto_valor']['diferencia_pp'], 1, True)} puntos en test)"],
+         ["en mujeres, en alto valor"]),
+        ("a5", None, ["Logística ajustada, lista de 500 sin filtro", "lugares en la lista de test",
+                      f"en test, mujeres {pct(seg['mujeres']['precision'], 1)} y hombres "
+                      f"{pct(seg['hombres']['precision'], 1)}; género X, {fijo(seg['genero_x']['en_lista'])} lugares, "
+                      f"{pct(seg['genero_x']['precision'], 1)}"]
+         + [fijo(f["diferencia_pp"], 1, True) for f in seg.values()], []),
+        ("a6", None, [usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
+                      usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"])]
+         + [f[a6["columnas"].index("Con modelo (USD)")] for f in a6["filas"]], ["(L3", "L3 a L5"]),
+        ("a7", None, ["Regresión logística (Parte B)", fijo(E["matrices"]["modelo"]["vp"]),
+                      fijo(E["matrices"]["regla"]["vp"], 2), "empates del último puesto"], ["Logística ajustada"]),
+        ("a7", "Test", ["Logística ajustada", fijo(M["logistica_ajustada"]["vp"]), fijo(M["regla"]["vp"], 2)],
+         ["Regresión logística (Parte B)"]),
+    ]
 
 
-def contenido_d(p: Pagina, esperado_d):
-    for id_, textos in esperado_d.items():
+def respaldo(p: Pagina, casos):
+    for id_, opcion, deben, no_deben in casos:
+        # pasar por otra vista: con el mismo hash la vista no se monta de nuevo y «Explorar» seguiría abierto
+        p.ir("v01" if id_ != "v01" else "v02")
         p.ir(id_)
-        if p.pg.evaluate(CHEQUEO)["esqueleto"]:
-            continue
+        estado = "al llegar"
+        if opcion is not None:
+            p.pg.locator(".cuerpo .e3-explorar").click()
+            p.quieto(80)
+            estado = "Explorar"
+            if opcion:
+                p.pg.locator(".cuerpo .e3-opciones [role=radio]", has_text=opcion).first.click()
+                p.quieto(80)
+                estado = f"Explorar, «{opcion}»"
         r = p.pg.evaluate(LEER_VISTA)
-        pantalla = norm(r["pantalla"])
-        for x in textos:
-            if norm(x) not in pantalla:
-                p.mal(f"{id_}: en pantalla no está «{norm(x)}» (etapa 4, J03)")
-        revisar_estado(p, id_, "al llegar", r)
+        # todo en un renglón (una celda partida en dos se lee entera); lo que termina en «\n» se busca al final de un
+        # renglón de la pantalla («semana 1» no es «semana 13»)
+        # sin distinguir mayúsculas: innerText aplica el text-transform de los rótulos (.kpi-lbl)
+        plano_ = norm(r["pantalla"]).casefold()
+        renglones_ = "\n".join(norm(x) for x in r["pantalla"].split("\n")).casefold() + "\n"
+        for x in deben:
+            y = norm(x).casefold()
+            ok = (y + "\n" in renglones_) if x.endswith("\n") else (y in plano_)
+            if not ok:
+                p.mal(f"{id_} ({estado}): en pantalla no está «{x.strip()}»")
+        for x in no_deben:
+            if norm(x).casefold() in plano_:
+                p.mal(f"{id_} ({estado}): en pantalla sigue «{x}»")
+        revisar_estado(p, id_, estado, r)
 
 
 def abrir_navegador(pw):
@@ -662,7 +742,7 @@ def hoja(nav, destino: Path, ids):
 
 def main():
     esperado, guion = contenido_esperado()
-    esperado_d = pantalla_d_esperada()
+    casos_r = respaldo_esperado()
     ap = argparse.ArgumentParser()
     ap.add_argument("--capturas", default=str(APP / "e3" / "capturas-verif"))
     ap.add_argument("--sin-capturas", action="store_true")
@@ -684,7 +764,7 @@ def main():
             try:
                 vistas(p, w, h, out, (w, h) in CAPTURAR and not a.sin_capturas, a.sin_esqueletos)
                 contenido(p, esperado)
-                contenido_d(p, esperado_d)
+                respaldo(p, casos_r)
                 if (w, h) in NOTAS_RES:
                     notas_entran(p, w, h)
                     guion_en_notas(p, w, h, guion)

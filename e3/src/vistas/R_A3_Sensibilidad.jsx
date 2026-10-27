@@ -9,6 +9,8 @@
 //   estimado, y tampoco llega a 0.
 // - El pie de C3 (ROI a un año, la regla con descuento) entra en la frase con el descuento de D3; el resto,
 //   al title (sin pie en pantalla, regla 12 del E2).
+// - (Crítica del W3, hallazgo 9) La fila base de C3 dice «lo que usan las diapositivas 8 y 9»: en el
+//   tablero no hay diapositivas, así que la celda dice de dónde sale el escenario y en qué vista se ve.
 // Ninguna cifra escrita acá: la tabla es la de C3, la fila del test y el descuento salen de D3.
 
 import { C3 } from '../contenido_e3.js'
@@ -33,8 +35,13 @@ TEST[COL.Escenario] = `lista de ${entero(D3.lista.elegida.largo_mes)} contactabl
 TEST[COL['ROI modelo sobre la regla']] = pctDirecto(MODELO.contactables.roi_pct, 2)
 TEST[COL['ROI regla sin modelo']] = pctDirecto(REGLA.contactables.roi_pct, 2)
 
+const BASE = 'escenario base de la B 3.4 (vista 5)'
+const DE_C3 = filasDeAnexo(A).map((f) => ({
+  ...f, celdas: f.celdas.map((c, j) => (j === COL.Escenario && /diapositivas?\s+\d/.test(c) ? BASE : c)),
+}))
+if (!DE_C3.some((f) => f.celdas[COL.Escenario] === BASE)) throw new Error('R_A3: no encuentro la fila base del anexo A3')
 const FILAS = [
-  ...filasDeAnexo(A),
+  ...DE_C3,
   { celdas: TEST, title: `Parte D 11.2 · registro J12: con el test, la regla en la lista de ` +
       `${D3.lista.elegida.largo_mes} contactables deja ${pctDirecto(REGLA.contactables.roi_pct, 2)} y el modelo ` +
       `sobre la regla ${pctDirecto(MODELO.contactables.roi_pct, 2)}; ninguno recupera el costo en el año.` },

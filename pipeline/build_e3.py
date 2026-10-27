@@ -316,6 +316,14 @@ def armar_lista(e3: dict) -> dict:
         "regla_menos_modelo_500_contactables": {
             "aciertos": r500c["vp"] - m500c["vp"],
             "ic95_pp_modelo_menos_regla": [x * 100 for x in e3["contra"]["filtrada_logistica_ajustada_menos_regla"]["ic95"]]},
+        # (27/10, crítica del W3, hallazgo 3) H06: la logística ajustada menos la regla en la lista de 500 sin
+        # filtro de validación, la fila «Sin filtrar · validación» de la vista 4 (la D 11.2 la cita: «−0,50 a
+        # +1,81 en la C»). Hasta W3 esa fila usaba G17, la logística de la Parte B sin ajustar.
+        "modelo_menos_regla_500_sin_filtro": {
+            "diferencia_pp": (m500["vp"] - busca("regla", "sin_filtro", 500)["vp"]) / m500["casos"] * 100,
+            "ic95_pp": [x * 100 for x in e3["contra"]["logistica_ajustada_menos_regla"]["ic95"]],
+            "aciertos_de_mas": m500["vp"] - busca("regla", "sin_filtro", 500)["vp"],
+            "replicas_a_favor": e3["contra"]["logistica_ajustada_menos_regla"]["replicas_con_a_mejor"]},
         "no_contactables_lista_500": m500["casos"] - m500["contactables"]["quedan"],
         "precision_de_equilibrio": u["precision_de_equilibrio"],
         "ajuste": {
@@ -410,6 +418,13 @@ def armar_lista(e3: dict) -> dict:
           lista["regla_menos_modelo_500_contactables"]["aciertos"], "29", 0, donde="C 7.2", c3="d7")
     ancla("H45", "lista: no contactables en la de 500 sin filtro", lista["no_contactables_lista_500"], "483", 0,
           donde="C 7.2", c3="A2")
+    h06 = lista["modelo_menos_regla_500_sin_filtro"]
+    ancla("H06", "lista: logística ajustada − regla, 500 sin filtro (puntos)", h06["diferencia_pp"], "1,02", 2,
+          donde="C 7.1; D 11.2")
+    ancla("H06", "lista: IC 95 % inferior (puntos)", h06["ic95_pp"][0], "−0,50", 2, donde="C 7.1; D 11.2")
+    ancla("H06", "lista: IC 95 % superior (puntos)", h06["ic95_pp"][1], "1,81", 2, donde="C 7.1; D 11.2")
+    ancla("H06", "lista: aciertos de más en 1.500", h06["aciertos_de_mas"], "15,3", 1, donde="C 7.1")
+    ancla("H06", "lista: réplicas a favor del modelo (%)", h06["replicas_a_favor"], "86,5", 1, 100, donde="C 7.1")
     ancla("H01", "lista: pliegues temporales", lista["ajuste"]["pliegues"], "4", 0, donde="C 7.1", c3="d7")
     b = {x["id"]: x for x in lista["ajuste"]["brecha_pp"]}
     ancla("H08", "lista: brecha del gradient boosting antes", b["hgb"]["antes"], "18,1", 1, donde="C 7.1", c3="d7")

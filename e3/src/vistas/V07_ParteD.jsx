@@ -1,55 +1,42 @@
-// V07 · ¿Qué dice el test y qué decide María G.? (Parte D 8, 9, 10.2 y 12; diapositiva 12 de C3).
-// W3, 27/10. Junta las vistas 7, 8 y 9 de la tabla «La historia» del PLAN.md, como pide el plan desde el 27/10
-// («7 a 9 en una»; W5: «6 la Parte D y lo que decide María G.»): con las seis vistas de W2 y las dos o tres de la
-// corrección al otro grupo, tres vistas más pasaban el tope de nueve. Misma forma que la vista 5: banda de cifras
-// con la tarjeta de decisión a la derecha y un gráfico a todo el ancho debajo.
+// V07 · ¿Qué decide María G. con el piloto? (Parte D 9, 11.1 y 12; diapositiva 12 de C3).
+// W3, 27/10. Junta las vistas 8 y 9 de la tabla «La historia» del PLAN.md (la 7, el test, quedó en la vista 4:
+// crítica del W3, hallazgo 5, «una vista, un mensaje»). Misma forma que la vista 5: banda de cifras con la
+// tarjeta de decisión a la derecha y un gráfico a todo el ancho debajo.
 //
-// - Banda: lo que dice el test (J03: la regla acierta 86,1 % y la logística ajustada 85,9 %, que la frase nombra;
-//   J09 y J10 al title), cuánto tiene que dar el piloto para pasar a producción (H49, 40,4 puntos), la cifra
-//   que responde la pregunta y la única al tamaño máximo (regla 13 H1 del E2), y cuánto falta para decidir
-//   (J50: 20 semanas, primera lista el 07/12/2026). Anchos 2 / 3 / 2, como la 5.
-// - Decisión: «D-PRO · propuesta» de decisiones.js, la que comparte con la vista 1, con la regla del piloto
-//   en una frase de hasta 60 caracteres (regla 11 del E2). C3 no trae esa frase: queda acá hasta que
-//   contenido.py exporte la Parte D (W4).
-// - Gráfico: la regla de decisión del piloto, como la figura de la diapositiva 12 (G49, H49): debajo de 2,87
-//   puntos el efecto no se distingue de cero; de 2,87 a 40,4 contactar funciona y la lista no se paga; desde
-//   40,4 se pasa a producción. A la derecha, lo que se le pide a María G. con esta entrega (los cinco pedidos
-//   de la diapositiva 12, a los que apunta su guion: «las cinco decisiones de la derecha»), sin las citas al
-//   relevamiento (regla 13 H13 del E2).
-// - Explorar, cerrado al llegar, con tres paneles: el test (precisión de la lista en test por método, J03 y
-//   J17), el flujo de cada mes (la tabla 9.2 de la Parte D, el diagrama de la solución) y el plan de 20
-//   semanas (J50, sección 12). Las cifras del test que no entran (meta, calibración, segmentos) quedan para el
-//   respaldo y el guion.
-// Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y los pedidos de C3 (contenido_e3.js). Los
-// textos del flujo resumen la tabla 9.2 de la Parte D (contenido_d_solucion.py) hasta que C3 los traiga (W4).
+// - Banda: el tamaño del piloto (G49: 1.260 contactados y 240 de control), cuánto tiene que dar para pasar a
+//   producción (H49, 40,4 puntos), la cifra que responde la pregunta y la única al tamaño máximo (regla 13 H1
+//   del E2), y cuánto dura el plan hasta la decisión (J50: 20 semanas, del 02/11/2026 al 21/03/2027). Anchos
+//   2 / 3 / 2, como la 5.
+// - Decisión: «D-PIL · propuesta» de decisiones.js, la regla del piloto en una frase de hasta 60 caracteres
+//   (regla 11 del E2). C3 no trae esa frase: queda acá hasta que contenido.py exporte la Parte D (W4).
+// - Gráfico: la regla de decisión del piloto, como la figura de la diapositiva 12 (G49, H49). Debajo de 2,87
+//   puntos el efecto no se distingue de cero (el rótulo va junto al 2,87, porque el tramo es angosto); de
+//   2,87 a 40,4 contactar funciona y la lista no se paga; desde 40,4 se pasa a producción. Una llave sobre la
+//   banda, de 0 a 40,4, dice lo que decide María G. con cualquier valor debajo de 40,4 (D 11.1). A la
+//   derecha, lo que decide María G. y en qué semana: las filas de la D 12.3 que son suyas (12.4), con las
+//   semanas de D3.plan.hitos_semana (J50). Hasta la crítica del W3 la lista salía de los pedidos de la
+//   diapositiva 12 de C3, escritos antes de la D: le daba a María G. el grupo de control (lo aprueba Sofía R.)
+//   y dejaba sin dueño ni plazo la inscripción en la AAIP.
+// - Explorar, cerrado al llegar, con dos paneles: el flujo de cada mes (la tabla 9.2 de la Parte D) y el plan
+//   de 20 semanas (J50, sección 12). Lo que antes iba al pie del flujo va al title (regla 12 del E2).
+// Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js). Los textos del flujo y de los pedidos
+// resumen las tablas 9.2, 12.3 y 12.4 de la Parte D hasta que C3 los traiga (W4).
 
 import { useState } from 'react'
-import { Lienzo, BarrasH, escalaNice } from '../../../src/graficos.jsx'
+import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
-import { C3 } from '../contenido_e3.js'
 import { NBSP, entero, fecha, fijo, pct } from '../formato.js'
-import { Rico, sinCodigos } from '../texto.jsx'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
 import { BotonExplorar, Opciones } from '../controles.jsx'
 import { Cifra } from '../cifra.jsx'
 import { anchoTexto as ancho } from '../medir.js'
 
-const T = D3.test
 const P = D3.piloto
 const PL = D3.plan
 const E = D3.economia
-const D12 = C3.DIAPOSITIVAS.find((d) => d.n === 12)
-
-// El test (J03, J09, J10, J17): la lista de 500 contactables por mes en los cortes de 2025.
-const REGLA = T.metodos.regla.test
-const LOG = T.metodos.logistica_ajustada.test
-const PRACTICA = T.metodos.practica_actual.test
-const CR = T.contra_regla
-const LARGO = D3.lista.elegida.largo_mes
-const CORTES = T.conjunto.cortes.length
-const NOMBRE = Object.fromEntries(D3.modelos.filas.map((f) => [f.id, f.nombre]))
+const HS = PL.hitos_semana
 
 // La regla del piloto (G49, H49) y el equilibrio de la Parte B del que sale el 40,4 (G43).
 const MDE = P.diferencia_detectable_pp
@@ -66,36 +53,45 @@ const semanas = (n) => `${n}${NBSP}${n === 1 ? 'semana' : 'semanas'}`
 const rango = (f) => (f.desde_semana === f.hasta_semana ? `semana ${f.desde_semana}`
   : `semanas ${f.desde_semana} a ${f.hasta_semana}`)
 
-const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s)
-
 // La decisión: la regla del piloto en una línea; el resto, al title.
-const DECISION = decision('D-PRO', {
+const DECISION = decision('D-PIL', {
   llano_corto: `Piloto de ${P.meses} meses; con ${T_PAGA} puntos o más, a producción`,
-  llano: `La lista de ${entero(P.lista_mes)} por mes sale con la regla del umbral, sin modelo: el test lo confirma. `
-    + `Un piloto de ${P.meses} meses, con ${entero(P.control)} clientes de control, mide la compra a 7 días. Con `
-    + `${T_PAGA} puntos o más sobre el control, María G. invierte en producción; debajo, elige entre cerrar o `
-    + 'repetir el piloto sin descuento.',
+  llano: `La lista de ${entero(P.lista_mes)} por mes sale con la regla del umbral, sin modelo. Un piloto de `
+    + `${P.meses} meses, con ${entero(P.control)} clientes de control, mide la compra a 7 días. Con ${T_PAGA} puntos `
+    + 'o más sobre el control, María G. invierte en producción; debajo, elige entre cerrar o repetir el piloto sin '
+    + 'descuento.',
   decision: `Piloto de ${P.meses} meses; con ${T_PAGA} puntos o más, a producción`,
   justificacion: `${T_PAGA} puntos es el ${pct(S_EQ, 1)} de equilibrio de la Parte B, sobre los que se iban a ir, `
     + `llevado a todos los contactados. Con ${entero(P.tratados)} contactados y ${entero(P.control)} de control, `
     + `el piloto distingue de cero una diferencia de ${T_MDE} puntos o más.`,
 })
 
-// Los pedidos de la diapositiva 12, sin las citas al relevamiento ni el código de la acción legal.
-const PEDIDOS = D12.pedidos.map((t) => sinCodigos(t).replace(/\s*\(L\d+\)/g, ''))
+// Lo que decide María G. y en qué semana: las filas de la D 12.3 a su cargo (12.4), en el orden del plan.
+const PEDIDOS = [
+  { t: 'El alcance: regla sin modelo y piloto con control', s: HS.alcance },
+  { t: 'La regla del target, con revisión de Sofía R.', s: HS.regla_y_operador_del_piloto },
+  { t: 'Quién inscribe las bases en la AAIP', s: HS.acciones_legales_y_control },
+  { t: 'Quién opera la lista después del piloto', s: HS.operador_despues_del_piloto },
+  { t: `Si pasa a producción, con ${T_PAGA} puntos o más`, s: HS.decision },
+]
+const TITULO_PEDIDOS = `Parte D 12.3 y 12.4. En la semana ${HS.regla_y_operador_del_piloto} María G. también aprueba `
+  + 'quién opera el piloto (el equipo consultor), firma el acuerdo de confidencialidad y aprueba la política de '
+  + `retención. El grupo de control, ${entero(P.control_mes)} por mes fuera del 20${NBSP}% de mayor facturación, lo `
+  + `aprueba Sofía R. en la semana ${HS.regla_y_operador_del_piloto}.`
 
-const TITULO_TEST = `Precisión de la lista de ${entero(LARGO)} contactables por mes en test: ${CORTES} listas, de `
-  + `${fecha(T.conjunto.desde)} a ${fecha(T.conjunto.hasta)}, con datos que se miraron una sola vez y con el método `
-  + `ya fijado. Regla del umbral ${pct(REGLA.precision, 1)}, regresión logística ajustada ${pct(LOG.precision, 1)}, `
-  + `práctica actual ${pct(PRACTICA.precision, 1)}. Logística menos regla: ${fijo(CR.diferencia_pp, 2, true)} puntos, `
-  + `intervalo al 95${NBSP}% de ${fijo(CR.ic95_pp[0], 2, true)} a ${fijo(CR.ic95_pp[1], 2, true)}. ${cap(T.decision.resultado)}.`
+const TITULO_PILOTO = `Piloto de ${P.meses} meses, una lista de ${entero(P.lista_mes)} por mes: ${entero(P.contactados_mes)} `
+  + `contactados y ${entero(P.control_mes)} de control cada mes, ${entero(P.tratados)} y ${entero(P.control)} en total. `
+  + `Con ese tamaño, el piloto distingue de cero una diferencia de ${T_MDE} puntos o más.`
 const TITULO_PAGA = `Para pasar a producción, al tercer mes la compra a 7 días de los contactados tiene que superar a la `
   + `del control en ${T_PAGA} puntos o más. ${DECISION.justificacion}`
 const TITULO_PLAN = `Plan del proyecto: ${semanas(PL.semanas)} desde el ${fecha(PL.semana_1)}. `
   + PL.fases.map((f) => `${f.nombre}, ${rango(f)}`).join('; ')
   + `. La primera lista sale el ${fecha(PILOTO.desde)}; María G. decide el ${fecha(DECIDE.hasta)}.`
+const TITULO_FLUJO = `Parte D 9.2. Una lista por mes, ${P.meses} en total, desde el ${fecha(PILOTO.desde)}; el piloto `
+  + `cierra el ${fecha(PILOTO.hasta)}. Lo que se mide reemplaza el ${pct(E.parametros.s_observada, 2)} de compra que `
+  + 'hoy se ve sin grupo de control.'
 
-export const meta = { id: 'V07', dc: 'D-PRO' }
+export const meta = { id: 'V07', dc: 'D-PIL' }
 
 // ---------------------------------------------------------------- texto en SVG
 
@@ -145,30 +141,33 @@ function ReglaPiloto({ w, h, k }) {
   const xp = x(PAGA)
   const xf = x(max)
 
-  // Lo que pasa en el tramo del medio y en el de la derecha, envuelto al ancho de cada uno.
-  const medio = [
-    { t: 'contactar funciona, pero la lista no se paga', peso: 400 },
-    { t: 'María G. elige: cerrar o repetir sin descuento', peso: 700 },
-  ].flatMap(({ t, peso }) => envolver(t, xp - xm - 20 * k, fT, peso).map((l) => ({ l, peso })))
+  // Lo que pasa en el tramo del medio y en el de la derecha, envuelto al ancho de cada uno; lo que decide María
+  // G. debajo de 40,4, sobre la llave que va de 0 a 40,4, centrado entre el 2,87 y el 40,4 para no cruzar la
+  // línea del 2,87.
+  const medio = envolver('contactar funciona, pero la lista no se paga', xp - xm - 20 * k, fT)
   const derecha = envolver('se pasa a producción', xf - xp - 14 * k, fT, 700)
+  const decide = envolver('María G. elige: cerrar o repetir sin descuento', xp - xm - 20 * k, fT, 700)
   const inter = fT * 1.3
   const nLineas = Math.max(medio.length, derecha.length)
 
-  // Alto: la fila de los dos valores, la banda y el eje con su título. Lo que sobra se reparte arriba y
-  // abajo, para que el dibujo quede centrado en su caja.
-  const hb = Math.max(nLineas * inter + 22 * k, Math.min(160 * k, h * 0.5))
-  const fijoAlto = fVal * 1.25 + 8 * k + hb + 5 + fTick + 8 * k + fTit + 4 * k
-  const y0 = Math.max(2, (h - fijoAlto) * 0.45)
+  // Alto: la fila de los dos valores, la llave con su texto, la banda y el eje con su título. La banda toma lo
+  // que sobra (con tope); el resto se reparte arriba y abajo, para que el dibujo quede centrado en su caja.
+  const altoArriba = fVal * 1.25 + 8 * k + decide.length * inter + 4 * k + 7 * k
+  const altoAbajo = 5 + fTick + 8 * k + fTit + 4 * k
+  const hb = Math.max(nLineas * inter + 22 * k, Math.min(150 * k, h - altoArriba - altoAbajo - 4))
+  const y0 = Math.max(2, (h - altoArriba - hb - altoAbajo) * 0.45)
   const yVal = y0 + fVal
-  const yb = yVal + 8 * k
+  const yDec = yVal + fVal * 0.25 + 8 * k            // arriba del texto de la llave
+  const yLlave = yDec + decide.length * inter + 4 * k
+  const yb = yLlave + 7 * k
   const yEje = yb + hb
 
-  // Los dos valores, sobre su línea; al lado del 2,87, qué es, si entra antes del 40,4.
+  // Los dos valores, sobre su línea; al lado del 2,87, el rótulo del tramo gris, si entra antes del 40,4.
   const wMde = ancho(T_MDE, fVal, 700)
   const wPaga = ancho(T_PAGA, fVal, 700)
   const xMdeTxt = Math.max(0, xm - wMde / 2)
   const limite = xp - wPaga / 2 - 12 * k
-  const queEs = ['lo mínimo que se distingue de cero', 'mínimo medible']
+  const gris = ['por debajo, no se distingue de cero', 'debajo, no se distingue de cero']
     .find((t) => xMdeTxt + wMde + 10 * k + ancho(t, fNota, 500) <= limite)
 
   const yMedio = yb + hb / 2 - ((nLineas - 1) * inter) / 2
@@ -179,18 +178,18 @@ function ReglaPiloto({ w, h, k }) {
     <svg width={w} height={h} role="img" style={{ display: 'block' }}
          aria-label={`Regla de decisión del piloto, con la compra a 7 días de los contactados menos la del control al `
            + `tercer mes: debajo de ${T_MDE} puntos no se distingue de cero; de ${T_MDE} a ${T_PAGA}, contactar `
-           + `funciona pero la lista no se paga; desde ${T_PAGA}, se pasa a producción`}>
+           + `funciona pero la lista no se paga; con cualquier valor debajo de ${T_PAGA}, María G. elige entre cerrar `
+           + `o repetir sin descuento; desde ${T_PAGA}, se pasa a producción`}>
       <g>
         <title>{`Debajo de ${T_MDE} puntos: con ${entero(P.control)} clientes de control, el efecto del contacto no se `
           + 'distingue de cero. No se pasa a producción.'}</title>
         <rect x={x(0)} y={yb} width={Math.max(1, xm - x(0))} height={hb} fill="var(--trk)" />
       </g>
       <g>
-        <title>{`De ${T_MDE} a ${T_PAGA} puntos: contactar funciona, pero la lista no se paga. María G. elige entre `
-          + 'cerrar con el piloto o repetirlo sin descuento.'}</title>
+        <title>{`De ${T_MDE} a ${T_PAGA} puntos: contactar funciona, pero la lista no se paga.`}</title>
         <rect x={xm} y={yb} width={Math.max(1, xp - xm)} height={hb} fill="var(--azul1)" />
-        {medio.map(({ l, peso }, i) => (
-          <text key={i} x={cMedio} y={yMedio + i * inter} fontSize={fT} fontWeight={peso} fill={INK}
+        {medio.map((l, i) => (
+          <text key={i} x={cMedio} y={yMedio + i * inter} fontSize={fT} fill={INK}
                 textAnchor="middle" dominantBaseline="central">{l}</text>
         ))}
       </g>
@@ -203,14 +202,26 @@ function ReglaPiloto({ w, h, k }) {
         ))}
       </g>
 
+      {/* La llave de 0 a 40,4: lo que decide María G. con cualquier valor debajo de 40,4 (D 11.1). */}
+      <g>
+        <title>{`Con cualquier valor debajo de ${T_PAGA} puntos, María G. elige entre cerrar con el piloto o repetirlo `
+          + 'sin descuento (Parte D 11.1).'}</title>
+        <path d={`M ${x(0) + 1} ${yb - 1} V ${yLlave} H ${xp - 5 * k} V ${yb - 1}`} fill="none" stroke={INK}
+              strokeWidth="1.25" />
+        {decide.map((l, i) => (
+          <text key={i} x={cMedio} y={yDec + i * inter + fT * 0.5} fontSize={fT} fontWeight={700} fill={INK}
+                textAnchor="middle" dominantBaseline="central">{l}</text>
+        ))}
+      </g>
+
       {/* Las dos líneas de la regla, con su valor arriba. */}
       <g>
         <title>{`${T_MDE} puntos: la diferencia más chica que ${entero(P.tratados)} contactados contra `
-          + `${entero(P.control)} de control distinguen de cero`}</title>
+          + `${entero(P.control)} de control distinguen de cero; por debajo, el efecto no se distingue de cero`}</title>
         <line x1={xm} x2={xm} y1={yVal + 4 * k} y2={yEje} stroke={INK} strokeWidth="1.5" />
         <text x={xMdeTxt} y={yVal} fontSize={fVal} fontWeight={700} fill={INK} className="tabular">{T_MDE}</text>
-        {queEs && (
-          <text x={xMdeTxt + wMde + 10 * k} y={yVal} fontSize={fNota} fontWeight={500} fill={MUT2}>{queEs}</text>
+        {gris && (
+          <text x={xMdeTxt + wMde + 10 * k} y={yVal} fontSize={fNota} fontWeight={500} fill={MUT2}>{gris}</text>
         )}
       </g>
       <g>
@@ -236,16 +247,20 @@ function ReglaPiloto({ w, h, k }) {
   )
 }
 
-/** Los pedidos de la diapositiva 12, a la derecha del gráfico. */
+/** Lo que decide María G. y en qué semana (D 12.3 y 12.4), a la derecha del gráfico. */
 function Pedidos() {
   return (
-    <div style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center',
+    <div title={TITULO_PEDIDOS}
+         style={{ flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center',
                   borderLeft: '1px solid var(--bd)', paddingLeft: 'clamp(12px, 1.4cqw, 24px)' }}>
-      <span className="kpi-lbl"><span>{D12.pedidos_titulo}</span></span>
+      <span className="kpi-lbl"><span>Lo que decide María G.</span></span>
       <ol style={{ margin: 'clamp(6px, 1.2cqh, 14px) 0 0', paddingLeft: '1.3em', display: 'flex',
                    flexDirection: 'column', gap: 'clamp(3px, 0.8cqh, 10px)' }}>
-        {PEDIDOS.map((t) => (
-          <li key={t} className="e2-nota" style={{ margin: 0, color: 'var(--ink)' }}><Rico t={t} /></li>
+        {PEDIDOS.map((p) => (
+          <li key={p.t} className="e2-nota" style={{ margin: 0, color: 'var(--ink)' }}>
+            {p.t}
+            <span className="tabular" style={{ color: 'var(--mut2)', whiteSpace: 'nowrap' }}>{` · semana${NBSP}${p.s}`}</span>
+          </li>
         ))}
       </ol>
     </div>
@@ -263,7 +278,7 @@ const PASOS = [
   { titulo: 'Ordenar', texto: `La regla toma los ${entero(P.lista_mes)} contactables más cerca de su umbral, sin modelo`,
     quien: QUIEN_EQUIPO, enfasis: true },
   { titulo: 'Entregar', texto: `Planilla con ${entero(P.control_mes)} de control, resumen por local y tablero del mes`,
-    quien: QUIEN_EQUIPO },
+    quien: 'El equipo; el resumen por local, Sofía R.' },
   { titulo: 'Contactar', texto: `Sofía R. excluye con motivo; Marketing escribe por WhatsApp con ${pct(E.parametros.descuento, 0)} de descuento`,
     quien: 'Sofía R.' },
   { titulo: 'Medir', texto: `Compra a 7 días de contactados y control; a los ${entero(D3.caso.ventana_dias)} días, quién cruzó su umbral`,
@@ -286,10 +301,6 @@ function FlujoMes() {
           </li>
         ))}
       </ol>
-      <p className="e2-linea" style={{ margin: 0 }}>
-        {`${P.meses} listas, del ${fecha(PILOTO.desde)} al ${fecha(PILOTO.hasta)}. Lo que se mide reemplaza el `
-          + `${pct(E.parametros.s_observada, 2)} de compra que hoy se ve sin grupo de control.`}
-      </p>
     </div>
   )
 }
@@ -370,7 +381,6 @@ function PlanSemanas({ w, h, k }) {
 // ---------------------------------------------------------------- la vista
 
 const OPCIONES = [
-  { valor: 'test', texto: 'El test' },
   { valor: 'flujo', texto: 'El flujo' },
   { valor: 'plan', texto: 'El plan' },
 ]
@@ -378,34 +388,26 @@ const OPCIONES = [
 export default function V07ParteD() {
   const k = useEscalaTexto()
   const [abierto, setAbierto] = useState(false)
-  const [panel, setPanel] = useState('test')
+  const [panel, setPanel] = useState('flujo')
   // Tocado con el mouse, el control cambia y suelta el foco: las flechas siguen pasando de vista.
   const soltar = (e) => { if (e.detail) e.target.closest?.('button')?.blur() }
   const frase = !abierto
-    ? { span: 'Regla de decisión del piloto, con la compra a 7 días al tercer mes',
-        b: `${entero(P.tratados)} contactados y ${entero(P.control)} de control` }
-    : panel === 'test'
-      ? { span: `Precisión de la lista de ${entero(LARGO)} contactables por mes, en test`,
-          b: `${CORTES} listas, de ${fecha(T.conjunto.desde)} a ${fecha(T.conjunto.hasta)}` }
-      : panel === 'flujo'
-        ? { span: 'Cada mes del piloto, de la exportación a la medición', b: 'la lista sale con la regla' }
-        : { span: `Plan del proyecto: ${semanas(PL.semanas)}`,
-            b: `piloto del ${fecha(PILOTO.desde)} al ${fecha(PILOTO.hasta)}` }
-  const altoRegla = Math.round(270 * k)
-  const barras = [
-    { etiqueta: NOMBRE.practica_actual ?? 'Práctica actual', valor: PRACTICA.precision },
-    { etiqueta: 'Regresión logística ajustada', valor: LOG.precision },
-    { etiqueta: NOMBRE.regla_umbral ?? 'Regla del umbral', valor: REGLA.precision, enfasis: true },
-  ]
+    ? { span: 'Regla de decisión del piloto, con la compra a 7 días',
+        b: `al cierre del tercer mes, semana ${PILOTO.hasta_semana}` }
+    : panel === 'flujo'
+      ? { span: 'Cada mes del piloto, de la exportación a la medición', b: 'la lista sale con la regla' }
+      : { span: `Plan del proyecto: ${semanas(PL.semanas)}`,
+          b: `piloto del ${fecha(PILOTO.desde)} al ${fecha(PILOTO.hasta)}` }
+  const altoRegla = Math.round(290 * k)
   return (
     <section className="pant v07">
       <Banda dcs={[DECISION]}>
-        <div className="tarjeta" style={{ gridColumn: 'span 2' }} title={TITULO_TEST}>
-          <span className="kpi-lbl"><span>Regla en test</span></span>
+        <div className="tarjeta" style={{ gridColumn: 'span 2' }} title={TITULO_PILOTO}>
+          <span className="kpi-lbl"><span>En el piloto</span></span>
           <div className="ban-par">
-            <div className="par-item par-unico"><Cifra texto={pct(REGLA.precision, 1)} sec /></div>
+            <div className="par-item par-unico"><Cifra num={entero(P.tratados)} sec /></div>
           </div>
-          <p className="e2-linea">{`logística ${pct(LOG.precision, 1)}: no la supera`}</p>
+          <p className="e2-linea">{`contactados y ${entero(P.control)} de control`}</p>
         </div>
 
         <div className="tarjeta e2-central" style={{ gridColumn: 'span 3' }} title={TITULO_PAGA}>
@@ -423,11 +425,12 @@ export default function V07ParteD() {
               <Cifra num={entero(PL.semanas)} unidad={`${NBSP}semanas`} sec />
             </div>
           </div>
-          <p className="e2-linea">{`primera lista el ${fecha(PILOTO.desde)}`}</p>
+          <p className="e2-linea">{`del ${fecha(PL.semana_1)} al ${fecha(DECIDE.hasta)}`}</p>
         </div>
       </Banda>
 
-      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
+      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}
+           title={abierto ? (panel === 'flujo' ? TITULO_FLUJO : TITULO_PLAN) : undefined}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'clamp(8px, 1.2cqw, 16px)' }}>
           <span className="kpi-lbl frase" style={{ flex: '1 1 auto' }}>
             <span>{frase.span}</span>
@@ -436,7 +439,7 @@ export default function V07ParteD() {
           <span style={{ display: 'flex', alignItems: 'center', gap: 'clamp(6px, 0.8cqw, 12px)', flexShrink: 0 }}
                 onClick={soltar}>
             {abierto && <Opciones etiqueta="Qué mostrar" valor={panel} onCambio={setPanel} opciones={OPCIONES} />}
-            <BotonExplorar abierto={abierto} onCambio={(v) => { setAbierto(v); if (!v) setPanel('test') }} />
+            <BotonExplorar abierto={abierto} onCambio={(v) => { setAbierto(v); if (!v) setPanel('flujo') }} />
           </span>
         </div>
 
@@ -454,12 +457,9 @@ export default function V07ParteD() {
           </div>
         ) : panel === 'flujo' ? <FlujoMes /> : (
           <div style={{ flex: '1 1 0', minHeight: 0, marginTop: 'clamp(6px, 1.6cqh, 20px)', display: 'flex',
-                        flexDirection: 'column', maxHeight: panel === 'test' ? Math.round((3 * 70 + 56) * k) : undefined }}>
+                        flexDirection: 'column' }}>
             <Lienzo className="lienzo">
-              {({ w, h }) => (panel === 'test'
-                ? <BarrasH datos={barras} w={w} h={h} formato={(v) => pct(v, 1)} formatoEje={(v) => pct(v, 0)}
-                           anchoEtiqueta={Math.round(270 * k)} tituloEje="Precisión de la lista en test" tope={1} />
-                : <PlanSemanas w={w} h={h} k={k} />)}
+              {({ w, h }) => <PlanSemanas w={w} h={h} k={k} />}
             </Lienzo>
           </div>
         )}

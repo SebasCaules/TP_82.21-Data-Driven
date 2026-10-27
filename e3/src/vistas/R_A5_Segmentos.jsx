@@ -6,12 +6,15 @@
 // no aparece, menos de 12 meses y alta online pasan a positivo y solo el alto valor repite. Por eso la
 // pieza muestra las dos mediciones, una al lado de la otra.
 //
-// - Frase: la precisión de mujeres y de hombres en test, como la escribe la D 11.2 (D3.test.segmentos,
-//   J15).
+// - Frase: el modelo y la lista (logística ajustada, lista de 500 sin filtro) y qué se resta. Cifra: la
+//   precisión de mujeres y de hombres en test, como la escribe la D 11.2, y la de género X, que la D no
+//   nombra: es la diferencia más grande del gráfico (−10,0 puntos, 66 lugares, su intervalo de 69,2 a
+//   88,1 % queda debajo del 90,3 % de toda la lista; crítica del W3, hallazgo 4b). D3.test.segmentos, J15.
 // - Pieza: un punto por segmento y medición, en puntos de precisión contra toda la lista (logística
 //   ajustada, lista de 500 sin filtro, la misma población que la C 7.4): validación con un aro gris, test
 //   con un punto en --acc, unidos por una línea; el cero, la lista entera. A la derecha, los lugares que
-//   el segmento ocupa en la lista de test (pocos lugares, poca precisión en la diferencia). Los formatos
+//   el segmento ocupa en la lista de test (pocos lugares, poca precisión en la diferencia), con su rótulo
+//   de columna arriba (hallazgo 6). Los formatos
 //   de tienda de la C 7.4 no se midieron en test y quedan en el anexo de C3.
 // - En el title de cada fila, la precisión, el intervalo y la diferencia de la regla en test.
 // Ninguna cifra escrita acá: todo sale de D3.test.segmentos (las diferencias de validación son las de
@@ -40,7 +43,9 @@ const FILAS = S.filas.map((f) => ({ ...f, nombre: NOMBRE[f.id] ?? f.valor }))
 const fila = (id) => FILAS.find((f) => f.id === id)
 const MUJ = fila('mujeres')
 const HOM = fila('hombres')
-if (!MUJ || !HOM) throw new Error('R_A5: D3.test.segmentos no trae mujeres y hombres')
+const GX = fila('genero_x')
+if (!MUJ || !HOM || !GX) throw new Error('R_A5: D3.test.segmentos no trae mujeres, hombres y género X')
+const CABEZA_LUGARES = 'lugares en la lista de test'
 
 const puntos = (x) => fijo(x, 1, true)
 const CORTES_TEST = D3.test.conjunto.cortes.length
@@ -63,8 +68,9 @@ function Puntos({ w, h, k }) {
   for (let v = lo; v <= hi; v += 2) ticks.push(v)
 
   const x0 = Math.max(...FILAS.map((f) => anchoTexto(f.nombre, fEtq, 500))) + 16 * k
-  const textoLugares = (f) => `${entero(f.en_lista)} lugares`
-  const anchoDer = Math.max(...FILAS.map((f) => anchoTexto(textoLugares(f), fVal))) + 18 * k
+  const textoLugares = (f) => entero(f.en_lista)
+  const anchoDer = Math.max(anchoTexto(CABEZA_LUGARES, fLey),
+    ...FILAS.map((f) => anchoTexto(textoLugares(f), fVal))) + 18 * k
   const x1 = w - anchoDer
   const x = (v) => x0 + ((v - lo) / (hi - lo)) * (x1 - x0)
 
@@ -102,6 +108,11 @@ function Puntos({ w, h, k }) {
           {`test (${CORTES_TEST} cortes)`}
         </text>
       </g>
+
+      {/* el rótulo de la columna de la derecha */}
+      <text x={w} y={fLey * 0.8} fontSize={fLey} fill="var(--mut2)" textAnchor="end" dominantBaseline="central">
+        {CABEZA_LUGARES}
+      </text>
 
       {/* el cero: la precisión de toda la lista */}
       <line x1={x(0)} x2={x(0)} y1={altoLey - 4 * k} y2={yEje} stroke="var(--ink)" strokeWidth="1.5" />
@@ -154,8 +165,9 @@ export default function RA5Segmentos() {
   return (
     <TarjetaRespaldo
       clase="ra5"
-      frase="Precisión de cada segmento menos la de toda la lista, en validación y en test"
-      cifra={`en test, mujeres ${pct(MUJ.precision, 1)} y hombres ${pct(HOM.precision, 1)}`}
+      frase="Logística ajustada, lista de 500 sin filtro: cada segmento contra toda la lista"
+      cifra={`en test, mujeres ${pct(MUJ.precision, 1)} y hombres ${pct(HOM.precision, 1)}; género X, ` +
+        `${entero(GX.en_lista)} lugares, ${pct(GX.precision, 1)}`}
       title={`Logística ajustada, lista de 500 sin filtro. Toda la lista acierta ${pct(S.lista_precision, 1)} en test ` +
         `(la regla, ${pct(S.lista_precision_regla, 1)}). Validación: ${plano(A.titulo)} (${A.fuente}). ` +
         `Fuente: C 7.4 y D 11.2 · registro ${A.ids.join(', ')}, J15 y J21`}

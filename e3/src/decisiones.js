@@ -16,8 +16,11 @@
 //   de decisiones de los hitos, vigente desde el E1.
 // - C-MOD · sale la regla: ningún modelo reemplaza a la regla del umbral (vista 4; Parte C 7, que cierra
 //   la comparación). MOD-05, MOD-06 y VER-MVP del registro.
-// - D-PRO · propuesta: la lista sale con la regla y un piloto mide (vistas 1 y 9; la Parte D, diseño de
-//   la solución). D6 del registro.
+// - D-PRO · propuesta: la lista sale con la regla y un piloto mide (vista 1; la Parte D, diseño de la
+//   solución). D6 del registro.
+// - D-PIL · propuesta (crítica del W3, hallazgo 12): la regla de decisión del piloto, con 40,4 puntos o más
+//   a producción (vista 7; Parte D 11.1 y 12.2, hito 8; G49 y H49). Hasta entonces la vista 7 usaba D-PRO
+//   con otra frase corta: una decisión, una frase.
 
 import { C3 } from './contenido_e3.js'
 
@@ -36,6 +39,7 @@ const PROPIAS = [
   { id: 'A-UMB', area: 'Umbral', estado: 'vigente' },
   { id: 'C-MOD', area: 'Modelo', estado: 'sale la regla' },
   { id: 'D-PRO', area: 'Propuesta', estado: 'propuesta' },
+  { id: 'D-PIL', area: 'Piloto', estado: 'propuesta' },
 ]
 
 export const DECISIONES = Object.fromEntries([

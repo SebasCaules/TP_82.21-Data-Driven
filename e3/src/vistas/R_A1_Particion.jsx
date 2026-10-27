@@ -55,8 +55,10 @@ const FINAL = {
   nota: `${entero(T.entrenamiento.cortes)} cortes: entrenamiento y embargo`,
   desde: mesDe(T.entrenamiento.desde.slice(0, 7)), hasta: mesDe(T.entrenamiento.hasta.slice(0, 7)),
   estilo: 'entrenamiento',
+  // Prevalencia con dos decimales, como el resto de la columna (crítica del W3, hallazgo 12): 30,18 %, el
+  // 30,2 % de J20 (5.698 de 18.882 filas, J02).
   celdas: ['Modelo final (etapa 4)', '', entero(T.entrenamiento.filas), entero(T.entrenamiento.positivos),
-    pct(T.entrenamiento.tasa, 1)],
+    pct(T.entrenamiento.tasa, 2)],
   title: `Parte D 8.3 · registro J02 y J20: el modelo final se entrena otra vez con ${entero(T.entrenamiento.cortes)} ` +
     `cortes, del ${fecha(T.entrenamiento.desde)} al ${fecha(T.entrenamiento.hasta)}, ${entero(T.entrenamiento.clientes)} clientes`,
 }

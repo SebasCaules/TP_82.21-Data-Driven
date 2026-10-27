@@ -24,11 +24,16 @@
 // - Gráfico: logística menos regla, en puntos, con intervalo del 95 %, en las dos listas y los dos
 //   conjuntos (G17, J11, J09 en validación y en test). La fila que decide, «Lista que sale · test», en
 //   --acc; validación en trazo fino. A la derecha, lo que dice cada intervalo: gana uno o empatan.
-//   La fila «Sin filtrar · validación» es la logística de la Parte B (G17), no la ajustada que va al test:
-//   la de la C 7.1 (H06) no está en D3. Si build_e3.py la suma, va en esa fila; el title de la tarjeta lo
-//   dice mientras tanto.
-// - Explorar (sin cambios desde W2): la precisión de la lista de 500 sin filtrar por modelo, en validación
-//   o en entrenamiento (F07, F08, G11, G13 a G15; techo G12). Son las Partes A a C, rotuladas.
+//   (Crítica del W3, hallazgo 3) Las cuatro filas son de la logística ajustada: la de «Sin filtrar ·
+//   validación» es H06 (D3.lista.modelo_menos_regla_500_sin_filtro, la que cita la D 11.2: «−0,50 a +1,81
+//   en la C»), no G17, que es la logística de la Parte B sin ajustar.
+// - Explorar: la precisión de la lista por método.
+//   - «Test» (desde la crítica del W3, hallazgo 5; antes estaba en la vista 7): la lista de 500
+//     contactables por mes en los 5 cortes de test, la regla, la logística ajustada y la práctica actual
+//     (J03 y J17). Es la opción con que abre.
+//   - «Validación» y «Entrenamiento» (W2): la lista de 500 sin filtrar por modelo de la Parte B (F07, F08,
+//     G11, G13 a G15; techo G12). La logística de esa comparación se rotula «de la Parte B» para no
+//     confundirla con la ajustada (82,5 % contra 82,6 % en la A2).
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js). Las notas (N) siguen leyendo el guion
 // de las diapositivas 6 y 7 de C3 (vistas/index.jsx), que es de validación: el guion del test lo suma W4.
 
@@ -36,7 +41,7 @@ import { useState } from 'react'
 import { Lienzo, BarrasH, PuntosIC, escalaNice } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
-import { NBSP, entero, fijo, mesAnio, pct, usd } from '../formato.js'
+import { NBSP, entero, fecha, fijo, mesAnio, pct, usd } from '../formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
 import { BotonExplorar, Opciones } from '../controles.jsx'
@@ -50,6 +55,7 @@ const SF = TE.sin_filtro       // J11: lista de 500 sin filtro, test
 const CO = TE.contra_regla     // J09: lista de 500 contactables, test (y su validación)
 const DE = TE.decision         // J10: el criterio de la C 6.2, fila 13, medido en test
 const MET = TE.metodos         // J03: precisión de cada método en test
+const SFV = L.modelo_menos_regla_500_sin_filtro   // H06: lista de 500 sin filtro, validación, logística ajustada
 
 /** «enero a mayo de 2025»; con años distintos, los dos. */
 function periodo(desde, hasta) {
@@ -86,9 +92,10 @@ const DECISION = decision('C-MOD', {
 
 const TITULO_SF = `Logística menos regla en la lista de ${entero(LARGO)} por mes sin filtrar, en test (${TEST}): ` +
   `${pp(SF.diferencia_pp)} puntos, intervalo del 95${NBSP}% de ${intervalo(SF.ic95_pp)}; ` +
-  `${fijo(SF.aciertos_de_mas_por_mes, 2)} aciertos más por mes. En validación (${VALID}), la logística de la ` +
-  `Parte B sumaba ${pp(MD.contra_regla.diferencia_pp)} puntos, de ${intervalo(MD.contra_regla.ic95_pp)}. Esa ` +
-  'lista incluye clientes que no aceptan marketing: no se puede mandar.'
+  `${fijo(SF.aciertos_de_mas_por_mes, 2)} aciertos más por mes. En validación (${VALID}), la misma logística ` +
+  `sumaba ${pp(SFV.diferencia_pp)} puntos, de ${intervalo(SFV.ic95_pp)} (la de la Parte B, sin ajustar, ` +
+  `${pp(MD.contra_regla.diferencia_pp)}, de ${intervalo(MD.contra_regla.ic95_pp)}). Esa lista incluye clientes que ` +
+  'no aceptan marketing: no se puede mandar.'
 const TITULO_LISTA = `Logística menos regla en la lista de ${entero(LARGO)} contactables por mes, la que sale, en ` +
   `test (${TEST}): ${pp(CO.diferencia_pp)} puntos, intervalo del 95${NBSP}% de ${intervalo(CO.ic95_pp)}, que ` +
   `incluye el cero. La regla acierta ${pct(MET.regla.test.precision, 1)} y la logística ` +
@@ -104,8 +111,7 @@ const TITULO_PAGA = `El modelo agrega ${usd(DE.costo_incremental_usd)} al costo 
 // El gráfico que llega: una fila por lista y conjunto, de arriba abajo como se contó (Partes B y C, después
 // el test). La que decide, en --acc; validación, en trazo fino (`tenue` de PuntosIC).
 const FILAS = [
-  { etiqueta: 'Sin filtrar · validación', valor: MD.contra_regla.diferencia_pp, ic: MD.contra_regla.ic95_pp,
-    tenue: true },
+  { etiqueta: 'Sin filtrar · validación', valor: SFV.diferencia_pp, ic: SFV.ic95_pp, tenue: true },
   { etiqueta: 'Sin filtrar · test', valor: SF.diferencia_pp, ic: SF.ic95_pp },
   { etiqueta: 'Lista que sale · validación', valor: CO.validacion_diferencia_pp, ic: CO.validacion_ic95_pp,
     tenue: true },
@@ -139,23 +145,37 @@ const formatoPuntos = (v) => {
   return Math.abs(x - Math.round(x)) < 1e-9 ? fijo(Math.round(x), 0, true) : pp(x)
 }
 
-// Explorar (W2): la precisión de la lista de 500 sin filtrar por modelo, en validación o en entrenamiento.
-const CONJUNTOS = [{ valor: 'validacion', texto: 'Validación' }, { valor: 'entrenamiento', texto: 'Entrenamiento' }]
+// Explorar: la precisión de la lista por método, en test (la lista que sale) o, sin filtrar, en validación o en
+// entrenamiento (los modelos de la Parte B).
+const CONJUNTOS = [
+  { valor: 'test', texto: 'Test' },
+  { valor: 'validacion', texto: 'Validación' },
+  { valor: 'entrenamiento', texto: 'Entrenamiento' },
+]
+const NOMBRE = Object.fromEntries(MD.filas.map((f) => [f.id, f.nombre]))
+const nombreParteB = (f) => (f.id === 'logistica' ? 'Logística de la Parte B' : f.nombre)
+const BARRAS_TEST = [
+  { etiqueta: NOMBRE.practica_actual, valor: MET.practica_actual.test.precision },
+  { etiqueta: 'Logística ajustada', valor: MET.logistica_ajustada.test.precision },
+  { etiqueta: NOMBRE.regla_umbral, valor: MET.regla.test.precision, enfasis: true },
+]
+const LISTAS_TEST = TE.conjunto.cortes.length
 
 export const meta = { id: 'V04', dc: 'C-MOD' }
 
 export default function V04ModeloORegla() {
   const k = useEscalaTexto()
   const [explorar, setExplorar] = useState(false)
-  const [conjunto, setConjunto] = useState('validacion')
+  const [conjunto, setConjunto] = useState('test')
   const ent = conjunto === 'entrenamiento'
-  // Tope de alto por fila, como en W2: con el alto de las seis barras, las cuatro filas quedaban sueltas a 1920.
-  const tope = Math.round(((explorar ? MD.filas.length : FILAS.length) * 56 + 56) * k)
-  const barras = MD.filas.filter((f) => f[conjunto]).map((f) => ({
-    etiqueta: f.nombre,
+  const test = conjunto === 'test'
+  const barras = test ? BARRAS_TEST : MD.filas.filter((f) => f[conjunto]).map((f) => ({
+    etiqueta: nombreParteB(f),
     valor: f[conjunto].precision,
     enfasis: f.grupo === 'regla',
   }))
+  // Tope de alto por fila, como en W2: con el alto de las seis barras, las cuatro filas quedaban sueltas a 1920.
+  const tope = Math.round(((explorar ? barras.length : FILAS.length) * (explorar && test ? 70 : 56) + 56) * k)
   const techo = MD.entrenamiento.techo_precision
   return (
     <section className="pant v04">
@@ -181,20 +201,27 @@ export default function V04ModeloORegla() {
           <div className="ban-par">
             <div className="par-item par-unico"><Cifra num={entero(DE.aciertos_por_mes_para_pagar)} sec /></div>
           </div>
-          <p className="e2-linea">aciertos más por mes</p>
+          {/* «de 500»: el largo de la lista, para que se vea que ni una lista perfecta lo paga (crítica del W3,
+              hallazgo 6). «en una lista de 500» pedía un tercer renglón y la banda no entraba (paridad_e3.py). */}
+          <p className="e2-linea">{`aciertos más por mes, de ${entero(LARGO)}`}</p>
         </div>
       </Banda>
 
       <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1cqw, 16px)' }}>
           <span className="kpi-lbl frase" style={{ flex: '1 1 auto' }}>
-            {explorar ? (
+            {explorar && test ? (
+              <>
+                <span>{`Precisión de la lista de ${entero(LARGO)} contactables por mes, en test`}</span>
+                <b className="tabular">{`${LISTAS_TEST} listas, de ${fecha(TE.conjunto.desde)} a ${fecha(TE.conjunto.hasta)}`}</b>
+              </>
+            ) : explorar ? (
               <>
                 <span>{`Precisión de la lista de ${entero(LARGO)} por mes, sin filtrar${ent ? ', en entrenamiento' : ''}`}</span>
                 <b className="tabular">
                   {ent
                     ? `${MD.entrenamiento.cortes} cortes; techo ${pct(techo, 1)}`
-                    : `${entero(MD.validacion.largo_lista)} contactos en ${MD.validacion.cortes} meses de validación`}
+                    : `${entero(MD.validacion.largo_lista)} lugares en ${MD.validacion.cortes} meses de validación`}
                 </b>
               </>
             ) : (
@@ -208,7 +235,7 @@ export default function V04ModeloORegla() {
             <Opciones etiqueta="Conjunto" valor={conjunto} onCambio={setConjunto} opciones={CONJUNTOS} />
           )}
           <BotonExplorar abierto={explorar}
-                         onCambio={(v) => { setExplorar(v); if (!v) setConjunto('validacion') }} />
+                         onCambio={(v) => { setExplorar(v); if (!v) setConjunto('test') }} />
         </div>
         <div style={{ flex: '1 1 0', minHeight: 0, maxHeight: tope, marginTop: 'clamp(6px, 1.6cqh, 20px)',
                       display: 'flex', flexDirection: 'column' }}>
@@ -219,7 +246,7 @@ export default function V04ModeloORegla() {
                 formato={(v) => pct(v, 1)}
                 formatoEje={(v) => pct(v, 0)}
                 anchoEtiqueta={Math.round(270 * k)}
-                tituloEje="Precisión de la lista"
+                tituloEje={test ? 'Precisión de la lista en test' : 'Precisión de la lista'}
                 tope={1}
               />
             ) : (

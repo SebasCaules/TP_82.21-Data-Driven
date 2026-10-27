@@ -151,6 +151,9 @@ factible; 1,6 a 2,0 baja; 2,1 a 2,5 media; 2,6 a 3,0 alta) y `nivel` «Factibili
   filtro, también (H11, H12, H15, H16; 24/10).
 - `elegida` (la lista que sale: regla, contactables, 500) y `elegida_modelo` (logística, contactables, 500).
 - `regla_menos_modelo_500_contactables`: `aciertos` 29 (H16) e `ic95_pp_modelo_menos_regla` (−3,25 a −1,07).
+- `modelo_menos_regla_500_sin_filtro` (27/10, crítica del W3): la logística ajustada menos la regla en la lista de
+  500 sin filtro de validación (H06): `diferencia_pp` +1,02, `ic95_pp` (−0,50 a +1,81), `aciertos_de_mas` 15,3 y
+  `replicas_a_favor` 0,865. La usa la fila «Sin filtrar · validación» de la vista 4.
 - `comparaciones[] = {filtro, largo_mes, gana, aciertos_de_mas}` (24/10, para el selector de la diapositiva 7):
   por cada largo de lista y filtro, quién acierta más entre `regla` y `logistica_ajustada` (`empate` si dan igual)
   y por cuántos aciertos en los 3 cortes de validación. La resta se hace acá, no en el navegador. Cada una es

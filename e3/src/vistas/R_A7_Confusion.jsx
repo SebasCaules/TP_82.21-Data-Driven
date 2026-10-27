@@ -2,10 +2,14 @@
 // Respaldo: se abre si preguntan por la matriz de confusión o de dónde salen los USD 5,38 (guion, «Anexos
 // de respaldo»).
 //
-// - Pieza: las dos matrices lado a lado, la logística ajustada y la regla del umbral, con la misma
-//   disposición que la D 8.1 (filas: pasó o no su umbral; columnas: en la lista o fuera). El acierto, sobre
-//   --azul1 y en --acc; el resto en tinta. Debajo de cada una, su valor neto. Al pie del dibujo, el valor de
-//   cada celda en pesos (B 4.4), el mismo en las dos mediciones (la D 8.1 usa los valores de la B 4.4).
+// - Pieza: las dos matrices lado a lado, la logística y la regla del umbral, con la misma disposición que
+//   la D 8.1 (filas: pasó o no su umbral; columnas: en la lista o fuera). El acierto, sobre --azul1 y en
+//   --acc; el resto en tinta. Debajo de cada una, su valor neto. Al pie del dibujo, el valor de cada celda
+//   en pesos (B 4.4), el mismo en las dos mediciones (la D 8.1 usa los valores de la B 4.4), y por qué la
+//   regla tiene decimales (D 8.1: empates del borde repartidos en proporción).
+// - (Crítica del W3, hallazgo 2) En validación la logística es la de la Parte B, sin ajustar (G19, G34:
+//   1.237 aciertos, 82,5 %); la ajustada acierta 1.239 (H05). Por eso se rotula «Regresión logística (Parte
+//   B)»; «Logística ajustada» queda para la medición de test, que es el modelo final de la D 8.1.
 // - Al llegar, la medición del anexo de C3: la lista de 500 sin filtro en los cortes de validación, de
 //   donde sale el valor neto de la B 4.4 (D3.economia.matrices, G33 y G40).
 // - Explorar (cerrado al llegar): «Test» muestra la matriz de la D 8.1, la lista de 500 contactables por
@@ -45,10 +49,10 @@ const MEDICIONES = {
       `${entero(D3.modelos.validacion.filas)} filas`,
     cifra: `valor neto ${ars(M.modelo.neto_ars)} y ${ars(M.regla.neto_ars)} en ${D3.modelos.validacion.cortes} meses`,
     metodos: [
-      { nombre: 'Logística ajustada', m: M.modelo, neto: `${ars(M.modelo.neto_ars)} en ${D3.modelos.validacion.cortes} meses` },
+      { nombre: 'Regresión logística (Parte B)', m: M.modelo, neto: `${ars(M.modelo.neto_ars)} en ${D3.modelos.validacion.cortes} meses` },
       { nombre: 'Regla del umbral', m: M.regla, neto: `${ars(M.regla.neto_ars)} en ${D3.modelos.validacion.cortes} meses` },
     ],
-    fuente: 'B 4.3 y 4.4 · registro G33 y G40',
+    fuente: 'B 4.3 y 4.4 · registro G19, G33, G34 y G40',
   },
   test: {
     frase: `Lista de ${entero(LARGO)} contactables por corte, ${D3.test.conjunto.cortes.length} cortes de test: ` +
@@ -81,7 +85,7 @@ function Matrices({ w, h, k, medicion }) {
   const altoTit = fTit * 1.7
   const altoCab = fCab * 2
   const altoNeto = fNeto * 2.2
-  const altoPie = fRot * 2.4
+  const altoPie = fRot * 3.8
   const celdaH = Math.max(fNum + fRot * 2.6, Math.min((h - altoTit - altoCab - altoNeto - altoPie) / 2, 140 * k))
   // El conjunto, centrado en el alto libre de la tarjeta (un poco arriba del centro), como en el E2.
   const alto = altoTit + altoCab + celdaH * 2 + altoNeto + altoPie
@@ -92,6 +96,7 @@ function Matrices({ w, h, k, medicion }) {
   const mono = { fontFamily: 'var(--mono)', fontWeight: 500, letterSpacing: `${0.06 * fCab}` }
   const pie = `Valor por caso: ${enFrase(F_VP)} ARS ${valorCelda(F_VP)} · ` +
     `${enFrase(F_FP)} ARS ${valorCelda(F_FP)} · los demás, ${valorCelda(F_FN)}`
+  const pie2 = 'Los decimales de la regla son empates del último puesto, repartidos en proporción'
 
   return (
     <svg width={w} height={h} role="img" style={{ display: 'block' }}
@@ -140,8 +145,11 @@ function Matrices({ w, h, k, medicion }) {
           </g>
         )
       })}
-      <text x={anchoFilaCab} y={Math.min(yPie, h - fRot * 0.4)} fontSize={fRot} fill="var(--mut2)" className="tabular">
+      <text x={anchoFilaCab} y={Math.min(yPie, h - fRot * 1.8)} fontSize={fRot} fill="var(--mut2)" className="tabular">
         {sinCortes(pie)}
+      </text>
+      <text x={anchoFilaCab} y={Math.min(yPie + fRot * 1.4, h - fRot * 0.4)} fontSize={fRot} fill="var(--mut2)">
+        {pie2}
       </text>
     </svg>
   )

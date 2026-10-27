@@ -916,6 +916,15 @@ export const D3 = {
     -1.0709999999999895
    ]
   },
+  "modelo_menos_regla_500_sin_filtro": {
+   "diferencia_pp": 1.0222222222222324,
+   "ic95_pp": [
+    -0.5049206349206273,
+    1.8069761904761912
+   ],
+   "aciertos_de_mas": 15.333333333333485,
+   "replicas_a_favor": 0.865
+  },
   "no_contactables_lista_500": 483.0,
   "precision_de_equilibrio": 0.3207671620152508,
   "ajuste": {
@@ -2697,6 +2706,36 @@ export const D3 = {
    "nombre": "lista: no contactables en la de 500 sin filtro",
    "documento": "483",
    "donde": "C 7.2 · C3 A2"
+  },
+  {
+   "id": "H06",
+   "nombre": "lista: logística ajustada − regla, 500 sin filtro (puntos)",
+   "documento": "1,02",
+   "donde": "C 7.1; D 11.2"
+  },
+  {
+   "id": "H06",
+   "nombre": "lista: IC 95 % inferior (puntos)",
+   "documento": "−0,50",
+   "donde": "C 7.1; D 11.2"
+  },
+  {
+   "id": "H06",
+   "nombre": "lista: IC 95 % superior (puntos)",
+   "documento": "1,81",
+   "donde": "C 7.1; D 11.2"
+  },
+  {
+   "id": "H06",
+   "nombre": "lista: aciertos de más en 1.500",
+   "documento": "15,3",
+   "donde": "C 7.1"
+  },
+  {
+   "id": "H06",
+   "nombre": "lista: réplicas a favor del modelo (%)",
+   "documento": "86,5",
+   "donde": "C 7.1"
   },
   {
    "id": "H01",

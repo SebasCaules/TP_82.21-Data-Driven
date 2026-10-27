@@ -8,13 +8,18 @@
 //
 // - Deslizante: la tasa de éxito s sobre la grilla precalculada de D3.economia.grilla (el navegador no
 //   calcula: lee la fila i). Arranca en la observada (1,02 %) y va del borde inferior del IC 95 % (0,63 %)
-//   a 100 %, con el tramo de 0,63 a 5 % ampliado y sombreado (la grilla cambia de paso en 5 %). Imanes y
-//   ↑ ↓ en las marcas de la grilla (`notables`). Arriba, la observada con su IC y el equilibrio del
-//   descuento elegido; abajo, la escala.
+//   a 100 %, con el tramo de 0,63 a 5 % ampliado (la grilla cambia de paso en 5 %). Imanes y ↑ ↓ en las
+//   marcas de la grilla (`notables`). Arriba, la observada con su IC y el equilibrio del descuento
+//   elegido; abajo, la escala. (Crítica del W3, hallazgo 6) Un solo sombreado, el del IC, que es el que
+//   nombra el rótulo; el cambio de escala en 5 % va marcado con un corte (dos barras sobre el riel) y no
+//   con un segundo sombreado sin leyenda.
 // - Descuento: con el de la oferta (15 %) o sin descuento; cambia la regla y el modelo (columnas `_sin`).
 // - Lecturas: s, el ROI de la regla y el del modelo sobre la regla, con la fila de la grilla.
 // - El gráfico: la barra del beneficio de la regla sigue a s. El eje queda fijo mientras se arrastra (el
 //   tope es el beneficio con s = 100 % del descuento elegido), así las barras de costo no saltan.
+//   (Crítica del W3, hallazgo 7) El beneficio es el de la lista de 500 sin filtro en validación, el
+//   escenario base de la B 3.4 (G41): la frase lo dice, y el title suma la lista que sale (500
+//   contactables) en validación (H42) y en test (D 11.2, J12).
 // Los valores que dependen del control llevan data-simulacion; las marcas de la escala, data-escala.
 // «Cerrar» vuelve a la observada, con descuento, y al gráfico de la vista presentada.
 
@@ -47,6 +52,9 @@ const MARCAS = [0.01, 0.02, 0.03, 0.04, 0.05, 0.25, 0.5, 0.75, 1].map((v) => ({ 
 const DESC = pct(E.parametros.descuento, 0)
 const OPCIONES = [{ valor: 'con', texto: `${DESC} de descuento` }, { valor: 'sin', texto: 'Sin descuento' }]
 
+const RC = E.regla_contactables                                           // H42
+const RT = D3.test.roi_b_3_4.find((f) => f.fila === 'regla_sin_modelo')   // J12
+if (!RT) throw new Error('V05_Simulador: D3.test.roi_b_3_4 no trae la fila de la regla')
 const COSTO_MODELO = E.costos.con_modelo.total_anio_1_usd
 const COSTO_REGLA = E.costos.regla_sin_modelo.total_anio_1_usd
 const ULTIMA = G.n - 1
@@ -75,11 +83,15 @@ function Escala({ ancho, i, setI, desc }) {
     <div style={{ paddingLeft: 12, paddingRight: 12 }}>
       <Deslizante n={G.n} desde={DESDE} valor={i} onCambio={setI} imanes={IMANES} ancho={w} alto={78}
                   etiqueta="Tasa de éxito" textoValor={tasa(G.s[i])}>
-        {/* el tramo ampliado (0,63 a 5 %) y el IC 95 % de la observada, detrás del riel */}
-        <div style={{ position: 'absolute', left: 0, width: xi(QUIEBRE), top: 30, height: 16, background: 'var(--zona)' }} />
+        {/* el IC 95 % de la observada, detrás del riel; en 5 %, el corte de la escala (cambia de paso) */}
         <div style={{ position: 'absolute', left: xi(IC[0].i), width: Math.max(2, xi(IC[1].i) - xi(IC[0].i)), top: 30,
                       height: 16, background: 'var(--azul1)' }} />
-        <i style={{ position: 'absolute', left: xi(QUIEBRE), top: 28, width: 1, height: 20, background: 'var(--eje)' }} />
+        <i aria-hidden="true" style={{ position: 'absolute', left: xi(QUIEBRE) - 5, top: 29, width: 10, height: 18,
+                                       background: 'var(--sup)', zIndex: 2 }} />
+        {[-3, 3].map((d) => (
+          <i key={d} aria-hidden="true" style={{ position: 'absolute', left: xi(QUIEBRE) + d - 1, top: 29, width: 2, height: 18,
+                                                 background: 'var(--eje)', transform: 'skewX(-24deg)', zIndex: 3 }} />
+        ))}
         {/* arriba: la observada y el equilibrio del descuento elegido */}
         <i style={{ position: 'absolute', left: xi(OBS.i) - 1, top: 18, width: 2, height: 30, background: 'var(--ink)' }} />
         <span style={{ ...rot, left: xi(OBS.i) - 2, top: 0, color: 'var(--ink)', fontWeight: 600 }} data-escala="">
@@ -147,13 +159,18 @@ export function TarjetaCostoBeneficio() {
   const reglaRoi = col('regla_roi_pct', desc)[i]
   const modeloRoi = col('modelo_roi_pct', desc)[i]
 
+  const titulo = `Beneficio anual de la regla con la lista de 500 sin filtro en los cortes de validación, el escenario `
+    + `base de la B 3.4: ${monto(E.observada.regla_usd)}, ROI ${pctDirecto(E.observada.regla_roi_pct, 2)}. Con la lista `
+    + `que sale, 500 contactables: ${monto(RC.usd_anio)} en validación (ROI ${pctDirecto(RC.roi_pct, 2)}) y `
+    + `${monto(RT.contactables.usd)} en test (ROI ${pctDirecto(RT.contactables.roi_pct, 2)}, Parte D 11.2). Ninguna `
+    + 'recupera el costo en el año.'
+    + (explorar ? ` Simulación sobre la grilla de la Parte B (filas G31 a G54 del registro). ${D9.pie_figura}` : '')
   return (
-    <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}
-         title={explorar ? `Simulación sobre la grilla de la Parte B (filas G31 a G54 del registro). ${D9.pie_figura}` : undefined}>
+    <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }} title={titulo}>
       {/* El rótulo sigue siendo hijo directo de la tarjeta, como en V05 antes de W3 (paridad_e3.py mide
           `.pant > .tarjeta > .kpi-lbl` en esta vista): el botón va adentro, a la derecha de la cifra. */}
       <span className="kpi-lbl frase">
-        <span style={{ flex: '1 1 auto' }}>{D9.pie_figura.replace(/\.$/, '')}</span>
+        <span style={{ flex: '1 1 auto' }}>{`${D9.pie_figura.replace(/\.$/, '')}, lista de 500 sin filtro en validación`}</span>
         <b className="tabular" {...(explorar ? sim : {})}>{`${monto(regla)} por año contra ${monto(COSTO_REGLA)}`}</b>
         <BotonExplorar abierto={explorar} onCambio={cambiarExplorar} style={{ marginLeft: 'clamp(4px, 0.6cqw, 10px)' }} />
       </span>
