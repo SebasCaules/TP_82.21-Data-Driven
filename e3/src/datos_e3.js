@@ -44,7 +44,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "719b97dddcfc6d76c0a1e25da1d65f9f88007a600192b9fdc411a3ffcc87d7db"
+   "sha256": "984dc98e81630ef2e4db6a5259e369955cdbd059d328b00859852e3abcff0d48"
   }
  },
  "caso": {
@@ -2271,7 +2271,7 @@ export const D3 = {
    "id": "H16",
    "nombre": "lista: comparación 500 contactables, aciertos de más",
    "documento": "29",
-   "donde": "C 7.2 · C3 d7"
+   "donde": "C 7.2"
   },
   {
    "id": "H16",
@@ -2715,7 +2715,7 @@ export const D3 = {
    "id": "H16",
    "nombre": "lista: aciertos de más de la regla, 500 contactables",
    "documento": "29",
-   "donde": "C 7.2 · C3 d7"
+   "donde": "C 7.2"
   },
   {
    "id": "H45",
@@ -2973,7 +2973,7 @@ export const D3 = {
    "id": "G43",
    "nombre": "economía: veces lo observado, con descuento",
    "documento": "48,6",
-   "donde": "B 3.6 · C3 d9"
+   "donde": "B 3.6 · C3 d2"
   },
   {
    "id": "G43",
