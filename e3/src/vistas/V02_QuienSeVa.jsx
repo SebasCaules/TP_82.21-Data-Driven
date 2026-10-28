@@ -6,10 +6,10 @@
 //   D3.test.conjunto.tasa (25,35 %, registro J02): de las filas cliente × corte del test (cortes de enero a
 //   mayo de 2025, clientes elegibles que al corte todavía no pasaron su umbral; pipeline/tablon.py), las que
 //   pasan su umbral en los 90 días siguientes. Responde la pregunta de la vista. El rótulo arma «90» con
-//   D3.caso.ventana_dias. Secundaria: la caída de ventas de 2025 contra 2024 (D3.encuadre, C14) con el
-//   fragmento «no se sabe cuánto es mercado» (pendiente 74 del E3 y bloque D de C 6.1): ya no dice «con
-//   meses incompletos», que desmentía la cifra; el texto entero de C3 (meses incompletos, CAME) va al title.
-//   Sale la capacidad de Marketing (500/mes): no responde quién se va; queda en el guion y en la V04.
+//   D3.caso.ventana_dias. Es la única tarjeta de cifra (28/10, fix del verificador): la caída de ventas de
+//   2025 (−35,6 %) salió porque cualquier fragmento corto deja afuera que 2025 llegó con meses incompletos y
+//   se lee como caída limpia; queda en el guion. La capacidad de Marketing (500/mes) también salió: no
+//   responde quién se va.
 // - Decisión: la definición del umbral, «A-UMB · vigente» de decisiones.js (DEF-UMBRAL). La frase corta se
 //   arma con el factor y el piso de D3.caso; la definición completa de C3 va al title.
 // - Gráfico: la línea de tiempo del cliente real CLI03296 (H23), el mejor gráfico del tablero. Llena el alto
@@ -25,8 +25,8 @@ import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
 import { C3 } from '../contenido_e3.js'
-import { entero, fecha, fijo, pct, pctDirecto } from '../formato.js'
-import { plano, sinCodigos } from '../texto.jsx'
+import { entero, fecha, fijo, pct } from '../formato.js'
+import { plano } from '../texto.jsx'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
 import { Cifra } from '../cifra.jsx'
@@ -36,7 +36,6 @@ import './V02.css'
 const C = D3.caso
 const T = D3.test.conjunto
 const D = C3.DIAPOSITIVAS.find((d) => d.n === 3)
-const [CAIDA] = D.cifras
 const [DEF_UMBRAL, DEF_SE_VA, DEF_MODELO] = D.definicion.map(plano)
 const sinPunto = (t) => t.replace(/\.$/, '')
 
@@ -48,12 +47,6 @@ const SE_VAN = {
   title: `${pct(T.tasa, 2)}: de ${entero(T.filas)} filas cliente × corte del test (cortes del ${fecha(T.desde)} al ` +
     `${fecha(T.hasta)}; clientes que al corte no pasaron su umbral), ${entero(T.positivos)} lo pasan en los ` +
     `${entero(C.ventana_dias)} días siguientes. ${DEF_SE_VA}`,
-}
-const VENTAS = {
-  rotulo: 'Ventas 2025 vs. 2024',
-  valor: pctDirecto(D3.encuadre.variacion_ventas_2025_pct, 1),
-  linea: 'no se sabe cuánto es mercado',
-  title: `${plano(CAIDA.valor)}: ${sinCodigos(plano(CAIDA.texto))}`,
 }
 
 // La decisión: id y estado de decisiones.js, como toda vista. La frase corta (≤ 60 caracteres, regla 11
@@ -229,7 +222,6 @@ export default function V02QuienSeVa() {
     <section className="pant v02">
       <Banda dcs={[DECISION]}>
         <TarjetaCifra c={SE_VAN} central span={3} />
-        <TarjetaCifra c={VENTAS} span={2} />
       </Banda>
 
       <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }} title={plano(D.pie_figura)}>
