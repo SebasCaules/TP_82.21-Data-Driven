@@ -65,7 +65,7 @@ export const C3 = {
         }
       ],
       "decision": "**Decisión.** La lista de 500 por mes sale con la regla del umbral, sin modelo. Un piloto de tres meses con grupo de control mide la tasa de éxito antes de invertir más.",
-      "fuente": "Parte A 1.3 · Parte B 3.6 · Parte C 5.4 y 6.3",
+      "fuente": "Parte D 11.1",
       "ids": [
         "F16",
         "G40",
@@ -109,8 +109,8 @@ export const C3 = {
         "C08",
         "H23"
       ],
-      "guion": "En 2025 las ventas cayeron 35,6 %. Para encontrar a quién se va, cada cliente tiene su umbral: 1,5 veces su intervalo habitual entre compras, con un piso de 90 días. Se va si lo pasa sin comprar. Este es un cliente real. Compra cada 162 días, su umbral es 243 y al corte llevaba 181. En los 90 días siguientes lo cruzó. Queremos encontrar a estos clientes antes, en una lista de 500 por mes, que es lo que Marketing puede contactar.",
-      "segundos": 50
+      "guion": "En 2025 las ventas cayeron 35,6 %. El rubro cayó 15,0 % interanual en diciembre y los últimos meses de 2025 llegaron incompletos: no sabemos cuánto es mercado. Para encontrar a quién se va, cada cliente tiene su umbral: 1,5 veces su intervalo habitual entre compras, con un piso de 90 días. Se va si lo pasa sin comprar. Este es un cliente real. Compra cada 162 días, su umbral es 243 y al corte llevaba 181. En los 90 días siguientes lo cruzó. Queremos encontrar a estos clientes antes, en una lista de 500 por mes, que es lo que Marketing puede contactar.",
+      "segundos": 60
     },
     {
       "n": 4,
@@ -281,8 +281,8 @@ export const C3 = {
         "J09",
         "J10"
       ],
-      "guion": "Pero esa lista no se puede mandar: un tercio son clientes que no aceptaron marketing o pidieron la baja. En la lista que sale, en validación ganaba la regla por 29 clientes, y en el test empatan: −0,25 puntos, con un intervalo que incluye el cero. Para pagar los USD 10.400 que agrega, el modelo tendría que acertar 8.595 clientes más por mes. Por eso la lista sale con la regla.",
-      "segundos": 40
+      "guion": "Pero esa lista no se puede mandar: un tercio son clientes que no aceptaron marketing o pidieron la baja. En la lista que sale, en validación ganaba la regla por 29 clientes, y en el test empatan: −0,25 puntos, con un intervalo que incluye el cero. Para pagar los USD 10.400 que agrega, el modelo tendría que acertar 8.595 clientes más por mes, en una lista de 500: ni una lista perfecta lo paga. Por eso la lista sale con la regla.",
+      "segundos": 45
     },
     {
       "n": 8,
@@ -327,8 +327,8 @@ export const C3 = {
         "H42",
         "J12"
       ],
-      "guion": "Pasamos a dinero. Un acierto vale, en valor esperado, 99,96 pesos: vuelve uno de cada 98. Un falso positivo cuesta 47,21. Con esos valores, lo que el modelo suma sobre la regla vale 5,38 dólares por año, contra 10.400 que agrega al costo. En el test es peor: queda 1,54 dólares por año debajo de la regla.",
-      "segundos": 35
+      "guion": "Pasamos a dinero. Un acierto vale, en valor esperado, 99,96 pesos: vuelve uno de cada 98. Un falso positivo cuesta 47,21. En su mejor caso, con la lista sin filtrar de validación, lo que el modelo suma sobre la regla vale 5,38 dólares por año, contra 10.400 que agrega al costo. En el test, con la lista que sale, queda 1,54 dólares por año debajo de la regla.",
+      "segundos": 40
     },
     {
       "n": 9,
@@ -383,10 +383,11 @@ export const C3 = {
         "G41",
         "G40",
         "G43",
-        "G42"
+        "G42",
+        "J12"
       ],
-      "guion": "Tampoco la regla sola se paga. Con modelo, el primer año pasa el presupuesto; sin modelo cuesta 20.260 dólares y la regla deja 299,49 por año. Para pagarse tendría que volver el 49,6 % de los contactados que se iban a ir, 48,6 veces lo que vemos. Y ese 1,02 % es un techo, sin grupo de control. No es viable tal como está planteado.",
-      "segundos": 40
+      "guion": "Tampoco la regla sola se paga. Con modelo, el primer año pasa el presupuesto; sin modelo cuesta 20.260 dólares y la regla deja 299,49 por año; en el test, con la lista que sale, 327,06. Para pagarse tendría que volver el 49,6 % de los contactados que se iban a ir, 48,6 veces lo que vemos. Y ese 1,02 % es un techo, sin grupo de control. No es viable tal como está planteado.",
+      "segundos": 45
     },
     {
       "n": 10,
@@ -576,7 +577,7 @@ export const C3 = {
         "Quién opera la lista después del piloto (semana 13).",
         "Si pasa a producción, con 40,4 puntos o más (semana 20)."
       ],
-      "nota": "Plan de 20 semanas desde la entrega; la primera lista sale en la semana 6 y la decisión se toma con el tercer mes cerrado, en la semana 18. El grupo de control lo aprueba Sofía R. (semana 2).",
+      "nota": "Plan de 20 semanas desde la entrega; la primera lista sale en la semana 6 y la decisión se toma en la semana 20, con el tercer mes cerrado en la 18. El grupo de control lo aprueba Sofía R. (semana 2).",
       "fuente": "Parte B 3.6 · Parte C 6.3 · Parte D 12.1 a 12.4",
       "ids": [
         "G49",
@@ -1273,7 +1274,7 @@ export const C3 = {
   "TIEMPOS": {
     "palabras_por_minuto": 130,
     "cambio_s": 3,
-    "total_s": 440,
+    "total_s": 465,
     "turnos": [
       {
         "quien": "Sebastian C.",
@@ -1281,7 +1282,7 @@ export const C3 = {
           2,
           3
         ],
-        "segundos": 105
+        "segundos": 115
       },
       {
         "quien": "Tomas F.",
@@ -1297,7 +1298,7 @@ export const C3 = {
           6,
           7
         ],
-        "segundos": 70
+        "segundos": 75
       },
       {
         "quien": "Francisco C.",
@@ -1305,7 +1306,7 @@ export const C3 = {
           8,
           9
         ],
-        "segundos": 75
+        "segundos": 85
       },
       {
         "quien": "Matías S.",

@@ -40,7 +40,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "c98442192b56536b7baa6fd7533f6146d928e0d847d2ff79b654b87e6b586e67"
+   "sha256": "b8c90c7834d3b36730c5d2c111f2fad14b24771c5e62d7ed19a0326d36d0ce78"
   }
  },
  "caso": {
