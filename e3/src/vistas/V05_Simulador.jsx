@@ -28,6 +28,7 @@
 //   (Crítica del W3, hallazgo 7) El beneficio es el de la lista de 500 sin filtro en validación, el
 //   escenario base de la B 3.4 (G41): la frase lo dice, y el title suma la lista que sale (500
 //   contactables) en validación (H42) y en test (D 11.2, J12).
+// - (28/10) El ROI negativo y el equilibrio, en --acc: la terracota queda para la excepción (regla 4 del plan).
 // - La conclusión sigue al deslizante: si el ROI de la regla llega a 0 o más, dice que la regla se paga.
 // Los valores que dependen del control llevan data-simulacion; las marcas de la escala, data-escala.
 // «Cerrar» vuelve a la observada, con descuento, y al gráfico de la vista presentada.
@@ -83,7 +84,7 @@ function Lectura({ rotulo, valor, malo }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: '0.45em', whiteSpace: 'nowrap' }}>
       <span style={{ color: 'var(--mut2)' }}>{rotulo}</span>
-      <b className="tabular" style={{ color: malo ? 'var(--terra)' : 'var(--ink)' }} {...sim}>{valor}</b>
+      <b className="tabular" style={{ color: malo ? 'var(--acc)' : 'var(--ink)' }} {...sim}>{valor}</b>
     </span>
   )
 }
@@ -112,8 +113,8 @@ function Escala({ ancho, i, setI, desc }) {
         <span style={{ ...rot, left: xi(OBS.i) - 2, top: 0, color: 'var(--ink)', fontWeight: 600 }} data-escala="">
           {`${tasa(OBS.s)} observada; sombreado, su IC 95 %`}
         </span>
-        <i style={{ position: 'absolute', left: xi(eq.i) - 1, top: 18, width: 2, height: 30, background: 'var(--terra)' }} />
-        <span style={{ ...rot, right: w - xi(eq.i) - 2, top: 0, color: 'var(--terra)', fontWeight: 600 }} data-escala="">
+        <i style={{ position: 'absolute', left: xi(eq.i) - 1, top: 18, width: 2, height: 30, background: 'var(--acc)' }} />
+        <span style={{ ...rot, right: w - xi(eq.i) - 2, top: 0, color: 'var(--acc)', fontWeight: 600 }} data-escala="">
           {`${tasa(eq.s)}: la regla se paga`}
         </span>
         {/* abajo: la escala */}
@@ -186,7 +187,7 @@ export function TarjetaCostoBeneficio() {
     + `${monto(RT.contactables.usd)} en test (ROI ${pctDirecto(RT.contactables.roi_pct, 2)}, Parte D 11.2). Ninguna `
     + `recupera el costo en el año. Con modelo, el año 1 cuesta ${monto(COSTO_MODELO)} (presupuesto `
     + `${monto(E.costos.presupuesto_usd)}).`
-    + (explorar ? ` Simulación sobre la grilla de la Parte B (filas G31 a G54 del registro). ${D9.pie_figura}` : '')
+    + (explorar ? ` Simulación sobre la grilla de la Parte B. ${D9.pie_figura}` : '')
   return (
     <div className="tarjeta e3-v05-graf" title={titulo}>
       <div className="e3-v05-cab">

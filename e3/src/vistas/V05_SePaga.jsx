@@ -8,11 +8,12 @@
 //   central de la vista 1 y no se repite. Después, en tarjetas separadas, lo que suma el modelo sobre la regla
 //   (observada.modelo_usd, USD 5,38 por año, G40) y lo que cuesta de más en el año 1
 //   (costos.incremental_usd, USD 10.400, C28). El 49,6 % de tasa de éxito necesaria sale de la banda: lo
-//   muestra la vista 1. Rótulos ≤ 22 caracteres y fragmentos sin segundo número (N0-8); el detalle, al title.
-//   Anchos 3 / 2 / 2: con menos, el −98,52 % no entra en la central a 1366 × 768. Los dos montos van sin
-//   «USD» en la cifra y con «dólares» en el fragmento: «USD 10.400» mide 225 px con su relleno a 1366 × 768
-//   y la tarjeta de ancho 2 mide 188 (ningún reparto de la grilla de 7 de la banda le da más sin dejar
-//   afuera el −98,52 %); el rótulo con «(USD)» pasa de una línea.
+//   muestra la vista 1. Rótulos ≤ 22 caracteres y fragmentos de un renglón a 1366 × 768, sin segundo número
+//   (N0-8); el detalle, al title. Anchos 3 / 2 / 2: con menos, el −98,52 % no entra en la central a
+//   1366 × 768. «USD 5,38» lleva su moneda y aclara que es la lista sin filtrar (en la que sale, el modelo
+//   empata: vista 4). «USD 10.400» no entra pegado (225 px con su relleno contra 188 de la tarjeta a
+//   1366 × 768, y ningún reparto de la grilla de 7 le da más sin dejar afuera el −98,52 %): va «10.400» y el
+//   fragmento empieza con «dólares». El año 1 del costo, al title.
 // - Decisión: el veredicto de C3 (diapositiva 9), solo la frase corta en negrita; el resto, al title.
 // - Gráfico (V05_Simulador.jsx, TarjetaCostoBeneficio): dos barras, el costo del año 1 de la regla sola
 //   (USD 20.260, contexto) contra su beneficio anual (USD 299,49, --acc). La astilla del beneficio es el
@@ -61,14 +62,14 @@ const ROI = {
 }
 const SUMA = {
   rotulo: 'Suma el modelo',
-  valor: fijo(E.observada.modelo_usd, 2),
-  linea: 'dólares por año, sobre la regla',
-  title: `Lo que suma el modelo sobre la regla: ${usd(E.observada.modelo_usd, 2)} por año. ${plano(D8.cadena)} ${plano(D8.filtro)}`,
+  valor: usd(E.observada.modelo_usd, 2),
+  linea: 'por año, sin filtrar',
+  title: `Lo que suma el modelo sobre la regla con la lista de 500 sin filtrar en validación: ${usd(E.observada.modelo_usd, 2)} por año. ${plano(D8.cadena)} ${plano(D8.filtro)}`,
 }
 const CUESTA = {
   rotulo: 'Cuesta el modelo',
   valor: fijo(E.costos.incremental_usd),
-  linea: 'dólares más el primer año',
+  linea: 'dólares de más',
   title: `El modelo cuesta ${usd(E.costos.incremental_usd)} más que la regla en el año 1: ${usd(C_MOD)} con modelo contra ${usd(C_REG)} con la regla sola; el presupuesto es `
     + `${usd(E.costos.presupuesto_usd)}.`,
 }
