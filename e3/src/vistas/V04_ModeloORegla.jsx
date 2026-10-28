@@ -11,7 +11,7 @@
 //   (van al gráfico); fragmentos de 2 a 6 palabras sin segundo número (N0-8).
 //   - «Lista que sale · test», la central: logística menos regla en la lista de 500 contactables (J09,
 //     D3.test.contra_regla.diferencia_pp), «empata con la regla».
-//   - «Harían falta por mes»: los aciertos de más por mes que pagan los USD 10.400 del modelo (J10,
+//   - «Para pagar el modelo» (unidad «aciertos más/mes»): los aciertos de más por mes que pagan los USD 10.400 del modelo (J10,
 //     D3.test.decision.aciertos_por_mes_para_pagar), «más que toda la lista». El largo de la lista va al
 //     title y la vista corta el armado si la cifra deja de pasar ese largo.
 //   Dos tarjetas, no tres: el +1,06 sin filtrar (J11) queda en el gráfico, con su veredicto, y su detalle en
@@ -305,10 +305,10 @@ export default function V04ModeloORegla() {
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 1' }} title={TITULO_PAGA}>
-          <span className="kpi-lbl"><span>Harían falta por mes</span></span>
+          <span className="kpi-lbl"><span>Para pagar el modelo</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
-              <Cifra num={entero(DE.aciertos_por_mes_para_pagar)} unidad={`${NBSP}aciertos`} sec />
+              <Cifra num={entero(DE.aciertos_por_mes_para_pagar)} unidad={`${NBSP}aciertos más/mes`} sec />
             </div>
           </div>
           <p className="e2-linea">más que toda la lista</p>
