@@ -102,51 +102,59 @@ para Pages y no se versiona.
 
 ## Presentación del Entregable 3 (`/e3/`)
 
-La presentación del 27/10/2026 en el navegador: las 12 diapositivas del PPTX del equipo, en el
-mismo orden y con el mismo texto, más los anexos A1 a A6 de respaldo. Donde ayuda a contestar
-preguntas, la diapositiva se mueve: la tasa de éxito con y sin descuento (9), el largo y el
-filtro de la lista (7), validación o entrenamiento (6) y la matriz de los 13 riesgos (11). Un
-solo HTML autocontenido en `dist-e3/index.html`: se abre con doble clic, sin red.
+La presentación del Entregable 3 (Partes A a D) en el navegador, con el armazón del tablero del E2:
+riel de capítulos a la izquierda, la pregunta de cada vista como encabezado, una banda de cifras con
+la tarjeta de decisión y un gráfico. Siete vistas presentadas y siete anexos de respaldo (A1 a A7)
+que se abren solo si preguntan. Los controles para explorar (precisión por método, simulador de la
+tasa de éxito, acciones legales, riesgos, flujo y plan del piloto) llegan cerrados detrás de
+«Explorar». La letra es la del E2 por un factor uniforme, k = mín(1,2; ancho / 1152; alto / 640) y nunca menos de 1. Un solo HTML
+autocontenido en `dist-e3/index.html`: se abre con doble clic, sin red.
 
-El texto sale del vault y los números de las salidas de las partes; el navegador no calcula
-(contrato en `pipeline/CONTRACT_E3.md`, diseño por diapositiva en `e3/DISENO.md`).
+| # | Pregunta | Sale de |
+|---|---|---|
+| 1 | ¿Conviene anticipar a quien deja de comprar? | Partes A, B y C; veredicto integrado de la D 11.1 |
+| 2 | ¿Quién se va? | A 2.1; C 7.3 |
+| 3 | ¿Se puede hacer? | A 1.1 a 1.6 |
+| 4 | ¿El modelo mejora a la regla? | B 4; C 7; D 8.1, 8.2 y 11.2 (el test) |
+| 5 | ¿Se paga? | B 3 y 4; C 7.2 |
+| 6 | ¿Es legal y seguro? | C 5 y 6 |
+| 7 | ¿Qué decide María G. con el piloto? | D 9, 11.1 y 12 |
+
+El texto y el guion de cada vista salen del vault y los números de las salidas de las partes; el
+navegador no calcula (contrato en `pipeline/CONTRACT_E3.md`; el diseño, en la última sección de
+`e3/DISENO.md`, «Decisiones (27/10, W1): el armazón del E2»).
 
 ```bash
-# en el vault, entregas/entregable-3/_build/F/presentacion/
-python3 exportar_web.py --app <app>    # e3/src/contenido_e3.js y data/e3/*.json
+# en el vault, entregas/entregable-3/_build/F/
+python3 dossiers/guion-presentacion-e3/armar.py --app <app>   # guion, tiempos y capturas (lee las de abajo)
+python3 presentacion/exportar_web.py --app <app>              # e3/src/contenido_e3.js y data/e3/*.json
 # en la app
-python3 -I pipeline/build_e3.py         # e3/src/datos_e3.js; corta si una de sus anclas no da
-npm run build:e3                        # dist-e3/index.html
-python3 scripts/verificar_e3.py         # desborde, consola, red, teclado y controles, a 5 resoluciones
+python3 -I pipeline/build_e3.py                     # e3/src/datos_e3.js; corta si una de sus anclas no da
+npm run build:e3                                    # dist-e3/index.html
+python3 scripts/verificar_e3.py --sin-esqueletos    # desborde, consola, red, teclado, notas y contenido, 5 resoluciones
+python3 scripts/paridad_e3.py                       # estilos, cajas y reglas del E2, 4 resoluciones
+# en el vault
+python3 presentacion/verificar.py --web <app>/dist-e3/index.html   # cada número visible contra las Partes A a D
 ```
 
-`npm run dev:e3` la levanta en el puerto 5179. El verificador usa Playwright de Python
-(`pip install playwright`); si no encuentra su Chromium, abre el Chrome instalado.
+`npm run dev:e3` la levanta en el puerto 5179. Los verificadores usan Playwright de Python
+(`pip install playwright`); si no encuentran su Chromium, abren el Chrome instalado.
 
 | Tecla | Qué hace |
 |---|---|
-| → ↓ Espacio Av Pág Enter | siguiente; en la 3 y la 6, el paso que sigue (el pie avisa «paso 1 de 3 · → sigue aquí») |
-| ← ↑ Re Pág Retroceso | anterior; deshace un paso solo si a la diapositiva se llegó con →; en un anexo, vuelve a la diapositiva de la que se vino |
-| Inicio · Fin | primera · última |
-| número y Enter | ir a esa diapositiva |
-| clic a la izquierda o a la derecha | anterior · siguiente, en todas las diapositivas |
-| O | vista general |
-| A | anexos |
-| N | notas del orador: guion, quién lo dice y su tiempo |
+| → ↓ Av Pág | vista siguiente (Av Pág también con el foco en un control: es el control remoto) |
+| ← ↑ Re Pág | vista anterior |
+| Inicio · Fin | primera vista · último anexo |
+| riel | lleva a cada vista o anexo |
+| N | notas del orador debajo del tablero: el guion de la vista, quién lo dice y su tiempo |
 | F · F5 | pantalla completa (F5 es lo que manda el botón de iniciar de un control remoto) |
-| . · B | pantalla en negro; cualquier tecla vuelve |
-| Esc | cierra lo abierto; nunca cambia la diapositiva ni muestra la vista general |
-| ? | atajos |
+| . · B | pantalla en negro; cualquier tecla vuelve sin cambiar de vista |
+| I | imprime todas las vistas |
+| Esc | suelta el foco de un control |
 
-Un control tocado con el mouse cambia y suelta el foco: → sigue pasando de diapositiva. Con Tab el
-foco queda en el control, las flechas lo mueven (↑ y ↓ saltan entre las marcas del deslizante de la
-9) y Esc lo suelta. La página va en la URL (`#3`, `#a2`). Al abrir en la portada, una pista de 4 s
-recuerda los atajos.
-
-Para presentar con notas: con la pantalla extendida, abrir la misma dirección en dos ventanas, una
-en el proyector y otra en la laptop con N. Las dos se siguen (la que se abre toma la posición de la
-otra) y se puede avanzar desde cualquiera. Con la pantalla duplicada, las notas se verían en el
-proyector: N queda para ensayar.
+La vista va en la URL (`#v04`, `#a2`). Para presentar con notas: con la pantalla extendida, el
+tablero en el proyector y, en la laptop, la misma dirección con `?notas` (o «Abrir en otra ventana»
+desde el panel N). Las dos ventanas se siguen y se puede avanzar desde cualquiera.
 
 ## Los datos
 

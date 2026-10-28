@@ -25,3 +25,9 @@ export function Rico({ t }) {
 
 /** El texto sin marcado, para un title o un aria-label. */
 export const plano = (t) => (t || '').replace(/\*\*/g, '').replace(/\[\[|\]\]/g, '')
+
+/** (27/10, W2) El texto sin las citas al relevamiento («(envío 29)», «(inferido del envío 71)», «, envío
+ *  17»): los códigos internos van fuera de pantalla (regla 13 H13 del E2) y quedan en el title. */
+export const sinCodigos = (t) => (t || '')
+  .replace(/\s*\((?:inferido del )?envío \d+\)/g, '')
+  .replace(/,\s*envío \d+(?=\))/g, '')

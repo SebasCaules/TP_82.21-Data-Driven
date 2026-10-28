@@ -1,0 +1,1350 @@
+{
+  "modo": "test, abierto una sola vez (ver test-abierto.log)",
+  "preregistro_sha256": "c10f6ba35a958a6697d9b48a5b1a00fa8397acf93f734e2838d482400e82ba0f",
+  "medicion": {
+    "cortes": [
+      "2025-01-31",
+      "2025-02-28",
+      "2025-03-31",
+      "2025-04-30",
+      "2025-05-31"
+    ],
+    "filas": 14211,
+    "positivos": 3602,
+    "tasa_base": 0.25346562521990007,
+    "entrenamiento": {
+      "filas": 18882,
+      "cortes": 18,
+      "desde": "2023-01-31",
+      "hasta": "2024-06-30",
+      "clientes": 2921,
+      "positivos": 5698
+    },
+    "anualizar": 2.4,
+    "contactables": {
+      "filas": 9962,
+      "positivos": 2521,
+      "por_corte": [
+        1973,
+        1969,
+        2005,
+        2016,
+        1999
+      ]
+    },
+    "modelo": {
+      "variables": 39,
+      "terminos_con_intercepto": 75,
+      "iteraciones": 31,
+      "intercepto": -2.181414962306178,
+      "coeficientes": [
+        {
+          "termino": "gap_mediano",
+          "variable": "gap_mediano",
+          "valor": null,
+          "coeficiente": -2.473391115651766,
+          "odds_ratio": 0.08429850776179953,
+          "filas": 18882,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "recency_sobre_umbral",
+          "variable": "recency_sobre_umbral",
+          "valor": null,
+          "coeficiente": 1.3080536123813977,
+          "odds_ratio": 3.698967077311982,
+          "filas": 18882,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "recency_dias",
+          "variable": "recency_dias",
+          "valor": null,
+          "coeficiente": 0.68414727466194,
+          "odds_ratio": 1.9820809440635292,
+          "filas": 18882,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "compras_90d",
+          "variable": "compras_90d",
+          "valor": null,
+          "coeficiente": 0.2383252573861128,
+          "odds_ratio": 1.2691219169778574,
+          "filas": 18882,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "envios_acum",
+          "variable": "envios_acum",
+          "valor": null,
+          "coeficiente": -0.18458456848753,
+          "odds_ratio": 0.8314496224890962,
+          "filas": 18882,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "missingindicator_ticket_90d",
+          "variable": "ticket_90d",
+          "valor": "vacío",
+          "coeficiente": 0.18144013075213677,
+          "odds_ratio": 1.198942754760011,
+          "filas": 5173,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "reclamos_90d",
+          "variable": "reclamos_90d",
+          "valor": null,
+          "coeficiente": -0.12516707648428546,
+          "odds_ratio": 0.8823494704212855,
+          "filas": 18882,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "meses_desde_alta",
+          "variable": "meses_desde_alta",
+          "valor": null,
+          "coeficiente": -0.11557005500821553,
+          "odds_ratio": 0.890858160975207,
+          "filas": 18882,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "categoria_dominante_Decoracion",
+          "variable": "categoria_dominante",
+          "valor": "Decoracion",
+          "coeficiente": -0.11435040263551098,
+          "odds_ratio": 0.8919453611133253,
+          "filas": 4439,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "reclamos_acum",
+          "variable": "reclamos_acum",
+          "valor": null,
+          "coeficiente": 0.10084613047635425,
+          "odds_ratio": 1.1061064325988723,
+          "filas": 18882,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "region_dominante_Centro",
+          "variable": "region_dominante",
+          "valor": "Centro",
+          "coeficiente": 0.08177202181999332,
+          "odds_ratio": 1.0852083777951707,
+          "filas": 3760,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "formato_tienda_Chico",
+          "variable": "formato_tienda",
+          "valor": "Chico",
+          "coeficiente": -0.07436985751503361,
+          "odds_ratio": 0.9283282811471186,
+          "filas": 3190,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "provincia_Mendoza",
+          "variable": "provincia",
+          "valor": "Mendoza",
+          "coeficiente": -0.06511811116873048,
+          "odds_ratio": 0.9369567917800291,
+          "filas": 2074,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "provincia_Tucuman",
+          "variable": "provincia",
+          "valor": "Tucuman",
+          "coeficiente": 0.06269408185666991,
+          "odds_ratio": 1.0647010780287227,
+          "filas": 2152,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "region_dominante_NOA",
+          "variable": "region_dominante",
+          "valor": "NOA",
+          "coeficiente": -0.062481906654302775,
+          "odds_ratio": 0.9394300600925422,
+          "filas": 3198,
+          "sentido": "baja el riesgo"
+        }
+      ],
+      "agrupadas_min_frecuencia": {
+        "motivo_ultima_devolucion": [
+          "Cambio de talle/color",
+          "Error de compra",
+          "Producto dañado en envio"
+        ]
+      }
+    },
+    "principal": {
+      "metrica": "precisión de la lista de 500 contactables por corte",
+      "logistica_ajustada": {
+        "umbral": "lista de 500 por corte, solo contactables",
+        "tipo": "lista filtrada",
+        "casos_marcados": 2500,
+        "por_corte": [
+          500,
+          500,
+          500,
+          500,
+          500
+        ],
+        "vp": 2147.0,
+        "fp": 353.0,
+        "fn": 374.0,
+        "vn": 7088.0,
+        "precision": 0.8588,
+        "recall": 0.8516461721539071,
+        "valor_neto_ars": 197948.08814921023,
+        "valor_neto_usd": 135.63507129198277,
+        "valor_neto_anual_usd": 325.5241711007587,
+        "operable": true,
+        "contactables": null,
+        "f1": 0.8552081258713403,
+        "aciertos_por_mes": 429.4,
+        "precision_por_corte": [
+          {
+            "corte": "2025-01-31",
+            "largo": 500,
+            "vp": 423.0,
+            "precision": 0.846
+          },
+          {
+            "corte": "2025-02-28",
+            "largo": 500,
+            "vp": 436.0,
+            "precision": 0.872
+          },
+          {
+            "corte": "2025-03-31",
+            "largo": 500,
+            "vp": 433.0,
+            "precision": 0.866
+          },
+          {
+            "corte": "2025-04-30",
+            "largo": 500,
+            "vp": 435.0,
+            "precision": 0.87
+          },
+          {
+            "corte": "2025-05-31",
+            "largo": 500,
+            "vp": 420.0,
+            "precision": 0.84
+          }
+        ],
+        "auc_roc_contactables": 0.9744690494217609,
+        "probabilidad_del_ultimo_puesto": [
+          0.38888380146765955,
+          0.3787182124087106,
+          0.36214351620283586,
+          0.33225871862161266,
+          0.31750649496166833
+        ]
+      },
+      "regla_umbral": {
+        "umbral": "lista de 500 por corte, solo contactables",
+        "tipo": "lista filtrada",
+        "casos_marcados": 2500,
+        "por_corte": [
+          500,
+          500,
+          500,
+          500,
+          500
+        ],
+        "vp": 2153.35,
+        "fp": 346.65,
+        "fn": 367.65,
+        "vn": 7094.35,
+        "precision": 0.86134,
+        "recall": 0.8541650138833796,
+        "valor_neto_ars": 198882.58156374274,
+        "valor_neto_usd": 136.27539109545802,
+        "valor_neto_anual_usd": 327.06093862909927,
+        "operable": true,
+        "contactables": null,
+        "f1": 0.8577375024895441,
+        "aciertos_por_mes": 430.66999999999996,
+        "precision_por_corte": [
+          {
+            "corte": "2025-01-31",
+            "largo": 500,
+            "vp": 418.0,
+            "precision": 0.836
+          },
+          {
+            "corte": "2025-02-28",
+            "largo": 500,
+            "vp": 433.6,
+            "precision": 0.8672000000000001
+          },
+          {
+            "corte": "2025-03-31",
+            "largo": 500,
+            "vp": 435.0,
+            "precision": 0.87
+          },
+          {
+            "corte": "2025-04-30",
+            "largo": 500,
+            "vp": 441.0,
+            "precision": 0.882
+          },
+          {
+            "corte": "2025-05-31",
+            "largo": 500,
+            "vp": 425.75,
+            "precision": 0.8515
+          }
+        ],
+        "auc_roc_contactables": 0.9787815144081211
+      },
+      "diferencia_logistica_menos_regla": {
+        "replicas": 1000,
+        "semilla": 42,
+        "unidad": "cliente",
+        "ic95": [
+          -0.0145054761904763,
+          0.00787133333333346
+        ],
+        "replicas_con_a_mejor": 0.31
+      }
+    },
+    "secundarias": {
+      "practica_actual_contactables": {
+        "umbral": "lista de 500 por corte, solo contactables",
+        "tipo": "lista filtrada",
+        "casos_marcados": 2500,
+        "por_corte": [
+          500,
+          500,
+          500,
+          500,
+          500
+        ],
+        "vp": 939.709090909091,
+        "fp": 1560.290909090909,
+        "fn": 1581.290909090909,
+        "vn": 5880.709090909091,
+        "precision": 0.37588363636363636,
+        "recall": 0.37275251523565683,
+        "valor_neto_ars": 20277.945791660342,
+        "valor_neto_usd": 13.894555127168507,
+        "valor_neto_anual_usd": 33.34693230520441,
+        "operable": true,
+        "contactables": null,
+        "f1": 0.3743115279462621,
+        "aciertos_por_mes": 187.94181818181818,
+        "precision_por_corte": [
+          {
+            "corte": "2025-01-31",
+            "largo": 500,
+            "vp": 187.9090909090909,
+            "precision": 0.37581818181818183
+          },
+          {
+            "corte": "2025-02-28",
+            "largo": 500,
+            "vp": 199.0,
+            "precision": 0.398
+          },
+          {
+            "corte": "2025-03-31",
+            "largo": 500,
+            "vp": 182.0,
+            "precision": 0.364
+          },
+          {
+            "corte": "2025-04-30",
+            "largo": 500,
+            "vp": 195.0,
+            "precision": 0.39
+          },
+          {
+            "corte": "2025-05-31",
+            "largo": 500,
+            "vp": 175.8,
+            "precision": 0.3516
+          }
+        ],
+        "auc_roc_contactables": 0.6602026914250894
+      },
+      "sin_filtro": {
+        "logistica_ajustada": {
+          "lista_500": {
+            "largo": 2500,
+            "aciertos": 2258.0,
+            "positivos": 3602,
+            "precision": 0.9032,
+            "recall": 0.6268739589117157,
+            "f1": 0.7400852179613242,
+            "valor_neto_usd": 146.82806313225916,
+            "valor_neto_anual_usd": 352.38735151742196
+          },
+          "lista_500_por_corte": [
+            {
+              "corte": "2025-01-31",
+              "precision": 0.884
+            },
+            {
+              "corte": "2025-02-28",
+              "precision": 0.894
+            },
+            {
+              "corte": "2025-03-31",
+              "precision": 0.924
+            },
+            {
+              "corte": "2025-04-30",
+              "precision": 0.93
+            },
+            {
+              "corte": "2025-05-31",
+              "precision": 0.884
+            }
+          ],
+          "decil_superior": 0.932441942294159,
+          "auc_roc": 0.972488446396256,
+          "auc_pr": 0.9031230639607619,
+          "umbral_05": {
+            "precision": 0.891566265060241,
+            "recall": 0.6985008328706275,
+            "f1": 0.7833125778331258,
+            "avisados": 2822
+          },
+          "lift_decil_superior": 3.6787708056474995
+        },
+        "regla_umbral": {
+          "lista_500": {
+            "largo": 2500,
+            "aciertos": 2231.4,
+            "positivos": 3602,
+            "precision": 0.89256,
+            "recall": 0.6194891726818434,
+            "f1": 0.7313667649950836,
+            "valor_neto_usd": 144.1457786011659,
+            "valor_neto_anual_usd": 345.9498686427981
+          },
+          "lista_500_por_corte": [
+            {
+              "corte": "2025-01-31",
+              "precision": 0.876
+            },
+            {
+              "corte": "2025-02-28",
+              "precision": 0.876
+            },
+            {
+              "corte": "2025-03-31",
+              "precision": 0.914
+            },
+            {
+              "corte": "2025-04-30",
+              "precision": 0.9208
+            },
+            {
+              "corte": "2025-05-31",
+              "precision": 0.876
+            }
+          ],
+          "decil_superior": 0.9367346938775509,
+          "auc_roc": 0.9772318077811947,
+          "auc_pr": 0.9123055337535905,
+          "lift_decil_superior": 3.6957070335074618
+        }
+      },
+      "diferencia_sin_filtro_logistica_menos_regla": {
+        "replicas": 1000,
+        "semilla": 42,
+        "unidad": "cliente",
+        "ic95": [
+          0.004056380952380856,
+          0.019486249999999854
+        ],
+        "replicas_con_a_mejor": 0.999
+      },
+      "calibracion": {
+        "brier": 0.06583603373013877,
+        "brier_tasa_base": 0.18922080205178526,
+        "probabilidad_media": 0.2184437874191773,
+        "tasa_observada": 0.25346562521990007,
+        "probabilidad_media_entrenamiento": 0.30177037991891303,
+        "tasa_entrenamiento": 0.30176888041521027,
+        "positivos_esperados": 3104.304663013929,
+        "positivos_observados": 3602,
+        "ece_deciles": 0.058299009520404045,
+        "por_decil": [
+          {
+            "decil": 1,
+            "filas": 1422,
+            "probabilidad_media": 2.069027637509663e-05,
+            "tasa_observada": 0.0
+          },
+          {
+            "decil": 2,
+            "filas": 1421,
+            "probabilidad_media": 0.0004079528962028523,
+            "tasa_observada": 0.0
+          },
+          {
+            "decil": 3,
+            "filas": 1421,
+            "probabilidad_media": 0.0024523591390162368,
+            "tasa_observada": 0.0
+          },
+          {
+            "decil": 4,
+            "filas": 1421,
+            "probabilidad_media": 0.0091806073053324,
+            "tasa_observada": 0.0
+          },
+          {
+            "decil": 5,
+            "filas": 1421,
+            "probabilidad_media": 0.027344637596477383,
+            "tasa_observada": 0.0007037297677691766
+          },
+          {
+            "decil": 6,
+            "filas": 1421,
+            "probabilidad_media": 0.07123325835195837,
+            "tasa_observada": 0.022519352568613652
+          },
+          {
+            "decil": 7,
+            "filas": 1421,
+            "probabilidad_media": 0.16901983501445395,
+            "tasa_observada": 0.14004222378606615
+          },
+          {
+            "decil": 8,
+            "filas": 1421,
+            "probabilidad_media": 0.3626209666892335,
+            "tasa_observada": 0.58972554539057
+          },
+          {
+            "decil": 9,
+            "filas": 1421,
+            "probabilidad_media": 0.6469268296108723,
+            "tasa_observada": 0.8465869106263195
+          },
+          {
+            "decil": 10,
+            "filas": 1421,
+            "probabilidad_media": 0.8953844481472788,
+            "tasa_observada": 0.9352568613652358
+          }
+        ],
+        "lista_500": {
+          "probabilidad_media": 0.8036556665719007,
+          "precision_observada": 0.9032
+        }
+      },
+      "segmentos": {
+        "global": {
+          "filas": 14211,
+          "positivos": 3602,
+          "en_lista": 2500.0,
+          "vp": 2258.0,
+          "fp": 242.0,
+          "precision": 0.9032,
+          "precision_regla": 0.89256
+        },
+        "filas": [
+          {
+            "segmento": "formato de tienda principal",
+            "valor": "(sin tienda)",
+            "filas": 313,
+            "positivos": 66,
+            "tasa_base": 0.2108626198083067,
+            "en_lista": 45.0,
+            "vp": 40.0,
+            "fp": 5.0,
+            "precision": 0.8888888888888888,
+            "ic95": [
+              0.7650062450910905,
+              0.9515959956217445
+            ],
+            "diferencia_pp": -1.4311111111111163,
+            "recall": 0.6060606060606061,
+            "parte_de_la_lista": 0.018,
+            "parte_de_las_falsas_alarmas": 0.02066115702479339,
+            "precision_regla": 0.88,
+            "diferencia_regla_pp": -1.2560000000000016
+          },
+          {
+            "segmento": "formato de tienda principal",
+            "valor": "Chico",
+            "filas": 2349,
+            "positivos": 617,
+            "tasa_base": 0.2626649638143891,
+            "en_lista": 416.0,
+            "vp": 392.0,
+            "fp": 24.0,
+            "precision": 0.9423076923076923,
+            "ic95": [
+              0.9155930219926713,
+              0.9609280278508887
+            ],
+            "diferencia_pp": 3.9107692307692288,
+            "recall": 0.6353322528363047,
+            "parte_de_la_lista": 0.1664,
+            "parte_de_las_falsas_alarmas": 0.09917355371900827,
+            "precision_regla": 0.91701244813278,
+            "diferencia_regla_pp": 2.4452448132780025
+          },
+          {
+            "segmento": "formato de tienda principal",
+            "valor": "Grande",
+            "filas": 5628,
+            "positivos": 1308,
+            "tasa_base": 0.232409381663113,
+            "en_lista": 911.0,
+            "vp": 813.0,
+            "fp": 98.0,
+            "precision": 0.8924259055982436,
+            "ic95": [
+              0.8706324020714864,
+              0.9109236618416543
+            ],
+            "diferencia_pp": -1.0774094401756362,
+            "recall": 0.6215596330275229,
+            "parte_de_la_lista": 0.3644,
+            "parte_de_las_falsas_alarmas": 0.4049586776859504,
+            "precision_regla": 0.8794104510942385,
+            "diferencia_regla_pp": -1.3149548905761477
+          },
+          {
+            "segmento": "formato de tienda principal",
+            "valor": "Mediano",
+            "filas": 5921,
+            "positivos": 1611,
+            "tasa_base": 0.2720824185103868,
+            "en_lista": 1128.0,
+            "vp": 1013.0,
+            "fp": 115.0,
+            "precision": 0.8980496453900709,
+            "ic95": [
+              0.8790187310701159,
+              0.9143785075540873
+            ],
+            "diferencia_pp": -0.5150354609929075,
+            "recall": 0.6288019863438857,
+            "parte_de_la_lista": 0.4512,
+            "parte_de_las_falsas_alarmas": 0.47520661157024796,
+            "precision_regla": 0.8941638407995718,
+            "diferencia_regla_pp": 0.16038407995717652
+          },
+          {
+            "segmento": "canal de alta",
+            "valor": "fisico",
+            "filas": 8335,
+            "positivos": 2087,
+            "tasa_base": 0.2503899220155969,
+            "en_lista": 1466.0,
+            "vp": 1314.0,
+            "fp": 152.0,
+            "precision": 0.8963165075034106,
+            "ic95": [
+              0.8796613228760108,
+              0.9109000546220813
+            ],
+            "diferencia_pp": -0.6883492496589372,
+            "recall": 0.6296118830857691,
+            "parte_de_la_lista": 0.5864,
+            "parte_de_las_falsas_alarmas": 0.628099173553719,
+            "precision_regla": 0.8871403812824955,
+            "diferencia_regla_pp": -0.5419618717504515
+          },
+          {
+            "segmento": "canal de alta",
+            "valor": "online",
+            "filas": 5876,
+            "positivos": 1515,
+            "tasa_base": 0.2578284547311096,
+            "en_lista": 1034.0,
+            "vp": 944.0,
+            "fp": 90.0,
+            "precision": 0.9129593810444874,
+            "ic95": [
+              0.894212297552884,
+              0.9286493029071475
+            ],
+            "diferencia_pp": 0.975938104448737,
+            "recall": 0.6231023102310231,
+            "parte_de_la_lista": 0.4136,
+            "parte_de_las_falsas_alarmas": 0.371900826446281,
+            "precision_regla": 0.8999527186761229,
+            "diferencia_regla_pp": 0.73927186761229
+          },
+          {
+            "segmento": "antigüedad",
+            "valor": "12 a 23 meses",
+            "filas": 3094,
+            "positivos": 943,
+            "tasa_base": 0.3047834518422754,
+            "en_lista": 710.0,
+            "vp": 647.0,
+            "fp": 63.0,
+            "precision": 0.9112676056338028,
+            "ic95": [
+              0.8880770123917574,
+              0.9300316548531888
+            ],
+            "diferencia_pp": 0.8067605633802821,
+            "recall": 0.6861081654294804,
+            "parte_de_la_lista": 0.284,
+            "parte_de_las_falsas_alarmas": 0.2603305785123967,
+            "precision_regla": 0.9082147774208352,
+            "diferencia_regla_pp": 1.5654777420835209
+          },
+          {
+            "segmento": "antigüedad",
+            "valor": "24 meses o más",
+            "filas": 10958,
+            "positivos": 2583,
+            "tasa_base": 0.23571819675123198,
+            "en_lista": 1728.0,
+            "vp": 1554.0,
+            "fp": 174.0,
+            "precision": 0.8993055555555556,
+            "ic95": [
+              0.8842192697109661,
+              0.9126203488777087
+            ],
+            "diferencia_pp": -0.38944444444444226,
+            "recall": 0.6016260162601627,
+            "parte_de_la_lista": 0.6912,
+            "parte_de_las_falsas_alarmas": 0.71900826446281,
+            "precision_regla": 0.8861118842193153,
+            "diferencia_regla_pp": -0.6448115780684716
+          },
+          {
+            "segmento": "antigüedad",
+            "valor": "menos de 12 meses",
+            "filas": 159,
+            "positivos": 76,
+            "tasa_base": 0.4779874213836478,
+            "en_lista": 62.0,
+            "vp": 57.0,
+            "fp": 5.0,
+            "precision": 0.9193548387096774,
+            "ic95": [
+              0.824712077925188,
+              0.9650621681441662
+            ],
+            "diferencia_pp": 1.6154838709677377,
+            "recall": 0.75,
+            "parte_de_la_lista": 0.0248,
+            "parte_de_las_falsas_alarmas": 0.02066115702479339,
+            "precision_regla": 0.9196787148594378,
+            "diferencia_regla_pp": 2.711871485943773
+          },
+          {
+            "segmento": "alto valor",
+            "valor": "20 % de mayor facturación",
+            "filas": 2845,
+            "positivos": 996,
+            "tasa_base": 0.3500878734622144,
+            "en_lista": 727.0,
+            "vp": 637.0,
+            "fp": 90.0,
+            "precision": 0.8762035763411279,
+            "ic95": [
+              0.8502661869298945,
+              0.8981860084569034
+            ],
+            "diferencia_pp": -2.6996423658872115,
+            "recall": 0.6395582329317269,
+            "parte_de_la_lista": 0.2908,
+            "parte_de_las_falsas_alarmas": 0.371900826446281,
+            "precision_regla": 0.8645894001164822,
+            "diferencia_regla_pp": -2.79705998835178
+          },
+          {
+            "segmento": "alto valor",
+            "valor": "resto",
+            "filas": 11366,
+            "positivos": 2606,
+            "tasa_base": 0.22928030969558333,
+            "en_lista": 1773.0,
+            "vp": 1621.0,
+            "fp": 152.0,
+            "precision": 0.9142695995487874,
+            "ic95": [
+              0.9003253960115347,
+              0.9264224694143988
+            ],
+            "diferencia_pp": 1.106959954878739,
+            "recall": 0.6220260936300844,
+            "parte_de_la_lista": 0.7092,
+            "parte_de_las_falsas_alarmas": 0.628099173553719,
+            "precision_regla": 0.9031546437238033,
+            "diferencia_regla_pp": 1.0594643723803254
+          },
+          {
+            "segmento": "genero",
+            "valor": "(vacío)",
+            "filas": 701,
+            "positivos": 187,
+            "tasa_base": 0.26676176890156916,
+            "en_lista": 127.0,
+            "vp": 114.0,
+            "fp": 13.0,
+            "precision": 0.8976377952755905,
+            "ic95": [
+              0.8327267299026505,
+              0.9391990184831839
+            ],
+            "diferencia_pp": -0.5562204724409492,
+            "recall": 0.6096256684491979,
+            "parte_de_la_lista": 0.0508,
+            "parte_de_las_falsas_alarmas": 0.05371900826446281,
+            "precision_regla": 0.8888888888888888,
+            "diferencia_regla_pp": -0.36711111111111805
+          },
+          {
+            "segmento": "genero",
+            "valor": "F",
+            "filas": 6442,
+            "positivos": 1607,
+            "tasa_base": 0.2494566904687985,
+            "en_lista": 1132.0,
+            "vp": 1033.0,
+            "fp": 99.0,
+            "precision": 0.9125441696113075,
+            "ic95": [
+              0.8946604564704642,
+              0.9276373005407247
+            ],
+            "diferencia_pp": 0.9344169611307462,
+            "recall": 0.64281269446173,
+            "parte_de_la_lista": 0.4528,
+            "parte_de_las_falsas_alarmas": 0.4090909090909091,
+            "precision_regla": 0.8988603988603989,
+            "diferencia_regla_pp": 0.6300398860398904
+          },
+          {
+            "segmento": "genero",
+            "valor": "M",
+            "filas": 6673,
+            "positivos": 1713,
+            "tasa_base": 0.2567061291772816,
+            "en_lista": 1175.0,
+            "vp": 1058.0,
+            "fp": 117.0,
+            "precision": 0.9004255319148936,
+            "ic95": [
+              0.8819775795201211,
+              0.9162636769811764
+            ],
+            "diferencia_pp": -0.27744680851063963,
+            "recall": 0.6176298890834793,
+            "parte_de_la_lista": 0.47,
+            "parte_de_las_falsas_alarmas": 0.4834710743801653,
+            "precision_regla": 0.8899051490514905,
+            "diferencia_regla_pp": -0.26548509485094796
+          },
+          {
+            "segmento": "genero",
+            "valor": "X",
+            "filas": 395,
+            "positivos": 95,
+            "tasa_base": 0.24050632911392406,
+            "en_lista": 66.0,
+            "vp": 53.0,
+            "fp": 13.0,
+            "precision": 0.803030303030303,
+            "ic95": [
+              0.6916098449524694,
+              0.8811147203495856
+            ],
+            "diferencia_pp": -10.016969696969703,
+            "recall": 0.5578947368421052,
+            "parte_de_la_lista": 0.0264,
+            "parte_de_las_falsas_alarmas": 0.05371900826446281,
+            "precision_regla": 0.8428571428571429,
+            "diferencia_regla_pp": -4.9702857142857155
+          }
+        ]
+      },
+      "meta_criterio_1": {
+        "regla_aciertos_por_mes": 430.66999999999996,
+        "meta": 379
+      },
+      "alerta_fila_10": {
+        "regla_precision_por_corte": [
+          0.836,
+          0.8672000000000001,
+          0.87,
+          0.882,
+          0.8515
+        ],
+        "umbral": 0.72
+      }
+    },
+    "criterio": {
+      "ic95_limite_inferior": -0.0145054761904763,
+      "condicion_1_intervalo_excluye_el_cero": false,
+      "aciertos_extra_por_mes": -1.2699999999999818,
+      "aciertos_extra_por_mes_para_pagar": 8594.663640675424,
+      "condicion_2_paga_lo_que_agrega": false,
+      "valor_extra_anual_usd": -1.5367675283406255,
+      "costo_incremental_usd": 10400.0
+    }
+  },
+  "tabla_8_1": [
+    {
+      "fila": "metrica_principal",
+      "baseline_test": 0.86134,
+      "modelo_validacion": 0.7386666666666667,
+      "modelo_test": 0.8588,
+      "diferencia_test_menos_validacion": 0.12013333333333331,
+      "baseline_validacion": 0.758,
+      "modelo_menos_baseline_test": -0.0025399999999999867
+    },
+    {
+      "fila": "precision",
+      "baseline_test": 0.86134,
+      "modelo_validacion": 0.7386666666666667,
+      "modelo_test": 0.8588,
+      "diferencia_test_menos_validacion": 0.12013333333333331,
+      "baseline_validacion": 0.758,
+      "modelo_menos_baseline_test": -0.0025399999999999867
+    },
+    {
+      "fila": "recall",
+      "baseline_test": 0.8541650138833796,
+      "modelo_validacion": 0.9429787234042554,
+      "modelo_test": 0.8516461721539071,
+      "diferencia_test_menos_validacion": -0.09133255125034823,
+      "baseline_validacion": 0.9676595744680851,
+      "modelo_menos_baseline_test": -0.0025188417294724763
+    },
+    {
+      "fila": "f1",
+      "baseline_test": 0.8577375024895441,
+      "modelo_validacion": 0.8284112149532711,
+      "modelo_test": 0.8552081258713403,
+      "diferencia_test_menos_validacion": 0.02679691091806924,
+      "baseline_validacion": 0.8500934579439252,
+      "modelo_menos_baseline_test": -0.002529376618203738
+    },
+    {
+      "fila": "auc_roc",
+      "baseline_test": 0.9787815144081211,
+      "modelo_validacion": 0.9660145075208882,
+      "modelo_test": 0.9744690494217609,
+      "diferencia_test_menos_validacion": 0.008454541900872692,
+      "baseline_validacion": 0.9697447138978086,
+      "modelo_menos_baseline_test": -0.004312464986360176
+    },
+    {
+      "fila": "valor_neto_anual_usd",
+      "baseline_test": 327.06093862909927,
+      "modelo_validacion": 252.840310573991,
+      "modelo_test": 325.5241711007587,
+      "diferencia_test_menos_validacion": 72.68386052676769,
+      "baseline_validacion": 264.5374912359015,
+      "modelo_menos_baseline_test": -1.5367675283405902
+    }
+  ],
+  "matriz_8_1": {
+    "vp": 2147.0,
+    "fn": 374.0,
+    "fp": 353.0,
+    "vn": 7088.0,
+    "filas": 9962.0,
+    "en_la_lista": 2500.0,
+    "positivos": 2521.0
+  },
+  "contra_roi_b_3_4": {
+    "evaluado": [
+      {
+        "fila": "modelo_sobre_la_regla",
+        "id": "G40",
+        "que": "modelo sobre la regla, contra el costo incremental",
+        "costo_usd": 10400.0,
+        "b_3_4": {
+          "beneficio_usd": 5.378014097430056,
+          "roi_pct": -99.94828832598624,
+          "recupera_en_el_anio": false
+        },
+        "contactables": {
+          "beneficio_usd": -1.5367675283405902,
+          "roi_pct": -100.01477661084944,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": -6.9147816257706465
+        },
+        "sin_filtro": {
+          "beneficio_usd": 6.437482874623868,
+          "roi_pct": -99.93810112620554,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": 1.0594687771938114
+        },
+        "cambia_el_veredicto": false
+      },
+      {
+        "fila": "proyecto_completo",
+        "id": "G40 (beneficio de G34)",
+        "que": "proyecto con modelo frente a no contactar, contra el costo total del año 1",
+        "costo_usd": 30660.0,
+        "b_3_4": {
+          "beneficio_usd": 304.87259696662704,
+          "roi_pct": -99.00563406077421,
+          "recupera_en_el_anio": false
+        },
+        "contactables": {
+          "beneficio_usd": 325.5241711007587,
+          "roi_pct": -98.93827732843849,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": 20.651574134131636
+        },
+        "sin_filtro": {
+          "beneficio_usd": 352.38735151742196,
+          "roi_pct": -98.85066095395491,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": 47.51475455079492
+        },
+        "cambia_el_veredicto": false
+      },
+      {
+        "fila": "regla_sin_modelo",
+        "id": "G41",
+        "que": "regla sin modelo con 15 % de descuento, contra el costo del año 1 de la regla",
+        "costo_usd": 20260.0,
+        "b_3_4": {
+          "beneficio_usd": 299.49458286919696,
+          "roi_pct": -98.52174440834553,
+          "recupera_en_el_anio": false
+        },
+        "contactables": {
+          "beneficio_usd": 327.06093862909927,
+          "roi_pct": -98.3856814480301,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": 27.566355759902308
+        },
+        "sin_filtro": {
+          "beneficio_usd": 345.9498686427981,
+          "roi_pct": -98.29244882209873,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": 46.45528577360113
+        },
+        "cambia_el_veredicto": false
+      }
+    ],
+    "validacion": [
+      {
+        "fila": "modelo_sobre_la_regla",
+        "id": "G40",
+        "que": "modelo sobre la regla, contra el costo incremental",
+        "costo_usd": 10400.0,
+        "b_3_4": {
+          "beneficio_usd": 5.378014097430056,
+          "roi_pct": -99.94828832598624,
+          "recupera_en_el_anio": false
+        },
+        "contactables": {
+          "beneficio_usd": -11.697180661910494,
+          "roi_pct": -100.11247289097992,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": -17.07519475934055
+        },
+        "sin_filtro": {
+          "beneficio_usd": 6.184716212044634,
+          "roi_pct": -99.94053157488419,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": 0.8067021146145779
+        },
+        "cambia_el_veredicto": false
+      },
+      {
+        "fila": "proyecto_completo",
+        "id": "G40 (beneficio de G34)",
+        "que": "proyecto con modelo frente a no contactar, contra el costo total del año 1",
+        "costo_usd": 30660.0,
+        "b_3_4": {
+          "beneficio_usd": 304.87259696662704,
+          "roi_pct": -99.00563406077421,
+          "recupera_en_el_anio": false
+        },
+        "contactables": {
+          "beneficio_usd": 252.840310573991,
+          "roi_pct": -99.17534145279193,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": -52.03228639263605
+        },
+        "sin_filtro": {
+          "beneficio_usd": 305.6792990812416,
+          "roi_pct": -99.00300293841734,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": 0.8067021146145521
+        },
+        "cambia_el_veredicto": false
+      },
+      {
+        "fila": "regla_sin_modelo",
+        "id": "G41",
+        "que": "regla sin modelo con 15 % de descuento, contra el costo del año 1 de la regla",
+        "costo_usd": 20260.0,
+        "b_3_4": {
+          "beneficio_usd": 299.49458286919696,
+          "roi_pct": -98.52174440834553,
+          "recupera_en_el_anio": false
+        },
+        "contactables": {
+          "beneficio_usd": 264.5374912359015,
+          "roi_pct": -98.69428681522261,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": -34.95709163329548
+        },
+        "sin_filtro": {
+          "beneficio_usd": 299.49458286919696,
+          "roi_pct": -98.52174440834553,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": 0.0
+        },
+        "cambia_el_veredicto": false
+      }
+    ]
+  },
+  "ficha_8_3": {
+    "nombre": "logistica_ajustada",
+    "configuracion": {
+      "C": 0.01,
+      "min_frecuencia": 100
+    },
+    "hash_config": "b59cabb90855966a4b02542c24bbf761b3025cc1428a709b08411b75ed6c6b22",
+    "preregistro_version": "1.1",
+    "scikit_learn": "1.9.1",
+    "algoritmo": "regresión logística L2 de la etapa 3, ajustada en grilla con 4 pliegues temporales y la regla de un error estándar (C 7.1), sin genero (D11, C 5.3)",
+    "constructor": "etapa3.logistica (imputación por mediana con marca de vacío y estandarización en numéricas; one-hot con agrupación de categorías infrecuentes; lbfgs, hasta 5.000 iteraciones)",
+    "dataset": {
+      "ruta": "A/modelado/dataset/churn_cliente_corte_v0.2.csv.gz",
+      "sha256": "3575178c52b138827c380b1ede63747dd8cd3c088ac50b0ffc9407e708b086db"
+    },
+    "entrenamiento": {
+      "filas": 18882,
+      "cortes": 18,
+      "desde": "2023-01-31",
+      "hasta": "2024-06-30",
+      "clientes": 2921,
+      "positivos": 5698
+    },
+    "entrenamiento_regla": "vuelve el embargo de mayo y junio de 2024 (A 2.2: «vuelven para el modelo final»; wiki/entregables/modelado-etapa-3.md, «Para la etapa 4»)",
+    "modelo": {
+      "variables": 39,
+      "terminos_con_intercepto": 75,
+      "iteraciones": 31,
+      "intercepto": -2.181414962306178,
+      "coeficientes": [
+        {
+          "termino": "gap_mediano",
+          "variable": "gap_mediano",
+          "valor": null,
+          "coeficiente": -2.473391115651766,
+          "odds_ratio": 0.08429850776179953,
+          "filas": 18882,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "recency_sobre_umbral",
+          "variable": "recency_sobre_umbral",
+          "valor": null,
+          "coeficiente": 1.3080536123813977,
+          "odds_ratio": 3.698967077311982,
+          "filas": 18882,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "recency_dias",
+          "variable": "recency_dias",
+          "valor": null,
+          "coeficiente": 0.68414727466194,
+          "odds_ratio": 1.9820809440635292,
+          "filas": 18882,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "compras_90d",
+          "variable": "compras_90d",
+          "valor": null,
+          "coeficiente": 0.2383252573861128,
+          "odds_ratio": 1.2691219169778574,
+          "filas": 18882,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "envios_acum",
+          "variable": "envios_acum",
+          "valor": null,
+          "coeficiente": -0.18458456848753,
+          "odds_ratio": 0.8314496224890962,
+          "filas": 18882,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "missingindicator_ticket_90d",
+          "variable": "ticket_90d",
+          "valor": "vacío",
+          "coeficiente": 0.18144013075213677,
+          "odds_ratio": 1.198942754760011,
+          "filas": 5173,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "reclamos_90d",
+          "variable": "reclamos_90d",
+          "valor": null,
+          "coeficiente": -0.12516707648428546,
+          "odds_ratio": 0.8823494704212855,
+          "filas": 18882,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "meses_desde_alta",
+          "variable": "meses_desde_alta",
+          "valor": null,
+          "coeficiente": -0.11557005500821553,
+          "odds_ratio": 0.890858160975207,
+          "filas": 18882,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "categoria_dominante_Decoracion",
+          "variable": "categoria_dominante",
+          "valor": "Decoracion",
+          "coeficiente": -0.11435040263551098,
+          "odds_ratio": 0.8919453611133253,
+          "filas": 4439,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "reclamos_acum",
+          "variable": "reclamos_acum",
+          "valor": null,
+          "coeficiente": 0.10084613047635425,
+          "odds_ratio": 1.1061064325988723,
+          "filas": 18882,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "region_dominante_Centro",
+          "variable": "region_dominante",
+          "valor": "Centro",
+          "coeficiente": 0.08177202181999332,
+          "odds_ratio": 1.0852083777951707,
+          "filas": 3760,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "formato_tienda_Chico",
+          "variable": "formato_tienda",
+          "valor": "Chico",
+          "coeficiente": -0.07436985751503361,
+          "odds_ratio": 0.9283282811471186,
+          "filas": 3190,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "provincia_Mendoza",
+          "variable": "provincia",
+          "valor": "Mendoza",
+          "coeficiente": -0.06511811116873048,
+          "odds_ratio": 0.9369567917800291,
+          "filas": 2074,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "provincia_Tucuman",
+          "variable": "provincia",
+          "valor": "Tucuman",
+          "coeficiente": 0.06269408185666991,
+          "odds_ratio": 1.0647010780287227,
+          "filas": 2152,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "region_dominante_NOA",
+          "variable": "region_dominante",
+          "valor": "NOA",
+          "coeficiente": -0.062481906654302775,
+          "odds_ratio": 0.9394300600925422,
+          "filas": 3198,
+          "sentido": "baja el riesgo"
+        }
+      ],
+      "agrupadas_min_frecuencia": {
+        "motivo_ultima_devolucion": [
+          "Cambio de talle/color",
+          "Error de compra",
+          "Producto dañado en envio"
+        ]
+      }
+    },
+    "sin": [
+      "genero"
+    ],
+    "importancia_c_7_3": [
+      {
+        "variable": "gap_mediano",
+        "caida_lista_500_pp": 34.39333333333333,
+        "desvio_pp": 0.7148858149348475
+      },
+      {
+        "variable": "recency_sobre_umbral",
+        "caida_lista_500_pp": 23.97333333333333,
+        "desvio_pp": 0.8250402160044655
+      },
+      {
+        "variable": "recency_dias",
+        "caida_lista_500_pp": 7.566666666666663,
+        "desvio_pp": 0.5050363634383793
+      },
+      {
+        "variable": "ticket_90d",
+        "caida_lista_500_pp": 0.7666666666666633,
+        "desvio_pp": 0.21602468994692983
+      },
+      {
+        "variable": "envios_acum",
+        "caida_lista_500_pp": 0.5533333333333312,
+        "desvio_pp": 0.2573367875415858
+      }
+    ],
+    "umbral": "umbral elegido en la C 7.2 (H17): lista de 500 por mes armada solo con contactables; 500 es el piso de la capacidad de Marketing (C08, envío 29)",
+    "probabilidad_del_ultimo_puesto": [
+      0.38888380146765955,
+      0.3787182124087106,
+      0.36214351620283586,
+      0.33225871862161266,
+      0.31750649496166833
+    ],
+    "desempeno": "tabla_8_1 y matriz_8_1 de este archivo"
+  },
+  "decision": {
+    "criterio": "Un modelo reemplaza a la regla solo si suma aciertos por mes con un intervalo que excluye el cero y paga lo que agrega al costo (criterio de éxito 1, B 4.5). Se mide en el test, en la etapa 4",
+    "condicion_1": "el límite inferior del intervalo del 95 % de (logística − regla), en la precisión de la lista de 500 contactables por corte, es mayor que 0",
+    "condicion_2": "los aciertos extra por mes de la logística en esa lista, (VP logística − VP regla) / cortes, llegan a los que pagan el costo incremental",
+    "resultado": "la lista sigue con la regla del umbral"
+  },
+  "apertura": [
+    "2026-10-27T15:55:55-03:00\tapertura del test\tpreregistro.json sha256 c10f6ba35a958a6697d9b48a5b1a00fa8397acf93f734e2838d482400e82ba0f\tetapa4.py sha256 7a7387ca474cec5bcf5e2f4fb027451e693d94276d1e1c987e3e4a14f3fce98c\tclase13.listo sha256 75ba0cdc5403c2d8e4e63e93dd3d106ab809539bceded1ffed16e2addb4c893c"
+  ],
+  "validacion": {
+    "preregistro_sha256": "c10f6ba35a958a6697d9b48a5b1a00fa8397acf93f734e2838d482400e82ba0f",
+    "control": {
+      "cifras": 125,
+      "reproducen": 125,
+      "tolerancia": 1e-09
+    }
+  }
+}

@@ -1,5 +1,10 @@
 # Diseño de la presentación E3 (`/e3/`)
 
+> **Desde el 27/10 (W1) manda la última sección, «Decisiones (27/10, W1): el armazón del E2».** Las reglas
+> transversales y la tabla por diapositiva de abajo describen el escenario fijo de 1600 × 900, que se fue;
+> quedan como referencia del contenido de cada diapositiva (el código está en el commit `a06f88c`,
+> `e3/src/diapositivas/`).
+
 La presentación del Entregable 3 (27/10/2026) en el navegador. Desde el 27/10 es la única versión: el
 PPTX del equipo se borró a pedido del usuario. El texto sigue saliendo de
 `entregas/entregable-3/_build/F/presentacion/contenido.py` del vault. El texto sale de `C3` (`e3/src/contenido_e3.js`) y los valores de los
@@ -133,3 +138,111 @@ tanta interacción necesaria para presentar».
   quieta de la tasa de éxito (1,02 % contra 49,6 %). Salen los «ver la n →» de la 2: navega el riel.
 - **Reglas 6 y 7.** Las reglas transversales 6 (pasos) y 7 (controles) quedan reemplazadas por esto.
 
+
+## Decisiones (27/10, W1): el armazón del E2
+
+Pedido del usuario: «/e3/ estéticamente exactamente igual a /e1/ y /e2/», más corta. Plan del E3 (frente web) y
+decisiones N0-5 y N0-6.
+
+- **El armazón es el del E2.** `e3/src/App.jsx` es `e2/src/App.jsx` (riel `.lat`, encabezado `.e2-enc` con la
+  pregunta como `h1`, `.cuerpo`, flujo de impresión, transición entre vistas) y `main.jsx` importa
+  `src/estilos.css`, `e2/src/estilos_e2.css` y `src/fit.js` tal cual. Las vistas usan `e2/src/Banda.jsx` (con
+  `TarjetaDecision`) y las primitivas de `src/graficos.jsx`. Rigen las reglas 11 (banda de cifras y tarjeta
+  de decisión), 12 (la pregunta en el encabezado, sin título ni pie) y 13 H1 (una cifra dominante) del
+  `e2/DISENO.md`. `estilos_e3.css` no nombra ninguna clase del armazón; ni `src/**` ni `e2/**` cambian.
+- **Letra más grande (N0-5 y N0-13): zoom uniforme, letra contra la ventana real.** k = máx(1; mín(1,2;
+  ancho / 1152; alto / 640)) (`zoom.js`): 1 a 1152 × 640, 1,186 a 1366 × 768 y 1,2 desde 1536 × 864. El tablero
+  va en `.e3-vp`, una caja del tamaño de la ventana lógica (ancho / k × alto / k) con `zoom: k`. Para que las
+  hojas compartidas, que miden en vw, vh y `@media`, midan contra esa caja, `vite.e3.config.js` reescribe al
+  empaquetar el E3 vw → cqw, vh → cqh y los `@media` de ancho o alto → `@container`. Así las cajas de /e3/ a
+  W × H son las de /e2/ a W/k × H/k, ampliadas k veces.
+  - (W2.0, N0-13) La letra no sigue esa regla. En W1 la pregunta y las cifras grandes medían lo mismo que en
+    /e2/ en la misma ventana (el E2 ya las escala con la ventana y el zoom solo devolvía lo que la ventana
+    lógica quitaba) y el resto crecía entre 1,02 y 1,20. Ahora las declaraciones de letra (`font`,
+    `font-size`, `line-height`, `letter-spacing` y las variables que alguna hoja usa en ellas: `--e2-txt`,
+    `--e2-txt2`, `--e2-rot`) conservan sus vw y vh, que bajo el zoom valen k veces lo de /e2/; dentro de un
+    `@media` de ancho o alto quedan en un `@media` aparte, contra la ventana real (el riel de 11,5 px de
+    `max-height: 730px` del E1 se aplica según la ventana real, como en /e2/), y el resto pasa al
+    `@container`. Resultado medido: **cada texto de /e3/ a W × H mide k veces lo que mide en /e2/ en la misma
+    ventana**, la pregunta y las cifras grandes incluidas (tabla en `paridad_e3.py`, sección 2).
+  - Los SVG de las vistas escalan su letra con `useEscalaTexto` del E2 (`e2/src/escala.js`), que mide la
+    ventana real; el zoom la multiplica por k. En estilos en línea, la letra va en px, vw o vh (crece ×k como
+    en /e2/) y los largos de la caja en cqw o cqh, que miden la ventana lógica.
+  - Precio: la caja sigue siendo la del E2 en la ventana lógica y la letra es k veces más grande, así que lo
+    que en el E2 entraba justo no entra. La ventana más angosta para el texto es 1366 × 768 (lógica 1152 ×
+    648, letra ×1,186). Medido en la vista 5: el riel entra con 13 px de aire sobre su pie si ningún nombre
+    se parte (por eso la 8 es «Paso a producción»); en la banda entran tres cifras con anchos 2 / 3 / 2 y
+    rótulos de hasta unos 125 px lógicos. A 1440 × 900 (16:10, fuera del rango verificado) la cifra grande
+    de la 5 invade 5 px el relleno de su tarjeta: crece con el alto de la ventana.
+- **El encabezado.** A la derecha, «5 / 9 · Parte B 3.2…» (vista y fuente en C3) y, en el lugar de la
+  miniatura del mapa de calidad del E2, el avance de la historia: una barra por vista, mismo marco y medidas
+  (118 × 46), así el encabezado tiene el alto del E2.
+- **El riel.** Nueve vistas y el grupo «Respaldo» con los anexos A1 a A7 de C3 (`vistas/index.jsx`). Una vista
+  es un archivo `Vnn_*.jsx` (o `An_*.jsx`) que exporta `default` y `meta = { id }`; sin archivo, la vista se
+  muestra como esqueleto con su pregunta. Cada vista declara de qué diapositivas de C3 sale (`de`): de ahí
+  sale el guion de las notas.
+- **Quien presenta (N0-6).** Las teclas del E2 (flechas con el foco libre o en el riel, Inicio, Fin, F, I)
+  más Av Pág y Re Pág, que pasan de vista siempre (control remoto); F5 pide pantalla completa sin recargar;
+  N abre las notas debajo del tablero, que se achica para dejarles lugar: el panel toma el 35 % del alto,
+  con letra de 14 px, para que el guion más largo (el de la 6) entre sin desplazar a 1366 × 768 (con las
+  notas, k baja a 0,78 a esa resolución: se ensaya, no se proyecta); desde el panel, «Abrir en otra ventana» abre `?notas`, solo las notas. «.» y B ponen la pantalla en
+  negro y cualquier tecla vuelve. Una tecla mantenida no recorre. Dos ventanas con la misma dirección se
+  siguen (`BroadcastChannel`).
+- **Decisiones: un id y un estado por decisión (`decisiones.js`).** La tarjeta del E2 muestra «id · estado»
+  (DC-04 · APLICADA). En el E3 el id es la letra de la Parte y el área (A-TEC, B-ECO, C-LEG) y el estado, el
+  veredicto de la tarjeta de la diapositiva 2 de C3 (factibilidad media, no viable, viable con condiciones).
+  Toda vista toma su par con `decision(id, …)`; ninguna lo arma con el kicker. La propuesta se suma ahí en W2.
+- **Sin controles a la vista.** Lo que una vista deje tocar va detrás de «Explorar» (`controles.jsx`),
+  cerrado al llegar. En W1 ninguna vista tiene controles; el simulador de la tasa de éxito de la 5 queda para
+  W2.
+- **Vista 5, de muestra.** Banda: lo que suma el modelo por año (USD 5,38, con los USD 10.400 de más en su
+  frase), el ROI del modelo sobre la regla a un año (la cifra dominante) y la tasa de éxito que pagaría la
+  regla (49,6 %, con la observada en su frase); con cuatro tarjetas, a 1152 × 640 las cifras no entran.
+  Desde W2.0, anchos 2 / 3 / 2 (con 3 / 4 / 3 el −99,95 % no entra en la central a 1366 × 768) y la moneda y
+  el «%» un escalón más chicos (`.par-unidad`). Rótulos cortos para que entren en una línea de 1152 × 640 a
+  1920 × 1080 («Suma el modelo», «ROI sobre la regla», «Éxito necesario», que reemplaza a «Para pagar la
+  regla» porque a 1366 × 768 se partía; el largo va al title). Decisión: «No viable tal como está planteado» (C3, diapositiva 9),
+  con «B-ECO · no viable». Gráfico: `BarrasH` del costo del año 1
+  con modelo y solo la regla contra el beneficio anual de la regla, con el presupuesto marcado.
+
+### Verificación (desde W1)
+
+- `python3 scripts/paridad_e3.py`, a 1152 × 640, 1366 × 768, 1536 × 864 y 1920 × 1080: lo estático; la letra
+  (desde W2.0), /e3/ contra /e2/ en la misma ventana, donde el cociente de tamaño, interlineado, espaciado y
+  ancho dibujado de cada texto (riel, pregunta, encabezado, cifras y frases de la banda, tarjeta de decisión,
+  textos del gráfico y esqueleto) tiene que dar k, con la tabla impresa; el armazón, /e2/ en la ventana
+  lógica contra /e3/, sin la letra (colores, bordes, relleno y la posición y el ancho de las cajas); las
+  reglas 11 y 12 y los desbordes que `__fit` no ve (texto cortado en la banda, cifra más ancha que su
+  tarjeta, riel encimado con su pie) en cada vista, y la hoja de contacto
+  `entregas/entregable-3/_build/workforce/fase-w1/e2-e3-1536.png` del vault.
+- `python3 scripts/verificar_e3.py`: cada vista a cinco resoluciones con `__fit`, consola y red limpias, y el
+  recorrido de quien presenta, con cada rótulo de la banda en una línea y el guion de cada vista entero en el
+  panel de notas a 1366 × 768 y 1536 × 864. Desde W3 y antes de exportar se corre con `--sin-esqueletos`, que
+  falla si alguna vista sigue mostrando «se arma en la etapa siguiente».
+
+## Decisiones (27/10, W2): vistas 1 a 4 y 6
+
+- **Decisiones nuevas en `decisiones.js`**, con el mismo esquema (letra de la Parte y área) y el estado en
+  palabras: `A-UMB · vigente` (el umbral propio, vista 2; DEF-UMBRAL del registro de decisiones de los hitos),
+  `C-MOD · sale la regla` (vista 4; MOD-05, MOD-06 y VER-MVP) y `D-PRO · propuesta` (vistas 1 y 9; D6). Ninguna
+  vista arma su par ni cae en el id de otra.
+- **Encabezado.** La fuente junta todas las diapositivas de la vista: una Parte y una sección, el tramo
+  («Parte A 1.1 a 1.6»); dos Partes, sus secciones («Partes B 3 y 4 · C 7»); tres, solo las letras («Partes A,
+  B y C»), porque con las secciones la pregunta de la 1 se parte desde 1280 × 720.
+- **Piezas comunes del E3.** `cifra.jsx` (la cifra de la banda con la unidad un escalón más chica; reemplaza
+  las copias de cada vista), `medir.js` (ancho de un texto con canvas) y `PuntajeDimensiones.jsx`: las vistas 3
+  y 6 muestran lo mismo (puntaje por dimensión en la escala de la cátedra) y lo dibujan igual, con el tramo
+  sombreado y su plaqueta, el promedio punteado solo si no coincide con las barras y la que limita en `--acc`.
+- **Códigos internos fuera de pantalla** (regla 13 H13 del E2): `sinCodigos` (`texto.jsx`) saca «(envío N)» de
+  lo que se ve; el title lo conserva.
+- **Vista 1.** «no viable: ROI a un año» (el horizonte pegado a la cifra; «ROI anual sobre la regla» agranda la
+  banda a 1366 y 1536). La nota de la tasa dice la población («envíos cerca del umbral») y es más corta que la
+  de la fila vacía: `PuntosIC` no reserva el rótulo del valor y la nota más larga lo pisaba.
+- **Vista 3.** «casos positivos para entrenar» (G10 son positivos); arriba del gráfico, lo barato del MVP
+  («MVP: USD 0 en licencias y 1 computadora») al lado del botón que lo abre; el MVP, centrado en su tarjeta.
+- **Vista 6.** Banda 3 / 3 / 3 y «Sin consentimiento», el término de C18, L3 y el riesgo 6 (con 3 / 2 / 2 el
+  rótulo se parte; con 3 / 3 / 2, «Riesgos críticos» se parte y la banda crece de 12 a 20 px).
+- **Verificación.** `verificar_e3.py` revisa el contenido de las vistas 1 a 6 en cada resolución contra D3 y
+  C3 (decisión, cifras de la banda, una sola cifra grande en la central, valores del gráfico, palabras
+  prohibidas y códigos en pantalla, textos del gráfico que se pisan, «Explorar» en cada opción y el guion en
+  las notas) y, con `--hoja`, arma la hoja de contacto de las vistas a 1536 × 864.
