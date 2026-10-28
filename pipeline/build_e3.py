@@ -364,8 +364,10 @@ def armar_lista(e3: dict) -> dict:
                                   "aciertos_de_mas": abs(dif)})
     lista["comparaciones"] = comparaciones
     c500 = next(c for c in comparaciones if c["filtro"] == "contactables" and c["largo_mes"] == 500)
+    # (28/10) Sin c3: desde la auditoría de /e3/ el guion de la diapositiva 7 ya no dice los 29 de validación;
+    # el 48,6 de G43 pasó del guion de la 9 al de la 2, junto al gráfico que lo dibuja.
     ancla("H16", "lista: comparación 500 contactables, aciertos de más",
-          c500["aciertos_de_mas"], "29", 0, donde="C 7.2", c3="d7")
+          c500["aciertos_de_mas"], "29", 0, donde="C 7.2")
     ancla("H16", "lista: comparación 500 contactables, gana", c500["gana"], "regla", donde="C 7.2")
     # (24/10) Las diez comparaciones del selector, contra la fila H48 del registro (regla menos
     # logística ajustada, aciertos en los 3 cortes de validación). La de 500 sin filtro es la de H06.
@@ -418,7 +420,7 @@ def armar_lista(e3: dict) -> dict:
         ancla(id_, f"A2 {q}: recall", f["recall"], rec, 1, 100, donde="C 7.2", c3="A2")
         ancla(id_, f"A2 {q}: USD por año", f["usd_anio"], usd, 2, donde="C 7.2", c3="A2")
     ancla("H16", "lista: aciertos de más de la regla, 500 contactables",
-          lista["regla_menos_modelo_500_contactables"]["aciertos"], "29", 0, donde="C 7.2", c3="d7")
+          lista["regla_menos_modelo_500_contactables"]["aciertos"], "29", 0, donde="C 7.2")
     ancla("H45", "lista: no contactables en la de 500 sin filtro", lista["no_contactables_lista_500"], "483", 0,
           donde="C 7.2", c3="A2")
     h06 = lista["modelo_menos_regla_500_sin_filtro"]
@@ -663,7 +665,7 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
     ancla("G43", "economía: s de equilibrio sin descuento (%)", g("s", "equilibrio_sin_descuento"), "39,7", 1, 100,
           donde="B 3.6")
     ancla("G43", "economía: veces lo observado, con descuento", g("veces", "equilibrio_con_descuento"), "48,6", 1,
-          donde="B 3.6", c3="d9")
+          donde="B 3.6", c3="d2")
     ancla("G43", "economía: veces lo observado, sin descuento", g("veces", "equilibrio_sin_descuento"), "39,0", 1,
           donde="registro G43")
     ancla("G43", "economía: ROI de la regla en el equilibrio con descuento", g("regla_roi_pct", "equilibrio_con_descuento"),
