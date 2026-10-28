@@ -128,6 +128,8 @@ export default function V03SePuedeHacer() {
   const [explorar, setExplorar] = useState(false)
   const datos = filaDe(T.condiciones.find((c) => c.id === 'datos'))
   const calidad = filaDe(T.condiciones.find((c) => c.id === 'calidad'))
+  // Tocado con el mouse, el botón suelta el foco: las flechas siguen pasando de vista (patrón de V07).
+  const soltar = (e) => { if (e.detail) e.target.closest?.('button')?.blur() }
   return (
     <section className="pant v03">
       <Banda dcs={[DECISION]}>
@@ -172,7 +174,9 @@ export default function V03SePuedeHacer() {
             <span className="e3-v03-mvp tabular"
                   title={D5.hechos.map((x) => `${plano(x.valor)} ${plano(x.texto)}`).join(' · ')}>{MVP_CORTO}</span>
           )}
-          <BotonExplorar abierto={explorar} onCambio={setExplorar} style={{ alignSelf: 'center' }} />
+          <span style={{ alignSelf: 'center', display: 'flex' }} onClick={soltar}>
+            <BotonExplorar abierto={explorar} onCambio={setExplorar} />
+          </span>
         </div>
         {explorar ? <Mvp /> : (
           <div className="e3-v03-graf">

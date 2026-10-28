@@ -90,7 +90,7 @@ const TITULO_PEDIDOS = `Parte D 12.3 y 12.4. En la semana ${HS.regla_y_operador_
 const TITULO_PILOTO = `Piloto de ${P.meses} meses, una lista de ${entero(P.lista_mes)} por mes: ${entero(P.contactados_mes)} `
   + `contactados y ${entero(P.control_mes)} de control cada mes, ${entero(P.tratados)} y ${entero(P.control)} en total. `
   + `Con ese tamaño, el piloto distingue de cero una diferencia de ${T_MDE} puntos o más.`
-const TITULO_PAGA = `Para pasar a producción, al tercer mes la compra a 7 días de los contactados tiene que superar a la `
+const TITULO_PAGA = `Para pasar a producción, al cierre del mes ${entero(P.meses)} la compra a 7 días de los contactados tiene que superar a la `
   + `del control en ${T_PAGA} puntos o más. ${DECISION.justificacion}`
 const TITULO_PLAN = `Plan del proyecto: ${semanas(PL.semanas)} desde el ${fecha(PL.semana_1)}. `
   + PL.fases.map((f) => `${f.nombre}, ${rango(f)}`).join('; ')
@@ -210,7 +210,7 @@ function ReglaPiloto({ w, h, k }) {
   return (
     <svg width={w} height={h} role="img" style={{ display: 'block' }}
          aria-label={`Regla de decisión del piloto, con la compra a 7 días de los contactados menos la del control al `
-           + `tercer mes: con cualquier valor debajo de ${T_PAGA} puntos, María G. elige entre cerrar o repetir sin `
+           + `cierre del mes ${entero(P.meses)}: con cualquier valor debajo de ${T_PAGA} puntos, María G. elige entre cerrar o repetir sin `
            + `descuento; debajo de ${T_MDE} puntos, la diferencia no se distingue de cero; desde ${T_PAGA}, la lista `
            + 'se paga y pasa a producción'}>
       {/* Zona 1: debajo de 40,4, decide María G. (D 11.1). */}
@@ -415,7 +415,7 @@ export default function V07ParteD() {
   // Tocado con el mouse, el control cambia y suelta el foco: las flechas siguen pasando de vista.
   const soltar = (e) => { if (e.detail) e.target.closest?.('button')?.blur() }
   const cab = !abierto
-    ? { mide: `Compra a 7 días al cierre del tercer mes · semana${NBSP}${PILOTO.hasta_semana}`, conclusion: CONCLUSION }
+    ? { mide: `Compra a 7 días al cierre del mes ${entero(P.meses)} · semana${NBSP}${PILOTO.hasta_semana}`, conclusion: CONCLUSION }
     : panel === 'decide'
       ? { mide: 'Del alcance a la decisión final', conclusion: 'Lo que decide María G. y en qué semana' }
       : panel === 'flujo'
