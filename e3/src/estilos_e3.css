@@ -4,7 +4,8 @@
    tarjeta de decisión (.tarjeta-dec). Acá va SOLO lo que el E2 no tiene, con el prefijo e3-: la caja del
    zoom, el esqueleto de las vistas que faltan, las notas del orador, la pantalla en negro y los
    controles detrás de «Explorar». Ninguna regla de esta hoja nombra una clase del armazón ni :root
-   (lo controla scripts/paridad_e3.py). */
+   (lo controla scripts/paridad_e3.py), salvo el bloque «Contraste de proyector» del final (N0-1,
+   28/10): todas sus reglas van bajo .e3-vp, que solo existe en /e3/, así /e2/ no cambia. */
 
 /* ---------- zoom uniforme (N0-5, e3/src/zoom.js) ---------- */
 /* La caja mide la ventana lógica (ancho / k × alto / k, en línea desde App.jsx) y lleva zoom: k. Es el
@@ -100,6 +101,99 @@
 
 /* Texto de C3 con [[unidad chica]] (texto.jsx). */
 .e3-chico { font-size: .6em; font-weight: 500; letter-spacing: 0; }
+
+/* ==========================================================================================
+   Contraste de proyector (N0-1, 28/10; .workforce/PLAN.md, unidad G)
+   El usuario pidió contraste para proyector: se rompe para el E3 la regla H1 del E2 (cifra
+   secundaria gris). Todo va bajo .e3-vp (la caja del zoom, App.jsx), que solo existe en /e3/; los
+   overrides de clases del armazón están permitidos ahí (N0-4). La central domina por tamaño y peso,
+   no por color (N0-5).
+   ==========================================================================================
+
+   TOKENS DE GRÁFICO DEL E3, para las vistas (relaciones medidas sobre la tarjeta blanca):
+     --e3-ctx    #5a6478  TEXTO de contexto: etiquetas y valores de lo que NO es el dato. 5,95:1 sobre
+                          blanco. No va en rellenos: a 1,64:1 contra --acc, una barra así compite con
+                          la de énfasis.
+     --e3-ctx-relleno #a9b1bf  RELLENO de contexto: barras, áreas, puntos y trazos que no son el dato.
+                          2,16:1 sobre blanco (se ve en proyector) y 4,53:1 contra --acc (el énfasis
+                          se impone). El valor rotulado al lado va en --ink o --e3-ctx, nunca en este.
+     --e3-eje    #6a7489  ejes, marcas del eje, líneas de referencia finas. 4,7:1 sobre blanco.
+     --e3-contorno #4f5a6e  borde de un tramo o zona (banda de 90 días, franja de la regla, línea
+                          del empate), 1,5 px, con su rótulo en tinta al lado. Es la forma preferida
+                          de marcar un tramo (N0-5). 6,95:1 sobre blanco; se separa de --acc por la
+                          forma (trazo, no relleno).
+     --e3-tinte  #bccfe2  relleno de tramo, solo si el contorno no alcanza; siempre con contorno y
+                          rótulo. 1,6:1 sobre blanco. El texto encima va en --ink (9,9:1).
+     --e3-zona   rgba(34, 69, 111, .16)  lavado de fondo sin significado propio (separar dos
+                          mitades, sombrear una franja de contexto). Sobre blanco ≈ #d8dee6.
+   El dato que hay que mirar sigue en --acc; la excepción, en --terra con la trama --terra-osc.
+
+   Además, dentro de /e3/ los tokens del E1 que las vistas y src/graficos.jsx ya usan (como atributo
+   SVG, fill="var(--gris)", o en estilo en línea) apuntan a estos: --gris → --e3-ctx-relleno, --eje →
+   --e3-eje, --azul1 → --e3-tinte, --zona → --e3-zona. Un var() se resuelve en el elemento, así que
+   los gráficos compartidos y los anexos suben de contraste sin tocar src/ ni /e2/. Una vista nueva
+   usa los nombres --e3-*: dicen la intención y no dependen de esta redirección. */
+.e3-vp {
+  --e3-ctx: #5a6478;
+  --e3-ctx-relleno: #a9b1bf;
+  --e3-eje: #6a7489;
+  --e3-contorno: #4f5a6e;
+  --e3-tinte: #bccfe2;
+  --e3-zona: rgba(34, 69, 111, .16);
+  --gris: var(--e3-ctx-relleno);
+  --eje: var(--e3-eje);
+  --azul1: var(--e3-tinte);
+  --zona: var(--e3-zona);
+}
+
+/* ---------- banda de cifras ---------- */
+/* Cifra secundaria (Cifra con `sec`): en tinta y no en gris, peso 600, el 72 % de la central (antes
+   70 % y --mut2). La central, en --acc, al mismo tamaño del E2 (más grande, el −99,95 % no entra a
+   1366 × 768) y en 700: domina por tamaño y peso. */
+.e3-vp .e2-kpis .tarjeta .par-val.e2-cifra.sec {
+  font-size: clamp(24.5px, calc(0.79vw + 3.02vh), 72px);
+  font-weight: 600; color: var(--ink);
+}
+.e3-vp .e2-kpis > .tarjeta.e2-central .par-val.e2-cifra:not(.sec) { font-weight: 700; }
+/* La frase debajo de la cifra: tinta 500 (en el E2 ya lo es; se fija acá para que ninguna variante
+   la vuelva gris en /e3/). */
+.e3-vp .e2-kpis .e2-linea { font-weight: 500; color: var(--ink); }
+
+/* ---------- tarjeta de decisión: «Decisión» y «área · estado» ---------- */
+/* Letra un 6 % más grande que el rótulo mono de la banda y en negrita, con menos espaciado: ocupa el
+   mismo ancho que en el E2. Mismo verde oscuro (6,3:1 sobre el fondo). Si «área · estado» no entra al
+   lado de «Decisión», baja entero al renglón siguiente en vez de salirse de la tarjeta (pasa con
+   «Legal · viable con condiciones» y «Técnica · factibilidad media» a 1152-1536: el estado largo se
+   acorta en decisiones.js). El fondo, un paso más saturado para que la tarjeta no se lea blanca. */
+.e3-vp .e2-banda > .tarjeta-dec {
+  --dec-fondo: #d6ebe3;
+  --dec-borde: #9fcfc0;
+}
+.e3-vp .e2-banda > .tarjeta-dec .kpi-lbl {
+  flex-wrap: wrap; row-gap: 2px;
+  font-size: calc(var(--e2-rot) * 1.06); font-weight: 700; letter-spacing: .03em;
+}
+.e3-vp .e2-banda > .tarjeta-dec .kpi-lbl b { font-weight: 700; white-space: nowrap; }
+
+/* ---------- encabezado de la tarjeta del gráfico ---------- */
+/* Hoy: qué mide (span, a la izquierda) y la conclusión (b, a la derecha, antes 15 px azul). La
+   conclusión pasa a ser lo primero que se lee: más grande, tinta, 700. Qué mide sigue como en el E2
+   (tinta 600, --e2-txt2), alineado a la base de la conclusión. */
+.e3-vp .pant > .tarjeta > .kpi-lbl.frase { align-items: baseline; color: var(--ink); }
+.e3-vp .pant > .tarjeta > .kpi-lbl.frase > b {
+  font: 700 clamp(15px, calc(0.2vw + 1.3vh + 3px), 24px)/1.2 var(--fuente);
+  color: var(--ink); letter-spacing: -.01em; text-align: right;
+}
+
+/* ---------- conclusión del gráfico (la única clase común para las vistas; el resto, en V0n.css) ---------- */
+/* .e3-conclusion: la conclusión del gráfico, una frase (≤ 70 caracteres para que quede en un renglón
+   a 1152 × 640). Grande, tinta, 700; un <b> adentro marca la cifra en --acc. */
+.e3-conclusion {
+  margin: 0; min-width: 0;
+  font: 700 clamp(17px, calc(0.25vw + 1.6vh + 3px), 28px)/1.2 var(--fuente);
+  color: var(--ink); letter-spacing: -.01em; text-wrap: balance;
+}
+.e3-conclusion b { font-weight: 700; color: var(--acc); }
 
 @media print {
   .e3-vp { zoom: 1 !important; width: auto !important; height: auto !important; container-type: normal; overflow: visible; }
