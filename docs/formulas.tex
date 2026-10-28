@@ -37,12 +37,12 @@
 \setcounter{tocdepth}{1}  % en el consolidado el índice interno lista solo secciones: los incisos están en la página de contenido global y en el pie
 \noindent{\small\bfseries\color[HTML]{B8433A} ANEXO 1}\\[1mm]
 {\Large\bfseries Formulación del tablero de riesgo de clientes}\\[1mm]
-{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.4 · 27/10/2026}
+{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.5 · 28/10/2026}
 \else
 \begin{center}
 {\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
 Materia 82.21 --- Factibilidad de Proyectos Data Driven\\
-Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v2.4\\[3mm]
+Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v2.5\\[3mm]
 \begin{tabular}{ll}
 Sebastián Caules & 64331 \\
 Tomás Ferreccio & 64934 \\
@@ -50,7 +50,7 @@ Matías Sola & 64322 \\
 Francisco Cattaneo & 64900 \\
 Juan Manuel Rilo & 64037 \\
 \end{tabular}\\[3mm]
-27/10/2026 (v1.0: 01/09/2026)
+28/10/2026 (v1.0: 01/09/2026)
 \end{center}
 \fi
 
@@ -546,7 +546,7 @@ Feature & $D(x)$ & Lectura \\
 \impl{entregas/entregable-1/\_build/F/recalc\_e1.py, líneas C21, sobre \texttt{features.client\_facts} del corte de referencia.}
 \valor{los seis valores de la tabla~\ref{tab:discriminante}, reproducidos el 15/09/2026.}
 
-\textbf{Por qué se descartan las dos primeras.} $B_i(t)$ se calcula con $\rho_i(t)$ y $\gamma_i(t)$: que ``predigan'' el riesgo es aritmética, no señal. Entrenar un modelo con ellas como features y $B_i(t)$ como target es el \emph{leakage} que advierte Provost y Fawcett. Descontadas, la mejor señal genuina disponible con los seis datasets del Entregable 1 es \texttt{n\_tiendas\_distintas} con 1,22$\times$. Hasta el Entregable 3, el criterio de éxito 1 de la Parte C pedía un lift de $1{,}30\times$ en el decil superior contra la línea base de recency. La regla del umbral, sin modelo, ya da $2{,}30\times$ (subsección~\ref{sec:regla-umbral}), y con las señales de reclamos, consultas y devoluciones que llegaron el 08/09 ningún modelo le gana con un intervalo que excluya el cero. Por eso el criterio se reescribió contra la regla (subsección~\ref{sec:meta-criterio-1}). La pasada exploratoria del 05/08 reportó además una feature ``tendencia'' con 4,5$\times$; su definición no quedó registrada y no se reproduce, así que no se cita.
+\textbf{Por qué se descartan las dos primeras.} $B_i(t)$ se calcula con $\rho_i(t)$ y $\gamma_i(t)$: que ``predigan'' el riesgo es aritmética, no señal. Entrenar un modelo con ellas como features y $B_i(t)$ como target es el \emph{leakage} que advierte Provost y Fawcett. Descontadas, la mejor señal genuina disponible con los seis datasets del Entregable 1 es \texttt{n\_tiendas\_distintas} con 1,22$\times$. Hasta el Entregable 3, el criterio de éxito 1 de la Parte C pedía un lift de $1{,}30\times$ en el decil superior contra la línea base de recency. La regla del umbral, sin modelo, ya da $2{,}30\times$ (subsección~\ref{sec:regla-umbral}), y con las señales de reclamos, consultas y devoluciones que llegaron el 08/09 ningún modelo le gana en la lista de contactables con un intervalo que excluya el cero (subsección~\ref{sec:bootstrap}). Por eso el criterio se reescribió contra la regla (subsección~\ref{sec:meta-criterio-1}). La pasada exploratoria del 05/08 reportó además una feature ``tendencia'' con 4,5$\times$; su definición no quedó registrada y no se reproduce, así que no se cita.
 
 \section{Anticipación: qué confirma la regla y qué promete el modelo}
 \label{sec:anticipacion}
@@ -563,9 +563,10 @@ Y_i(T) = \mathbb{1}\bigl[\,E_i(T)=1 \ \wedge\ B_i(T)=0 \ \wedge\ \exists\, t \in
 es decir, entre los clientes elegibles que al corte $T$ todavía no cruzaron su umbral, cuáles lo cruzan dentro de los 90 días siguientes. La condición $E_i(T)=1$ se agrega en la v2.1 (22/09/2026): un cliente con menos de tres compras no tiene umbral propio y no puede cruzarlo, así que sin esa condición la población del target mezclaría clientes que nunca pueden dar $Y_i(T)=1$ (sección~\ref{sec:proxy-churn}). Un modelo puntúa en $T$ la probabilidad de $Y_i(T)=1$ con señales que se mueven \emph{antes} del cruce: caída de frecuencia y de ticket respecto del propio historial, y desde el 08/09 reclamos, consultas de soporte y devoluciones. Se valida con holdout temporal (entrenar hasta un corte, evaluar sobre los 90 días siguientes), contra la línea base de ordenar por $\rho_i(T)$ y, desde el Entregable 3, contra la regla del umbral. El dataset de entrenamiento del Entregable 2 materializa esta definición como una fila por cliente elegible y no en riesgo en cada corte mensual $T$, del 31/01/2023 al 30/09/2025, con las features calculadas solo con datos de fecha $\le T$ y el target medido en $(T,\,T+90]$; la partición es por corte (entrenamiento hasta 2024, prueba en 2025), nunca aleatoria, y la del Entregable 3 suma un embargo (subsección~\ref{sec:particion}). En la versión 0.1 del dataset la existencia se evalúa en tres puntos de la ventana, $t \in \{T+30,\,T+60,\,T+90\}$ días: un cliente que cruza su umbral y vuelve a comprar entre dos evaluaciones queda con $Y_i(T)=0$. Desde la v0.2 (Entregable 3) el target se evalúa cada día de la ventana, como dice la ecuación~\eqref{eq:target}: suma 885 positivos y ninguno pasa a 0.
 % registro de cifras: F02
 
-\textbf{Las ``dos semanas de anticipación'' del alcance} (Parte C, sección 1.2) no son un horizonte de predicción: son el tiempo operativo entre el corte mensual en que se calcula la lista y la salida de la campaña, para que Marketing la reciba antes de que arme el envío del mes. El horizonte de predicción es el de la ecuación~\eqref{eq:target}: 90 días.
+\textbf{Las ``dos semanas posteriores al corte''} del alcance (Parte C, sección 1.2) son el plazo para enviar la lista, no un horizonte de predicción: ese es el de la ecuación~\eqref{eq:target}, 90 días.
 
-En el Entregable 3 la anticipación no la da un modelo sino la regla del umbral de la subsección~\ref{sec:regla-umbral}: ordenar a los clientes por los días que les faltan para cruzar su umbral acierta 81,6\% de la lista mensual en validación y 86,1\% de la lista de contactables en test, y ningún modelo la supera con un intervalo que excluya el cero (subsección~\ref{sec:criterio-reemplazo}).
+En el Entregable 3 la anticipación no la da un modelo sino la regla del umbral de la subsección~\ref{sec:regla-umbral}: ordenar a los clientes por los días que les faltan para cruzar su umbral acierta 81,6\% de la lista mensual en validación y 86,1\% de la lista de contactables en test. En esa lista ningún modelo la supera con un intervalo que excluya el cero; sin filtro, en test, la logística suma 1,06 puntos, pero esa lista no se puede mandar y la ventaja no paga lo que el modelo agrega al costo (subsecciones~\ref{sec:bootstrap} y~\ref{sec:criterio-reemplazo}).
+% registro de cifras: J03, J11
 
 \subsection{Días para cruzar el umbral y cercanía}
 \label{sec:dias-cruzar}
