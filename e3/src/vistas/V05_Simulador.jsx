@@ -1,7 +1,14 @@
 // V05 · el simulador de la tasa de éxito (Parte B 3.2 y 3.4 a 3.6; diapositiva 9 de C3), detrás de
-// «Explorar» en la tarjeta del gráfico de la vista 5 (27/10, W3). Es la tarjeta del gráfico de V05 entera:
-// al llegar se ve igual que antes (el costo del año 1 con modelo y con la regla sola contra el beneficio
-// anual de la regla, con el presupuesto marcado) y «Explorar» suma el deslizante.
+// «Explorar» en la tarjeta del gráfico de la vista 5 (27/10, W3). Es la tarjeta del gráfico de V05 entera.
+//
+// (28/10, unidad V05 de .workforce/PLAN.md) Al llegar, dos barras con BarrasH (src/graficos.jsx; paridad_e3.py
+// mide sus rótulos en esta vista): el costo del año 1 de la regla sola (D3.economia.costos.regla_sin_modelo,
+// USD 20.260, en --e3-ctx-relleno, sin énfasis) contra el beneficio anual de la regla
+// (D3.economia.observada.regla_usd, USD 299,49, en --acc). La astilla es el mensaje. Encabezado como las
+// vistas 1 y 4: qué mide en mono (con «lista de 500 sin filtro en validación», que busca verificar_e3.py) y
+// la conclusión en .e3-conclusion, la frase de la tarjeta «Económica» de la diapositiva 2 de C3 con el
+// beneficio en --acc. El lienzo llena el alto de la tarjeta. El costo con modelo y la línea del presupuesto
+// pasan a «Explorar»: ahí se lee también el ROI del modelo sobre la regla.
 //
 // Este archivo NO exporta `default`: vistas/index.jsx registra como vista todo `V*.jsx` con default, y
 // sin `meta.id` este archivo caería en el id «V05» de V05_SePaga.jsx. Lo importa V05_SePaga.jsx.
@@ -15,11 +22,13 @@
 //   con un segundo sombreado sin leyenda.
 // - Descuento: con el de la oferta (15 %) o sin descuento; cambia la regla y el modelo (columnas `_sin`).
 // - Lecturas: s, el ROI de la regla y el del modelo sobre la regla, con la fila de la grilla.
-// - El gráfico: la barra del beneficio de la regla sigue a s. El eje queda fijo mientras se arrastra (el
+// - El gráfico: la barra del beneficio de la regla sigue a s; arriba se suma el costo con modelo y el
+//   presupuesto. El eje queda fijo mientras se arrastra (el
 //   tope es el beneficio con s = 100 % del descuento elegido), así las barras de costo no saltan.
 //   (Crítica del W3, hallazgo 7) El beneficio es el de la lista de 500 sin filtro en validación, el
 //   escenario base de la B 3.4 (G41): la frase lo dice, y el title suma la lista que sale (500
 //   contactables) en validación (H42) y en test (D 11.2, J12).
+// - La conclusión sigue al deslizante: si el ROI de la regla llega a 0 o más, dice que la regla se paga.
 // Los valores que dependen del control llevan data-simulacion; las marcas de la escala, data-escala.
 // «Cerrar» vuelve a la observada, con descuento, y al gráfico de la vista presentada.
 
@@ -34,6 +43,12 @@ import { BotonExplorar, Deslizante, Opciones } from '../controles.jsx'
 const E = D3.economia
 const G = E.grilla
 const D9 = C3.DIAPOSITIVAS.find((d) => d.n === 9)
+// La conclusión del gráfico: la frase de la tarjeta «Económica» de la diapositiva 2 de C3, sin el punto.
+const ECO = C3.DIAPOSITIVAS.find((d) => d.n === 2).tarjetas.find((t) => t.area === 'Económica')
+if (!ECO) throw new Error('V05_Simulador: la diapositiva 2 de C3 no trae la tarjeta «Económica»')
+const NO_RECUPERA = ECO.texto.replace(/\.$/, '')
+// Las barras de costo, en el relleno de contexto del E3.
+const CTX = 'var(--e3-ctx-relleno, #a9b1bf)'
 const N = (id) => {
   const x = G.notables.find((m) => m.id === id)
   if (!x) throw new Error(`V05_Simulador: la grilla no trae la marca «${id}»`)
@@ -150,47 +165,55 @@ export function TarjetaCostoBeneficio() {
   }
 
   const regla = explorar ? col('regla_usd', desc)[i] : E.observada.regla_usd
-  const tope = Math.round((3 * 80 + 56) * k)
+  const reglaRoi = explorar ? col('regla_roi_pct', desc)[i] : E.observada.regla_roi_pct
+  const modeloRoi = col('modelo_roi_pct', desc)[i]
+  // Al llegar, dos barras: el costo de la regla sola (contexto) y su beneficio (--acc). «Explorar» suma el
+  // costo con modelo arriba y el presupuesto, para leer el ROI del modelo junto al de la regla.
   const barras = [
-    { etiqueta: 'Costo del año 1, con modelo', valor: COSTO_MODELO },
-    { etiqueta: 'Costo del año 1, solo la regla', valor: COSTO_REGLA },
+    ...(explorar ? [{ etiqueta: 'Costo del año 1, con modelo', valor: COSTO_MODELO, color: CTX }] : []),
+    { etiqueta: 'Costo del año 1, regla sola', valor: COSTO_REGLA, color: CTX },
     { etiqueta: 'Beneficio anual de la regla', valor: regla, enfasis: true, anchoMin: 3 },
   ]
-  const reglaRoi = col('regla_roi_pct', desc)[i]
-  const modeloRoi = col('modelo_roi_pct', desc)[i]
+
+  // La conclusión dice lo que muestra el gráfico; con el deslizante, cambia si la regla llega a pagarse.
+  const conclusion = reglaRoi < 0
+    ? <>{`${NO_RECUPERA}: deja `}<b className="tabular" {...(explorar ? sim : {})}>{monto(regla)}</b>{' por año'}</>
+    : <>{'Con esta tasa de éxito, la regla se paga: deja '}<b className="tabular" {...sim}>{monto(regla)}</b>{' por año'}</>
 
   const titulo = `Beneficio anual de la regla con la lista de 500 sin filtro en los cortes de validación, el escenario `
     + `base de la B 3.4: ${monto(E.observada.regla_usd)}, ROI ${pctDirecto(E.observada.regla_roi_pct, 2)}. Con la lista `
     + `que sale, 500 contactables: ${monto(RC.usd_anio)} en validación (ROI ${pctDirecto(RC.roi_pct, 2)}) y `
     + `${monto(RT.contactables.usd)} en test (ROI ${pctDirecto(RT.contactables.roi_pct, 2)}, Parte D 11.2). Ninguna `
-    + 'recupera el costo en el año.'
+    + `recupera el costo en el año. Con modelo, el año 1 cuesta ${monto(COSTO_MODELO)} (presupuesto `
+    + `${monto(E.costos.presupuesto_usd)}).`
     + (explorar ? ` Simulación sobre la grilla de la Parte B (filas G31 a G54 del registro). ${D9.pie_figura}` : '')
   return (
-    <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }} title={titulo}>
-      {/* El rótulo sigue siendo hijo directo de la tarjeta, como en V05 antes de W3 (paridad_e3.py mide
-          `.pant > .tarjeta > .kpi-lbl` en esta vista): el botón va adentro, a la derecha de la cifra. */}
-      <span className="kpi-lbl frase">
-        <span style={{ flex: '1 1 auto' }}>{`${D9.pie_figura.replace(/\.$/, '')}, lista de 500 sin filtro en validación`}</span>
-        <b className="tabular" {...(explorar ? sim : {})}>{`${monto(regla)} por año contra ${monto(COSTO_REGLA)}`}</b>
-        <BotonExplorar abierto={explorar} onCambio={cambiarExplorar} style={{ marginLeft: 'clamp(4px, 0.6cqw, 10px)' }} />
-      </span>
+    <div className="tarjeta e3-v05-graf" title={titulo}>
+      <div className="e3-v05-cab">
+        <div className="e3-v05-titulos">
+          <p className="e3-v05-mide">{`${D9.pie_figura.replace(/\.$/, '')} · lista de 500 sin filtro en validación`}</p>
+          <p className="e3-conclusion">{conclusion}</p>
+        </div>
+        <BotonExplorar abierto={explorar} onCambio={cambiarExplorar} />
+      </div>
 
       {explorar && (
         <PanelSimulador i={i} setI={setI} desc={desc} setDesc={setDesc} reglaRoi={reglaRoi} modeloRoi={modeloRoi} />
       )}
 
-      <div style={{ flex: '1 1 0', minHeight: 0, maxHeight: tope, marginTop: 'clamp(6px, 1.6cqh, 20px)',
-                    display: 'flex', flexDirection: 'column' }}>
+      <div className="e3-v05-lienzo">
         <Lienzo className="lienzo">
           {({ w, h }) => (
             <BarrasH
               datos={barras} w={w} h={h}
               formato={monto}
               formatoEje={(v) => fijo(v, 0)}
-              anchoEtiqueta={Math.round(220 * k)}
+              anchoEtiqueta={Math.round(230 * k)}
               tituloEje="Dólares"
               tope={explorar ? Math.max(col('regla_usd', desc)[ULTIMA], COSTO_MODELO) : undefined}
-              referencia={{ valor: E.costos.presupuesto_usd, etiqueta: `presupuesto ${monto(E.costos.presupuesto_usd)}` }}
+              referencia={explorar
+                ? { valor: E.costos.presupuesto_usd, etiqueta: `presupuesto ${monto(E.costos.presupuesto_usd)}` }
+                : undefined}
             />
           )}
         </Lienzo>
