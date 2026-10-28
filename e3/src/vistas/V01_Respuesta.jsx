@@ -155,9 +155,9 @@ function BarrasVeces({ w, h, k }) {
         <title>{`${EXI.area} ${txtHoy}: ${entero(E.parametros.compras_7d)} compras a 7 días en `
           + `${entero(E.parametros.envios)} envíos a clientes cerca del umbral, rango al 95 % de `
           + `${tasaTxt(S_LO)} a ${tasaTxt(S_HI)}, ${EXI.escala}. ${plano(EXI.texto)}`}</title>
-        <text x={x0 - Math.round(14 * k)} y={y1 - fSub * 0.45} fontSize={fEtq} fontWeight={600} fill={INK}
+        <text x={x0 - Math.round(14 * k)} y={y1 - fSub * 0.7} fontSize={fEtq} fontWeight={600} fill={INK}
               textAnchor="end" dominantBaseline="central">{ROT_HOY}</text>
-        <text x={x0 - Math.round(14 * k)} y={y1 + fEtq * 0.62} fontSize={fSub} fontWeight={500} fill={CTX}
+        <text x={x0 - Math.round(14 * k)} y={y1 + fEtq * 0.72} fontSize={fSub} fontWeight={500} fill={CTX}
               textAnchor="end" dominantBaseline="central">{NOTA_HOY}</text>
         <rect x={x0} y={y1 - alto / 2} width={largoHoy} height={alto} fill={ACC} />
         <text x={x0 + largoHoy + 10} y={y1} fontSize={fVal} fontWeight={700} fill={INK}
