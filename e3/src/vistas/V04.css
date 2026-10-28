@@ -1,0 +1,22 @@
+/* V04 · ¿El modelo mejora a la regla? (28/10, unidad V04 de .workforce/PLAN.md). Estilos propios de la
+   vista (N0-7): solo clases e3-v04-*. Los tokens --e3-* los define estilos_e3.css bajo .e3-vp; cada uso
+   lleva su valor de respaldo. */
+
+/* Tarjeta del gráfico: encabezado arriba y el SVG llena el resto del alto. */
+.e3-v04-graf { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+
+/* Encabezado: qué mide (rótulo mono) y debajo la conclusión; los mandos a la derecha. */
+.e3-v04-cab { display: flex; align-items: flex-start; gap: clamp(8px, 1cqw, 16px); }
+.e3-v04-titulos { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: clamp(2px, .5vh, 6px); }
+.e3-v04-mide {
+  margin: 0;
+  font: 600 var(--e2-rot, 12px)/1.25 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--e3-ctx, #5a6478);
+}
+.e3-v04-mandos { flex: none; display: flex; align-items: center; gap: clamp(8px, 1cqw, 16px); }
+
+.e3-v04-lienzo { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;
+                 margin-top: clamp(8px, 2vh, 24px); }
+
+/* Halo del color de la tarjeta detrás de los números del gráfico: la línea del 0 o la grilla no los cortan. */
+.e3-v04-halo { paint-order: stroke; stroke: var(--sup, #fff); stroke-width: 4px; stroke-linejoin: round; }

@@ -1,0 +1,23 @@
+/* Vista 3 (28/10, .workforce/PLAN.md, unidad V03; N0-7: clases e3-v03-*). */
+
+/* Encabezado de la tarjeta del gráfico: la conclusión a la izquierda (crece), lo barato del MVP y el
+   botón «Explorar» a la derecha. */
+.e3-v03-cab {
+  display: flex; align-items: baseline; gap: clamp(10px, 1.2cqw, 20px);
+}
+.e3-v03-cab > .e3-conclusion { flex: 1 1 auto; }
+.e3-v03-mvp {
+  flex: none; white-space: nowrap;
+  font: 600 var(--e2-txt2)/1.2 var(--fuente); color: var(--e3-ctx, #5a6478);
+}
+/* En la ventana lógica de 1152 (1152 × 640 y 1366 × 768) no entra al lado de la conclusión: queda
+   detrás de «Explorar», que lo muestra entero. */
+@container e3vp (max-width: 1200px) {
+  .e3-v03-mvp { display: none; }
+}
+
+/* El gráfico llena el alto que deja el encabezado. */
+.e3-v03-graf {
+  flex: 1 1 0; min-height: 0; margin-top: clamp(8px, 1.8cqh, 22px);
+  display: flex; flex-direction: column;
+}

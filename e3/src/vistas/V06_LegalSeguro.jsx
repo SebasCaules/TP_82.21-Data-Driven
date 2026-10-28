@@ -1,64 +1,76 @@
-// V06 · ¿Es legal y seguro? (Parte C 5.1 a 5.4 y 6.2 a 6.5; diapositivas 10 y 11 de C3). W2.06, con la
-// forma de la vista 5: banda de cifras con la tarjeta de decisión a la derecha y un gráfico a todo el
-// ancho debajo.
+// V06 · ¿Es legal y seguro? (Parte C 5.1 a 5.4 y 6.2 a 6.5; diapositivas 10 y 11 de C3). Banda de cifras
+// con la tarjeta de decisión a la derecha y un gráfico a todo el ancho debajo. Rehecha el 28/10 (unidad
+// V06 de .workforce/PLAN.md y sus correcciones del crítico).
 //
-// - Banda (fila 6 de la historia del PLAN.md): el puntaje legal, que responde la pregunta y es la única
-//   cifra al tamaño máximo (regla 13 H1 del E2; H40); los envíos de 2022 a 2025 que fueron a quien no
-//   aceptó marketing, con la marca de excepción del E2 en el rótulo (C18); los riesgos críticos sobre los
-//   de la matriz (diapositiva 11 y anexo A4). Anchos 3 / 3 / 3 (W2, hallazgo del verificador): el
-//   rótulo del 30,1 % dice «Sin consentimiento», el término de C18, de L3 y del riesgo 6, y con la marca
-//   no entra en un renglón de una tarjeta de 2 hasta 1536 × 864. Con 3 / 3 / 2, «Riesgos críticos» se
-//   parte y su frase va a tres renglones, y la banda crece de 12 a 20 px desde 1280 × 720. La frase del
-//   30,1 % corta en «fue» y el resto va al title.
+// - Banda: un número por tarjeta, la central primero (N0-6). Central: el puntaje legal (H40,
+//   D3.legal.promedio, con el tope de la escala de la unidad de C3, «/3»), con el fragmento «cada
+//   dimensión en 2» (las cinco valen lo mismo; si dejaran de valer lo mismo, vuelve el nivel de la
+//   escala). Después el 30,1 % de los envíos sin consentimiento (C18, D3.legal.envios_sin_consentimiento_tasa)
+//   con la marca de excepción del E2 en el rótulo y el fragmento «de los envíos» (la frase de C3 hasta
+//   «envíos»; el período va al gráfico, N0-8), y los riesgos críticos (J22, D3.legal.riesgos_criticos,
+//   sola, «con señal y umbral»; los 13 de la matriz, D3.legal.riesgos, van al title: regla 2). Anchos 3 / 3 / 3: con la marca, «Sin consentimiento»
+//   no entra en un renglón de una tarjeta de 2.
 // - Decisión: «C-LEG · viable con condiciones» (decisiones.js) y la frase de la tarjeta Legal de la
-//   diapositiva 2 con un «Sí» delante («Sí, con seis acciones; la lista sale filtrada»). El plan L1 a L6
-//   con sus dueños, la escala y la alerta van al title.
-// - Gráfico: el puntaje de cada una de las cinco dimensiones, con el tramo «viable con condiciones» de
-//   la escala de la cátedra dibujado (diapositiva 10). Es PuntajeDimensiones, la misma pieza que la vista
-//   3; como las cinco valen lo mismo que el promedio, la línea del promedio no se dibuja.
-// - Lo que en las diapositivas 10 y 11 no entra va detrás de «Explorar», cerrado al llegar: el plan L1 a
-//   L6 en sus dos tramos, con dueño, y la matriz de los 13 riesgos (anexo A4), donde cada riesgo crítico
-//   muestra qué se mide, su umbral y quién lo mira. Las normas y los límites, en el pie de cada panel.
-//   El resto lo dice el guion (notas, N).
-// Ninguna cifra escrita acá: todo sale de C3 (contenido_e3.js). D3 no trae datos legales; los puntajes,
-// el tramo de la escala, el 30,1 % y los conteos se leen del texto de C3.
+//   diapositiva 2 con un «Sí» delante. El plan L1 a L6 con sus dueños, la escala y la alerta van al title.
+// - Gráfico (28/10): reemplaza las cinco barras iguales en 2, que no decían nada. Una barra 100 % de los
+//   envíos de 2022 a 2025: el tramo sin consentimiento (D3.legal.envios_sin_consentimiento_tasa) en
+//   terracota con la trama de excepción (Tramas de src/graficos.jsx) y su valor adentro, más chico
+//   que la cifra central de la banda (la única al tamaño máximo); el resto en
+//   relleno de contexto y sin número (no se calcula el complemento en el navegador). Debajo del tramo, una
+//   llave con «la lista sale sin ellos» y la acción del plan que lo hace (la de consentimiento, con su
+//   tramo «antes de la primera lista del piloto»). Conclusión arriba, en .e3-conclusion: la cola del
+//   título de la diapositiva 10, «El riesgo es contactar sin consentimiento». Una sola idea: los tres
+//   riesgos críticos quedan en la banda y en «Explorar».
+// - «Explorar», cerrado al llegar, con tres paneles: las cinco dimensiones en pips (D3.legal.dimensiones,
+//   lo que antes era el gráfico; ya no usa PuntajeDimensiones), el plan L1 a L6 en sus dos tramos con dueño
+//   y la matriz de los 13 riesgos (anexo A4), donde cada riesgo crítico muestra qué se mide, su umbral y
+//   quién lo mira. Las normas, la escala y los límites, en el pie de cada panel.
+// Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js; el texto, de C3.
 
 import { useState } from 'react'
-import { Lienzo } from '../../../src/graficos.jsx'
+import { Lienzo, Tramas } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
+import { D3 } from '../datos_e3.js'
 import { C3 } from '../contenido_e3.js'
-import { NBSP } from '../formato.js'
+import { NBSP, entero, fijo, pct } from '../formato.js'
 import { plano, sinCortes } from '../texto.jsx'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
 import { BotonExplorar, Opciones } from '../controles.jsx'
 import { Cifra } from '../cifra.jsx'
 import { anchoTexto as ancho } from '../medir.js'
-import PuntajeDimensiones, { tramoDe } from '../PuntajeDimensiones.jsx'
 import { RIESGO_12 } from '../riesgo12.js'
+import './V06.css'
 
 const D2 = C3.DIAPOSITIVAS.find((d) => d.n === 2)
 const D10 = C3.DIAPOSITIVAS.find((d) => d.n === 10)
 const D11 = C3.DIAPOSITIVAS.find((d) => d.n === 11)
 const A4 = C3.ANEXOS.find((a) => a.n === 'A4')
 const T_LEGAL = D2.tarjetas.find((t) => t.area === 'Legal')
+const L = D3.legal
 
 const num = (s) => Number(String(s).replace(/\./g, '').replace(',', '.'))
 const minus = (s) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s)
+const mayus = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s)
 
-// «2,0[[/3]]»: la cifra y su unidad chica; el tope de la escala sale de la unidad.
-const [, PROM_TXT = D10.promedio.valor, PROM_UNIDAD = ''] = D10.promedio.valor.match(/^(.+?)\[\[(.+?)\]\]$/) ?? []
+// El puntaje (D3) y el tope de la escala, que sale de la unidad de C3 («2,0[[/3]]»).
+const PROM_TXT = fijo(L.promedio, 1)
+const PROM_UNIDAD = (D10.promedio.valor.match(/\[\[(.+?)\]\]$/) ?? [])[1] ?? ''
 const TOPE = num(PROM_UNIDAD.replace('/', ''))
 if (!(TOPE > 0)) throw new Error(`V06: el promedio legal de C3 no trae su escala («${D10.promedio.valor}»)`)
-// «Escala de la cátedra: 1,6 a 2,5 es viable con condiciones.»: el tramo que se dibuja.
-const TRAMO = tramoDe(D10.escala)
-const DIMS = D10.dimensiones.map((d) => ({ ...d, valor: num(d.puntaje) }))
+const DIMS = L.dimensiones
 const PAREJAS = DIMS.every((d) => d.puntaje === DIMS[0].puntaje)
+const FRASE_CENTRAL = PAREJAS ? `cada dimensión en ${fijo(DIMS[0].puntaje, 0)}` : minus(L.tramo.nivel)
 
-// La frase de la tarjeta, hasta «fue»: «de los envíos de 2022 a 2025»; a quién fueron lo dice el rótulo.
-// El período no se parte («2022 a 2025» en un renglón).
-const ALERTA_DE = sinCortes((D10.alerta.texto.match(/^(.*?) fue\b/) ?? [, D10.alerta.texto])[1])
+// «de los envíos de 2022 a 2025 fue a quien no aceptó marketing.»: la tarjeta dice «de los envíos»; el
+// gráfico, el período («Envíos de 2022 a 2025») y a quién fueron («no aceptó marketing»).
+const ALERTA = plano(D10.alerta.texto)
+const ALERTA_DE = (ALERTA.match(/^(.*?envíos)\b/) ?? [, ALERTA])[1]
+const PERIODO = sinCortes(mayus((ALERTA.match(/^de los (envíos de \d{4} a \d{4})/) ?? [, 'envíos'])[1]))
   .replace(/(\d{4}) a (\d{4})/g, `$1${NBSP}a${NBSP}$2`)
+const A_QUIEN = (ALERTA.match(/fue a quien (.+?)\.?$/) ?? [, 'sin consentimiento'])[1]
+const TASA = L.envios_sin_consentimiento_tasa
+const TASA_TXT = pct(TASA, 1)
 
 // Riesgos: los 13 de A4 y los críticos (A4.destacar, en el orden de las columnas de la diapositiva 11). El 12, como
 // lo deja la Parte D 11.2 (riesgo12.js, el mismo texto del anexo A4; F6b, H-2-072): hasta el 28/10 decía el de
@@ -72,12 +84,21 @@ const RIESGOS = A4.filas.map((f, i) => ({
 A4.destacar.forEach((i, j) => { if (D11.columnas[j]) RIESGOS[i].senal = D11.columnas[j] })
 const CRITICOS = RIESGOS.filter((r) => r.critico)
 const PRIMERO = RIESGOS[A4.destacar[0]] ?? CRITICOS[0]
-const COLA_D11 = (D11.titulo.match(/cada uno.*$/) ?? [D11.titulo])[0]
+if (CRITICOS.length !== L.riesgos_criticos || RIESGOS.length !== L.riesgos) {
+  throw new Error(`V06: A4 (${CRITICOS.length} de ${RIESGOS.length}) no coincide con D3.legal (${L.riesgos_criticos} de ${L.riesgos})`)
+}
 
 // Plan L1 a L6 (diapositiva 10), en sus dos tramos.
 const ACCIONES = D10.plan.flatMap((t) => t.acciones)
 const IDS_L = ACCIONES.map((a) => a.id).sort((a, b) => num(a.slice(1)) - num(b.slice(1)))
 const RANGO_L = `${IDS_L[0]} a ${IDS_L[IDS_L.length - 1]}`
+// La acción que deja afuera a quien no consintió, con su tramo: lo que dice la llave del gráfico.
+const TRAMO_FILTRO = D10.plan.find((t) => t.acciones.some((a) => /consentimiento/i.test(a.que))) ?? D10.plan[0]
+const FILTRO = TRAMO_FILTRO.acciones.find((a) => /consentimiento/i.test(a.que)) ?? TRAMO_FILTRO.acciones[0]
+const COMO = `${plano(FILTRO.que)}, ${minus(TRAMO_FILTRO.cuando)}`
+
+// «Sí, con condiciones: el riesgo es contactar sin consentimiento» → la conclusión del gráfico.
+const CONCLUSION = mayus((plano(D10.titulo).match(/:\s*(.+)$/) ?? [, plano(D10.titulo)])[1])
 
 const DECISION = decision('C-LEG', {
   llano_corto: `Sí, con ${minus(T_LEGAL.texto)}`.replace(/\.$/, ''),
@@ -95,6 +116,10 @@ const GRIS = 'var(--gris)'
 const INK = 'var(--ink)'
 const MUT2 = 'var(--mut2)'
 const EJE = 'var(--eje)'
+const CTX = 'var(--e3-ctx, #5a6478)'
+const CTX_RELLENO = 'var(--e3-ctx-relleno, #a9b1bf)'
+const CONTORNO = 'var(--e3-contorno, #4f5a6e)'
+const EXC = 'var(--terra)'
 
 /** Ancho de un Rotulo: mono, mayúsculas y .08em de espaciado por letra. */
 const anchoRotulo = (t, f) => ancho(String(t).toUpperCase(), f, 600, true) + 0.08 * f * String(t).length
@@ -308,82 +333,197 @@ function MatrizRiesgos({ w, h, k, sel, setSel }) {
   )
 }
 
+// ---------------------------------------------------------------- gráfico: la barra de los envíos
+
+/**
+ * Barra 100 % de los envíos del período: el tramo sin consentimiento en terracota con trama y su valor
+ * adentro; el resto en relleno de contexto, sin número. Arriba, el período con una cota de punta a punta y
+ * a quién fue cada tramo; debajo del tramo, una llave con «la lista sale sin ellos» y la acción que lo hace.
+ * El bloque se centra en el alto; la barra crece con el alto hasta un tope.
+ */
+function BarraEnvios({ w, h, k }) {
+  const fRot = Math.round(12 * k)
+  const fEtq = Math.round(18 * k)
+  const fBig = Math.round(24 * k)
+  const fSub = Math.round(15 * k)
+  const gap = Math.round(14 * k)
+  const xIni = 1
+  const xFin = w - 1
+  const total = xFin - xIni
+  const wExc = Math.max(2, total * TASA)
+  const xResto = xIni + wExc + 2                 // 2 px de superficie entre los tramos
+  const llave = Math.round(12 * k)
+
+  // Alto fijo de todo lo que no es la barra; la barra se queda con el resto, entre un piso y un tope.
+  const arribaAlto = arriba(fRot) + fRot + gap * 1.2 + fEtq + gap * 0.7
+  const abajoAlto = gap + llave + gap + fBig * 1.15 + fSub * 1.5
+  const barra = Math.max(48 * k, Math.min(120 * k, (h - arribaAlto - abajoAlto) * 0.7))
+  const alto = arribaAlto + barra + abajoAlto
+  const y0 = Math.max(0, (h - alto) * 0.4)       // un poco arriba del centro: más cerca de la conclusión
+  const yCota = y0 + arriba(fRot) + fRot + 7 * k
+  const yEtq = y0 + arribaAlto - gap * 0.7
+  const yBar = y0 + arribaAlto
+  const yLlave = yBar + barra + gap
+  const yLista = yLlave + llave + gap
+
+  // Valor adentro del tramo: lo más grande que entra en el ancho y en el alto.
+  const fVal = Math.min(barra * 0.4, 36 * k, ((wExc - 28 * k) / Math.max(1, ancho(TASA_TXT, 100, 700))) * 100)
+  // «el resto de los envíos» al principio de su tramo; si choca con el rótulo del tramo sin consentimiento,
+  // al final.
+  const etqExc = A_QUIEN
+  const etqResto = 'el resto de los envíos'
+  const choca = xIni + ancho(etqExc, fEtq, 700) + 16 * k > xResto + 10 * k
+  const tituloExc = `Sin consentimiento: ${TASA_TXT} ${ALERTA} (${entero(L.envios_sin_consentimiento)} envíos)`
+
+  return (
+    <svg width={w} height={h} role="img" style={{ display: 'block' }}
+         aria-label={`${PERIODO}: ${TASA_TXT} fue a quien ${A_QUIEN}; la lista sale sin ellos.`}>
+      <Tramas />
+      {/* período: rótulo y cota de punta a punta, que dice que la barra es el total */}
+      <Rotulo x={xIni} y={y0 + arriba(fRot)} texto={PERIODO} f={fRot} color={CTX} />
+      <path d={`M${xIni + 0.5} ${yCota + 5 * k} V${yCota} H${xFin - 0.5} V${yCota + 5 * k}`}
+            fill="none" stroke={EJE} strokeWidth="1" />
+
+      {/* a quién fue cada tramo */}
+      <text x={xIni} y={yEtq} fontSize={fEtq} fontWeight={700} fill={INK}>{etqExc}</text>
+      <text x={choca ? xFin : xResto + 10 * k} y={yEtq} fontSize={fEtq} fontWeight={500} fill={CTX}
+            textAnchor={choca ? 'end' : 'start'}>{etqResto}</text>
+
+      {/* la barra */}
+      <g>
+        <title>{tituloExc}</title>
+        <rect x={xIni} y={yBar} width={wExc} height={barra} fill="url(#trama-exc)" />
+        {fVal >= 14 && (
+          <text x={xIni + 14 * k} y={yBar + barra / 2} fontSize={fVal} fontWeight={700} fill="#fff"
+                dominantBaseline="central" className="tabular">{TASA_TXT}</text>
+        )}
+      </g>
+      <g>
+        <title>{`El resto de los ${minus(PERIODO)}`}</title>
+        <rect x={xResto} y={yBar} width={Math.max(0, xFin - xResto)} height={barra} fill={CTX_RELLENO} />
+      </g>
+
+      {/* llave bajo el tramo y lo que hace la lista */}
+      <path d={`M${xIni + 0.75} ${yLlave} V${yLlave + llave * 0.5} H${xIni + wExc - 0.75} V${yLlave}`
+             + ` M${xIni + 0.75} ${yLlave + llave * 0.5} V${yLlave + llave}`}
+            fill="none" stroke={CONTORNO} strokeWidth={Math.max(1.5, 2 * k)} />
+      <text x={xIni} y={yLista} fontSize={fBig} fontWeight={700} fill={INK} dominantBaseline="hanging">
+        la lista sale sin ellos
+      </text>
+      <text x={xIni} y={yLista + fBig * 1.2} fontSize={fSub} fontWeight={500} fill={CTX}
+            dominantBaseline="hanging">{COMO}</text>
+    </svg>
+  )
+}
+
+// ---------------------------------------------------------------- Explorar: las cinco dimensiones
+
+function Dimensiones({ w, h, k }) {
+  const f2 = 12.5 * k
+  const pie = envolver(D10.escala, w, f2)
+  const altoPie = pie.length * f2 * 1.3 + 8 * k
+  const paso = Math.min(64 * k, (h - altoPie) / DIMS.length)
+  const f = Math.min(18 * k, paso * 0.4)
+  const r = f * 0.42
+  const sep = r * 2.9
+  const anchoNom = Math.max(...DIMS.map((d) => ancho(d.nombre, f, 600)))
+  const xPip = anchoNom + 28 * k
+  const xVal = xPip + (TOPE - 1) * sep + r + 14 * k
+  return (
+    <svg width={w} height={h} role="img" style={{ display: 'block' }}
+         aria-label={`Puntaje de cada dimensión legal: ${DIMS.map((d) => `${d.nombre} ${fijo(d.puntaje, 0)}`).join(', ')}`}>
+      {DIMS.map((d, i) => {
+        const y = i * paso + paso / 2
+        return (
+          <g key={d.id}>
+            <title>{`${d.nombre}: ${fijo(d.puntaje, 0)}${PROM_UNIDAD}`}</title>
+            {i > 0 && <line x1={0} x2={w} y1={i * paso} y2={i * paso} stroke="var(--bd, #d9dde3)" strokeWidth="1" />}
+            <text x={0} y={y} fontSize={f} fontWeight={600} fill={INK} dominantBaseline="central">{d.nombre}</text>
+            {Array.from({ length: TOPE }, (_, j) => (
+              <circle key={j} cx={xPip + j * sep} cy={y} r={r}
+                      fill={j < d.puntaje ? CONTORNO : 'none'} stroke={CONTORNO} strokeWidth={1.5} />
+            ))}
+            <text x={xVal} y={y} fontSize={f} fontWeight={700} fill={INK} dominantBaseline="central"
+                  className="tabular">{`${fijo(d.puntaje, 0)}${PROM_UNIDAD}`}</text>
+          </g>
+        )
+      })}
+      <Renglones lineas={pie} x={0} y={h - altoPie + 8 * k} f={f2} color={MUT2} />
+    </svg>
+  )
+}
+
 // ---------------------------------------------------------------- la vista
 
 export default function V06LegalSeguro() {
   const k = useEscalaTexto()
   const [abierto, setAbierto] = useState(false)
-  const [panel, setPanel] = useState('plan')
+  const [panel, setPanel] = useState('dimensiones')
   const [sel, setSel] = useState(PRIMERO?.n)
-  const tope = Math.round((DIMS.length * 50 + 60) * k)
   // Tocado con el mouse, el control cambia y suelta el foco: las flechas siguen pasando de vista.
   const soltar = (e) => { if (e.detail) e.target.closest?.('button')?.blur() }
-  const frase = !abierto
-    ? { span: 'Puntaje de cada dimensión legal',
-        b: PAREJAS ? `${DIMS.length} dimensiones, todas en ${DIMS[0].puntaje}` : `promedio ${PROM_TXT}${PROM_UNIDAD}` }
-    : panel === 'plan'
-      ? { span: `Plan ${RANGO_L}, con dueño`, b: `${ACCIONES.length} acciones en ${D10.plan.length} tramos` }
-      : { span: 'Matriz de riesgos: probabilidad por impacto', b: `en azul, los ${CRITICOS.length} críticos` }
+  const conclusion = !abierto
+    ? <>{CONCLUSION}</>
+    : panel === 'dimensiones'
+      ? <>{`Las ${DIMS.length} dimensiones, `}<b>{PAREJAS ? `todas en ${fijo(DIMS[0].puntaje, 0)}` : `promedio ${PROM_TXT}`}</b></>
+      : panel === 'plan'
+        ? <>{`${ACCIONES.length} acciones en ${D10.plan.length} tramos, `}<b>con dueño</b></>
+        : <>{'En azul, '}<b>{`los ${CRITICOS.length} críticos`}</b></>
   return (
     <section className="pant v06">
       <Banda dcs={[DECISION]}>
         <div className="tarjeta e2-central" style={{ gridColumn: 'span 3' }}
-             title={`Puntaje legal: promedio de las ${DIMS.length} dimensiones. ${plano(D10.escala)}`}>
+             title={`Puntaje legal: promedio de las ${DIMS.length} dimensiones, ${minus(L.tramo.nivel)}. ${plano(D10.escala)}`}>
           <span className="kpi-lbl"><span>Puntaje legal</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <Cifra num={PROM_TXT} unidad={PROM_UNIDAD} />
             </div>
           </div>
-          <p className="e2-linea">{D10.promedio.texto}</p>
+          <p className="e2-linea">{FRASE_CENTRAL}</p>
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 3' }}
-             title={`Envíos sin consentimiento: ${plano(D10.alerta.valor)} ${plano(D10.alerta.texto)}`}>
+             title={`Envíos sin consentimiento: ${TASA_TXT} ${ALERTA}`}>
           <span className="kpi-lbl"><span><span className="e2-marca-exc" aria-hidden="true" />Sin consentimiento</span></span>
           <div className="ban-par">
-            <div className="par-item par-unico"><Cifra texto={D10.alerta.valor} sec /></div>
+            <div className="par-item par-unico"><Cifra texto={TASA_TXT} sec /></div>
           </div>
           <p className="e2-linea">{ALERTA_DE}</p>
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 3' }}
-             title={`${plano(D11.titulo)}. ${CRITICOS.map((r) => `${r.n}: ${r.texto}${r.senal ? ` (${r.senal.filas.map((f) => `${minus(f.rotulo)}: ${plano(f.texto)}`).join('; ')})` : ''}`).join(' · ')}`}>
+             title={`${plano(D11.titulo)}, de los ${fijo(L.riesgos, 0)} de la matriz. ${CRITICOS.map((r) => `${r.n}: ${r.texto}${r.senal ? ` (${r.senal.filas.map((f) => `${minus(f.rotulo)}: ${plano(f.texto)}`).join('; ')})` : ''}`).join(' · ')}`}>
           <span className="kpi-lbl"><span>Riesgos críticos</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
-              <Cifra num={CRITICOS.length} unidad={`${NBSP}de${NBSP}${RIESGOS.length}`} sec />
+              <Cifra num={fijo(L.riesgos_criticos, 0)} sec />
             </div>
           </div>
-          <p className="e2-linea">{COLA_D11}</p>
+          <p className="e2-linea">con señal y umbral</p>
         </div>
       </Banda>
 
       <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'clamp(8px, 1.2cqw, 16px)' }}>
-          <span className="kpi-lbl frase" style={{ flex: '1 1 auto' }}>
-            <span>{frase.span}</span>
-            <b className="tabular">{frase.b}</b>
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 'clamp(6px, 0.8cqw, 12px)', flexShrink: 0 }}
-                onClick={soltar}>
+        <div className="e3-v06-cab">
+          <p className="e3-conclusion tabular">{conclusion}</p>
+          <span className="e3-v06-ctl" onClick={soltar}>
             {abierto && (
               <Opciones etiqueta="Qué mostrar" valor={panel} onCambio={setPanel}
-                        opciones={[{ valor: 'plan', texto: `Plan ${RANGO_L}` },
+                        opciones={[{ valor: 'dimensiones', texto: `Las ${DIMS.length} dimensiones` },
+                                   { valor: 'plan', texto: `Plan ${RANGO_L}` },
                                    { valor: 'riesgos', texto: `Los ${RIESGOS.length} riesgos` }]} />
             )}
             <BotonExplorar abierto={abierto} onCambio={setAbierto} />
           </span>
         </div>
-        <div style={{ flex: '1 1 0', minHeight: 0, maxHeight: abierto ? undefined : tope,
-                      marginTop: 'clamp(6px, 1.6cqh, 20px)', display: 'flex', flexDirection: 'column' }}>
+        <div className="e3-v06-graf">
           <Lienzo className="lienzo">
             {({ w, h }) => (!abierto
-              ? <PuntajeDimensiones w={w} h={h} k={k} tope={TOPE} tramo={TRAMO}
-                                    dims={DIMS.map((d) => ({ nombre: d.dimension, valor: d.valor, texto: d.puntaje }))}
-                                    promedio={{ valor: num(PROM_TXT), rotulo: `promedio ${PROM_TXT}` }} />
-              : panel === 'plan' ? <PlanLegal w={w} h={h} k={k} />
-                : <MatrizRiesgos w={w} h={h} k={k} sel={sel} setSel={setSel} />)}
+              ? <BarraEnvios w={w} h={h} k={k} />
+              : panel === 'dimensiones' ? <Dimensiones w={w} h={h} k={k} />
+                : panel === 'plan' ? <PlanLegal w={w} h={h} k={k} />
+                  : <MatrizRiesgos w={w} h={h} k={k} sel={sel} setSel={setSel} />)}
           </Lienzo>
         </div>
       </div>

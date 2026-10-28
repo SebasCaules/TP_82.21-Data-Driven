@@ -12,14 +12,23 @@ real (vite.e3.config.js). Lo que se declara y se mide:
 1. Estático. e3/src/main.jsx importa src/estilos.css, e2/src/estilos_e2.css y src/fit.js; las vistas
    importan los componentes compartidos (e2/src/Banda.jsx, src/graficos.jsx); e3/src/estilos_e3.css no
    nombra ninguna clase del armazón (.lat*, .cuerpo, .e2-enc*, .e2-preg, .tarjeta, .kpi-*, .ban-*,
-   .e2-banda, .tarjeta-dec, :root y otras del E2) ni usa !important fuera de @media print; y src/** y
-   e2/** no cambian contra main.
+   .e2-banda, .tarjeta-dec, :root y otras del E2) salvo en un selector que arranca en .e3-vp (la caja del
+   zoom, que solo existe en /e3/: N0-4 del 28/10), ni usa !important fuera de @media print; las hojas de
+   cada vista (e3/src/vistas/*.css, N0-7) no nombran ninguna, ni bajo .e3-vp; y src/** y e2/** no
+   cambian contra main.
 2. Letra, /e2/ y /e3/ en la misma ventana, a 1152×640, 1366×768, 1536×864 y 1920×1080 (/e2/ en la vista 4
    o la 7b, /e3/ en la 5): de cada texto (riel, pregunta, encabezado, banda con sus cifras grandes,
    tarjeta de decisión, rótulo y textos del gráfico), el cociente e3 / e2 del tamaño de letra efectivo
    (tamaño × zoom), del interlineado y del espaciado tiene que dar el k declarado; el del ancho en
    pantalla de una misma muestra escrita con la letra de cada pieza, también. Familia, peso, mayúsculas
    y color, iguales. Imprime la tabla de cocientes por texto y resolución.
+   (28/10, N0-1 y N0-5) Lo que el E3 cambia a propósito para el proyector se declara pieza por pieza en
+   TEXTOS y DISTINTO, con el valor que tiene que dar, y se mide igual: la cifra central en 700; la
+   secundaria en tinta 600 al 72 % de la central (en el E2, gris al 70 %); el rótulo de la decisión un
+   6 % más grande, en 700 y con .03em; el fondo y el borde de la tarjeta de decisión; y el encabezado del
+   gráfico, que en el E3 es propio: qué mide (.e3-v05-mide, mono a la letra del rótulo de la banda del
+   E2, en --e3-ctx) y la conclusión (.e3-conclusion, tinta 700, más grande que el rótulo del E2). Cualquier otro
+   desvío sigue siendo una diferencia.
 3. Armazón, /e2/ en la ventana lógica (W/k × H/k) contra /e3/ en W × H: del riel, el encabezado, la
    banda, la tarjeta de decisión, la tarjeta central, la tarjeta del gráfico y el cuerpo, colores, fondo,
    bordes, radio y padding iguales (los valores calculados son lógicos: el zoom no los cambia); cajas
@@ -60,15 +69,30 @@ TOL = 0.5
 
 # Clases del armazón que la hoja del E3 no puede nombrar (PLAN.md: .lat*, .cuerpo, .e2-enc*, .e2-preg,
 # .tarjeta, .kpi-*, .ban-*, .e2-banda, .tarjeta-dec, :root) y otras del E2 que darían el mismo efecto.
+# (28/10, N0-4) En estilos_e3.css sí, en un selector que arranca en .e3-vp: la caja del zoom solo existe en
+# /e3/, así /e2/ no cambia. :root, html y body, nunca. Las hojas de las vistas (V0n.css), nunca.
 ARMAZON = re.compile(
     r"(:root\b|(?<![\w-])html\b|(?<![\w-])body\b|\.lat(?:-[\w-]+)?\b|\.cuerpo\b|\.principal\b|\.app\b|\.pant\b"
     r"|\.e2-[\w-]+|\.tarjeta(?:-dec)?\b|\.kpi-[\w-]+|\.ban-[\w-]+|\.par-[\w-]+|\.dec-[\w-]+|\.lienzo[\w-]*"
     r"|\.titulo\b|\.chico\b)")
+BAJO_VP = re.compile(r"^\.e3-vp(?=[\s>])")
+RAIZ = re.compile(r":root\b|(?<![\w-])html\b|(?<![\w-])body\b")
+
+# Colores del E3 que se declaran distintos (src/estilos.css y estilos_e3.css), en el formato de getComputedStyle.
+INK = "rgb(22, 35, 58)"           # --ink, #16233a
+E3_CTX = "rgb(90, 100, 120)"      # --e3-ctx, #5a6478
+DEC_FONDO = "rgb(214, 235, 227)"  # --dec-fondo del E3, #d6ebe3
+DEC_BORDE = "rgb(159, 207, 192)"  # --dec-borde del E3, #9fcfc0
 
 # ---- 2. Letra: /e2/ y /e3/ en la misma ventana. (nombre, vista de /e2/, selector en /e2/, selector en /e3/,
 # opciones). La vista de /e3/ es siempre la 5, salvo «vista3». «solo_tam»: solo el tamaño y la muestra (el
 # interlineado y el color de la regla son otros); «opcional»: si /e3/ no lo tiene (el esqueleto, cuando ya
 # no quede ninguno), no se mide.
+# (28/10, N0-1 y N0-5) Diferencias declaradas: «factor», la letra de /e3/ mide k × factor la de /e2/ (y el
+# interlineado y la muestra, lo mismo); «espaciado_libre», el espaciado es otro (lo declara estilos_e3.css) y la
+# muestra no se mide; «interlineado_libre», el interlineado es otro; «tam_min», la letra mide por lo menos
+# k × tam_min la de /e2/ y nada más de la escala se compara; «est3», propiedades que en /e3/ tienen que dar ese
+# valor en lugar del de /e2/.
 TEXTOS = [
     ("riel · nombre", "v04", ".lat-oga", ".lat-oga", {}),
     ("riel · subtítulo", "v04", ".lat-sub", ".lat-sub", {}),
@@ -81,14 +105,26 @@ TEXTOS = [
     ("encabezado · dónde", "v04", ".e2-enc-corte", ".e2-enc-corte", {}),
     ("banda · rótulo", "v04", ".e2-central .kpi-lbl > span", ".e2-central .kpi-lbl > span", {}),
     # en la vista 4 del E2 la tarjeta central es un par antes → después: se mide la cifra de después
-    ("banda · cifra grande", "v04", ".e2-central .par-despues .e2-cifra", ".e2-central .e2-cifra", {}),
-    ("banda · cifra secundaria", "v07b", ".e2-banda .e2-cifra.sec", ".e2-banda .e2-cifra.sec", {}),
+    # N0-5: la central domina por tamaño y peso, en 700
+    ("banda · cifra grande", "v04", ".e2-central .par-despues .e2-cifra", ".e2-central .e2-cifra",
+     {"est3": {"fontWeight": "700"}}),
+    # N0-1: la secundaria, en tinta 600 y al 72 % de la central; en el E2, gris al 70 %
+    ("banda · cifra secundaria", "v07b", ".e2-banda .e2-cifra.sec", ".e2-banda .e2-cifra.sec",
+     {"factor": 72 / 70, "est3": {"color": INK, "fontWeight": "600"}}),
     ("banda · frase", "v04", ".e2-central .e2-linea", ".e2-central .e2-linea", {}),
-    ("decisión · rótulo", "v04", ".tarjeta-dec .kpi-lbl > span", ".tarjeta-dec .kpi-lbl > span", {}),
-    ("decisión · id y estado", "v04", ".tarjeta-dec .kpi-lbl > b", ".tarjeta-dec .kpi-lbl > b", {}),
+    # N0-1: «Decisión» y «área · estado», un 6 % más grandes, en 700 y con menos espaciado
+    ("decisión · rótulo", "v04", ".tarjeta-dec .kpi-lbl > span", ".tarjeta-dec .kpi-lbl > span",
+     {"factor": 1.06, "espaciado_libre": True, "est3": {"fontWeight": "700"}}),
+    ("decisión · id y estado", "v04", ".tarjeta-dec .kpi-lbl > b", ".tarjeta-dec .kpi-lbl > b",
+     {"factor": 1.06, "espaciado_libre": True, "est3": {"fontWeight": "700"}}),
     ("decisión · frase", "v04", ".tarjeta-dec .dec-llano", ".tarjeta-dec .dec-llano", {}),
-    ("gráfico · rótulo", "v04", ".pant > .tarjeta > .kpi-lbl > span", ".pant > .tarjeta > .kpi-lbl > span", {}),
-    ("gráfico · cifra del rótulo", "v04", ".pant > .tarjeta > .kpi-lbl > b", ".pant > .tarjeta > .kpi-lbl > b", {}),
+    # N0-1: el encabezado del gráfico es propio del E3. Qué mide, mono a la letra del rótulo de la banda del E2 (el
+    # rótulo del gráfico de la vista 4 del E2 es una frase en sans), en --e3-ctx; la conclusión, que en el E2 era
+    # la cifra azul del rótulo, en tinta 700 y más grande.
+    ("gráfico · qué mide", "v04", ".e2-central .kpi-lbl > span", ".e3-v05-mide",
+     {"espaciado_libre": True, "interlineado_libre": True, "est3": {"color": E3_CTX}}),
+    ("gráfico · conclusión", "v04", ".pant > .tarjeta > .kpi-lbl > b", ".e3-v05-graf .e3-conclusion",
+     {"tam_min": 1.3, "est3": {"color": INK, "fontWeight": "700", "textTransform": "none"}}),
     # BarrasH: la barra que se destaca va en negrita; se miden las otras
     ("gráfico · etiqueta de barra", "v04", ".lienzo svg text[text-anchor=end][font-weight='400']",
      ".lienzo svg text[text-anchor=end][font-weight='400']", {}),
@@ -159,8 +195,16 @@ PIEZAS = [
     ("decisión · rótulo", ".tarjeta-dec .kpi-lbl"),
     ("decisión · frase", ".tarjeta-dec .dec-llano"),
     ("tarjeta del gráfico", ".pant > .tarjeta"),
-    ("tarjeta del gráfico · rótulo", ".pant > .tarjeta > .kpi-lbl"),
+    # (28/10, N0-1) «tarjeta del gráfico · rótulo» (.pant > .tarjeta > .kpi-lbl) salió: ninguna vista del E3 lo
+    # usa; el encabezado del gráfico es propio (qué mide y la conclusión) y su letra se mide en TEXTOS.
 ]
+# (28/10, N0-1 y N0-5) Propiedades del armazón que en /e3/ tienen que dar otro valor, declarado.
+DISTINTO = {
+    "tarjeta central · cifra": {"fontWeight": "700"},
+    "decisión": {"backgroundColor": DEC_FONDO, "borderRightColor": DEC_BORDE, "borderBottomColor": DEC_BORDE,
+                 "borderLeftColor": DEC_BORDE},
+    "decisión · rótulo": {"fontWeight": "700"},
+}
 # Cajas que miden lo mismo en px lógicos, y en qué ejes: lo que no depende de la letra. La posición y el
 # ancho no dependen; el alto del encabezado sí (la pregunta crece ×k), y con él la posición vertical de lo
 # que va debajo; el de la marca y los ítems del riel, también.
@@ -273,19 +317,28 @@ def estatico(problemas):
     for imp in ("e2/src/Banda.jsx", "src/graficos.jsx"):
         if not re.search(r"from '(\.\./)+" + re.escape(imp) + "'", fuentes):
             problemas.append(f"estático: ninguna vista de e3 importa {imp}")
-    css = (APP / "e3" / "src" / "estilos_e3.css").read_text()
-    sin_com = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
-    # selectores: lo que va antes de cada «{» que no es un @-bloque
-    for m in re.finditer(r"([^{}]+)\{", sin_com):
-        sel = m.group(1).strip()
-        if not sel or sel.startswith("@"):
-            continue
-        for s in sel.split(","):
-            if ARMAZON.search(s):
-                problemas.append(f"estático: estilos_e3.css nombra una clase del armazón: «{s.strip()}»")
-    fuera_print = re.sub(r"@media\s+print\s*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}", "", sin_com)
-    if "!important" in fuera_print:
-        problemas.append("estático: estilos_e3.css usa !important fuera de @media print")
+    hojas = [APP / "e3" / "src" / "estilos_e3.css"] + sorted((APP / "e3" / "src" / "vistas").glob("*.css"))
+    for hoja_css in hojas:
+        nombre = hoja_css.name
+        general = nombre == "estilos_e3.css"
+        sin_com = re.sub(r"/\*.*?\*/", "", hoja_css.read_text(), flags=re.S)
+        # selectores: lo que va antes de cada «{» que no es un @-bloque
+        for m in re.finditer(r"([^{}]+)\{", sin_com):
+            sel = m.group(1).strip()
+            if not sel or sel.startswith("@"):
+                continue
+            for s in sel.split(","):
+                s = s.strip()
+                if not ARMAZON.search(s):
+                    continue
+                # N0-4: en la hoja general, bajo .e3-vp; nunca :root, html ni body; en las de las vistas, nunca
+                if general and BAJO_VP.match(s) and not RAIZ.search(s):
+                    continue
+                problemas.append(f"estático: {nombre} nombra una clase del armazón"
+                                 f"{' fuera de .e3-vp' if general else ''}: «{s}»")
+        fuera_print = re.sub(r"@media\s+print\s*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}", "", sin_com)
+        if "!important" in fuera_print:
+            problemas.append(f"estático: {nombre} usa !important fuera de @media print")
     r = subprocess.run(["git", "diff", "--quiet", "main", "--", "src", "e2"], cwd=APP)
     if r.returncode != 0:
         problemas.append("estático: src/** o e2/** cambiaron contra main")
@@ -333,22 +386,35 @@ def letra(nav, problemas):
             ct = y["tam"] / x["tam"]
             ca = y["ancho"] / x["ancho"] if x["ancho"] else None
             tabla.setdefault(nombre, {})[res] = (ct, ca)
-            if abs(ct - k) > 0.01:
-                problemas.append(f"[{res}] {nombre}: la letra mide {fmt(ct)} veces la de /e2/, se declaró k = {fmt(k)}")
-            if ca is None or abs(ca - k) > 0.01:
-                problemas.append(f"[{res}] {nombre}: la muestra mide {fmt(ca)} veces la de /e2/ de ancho, k = {fmt(k)}")
+            est3 = op.get("est3", {})
+            for prop, v in est3.items():
+                if y["est"][prop] != v:
+                    problemas.append(f"[{res}] {nombre} · {prop}: /e3/ {y['est'][prop]}, se declaró {v}")
+            if "tam_min" in op:
+                if ct < k * op["tam_min"] - 0.01:
+                    problemas.append(f"[{res}] {nombre}: la letra mide {fmt(ct)} veces la de /e2/, se declaró al "
+                                     f"menos k × {fmt(op['tam_min'], 2)} = {fmt(k * op['tam_min'])}")
+                continue
+            kf = k * op.get("factor", 1)
+            dice = f"k = {fmt(k)}" if "factor" not in op else f"k × {fmt(op['factor'])} = {fmt(kf)}"
+            if abs(ct - kf) > 0.01:
+                problemas.append(f"[{res}] {nombre}: la letra mide {fmt(ct)} veces la de /e2/, se declaró {dice}")
+            if not op.get("espaciado_libre") and (ca is None or abs(ca - kf) > 0.01):
+                problemas.append(f"[{res}] {nombre}: la muestra mide {fmt(ca)} veces la de /e2/ de ancho, {dice}")
             if op.get("solo_tam"):
                 continue
             for prop in ("interlineado", "espaciado"):
+                if op.get(f"{prop}_libre"):
+                    continue
                 a, b = x[prop], y[prop]
                 if a is None and b is None:
                     continue
                 if a is None or b is None or (abs(a) < 1e-6 and abs(b) > 1e-6):
                     problemas.append(f"[{res}] {nombre} · {prop}: /e2/ {a} · /e3/ {b}")
-                elif abs(a) > 1e-6 and abs(b / a - k) > 0.01:
-                    problemas.append(f"[{res}] {nombre} · {prop}: {fmt(b / a)} veces el de /e2/, k = {fmt(k)}")
+                elif abs(a) > 1e-6 and abs(b / a - kf) > 0.01:
+                    problemas.append(f"[{res}] {nombre} · {prop}: {fmt(b / a)} veces el de /e2/, {dice}")
             for prop in PROPS_IGUALES:
-                if x["est"][prop] != y["est"][prop]:
+                if prop not in est3 and x["est"][prop] != y["est"][prop]:
                     problemas.append(f"[{res}] {nombre} · {prop}: /e2/ {x['est'][prop]} · /e3/ {y['est'][prop]}")
     cab = ["texto"] + [f"{w}×{h}" for w, h in RES]
     filas = [["k declarado"] + [fmt(k_de(w, h)) for w, h in RES]]
@@ -409,6 +475,11 @@ def armazon(nav, problemas):
                 continue
             for prop in PROPS:
                 if nombre in SIN_TEXTO and prop in PROPS_TEXTO:
+                    continue
+                if prop in DISTINTO.get(nombre, {}):
+                    if y["est"][prop] != DISTINTO[nombre][prop]:
+                        problemas.append(f"[{res}] {nombre} · {prop}: /e3/ {y['est'][prop]}, se declaró "
+                                         f"{DISTINTO[nombre][prop]}")
                     continue
                 if prop.endswith("Width") and prop.startswith("border"):
                     # Los bordes se ajustan al píxel de la pantalla: 5 px × 1,186 se dibujan con 5 px reales,

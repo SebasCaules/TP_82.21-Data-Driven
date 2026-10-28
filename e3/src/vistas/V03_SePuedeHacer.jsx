@@ -1,20 +1,24 @@
-// V03 · ¿Se puede hacer? (Parte A 1.1 a 1.6; diapositivas 4 y 5 de C3). Misma forma que la vista 5:
-// banda de cifras con la tarjeta de decisión a la derecha y un gráfico a todo el ancho debajo.
+// V03 · ¿Se puede hacer? (Parte A 1.1 a 1.6; diapositivas 4 y 5 de C3). Banda de cifras con la tarjeta
+// de decisión a la derecha y un gráfico a todo el ancho debajo.
 //
-// - Banda: el puntaje técnico, la cifra que responde la pregunta y la única al tamaño máximo (F16;
-//   regla 13 H1 del E2), los casos para entrenar de la condición «Datos» (G10) y las ventas sin cliente
-//   de la condición «Calidad» (C19). Anchos 2 / 3 / 2 como la 5 (W2.0): con la letra ×k, una tarjeta
-//   más ancha deja sin lugar a las otras a 1366 × 768. Rótulos de hasta 15 caracteres para que entren
-//   en una línea; la fila entera de C3, al title.
-// - Decisión: el título de la diapositiva 4 de C3 («Sí, con condiciones: los datos alcanzan y el límite
-//   es quién opera la lista», 74 caracteres) sin el tramo de los datos, que ya dicen la banda y el
-//   gráfico; el resto, al title. Par «A-TEC · factibilidad media» de decisiones.js.
-// - Gráfico: el puntaje de cada una de las cuatro condiciones (PuntajeDimensiones, la misma pieza que la
-//   vista 6), con el tramo de factibilidad media de la escala de D3 sombreado y el promedio punteado. La
-//   barra que hay que mirar, la capacidad humana (el límite que dice la decisión), en --acc; las demás en
-//   gris (regla 12 del E2). Las condiciones que la banda no cubre llevan su razón al lado, de la fila de
-//   C3 sin la cita al relevamiento (va al title). Arriba, a la derecha, lo barato del MVP (diapositiva 5:
-//   USD 0 en licencias y 1 computadora), al lado del botón que lo abre.
+// Decisiones del 28/10 (.workforce/PLAN.md, unidad V03 y «Correcciones del crítico»):
+// - Banda: un número por tarjeta, la central primero (N0-6). Central: el puntaje técnico 2,25/3 con
+//   el tramo de la escala de D3 como fragmento («promedio: factibilidad media», sin segundo número,
+//   N0-8). Después, los casos para entrenar de la condición «Datos» y las ventas sin cliente de
+//   «Calidad». Rótulos de C3 (≤ 22 caracteres); la fila entera de C3, al title.
+// - Decisión: el título de la diapositiva 4 sin «los datos alcanzan y», que dicen la banda y el gráfico.
+//   Par «A-TEC · factibilidad media» de decisiones.js.
+// - Gráfico: tarjeta de puntaje (V03Puntaje.jsx) en vez de las barras 3/2/2/2 con tramo y promedio, que
+//   no distinguían el límite (tres barras iguales). Una fila por condición de D3 (tecnica.condiciones):
+//   pips chicos y la razón grande, de la fila de C3 sin la cita al relevamiento y sin repetir las cifras
+//   de la banda. «Datos» toma su razón del guion de la diapositiva 4 («alcanzan con margen»), porque su
+//   fila de C3 empieza con 4.636; «Calidad» reescribe su fila sin el 44,8 % («Ventas sin cliente
+//   identificado»). Solo «Capacidad humana» va en --acc y peso 700: es el límite que dice la decisión.
+//   Sin eje ni tramo sombreado.
+// - Conclusión del gráfico (.e3-conclusion, arriba a la izquierda): la cola del título de la diapositiva
+//   4, «Los datos alcanzan y el límite es quién opera la lista», con el límite en --acc. A la derecha, lo
+//   barato del MVP (diapositiva 5) si hay lugar (V03.css lo oculta en la ventana lógica de 1152) y el
+//   botón que lo abre.
 // - Explorar: el MVP de la diapositiva 5 (cinco pasos y tres hechos), en el lugar del gráfico y centrado
 //   en el alto de la tarjeta. Cerrado al llegar; el guion de la 5 está en las notas (N).
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y el texto de C3 (contenido_e3.js).
@@ -30,7 +34,8 @@ import { Rico, plano, sinCodigos } from '../texto.jsx'
 import { decision } from '../decisiones.js'
 import { BotonExplorar } from '../controles.jsx'
 import { Cifra } from '../cifra.jsx'
-import PuntajeDimensiones from '../PuntajeDimensiones.jsx'
+import { TarjetaPuntaje } from './V03Puntaje.jsx'
+import './V03.css'
 
 const T = D3.tecnica
 const D4 = C3.DIAPOSITIVAS.find((d) => d.n === 4)
@@ -40,21 +45,48 @@ const TOPE_ESCALA = T.escala[T.escala.length - 1].hasta
 // La fila de C3 de cada condición de D3: el rótulo de C3 es el comienzo del nombre de D3 («Datos» y
 // «Datos suficientes»).
 const filaDe = (c) => D4.filas.find((f) => c.nombre.startsWith(f.rotulo))
-// La razón corta de una fila: hasta los dos puntos, el punto y coma o el punto («Sin servidor ni BI»).
-const razon = (t) => (t || '').split(/[:;.](?:\s|$)/)[0]
+const mayuscula = (t) => (t ? t[0].toUpperCase() + t.slice(1) : t)
 
 const ID_LIMITE = 'capacidad_humana'
 const LIMITE = T.condiciones.find((c) => c.id === ID_LIMITE)
-// El tramo de la escala de la cátedra en el que cae el promedio (D3: «Factibilidad media», 2,1 a 2,5).
-const TRAMO = T.escala.find((e) => e.nivel === T.nivel)
+// Las cifras que ya muestra la banda: ninguna razón del gráfico las repite.
+const CIFRAS_BANDA = [fijo(T.positivos_entrenamiento, 0), fijo(T.ventas_sin_cliente_pct, 1)]
+const sinCifraDeBanda = (t) => !!t && !CIFRAS_BANDA.some((n) => t.includes(n))
+
+// La razón de una condición, un fragmento de una línea de su fila de C3 (sin la cita al relevamiento),
+// y el detalle que sigue a los dos puntos si no trae números. Ver la cabecera para «Datos» y «Calidad».
+function razonDe(c) {
+  const t = sinCodigos(plano(filaDe(c)?.texto)).trim().replace(/\.$/, '')
+  if (c.id === 'datos') {
+    const m = (D4.guion || '').match(/datos (alcanzan[^:.;]*)/i)
+    if (m) return { razon: mayuscula(m[1].trim()) }
+  }
+  const pct = t.match(/^[\d.,]+\s*%\s*de las (.+?) no tiene (.+)$/)
+  if (pct) return { razon: `${mayuscula(pct[1])} sin ${pct[2]}` }
+  const [antes, ...resto] = t.split(/:\s+/)
+  const detalle = resto.join(': ')
+  if (sinCifraDeBanda(antes)) {
+    return { razon: mayuscula(antes), detalle: detalle && !/\d/.test(detalle) ? detalle : undefined }
+  }
+  return { razon: mayuscula(t.split(/[;:.]\s+/).find(sinCifraDeBanda) ?? c.nombre) }
+}
+const FILAS = T.condiciones.map((c) => ({
+  id: c.id, nombre: c.nombre, puntaje: c.puntaje, limite: c.id === ID_LIMITE, ...razonDe(c),
+}))
+
 // Lo barato del MVP (diapositiva 5): «USD 0 en licencias y 1 computadora».
 const [LIC, PC] = D5.hechos
 const MVP_CORTO = `MVP: ${plano(LIC.valor)} ${plano(LIC.texto)} y ${plano(PC.valor)}`
 
 // La decisión: el título de la diapositiva 4 sin «los datos alcanzan y». Si C3 cambia de forma, queda el
-// título entero y la verificación avisa si pasa de 60 caracteres.
+// título entero y la verificación avisa si pasa de 60 caracteres. La conclusión del gráfico es la cola
+// entera del título («los datos alcanzan y el límite es quién opera la lista»).
 const [, CABEZA, COLA] = D4.titulo.match(/^(.+?):.*\by\s+(.+)$/) ?? []
 const CORTA = CABEZA && COLA ? `${CABEZA}: ${COLA}` : D4.titulo
+const TRAS_DOS_PUNTOS = D4.titulo.includes(':') ? D4.titulo.slice(D4.titulo.indexOf(':') + 1).trim() : D4.titulo
+const CONCLUSION_ANTES = COLA && TRAS_DOS_PUNTOS.endsWith(COLA)
+  ? mayuscula(TRAS_DOS_PUNTOS.slice(0, TRAS_DOS_PUNTOS.length - COLA.length)) : ''
+const CONCLUSION_LIMITE = CONCLUSION_ANTES ? COLA : mayuscula(TRAS_DOS_PUNTOS)
 const DECISION = decision('A-TEC', {
   llano_corto: CORTA,
   llano: plano(D4.titulo),
@@ -94,21 +126,10 @@ export const meta = { id: 'V03', dc: 'A-TEC' }
 export default function V03SePuedeHacer() {
   const k = useEscalaTexto()
   const [explorar, setExplorar] = useState(false)
-  // Cuatro filas, las dos plaquetas de arriba (tramo y promedio) y el eje.
-  const tope = Math.round((4 * 62 + 90) * k + 14)
   const datos = filaDe(T.condiciones.find((c) => c.id === 'datos'))
   const calidad = filaDe(T.condiciones.find((c) => c.id === 'calidad'))
-  const dims = T.condiciones.map((c) => ({
-    nombre: c.nombre,
-    valor: c.puntaje,
-    enfasis: c.id === ID_LIMITE,
-    // La banda ya explica datos y calidad; la infraestructura y la capacidad humana, al lado de su barra.
-    nota: c.id === 'datos' || c.id === 'calidad' ? undefined : razon(sinCodigos(filaDe(c)?.texto)),
-  }))
-  const tramo = TRAMO && {
-    desde: TRAMO.desde, hasta: TRAMO.hasta,
-    rotulo: `${TRAMO.nivel.toLowerCase()} · ${fijo(TRAMO.desde, 1)} a ${fijo(TRAMO.hasta, 1)}`,
-  }
+  // Tocado con el mouse, el botón suelta el foco: las flechas siguen pasando de vista (patrón de V07).
+  const soltar = (e) => { if (e.detail) e.target.closest?.('button')?.blur() }
   return (
     <section className="pant v03">
       <Banda dcs={[DECISION]}>
@@ -120,7 +141,7 @@ export default function V03SePuedeHacer() {
               <Cifra num={fijo(T.promedio, 2)} unidad={`/${fijo(TOPE_ESCALA, 0)}`} />
             </div>
           </div>
-          <p className="e2-linea">{`promedio de las ${T.condiciones.length} condiciones`}</p>
+          <p className="e2-linea">{`promedio: ${T.nivel.toLowerCase()}`}</p>
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 2' }} title={`${datos.rotulo}. ${plano(datos.texto)}`}>
@@ -145,21 +166,22 @@ export default function V03SePuedeHacer() {
       </Banda>
 
       <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1cqw, 16px)' }}>
-          <span className="kpi-lbl frase" style={{ flex: '1 1 auto' }}>
-            <span>{explorar ? plano(D5.titulo) : 'Puntaje de cada condición técnica'}</span>
-            {!explorar && <b className="tabular" title={D5.hechos.map((x) => `${plano(x.valor)} ${plano(x.texto)}`).join(' · ')}>{MVP_CORTO}</b>}
+        <div className="e3-v03-cab">
+          {explorar
+            ? <p className="e3-conclusion">{plano(D5.titulo)}</p>
+            : <p className="e3-conclusion">{CONCLUSION_ANTES}<b>{CONCLUSION_LIMITE}</b></p>}
+          {!explorar && (
+            <span className="e3-v03-mvp tabular"
+                  title={D5.hechos.map((x) => `${plano(x.valor)} ${plano(x.texto)}`).join(' · ')}>{MVP_CORTO}</span>
+          )}
+          <span style={{ alignSelf: 'center', display: 'flex' }} onClick={soltar}>
+            <BotonExplorar abierto={explorar} onCambio={setExplorar} />
           </span>
-          <BotonExplorar abierto={explorar} onCambio={setExplorar} />
         </div>
         {explorar ? <Mvp /> : (
-          <div style={{ flex: '1 1 0', minHeight: 0, maxHeight: tope, marginTop: 'clamp(6px, 1.6cqh, 20px)',
-                        display: 'flex', flexDirection: 'column' }}>
+          <div className="e3-v03-graf">
             <Lienzo className="lienzo">
-              {({ w, h }) => (
-                <PuntajeDimensiones dims={dims} tope={TOPE_ESCALA} tramo={tramo} k={k} w={w} h={h}
-                                    promedio={{ valor: T.promedio, rotulo: `promedio ${fijo(T.promedio, 2)}` }} />
-              )}
+              {({ w, h }) => <TarjetaPuntaje filas={FILAS} tope={TOPE_ESCALA} k={k} w={w} h={h} />}
             </Lienzo>
           </div>
         )}

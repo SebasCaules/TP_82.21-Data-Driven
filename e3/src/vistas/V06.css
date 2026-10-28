@@ -1,0 +1,18 @@
+/* V06 · ¿Es legal y seguro? (28/10, unidad V06 de .workforce/PLAN.md). Estilos propios de la vista
+   (N0-7): solo clases e3-v06-*. Los tokens --e3-* los define estilos_e3.css bajo .e3-vp. */
+
+/* Encabezado de la tarjeta del gráfico: la conclusión a la izquierda (crece) y los controles a la
+   derecha, sin partirse. */
+.e3-v06-cab {
+  display: flex; align-items: center; gap: clamp(10px, 1.2cqw, 20px);
+}
+.e3-v06-cab > .e3-conclusion { flex: 1 1 auto; }
+.e3-v06-ctl {
+  display: flex; align-items: center; gap: clamp(6px, .8cqw, 12px); flex: none;
+}
+
+/* El gráfico llena el alto que deja el encabezado. */
+.e3-v06-graf {
+  flex: 1 1 0; min-height: 0; margin-top: clamp(8px, 1.8cqh, 22px);
+  display: flex; flex-direction: column;
+}

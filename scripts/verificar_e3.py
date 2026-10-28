@@ -28,15 +28,26 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
    e3/src/datos_e3.js y contenido_e3.js y escritos con las mismas reglas de e3/src/formato.js):
    - la tarjeta de decisión dice el «área · estado» de su decisión en e3/src/decisiones.js (F6b, 28/10: hasta
      ese día, el id interno, «D-PRO · propuesta», que ningún documento define; hallazgo H-2-077);
-   - las cifras de la banda, en orden, son las de su fila del registro, y hay una sola al tamaño máximo,
-     en la tarjeta central (regla 13 H1 del E2);
-   - el gráfico escribe sus valores clave (la tasa de éxito, los días del cliente, los puntajes, la
-     precisión de cada método, el beneficio de la regla);
+   - las cifras de la banda, en orden, son las de su fila del registro, una por tarjeta; hay una sola al
+     tamaño máximo, en la tarjeta central, y la central es la primera, a la izquierda (N0-6 del 28/10); la
+     cifra central no se repite en otra vista (regla 3 del plan del 28/10);
+   - cada rótulo de la banda tiene 22 caracteres o menos y cada fragmento debajo de la cifra, de 2 a 6
+     palabras y sin otro número (regla 2 y N0-8 del 28/10; la vista 6, «cada dimensión en 2», lo pide el
+     plan);
+   - el gráfico tiene su conclusión arriba (.e3-conclusion) y escribe sus valores clave (28/10: lo que vuelve
+     hoy, lo que haría falta y las veces; los días del cliente; las condiciones técnicas con su puntaje; las
+     dos filas de test con su veredicto; el costo y el beneficio de la regla; los envíos sin consentimiento;
+     la regla del piloto en dos zonas), y no escribe lo que el plan sacó (las cifras de la banda en la
+     vista 3, validación en la 4 al llegar, el costo con modelo en la 5);
+   - el terracota, solo en la vista 6 (la excepción: sin consentimiento); en la 3, solo la capacidad humana
+     en --acc;
    - en pantalla, ni «pendiente», «abierto», «a definir», «sin respuesta» ni «espera respuesta» (tampoco
      en los title), ni códigos internos («envío 29», «G40»: regla 13 H13 del E2);
    - ningún texto de un gráfico pisa a otro;
-   - «Explorar» llega cerrado; abierto, en cada opción, __fit sigue limpio y ningún texto se pisa;
-     «Cerrar» vuelve a un gráfico;
+   - «Explorar» llega cerrado; abierto, trae las opciones de su vista (28/10: la 4, «Diferencia», «Test»,
+     «Validación» y «Entrenamiento»; la 6, las dimensiones, el plan y los riesgos; la 7, «Qué decide», «El
+     flujo» y «El plan»); en cada opción, __fit sigue limpio y ningún texto se pisa; «Cerrar» vuelve a un
+     gráfico;
    - (a 1366×768 y 1536×864, con N) las notas traen el guion de cada diapositiva de la vista, con quién
      lo dice.
 
@@ -50,6 +61,10 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
    A7 en cada medición) escriben lo que dicen D3 y C3, y no escriben lo que la crítica sacó (la logística de la
    Parte B rotulada «ajustada», la fila 12 de la C 6.2 sin la D 11.2, «diapositivas», «(L3 a L5)», el grupo de
    control como decisión de María G.). La precisión del test (J03) se lee ahora en la vista 4, «Explorar», «Test».
+   (28/10) Lo que el plan pasó a «Explorar» se busca ahí: la diferencia en validación y test (vista 4,
+   «Diferencia»), el MVP (vista 3), el costo con modelo y el presupuesto (vista 5), las cinco dimensiones, el
+   plan y los riesgos (vista 6) y lo que decide María G. con su semana (vista 7, «Qué decide»), que ya no está
+   al llegar.
 
 Termina con «E3 OK» o con la lista de problemas y código 1.
 """
@@ -177,48 +192,83 @@ def contenido_esperado():
     leg = next(t for t in dia[2]["tarjetas"] if t["area"] == "Legal")
 
     a4 = next(a for a in C3["ANEXOS"] if a["n"] == "A4")
-    regla = E["observada"]["regla_usd"]
-    tramo_t = next(e for e in T["escala"] if e["nivel"] == T["nivel"])
-    m = re.search(r"(\d+(?:,\d+)?) a (\d+(?:,\d+)?) es ([^.]+)", dia[10]["escala"])
+    LE, U, CO, SF = D3["legal"], E["umbral"], TE["contra_regla"], TE["sin_filtro"]
+    pp = lambda x: fijo(x, 2, True)                       # noqa: E731
+    ic = lambda par: [pp(x) for x in par]                 # noqa: E731
+    puntaje = lambda x: str(int(x)) if float(x).is_integer() else str(x)   # noqa: E731 (`${x}` de JS)
+    limite = next(c for c in T["condiciones"] if c["id"] == "capacidad_humana")
+    ids_l = sorted((a["id"] for t in dia[10]["plan"] for a in t["acciones"]), key=lambda x: int(x[1:]))
+    dims = LE["dimensiones"]
+    parejas = all(d["puntaje"] == dims[0]["puntaje"] for d in dims)
+    # (28/10, .workforce/PLAN.md del E3, auditoría de contraste y gráficos) Por vista: la decisión; las cifras de la
+    # banda en orden, la central primero (N0-6); lo que el gráfico tiene que escribir al llegar y lo que no; las
+    # opciones de «Explorar»; y, si la hay, la excepción a la regla del fragmento sin número.
     esperado = {
-        "v01": ("D-PRO", [f"{fijo(T['promedio'], 2)}/{tope}", pct_directo(E["observada"]["modelo_roi_pct"], 2),
-                          plano(leg["valor"])],
-                [pct(E["parametros"]["s_observada"], 2)]),
-        "v02": ("A-UMB", [plano(c["valor"]) for c in dia[3]["cifras"]],
-                [f"{fijo(C['recency_dias'])} días sin comprar", f"umbral {fijo(C['umbral_dias'])} días",
-                 f"faltaban {fijo(C['dias_para_cruzar'])}"]),
-        "v03": ("A-TEC", [f"{fijo(T['promedio'], 2)}/{tope}", fijo(T["positivos_entrenamiento"]),
-                          pct_directo(T["ventas_sin_cliente_pct"], 1)],
-                [f"promedio {fijo(T['promedio'], 2)}",
-                 f"{tramo_t['nivel'].lower()} · {fijo(tramo_t['desde'], 1)} a {fijo(tramo_t['hasta'], 1)}"]),
-        # W3: la vista 4 decide con el test (Parte D 8.2 y 11.1): sin filtrar, en la lista que sale y lo que tendría
-        # que dar para pagarse; el gráfico, la diferencia con su intervalo en validación y en test.
-        # (crítica del W3, hallazgo 3) la fila «Sin filtrar · validación» es H06, la logística ajustada, no G17.
-        "v04": ("C-MOD", [fijo(TE["sin_filtro"]["diferencia_pp"], 2, True),
-                          fijo(TE["contra_regla"]["diferencia_pp"], 2, True),
-                          fijo(TE["decision"]["aciertos_por_mes_para_pagar"])],
-                [fijo(x, 2, True) for x in (D3["lista"]["modelo_menos_regla_500_sin_filtro"]["diferencia_pp"],
-                                            TE["sin_filtro"]["diferencia_pp"],
-                                            TE["contra_regla"]["validacion_diferencia_pp"],
-                                            TE["contra_regla"]["diferencia_pp"])]),
-        "v05": ("B-ECO", [usd(E["observada"]["modelo_usd"], 2), pct_directo(E["observada"]["modelo_roi_pct"], 2),
-                          pct(E["umbral"]["s_equilibrio_con_descuento"], 1)],
-                [usd(regla, 2 if regla < 1000 else 0)]),
-        "v06": ("C-LEG", [plano(dia[10]["promedio"]["valor"]), plano(dia[10]["alerta"]["valor"]),
-                          f"{len(a4['destacar'])} de {len(a4['filas'])}"],
-                [f"{m.group(3)} · {m.group(1)} a {m.group(2)}"] if m else []),
-        # W3: la Parte D y el piloto. Desde la crítica del W3 (hallazgo 5), el tamaño del piloto (G49) en lugar de la
-        # regla en test, lo que tiene que dar para ir a producción (H49) y las semanas hasta decidir (J50); el
-        # gráfico, la regla de decisión del piloto (G49, H49). La decisión es D-PIL (hallazgo 12).
-        "v07": ("D-PIL", [fijo(P["tratados"]), fijo(P["umbral_produccion_pp"], 1), f"{fijo(PL['semanas'])} semanas"],
-                [fijo(P["diferencia_detectable_pp"], 2), fijo(P["umbral_produccion_pp"], 1),
-                 "no se distingue de cero", "María G. elige"]),
+        # la central, el ROI del modelo sobre la regla (G40); el gráfico, lo que vuelve hoy (1,02 %, «techo, sin
+        # control») contra lo que haría falta para pagarse (49,6 %), 48,6 veces; sale «lo mide el piloto»
+        "v01": dict(dec="D-PRO",
+                    cifras=[pct_directo(E["observada"]["modelo_roi_pct"], 2), f"{fijo(T['promedio'], 2)}/{tope}",
+                            plano(leg["valor"])],
+                    grafico=[pct(E["parametros"]["s_observada"], 2), pct(U["s_equilibrio_con_descuento"], 1),
+                             f"{fijo(U['veces_con_descuento'], 1)} veces", "techo, sin control"],
+                    sin=["lo mide el piloto"]),
+        # la central, la parte que se va en 90 días (J02, test.conjunto.tasa), sola; la línea de tiempo, igual
+        "v02": dict(dec="A-UMB", cifras=[pct(TE["conjunto"]["tasa"], 2)],
+                    grafico=[f"{fijo(C['recency_dias'])} días sin comprar", f"umbral {fijo(C['umbral_dias'])} días",
+                             f"faltaban {fijo(C['dias_para_cruzar'])}"] + (["se va"] if C["cruzo_en_la_ventana"] else [])),
+        # tarjeta de puntaje: una fila por condición, sin repetir las cifras de la banda; el puntaje, en el aria-label
+        "v03": dict(dec="A-TEC",
+                    cifras=[f"{fijo(T['promedio'], 2)}/{tope}", fijo(T["positivos_entrenamiento"]),
+                            pct_directo(T["ventas_sin_cliente_pct"], 1)],
+                    grafico=[c["nombre"] for c in T["condiciones"]],
+                    sin=[fijo(T["positivos_entrenamiento"]), pct_directo(T["ventas_sin_cliente_pct"], 1)],
+                    aria=[f"{c['nombre']}: {puntaje(c['puntaje'])} de {tope}" for c in T["condiciones"]],
+                    acc=[limite["nombre"]]),
+        # la central, la lista que sale en test (J09); para pagar el modelo (J10). El gráfico, las dos filas de test
+        # (J11 y J09) con su intervalo y su veredicto; validación, solo en «Explorar», «Diferencia»
+        "v04": dict(dec="C-MOD",
+                    cifras=[f"{pp(CO['diferencia_pp'])} puntos",
+                            f"{fijo(TE['decision']['aciertos_por_mes_para_pagar'])} aciertos más/mes"],
+                    grafico=["Sin filtrar", "Lista que sale", pp(SF["diferencia_pp"]), pp(CO["diferencia_pp"])]
+                    + ic(SF["ic95_pp"]) + ic(CO["ic95_pp"]) + ["empate", "gana la logística"],
+                    sin=["validación", "gana la regla"],
+                    opciones=["Diferencia", "Test", "Validación", "Entrenamiento"]),
+        # la central, el ROI de la regla sola (G41), que no repite el de la vista 1; lo que suma y lo que cuesta el
+        # modelo, separados. El gráfico, el costo del año 1 de la regla contra su beneficio; el resto, a «Explorar»
+        "v05": dict(dec="B-ECO",
+                    cifras=[pct_directo(E["observada"]["regla_roi_pct"], 2), usd(E["observada"]["modelo_usd"], 2),
+                            fijo(E["costos"]["incremental_usd"])],
+                    grafico=["Costo del año 1, regla sola", usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"]),
+                             "Beneficio anual de la regla", usd(E["observada"]["regla_usd"], 2)],
+                    sin=["con modelo", usd(E["costos"]["con_modelo"]["total_anio_1_usd"]), "presupuesto"],
+                    opciones=[f"{pct(E['parametros']['descuento'], 0)} de descuento", "Sin descuento"]),
+        # la central, el puntaje legal (H40); los envíos sin consentimiento (C18) y los riesgos críticos (J22). El
+        # gráfico, la barra 100 % con el 30,1 % en terracota
+        "v06": dict(dec="C-LEG",
+                    cifras=[plano(dia[10]["promedio"]["valor"]), pct(LE["envios_sin_consentimiento_tasa"], 1),
+                            fijo(LE["riesgos_criticos"])],
+                    grafico=[pct(LE["envios_sin_consentimiento_tasa"], 1), "la lista sale sin ellos"],
+                    opciones=[f"Las {len(dims)} dimensiones", f"Plan {ids_l[0]} a {ids_l[-1]}",
+                              f"Los {fijo(LE['riesgos'])} riesgos"],
+                    terracota=True,
+                    fragmento=({0: f"cada dimensión en {fijo(dims[0]['puntaje'])}"} if parejas else {})),
+        # la central, lo que tiene que dar el piloto (H49); el tamaño (G49) y las semanas (J50). El gráfico, la regla
+        # en dos zonas con la subfranja de 0 a 2,87
+        "v07": dict(dec="D-PIL",
+                    cifras=[f"{fijo(P['umbral_produccion_pp'], 1)} puntos", fijo(P["tratados"]),
+                            f"{fijo(PL['semanas'])} semanas"],
+                    grafico=[fijo(P["diferencia_detectable_pp"], 2), fijo(P["umbral_produccion_pp"], 1),
+                             "no se distingue de cero", "María G. elige", "a producción"],
+                    opciones=["Qué decide", "El flujo", "El plan"]),
     }
     out = {}
-    for v, (id_, cifras, grafico) in esperado.items():
-        rot, est = estados.get(id_, ("¿?", "¿?"))
-        out[v] = {"dec": f"{rot} · {est}", "cifras": [norm(x) for x in cifras],
-                  "grafico": [norm(x) for x in grafico]}
+    for v, e in esperado.items():
+        rot, est = estados.get(e["dec"], ("¿?", "¿?"))
+        out[v] = {"dec": f"{rot} · {est}", "cifras": [norm(x) for x in e["cifras"]],
+                  "grafico": [norm(x) for x in e["grafico"]], "sin": [norm(x) for x in e.get("sin", [])],
+                  "aria": [norm(x) for x in e.get("aria", [])], "acc": e.get("acc"),
+                  "opciones": e.get("opciones", []), "terracota": e.get("terracota", False),
+                  "fragmento": e.get("fragmento", {})}
     # el guion de cada vista: quién y el comienzo de lo que dice, por diapositiva (vistas/index.jsx)
     de = dict(re.findall(r"\{ id: '(V\d\d)'.*?de: \[([\d, ]*)\]", (SRC / "vistas" / "index.jsx").read_text()))
     guion = {}
@@ -232,8 +282,22 @@ LEER_VISTA = r"""() => {
   const q = (s) => document.querySelector(s)
   const banda = [...document.querySelectorAll('.e2-banda-cifras .par-val')].map((e) => e.textContent)
   const grandes = [...document.querySelectorAll('.e2-banda-cifras .e2-cifra:not(.sec)')]
+  const tarjetas = [...document.querySelectorAll('.e2-banda-cifras > .tarjeta')]
+  // un color de la hoja, como lo devuelve getComputedStyle (rgb), resuelto dentro de la caja del zoom
+  const color = (v) => {
+    const el = document.createElement('i'); el.style.color = `var(${v})`; q('.e3-vp').appendChild(el)
+    const c = getComputedStyle(el).color; el.remove(); return c
+  }
+  const ACC = color('--acc'), TERRA = [color('--terra'), color('--terra-osc')]
   const svgs = [...document.querySelectorAll('.cuerpo .lienzo svg')].filter((s) => !s.parentElement.closest('svg'))
   const textosSvg = svgs.flatMap((s) => [...s.querySelectorAll('text')].map((t) => t.textContent))
+  const aria = svgs.map((s) => s.getAttribute('aria-label') ?? '').join(' | ')
+  // textos del gráfico en --acc (sin contar los <tspan>: heredan) y marcas en terracota
+  const enAcc = svgs.flatMap((s) => [...s.querySelectorAll('text')]
+    .filter((t) => getComputedStyle(t).fill === ACC).map((t) => t.textContent.trim()))
+  const terracota = svgs.flatMap((s) => [...s.querySelectorAll('*')]).filter((el) => {
+    const cs = getComputedStyle(el); return TERRA.includes(cs.fill) || TERRA.includes(cs.stroke)
+  }).length
   // textos de un gráfico que se pisan: cajas en pantalla, con 1 px de tolerancia por lado
   const pisan = []
   for (const s of svgs) {
@@ -253,11 +317,18 @@ LEER_VISTA = r"""() => {
   return {
     dec: q('.tarjeta-dec .kpi-lbl > b')?.textContent ?? null,
     banda, grandes: grandes.length, grandeCentral: grandes.length === 1 && !!grandes[0].closest('.e2-central'),
-    graficos: svgs.length, textosSvg, pisan,
+    centralPrimera: tarjetas.length > 0 && tarjetas[0].classList.contains('e2-central')
+      && tarjetas[0].contains(grandes[0] ?? null),
+    porTarjeta: tarjetas.map((t) => t.querySelectorAll('.par-val').length),
+    rotulos: tarjetas.map((t) => t.querySelector('.kpi-lbl > span')?.textContent.trim() ?? ''),
+    lineas: tarjetas.map((t) => t.querySelector('.e2-linea')?.textContent ?? ''),
+    conclusion: q('.cuerpo .pant > .tarjeta .e3-conclusion')?.textContent ?? null,
+    graficos: svgs.length, textosSvg, pisan, aria, enAcc, terracota,
     pantalla: vp.innerText + '\n' + textosSvg.join('\n'), cuerpo: q('.cuerpo').innerText + '\n' + textosSvg.join('\n'),
     titulos,
     explorar: exp ? exp.getAttribute('aria-expanded') : null,
     opciones: [...document.querySelectorAll('.cuerpo .e3-opciones [role=radio]')].length,
+    opcionesTxt: [...document.querySelectorAll('.cuerpo .e3-opciones [role=radio]')].map((e) => e.textContent.trim()),
     fit: window.__fit().problemas.map((x) => `${x.tipo} ${x.detalle ?? ''}`),
   }
 }"""
@@ -280,6 +351,7 @@ def revisar_estado(p: Pagina, id_, estado, r):
 
 
 def contenido(p: Pagina, esperado):
+    centrales = {}
     for id_, e in esperado.items():
         p.ir(id_)
         r = p.pg.evaluate(LEER_VISTA)
@@ -288,14 +360,49 @@ def contenido(p: Pagina, esperado):
         banda = [norm(x) for x in r["banda"]]
         if banda != e["cifras"]:
             p.mal(f"{id_}: la banda dice {banda}, se esperaba {e['cifras']}")
+        # un número por tarjeta (regla 2 del 28/10)
+        if r["porTarjeta"] != [1] * len(e["cifras"]):
+            p.mal(f"{id_}: cifras por tarjeta de la banda {r['porTarjeta']}, se esperaba {[1] * len(e['cifras'])}")
         if not r["grandeCentral"]:
             p.mal(f"{id_}: {r['grandes']} cifras al tamaño máximo; tiene que haber una, en la tarjeta central")
+        elif not r["centralPrimera"]:
+            p.mal(f"{id_}: la cifra central no está en la primera tarjeta de la banda (N0-6)")
+        if banda:
+            centrales.setdefault(banda[0], []).append(id_)
+        for i, rot in enumerate(r["rotulos"]):
+            if len(rot) > 22:
+                p.mal(f"{id_}: el rótulo «{rot}» tiene {len(rot)} caracteres (22 o menos)")
+        for i, lin in enumerate(r["lineas"]):
+            lin = norm(lin)
+            if i in e["fragmento"]:
+                if lin != norm(e["fragmento"][i]):
+                    p.mal(f"{id_}: el fragmento de la tarjeta {i + 1} dice «{lin}», se esperaba «{e['fragmento'][i]}»")
+                continue
+            if not 2 <= len(lin.split()) <= 6:
+                p.mal(f"{id_}: el fragmento «{lin}» tiene {len(lin.split())} palabras (de 2 a 6)")
+            if re.search(r"\d", lin):
+                p.mal(f"{id_}: el fragmento «{lin}» trae otro número (N0-8)")
         if r["graficos"] != 1:
             p.mal(f"{id_}: {r['graficos']} gráficos al llegar")
+        if not norm(r["conclusion"]):
+            p.mal(f"{id_}: el gráfico no tiene su conclusión arriba (.e3-conclusion)")
         svg = norm(" | ".join(r["textosSvg"]))
         for x in e["grafico"]:
             if x not in svg:
                 p.mal(f"{id_}: el gráfico no escribe «{x}»")
+        for x in e["sin"]:
+            if x.casefold() in svg.casefold():
+                p.mal(f"{id_}: el gráfico sigue escribiendo «{x}»")
+        aria = norm(r["aria"])
+        for x in e["aria"]:
+            if x not in aria:
+                p.mal(f"{id_}: el aria-label del gráfico no dice «{x}»")
+        if e["acc"] is not None and sorted(set(norm(x) for x in r["enAcc"])) != sorted(e["acc"]):
+            p.mal(f"{id_}: en --acc el gráfico escribe {sorted(set(r['enAcc']))}, se esperaba solo {e['acc']}")
+        if not e["terracota"] and r["terracota"]:
+            p.mal(f"{id_}: {r['terracota']} marcas del gráfico en terracota (solo la excepción, vista 6)")
+        elif e["terracota"] and not r["terracota"]:
+            p.mal(f"{id_}: la excepción no va en terracota")
         revisar_estado(p, id_, "al llegar", r)
         if r["explorar"] is None:
             continue
@@ -308,6 +415,8 @@ def contenido(p: Pagina, esperado):
         if r["explorar"] != "true":
             p.mal(f"{id_}: «Explorar» no abre")
         revisar_estado(p, id_, "Explorar", r)
+        if [norm(x) for x in r["opcionesTxt"]] != [norm(x) for x in e["opciones"]]:
+            p.mal(f"{id_}: las opciones de «Explorar» son {r['opcionesTxt']}, se esperaba {e['opciones']}")
         for i in range(r["opciones"]):
             p.pg.locator(".cuerpo .e3-opciones [role=radio]").nth(i).click()
             p.quieto(80)
@@ -317,6 +426,9 @@ def contenido(p: Pagina, esperado):
         r = p.pg.evaluate(LEER_VISTA)
         if r["explorar"] != "false" or r["graficos"] != 1 or r["opciones"]:
             p.mal(f"{id_}: «Cerrar» no vuelve a la vista presentada")
+    for cifra, vs in centrales.items():
+        if len(vs) > 1:
+            p.mal(f"la cifra central «{cifra}» se repite en {', '.join(vs)} (regla 3)")
 
 
 def guion_en_notas(p: Pagina, w, h, guion):
@@ -471,19 +583,39 @@ def respaldo_esperado():
     a2 = anexo["A2"]
     prec_a2 = [f[a2["columnas"].index("Precisión")] for f in a2["filas"]]
     a6 = anexo["A6"]
+    dia = {d["n"]: d for d in C3["DIAPOSITIVAS"]}
+    CO, SF, SFV = T["contra_regla"], T["sin_filtro"], D3["lista"]["modelo_menos_regla_500_sin_filtro"]
+    ids_l = sorted((a["id"] for t in dia[10]["plan"] for a in t["acciones"]), key=lambda x: int(x[1:]))
+    pedidos = ["alcance", "regla_y_operador_del_piloto", "designa_l1", "operador_despues_del_piloto", "decision"]
     return [
         # la vista 4: el test que antes estaba en la 7 (J03, J17) y la logística de la Parte B con su nombre
         ("v04", "Test", ["Precisión de la lista de 500 contactables por mes, en test"]
          + [pct(m["precision"], 1) for m in M.values()], []),
         ("v04", "Validación", ["Logística de la Parte B", pct(logb["validacion"]["precision"], 1), "lugares"],
          ["contactos"]),
-        # la vista 7 al llegar: lo que decide María G. con su semana (D 12.3 y 12.4)
-        ("v07", None, ["Lo que decide María G."] + [f"· semana {hs[k]}\n" for k in (
-            "alcance", "regla_y_operador_del_piloto", "designa_l1", "operador_despues_del_piloto",
-            "decision")], ["El grupo de control", "lo revisa Sofía R.", "quien elija Casa Óga"]),
-        ("v07", "", ["El equipo; el resumen por local, Sofía R."], [f"{P['meses']} listas, del"]),
+        # (28/10) la vista 4, «Explorar» abre en «Diferencia»: las cuatro filas, validación (H06 y la de J09) y test
+        ("v04", "", ["Sin filtrar · validación", "Sin filtrar · test", "Lista que sale · validación",
+                     "Lista que sale · test", fijo(SFV["diferencia_pp"], 2, True), fijo(SF["diferencia_pp"], 2, True),
+                     fijo(CO["validacion_diferencia_pp"], 2, True), fijo(CO["diferencia_pp"], 2, True),
+                     "gana la regla", "gana la logística", "empate"], []),
+        # (28/10) la vista 7 al llegar: la regla del piloto, sin la lista de lo que decide María G.
+        ("v07", None, ["A producción solo si"], ["Lo que decide María G.", "Quién opera la lista después del piloto"]),
+        # lo que decide María G. con su semana (D 12.3 y 12.4), en «Explorar», «Qué decide» (abre ahí)
+        # (el grupo de control no es un pedido a María G.: se busca al comienzo de un renglón, porque la banda dice
+        # «más que el grupo de control»)
+        ("v07", "", ["Lo que decide María G."] + [f"semana {hs[k]}\n" for k in pedidos],
+         ["\nEl grupo de control", "lo revisa Sofía R.", "quien elija Casa Óga"]),
+        ("v07", "El flujo", ["El equipo; el resumen por local, Sofía R."], [f"{P['meses']} listas, del"]),
         # la vista 5: de qué lista es el beneficio de la regla (G41)
         ("v05", None, ["lista de 500 sin filtro en validación"], []),
+        # (28/10) el costo con modelo, el presupuesto y el ROI del modelo sobre la regla, en «Explorar»
+        ("v05", "", ["Costo del año 1, con modelo", usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
+                     f"presupuesto {usd(E['costos']['presupuesto_usd'])}", "ROI del modelo sobre la regla"], []),
+        # (28/10) la vista 3: el MVP de la diapositiva 5, en «Explorar»
+        ("v03", "", [plano(dia[5]["titulo"])] + [plano(x["titulo"]) for x in dia[5]["pasos"]], []),
+        # (28/10) la vista 6: las cinco dimensiones (lo que antes era el gráfico), el plan y la matriz, en «Explorar»
+        ("v06", "dimensiones", [d["nombre"] for d in LE["dimensiones"]], []),
+        ("v06", "Plan", ids_l, []),
         # el respaldo
         ("a1", None, [f"test medido una vez, el {T['apertura']['fecha'][8:10]}/{T['apertura']['fecha'][5:7]}/"
                       f"{T['apertura']['fecha'][:4]}"] + filas_a1
@@ -528,7 +660,7 @@ def respaldo(p: Pagina, casos):
                 estado = f"Explorar, «{opcion}»"
         r = p.pg.evaluate(LEER_VISTA)
         # todo en un renglón (una celda partida en dos se lee entera); lo que termina en «\n» se busca al final de un
-        # renglón de la pantalla («semana 1» no es «semana 13»)
+        # renglón de la pantalla («semana 1» no es «semana 13»), y lo que empieza con «\n», al comienzo
         # sin distinguir mayúsculas: innerText aplica el text-transform de los rótulos (.kpi-lbl)
         plano_ = norm(r["pantalla"]).casefold()
         renglones_ = "\n".join(norm(x) for x in r["pantalla"].split("\n")).casefold() + "\n"
@@ -538,8 +670,11 @@ def respaldo(p: Pagina, casos):
             if not ok:
                 p.mal(f"{id_} ({estado}): en pantalla no está «{x.strip()}»")
         for x in no_deben:
-            if norm(x).casefold() in plano_:
-                p.mal(f"{id_} ({estado}): en pantalla sigue «{x}»")
+            # lo que empieza con «\n» se busca al comienzo de un renglón de la pantalla
+            sigue = (("\n" + norm(x).casefold()) in ("\n" + renglones_)) if x.startswith("\n") \
+                else (norm(x).casefold() in plano_)
+            if sigue:
+                p.mal(f"{id_} ({estado}): en pantalla sigue «{x.strip()}»")
         revisar_estado(p, id_, estado, r)
 
 

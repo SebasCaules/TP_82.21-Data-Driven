@@ -1,0 +1,40 @@
+/* V07 · El piloto (28/10, unidad V07 de .workforce/PLAN.md). Estilos propios de la vista (N0-7): solo
+   clases e3-v07-*. Los tokens --e3-* los define estilos_e3.css bajo .e3-vp; cada uno lleva su valor de
+   respaldo por si la vista se monta fuera de esa caja. */
+
+/* Tarjeta del gráfico: encabezado arriba y el SVG (o el panel de Explorar) llena el resto del alto. */
+.e3-v07-graf { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+
+/* Encabezado: a la izquierda, qué mide (mono, contexto) y la conclusión debajo; a la derecha, los controles. */
+.e3-v07-cab { display: flex; align-items: flex-start; justify-content: space-between;
+              gap: clamp(8px, 1.2cqw, 16px); min-width: 0; }
+.e3-v07-txt { display: flex; flex-direction: column; gap: clamp(2px, .5cqh, 6px); min-width: 0; flex: 1 1 auto; }
+.e3-v07-mide {
+  margin: 0;
+  font: 600 var(--e2-rot, 12px)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--e3-ctx, #5a6478);
+}
+.e3-v07-ctrl { display: flex; align-items: center; gap: clamp(6px, .8cqw, 12px); flex-shrink: 0; }
+
+.e3-v07-lienzo { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;
+                 margin-top: clamp(8px, 1.8cqh, 22px); }
+
+/* Explorar · qué decide María G.: una fila por decisión, la semana a la izquierda en mono. */
+.e3-v07-panel { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; justify-content: center;
+                margin-top: clamp(6px, 1.4cqh, 18px); }
+.e3-v07-pedidos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.e3-v07-pedidos li {
+  display: grid; grid-template-columns: 9.5ch minmax(0, 1fr); align-items: baseline;
+  column-gap: clamp(12px, 1.6cqw, 28px);
+  padding: clamp(6px, 1.5cqh, 16px) 0;
+  border-top: 1px solid var(--bd);
+}
+.e3-v07-pedidos li:last-child { border-bottom: 1px solid var(--bd); }
+.e3-v07-sem {
+  font: 600 var(--e2-rot, 12px)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--e3-ctx, #5a6478);
+}
+.e3-v07-ped { font: 500 var(--e2-txt, 16px)/1.3 var(--fuente); color: var(--ink); min-width: 0; }
+/* La última decisión (la del gráfico) en --acc. */
+.e3-v07-pedidos li:last-child .e3-v07-sem,
+.e3-v07-pedidos li:last-child .e3-v07-ped { color: var(--acc); font-weight: 700; }

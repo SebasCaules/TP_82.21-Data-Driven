@@ -1,9 +1,9 @@
 # Diseño de la presentación E3 (`/e3/`)
 
-> **Desde el 27/10 (W1) manda la última sección, «Decisiones (27/10, W1): el armazón del E2».** Las reglas
-> transversales y la tabla por diapositiva de abajo describen el escenario fijo de 1600 × 900, que se fue;
-> quedan como referencia del contenido de cada diapositiva (el código está en el commit `a06f88c`,
-> `e3/src/diapositivas/`).
+> **Desde el 28/10 manda la última sección, «Decisiones (28/10): auditoría de contraste y gráficos».** Las
+> de W1 y W2 (27/10) siguen valiendo en lo que esa no cambia. Las reglas transversales y la tabla por
+> diapositiva de abajo describen el escenario fijo de 1600 × 900, que se fue; quedan como referencia del
+> contenido de cada diapositiva (el código está en el commit `a06f88c`, `e3/src/diapositivas/`).
 
 La presentación del Entregable 3 (27/10/2026) en el navegador. Desde el 27/10 es la única versión: el
 PPTX del equipo se borró a pedido del usuario. El texto sigue saliendo de
@@ -246,3 +246,78 @@ decisiones N0-5 y N0-6.
   C3 (decisión, cifras de la banda, una sola cifra grande en la central, valores del gráfico, palabras
   prohibidas y códigos en pantalla, textos del gráfico que se pisan, «Explorar» en cada opción y el guion en
   las notas) y, con `--hoja`, arma la hoja de contacto de las vistas a 1536 × 864.
+
+## Decisiones (28/10): auditoría de contraste y gráficos
+
+Plan y diagnóstico en `.workforce/PLAN.md` y `.workforce/AUDITORIA.md`. Objetivo: en cada vista, una cifra
+que se impone y dice qué significa, y un gráfico con un solo mensaje, con contraste de proyector.
+
+### Reglas
+
+- **N0-1. Contraste en el E3, no en el E2.** Se rompe para /e3/ la regla H1 del E2 (cifra secundaria gris):
+  la pidió el usuario el 28/10. /e2/ no cambia.
+- **N0-2. Anexos sin cambio de forma.** Heredan solo el contraste global.
+- **N0-3. Sin artifact de decisiones.** La elección de cada gráfico es de diseño y la cierra N0.
+- **N0-4. Overrides del armazón solo bajo `.e3-vp`.** `estilos_e3.css` puede nombrar `.e2-*`, `.kpi-*`,
+  `.dec-*` y `.par-*` en un selector que arranca en `.e3-vp` (la caja del zoom, que solo existe en /e3/).
+  `:root`, `html` y `body`, nunca. Lo controla `paridad_e3.py`.
+- **N0-5. La central domina por tamaño y peso.** Central en `--acc` 700; secundarias en tinta 600 al 72 % de
+  la central; fragmento debajo de la cifra en tinta 500. Tokens de gráfico propios bajo `.e3-vp`:
+  `--e3-ctx` (texto de contexto), `--e3-ctx-relleno` (#a9b1bf, barras de contexto), `--e3-eje`,
+  `--e3-contorno` (tramos con contorno y rótulo antes que con tinte), `--e3-tinte` y `--e3-zona`. `--gris`,
+  `--eje`, `--azul1` y `--zona` apuntan a ellos dentro de /e3/. Tarjeta de decisión: «área · estado» un 6 %
+  más grande, en 700, y fondo y borde un paso más saturados (#d6ebe3, #9fcfc0).
+- **N0-6. La cifra central, siempre en la primera tarjeta.** Las siete vistas.
+- **N0-7. CSS propio por vista.** `e3/src/vistas/V0n.css`, importado por la vista, clases `e3-v0n-*`; sin
+  clases del armazón. `estilos_e3.css` lo toca solo la unidad G. La conclusión del gráfico, común:
+  `.e3-conclusion` (tinta 700, grande, un `<b>` en `--acc`). Cada vista sigue con un solo `svg` en `.lienzo`,
+  que llena el alto de su tarjeta.
+- **N0-8. Fragmentos sin segundo número.** Fuera «de 500 a 800», «hoy se ve 1,02 %» y las fechas; van al
+  title o al gráfico. Excepción del plan: «cada dimensión en 2» (vista 6).
+- **N0-9. Ningún módulo roto.** `vistas/index.jsx` importa todas las vistas: un módulo que no compila tumba
+  el tablero entero.
+- **Comunes del plan.** Un número por tarjeta, rótulo de 22 caracteres o menos en un renglón. La cifra central
+  no se repite entre vistas. El dato del gráfico en `--acc`; terracota solo en la excepción (sin
+  consentimiento). La conclusión del gráfico es su título.
+
+### Por vista
+
+- **Vista 1.** Banda: ROI modelo sobre regla −99,95 % (central, «no viable, a un año») · Técnica 2,25/3 ·
+  Legal 2,0/3. Gráfico: dos barras en un eje de 0 a 50 %, lo que hoy compra a 7 días (1,02 %, `--acc`,
+  «techo, sin control») contra lo que haría falta para pagarse (49,6 %, contexto), con «48,6 veces» en la
+  cota. Sale la fila «lo mide el piloto».
+- **Vista 2.** Banda: solo la central, 25,35 % «Se van en 90 días» (`test.conjunto.tasa`). La caída de ventas
+  y los 500 por mes salen: no responden quién se va. Línea de tiempo a todo el alto; umbral y «se va» en
+  `--acc`, sin terracota; la ventana de 90 días con contorno.
+- **Vista 3.** Banda: 2,25/3 (central) · 4.636 · 44,8 %. Gráfico: tarjeta de puntaje (`V03Puntaje.jsx`), una
+  fila por condición con pips y la razón grande; solo «Capacidad humana» en `--acc`. Sin barras, eje ni tramo;
+  la razón no repite las cifras de la banda. MVP en «Explorar».
+- **Vista 4.** Banda: −0,25 puntos «empata con la regla» (central) · 8.595 aciertos más/mes «más que toda la
+  lista». Gráfico propio (no `PuntosIC`): las dos filas de test con su intervalo, la línea del 0 rotulada
+  «empate» y el veredicto pegado a cada fila. «Explorar» abre en «Diferencia» (las cuatro filas, con
+  validación) y sigue con «Test», «Validación» y «Entrenamiento».
+- **Vista 5.** Banda: ROI de la regla sola −98,52 % (central; no repite el de la vista 1) · Suma el modelo
+  USD 5,38 · Cuesta el modelo 10.400 «dólares de más». Gráfico: `BarrasH` con dos barras, costo del año 1 de
+  la regla (USD 20.260) contra su beneficio anual (USD 299,49). Costo con modelo y presupuesto, en «Explorar»
+  con el simulador. El 49,6 % pasa a la vista 1.
+- **Vista 6.** Banda: Puntaje legal 2,0/3 (central, «cada dimensión en 2») · Sin consentimiento 30,1 % ·
+  Riesgos críticos 3. Gráfico: barra 100 % de los envíos de 2022 a 2025, el 30,1 % sin consentimiento en
+  terracota con trama (`Tramas`), el resto sin número, «la lista sale sin ellos». Dimensiones, plan L1 a L6 y
+  los 13 riesgos, en «Explorar». `PuntajeDimensiones.jsx` quedó sin uso y se borró.
+- **Vista 7.** Banda: Para ir a producción 40,4 puntos (central) · Tamaño del piloto 1.260 · Duración del plan
+  20 semanas. Gráfico: la regla del piloto en dos zonas a todo el ancho (debajo de 40,4, «María G. elige:
+  cerrar o repetir sin descuento»; desde 40,4, «a producción»), con 0 a 2,87 como subfranja «no se distingue
+  de cero». La lista de decisiones de María G., en «Explorar», «Qué decide».
+
+### Verificación (desde el 28/10)
+
+- `verificar_e3.py`, por vista y resolución: cifras de la banda en orden y una por tarjeta; una sola al tamaño
+  máximo, en la primera tarjeta; la central sin repetir entre vistas; rótulos de 22 caracteres o menos;
+  fragmentos de 2 a 6 palabras sin número (salvo el de la vista 6); `.e3-conclusion` presente; valores clave
+  del gráfico y lo que ya no puede escribir; terracota solo en la vista 6; en la 3, solo la capacidad humana en
+  `--acc`; las opciones de «Explorar» de cada vista y lo que el plan pasó ahí.
+- `paridad_e3.py`: los overrides bajo `.e3-vp` pasan y las hojas `V0n.css` no pueden nombrar el armazón. Las
+  diferencias de N0-1 y N0-5 se declaran pieza por pieza con el valor que tienen que dar (cifra central 700;
+  secundaria tinta 600 al 72/70 de la del E2; rótulo de la decisión × 1,06 en 700; fondo y borde de la
+  decisión; qué mide del gráfico en `--e3-ctx`; conclusión del gráfico en tinta 700, al menos 1,3 veces el
+  rótulo del E2). Cualquier otra diferencia con /e2/ sigue fallando.

@@ -74,7 +74,7 @@ export const C3 = {
         "G31",
         "J09"
       ],
-      "guion": "Somos el grupo 2. Casa Óga quiere saber a tiempo qué clientes van a dejar de comprar, para que Marketing los contacte. La respuesta corta: se puede hacer, pero no como lo planteamos al principio. En lo técnico y en lo legal es factible con condiciones. Lo económico no cierra: el ROI a un año da −99,95 %, porque un modelo no le gana a una regla simple y ni la regla sola recupera su costo. Falta medir cuántos clientes vuelven porque se los contactó. El único dato es este 1,02 %, sin grupo de control. Por eso la lista sale con la regla y un piloto mide ese efecto.",
+      "guion": "Somos el grupo 2. Casa Óga quiere saber a tiempo qué clientes van a dejar de comprar, para que Marketing los contacte. La respuesta corta: se puede hacer, pero no como lo planteamos al principio. En lo técnico y en lo legal es factible con condiciones. Lo económico no cierra: el ROI del modelo sobre la regla da −99,95 % a un año, y ni la regla sola recupera su costo. Para pagarse tendría que volver casi la mitad de los que se iban: 48,6 veces este 1,02 %, sin grupo de control. Por eso la lista sale con la regla y un piloto mide cuántos vuelven por el contacto.",
       "segundos": 55
     },
     {
@@ -109,7 +109,7 @@ export const C3 = {
         "C08",
         "H23"
       ],
-      "guion": "En 2025 las ventas cayeron 35,6 %. El rubro quedó plano en el año y cayó 15,0 % interanual en diciembre, y los últimos meses de 2025 llegaron incompletos: no sabemos cuánto es mercado. Cada cliente tiene su umbral: 1,5 veces su intervalo habitual entre compras, con un piso de 90 días. Se va si lo pasa sin comprar. Este es un cliente real. Compra cada 162 días, su umbral es 243 y al corte llevaba 181. En los 90 días siguientes lo cruzó. Queremos encontrar a estos clientes antes, en una lista de 500 por mes, que es lo que Marketing puede contactar.",
+      "guion": "De los clientes que siguen comprando al corte, el 25,35 % se va en los 90 días siguientes. En 2025 las ventas cayeron 35,6 %, pero los últimos meses llegaron incompletos: no sabemos cuánto es mercado. Cada cliente tiene su umbral: 1,5 veces su intervalo habitual entre compras, con un piso de 90 días. Se va si lo pasa sin comprar. Este es un cliente real. Compra cada 162 días, su umbral es 243 y al corte llevaba 181. Le faltaban 62 días y en los 90 siguientes lo cruzó. Queremos encontrar a estos clientes antes de que crucen.",
       "segundos": 60
     },
     {
@@ -242,7 +242,7 @@ export const C3 = {
         "H06",
         "J11"
       ],
-      "guion": "Comparamos la regla con un modelo por la precisión de la lista de 500: qué parte de la lista realmente se iba. Cada fila es la logística menos la regla, con su intervalo. Arriba, la lista sin filtrar: en validación empataban y en el test, que abrimos una sola vez, la logística gana por 1,06 puntos.",
+      "guion": "Comparamos la regla con un modelo por la precisión de la lista de 500: qué parte de la lista realmente se iba. Cada fila es la logística menos la regla en el test, que abrimos una sola vez, con su intervalo. Arriba, la lista sin filtrar: la logística gana por 1,06 puntos.",
       "segundos": 30
     },
     {
@@ -281,7 +281,7 @@ export const C3 = {
         "J09",
         "J10"
       ],
-      "guion": "Pero esa lista no se puede mandar: un tercio son clientes que no aceptaron marketing o pidieron la baja. En la lista que sale, en validación ganaba la regla por 29 clientes, y en el test empatan: −0,25 puntos, con un intervalo que incluye el cero. Para pagar los USD 10.400 que agrega, el modelo tendría que acertar 8.595 clientes más por mes, en una lista de 500: ni una lista perfecta lo paga. Por eso la lista sale con la regla.",
+      "guion": "Pero esa lista no se puede mandar: un tercio son clientes que no aceptaron marketing o pidieron la baja. Abajo, la lista que sale, sin esos clientes: en el test empatan, −0,25 puntos, con un intervalo que cruza el cero. Para pagar los USD 10.400 que agrega, el modelo tendría que acertar 8.595 clientes más por mes, y la lista tiene 500: ni una lista perfecta lo paga. Por eso la lista sale con la regla, sin modelo.",
       "segundos": 45
     },
     {
@@ -386,7 +386,7 @@ export const C3 = {
         "G42",
         "J12"
       ],
-      "guion": "Tampoco la regla sola se paga. Con modelo, el primer año pasa el presupuesto; sin modelo cuesta 20.260 dólares y la regla deja 299,49 por año con la lista sin filtrar; con la que sale, 264,54 en validación y 327,06 en el test. Para pagarse tendría que volver el 49,6 % de los contactados que se iban a ir, 48,6 veces lo que vemos. Y ese 1,02 % es un techo, sin grupo de control. No es viable tal como está planteado.",
+      "guion": "Tampoco la regla sola se paga: su ROI a un año es −98,52 %. Con modelo, el primer año pasa el presupuesto; sin modelo cuesta 20.260 dólares y la regla deja 299,49 por año con la lista sin filtrar; con la que sale, 264,54 en validación y 327,06 en el test. Para pagarse tendría que volver el 49,6 % de los contactados que se iban a ir. No es viable tal como está planteado.",
       "segundos": 45
     },
     {
@@ -585,7 +585,7 @@ export const C3 = {
         "G50",
         "J50"
       ],
-      "guion": "La propuesta de la Parte D. La lista sale cada mes con la regla, sin modelo, y durante tres meses 80 clientes por mes quedan sin contactar: son el grupo de control. Con 1.260 contactados y 240 de control, el piloto distingue de cero una diferencia de 2,87 puntos. Al cierre del tercer mes, si los contactados compran 40,4 puntos más que el control, se pasa a producción. Si no, María G. elige entre cerrar o repetir el piloto sin descuento. El plan dura 20 semanas. La primera lista sale en la semana 6, en diciembre, con cinco condiciones: acciones legales, extracto nuevo, target y operador aprobados, grupo de control aprobado y 379 aciertos por mes, que el test ya da. A la derecha, lo que decide María G. y en qué semana. Gracias.",
+      "guion": "La propuesta de la Parte D. La lista sale cada mes con la regla, sin modelo, y durante tres meses 80 clientes por mes quedan sin contactar: son el grupo de control. Con 1.260 contactados y 240 de control, el piloto distingue de cero una diferencia de 2,87 puntos. Al cierre del tercer mes, si los contactados compran 40,4 puntos más que el control, se pasa a producción. Si no, María G. elige entre cerrar o repetir el piloto sin descuento. El plan dura 20 semanas. La primera lista sale en la semana 6, en diciembre, con cinco condiciones: acciones legales, extracto nuevo, target y operador aprobados, grupo de control aprobado y 379 aciertos por mes, que el test ya da. En «Explorar», lo que decide María G. y en qué semana. Gracias.",
       "segundos": 70
     }
   ],
