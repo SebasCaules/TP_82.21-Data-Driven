@@ -11,8 +11,12 @@
 //   su ritmo, los días sin comprar al corte, el umbral, lo que le faltaba y los 90 días siguientes, en
 //   los que lo pasó. Encima, la regla que el dibujo muestra («Se va si pasa su umbral…», C3).
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y el texto de C3 (contenido_e3.js).
-// Lo que no entra (el rubro según CAME, la nota «Envío N», «el modelo busca a los que lo van a pasar») va
-// al title de su tarjeta y al guion de las notas. La cita al relevamiento («(envío 29)») queda solo en el
+// (F6b, 28/10, hallazgo H-2-078) La tarjeta del problema dice, junto al −35,6 %, que 2025 tiene meses incompletos
+// (A 1.1 y C 6.5; pendiente 74: las dos cosas juntas): sin eso se lee como mercado (guía de defensa, «Lo que no
+// hay que decir»). Es la primera oración del texto de C3; la tarjeta central de una banda deja un renglón de texto
+// (paridad_e3.py), así que pasa a 3 / 2 de ancho, como las vistas 1, 4, 5 y 7, y el rubro según CAME va al title.
+// Lo que no entra (la nota «Envío N», «el modelo busca a los que lo van a pasar») va al title de su tarjeta y al
+// guion de las notas. La cita al relevamiento («(envío 29)») queda solo en el
 // title: los códigos internos van fuera de pantalla (regla 13 H13 del E2).
 
 import { useId } from 'react'
@@ -186,7 +190,7 @@ export default function V02QuienSeVa() {
   return (
     <section className="pant v02">
       <Banda dcs={[DECISION]}>
-        <div className="tarjeta e2-central" style={{ gridColumn: 'span 1' }}
+        <div className="tarjeta e2-central" style={{ gridColumn: 'span 3' }}
              title={`${D.kicker}: ${plano(CAIDA.valor)} de ${plano(CAIDA.texto)}`}>
           <span className="kpi-lbl"><span>{D.kicker}</span></span>
           <div className="ban-par">
@@ -195,7 +199,7 @@ export default function V02QuienSeVa() {
           <p className="e2-linea">{sinCortes(caidaLinea)}</p>
         </div>
 
-        <div className="tarjeta" style={{ gridColumn: 'span 1' }}
+        <div className="tarjeta" style={{ gridColumn: 'span 2' }}
              title={`${plano(CONTACTO.valor)}: ${plano(CONTACTO.texto)}. ${D.definicion.length > 3 ? plano(D.definicion[3]) : ''}`}>
           <span className="kpi-lbl"><span>Capacidad de Marketing</span></span>
           <div className="ban-par">

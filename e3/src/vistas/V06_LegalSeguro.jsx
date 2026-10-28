@@ -35,6 +35,7 @@ import { BotonExplorar, Opciones } from '../controles.jsx'
 import { Cifra } from '../cifra.jsx'
 import { anchoTexto as ancho } from '../medir.js'
 import PuntajeDimensiones, { tramoDe } from '../PuntajeDimensiones.jsx'
+import { RIESGO_12 } from '../riesgo12.js'
 
 const D2 = C3.DIAPOSITIVAS.find((d) => d.n === 2)
 const D10 = C3.DIAPOSITIVAS.find((d) => d.n === 10)
@@ -59,10 +60,13 @@ const PAREJAS = DIMS.every((d) => d.puntaje === DIMS[0].puntaje)
 const ALERTA_DE = sinCortes((D10.alerta.texto.match(/^(.*?) fue\b/) ?? [, D10.alerta.texto])[1])
   .replace(/(\d{4}) a (\d{4})/g, `$1${NBSP}a${NBSP}$2`)
 
-// Riesgos: los 13 de A4 y los críticos (A4.destacar, en el orden de las columnas de la diapositiva 11).
+// Riesgos: los 13 de A4 y los críticos (A4.destacar, en el orden de las columnas de la diapositiva 11). El 12, como
+// lo deja la Parte D 11.2 (riesgo12.js, el mismo texto del anexo A4; F6b, H-2-072): hasta el 28/10 decía el de
+// validación de la C 6.2.
 const COL = Object.fromEntries(A4.columnas.map((c, i) => [c, i]))
 const RIESGOS = A4.filas.map((f, i) => ({
-  n: f[COL['#']], tipo: f[COL['Tipo']], texto: f[COL['Riesgo']], prob: f[COL['Prob.']], imp: f[COL['Impacto']],
+  n: f[COL['#']], tipo: f[COL['Tipo']], texto: f[COL['#']] === '12' ? RIESGO_12 : f[COL['Riesgo']],
+  prob: f[COL['Prob.']], imp: f[COL['Impacto']],
   estrategia: f[COL['Estrategia']], critico: A4.destacar.includes(i),
 }))
 A4.destacar.forEach((i, j) => { if (D11.columnas[j]) RIESGOS[i].senal = D11.columnas[j] })

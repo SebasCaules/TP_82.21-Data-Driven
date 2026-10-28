@@ -95,7 +95,7 @@ export const C3 = {
       "cifras": [
         {
           "valor": "−35,6 %",
-          "texto": "ventas de 2025 contra 2024. Rubro: +0,3 % en el año, −15,0 % en diciembre (CAME)"
+          "texto": "ventas de 2025, con meses incompletos. Contra 2024; el rubro, +0,3 % en el año y −15,0 % en diciembre (CAME)"
         },
         {
           "valor": "500[[/mes]]",
@@ -109,7 +109,7 @@ export const C3 = {
         "C08",
         "H23"
       ],
-      "guion": "En 2025 las ventas cayeron 35,6 %. El rubro cayó 15,0 % interanual en diciembre y los últimos meses de 2025 llegaron incompletos: no sabemos cuánto es mercado. Para encontrar a quién se va, cada cliente tiene su umbral: 1,5 veces su intervalo habitual entre compras, con un piso de 90 días. Se va si lo pasa sin comprar. Este es un cliente real. Compra cada 162 días, su umbral es 243 y al corte llevaba 181. En los 90 días siguientes lo cruzó. Queremos encontrar a estos clientes antes, en una lista de 500 por mes, que es lo que Marketing puede contactar.",
+      "guion": "En 2025 las ventas cayeron 35,6 %. El rubro quedó plano en el año y cayó 15,0 % interanual en diciembre, y los últimos meses de 2025 llegaron incompletos: no sabemos cuánto es mercado. Cada cliente tiene su umbral: 1,5 veces su intervalo habitual entre compras, con un piso de 90 días. Se va si lo pasa sin comprar. Este es un cliente real. Compra cada 162 días, su umbral es 243 y al corte llevaba 181. En los 90 días siguientes lo cruzó. Queremos encontrar a estos clientes antes, en una lista de 500 por mes, que es lo que Marketing puede contactar.",
       "segundos": 60
     },
     {
@@ -290,7 +290,7 @@ export const C3 = {
       "tipo": "economia",
       "kicker": "Parte B · Factibilidad económica",
       "pregunta": "¿Cuánto vale acertar?",
-      "titulo": "En su mejor caso, el modelo suma USD 5,38 al año y cuesta USD 10.400 más",
+      "titulo": "En el escenario esperado, el modelo suma USD 5,38 al año y cuesta USD 10.400 más",
       "celdas": [
         {
           "celda": "Acierto",
@@ -327,7 +327,7 @@ export const C3 = {
         "H42",
         "J12"
       ],
-      "guion": "Pasamos a dinero. Un acierto vale, en valor esperado, 99,96 pesos: vuelve uno de cada 98. Un falso positivo cuesta 47,21. En su mejor caso, con la lista sin filtrar de validación, lo que el modelo suma sobre la regla vale 5,38 dólares por año, contra 10.400 que agrega al costo. En el test, con la lista que sale, queda 1,54 dólares por año debajo de la regla.",
+      "guion": "Pasamos a dinero. Un acierto vale, en valor esperado, 99,96 pesos: vuelve uno de cada 98. Un falso positivo cuesta 47,21. En el escenario esperado, con la lista sin filtrar de validación, lo que el modelo suma sobre la regla vale 5,38 dólares por año, contra 10.400 que agrega al costo. En el test, con la lista que sale, queda 1,54 dólares por año debajo de la regla.",
       "segundos": 40
     },
     {
@@ -386,7 +386,7 @@ export const C3 = {
         "G42",
         "J12"
       ],
-      "guion": "Tampoco la regla sola se paga. Con modelo, el primer año pasa el presupuesto; sin modelo cuesta 20.260 dólares y la regla deja 299,49 por año; en el test, con la lista que sale, 327,06. Para pagarse tendría que volver el 49,6 % de los contactados que se iban a ir, 48,6 veces lo que vemos. Y ese 1,02 % es un techo, sin grupo de control. No es viable tal como está planteado.",
+      "guion": "Tampoco la regla sola se paga. Con modelo, el primer año pasa el presupuesto; sin modelo cuesta 20.260 dólares y la regla deja 299,49 por año con la lista sin filtrar; con la que sale, 264,54 en validación y 327,06 en el test. Para pagarse tendría que volver el 49,6 % de los contactados que se iban a ir, 48,6 veces lo que vemos. Y ese 1,02 % es un techo, sin grupo de control. No es viable tal como está planteado.",
       "segundos": 45
     },
     {
@@ -453,7 +453,7 @@ export const C3 = {
             },
             {
               "id": "L6",
-              "que": "Revisar el aviso de privacidad",
+              "que": "Revisar avisos y el cruce con No Llame",
               "quien": "asesor legal de Casa Óga"
             }
           ]
@@ -500,7 +500,7 @@ export const C3 = {
             },
             {
               "rotulo": "Umbral",
-              "texto": "**40,4 puntos** al tercer mes (el 49,6 % de la 9, sobre todos los contactados)"
+              "texto": "**40,4 puntos** al tercer mes (el 49,6 % que paga la regla, llevado a todos los contactados)"
             },
             {
               "rotulo": "Quién",
@@ -573,7 +573,7 @@ export const C3 = {
       "pedidos": [
         "El alcance: regla sin modelo y piloto con control (semana 1).",
         "La regla del target, con revisión de Sofía R. (semana 2).",
-        "Quién inscribe las bases en la AAIP (semana 4).",
+        "Quién inscribe las bases en la AAIP (semana 2).",
         "Quién opera la lista después del piloto (semana 13).",
         "Si pasa a producción, con 40,4 puntos o más (semana 20)."
       ],
@@ -585,8 +585,8 @@ export const C3 = {
         "G50",
         "J50"
       ],
-      "guion": "Lo que proponemos en la Parte D. La lista sale cada mes con la regla, sin modelo, y durante tres meses 80 clientes por mes quedan sin contactar: son el grupo de control. Con 1.260 contactados y 240 de control, el piloto distingue de cero una diferencia de 2,87 puntos. Al cierre del tercer mes, si los contactados compran 40,4 puntos más que el control, se pasa a producción. Si no, María G. elige entre cerrar o repetir el piloto sin descuento. El plan dura 20 semanas y la primera lista sale en diciembre. A la derecha, lo que decide María G. y en qué semana. Gracias.",
-      "segundos": 60
+      "guion": "La propuesta de la Parte D. La lista sale cada mes con la regla, sin modelo, y durante tres meses 80 clientes por mes quedan sin contactar: son el grupo de control. Con 1.260 contactados y 240 de control, el piloto distingue de cero una diferencia de 2,87 puntos. Al cierre del tercer mes, si los contactados compran 40,4 puntos más que el control, se pasa a producción. Si no, María G. elige entre cerrar o repetir el piloto sin descuento. El plan dura 20 semanas. La primera lista sale en la semana 6, en diciembre, con cinco condiciones: acciones legales, extracto nuevo, target y operador aprobados, grupo de control aprobado y 379 aciertos por mes, que el test ya da. A la derecha, lo que decide María G. y en qué semana. Gracias.",
+      "segundos": 70
     }
   ],
   "ANEXOS": [
@@ -991,7 +991,7 @@ export const C3 = {
         [
           "12",
           "Modelo",
-          "La lista acierta menos en mujeres, en alto valor y con menos de 12 meses",
+          "La lista acierta menos en mujeres, en género X, en alto valor y con menos de 12 meses",
           "A",
           "M",
           "Mitigar"
@@ -1103,6 +1103,13 @@ export const C3 = {
           "85,8 %",
           "+3,2",
           "La regla, 85,1 %"
+        ],
+        [
+          "Género X",
+          "193 (37)",
+          "78,4 %",
+          "−4,2",
+          "Pocos casos; la regla, 77,5 %"
         ]
       ],
       "destacar": [
@@ -1274,7 +1281,7 @@ export const C3 = {
   "TIEMPOS": {
     "palabras_por_minuto": 130,
     "cambio_s": 3,
-    "total_s": 465,
+    "total_s": 475,
     "turnos": [
       {
         "quien": "Sebastian C.",
@@ -1321,7 +1328,7 @@ export const C3 = {
         "diapositivas": [
           12
         ],
-        "segundos": 60
+        "segundos": 70
       }
     ]
   }

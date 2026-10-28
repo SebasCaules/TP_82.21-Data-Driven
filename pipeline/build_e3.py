@@ -35,9 +35,12 @@ APP = Path(__file__).resolve().parents[1]
 DATOS = APP / "data" / "e3"
 CONTENIDO = APP / "e3" / "src" / "contenido_e3.js"
 SALIDA = APP / "e3" / "src" / "datos_e3.js"
-ENTRADAS = ("etapa2.json", "etapa3.json", "economia.json", "condiciones.json", "etapa4.json", "etapa4_validacion.json")
-# (27/10, W3) dos fuentes de la app que no son de las partes del E3: el payload del tablero del E1 (C08, C14, C18,
-# C03 de J52) y la copia de los datos crudos de la cátedra (J51). Su sha256 también va en D3.meta.fuentes.
+ENTRADAS = ("etapa2.json", "etapa3.json", "economia.json", "condiciones.json", "etapa4.json", "etapa4_validacion.json",
+            "serie_riesgo.json")
+# (27/10, W3) dos fuentes de la app que no son de las partes del E3: el payload del tablero del E1 (C08, C14, C18)
+# y la copia de los datos crudos de la cátedra (J51). Su sha256 también va en D3.meta.fuentes.
+# (28/10, F6b) serie_riesgo.json es la serie de la alerta de drift de la D v1.3, 10.2 (J53), que escribe
+# entregas/entregable-3/_build/D/drift/serie_riesgo.py; reemplaza al semáforo del E1 (J52).
 E1_PAYLOAD = APP / "src" / "datos.js"
 CAMPANIAS = APP / "data" / "raw" / "Campanias_marketing.csv"
 
@@ -738,7 +741,8 @@ def armar_piloto(eco: dict, e2: dict) -> dict:
 #
 # test: la etapa 4 (el test, abierto una sola vez el 27/10/2026), J01 a J21. encuadre y legal: las cifras de las
 # vistas 2 y 6 que hasta W2 solo estaban en el texto de C3 (C14, C08, H40, C18 y J22). plan: el plan del proyecto
-# de la sección 12 de la D (J50). monitoreo: la campaña de noviembre (J51) y la alerta de drift (J52).
+# de la sección 12 de la D (J50). monitoreo: la campaña de noviembre (J51) y la alerta de drift (J53 desde el 28/10;
+# hasta la D v1.2, el semáforo del E1, J52).
 
 # huella de etapa4.json que cita el registro (J01) y etapa4-resumen.md: si cambia, el test se habría vuelto a correr
 ETAPA4_SHA256 = "0368611d7d797b3bec39f19764d2e3496d9c74e539a8b6c2e8cdf03099844fbd"
@@ -758,7 +762,8 @@ FASES_PLAN = [("gobierno", "Precondiciones de gobierno", 1, 2),
               ("prueba", "Corrida de prueba y capacitación", 5, 5),
               ("piloto", "Piloto", 6, 18),
               ("decision", "Informe y decisión", 19, 20)]
-HITOS_PLAN = {"alcance": 1, "regla_y_operador_del_piloto": 2, "acciones_legales_y_control": 4,
+# (28/10, F6b) designa_l1: María G. designa quién inscribe las bases en la AAIP en la semana 2 (D v1.3, 12.3 y 12.4).
+HITOS_PLAN = {"alcance": 1, "regla_y_operador_del_piloto": 2, "designa_l1": 2, "acciones_legales_y_control": 4,
               "extracto_regenerado": 6, "go_live": 6, "operador_despues_del_piloto": 13, "decision": 20}
 
 
@@ -1233,7 +1238,7 @@ def armar_plan() -> dict:
     return plan
 
 
-def armar_monitoreo(e1: dict) -> dict:
+def armar_monitoreo(drift: dict) -> dict:
     import csv
     from collections import defaultdict
     primero: dict[str, str] = {}
@@ -1247,21 +1252,27 @@ def armar_monitoreo(e1: dict) -> dict:
         if f_[5:7] == "11":
             nov[f_[:4]].append((f_, c))
     campanias = [{"anio": int(a), "fecha": min(v)[0], "id_campania": min(v)[1]} for a, v in sorted(nov.items())]
-    an = {a["nombre"]: a["real"] for a in e1["anclas"]}
-    sem = e1["meta"]["umbral_en_riesgo"]
+    # (28/10, F6b) La alerta de drift de la D v1.3, 10.2 (J53): una suba de más de 2,1 puntos en un mes de los clientes
+    # en riesgo sobre elegibles, con la identidad unida del E2; la mayor suba de 12/2023 a 08/2025. Referencias: 50,4 %
+    # al 31/12/2025 y 38,5 % al 31/08/2025, antes de los meses de cobertura no confirmada (DC-09).
+    serie = {s["corte"]: s for s in drift["serie"]}
+    ref, ref_dc09 = serie["2025-12-31"], serie[drift["ventana_umbral"][1]]
     mon = {"campanias_noviembre": campanias,
-           "drift": {"verde_hasta_pct": sem[0], "rojo_desde_pct": sem[1],
-                     "referencia": an["clientes en riesgo (corte ref)"] / an["clientes con compra valida"],
-                     "referencia_corte": e1["meta"]["corte_ref"],
-                     "en_riesgo": an["clientes en riesgo (corte ref)"], "clientes": an["clientes con compra valida"]}}
+           "drift": {"umbral_suba_pp": drift["umbral_suba_pp"], "umbral_corte": drift["umbral_corte"],
+                     "ventana_umbral": drift["ventana_umbral"], "saltaria_en": drift["saltaria_en"],
+                     "referencia": ref["pct"] / 100, "referencia_corte": ref["corte"],
+                     "en_riesgo": ref["en_riesgo"], "elegibles": ref["elegibles"],
+                     "antes_dc09": ref_dc09["pct"] / 100, "antes_dc09_corte": ref_dc09["corte"]}}
     ancla("J51", "campañas: primer envío de noviembre por año",
           " · ".join(f"{c['fecha']} {c['id_campania']}" for c in campanias),
           "2022-11-02 CAMP015 · 2023-11-16 CAMP039 · 2024-11-04 CAMP027 · 2025-11-12 CAMP018", donde="D 12.2")
-    ancla("J52", "drift: rojo del semáforo (%)", sem[1], "42", 0, donde="D 10.2")
-    ancla("J52", "drift: verde del semáforo, hasta (%)", sem[0], "38", 0, donde="registro J52 (E1 D 10.1)")
-    ancla("J52", "drift: referencia al corte (%)", mon["drift"]["referencia"], "41,0", 1, 100, donde="D 10.2 (C03)")
-    ancla("J52", "drift: corte de la referencia", mon["drift"]["referencia_corte"], "2025-12-31",
-          donde="registro J52 (31/12/2025)")
+    ancla("J53", "drift: suba en un mes que dispara la alerta (pp)", drift["umbral_suba_pp"], "2,1", 1, donde="D 10.2")
+    ancla("J53", "drift: en riesgo sobre elegibles al 31/12/2025 (%)", mon["drift"]["referencia"], "50,4", 1, 100,
+          donde="D 10.2 (D22)")
+    ancla("J53", "drift: al 31/08/2025, antes de DC-09 (%)", mon["drift"]["antes_dc09"], "38,5", 1, 100,
+          donde="D 10.2 (E01)")
+    ancla("J53", "drift: cortes en que habría saltado", " · ".join(drift["saltaria_en"]),
+          "2025-10-31 · 2025-11-30 · 2025-12-31", donde="registro J53")
     return mon
 
 
@@ -1272,7 +1283,7 @@ def main() -> int:
         if not (DATOS / n).exists():
             print(f"falta {DATOS / n}: corre antes entregas/entregable-3/_build/F/presentacion/exportar_web.py")
             return 1
-    e2, e3, eco, co, e4, v4 = (cargar(n) for n in ENTRADAS)
+    e2, e3, eco, co, e4, v4, drift = (cargar(n) for n in ENTRADAS)
     e1 = cargar_e1()
     c3 = cargar_c3()
     for d in c3["DIAPOSITIVAS"]:
@@ -1297,7 +1308,7 @@ def main() -> int:
         "legal": armar_legal(e1, c3),
         "test": armar_test(e4, v4, eco, e3),
         "plan": armar_plan(),
-        "monitoreo": armar_monitoreo(e1),
+        "monitoreo": armar_monitoreo(drift),
     }
 
     print(f"{'ID':6s}{'ANCLA':58s}{'DOCUMENTO':>14s}{'PANTALLA':>14s}  OK")

@@ -1,0 +1,216 @@
+{
+ "que": "clientes en riesgo sobre elegibles por corte mensual, con DC-04 (identidad unida del E2)",
+ "base": "app/pipeline: loader.load_transacciones, calidad.mapear_identidad, features.client_facts, calidad.resumen_riesgo",
+ "ventana_umbral": [
+  "2023-12-31",
+  "2025-08-31"
+ ],
+ "umbral_suba_pp": 2.098376309824431,
+ "umbral_corte": "2025-05-31",
+ "saltaria_en": [
+  "2025-10-31",
+  "2025-11-30",
+  "2025-12-31"
+ ],
+ "serie": [
+  {
+   "corte": "2023-12-31",
+   "clientes": 4871,
+   "elegibles": 1764,
+   "en_riesgo": 399,
+   "pct": 22.61904761904762
+  },
+  {
+   "corte": "2024-01-31",
+   "clientes": 4978,
+   "elegibles": 1970,
+   "en_riesgo": 483,
+   "pct": 24.517766497461928,
+   "suba_pp": 1.8987188784143072
+  },
+  {
+   "corte": "2024-02-29",
+   "clientes": 5053,
+   "elegibles": 2134,
+   "en_riesgo": 529,
+   "pct": 24.78912839737582,
+   "suba_pp": 0.2713618999138916
+  },
+  {
+   "corte": "2024-03-31",
+   "clientes": 5127,
+   "elegibles": 2355,
+   "en_riesgo": 603,
+   "pct": 25.605095541401273,
+   "suba_pp": 0.8159671440254535
+  },
+  {
+   "corte": "2024-04-30",
+   "clientes": 5202,
+   "elegibles": 2552,
+   "en_riesgo": 676,
+   "pct": 26.489028213166144,
+   "suba_pp": 0.883932671764871
+  },
+  {
+   "corte": "2024-05-31",
+   "clientes": 5258,
+   "elegibles": 2729,
+   "en_riesgo": 731,
+   "pct": 26.786368633198975,
+   "suba_pp": 0.2973404200328318
+  },
+  {
+   "corte": "2024-06-30",
+   "clientes": 5305,
+   "elegibles": 2925,
+   "en_riesgo": 794,
+   "pct": 27.145299145299145,
+   "suba_pp": 0.35893051210016935
+  },
+  {
+   "corte": "2024-07-31",
+   "clientes": 5359,
+   "elegibles": 3113,
+   "en_riesgo": 854,
+   "pct": 27.43334404111789,
+   "suba_pp": 0.2880448958187465
+  },
+  {
+   "corte": "2024-08-31",
+   "clientes": 5402,
+   "elegibles": 3302,
+   "en_riesgo": 900,
+   "pct": 27.25620835857056,
+   "suba_pp": -0.17713568254733048
+  },
+  {
+   "corte": "2024-09-30",
+   "clientes": 5442,
+   "elegibles": 3452,
+   "en_riesgo": 940,
+   "pct": 27.230590961761298,
+   "suba_pp": -0.025617396809263226
+  },
+  {
+   "corte": "2024-10-31",
+   "clientes": 5474,
+   "elegibles": 3605,
+   "en_riesgo": 988,
+   "pct": 27.406380027739253,
+   "suba_pp": 0.17578906597795552
+  },
+  {
+   "corte": "2024-11-30",
+   "clientes": 5499,
+   "elegibles": 3739,
+   "en_riesgo": 1059,
+   "pct": 28.32308103771062,
+   "suba_pp": 0.9167010099713657
+  },
+  {
+   "corte": "2024-12-31",
+   "clientes": 5527,
+   "elegibles": 3857,
+   "en_riesgo": 1129,
+   "pct": 29.271454498314753,
+   "suba_pp": 0.9483734606041345
+  },
+  {
+   "corte": "2025-01-31",
+   "clientes": 5550,
+   "elegibles": 3985,
+   "en_riesgo": 1203,
+   "pct": 30.188205771643663,
+   "suba_pp": 0.9167512733289094
+  },
+  {
+   "corte": "2025-02-28",
+   "clientes": 5565,
+   "elegibles": 4089,
+   "en_riesgo": 1277,
+   "pct": 31.23012961604304,
+   "suba_pp": 1.0419238443993777
+  },
+  {
+   "corte": "2025-03-31",
+   "clientes": 5575,
+   "elegibles": 4201,
+   "en_riesgo": 1334,
+   "pct": 31.754344203761008,
+   "suba_pp": 0.5242145877179674
+  },
+  {
+   "corte": "2025-04-30",
+   "clientes": 5589,
+   "elegibles": 4298,
+   "en_riesgo": 1404,
+   "pct": 32.666356444858074,
+   "suba_pp": 0.9120122410970666
+  },
+  {
+   "corte": "2025-05-31",
+   "clientes": 5599,
+   "elegibles": 4378,
+   "en_riesgo": 1522,
+   "pct": 34.764732754682505,
+   "suba_pp": 2.098376309824431
+  },
+  {
+   "corte": "2025-06-30",
+   "clientes": 5603,
+   "elegibles": 4442,
+   "en_riesgo": 1586,
+   "pct": 35.704637550652855,
+   "suba_pp": 0.9399047959703495
+  },
+  {
+   "corte": "2025-07-31",
+   "clientes": 5606,
+   "elegibles": 4520,
+   "en_riesgo": 1662,
+   "pct": 36.769911504424776,
+   "suba_pp": 1.0652739537719214
+  },
+  {
+   "corte": "2025-08-31",
+   "clientes": 5611,
+   "elegibles": 4581,
+   "en_riesgo": 1763,
+   "pct": 38.48504693298406,
+   "suba_pp": 1.715135428559286
+  },
+  {
+   "corte": "2025-09-30",
+   "clientes": 5621,
+   "elegibles": 4629,
+   "en_riesgo": 1867,
+   "pct": 40.332685245193346,
+   "suba_pp": 1.847638312209284
+  },
+  {
+   "corte": "2025-10-31",
+   "clientes": 5630,
+   "elegibles": 4670,
+   "en_riesgo": 2007,
+   "pct": 42.976445396145614,
+   "suba_pp": 2.643760150952268
+  },
+  {
+   "corte": "2025-11-30",
+   "clientes": 5633,
+   "elegibles": 4701,
+   "en_riesgo": 2187,
+   "pct": 46.52201659221442,
+   "suba_pp": 3.5455711960688063
+  },
+  {
+   "corte": "2025-12-31",
+   "clientes": 5634,
+   "elegibles": 4710,
+   "en_riesgo": 2372,
+   "pct": 50.360934182590235,
+   "suba_pp": 3.8389175903758144
+  }
+ ]
+}

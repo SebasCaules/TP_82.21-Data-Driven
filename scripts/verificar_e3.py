@@ -26,7 +26,8 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
    control de versiones).
 5. (27/10, W2 y W3) Contenido de las vistas 1 a 7, en cada resolución, contra lo que dicen D3 y C3 (leídos de
    e3/src/datos_e3.js y contenido_e3.js y escritos con las mismas reglas de e3/src/formato.js):
-   - la tarjeta de decisión dice el «id · estado» de su decisión en e3/src/decisiones.js;
+   - la tarjeta de decisión dice el «área · estado» de su decisión en e3/src/decisiones.js (F6b, 28/10: hasta
+     ese día, el id interno, «D-PRO · propuesta», que ningún documento define; hallazgo H-2-077);
    - las cifras de la banda, en orden, son las de su fila del registro, y hay una sola al tamaño máximo,
      en la tarjeta central (regla 13 H1 del E2);
    - el gráfico escribe sus valores clave (la tasa de éxito, los días del cliente, los puntajes, la
@@ -41,7 +42,7 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
 
 6. (W2) Con --hoja, una hoja de contacto de las vistas con contenido (por defecto, de la 1 a la 7) a
    1536 × 864, dos por fila, para mirarla de una vez.
-7. (27/10, W3) Datos de la Parte D, sin navegador: D3 trae las filas J01 a J22, J50 a J52 y las cinco cifras de las
+7. (27/10, W3) Datos de la Parte D, sin navegador: D3 trae las filas J01 a J22, J50, J51, J53 y las cinco cifras de las
    vistas 2 y 6 que antes solo tenía C3 (C14, C08, H40, C18, J22); cada valor, escrito con formato.js, da lo que
    dice el registro, y los del test coinciden con data/e3/etapa4.json.
 8. (27/10, crítica del W3, hallazgo 13) El respaldo y los paneles de «Explorar», en cada resolución: cada anexo A1
@@ -165,10 +166,11 @@ def contenido_esperado():
         if m:
             letra = m["kicker"].split()[1]
             area = t["area"].translate(str.maketrans("ÁÉÍÓÚáéíóú", "AEIOUaeiou"))
-            estados[f"{letra}-{area[:3].upper()}"] = (t["escala"] if t["valor"][:1].isdigit() else t["valor"]).lower()
-    for id_, est in re.findall(r"\{ id: '([A-Z]-[A-Z]{3})', area: '[^']*', estado: '([^']*)' \}",
-                               (SRC / "decisiones.js").read_text()):
-        estados[id_] = est
+            estados[f"{letra}-{area[:3].upper()}"] = (
+                t["area"], (t["escala"] if t["valor"][:1].isdigit() else t["valor"]).lower())
+    for id_, area_, est in re.findall(r"\{ id: '([A-Z]-[A-Z]{3})', area: '([^']*)', estado: '([^']*)' \}",
+                                      (SRC / "decisiones.js").read_text()):
+        estados[id_] = (area_, est)
     T, E, C, MD = D3["tecnica"], D3["economia"], D3["caso"], D3["modelos"]
     TE, P, PL = D3["test"], D3["piloto"], D3["plan"]   # W3: la etapa 4, el piloto y el plan (Parte D)
     tope = fijo(T["escala"][-1]["hasta"], 0)
@@ -214,7 +216,8 @@ def contenido_esperado():
     }
     out = {}
     for v, (id_, cifras, grafico) in esperado.items():
-        out[v] = {"dec": f"{id_} · {estados.get(id_, '¿?')}", "cifras": [norm(x) for x in cifras],
+        rot, est = estados.get(id_, ("¿?", "¿?"))
+        out[v] = {"dec": f"{rot} · {est}", "cifras": [norm(x) for x in cifras],
                   "grafico": [norm(x) for x in grafico]}
     # el guion de cada vista: quién y el comienzo de lo que dice, por diapositiva (vistas/index.jsx)
     de = dict(re.findall(r"\{ id: '(V\d\d)'.*?de: \[([\d, ]*)\]", (SRC / "vistas" / "index.jsx").read_text()))
@@ -332,9 +335,9 @@ def guion_en_notas(p: Pagina, w, h, guion):
 # ---------------------------------------------------------------- 6. datos de la Parte D (W3)
 
 # Filas del registro que D3 tiene que traer desde W3: la etapa 4 (J01 a J21), la matriz de riesgos (J22), el plan
-# (J50), la campaña de noviembre (J51), la alerta de drift (J52) y las cinco cifras de las vistas 2 y 6 que hasta W2
-# solo estaban en el texto de C3 (C14, C08, H40, C18; J22 es la quinta).
-IDS_D = [f"J{i:02d}" for i in range(1, 23)] + ["J50", "J51", "J52", "C14", "C08", "H40", "C18"]
+# (J50), la campaña de noviembre (J51), la alerta de drift (J53 desde el 28/10, F6b; hasta la D v1.2, J52) y las cinco
+# cifras de las vistas 2 y 6 que hasta W2 solo estaban en el texto de C3 (C14, C08, H40, C18; J22 es la quinta).
+IDS_D = [f"J{i:02d}" for i in range(1, 23)] + ["J50", "J51", "J53", "C14", "C08", "H40", "C18"]
 
 
 def anclas_datos():
@@ -391,7 +394,9 @@ def anclas_datos():
         ("J22", "riesgos de la matriz", fijo(LE["riesgos"]), "13"),
         ("J50", "semanas del plan", fijo(PL["semanas"]), "20"),
         ("J51", "campaña de noviembre de 2025", MO["campanias_noviembre"][-1]["fecha"], "2025-11-12"),
-        ("J52", "rojo de la alerta de drift", fijo(MO["drift"]["rojo_desde_pct"]) + " %", "42 %"),
+        ("J53", "suba que dispara la alerta de drift", fijo(MO["drift"]["umbral_suba_pp"], 1) + " puntos", "2,1 puntos"),
+        ("J53", "en riesgo sobre elegibles al 31/12/2025", pct(MO["drift"]["referencia"], 1), "50,4 %"),
+        ("J50", "María G. designa quién inscribe las bases", f"semana {PL['hitos_semana']['designa_l1']}", "semana 2"),
         ("C14", "ventas de 2025 contra 2024", pct_directo(EN["variacion_ventas_2025_pct"], 1), "−35,6 %"),
         ("C08", "capacidad de contacto", " a ".join(fijo(x) for x in EN["capacidad_contacto_mes"]), "500 a 800"),
         ("H40", "puntaje legal", fijo(LE["promedio"], 1), "2,0"),
@@ -414,6 +419,40 @@ def anclas_datos():
 
 
 # ---------------------------------------------------------------- 8. respaldo y «Explorar» (crítica del W3)
+
+def riesgo_12(seg):
+    """(F6b, 28/10) El riesgo 12 como lo deja la D 11.2, con el alto valor y el género X (e3/src/riesgo12.js)."""
+    return (f"La lista acierta menos en el 20 % de mayor facturación "
+            f"({fijo(seg['alto_valor']['diferencia_pp'], 1, True)} puntos en test) y en género X "
+            f"({fijo(seg['genero_x']['diferencia_pp'], 1, True)}, {fijo(seg['genero_x']['en_lista'])} lugares)")
+
+
+def riesgo_12_vista_6(p: Pagina):
+    """(F6b, 28/10, hallazgo H-2-072) La vista 6, «Explorar», «Los 13 riesgos», con el riesgo 12 elegido: el detalle y su
+    aria-label dicen lo mismo que el A4 (riesgo12.js) y no el texto de validación de la C 6.2 («en mujeres»)."""
+    D3 = leer_js("datos_e3.js", "D3")
+    texto = riesgo_12({f["id"]: f for f in D3["test"]["segmentos"]["filas"]})
+    p.ir("v01")
+    p.ir("v06")
+    p.pg.locator(".cuerpo .e3-explorar").click()
+    p.quieto(80)
+    p.pg.locator(".cuerpo .e3-opciones [role=radio]", has_text="riesgos").first.click()
+    p.quieto(80)
+    boton = p.pg.locator('.cuerpo [role=button][aria-label^="Riesgo 12"]').first
+    boton.click()
+    p.quieto(80)
+    r = p.pg.evaluate(LEER_VISTA)
+    aria = norm(boton.get_attribute("aria-label"))
+    pantalla = norm(r["pantalla"])
+    if norm(texto) not in pantalla:
+        p.mal(f"v06 (Explorar, riesgo 12): el detalle no dice «{texto}»")
+    if norm(texto) not in aria:
+        p.mal(f"v06 (Explorar, riesgo 12): el aria-label dice «{aria[:90]}»")
+    for x in (pantalla, aria):
+        if "en mujeres" in x.casefold():
+            p.mal("v06 (Explorar, riesgo 12): sigue el texto de validación de la C 6.2 («en mujeres»)")
+    revisar_estado(p, "v06", "Explorar, riesgo 12", r)
+
 
 def respaldo_esperado():
     """(vista, opción de «Explorar» o None, textos que tiene que escribir, textos que no puede escribir), calculado
@@ -440,7 +479,7 @@ def respaldo_esperado():
          ["contactos"]),
         # la vista 7 al llegar: lo que decide María G. con su semana (D 12.3 y 12.4)
         ("v07", None, ["Lo que decide María G."] + [f"· semana {hs[k]}\n" for k in (
-            "alcance", "regla_y_operador_del_piloto", "acciones_legales_y_control", "operador_despues_del_piloto",
+            "alcance", "regla_y_operador_del_piloto", "designa_l1", "operador_despues_del_piloto",
             "decision")], ["El grupo de control", "lo revisa Sofía R.", "quien elija Casa Óga"]),
         ("v07", "", ["El equipo; el resumen por local, Sofía R."], [f"{P['meses']} listas, del"]),
         # la vista 5: de qué lista es el beneficio de la regla (G41)
@@ -456,10 +495,8 @@ def respaldo_esperado():
         ("a3", None, ["escenario base de la B 3.4 (vista 5)",
                       pct_directo(roi["modelo_sobre_la_regla"]["contactables"]["roi_pct"], 2),
                       pct_directo(roi["regla_sin_modelo"]["contactables"]["roi_pct"], 2)], ["diapositiva"]),
-        ("a4", None, [f"{fijo(LE['riesgos_criticos'])} críticos de {fijo(LE['riesgos'])}",
-                      f"La lista acierta menos en el 20 % de mayor facturación "
-                      f"({fijo(seg['alto_valor']['diferencia_pp'], 1, True)} puntos en test)"],
-         ["en mujeres, en alto valor"]),
+        ("a4", None, [f"{fijo(LE['riesgos_criticos'])} críticos de {fijo(LE['riesgos'])}", riesgo_12(seg)],
+         ["en mujeres"]),
         ("a5", None, ["Logística ajustada, lista de 500 sin filtro", "lugares en la lista de test",
                       f"en test, mujeres {pct(seg['mujeres']['precision'], 1)} y hombres "
                       f"{pct(seg['hombres']['precision'], 1)}; género X, {fijo(seg['genero_x']['en_lista'])} lugares, "
@@ -765,6 +802,7 @@ def main():
                 vistas(p, w, h, out, (w, h) in CAPTURAR and not a.sin_capturas, a.sin_esqueletos)
                 contenido(p, esperado)
                 respaldo(p, casos_r)
+                riesgo_12_vista_6(p)
                 if (w, h) in NOTAS_RES:
                     notas_entran(p, w, h)
                     guion_en_notas(p, w, h, guion)

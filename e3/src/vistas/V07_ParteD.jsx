@@ -70,7 +70,9 @@ const DECISION = decision('D-PIL', {
 const PEDIDOS = [
   { t: 'El alcance: regla sin modelo y piloto con control', s: HS.alcance },
   { t: 'La regla del target, con revisión de Sofía R.', s: HS.regla_y_operador_del_piloto },
-  { t: 'Quién inscribe las bases en la AAIP', s: HS.acciones_legales_y_control },
+  // (28/10, F6b) La D v1.3 (12.3 y 12.4): María G. designa quién inscribe las bases en la semana 2, para que la
+  // inscripción (L1) esté en la 4. Hasta la v1.2 la fila decía la semana 4.
+  { t: 'Quién inscribe las bases en la AAIP', s: HS.designa_l1 },
   { t: 'Quién opera la lista después del piloto', s: HS.operador_despues_del_piloto },
   { t: `Si pasa a producción, con ${T_PAGA} puntos o más`, s: HS.decision },
 ]

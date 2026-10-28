@@ -21,6 +21,13 @@
 // - D-PIL · propuesta (crítica del W3, hallazgo 12): la regla de decisión del piloto, con 40,4 puntos o más
 //   a producción (vista 7; Parte D 11.1 y 12.2, hito 8; G49 y H49). Hasta entonces la vista 7 usaba D-PRO
 //   con otra frase corta: una decisión, una frase.
+//
+// (28/10, F6b, hallazgo H-2-077 de la auditoría) Los ids son internos: ningún documento que lee la cátedra los
+// define (en el E2, los DC-xx estaban en la Parte B). La tarjeta muestra en su lugar el área de la decisión,
+// «Legal · viable con condiciones», que se entiende sola (sección 8 del CLAUDE.md: cada rótulo se entiende solo).
+// `decision()` devuelve el área como `id`, que es lo que TarjetaDecision (del E2, sin tocar) escribe; el id
+// interno sigue en `meta.dc` de cada vista. D-PRO pasa de «Propuesta · propuesta» a «Alcance · propuesta» (D 12.3:
+// «Aprobar el alcance: regla sin modelo y piloto con control»). «Parte C · …» no entraba en la tarjeta a 1366 × 768.
 
 import { C3 } from './contenido_e3.js'
 
@@ -38,7 +45,7 @@ function parteDe(area) {
 const PROPIAS = [
   { id: 'A-UMB', area: 'Umbral', estado: 'vigente' },
   { id: 'C-MOD', area: 'Modelo', estado: 'sale la regla' },
-  { id: 'D-PRO', area: 'Propuesta', estado: 'propuesta' },
+  { id: 'D-PRO', area: 'Alcance', estado: 'propuesta' },
   { id: 'D-PIL', area: 'Piloto', estado: 'propuesta' },
 ]
 
@@ -53,9 +60,13 @@ export const DECISIONES = Object.fromEntries([
   ...PROPIAS.map((d) => [d.id, d]),
 ])
 
-/** La decisión `id` con lo que la vista agrega (llano_corto, llano, decision, justificacion). */
+/** El rótulo que ve el público en lugar del id interno: el área, «Legal». */
+export const rotuloDe = (d) => d.area
+
+/** La decisión `id` con lo que la vista agrega (llano_corto, llano, decision, justificacion). El `id` que devuelve
+ *  es el rótulo de pantalla (rotuloDe); el interno queda en `interno`. */
 export function decision(id, resto = {}) {
   const d = DECISIONES[id]
   if (!d) throw new Error(`decisiones.js: no hay decisión «${id}» (hay ${Object.keys(DECISIONES).join(', ')})`)
-  return { ...resto, id: d.id, estado: d.estado }
+  return { ...resto, id: rotuloDe(d), interno: d.id, estado: d.estado }
 }

@@ -27,12 +27,13 @@ python3 -I pipeline/build_e3.py
   `etapa2.json` ← `_build/B/modelado/salida/`, `etapa3.json` ← `_build/C/modelado/salida/`,
   `economia.json` ← `_build/B/economia/salida/`, `condiciones.json` ← `_build/A/factibilidad/salida/`;
   desde W3 (27/10), `etapa4.json` y `etapa4_validacion.json` ← `_build/D/modelado/salida/` (la etapa 4 de la
-  Parte D: el test, abierto una sola vez, y la misma medición en validación).
+  Parte D: el test, abierto una sola vez, y la misma medición en validación); desde el F6b (28/10),
+  `serie_riesgo.json` ← `_build/D/drift/` (la alerta de drift de la D 10.2, J53).
   Se copian enteras: 340 KB en total, y una copia fiel se verifica con el hash. Un recorte sería un
   formato más que mantener. `etapa4.json` además tiene que tener la huella que cita el registro (J01:
   sha256 `0368611d…`): si cambia, el test se habría vuelto a correr, y el script sale con código 1.
 - Dos fuentes más, de la propia app (su sha256 también va en `D3.meta.fuentes`): `src/datos.js`, el payload
-  del tablero del E1 (C08, C14, C18 y el C03 de J52), y `data/raw/Campanias_marketing.csv`, la copia de los
+  del tablero del E1 (C08, C14 y C18), y `data/raw/Campanias_marketing.csv`, la copia de los
   datos de la cátedra (J51).
 
 ## 1. Formato de los números
@@ -305,20 +306,23 @@ la de 500 contactables por corte, salvo en `sin_filtro`.
   `diferencia_compra_7d_pp` «40,4», `costo_anio_1_usd` 20.260. La fórmula es la de `economia.s_equilibrio_mvp`
   con la matriz de la regla en test × 2,4.
 
-### `plan` (J50, D 12.1 y 12.2) y `monitoreo` (J51, J52)
+### `plan` (J50, D 12.1 y 12.2) y `monitoreo` (J51, J53)
 
 - `plan`: `semana_1` «2026-11-02» (lunes; la semana de la entrega del E3), `fases[] = {id, nombre,
   desde_semana, hasta_semana, semanas, desde, hasta}` (fechas ISO: el piloto, semanas 6 a 18, del 2026-12-07
   al 2027-03-07; la decisión termina el 2027-03-21), `semanas` 20 y `hitos_semana` (alcance 1, regla del target
-  y operador del piloto 2, acciones legales y control 4, extracto regenerado y go-live 6, operador de después
-  del piloto 13, decisión 20).
+  y operador del piloto 2, María G. designa quién inscribe las bases (`designa_l1`) 2, acciones legales y control
+  4, extracto regenerado y go-live 6, operador de después del piloto 13, decisión 20).
 - `monitoreo.campanias_noviembre[] = {anio, fecha, id_campania}` (J51): el primer envío de noviembre de cada año,
-  calculado del CSV. `monitoreo.drift` (J52): `verde_hasta_pct` 38 y `rojo_desde_pct` 42 (el semáforo del E1),
-  `referencia` «41,0 %» = `en_riesgo` 2.452 / `clientes` 5.978 al `referencia_corte` 2025-12-31 (C03).
+  calculado del CSV. `monitoreo.drift` (J53, desde el 28/10; hasta la D v1.2 era el semáforo del E1, J52): la
+  alerta de la D 10.2 sale de `data/e3/serie_riesgo.json` (`_build/D/drift/serie_riesgo.py`): `umbral_suba_pp` 2,1
+  (la mayor suba mensual de clientes en riesgo sobre elegibles, con DC-04, de 12/2023 a 08/2025, `umbral_corte`
+  2025-05-31), `referencia` «50,4 %» = `en_riesgo` 2.372 / `elegibles` 4.710 al `referencia_corte` 2025-12-31 (D22),
+  `antes_dc09` «38,5 %» al 2025-08-31 (E01) y `saltaria_en` (octubre a diciembre de 2025).
 
 ### `meta` y `anclas`
 
-`meta.fuentes[] = {archivo, sha256}` de los seis JSON, `src/datos.js` y `data/raw/Campanias_marketing.csv`;
+`meta.fuentes[] = {archivo, sha256}` de los siete JSON, `src/datos.js` y `data/raw/Campanias_marketing.csv`;
 `meta.contenido = {archivo, version, sha256}`
 del `contenido_e3.js` con que se armó `D3`. `anclas[] = {id, nombre, documento, donde}`: las 409
 comprobaciones, con el texto del documento y dónde lo escribe («B 3.6 · C3 d9»). Cuando `donde` nombra

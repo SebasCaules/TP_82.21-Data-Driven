@@ -29,6 +29,10 @@ export const D3 = {
     "sha256": "494f260239ea95722c8976de5b62b361ae668eeb735e8ad89f7443ed93f0d6c2"
    },
    {
+    "archivo": "data/e3/serie_riesgo.json",
+    "sha256": "0c240afbe870eece9cd8c1f34baf61f9bd8d3a037bcbafb0ddd59c59332719ac"
+   },
+   {
     "archivo": "src/datos.js",
     "sha256": "29a919a236f672c73179ff03d9228d96a5311a788b62aacdb0b6e9b9f98843ee"
    },
@@ -40,7 +44,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "b8c90c7834d3b36730c5d2c111f2fad14b24771c5e62d7ed19a0326d36d0ce78"
+   "sha256": "719b97dddcfc6d76c0a1e25da1d65f9f88007a600192b9fdc411a3ffcc87d7db"
   }
  },
  "caso": {
@@ -1995,6 +1999,7 @@ export const D3 = {
   "hitos_semana": {
    "alcance": 1,
    "regla_y_operador_del_piloto": 2,
+   "designa_l1": 2,
    "acciones_legales_y_control": 4,
    "extracto_regenerado": 6,
    "go_live": 6,
@@ -2026,12 +2031,23 @@ export const D3 = {
    }
   ],
   "drift": {
-   "verde_hasta_pct": 38.0,
-   "rojo_desde_pct": 42.0,
-   "referencia": 0.4101706256273001,
+   "umbral_suba_pp": 2.098376309824431,
+   "umbral_corte": "2025-05-31",
+   "ventana_umbral": [
+    "2023-12-31",
+    "2025-08-31"
+   ],
+   "saltaria_en": [
+    "2025-10-31",
+    "2025-11-30",
+    "2025-12-31"
+   ],
+   "referencia": 0.5036093418259023,
    "referencia_corte": "2025-12-31",
-   "en_riesgo": 2452,
-   "clientes": 5978
+   "en_riesgo": 2372,
+   "elegibles": 4710,
+   "antes_dc09": 0.3848504693298406,
+   "antes_dc09_corte": "2025-08-31"
   }
  },
  "anclas": [
@@ -4498,28 +4514,28 @@ export const D3 = {
    "donde": "D 12.2"
   },
   {
-   "id": "J52",
-   "nombre": "drift: rojo del semáforo (%)",
-   "documento": "42",
+   "id": "J53",
+   "nombre": "drift: suba en un mes que dispara la alerta (pp)",
+   "documento": "2,1",
    "donde": "D 10.2"
   },
   {
-   "id": "J52",
-   "nombre": "drift: verde del semáforo, hasta (%)",
-   "documento": "38",
-   "donde": "registro J52 (E1 D 10.1)"
+   "id": "J53",
+   "nombre": "drift: en riesgo sobre elegibles al 31/12/2025 (%)",
+   "documento": "50,4",
+   "donde": "D 10.2 (D22)"
   },
   {
-   "id": "J52",
-   "nombre": "drift: referencia al corte (%)",
-   "documento": "41,0",
-   "donde": "D 10.2 (C03)"
+   "id": "J53",
+   "nombre": "drift: al 31/08/2025, antes de DC-09 (%)",
+   "documento": "38,5",
+   "donde": "D 10.2 (E01)"
   },
   {
-   "id": "J52",
-   "nombre": "drift: corte de la referencia",
-   "documento": "2025-12-31",
-   "donde": "registro J52 (31/12/2025)"
+   "id": "J53",
+   "nombre": "drift: cortes en que habría saltado",
+   "documento": "2025-10-31 · 2025-11-30 · 2025-12-31",
+   "donde": "registro J53"
   }
  ]
 };
