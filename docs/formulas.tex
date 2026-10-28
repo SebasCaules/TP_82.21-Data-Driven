@@ -37,12 +37,12 @@
 \setcounter{tocdepth}{1}  % en el consolidado el índice interno lista solo secciones: los incisos están en la página de contenido global y en el pie
 \noindent{\small\bfseries\color[HTML]{B8433A} ANEXO 1}\\[1mm]
 {\Large\bfseries Formulación del tablero de riesgo de clientes}\\[1mm]
-{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.5 · 28/10/2026}
+{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.6 · 28/10/2026}
 \else
 \begin{center}
 {\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
 Materia 82.21 --- Factibilidad de Proyectos Data Driven\\
-Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v2.5\\[3mm]
+Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v2.6\\[3mm]
 \begin{tabular}{ll}
 Sebastián Caules & 64331 \\
 Tomás Ferreccio & 64934 \\
@@ -639,6 +639,13 @@ la precisión de validación de la lista de contactables menos el medio interval
 \valoren{validación}{$M_1$ = 1.137 / 3 = 379 aciertos por mes (75,8\%). La logística ajustada acierta 29 menos en los tres meses, con un intervalo de $-3{,}25$ a $-1{,}07$ puntos. $P_{\text{alerta}}$ = 75,8\% $-$ 3,8 = 72,0\%.}
 % registro de cifras: G56, H16, H44
 
+% (28/10, v2.6) alerta de drift del monitoreo en producción (fila J53), sin ecuación numerada para no correr las que citan las partes; sin número de sección de la D, que el armado del consolidado no reescribe en el anexo
+El monitoreo en producción de la Parte D del Entregable 3 suma una alerta de drift sobre la proporción de clientes en riesgo entre los elegibles, con el riesgo de la subsección~\ref{sec:riesgo} y la identidad unida del Entregable 2, en cada corte de fin de mes. La alerta salta si esa proporción sube más de 2,1 puntos de un mes al siguiente. Los 2,1 puntos son la mayor suba mensual entre los cortes de diciembre de 2023 y agosto de 2025.
+
+\impl{entregas/entregable-3/\_build/D/drift/serie\_riesgo.py.}
+\valoren{cortes de fin de mes}{la mayor suba, de 32,67\% al 30/04/2025 a 34,76\% al 31/05/2025. La proporción es 38,5\% al 31/08/2025 y 50,4\% al 31/12/2025. Con ese umbral la alerta habría saltado en octubre (+2,64), noviembre (+3,55) y diciembre de 2025 (+3,84), meses de cobertura no confirmada (DC-09).}
+% registro de cifras: J53
+
 \subsection{Partición por corte y embargo}
 \label{sec:particion}
 
@@ -771,7 +778,8 @@ con $P_{500}$ la precisión de la lista, la parte de los contactados que se iba 
 
 \impl{entregas/entregable-3/\_build/C/contenido\_c.py (\texttt{DIF\_EQ}, \texttt{S\_EQ\_FILT}), que reproduce $s^*$ con la ecuación~\eqref{eq:s-equilibrio}.}
 \valoren{validación}{con la lista de 500 de la regla sin filtro, $s^* = 49{,}56\%$ y $P_{500} = 81{,}58\%$: $\Delta^* = 40{,}4$ puntos. Con la lista de contactables da lo mismo: $s^* = 53{,}35\%$ y $P^{c}_{500} = 75{,}8\%$. Con los factores redondeados a un decimal la cuenta da 40,5, por eso se citan sin redondear. Entre 2,87 y 40,4 puntos el contacto funciona pero no paga la lista, y no se invierte en producción.}
-% registro de cifras: H49, G43
+\valoren{test, lista de 500 contactables}{la regla acierta 86,1\% y su equilibrio baja a $s^* = 46{,}9\%$: $\Delta^*$ sigue en 40,4 puntos.}
+% registro de cifras: H49, G43, J19
 
 \section{Limitación: la caída del extracto en 2025}
 \label{sec:carga-parcial}
