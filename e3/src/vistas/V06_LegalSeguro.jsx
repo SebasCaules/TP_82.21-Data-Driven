@@ -7,8 +7,8 @@
 //   dimensión en 2» (las cinco valen lo mismo; si dejaran de valer lo mismo, vuelve el nivel de la
 //   escala). Después el 30,1 % de los envíos sin consentimiento (C18, D3.legal.envios_sin_consentimiento_tasa)
 //   con la marca de excepción del E2 en el rótulo y el fragmento «de los envíos» (la frase de C3 hasta
-//   «envíos»; el período va al gráfico, N0-8), y los riesgos críticos sobre los de la matriz (J22,
-//   D3.legal.riesgos_criticos y D3.legal.riesgos). Anchos 3 / 3 / 3: con la marca, «Sin consentimiento»
+//   «envíos»; el período va al gráfico, N0-8), y los riesgos críticos (J22, D3.legal.riesgos_criticos,
+//   sola, «con señal y umbral»; los 13 de la matriz, D3.legal.riesgos, van al title: regla 2). Anchos 3 / 3 / 3: con la marca, «Sin consentimiento»
 //   no entra en un renglón de una tarjeta de 2.
 // - Decisión: «C-LEG · viable con condiciones» (decisiones.js) y la frase de la tarjeta Legal de la
 //   diapositiva 2 con un «Sí» delante. El plan L1 a L6 con sus dueños, la escala y la alerta van al title.
@@ -493,14 +493,14 @@ export default function V06LegalSeguro() {
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 3' }}
-             title={`${plano(D11.titulo)}. ${CRITICOS.map((r) => `${r.n}: ${r.texto}${r.senal ? ` (${r.senal.filas.map((f) => `${minus(f.rotulo)}: ${plano(f.texto)}`).join('; ')})` : ''}`).join(' · ')}`}>
+             title={`${plano(D11.titulo)}, de los ${fijo(L.riesgos, 0)} de la matriz. ${CRITICOS.map((r) => `${r.n}: ${r.texto}${r.senal ? ` (${r.senal.filas.map((f) => `${minus(f.rotulo)}: ${plano(f.texto)}`).join('; ')})` : ''}`).join(' · ')}`}>
           <span className="kpi-lbl"><span>Riesgos críticos</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
-              <Cifra num={fijo(L.riesgos_criticos, 0)} unidad={`${NBSP}de${NBSP}${fijo(L.riesgos, 0)}`} sec />
+              <Cifra num={fijo(L.riesgos_criticos, 0)} sec />
             </div>
           </div>
-          <p className="e2-linea">cada uno con su umbral</p>
+          <p className="e2-linea">con señal y umbral</p>
         </div>
       </Banda>
 
