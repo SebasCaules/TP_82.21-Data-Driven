@@ -4,7 +4,7 @@
 //
 // - Banda (28/10): un número por tarjeta y la central primero, a la izquierda (N0-6). Central: el ROI del
 //   modelo sobre la regla a un año (G40, D3.economia.observada.modelo_roi_pct), la cifra que decide que la
-//   lista salga sin modelo y la única al tamaño máximo; fragmento «no viable: ROI a un año» (veredicto y
+//   lista salga sin modelo y la única al tamaño máximo; rótulo «ROI modelo sobre regla», fragmento «no viable, a un año» (veredicto y
 //   escala de la tarjeta Económica de C3, sin la cifra). Después el puntaje técnico (F16, D3.tecnica) y el
 //   legal (H40). D3 no trae la Parte C: el 2,0 sale de la tarjeta «Legal» de la diapositiva 2 de C3, como
 //   texto. Debajo de cada cifra, la escala de su tarjeta de C3; el resto (el límite técnico, las seis
@@ -49,8 +49,13 @@ const S_EQ = U.s_equilibrio_con_descuento
 const VECES = U.veces_con_descuento
 
 const SOBRE_TEC = `/${fijo(T.escala[T.escala.length - 1].hasta, 0)}`
-// «ROI −99,95 % a un año» (escala de la tarjeta Económica de C3) sin la cifra: «ROI a un año».
-const ROI_A = plano(ECO.escala).replace(/\s*[−-]?[\d.,]+\s*%/, '')
+// «ROI −99,95 % a un año» (escala de la tarjeta Económica de C3) sin la cifra.
+// (28/10) El −99,95 % es modelo_roi_pct: el ROI de sumar el modelo sobre la regla, no el del proyecto. Lo
+// dice el rótulo (≤ 22 caracteres); «no viable: ROI del modelo sobre la regla, a un año» como fragmento
+// partía en dos renglones y sacaba las tarjetas de la banda a 1366 y 1920. El fragmento queda con el
+// veredicto y el horizonte de la escala de C3 («ROI −99,95 % a un año» → «a un año»).
+const ROT_ECO = 'ROI modelo sobre regla'
+const HORIZONTE = plano(ECO.escala).replace(/^ROI\s*[−-]?[\d.,]+\s*%\s*/, '')
 
 const DECISION = decision('D-PRO', {
   llano_corto: 'La lista sale con la regla; el piloto mide',
@@ -99,7 +104,7 @@ function BarrasVeces({ w, h, k }) {
   const alto = Math.max(22, Math.min(disp * 0.17, 50 * k))
   // La cota del medio: el «48,6 veces» toma lo que dejan las barras, con tope por debajo de la cifra
   // central de la banda (regla 3: una sola cifra al tamaño máximo).
-  const fBig = Math.max(24, Math.min(disp * 0.17, 40 * k))
+  const fBig = Math.max(20, Math.min(disp * 0.12, 26 * k))
 
   const y1 = padTop + alto / 2 + 4
   const y2 = padTop + disp - alto / 2 - 4
@@ -198,11 +203,11 @@ export default function V01Respuesta() {
       <Banda dcs={[DECISION]}>
         <div className="tarjeta e2-central" style={{ gridColumn: 'span 3' }}
              title={`ROI del modelo sobre la regla a un año, escenario esperado: ${pctDirecto(ROI, 2)}. ${plano(ECO.texto)}`}>
-          <span className="kpi-lbl"><span>{ECO.area}</span></span>
+          <span className="kpi-lbl"><span>{ROT_ECO}</span></span>
           <div className="ban-par">
             <div className="par-item par-unico"><Cifra texto={pctDirecto(ROI, 2)} /></div>
           </div>
-          <p className="e2-linea">{`${plano(ECO.valor).toLowerCase()}: ${ROI_A}`}</p>
+          <p className="e2-linea">{`${plano(ECO.valor).toLowerCase()}, ${HORIZONTE}`}</p>
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 2' }}
