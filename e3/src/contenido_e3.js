@@ -29,20 +29,8 @@ export const C3 = {
       "rol": "Tratamiento de datos"
     }
   ],
-  "PIE": "Casa Óga · Entregable 3 · Grupo 2 · 27/10/2026",
+  "PIE": "Casa Óga · Entregable 3 · Grupo 2 · 03/11/2026",
   "DIAPOSITIVAS": [
-    {
-      "n": 1,
-      "quien": "Sebastian C.",
-      "tipo": "portada",
-      "kicker": "Factibilidad de Proyectos Data Driven · 2C 2026 · Entregable 3",
-      "titulo": "¿Conviene anticipar a los clientes que dejan de comprar?",
-      "bajada": "Factibilidad técnica, económica y legal, riesgos y modelado del proyecto de Casa Óga",
-      "fuente": "",
-      "ids": [],
-      "guion": "Somos el grupo 2. Presentamos la factibilidad del proyecto de Casa Óga: anticipar qué clientes van a dejar de comprar para que Marketing los contacte a tiempo. Primero les damos la respuesta y después cómo llegamos a ella.",
-      "segundos": 20
-    },
     {
       "n": 2,
       "quien": "Sebastian C.",
@@ -83,10 +71,11 @@ export const C3 = {
         "G40",
         "G38",
         "H40",
-        "G31"
+        "G31",
+        "J09"
       ],
-      "guion": "La respuesta corta: el proyecto se puede hacer, pero no como lo planteamos al principio. Técnicamente es factible, con 2,25 sobre 3. En lo legal también, con 2,0 y seis acciones. Lo que no cierra es lo económico: el modelo le gana a una regla simple por tan poco que no paga su costo, y ni la regla sola recupera lo que cuesta. Falta un dato que nadie midió: cuántos clientes vuelven porque se los contactó. Por eso la lista sale con la regla y un piloto de tres meses con grupo de control mide eso antes de invertir más.",
-      "segundos": 50
+      "guion": "Somos el grupo 2. Casa Óga quiere saber a tiempo qué clientes van a dejar de comprar, para que Marketing los contacte. La respuesta corta: se puede hacer, pero no como lo planteamos al principio. En lo técnico y en lo legal es factible con condiciones. Lo económico no cierra: el ROI a un año da −99,95 %, porque un modelo no le gana a una regla simple y ni la regla sola recupera su costo. Falta medir cuántos clientes vuelven porque se los contactó. El único dato es este 1,02 %, sin grupo de control. Por eso la lista sale con la regla y un piloto mide ese efecto.",
+      "segundos": 55
     },
     {
       "n": 3,
@@ -120,8 +109,8 @@ export const C3 = {
         "C08",
         "H23"
       ],
-      "guion": "El problema son los clientes que dejan de comprar. En 2025 las ventas de Casa Óga cayeron 35,6 %. El rubro cayó 15 % interanual en diciembre, según CAME, y los últimos cuatro meses de 2025 llegaron incompletos: no se sabe cuánto de la caída es mercado. Cada cliente tiene su ritmo, así que decimos que se va cuando pasa más días sin comprar que su propio umbral: 1,5 veces su intervalo habitual entre compras, con un piso de 90 días. Este es un cliente real. Compra cada 162 días, su umbral es 243 y al corte llevaba 181. En los 90 días siguientes lo cruzó. Queremos encontrar a estos clientes antes, para una lista de 500 por mes, que es lo que Marketing puede contactar.",
-      "segundos": 70
+      "guion": "En 2025 las ventas cayeron 35,6 %. Para encontrar a quién se va, cada cliente tiene su umbral: 1,5 veces su intervalo habitual entre compras, con un piso de 90 días. Se va si lo pasa sin comprar. Este es un cliente real. Compra cada 162 días, su umbral es 243 y al corte llevaba 181. En los 90 días siguientes lo cruzó. Queremos encontrar a estos clientes antes, en una lista de 500 por mes, que es lo que Marketing puede contactar.",
+      "segundos": 50
     },
     {
       "n": 4,
@@ -158,8 +147,8 @@ export const C3 = {
         "F11",
         "C19"
       ],
-      "guion": "Evaluamos cuatro condiciones de 1 a 3. Los datos alcanzan con margen: hay 4.636 casos positivos para entrenar, y la cátedra pone la alerta en 50 a 100. Las fuentes críticas son las transacciones, de donde sale el target, y la identidad unificada. La calidad tiene un límite que no se arregla con datos: el 44,8 % de las ventas no tiene cliente. La infraestructura es manual. Y lo que más pesa es quién lo opera: el proyecto anterior se cortó porque nadie lo mantuvo. Por eso el piloto lo opera nuestro equipo. Promedio, 2,25: factibilidad media.",
-      "segundos": 55
+      "guion": "La factibilidad técnica puntúa cuatro condiciones de 1 a 3. Los datos alcanzan con margen: hay 4.636 casos positivos para entrenar. Las otras tres quedan en 2: el 44,8 % de las ventas no tiene cliente, todo se exporta a mano y Casa Óga no tiene quién opere la lista. El promedio, 2,25, es factibilidad media. Lo que más pesa es quién opera: el proyecto anterior se cortó porque nadie lo mantuvo. En el piloto la opera nuestro equipo, y antes del tercer mes María G. elige quién sigue.",
+      "segundos": 50
     },
     {
       "n": 5,
@@ -209,8 +198,8 @@ export const C3 = {
         "F15",
         "H46"
       ],
-      "guion": "El MVP es simple a propósito. Cada mes Operaciones o Marketing exportan los datos a mano, con aviso una semana antes, como pidió Casa Óga. Controlamos que el mes esté completo: de septiembre a diciembre de 2025 llegaron meses con entre 53 % y 18 % de las operaciones del año anterior. El pipeline del Entregable 2 arma el dataset, la regla ordena a los clientes y sale una planilla de 500, sin los que no aceptaron marketing o pidieron la baja. Sofía R. la revisa y decide a quién se contacta. Todo con software libre, sin licencias. Automatizar la exportación queda para después del piloto, si demuestra valor.",
-      "segundos": 60
+      "guion": "El producto mínimo es una planilla mensual hecha con software libre: USD 0 en licencias y una computadora.",
+      "segundos": 10
     },
     {
       "n": 6,
@@ -218,9 +207,9 @@ export const C3 = {
       "tipo": "figura_callouts",
       "kicker": "Modelado · Etapas 1 y 2",
       "pregunta": "¿Un modelo acierta más que la regla?",
-      "titulo": "Ningún modelo le gana a la regla por más que el ruido",
+      "titulo": "En validación, ningún modelo le gana a la regla por más que el ruido",
       "figura": "modelos.png",
-      "pie_figura": "Lista de 500, sin filtrar. Entrena con enero de 2023 a abril de 2024, valida con julio a septiembre de 2024; el test de 2025 queda para la etapa 4.",
+      "pie_figura": "Lista de 500, sin filtrar. Entrena con enero de 2023 a abril de 2024, valida con julio a septiembre de 2024; el test de 2025 lo mide la etapa 4 (Parte D 8.1).",
       "callouts": [
         {
           "titulo": "+0,89 puntos",
@@ -233,9 +222,13 @@ export const C3 = {
         {
           "titulo": "Memoriza",
           "texto": "El boosting llega a 66,0 % en entrenamiento, con un techo de 66,3 %, y en validación empata."
+        },
+        {
+          "titulo": "Validación",
+          "texto": "Precisión de la lista: práctica actual 36,2 %, regla 81,6 %, logística 82,5 %."
         }
       ],
-      "fuente": "Parte A 2.2 y 2.5 · Parte B 4.1 a 4.5",
+      "fuente": "Parte A 2.2 y 2.5 · Parte B 4.1 a 4.5 · Parte D 11.2",
       "ids": [
         "F07",
         "F08",
@@ -245,10 +238,12 @@ export const C3 = {
         "G15",
         "G17",
         "G24",
-        "G12"
+        "G12",
+        "H06",
+        "J11"
       ],
-      "guion": "Primero fijamos los dos pisos que pide la cátedra. La clase mayoritaria, una lista sin orden, acierta 23,9 %; la práctica actual de Marketing, 36,2 %. La regla del umbral, sin modelo, acierta 81,6 %. Medimos la precisión de la lista de 500 porque la lista tiene largo fijo: cada falso positivo ocupa el lugar de un cliente que se iba. Después entrenamos tres modelos. El mejor, la regresión logística, llega a 82,5 %: 13,3 aciertos más en 1.500 contactos, con un intervalo que incluye el cero. El gradient boosting memoriza: en entrenamiento llega casi al techo posible.",
-      "segundos": 55
+      "guion": "Comparamos la regla con un modelo por la precisión de la lista de 500: qué parte de la lista realmente se iba. Cada fila es la logística menos la regla, con su intervalo. Arriba, la lista sin filtrar: en validación empataban y en el test, que abrimos una sola vez, la logística gana por 1,06 puntos.",
+      "segundos": 30
     },
     {
       "n": 7,
@@ -256,7 +251,7 @@ export const C3 = {
       "tipo": "figura_callouts",
       "kicker": "Modelado · Etapa 3",
       "pregunta": "¿Y con la lista que se puede mandar?",
-      "titulo": "El modelo queda debajo de la regla",
+      "titulo": "En validación el modelo queda debajo de la regla; en test empatan",
       "figura": "lista.png",
       "pie_figura": "Arriba, la lista de 500 contactables en validación. Abajo, la importancia por permutación de la logística ajustada.",
       "callouts": [
@@ -273,7 +268,7 @@ export const C3 = {
           "texto": "De 43 variables, 3 salen y 3 se recalculan: las 40 que quedan no miran después del corte."
         }
       ],
-      "fuente": "Parte A 2.3 · Parte C 7.1 a 7.3",
+      "fuente": "Parte A 2.3 · Parte C 7.1 a 7.3 · Parte D 8.1 y 11.2",
       "ids": [
         "H01",
         "H08",
@@ -281,10 +276,13 @@ export const C3 = {
         "H17",
         "H16",
         "H21",
-        "H45"
+        "H45",
+        "J03",
+        "J09",
+        "J10"
       ],
-      "guion": "En la etapa 3 ajustamos los dos candidatos con validación temporal. El gradient boosting dejó de memorizar: la diferencia entre entrenamiento y validación bajó de 18,1 a 6,4 puntos. La logística quedó en 82,6 %, apenas arriba de la regla. Pero un tercio de esa lista no se puede contactar: 483 de 1.500 lugares no aceptan marketing o pidieron la baja. En la lista de 500 contactables, la que se puede mandar, la regla acierta 29 clientes más que el modelo. En la etapa 1 revisamos las 43 variables: sacamos 3 que podían mirar después del corte y recalculamos otras 3. Las tres que más pesan son las de la regla porque definen el target, no por fuga.",
-      "segundos": 70
+      "guion": "Pero esa lista no se puede mandar: un tercio son clientes que no aceptaron marketing o pidieron la baja. En la lista que sale, en validación ganaba la regla por 29 clientes, y en el test empatan: −0,25 puntos, con un intervalo que incluye el cero. Para pagar los USD 10.400 que agrega, el modelo tendría que acertar 8.595 clientes más por mes. Por eso la lista sale con la regla.",
+      "segundos": 40
     },
     {
       "n": 8,
@@ -314,9 +312,9 @@ export const C3 = {
       "filtro": "**Lista contactable:** regla USD 264,54 contra logística 252,84 por año. El modelo queda USD 11,70 abajo.",
       "callout": {
         "titulo": "Umbral de viabilidad",
-        "texto": "1 punto de precisión = USD 6,05 por año. Hasta una lista perfecta quedan 18,4 puntos."
+        "texto": "1 punto de precisión = USD 6,05 por año: el modelo necesita 1.719. Hasta una lista perfecta quedan 18,4 puntos."
       },
-      "fuente": "Parte B 3.3, 3.5 y 4.4 · Parte C 7.2",
+      "fuente": "Parte B 3.3, 3.5 y 4.4 · Parte C 7.2 · Parte D 11.2",
       "ids": [
         "G40",
         "G38",
@@ -326,10 +324,11 @@ export const C3 = {
         "G06",
         "G32",
         "G46",
-        "H42"
+        "H42",
+        "J12"
       ],
-      "guion": "Valorizamos cada celda de la matriz frente a no contactar. Un acierto vale, en valor esperado, 99,96 pesos: vuelve uno de cada 98 y deja su margen anual menos el descuento. Un falso positivo cuesta 47,21 pesos. Los 13,3 aciertos de más del modelo, sin filtrar la lista, valen 5,38 dólares por año, contra 10.400 que agrega al costo. Cada punto de precisión vale 6,05 dólares: harían falta 1.719 puntos, y hasta una lista perfecta quedan 18,4. Con la lista que se puede mandar es peor: el modelo queda 11,70 dólares por año debajo de la regla.",
-      "segundos": 55
+      "guion": "Pasamos a dinero. Un acierto vale, en valor esperado, 99,96 pesos: vuelve uno de cada 98. Un falso positivo cuesta 47,21. Con esos valores, lo que el modelo suma sobre la regla vale 5,38 dólares por año, contra 10.400 que agrega al costo. En el test es peor: queda 1,54 dólares por año debajo de la regla.",
+      "segundos": 35
     },
     {
       "n": 9,
@@ -386,8 +385,8 @@ export const C3 = {
         "G43",
         "G42"
       ],
-      "guion": "Con modelo, el año 1 se pasa del presupuesto; sin modelo cuesta 20.260 dólares. Pero ni la regla sola recupera su costo: deja 299,49 dólares por año. En ningún escenario se recupera la inversión: en el esperado, el ROI del modelo sobre la regla es −99,95 % y el de la regla, −98,52 %. La regla se pagaría si volviera el 49,6 % de los contactados que se iban a ir, 48,6 veces lo que vemos. Y el 1,02 % observado es compra a 7 días sin grupo de control: un techo, no un efecto medido. Por eso el veredicto es no viable tal como está planteado.",
-      "segundos": 60
+      "guion": "Tampoco la regla sola se paga. Con modelo, el primer año pasa el presupuesto; sin modelo cuesta 20.260 dólares y la regla deja 299,49 por año. Para pagarse tendría que volver el 49,6 % de los contactados que se iban a ir, 48,6 veces lo que vemos. Y ese 1,02 % es un techo, sin grupo de control. No es viable tal como está planteado.",
+      "segundos": 40
     },
     {
       "n": 10,
@@ -479,8 +478,8 @@ export const C3 = {
         "H41",
         "H47"
       ],
-      "guion": "En lo legal, el modelo trabaja por cliente, así que trata datos personales bajo la Ley 25.326. Revisamos seis normas; dos las sumamos nosotros: la transferencia internacional, porque el CRM guarda los datos fuera del país, y el registro No Llame, porque la acción es un WhatsApp. Las cinco dimensiones quedan en 2, débil pero superable: viable con condiciones. El riesgo más grande ya ocurre hoy: el 30,1 % de los envíos fue a clientes que no aceptaron marketing, porque la plataforma no los filtra. Nuestra planilla sale filtrada. Antes de la primera lista tienen que estar cinco acciones, y la adenda del CRM antes de producción. Y sacamos el género del modelo: no baja el acierto y evita que decida a quién se ofrece un descuento.",
-      "segundos": 65
+      "guion": "En lo legal, la lista trata datos personales, bajo la Ley 25.326. Las cinco dimensiones quedan en 2: hay que hacer cosas antes, pero nada bloquea. El promedio, 2,0, es viable con condiciones. El riesgo más grande ya ocurre: el 30,1 % de los envíos fue a clientes que no aceptaron marketing. Nuestra planilla sale filtrada, y cinco acciones legales van antes de la primera lista.",
+      "segundos": 35
     },
     {
       "n": 11,
@@ -554,15 +553,15 @@ export const C3 = {
         "C18",
         "H45"
       ],
-      "guion": "Armamos una matriz de 13 riesgos. Estos son los tres críticos, cada uno con lo que se mide, el umbral y quién lo mira. Primero, que la tasa de éxito no pague la lista: Juan Manuel compara cada mes la compra de contactados y control, y si al tercer mes la diferencia no llega a 40,4 puntos, no se invierte en producción. Son los mismos 49,6 % de Francisco, contados sobre toda la lista y no solo sobre los que se iban a ir. Segundo, que al cerrar el piloto nadie opere la lista, como pasó con el proyecto anterior: María G. elige el operador antes del tercer mes. Tercero, contactar a alguien sin consentimiento: con un solo cliente así, la planilla no sale.",
-      "segundos": 65
+      "guion": "De los 13 riesgos, tres son críticos y cada uno tiene su señal. Que la tasa de éxito no pague la lista: se mide contra el grupo de control. Que al cerrar el piloto nadie opere la lista: María G. elige al operador en la semana 13. Y contactar a alguien sin consentimiento: con un solo cliente así, la planilla no sale.",
+      "segundos": 35
     },
     {
       "n": 12,
       "quien": "Sebastian C.",
       "tipo": "piloto",
       "kicker": "La propuesta",
-      "pregunta": "¿Qué proponemos?",
+      "pregunta": "¿Qué decide María G. con el piloto?",
       "titulo": "Un piloto de tres meses con grupo de control decide si se invierte más",
       "figura": "piloto.png",
       "hechos": [
@@ -571,32 +570,35 @@ export const C3 = {
       ],
       "pedidos_titulo": "Para que decida María G.",
       "pedidos": [
-        "El target (lo revisa Sofía R., envío 17).",
-        "El alcance: regla y piloto; lo que siga, «si el piloto demuestra valor» (envío 14).",
-        "Quién opera: el equipo en el piloto (inferido del envío 71); después, quien elija Casa Óga.",
-        "El grupo de control (lo revisa Sofía R.).",
-        "Quién inscribe las bases en la AAIP (L1)."
+        "El alcance: regla sin modelo y piloto con control (semana 1).",
+        "La regla del target, con revisión de Sofía R. (semana 2).",
+        "Quién inscribe las bases en la AAIP (semana 4).",
+        "Quién opera la lista después del piloto (semana 13).",
+        "Si pasa a producción, con 40,4 puntos o más (semana 20)."
       ],
-      "nota": "Sigue la Parte D: evaluación en test (etapa 4), diseño de la solución y go-live.",
-      "fuente": "Parte B 3.6 · Parte C 6.3 y 6.4",
+      "nota": "Plan de 20 semanas desde la entrega; la primera lista sale en la semana 6 y la decisión se toma con el tercer mes cerrado, en la semana 18. El grupo de control lo aprueba Sofía R. (semana 2).",
+      "fuente": "Parte B 3.6 · Parte C 6.3 · Parte D 12.1 a 12.4",
       "ids": [
         "G49",
         "H49",
-        "G50"
+        "G50",
+        "J50"
       ],
-      "guion": "Entonces, la propuesta. Durante tres meses sale la lista con la regla. Cada mes, 80 clientes quedan sin contactar, elegidos fuera de los de mayor valor, como pidió Sofía R. Con 240 clientes de control, el piloto distingue de cero una diferencia de 2,87 puntos en la compra. Si llega a 40,4, la lista se paga y recién ahí se invierte en producción. Lo más probable es que no llegue, porque el 1,02 % es un techo. Aun así el piloto vale: es barato y mide por primera vez el efecto del contacto. Si queda entre 2,87 y 40,4, contactar funciona pero la lista no se paga, y María G. elige entre cerrar o repetir el piloto sin descuento. Con esta entrega le presentamos las cinco decisiones de la derecha. Gracias.",
-      "segundos": 70
+      "guion": "Lo que proponemos en la Parte D. La lista sale cada mes con la regla, sin modelo, y durante tres meses 80 clientes por mes quedan sin contactar: son el grupo de control. Con 1.260 contactados y 240 de control, el piloto distingue de cero una diferencia de 2,87 puntos. Al cierre del tercer mes, si los contactados compran 40,4 puntos más que el control, se pasa a producción. Si no, María G. elige entre cerrar o repetir el piloto sin descuento. El plan dura 20 semanas y la primera lista sale en diciembre. A la derecha, lo que decide María G. y en qué semana. Gracias.",
+      "segundos": 60
     }
   ],
   "ANEXOS": [
     {
       "n": "A1",
-      "titulo": "Partición temporal: el test sigue reservado hasta la etapa 4",
+      "titulo": "Partición temporal: entrenamiento, validación y test en orden de tiempo",
       "fuente": "Parte A 2.2",
       "ids": [
         "F05",
         "F17",
-        "G10"
+        "G10",
+        "J01",
+        "J02"
       ],
       "columnas": [
         "Conjunto",
@@ -642,7 +644,7 @@ export const C3 = {
           "25,02 %"
         ],
         [
-          "Test (reservado hasta la etapa 4)",
+          "Test (medido en la etapa 4)",
           "2025-01 a 2025-05 (5)",
           "14.211",
           "3.602",
@@ -777,7 +779,7 @@ export const C3 = {
       "filas": [
         [
           "Base",
-          "lo que usan las diapositivas 8 y 9",
+          "escenario base de la B 3.4 (vista 5)",
           "−99,95 %",
           "−98,52 %"
         ],
@@ -1011,7 +1013,7 @@ export const C3 = {
     },
     {
       "n": "A5",
-      "titulo": "Errores por segmento: la brecha por género también la tiene la regla",
+      "titulo": "Errores por segmento: dónde acierta menos la lista",
       "fuente": "Parte C 7.4",
       "ids": [
         "H24",
@@ -1019,7 +1021,9 @@ export const C3 = {
         "H26",
         "H27",
         "H28",
-        "H43"
+        "H43",
+        "J23",
+        "J24"
       ],
       "columnas": [
         "Segmento",
@@ -1269,16 +1273,15 @@ export const C3 = {
   "TIEMPOS": {
     "palabras_por_minuto": 130,
     "cambio_s": 3,
-    "total_s": 695,
+    "total_s": 440,
     "turnos": [
       {
         "quien": "Sebastian C.",
         "diapositivas": [
-          1,
           2,
           3
         ],
-        "segundos": 140
+        "segundos": 105
       },
       {
         "quien": "Tomas F.",
@@ -1286,7 +1289,7 @@ export const C3 = {
           4,
           5
         ],
-        "segundos": 115
+        "segundos": 60
       },
       {
         "quien": "Juan Manuel R.",
@@ -1294,7 +1297,7 @@ export const C3 = {
           6,
           7
         ],
-        "segundos": 125
+        "segundos": 70
       },
       {
         "quien": "Francisco C.",
@@ -1302,7 +1305,7 @@ export const C3 = {
           8,
           9
         ],
-        "segundos": 115
+        "segundos": 75
       },
       {
         "quien": "Matías S.",
@@ -1310,14 +1313,14 @@ export const C3 = {
           10,
           11
         ],
-        "segundos": 130
+        "segundos": 70
       },
       {
         "quien": "Sebastian C.",
         "diapositivas": [
           12
         ],
-        "segundos": 70
+        "segundos": 60
       }
     ]
   }
