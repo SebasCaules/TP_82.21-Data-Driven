@@ -37,12 +37,12 @@
 \setcounter{tocdepth}{1}  % en el consolidado el índice interno lista solo secciones: los incisos están en la página de contenido global y en el pie
 \noindent{\small\bfseries\color[HTML]{B8433A} ANEXO 1}\\[1mm]
 {\Large\bfseries Formulación del tablero de riesgo de clientes}\\[1mm]
-{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.6 · 28/10/2026}
+{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.7 · 30/10/2026}
 \else
 \begin{center}
 {\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
 Materia 82.21 --- Factibilidad de Proyectos Data Driven\\
-Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v2.6\\[3mm]
+Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v2.7\\[3mm]
 \begin{tabular}{ll}
 Sebastián Caules & 64331 \\
 Tomás Ferreccio & 64934 \\
@@ -50,7 +50,7 @@ Matías Sola & 64322 \\
 Francisco Cattaneo & 64900 \\
 Juan Manuel Rilo & 64037 \\
 \end{tabular}\\[3mm]
-28/10/2026 (v1.0: 01/09/2026)
+30/10/2026 (v1.0: 01/09/2026)
 \end{center}
 \fi
 
@@ -679,7 +679,7 @@ Fuera de la evaluación & 2025-06 a 2025-09 & 11.294 & 3.031 (26,84\%) \\
 \subsection{Evaluación en test}
 \label{sec:evaluacion-test}
 
-\textbf{Población.} Las filas contactables de los cinco cortes de test, del 31/01 al 31/05/2025, con target medido hasta el 29/08/2025: clientes que aceptan marketing y no pidieron la baja con fecha $\le T$, el filtro L3 de la Parte C del Entregable 3. Son 9.962 de las 14.211 filas, con 2.521 positivos. $\mathcal C$ es el conjunto de cortes evaluados: 5 en test, 3 en validación. El test se abrió una sola vez, el 27/10/2026, con el modelo, la lista y el criterio de la subsección~\ref{sec:criterio-reemplazo} fijados antes en \texttt{preregistro.json} (v1.1).
+\textbf{Población.} Las filas contactables de los cinco cortes de test, del 31/01 al 31/05/2025, con target medido hasta el 29/08/2025: clientes que aceptan marketing y no pidieron la baja con fecha $\le T$, el filtro L3 de la Parte C del Entregable 3. Son 9.962 de las 14.211 filas, con 2.521 positivos. $\mathcal C$ es el conjunto de cortes evaluados: 5 en test, 3 en validación. El test decidió en su apertura del 27/10/2026, con el modelo, la lista y el criterio de la subsección~\ref{sec:criterio-reemplazo} fijados antes en \texttt{preregistro.json} (v1.1); el 30/10 se releyó para la lista de 800, sin elegir nada.
 
 La tabla de la evaluación final de la Parte D del Entregable 3 mide la lista de contactables $L^{c}(T)$ de la subsección~\ref{sec:precision-lista}. Predicho positivo es estar en la lista de su corte. Con $VP$ los aciertos, $FP$ los lugares de la lista sin acierto y $FN$ los positivos contactables que quedan fuera, sumados sobre los cortes de $\mathcal C$,
 
@@ -781,10 +781,11 @@ con $P_{500}$ la precisión de la lista, la parte de los contactados que se iba 
 \valoren{test, lista de 500 contactables}{la regla acierta 86,1\% y su equilibrio baja a $s^* = 46{,}9\%$: $\Delta^*$ sigue en 40,4 puntos.}
 % registro de cifras: H49, G43, J19
 
+% (30/10, v2.7) sin «carga parcial»: Casa Óga no sabe la causa (consulta 2), con la formulación de la condición 2 de la Parte A del E3 (pendiente 132, devolución del E2)
 \section{Limitación: la caída del extracto en 2025}
 \label{sec:carga-parcial}
 
-El extracto de transacciones cae en los dos extremos. Sube de 44 ventas en enero de 2022 a 893 en diciembre y baja de 1.390 en enero de 2025 a 255 en diciembre, aunque el ticket medio se mantiene y las altas de clientes no caen. Parece una carga parcial, pero Casa Óga no sabe la causa (consulta 2 del Entregable 2). Como $\rho_i(t)$ se mide contra el corte, si el cierre de 2025 está incompleto la recencia de todos sale inflada, y con ella $B_i(t)$, $X(t)$ y el riesgo por quintil. Las tres cifras (2.452 en riesgo, ARS 94,9 M/año, 51,8\% en Q5) quedan como referencia del tablero y se informan con la sensibilidad de la decisión DC-09 del Entregable 2; la causa de la caída la revisa Casa Óga con Operaciones y el proveedor del POS. Con las decisiones de calidad del Entregable 2, sobre 5.634 clientes con la identidad unida, el riesgo pasa a 50,4\% de los elegibles y la exposición a ARS 96,4 M/año. Con la base corregida del Entregable 2 y el corte al 31/08/2025, 38,5\% y ARS 77,7 M/año. Ninguna de estas cifras se repite sin esta salvedad.
+El extracto de transacciones cae en los dos extremos. Sube de 44 ventas en enero de 2022 a 893 en diciembre y baja de 1.390 en enero de 2025 a 255 en diciembre, aunque el ticket medio se mantiene y las altas de clientes no caen. Casa Óga no sabe la causa (consulta 2 del Entregable 2). Como $\rho_i(t)$ se mide contra el corte, si el cierre de 2025 está incompleto la recencia de todos sale inflada, y con ella $B_i(t)$, $X(t)$ y el riesgo por quintil. Las tres cifras (2.452 en riesgo, ARS 94,9 M/año, 51,8\% en Q5) quedan como referencia del tablero y se informan con la sensibilidad de la decisión DC-09 del Entregable 2; la causa de la caída la revisa Casa Óga con Operaciones y el proveedor del POS. Con las decisiones de calidad del Entregable 2, sobre 5.634 clientes con la identidad unida, el riesgo pasa a 50,4\% de los elegibles y la exposición a ARS 96,4 M/año. Con la base corregida del Entregable 2 y el corte al 31/08/2025, 38,5\% y ARS 77,7 M/año. Ninguna de estas cifras se repite sin esta salvedad.
 
 \section{Supuesto: la exposición no es recupero}
 \label{sec:exposicion-recupero}
