@@ -644,7 +644,7 @@ export const C3 = {
         "H49",
         "J50"
       ],
-      "guion": "El go-live es la primera lista, en la semana 6. Sale si cinco criterios dan sí: acciones legales hechas, extracto completo, target y operador aprobados, control y planilla aprobados, y 379 aciertos por mes, que el test ya cumple. En producción miramos cinco señales, cada una con su umbral. Por ejemplo, si la precisión baja de 72 % dos meses seguidos, se revisa el umbral.",
+      "guion": "El go-live es la primera lista, en la semana 6. Sale si cinco criterios dan sí: acciones legales hechas, extracto completo, target y operador aprobados, control y planilla aprobados, y 379 aciertos por mes, que el test ya cumple. En producción miramos cinco señales, cada una con su umbral. Por ejemplo, si la precisión baja de 72,0 % dos meses seguidos, se revisa el umbral.",
       "segundos": 35
     },
     {
