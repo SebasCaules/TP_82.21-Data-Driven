@@ -18,7 +18,8 @@
 // - Gráfico (V05_Simulador.jsx, TarjetaCostoBeneficio): dos barras, el costo del año 1 de la regla sola
 //   (USD 20.260, contexto) contra su beneficio anual (USD 299,49, --acc). La astilla del beneficio es el
 //   mensaje; la conclusión, arriba en .e3-conclusion, es la frase de la tarjeta «Económica» de la
-//   diapositiva 2 de C3. El costo con modelo y el presupuesto pasan a «Explorar», junto al simulador.
+//   diapositiva 2 de C3. (30/10, sin «Explorar») El costo con modelo y el presupuesto se ven en el anexo A6 y el
+//   simulador de la tasa de éxito, a la vista, en el anexo A3.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js y el texto de C3
 // (contenido_e3.js).
 

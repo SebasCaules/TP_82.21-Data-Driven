@@ -27,25 +27,19 @@
 //   a su intervalo; los extremos del intervalo, debajo de sus remates. La fila que decide, «Lista que
 //   sale», en --acc; la otra, en contexto (--e3-ctx-relleno, texto en --e3-ctx). La conclusión, arriba,
 //   con .e3-conclusion.
-// - Explorar (abre en «Diferencia»):
-//   - «Diferencia»: el mismo gráfico con las cuatro filas, validación (julio a septiembre de 2024, H06 y la
-//     validación de J09) y test. Validación pasó del gráfico de llegada a acá (28/10).
-//   - «Test»: precisión de la lista de 500 contactables por mes en los 5 cortes de test, la regla, la
-//     logística ajustada y la práctica actual (J03 y J17). verificar_e3.py lo abre por el nombre.
-//   - «Validación» y «Entrenamiento»: la lista de 500 sin filtrar por modelo de la Parte B (F07, F08, G11,
-//     G13 a G15; techo G12). La logística se rotula «de la Parte B» para no confundirla con la ajustada.
-//   «Diferencia» no contiene «Test» ni «Validación»: verificar_e3.py elige la opción por texto.
+// - (30/10, sin «Explorar») Lo que iba detrás de «Explorar» pasa al anexo A7, visible: la diferencia en
+//   validación y test (las cuatro filas, FILAS_TODAS, con este mismo gráfico, que se exporta) y la precisión de la
+//   lista de 500 contactables por corte en test (J03). La precisión de cada modelo de la Parte B en validación y en
+//   entrenamiento (G11, G13 a G15) sale de /e3/: la vista y el A7 deciden con el test, y esas barras están en la B 4.2.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y se escriben con formato.js. Las notas
 // (N) siguen leyendo el guion de las diapositivas 6 y 7 de C3 (vistas/index.jsx).
 
-import { useState } from 'react'
-import { Lienzo, BarrasH } from '../../../src/graficos.jsx'
+import { Lienzo } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
-import { NBSP, entero, fecha, fijo, mesAnio, pct, usd } from '../formato.js'
+import { NBSP, entero, fijo, mesAnio, pct, usd } from '../formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
-import { BotonExplorar, Opciones } from '../controles.jsx'
 import { Cifra } from '../cifra.jsx'
 import { anchoTexto } from '../medir.js'
 import './V04.css'
@@ -58,15 +52,15 @@ const SF = TE.sin_filtro       // J11: lista de 500 sin filtro, test
 const CO = TE.contra_regla     // J09: lista de 500 contactables, test (y su validación)
 const DE = TE.decision         // J10: el criterio de la C 6.2, fila 13, medido en test
 const MET = TE.metodos         // J03: precisión de cada método en test
-const SFV = L.modelo_menos_regla_500_sin_filtro   // H06: lista de 500 sin filtro, validación, logística ajustada
+const SFV = L.modelo_menos_regla_500_sin_filtro   // H06: lista de 500 sin filtro, validación, logística ajustada (title y A7)
 
 /** «enero a mayo de 2025»; con años distintos, los dos. */
 function periodo(desde, hasta) {
   const a = mesAnio(desde)
   return `${desde.slice(0, 4) === hasta.slice(0, 4) ? a.replace(/ de \d{4}$/, '') : a} a ${mesAnio(hasta)}`
 }
-const TEST = periodo(TE.conjunto.desde, TE.conjunto.hasta)
-const VALID = periodo(MD.validacion.desde, MD.validacion.hasta)
+export const TEST = periodo(TE.conjunto.desde, TE.conjunto.hasta)
+export const VALID = periodo(MD.validacion.desde, MD.validacion.hasta)
 
 const pp = (x) => fijo(x, 2, true)
 const intervalo = ([a, b]) => `${pp(a)} a ${pp(b)}`
@@ -111,14 +105,14 @@ const TITULO_PAGA = `El modelo agrega ${usd(DE.costo_incremental_usd)} al costo 
   `lista perfecta lo paga. En test suma ${fijo(CO.aciertos_extra_por_mes, 2, true)} aciertos por mes en la ` +
   `lista que sale y ${fijo(SF.aciertos_de_mas_por_mes, 2, true)} sin filtrar.`
 
-// Filas del gráfico. `decide`: la fila que decide, en --acc. `tenue`: validación, solo en Explorar.
+// Filas del gráfico. `decide`: la fila que decide, en --acc. `tenue`: validación, que se ve en el anexo A7.
 const NO_SALE = 'incluye a quien no acepta marketing'
 const SALE = `${entero(LARGO)} contactables por mes`
 const FILAS_TEST = [
   { id: 'sf', nombre: 'Sin filtrar', sub: NO_SALE, valor: SF.diferencia_pp, ic: SF.ic95_pp },
   { id: 'co', nombre: 'Lista que sale', sub: SALE, valor: CO.diferencia_pp, ic: CO.ic95_pp, decide: true },
 ]
-const FILAS_TODAS = [
+export const FILAS_TODAS = [
   { id: 'sfv', nombre: 'Sin filtrar · validación', sub: VALID, valor: SFV.diferencia_pp, ic: SFV.ic95_pp,
     tenue: true },
   { id: 'sf', nombre: 'Sin filtrar · test', sub: TEST, valor: SF.diferencia_pp, ic: SF.ic95_pp },
@@ -133,7 +127,7 @@ const marca = (t) => (t === 0 ? '0' : fijo(t, 0, true))
  * Diferencia con su intervalo, una fila por lista. Marcas gruesas para proyector; la línea del 0 es el
  * empate. `k`: escala de la letra (useEscalaTexto). Con más filas que alto, todo se achica junto (`s`).
  */
-function Diferencias({ filas, w, h, k, tituloEje }) {
+export function Diferencias({ filas, w, h, k, tituloEje }) {
   const pasoBruto = Math.min((h - 80 * k) / filas.length, 165 * k)
   const s = Math.max(0.72, Math.min(1, pasoBruto / (118 * k)))
   const f = k * s
@@ -241,57 +235,12 @@ function Diferencias({ filas, w, h, k, tituloEje }) {
   )
 }
 
-// Explorar: la diferencia en validación y test, o la precisión de la lista por método.
-const CONJUNTOS = [
-  { valor: 'diferencia', texto: 'Diferencia' },
-  { valor: 'test', texto: 'Test' },
-  { valor: 'validacion', texto: 'Validación' },
-  { valor: 'entrenamiento', texto: 'Entrenamiento' },
-]
-const NOMBRE = Object.fromEntries(MD.filas.map((f) => [f.id, f.nombre]))
-const nombreParteB = (f) => (f.id === 'logistica' ? 'Logística de la Parte B' : f.nombre)
-const BARRAS_TEST = [
-  { etiqueta: NOMBRE.practica_actual, valor: MET.practica_actual.test.precision },
-  { etiqueta: 'Logística ajustada', valor: MET.logistica_ajustada.test.precision },
-  { etiqueta: NOMBRE.regla_umbral, valor: MET.regla.test.precision, enfasis: true },
-]
-const LISTAS_TEST = TE.conjunto.cortes.length
-
 export const meta = { id: 'V04', dc: 'C-MOD' }
 
 export default function V04ModeloORegla() {
   const k = useEscalaTexto()
-  const [explorar, setExplorar] = useState(false)
-  const [conjunto, setConjunto] = useState('diferencia')
-  const ent = conjunto === 'entrenamiento'
-  const test = conjunto === 'test'
-  const dif = !explorar || conjunto === 'diferencia'
-  const barras = test ? BARRAS_TEST : MD.filas.filter((f) => f[conjunto]).map((f) => ({
-    etiqueta: nombreParteB(f),
-    valor: f[conjunto].precision,
-    enfasis: f.grupo === 'regla',
-  }))
-  const techo = MD.entrenamiento.techo_precision
-
-  let mide
-  let conclusion
-  if (!explorar) {
-    mide = `Logística menos regla, en puntos · lista de ${entero(LARGO)} por mes · test, ${TEST}`
-    conclusion = <>El intervalo de la lista que sale cruza el cero: <b>empate</b></>
-  } else if (dif) {
-    mide = "Logística menos regla, en puntos · validación y test"
-    conclusion = <>En validación ganaba la regla; en test, <b>empate</b></>
-  } else if (test) {
-    mide = `Precisión de la lista de ${entero(LARGO)} contactables por mes, en test`
-    conclusion = `${LISTAS_TEST} listas, de ${fecha(TE.conjunto.desde)} a ${fecha(TE.conjunto.hasta)}`
-  } else {
-    mide = `Precisión de la lista de ${entero(LARGO)} por mes, sin filtrar${ent ? ', en entrenamiento' : ''}`
-    conclusion = ent
-      ? `${MD.entrenamiento.cortes} cortes; techo ${pct(techo, 1)}`
-      : `${entero(MD.validacion.largo_lista)} lugares en ${MD.validacion.cortes} meses de validación`
-  }
-  // Las barras de precisión no llenan el alto: tope por fila, como antes (W2).
-  const tope = dif ? undefined : Math.round((barras.length * (test ? 70 : 56) + 56) * k)
+  const mide = `Logística menos regla, en puntos · lista de ${entero(LARGO)} por mes · test, ${TEST}`
+  const conclusion = <>El intervalo de la lista que sale cruza el cero: <b>empate</b></>
 
   return (
     <section className="pant v04">
@@ -322,29 +271,12 @@ export default function V04ModeloORegla() {
             <p className="e3-v04-mide">{mide}</p>
             <p className="e3-conclusion">{conclusion}</p>
           </div>
-          <div className="e3-v04-mandos">
-            {explorar && (
-              <Opciones etiqueta="Conjunto" valor={conjunto} onCambio={setConjunto} opciones={CONJUNTOS} />
-            )}
-            <BotonExplorar abierto={explorar}
-                           onCambio={(v) => { setExplorar(v); if (!v) setConjunto('diferencia') }} />
-          </div>
         </div>
-        <div className="e3-v04-lienzo" style={tope ? { maxHeight: tope } : undefined}>
+        <div className="e3-v04-lienzo">
           <Lienzo className="lienzo">
-            {({ w, h }) => (dif ? (
-              <Diferencias filas={explorar ? FILAS_TODAS : FILAS_TEST} w={w} h={h} k={k}
-                           tituloEje="Logística menos regla (puntos)" />
-            ) : (
-              <BarrasH
-                datos={barras} w={w} h={h}
-                formato={(v) => pct(v, 1)}
-                formatoEje={(v) => pct(v, 0)}
-                anchoEtiqueta={Math.round(270 * k)}
-                tituloEje={test ? 'Precisión de la lista en test' : 'Precisión de la lista'}
-                tope={1}
-              />
-            ))}
+            {({ w, h }) => (
+              <Diferencias filas={FILAS_TEST} w={w} h={h} k={k} tituloEje="Logística menos regla (puntos)" />
+            )}
           </Lienzo>
         </div>
       </div>

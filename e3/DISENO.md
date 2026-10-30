@@ -1,6 +1,7 @@
 # Diseño de la presentación E3 (`/e3/`)
 
-> **Desde el 28/10 manda la última sección, «Decisiones (28/10): auditoría de contraste y gráficos».** Las
+> **Desde el 30/10 manda la última sección, «Decisiones (30/10): sin Explorar, 11 vistas»; la del 28/10, «auditoría
+> de contraste y gráficos», sigue valiendo en lo que esa no cambia.** Las
 > de W1 y W2 (27/10) siguen valiendo en lo que esa no cambia. Las reglas transversales y la tabla por
 > diapositiva de abajo describen el escenario fijo de 1600 × 900, que se fue; quedan como referencia del
 > contenido de cada diapositiva (el código está en el commit `a06f88c`, `e3/src/diapositivas/`).
@@ -321,3 +322,77 @@ que se impone y dice qué significa, y un gráfico con un solo mensaje, con cont
   secundaria tinta 600 al 72/70 de la del E2; rótulo de la decisión × 1,06 en 700; fondo y borde de la
   decisión; qué mide del gráfico en `--e3-ctx`; conclusión del gráfico en tinta 700, al menos 1,3 veces el
   rótulo del E2). Cualquier otra diferencia con /e2/ sigue fallando.
+
+## Decisiones (30/10): sin Explorar, 11 vistas
+
+Pedido del usuario: «no me gusta que haya un botón Explorar en cada slide, ocultás información clave que pedía la
+cátedra». Regla: **denso está bien, oculto no.** Ninguna vista ni anexo tiene «Explorar» ni contenido detrás de un
+clic; sale `BotonExplorar` de `controles.jsx` y `.e3-explorar` de `estilos_e3.css`. El único control a la vista es el
+simulador de la tasa de éxito del anexo A3.
+
+### Las vistas
+
+La Parte D sigue el orden de la lámina 23 de la clase 13: primero el diseño y los criterios de go-live, después el
+piloto y el plan. Cada vista nueva sale de su diapositiva de C3 (13 a 16 de `contenido.py`).
+
+| # | Pregunta | Qué muestra | Fuente |
+|---|---|---|---|
+| 1 | ¿Conviene anticipar a quien deja de comprar? | igual | D 11.1 |
+| 2 | ¿Quién se va? | igual | A 2 |
+| 3 | ¿Se puede hacer? | igual, sin el MVP (pasa a la 8) | A 1.1 a 1.5 |
+| 4 | ¿El modelo mejora a la regla? | igual al llegar; la validación y las precisiones, al A7 | B, C, D 8 |
+| 5 | ¿Se paga? | igual; el costo con modelo al A6 y el simulador al A3 | B 3 |
+| 6 | ¿Es legal y seguro? | la barra del 30,1 % y, al lado, el plan L1 a L6 con dueño y tramo; abajo, las cinco dimensiones en una línea y las normas | C 5 y 6 |
+| 7 | ¿Qué solución? | banda con la precisión en test (regla 86,1 %, modelo 85,9 %, orden de hoy 37,6 %) y decisión «Solución · propuesta»; tabla de la escalera de la lámina 4 con las alternativas de la D 9.1 (qué resuelve, costo, qué deja sin resolver, ¿se adopta?) | D 9.1 |
+| 8 | ¿Cómo funciona cada mes? | sin banda: flujo de seis etapas (D 9.2 y Anexo 1), quién usa y qué decide (9.3 y 9.4) y alcance de la primera versión con el MVP (9.5; A 1.6) | D 9.2 a 9.5 |
+| 9 | ¿Qué tiene que estar listo para el go-live? | sin banda: los cinco criterios de la 10.3 con los requerimientos que bloquean de la 10.1 y su responsable, cómo se verifican, quién aprueba y en qué semana; el monitoreo de la 10.2 con umbral y acción (drift incluido) | D 10 |
+| 10 | ¿Qué decide María G. con el piloto? | la 7 de antes, sin «Explorar» (`V10_Piloto.jsx`, clases `e3-v07-*`) | D 11.1 y 12 |
+| 11 | ¿Cómo se llega? | sin banda: fases con su barra, responsable y cierre; hitos con semana, responsable y evidencia; precondiciones por plazo (marcadas, las que decide María G.); roles | D 12 |
+
+Las vistas 8, 9 y 11 no llevan banda: son tablas y el flujo, y con la banda no entraban a 1366 × 768 sin cortar
+celdas. La 7 sí, porque su tabla entra.
+
+### Lo que iba detrás de «Explorar»
+
+| Antes | Ahora |
+|---|---|
+| Vista 3: el MVP | vista 8, fila «Entra» del alcance (USD 0 en licencias y 1 computadora) |
+| Vista 4: diferencia en validación y test (cuatro filas) y precisión de cada método | anexo A7, arriba (el gráfico de la vista 4, exportado, y una tabla de precisión en validación y test) |
+| Vista 4: precisión de los modelos de la Parte B en validación y entrenamiento | sale: la vista y el A7 deciden con el test; está en la B 4.2 |
+| Vista 5: costo con modelo y presupuesto | anexo A6 (la tabla trae el total con modelo y el presupuesto) |
+| Vista 5: simulador de la tasa de éxito | anexo A3, arriba de la tabla, a la vista |
+| Vista 6: cinco dimensiones | vista 6, una línea al pie |
+| Vista 6: plan L1 a L6 | vista 6, al lado de la barra |
+| Vista 6: matriz de 13 riesgos | anexo A4 (la tabla); la señal y el umbral de los críticos, en el monitoreo de la vista 9 |
+| Vista 7: qué decide María G. y en qué semana | vista 11, precondiciones marcadas e hitos |
+| Vista 7: flujo de cada mes | vista 8 |
+| Vista 7: plan de 20 semanas | vista 11, tabla de fases |
+| A2: selector de filtro y largo | sale: la tabla ya trae cada forma de cortar la lista |
+| A7: matrices de test | A7, abajo, junto a las de validación |
+
+### Reglas nuevas
+
+- **Tablas sin cortar.** Las vistas 7, 8, 9 y 11 usan `TablaSvg` (`Respaldo.jsx`) con `tope = Infinity`: la letra baja
+  hasta que la tabla entra y ninguna celda se corta. El svg lleva `data-cortado` si alguna celda se cortó,
+  `data-desborda` si no entra y `data-letra` con la letra final; `verificar_e3.py` falla con cualquiera de los dos o
+  con letra menor a 9 px lógicos. `vistas/piezas.jsx` junta las piezas comunes (título en mono, bloque con tabla,
+  párrafo envuelto); no es una vista.
+- **Ninguna cifra a mano.** Los números de las vistas nuevas salen de D3. Lo que faltaba entró a `build_e3.py` con su
+  ancla: `D3.solucion` (60 %, 20 %, 7 días, 2 talleres, 50 %, 8 horas, 15 decisiones: H46, G50, G32, G37, F15) y
+  `D3.plan.hitos` y `plazos` (D 12.2 y 12.3, J50). Contrato: `pipeline/CONTRACT_E3.md`.
+- **Riel.** Con 11 vistas y 7 anexos el riel del E2 pisaba su pie a 1366 × 768. Los anexos y su rótulo de grupo van
+  más juntos (`.e3-vp .lat-item.e3-lat-anexo`): mismo ancho y misma letra, 1 px de relleno vertical. Queda aire de
+  21 px a 1152 × 640 y de 8 px con las notas abiertas a 1366 × 768 y 1536 × 864.
+- **Guion.** Sale de `contenido.py` de la presentación (diapositivas 13 a 16 nuevas; la 12, el piloto, la dice
+  Francisco C.). Reparto: Sebastian C. 1, 2 y 11; Tomas F. 3 y 8; Juan Manuel R. 4 y 7; Francisco C. 5 y 10; Matías S.
+  6 y 9. 789 palabras, 5:16 a 150 palabras por minuto; 7:30 con la cuenta del guion (130 por minuto, un número cuenta
+  tres, 3 s por diapositiva), dentro del tope de 8:00. Cadena: `contenido.py` → `../dossiers/guion-presentacion-e3/armar.py
+  --app <app>` (tiempos) → `exportar_web.py --app <app>` → `python3 -I pipeline/build_e3.py`.
+
+### Verificación (desde el 30/10)
+
+- `verificar_e3.py --sin-esqueletos`: las 11 vistas y los 7 anexos a cinco resoluciones; falla si hay un `.e3-explorar`,
+  la palabra «Explorar» en pantalla, controles fuera del A3 o una tabla cortada o desbordada; lo que iba detrás de
+  «Explorar» se busca donde quedó.
+- `paridad_e3.py --sin-hoja`: la regla 4 recorre las 18 entradas del riel y falla con «Explorar».
+- `verificar.py --web` (vault, presentación): cada número visible contra las partes A a D.

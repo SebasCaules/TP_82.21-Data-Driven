@@ -7,8 +7,9 @@
 //    pantalla en negro hasta la próxima tecla; una tecla mantenida no recorre el tablero.
 // 3. Dos ventanas con la misma dirección se siguen (BroadcastChannel): la del proyector y la de la
 //    laptop con las notas, en panel (N) o solas (?notas).
-// Sin controles a la vista: lo que una vista deje tocar va detrás de «Explorar» (controles.jsx),
-// cerrado al llegar.
+// (30/10) Sin «Explorar»: cada vista llega completa y nada se esconde detrás de un clic. El único control a la
+// vista es el simulador de la tasa de éxito del anexo A3 (controles.jsx). Los anexos van más juntos en el riel
+// (e3-lat-anexo, estilos_e3.css) para que entren las once vistas y los siete anexos.
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -357,9 +358,9 @@ function Lateral({ indice, irA }) {
           const abre = grupo.nombre && (i === 0 || grupoDe(VISTAS[i - 1]) !== grupo)
           return (
             <li key={v.id}>
-              {abre && <div className="lat-grupo"><span>{grupo.nombre}</span></div>}
+              {abre && <div className={`lat-grupo${v.respaldo ? ' e3-lat-anexo' : ''}`}><span>{grupo.nombre}</span></div>}
               <button type="button" onClick={() => irA(i)}
-                      className={`lat-item${i === indice ? ' on' : ''}`}
+                      className={`lat-item${i === indice ? ' on' : ''}${v.respaldo ? ' e3-lat-anexo' : ''}`}
                       aria-current={i === indice ? 'page' : undefined}>
                 <span className="lat-n tabular">{etiquetaDe(v)}</span>
                 <span className="lat-txt">{v.corto}</span>
