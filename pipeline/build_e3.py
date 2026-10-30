@@ -767,6 +767,26 @@ FASES_PLAN = [("gobierno", "Precondiciones de gobierno", 1, 2),
 # (28/10, F6b) designa_l1: María G. designa quién inscribe las bases en la AAIP en la semana 2 (D v1.3, 12.3 y 12.4).
 HITOS_PLAN = {"alcance": 1, "regla_y_operador_del_piloto": 2, "designa_l1": 2, "acciones_legales_y_control": 4,
               "extracto_regenerado": 6, "go_live": 6, "operador_despues_del_piloto": 13, "decision": 20}
+# (30/10, /e3/ sin «Explorar», vista 11) D 12.2: los ocho hitos en su orden, cada uno con la clave de HITOS_PLAN que
+# da su semana (los hitos 3 y 4 caen los dos en la semana 4; el 5 y el 6, en la 6). D 12.3 y 10.1: los plazos que no
+# son hitos (registro J50, «Plazos de las precondiciones»): aviso de regeneración y negociación de L2 en la semana 5,
+# talleres en las semanas 5 y 19.
+HITOS_D = [(1, "alcance"), (2, "regla_y_operador_del_piloto"), (3, "acciones_legales_y_control"),
+           (4, "acciones_legales_y_control"), (5, "extracto_regenerado"), (6, "go_live"),
+           (7, "operador_despues_del_piloto"), (8, "decision")]
+PLAZOS_PLAN = {"aviso_extracto": 5, "adenda_crm_desde": 5, "talleres": [5, 19]}
+# (30/10, /e3/ sin «Explorar», vistas 7 a 9) D v1.5, secciones 9 y 10: constantes del diseño de la solución que las
+# vistas escriben y que no vienen en los JSON de las partes. Cada una con su fila del registro de cifras:
+# - completitud_minima: el pipeline frena un mes con menos del 60 % de las operaciones del mismo mes del año anterior
+#   (D 9.2, 10.1, 10.2 y 10.3; A 1.5, DC-09; H46).
+# - alto_valor: el control se sortea fuera del 20 % de mayor facturación (D 9.2, 9.5, 10.1, 10.3; G50).
+# - oferta_dias: el 15 % de descuento vence a los 7 días (D 9.2 y 9.5; G32).
+# - talleres: dos talleres, equipo de Sofía R. y operador elegido (D 9.5 y 10.1; G37).
+# - alerta_adopcion: menos de 50 % de la lista contactada dispara la revisión (D 10.2; H46).
+# - horas_carga_crm: importar la lista al CRM si la carga manual pasa las 8 horas por mes (D 9.5; H46).
+# - decisiones_calidad: el pipeline aplica las 15 decisiones de calidad del E2 (D 9.2; F15).
+SOLUCION = {"completitud_minima": 0.60, "alto_valor": 0.20, "oferta_dias": 7, "talleres": 2,
+            "alerta_adopcion": 0.50, "horas_carga_crm": 8, "decisiones_calidad": 15}
 
 
 def cargar_e1() -> dict:
@@ -1223,8 +1243,17 @@ def armar_plan() -> dict:
     fases = [{"id": i, "nombre": n, "desde_semana": a, "hasta_semana": b, "semanas": b - a + 1,
               "desde": inicio(a), "hasta": fin(b)} for i, n, a, b in FASES_PLAN]
     plan = {"semana_1": SEMANA_1, "fases": fases, "semanas": max(f["hasta_semana"] for f in fases),
-            "hitos_semana": HITOS_PLAN}
+            "hitos_semana": HITOS_PLAN,
+            "hitos": [{"n": n, "clave": k, "semana": HITOS_PLAN[k], "desde": inicio(HITOS_PLAN[k])} for n, k in HITOS_D],
+            "plazos": PLAZOS_PLAN}
     f = {x["id"]: x for x in fases}
+    ancla("J50", "plan: semana de cada hito", " · ".join(str(h["semana"]) for h in plan["hitos"]),
+          "1 · 2 · 4 · 4 · 6 · 6 · 13 · 20", donde="D 12.2")
+    ancla("J50", "plan: aviso del extracto y adenda del CRM (semana)",
+          f"{PLAZOS_PLAN['aviso_extracto']} y {PLAZOS_PLAN['adenda_crm_desde']}", "5 y 5", donde="D 12.3")
+    ancla("J50", "plan: talleres (semanas)", " y ".join(map(str, PLAZOS_PLAN["talleres"])), "5 y 19", donde="D 10.1")
+    ancla("J50", "plan: primera lista en el go-live, el lunes de la semana 6",
+          inicio(HITOS_PLAN["go_live"]), "2026-12-07", donde="D 12.2 (07/12/2026)")
     ancla("J50", "plan: semanas de cada fase", " · ".join(str(x["semanas"]) for x in fases), "2 · 3 · 4 · 1 · 13 · 2",
           donde="D 12.1")
     ancla("J50", "plan: semanas en total", plan["semanas"], "20", 0, donde="D 12.1")
@@ -1238,6 +1267,18 @@ def armar_plan() -> dict:
           f["piloto"]["desde_semana"] < HITOS_PLAN["operador_despues_del_piloto"] < f["piloto"]["desde_semana"] + 8 + 1,
           True, donde="D 12.2 (C 6.3, riesgo 2)")
     return plan
+
+
+def armar_solucion() -> dict:
+    s = dict(SOLUCION)
+    ancla("H46", "solución: completitud mínima del mes (%)", s["completitud_minima"], "60", 0, 100, donde="D 9.2 y 10.3")
+    ancla("G50", "solución: control fuera del alto valor (%)", s["alto_valor"], "20", 0, 100, donde="D 9.2 y 9.5")
+    ancla("G32", "solución: la oferta vence a los (días)", s["oferta_dias"], "7", 0, donde="D 9.2 y 9.5")
+    ancla("G37", "solución: talleres", s["talleres"], "2", 0, donde="D 9.5 y 10.1")
+    ancla("H46", "solución: alerta de adopción (%)", s["alerta_adopcion"], "50", 0, 100, donde="D 10.2")
+    ancla("H46", "solución: carga manual que justifica el CRM (horas/mes)", s["horas_carga_crm"], "8", 0, donde="D 9.5")
+    ancla("F15", "solución: decisiones de calidad del pipeline", s["decisiones_calidad"], "15", 0, donde="D 9.2")
+    return s
 
 
 def armar_monitoreo(drift: dict) -> dict:
@@ -1310,6 +1351,7 @@ def main() -> int:
         "legal": armar_legal(e1, c3),
         "test": armar_test(e4, v4, eco, e3),
         "plan": armar_plan(),
+        "solucion": armar_solucion(),
         "monitoreo": armar_monitoreo(drift),
     }
 

@@ -1,5 +1,8 @@
-// V07 · ¿Qué decide María G. con el piloto? (Parte D 9, 11.1 y 12; diapositiva 12 de C3).
-// W3, 27/10; rehecha el 28/10 (unidad V07 de .workforce/PLAN.md y sus «Correcciones del crítico»).
+// V10 · ¿Qué decide María G. con el piloto? (Parte D 9, 11.1 y 12; diapositiva 12 de C3).
+// W3, 27/10; rehecha el 28/10 (unidad V07 de .workforce/PLAN.md y sus «Correcciones del crítico»). (30/10) Pasa de
+// vista 7 a vista 10 y pierde «Explorar»: lo que decide María G. y en qué semana va a la vista 11 (el plan, D 12),
+// el flujo de cada mes a la vista 8 (D 9.2) y el plan de 20 semanas a la vista 11. Archivo: V10_Piloto.jsx y V10.css
+// (antes V07_ParteD.jsx y V07.css); las clases siguen siendo e3-v07-* para no tocar lo que ya se verificó.
 // Misma forma que las demás: banda de cifras con la tarjeta de decisión a la derecha y un gráfico a todo
 // el ancho debajo.
 //
@@ -20,24 +23,17 @@
 //   de cero, no una decisión. Hasta el 28/10 había tres franjas (la del medio decía «contactar funciona,
 //   pero la lista no se paga») y una llave flotante encima. Las marcas 2,87 y 40,4 van grandes sobre su
 //   línea; el texto de cada zona, adentro de su zona. Conclusión arriba, en .e3-conclusion, sin cifra.
-// - Explorar, cerrado al llegar, con tres paneles: lo que decide María G. y en qué semana (las filas de la
-//   D 12.3 que son suyas, 12.4, con las semanas de D3.plan.hitos_semana; hasta el 28/10 iba al lado del
-//   gráfico y competía con la regla), el flujo de cada mes (la tabla 9.2 de la Parte D) y el plan de 20
-//   semanas (J50, sección 12). Lo que antes iba al pie va al title (regla 12 del E2).
-// Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js). Los textos del flujo y de los pedidos
-// resumen las tablas 9.2, 12.3 y 12.4 de la Parte D hasta que C3 los traiga (W4).
+// Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js).
 
-import { useState } from 'react'
 import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
 import { NBSP, entero, fecha, fijo, pct } from '../formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
-import { BotonExplorar, Opciones } from '../controles.jsx'
 import { Cifra } from '../cifra.jsx'
 import { anchoTexto as ancho } from '../medir.js'
-import './V07.css'
+import './V10.css'
 
 const P = D3.piloto
 const PL = D3.plan
@@ -72,21 +68,6 @@ const DECISION = decision('D-PIL', {
     + `el piloto distingue de cero una diferencia de ${T_MDE} puntos o más.`,
 })
 
-// Lo que decide María G. y en qué semana: las filas de la D 12.3 a su cargo (12.4), en el orden del plan.
-const PEDIDOS = [
-  { t: 'El alcance: regla sin modelo y piloto con control', s: HS.alcance },
-  { t: 'La regla del target, con revisión de Sofía R.', s: HS.regla_y_operador_del_piloto },
-  // (28/10, F6b) La D v1.3 (12.3 y 12.4): María G. designa quién inscribe las bases en la semana 2, para que la
-  // inscripción (L1) esté en la 4. Hasta la v1.2 la fila decía la semana 4.
-  { t: 'Quién inscribe las bases en la AAIP', s: HS.designa_l1 },
-  { t: 'Quién opera la lista después del piloto', s: HS.operador_despues_del_piloto },
-  { t: `Si pasa a producción, con ${T_PAGA} puntos o más`, s: HS.decision },
-]
-const TITULO_PEDIDOS = `Parte D 12.3 y 12.4. En la semana ${HS.regla_y_operador_del_piloto} María G. también aprueba `
-  + 'quién opera el piloto (el equipo consultor), firma el acuerdo de confidencialidad y aprueba la política de '
-  + `retención. El grupo de control, ${entero(P.control_mes)} por mes fuera del 20${NBSP}% de mayor facturación, lo `
-  + `aprueba Sofía R. en la semana ${HS.regla_y_operador_del_piloto}.`
-
 const TITULO_PILOTO = `Piloto de ${P.meses} meses, una lista de ${entero(P.lista_mes)} por mes: ${entero(P.contactados_mes)} `
   + `contactados y ${entero(P.control_mes)} de control cada mes, ${entero(P.tratados)} y ${entero(P.control)} en total. `
   + `Con ese tamaño, el piloto distingue de cero una diferencia de ${T_MDE} puntos o más.`
@@ -95,10 +76,6 @@ const TITULO_PAGA = `Para pasar a producción, al cierre del mes ${entero(P.mese
 const TITULO_PLAN = `Plan del proyecto: ${semanas(PL.semanas)} desde el ${fecha(PL.semana_1)}. `
   + PL.fases.map((f) => `${f.nombre}, ${rango(f)}`).join('; ')
   + `. La primera lista sale el ${fecha(PILOTO.desde)}; María G. decide el ${fecha(DECIDE.hasta)}.`
-const TITULO_FLUJO = `Parte D 9.2. Una lista por mes, ${P.meses} en total, desde el ${fecha(PILOTO.desde)}; el piloto `
-  + `cierra el ${fecha(PILOTO.hasta)}. Lo que se mide reemplaza el ${pct(E.parametros.s_observada, 2)} de compra que `
-  + 'hoy se ve sin grupo de control.'
-
 // Textos del gráfico. La conclusión dice lo que muestra el dibujo, sin cifra (la cifra va en la banda y en la
 // marca): la zona de producción empieza muy a la derecha del cero.
 const CONCLUSION = 'A producción solo si los contactados compran mucho más que el control'
@@ -108,7 +85,7 @@ const Z2_QUE = 'a producción'
 const Z2_POR = 'la lista se paga'
 const SUB = 'no se distingue de cero'
 
-export const meta = { id: 'V07', dc: 'D-PIL' }
+export const meta = { id: 'V10', dc: 'D-PIL' }
 
 // ---------------------------------------------------------------- texto en SVG
 
@@ -271,159 +248,11 @@ function ReglaPiloto({ w, h, k }) {
   )
 }
 
-// ---------------------------------------------------------------- Explorar: lo que decide María G. (D 12.3 y 12.4)
-
-function Pedidos() {
-  return (
-    <div className="e3-v07-panel" title={TITULO_PEDIDOS}>
-      <ol className="e3-v07-pedidos">
-        {PEDIDOS.map((p) => (
-          <li key={p.t}>
-            <span className="e3-v07-sem tabular">{`semana${NBSP}${p.s}`}</span>
-            <span className="e3-v07-ped">{p.t}</span>
-          </li>
-        ))}
-      </ol>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------- Explorar: el flujo de cada mes (D 9.2)
-
-const QUIEN_EQUIPO = 'El equipo, en el piloto'
-const PASOS = [
-  { titulo: 'Exportar', texto: 'Los archivos del mes, con un mismo corte, a una carpeta restringida',
-    quien: 'Lucía O., Operaciones' },
-  { titulo: 'Preparar', texto: 'Por cliente: días sin comprar, ritmo habitual y umbral; frena un mes incompleto',
-    quien: QUIEN_EQUIPO },
-  { titulo: 'Ordenar', texto: `La regla toma los ${entero(P.lista_mes)} contactables más cerca de su umbral, sin modelo`,
-    quien: QUIEN_EQUIPO, enfasis: true },
-  { titulo: 'Entregar', texto: `Planilla con ${entero(P.control_mes)} de control, resumen por local y tablero del mes`,
-    quien: 'El equipo; el resumen por local, Sofía R.' },
-  { titulo: 'Contactar', texto: `Sofía R. excluye con motivo; Marketing escribe por WhatsApp con ${pct(E.parametros.descuento, 0)} de descuento`,
-    quien: 'Sofía R.' },
-  { titulo: 'Medir', texto: `Compra a 7 días de contactados y control; a los ${entero(D3.caso.ventana_dias)} días, quién cruzó su umbral`,
-    quien: 'Juan Manuel R.' },
-]
-
-function FlujoMes() {
-  return (
-    <div style={{ flex: '1 1 0', minHeight: 0, marginTop: 'clamp(6px, 1.6cqh, 20px)', display: 'flex',
-                  flexDirection: 'column', justifyContent: 'center', gap: 'clamp(8px, 2cqh, 22px)' }}>
-      <ol style={{ display: 'grid', gridTemplateColumns: `repeat(${PASOS.length}, minmax(0, 1fr))`,
-                   gap: 'clamp(6px, 0.8cqw, 14px)', margin: 0, padding: 0, listStyle: 'none' }}>
-        {PASOS.map((p, i) => (
-          <li key={p.titulo} style={{ minWidth: 0, display: 'flex', flexDirection: 'column', border: '1px solid var(--bd)',
-                                      borderTop: `3px solid ${p.enfasis ? ACC : 'var(--azul3)'}`,
-                                      padding: 'clamp(6px, 1.4cqh, 14px) clamp(8px, 0.9cqw, 14px)' }}>
-            <span className="kpi-lbl"><span>{`${i + 1} · ${p.titulo}`}</span></span>
-            <p className="e2-nota" style={{ color: 'var(--ink)' }}>{p.texto}</p>
-            <p className="e2-nota" style={{ marginTop: 'auto', paddingTop: 'clamp(4px, 1cqh, 10px)' }}>{p.quien}</p>
-          </li>
-        ))}
-      </ol>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------- Explorar: el plan de 20 semanas (D 12)
-
-function PlanSemanas({ w, h, k }) {
-  const fEtq = 13.5 * k
-  const fVal = 12.5 * k
-  const fHito = 12.5 * k
-  const fTick = 10.5 * k
-  const fTit = 11 * k
-  const N = PL.semanas
-  const x0 = Math.max(...PL.fases.map((f) => ancho(f.nombre, fEtq, f.id === 'piloto' ? 700 : 400))) + 14 * k
-  const padR = Math.round(4 * k)
-  const x = (s) => x0 + (s / N) * (w - x0 - padR)        // s: semanas cumplidas, de 0 a N
-
-  const hitos = [
-    { s: PL.hitos_semana.go_live - 1, t: `primera lista · ${fecha(PILOTO.desde)}`, ancla: 'start' },
-    { s: PL.hitos_semana.decision, t: `decide María G. · ${fecha(DECIDE.hasta)}`, ancla: 'end' },
-  ]
-  const yHito = Math.ceil(fHito * 0.4) + 2 + fHito
-  const top = yHito + 10 * k
-  const yBase = h - (5 + fTick + 8 * k + fTit + 6 * k)
-  const paso = (yBase - top) / PL.fases.length
-  const alto = Math.min(paso * 0.62, 30 * k)
-  const marcas = [1, ...[5, 10, 15, 20].filter((s) => s <= N && s > 1)]
-
-  return (
-    <svg width={w} height={h} role="img" style={{ display: 'block' }} aria-label={TITULO_PLAN}>
-      {PL.fases.map((f, i) => {
-        const y = top + i * paso + (paso - alto) / 2
-        const xa = x(f.desde_semana - 1)
-        const xb = x(f.hasta_semana)
-        const enfasis = f.id === 'piloto'
-        const txt = semanas(f.semanas)
-        const wt = ancho(txt, fVal, 600)
-        // La duración, adentro de la barra si entra; si no, a la derecha; y si tampoco, a la izquierda.
-        const lugar = xb - xa >= wt + 12 * k ? 'adentro' : xb + 7 * k + wt <= w ? 'derecha' : 'izquierda'
-        const xt = lugar === 'adentro' ? (xa + xb) / 2 : lugar === 'derecha' ? xb + 7 * k : xa - 7 * k
-        return (
-          <g key={f.id}>
-            <title>{`${f.nombre}: ${rango(f)}, del ${fecha(f.desde)} al ${fecha(f.hasta)}`
-              + (enfasis ? `. Quién opera después del piloto se elige en la semana ${PL.hitos_semana.operador_despues_del_piloto}.` : '')}</title>
-            <text x={x0 - 9 * k} y={y + alto / 2} fontSize={fEtq} fill={enfasis ? INK : MUT2} textAnchor="end"
-                  fontWeight={enfasis ? 700 : 400} dominantBaseline="central">{f.nombre}</text>
-            <rect x={xa} y={y} width={Math.max(1, xb - xa)} height={alto} fill={enfasis ? ACC : GRIS} />
-            <text x={xt} y={y + alto / 2} fontSize={fVal} fontWeight={600} dominantBaseline="central"
-                  fill={lugar === 'adentro' ? '#fff' : INK} className="tabular"
-                  textAnchor={lugar === 'adentro' ? 'middle' : lugar === 'derecha' ? 'start' : 'end'}>{txt}</text>
-          </g>
-        )
-      })}
-
-      {hitos.map((m) => (
-        <g key={m.t}>
-          <line x1={x(m.s)} x2={x(m.s)} y1={yHito + 4 * k} y2={yBase} stroke={INK} strokeWidth="1.25" strokeDasharray="4 3" />
-          <text x={x(m.s) + (m.ancla === 'start' ? 5 * k : 0)} y={yHito} fontSize={fHito} fontWeight={700} fill={INK}
-                textAnchor={m.ancla} className="tabular">{m.t}</text>
-        </g>
-      ))}
-
-      <line x1={x0} x2={x0} y1={top} y2={yBase} stroke={EJE} strokeWidth="1" />
-      <line x1={x0} x2={x(N)} y1={yBase} y2={yBase} stroke={EJE} strokeWidth="1" />
-      {Array.from({ length: N + 1 }, (_, s) => (
-        <line key={s} x1={x(s)} x2={x(s)} y1={yBase} y2={yBase + 4} stroke={EJE} strokeWidth="1" />
-      ))}
-      {marcas.map((s) => (
-        <text key={s} x={x(s - 0.5)} y={yBase + 5 + fTick} fontSize={fTick} fill={MUT} textAnchor="middle"
-              className="tabular">{s}</text>
-      ))}
-      <TituloEje x={x(N)} y={yBase + 5 + fTick + 8 * k + fTit} f={fTit}
-                 texto={`semana del proyecto, desde el ${fecha(PL.semana_1)}`} />
-    </svg>
-  )
-}
-
-
 // ---------------------------------------------------------------- la vista
 
-const OPCIONES = [
-  { valor: 'decide', texto: 'Qué decide' },
-  { valor: 'flujo', texto: 'El flujo' },
-  { valor: 'plan', texto: 'El plan' },
-]
-
-export default function V07ParteD() {
+export default function V10Piloto() {
   const k = useEscalaTexto()
-  const [abierto, setAbierto] = useState(false)
-  const [panel, setPanel] = useState('decide')
-  // Tocado con el mouse, el control cambia y suelta el foco: las flechas siguen pasando de vista.
-  const soltar = (e) => { if (e.detail) e.target.closest?.('button')?.blur() }
-  const cab = !abierto
-    ? { mide: `Compra a 7 días al cierre del mes ${entero(P.meses)} · semana${NBSP}${PILOTO.hasta_semana}`, conclusion: CONCLUSION }
-    : panel === 'decide'
-      ? { mide: 'Del alcance a la decisión final', conclusion: 'Lo que decide María G. y en qué semana' }
-      : panel === 'flujo'
-        ? { mide: 'La lista sale con la regla', conclusion: 'Cada mes del piloto, de la exportación a la medición' }
-        : { mide: `Piloto del ${fecha(PILOTO.desde)} al ${fecha(PILOTO.hasta)}`,
-            conclusion: `Plan del proyecto: ${semanas(PL.semanas)}` }
-  const titulo = !abierto ? undefined
-    : panel === 'decide' ? TITULO_PEDIDOS : panel === 'flujo' ? TITULO_FLUJO : TITULO_PLAN
+  const cab = { mide: `Compra a 7 días al cierre del mes ${entero(P.meses)} · semana${NBSP}${PILOTO.hasta_semana}`, conclusion: CONCLUSION }
   return (
     <section className="pant v07">
       <Banda dcs={[DECISION]}>
@@ -454,31 +283,18 @@ export default function V07ParteD() {
         </div>
       </Banda>
 
-      <div className="tarjeta e3-v07-graf" title={titulo}>
+      <div className="tarjeta e3-v07-graf">
         <div className="e3-v07-cab">
           <div className="e3-v07-txt">
             <p className="e3-v07-mide tabular">{cab.mide}</p>
             <p className="e3-conclusion">{cab.conclusion}</p>
           </div>
-          <span className="e3-v07-ctrl" onClick={soltar}>
-            {abierto && <Opciones etiqueta="Qué mostrar" valor={panel} onCambio={setPanel} opciones={OPCIONES} />}
-            <BotonExplorar abierto={abierto} onCambio={(v) => { setAbierto(v); if (!v) setPanel('decide') }} />
-          </span>
         </div>
-
-        {!abierto ? (
-          <div className="e3-v07-lienzo">
-            <Lienzo className="lienzo">
-              {({ w, h }) => <ReglaPiloto w={w} h={h} k={k} />}
-            </Lienzo>
-          </div>
-        ) : panel === 'decide' ? <Pedidos /> : panel === 'flujo' ? <FlujoMes /> : (
-          <div className="e3-v07-lienzo">
-            <Lienzo className="lienzo">
-              {({ w, h }) => <PlanSemanas w={w} h={h} k={k} />}
-            </Lienzo>
-          </div>
-        )}
+        <div className="e3-v07-lienzo">
+          <Lienzo className="lienzo">
+            {({ w, h }) => <ReglaPiloto w={w} h={h} k={k} />}
+          </Lienzo>
+        </div>
       </div>
     </section>
   )

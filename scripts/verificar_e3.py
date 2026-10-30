@@ -66,6 +66,16 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
    plan y los riesgos (vista 6) y lo que decide María G. con su semana (vista 7, «Qué decide»), que ya no está
    al llegar.
 
+(30/10, e3/DISENO.md, «Decisiones (30/10): sin Explorar, 11 vistas») Once vistas (V01 a V11) y los anexos A1 a A7, sin
+«Explorar». Lo que arriba dice «Explorar» se lee así: hoy no hay ningún botón ni contenido detrás de un clic, y el
+verificador falla si aparece un .e3-explorar o la palabra «Explorar» en pantalla, en cualquier vista o anexo. Los
+controles a la vista (botones de opción y deslizante) solo se admiten en el A3, el simulador de la tasa de éxito. Lo que
+iba detrás de «Explorar» se busca donde quedó (respaldo_esperado): la diferencia en validación y la precisión de cada
+método, en el A7; el MVP, en la vista 8; el plan legal y las dimensiones, en la 6 al llegar; los 13 riesgos, en el A4; lo
+que decide María G. con su semana, en la 11; el costo con modelo, en el A6; el simulador, en el A3. Las vistas 8, 9 y 11
+no tienen banda (son tablas y el flujo, a todo el alto); la 7 sí. En las vistas 6 a 11 y en el A7 ninguna tabla corta
+una celda (data-cortado) ni desborda (data-desborda), y la letra de cada tabla no baja de 9 px lógicos.
+
 Termina con «E3 OK» o con la lista de problemas y código 1.
 """
 from __future__ import annotations
@@ -86,7 +96,7 @@ HTML = APP / "dist-e3" / "index.html"
 RES = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
 CAPTURAR = {(1280, 720), (1920, 1080)}
 NOTAS_RES = {(1366, 768), (1536, 864)}   # laptops donde se ensaya con el panel de notas
-HISTORIA = [f"v{i:02d}" for i in range(1, 8)]   # W3: las vistas 7 a 9 del plan van en una, la V07
+HISTORIA = [f"v{i:02d}" for i in range(1, 12)]   # (30/10) once vistas, sin «Explorar»
 RESPALDO = [f"a{i}" for i in range(1, 8)]
 VISTAS = HISTORIA + RESPALDO
 SRC = APP / "e3" / "src"
@@ -109,8 +119,16 @@ CHEQUEO = r"""() => {
     if (s.getClientRects().length > 1 || s.getBoundingClientRect().height > lh * 1.5)
       p.push(`rótulo de la banda en dos renglones: «${s.textContent}»`)
   }
-  if (!esqueleto && document.querySelector('.cuerpo [role=slider], .cuerpo .e3-opciones'))
-    p.push('controles a la vista sin abrir «Explorar»')
+  // (30/10) Sin «Explorar»: ni el botón ni la palabra, en ninguna vista ni anexo. Controles a la vista, solo en el
+  // simulador del A3. Ninguna tabla corta una celda ni desborda.
+  if (document.querySelector('.e3-explorar')) p.push('hay un botón «Explorar»')
+  if (/explorar/i.test(document.querySelector('.e3-vp')?.innerText ?? '')) p.push('en pantalla dice «Explorar»')
+  if (!esqueleto && location.hash !== '#a3' && document.querySelector('.cuerpo [role=slider], .cuerpo .e3-opciones'))
+    p.push('controles a la vista fuera del simulador del A3')
+  for (const t of document.querySelectorAll('.cuerpo svg[data-cortado]')) p.push(`tabla con una celda cortada: «${t.getAttribute('aria-label')}»`)
+  for (const t of document.querySelectorAll('.cuerpo svg[data-desborda]')) p.push(`tabla que no entra: «${t.getAttribute('aria-label')}»`)
+  for (const t of document.querySelectorAll('.cuerpo svg[data-letra]'))
+    if (parseFloat(t.getAttribute('data-letra')) < 9) p.push(`tabla con letra de ${t.getAttribute('data-letra')} px: «${t.getAttribute('aria-label')}»`)
   return { problemas: p, esqueleto, zoom: document.querySelector('.e3-vp')?.currentCSSZoom ?? 1 }
 }"""
 
@@ -231,8 +249,7 @@ def contenido_esperado():
                             f"{fijo(TE['decision']['aciertos_por_mes_para_pagar'])} aciertos más/mes"],
                     grafico=["Sin filtrar", "Lista que sale", pp(SF["diferencia_pp"]), pp(CO["diferencia_pp"])]
                     + ic(SF["ic95_pp"]) + ic(CO["ic95_pp"]) + ["empate", "gana la logística"],
-                    sin=["validación", "gana la regla"],
-                    opciones=["Diferencia", "Test", "Validación", "Entrenamiento"]),
+                    sin=["validación", "gana la regla"]),
         # la central, el ROI de la regla sola (G41), que no repite el de la vista 1; lo que suma y lo que cuesta el
         # modelo, separados. El gráfico, el costo del año 1 de la regla contra su beneficio; el resto, a «Explorar»
         "v05": dict(dec="B-ECO",
@@ -240,31 +257,60 @@ def contenido_esperado():
                             fijo(E["costos"]["incremental_usd"])],
                     grafico=["Costo del año 1, regla sola", usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"]),
                              "Beneficio anual de la regla", usd(E["observada"]["regla_usd"], 2)],
-                    sin=["con modelo", usd(E["costos"]["con_modelo"]["total_anio_1_usd"]), "presupuesto"],
-                    opciones=[f"{pct(E['parametros']['descuento'], 0)} de descuento", "Sin descuento"]),
+                    sin=["con modelo", usd(E["costos"]["con_modelo"]["total_anio_1_usd"]), "presupuesto"]),
         # la central, el puntaje legal (H40); los envíos sin consentimiento (C18) y los riesgos críticos (J22). El
         # gráfico, la barra 100 % con el 30,1 % en terracota
         "v06": dict(dec="C-LEG",
                     cifras=[plano(dia[10]["promedio"]["valor"]), pct(LE["envios_sin_consentimiento_tasa"], 1),
                             fijo(LE["riesgos_criticos"])],
-                    grafico=[pct(LE["envios_sin_consentimiento_tasa"], 1), "la lista sale sin ellos"],
-                    opciones=[f"Las {len(dims)} dimensiones", f"Plan {ids_l[0]} a {ids_l[-1]}",
-                              f"Los {fijo(LE['riesgos'])} riesgos"],
+                    # (30/10) el plan legal con su dueño y las cinco dimensiones, a la vista
+                    grafico=[pct(LE["envios_sin_consentimiento_tasa"], 1), "la lista sale sin ellos"] + ids_l
+                    + [plano(t["cuando"]) for t in dia[10]["plan"]]
+                    + [f"Las {len(dims)} dimensiones"],
                     terracota=True,
                     fragmento=({0: f"cada dimensión en {fijo(dims[0]['puntaje'])}"} if parejas else {})),
-        # la central, lo que tiene que dar el piloto (H49); el tamaño (G49) y las semanas (J50). El gráfico, la regla
-        # en dos zonas con la subfranja de 0 a 2,87
-        "v07": dict(dec="D-PIL",
+        # (30/10) la vista 7 nueva, ¿qué solución?: la precisión en test de la regla (central), el modelo y el orden de hoy
+        # (J03, J17); la escalera con las alternativas de la D 9.1, sin cortar celdas
+        "v07": dict(dec="D-SOL",
+                    cifras=[pct(TE["metodos"]["regla"]["test"]["precision"], 1),
+                            pct(TE["metodos"]["logistica_ajustada"]["test"]["precision"], 1),
+                            pct(TE["metodos"]["practica_actual"]["test"]["precision"], 1)],
+                    grafico=["Integración", fijo(TE["metodos"]["regla"]["test"]["auc_roc_contactables"], 3),
+                             fijo(TE["meta_y_alerta"]["regla_aciertos_por_mes"], 2),
+                             usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"]),
+                             usd(E["costos"]["con_modelo"]["total_anio_1_usd"]), pp(CO["diferencia_pp"])] + ic(CO["ic95_pp"])
+                    + [pct(E["parametros"]["s_observada"], 2), fijo(TE["meta_y_alerta"]["meta_aciertos_por_mes"])]),
+        # (30/10) la vista 8 nueva, sin banda: el flujo de seis etapas, quién usa y qué decide, y el alcance con el MVP
+        "v08": dict(banda=False,
+                    grafico=["1 · Ingesta", "3 · La regla", "6 · Registro", fijo(P["lista_mes"]), fijo(P["control_mes"]),
+                             pct(E["parametros"]["descuento"], 0), pct(D3["solucion"]["completitud_minima"], 0),
+                             pct(D3["solucion"]["alto_valor"], 0), plano(dia[5]["hechos"][0]["valor"]), "Sofía R.",
+                             "Entra", "Queda fuera", "Después"]),
+        # (30/10) la vista 9 nueva, sin banda: los cinco criterios de go-live con su semana y el monitoreo con su alerta
+        "v09": dict(banda=False,
+                    grafico=[f"Semana {PL['hitos_semana'][x]}" for x in ("acciones_legales_y_control", "extracto_regenerado",
+                                                                       "regla_y_operador_del_piloto")]
+                    + ["Se cumple", fijo(TE["meta_y_alerta"]["regla_aciertos_por_mes"], 2),
+                       pct(TE["meta_y_alerta"]["alerta_precision"], 1), fijo(D3["monitoreo"]["drift"]["umbral_suba_pp"], 1),
+                       pct(D3["monitoreo"]["drift"]["referencia"], 1), fijo(P["diferencia_detectable_pp"], 2),
+                       fijo(P["umbral_produccion_pp"], 1), pct(D3["solucion"]["alerta_adopcion"], 0)]),
+        # la vista 10 (la 7 hasta el 30/10): la central, lo que tiene que dar el piloto (H49); el tamaño (G49) y las
+        # semanas (J50). El gráfico, la regla en dos zonas con la subfranja de 0 a 2,87; sin «Explorar»
+        "v10": dict(dec="D-PIL",
                     cifras=[f"{fijo(P['umbral_produccion_pp'], 1)} puntos", fijo(P["tratados"]),
                             f"{fijo(PL['semanas'])} semanas"],
                     grafico=[fijo(P["diferencia_detectable_pp"], 2), fijo(P["umbral_produccion_pp"], 1),
-                             "no se distingue de cero", "María G. elige", "a producción"],
-                    opciones=["Qué decide", "El flujo", "El plan"]),
+                             "no se distingue de cero", "María G. elige", "a producción"]),
+        # (30/10) la vista 11 nueva, sin banda: fases con su barra, hitos, precondiciones (las de María G. marcadas) y roles
+        "v11": dict(banda=False,
+                    grafico=[f"{f['desde_semana']} a {f['hasta_semana']}" for f in PL["fases"] if f["desde_semana"] != f["hasta_semana"]]
+                    + [fijo(PL["semanas"]), fijo(P["umbral_produccion_pp"], 1), "María G.", "Sebastian C.", "Matías S.",
+                       "Francisco C.", "Juan Manuel R.", "Tomas F."]),
     }
     out = {}
     for v, e in esperado.items():
-        rot, est = estados.get(e["dec"], ("¿?", "¿?"))
-        out[v] = {"dec": f"{rot} · {est}", "cifras": [norm(x) for x in e["cifras"]],
+        rot, est = estados.get(e.get("dec"), ("¿?", "¿?"))
+        out[v] = {"banda": e.get("banda", True), "dec": f"{rot} · {est}", "cifras": [norm(x) for x in e.get("cifras", [])],
                   "grafico": [norm(x) for x in e["grafico"]], "sin": [norm(x) for x in e.get("sin", [])],
                   "aria": [norm(x) for x in e.get("aria", [])], "acc": e.get("acc"),
                   "opciones": e.get("opciones", []), "terracota": e.get("terracota", False),
@@ -355,17 +401,23 @@ def contenido(p: Pagina, esperado):
     for id_, e in esperado.items():
         p.ir(id_)
         r = p.pg.evaluate(LEER_VISTA)
-        if norm(r["dec"]) != norm(e["dec"]):
+        if r["explorar"] is not None:
+            p.mal(f"{id_}: hay un botón «Explorar»")
+        if not e["banda"]:
+            # (30/10) las vistas 8, 9 y 11: sin banda ni decisión; el gráfico, su conclusión y lo que escribe
+            if r["dec"] is not None or r["banda"]:
+                p.mal(f"{id_}: tiene banda; se esperaba la vista sin banda")
+        elif norm(r["dec"]) != norm(e["dec"]):
             p.mal(f"{id_}: la decisión dice «{r['dec']}», se esperaba «{e['dec']}»")
         banda = [norm(x) for x in r["banda"]]
-        if banda != e["cifras"]:
+        if e["banda"] and banda != e["cifras"]:
             p.mal(f"{id_}: la banda dice {banda}, se esperaba {e['cifras']}")
         # un número por tarjeta (regla 2 del 28/10)
-        if r["porTarjeta"] != [1] * len(e["cifras"]):
+        if e["banda"] and r["porTarjeta"] != [1] * len(e["cifras"]):
             p.mal(f"{id_}: cifras por tarjeta de la banda {r['porTarjeta']}, se esperaba {[1] * len(e['cifras'])}")
-        if not r["grandeCentral"]:
+        if e["banda"] and not r["grandeCentral"]:
             p.mal(f"{id_}: {r['grandes']} cifras al tamaño máximo; tiene que haber una, en la tarjeta central")
-        elif not r["centralPrimera"]:
+        elif e["banda"] and not r["centralPrimera"]:
             p.mal(f"{id_}: la cifra central no está en la primera tarjeta de la banda (N0-6)")
         if banda:
             centrales.setdefault(banda[0], []).append(id_)
@@ -404,28 +456,6 @@ def contenido(p: Pagina, esperado):
         elif e["terracota"] and not r["terracota"]:
             p.mal(f"{id_}: la excepción no va en terracota")
         revisar_estado(p, id_, "al llegar", r)
-        if r["explorar"] is None:
-            continue
-        if r["explorar"] != "false":
-            p.mal(f"{id_}: «Explorar» no llega cerrado")
-        boton = p.pg.locator(".cuerpo .e3-explorar")
-        boton.click()
-        p.quieto(80)
-        r = p.pg.evaluate(LEER_VISTA)
-        if r["explorar"] != "true":
-            p.mal(f"{id_}: «Explorar» no abre")
-        revisar_estado(p, id_, "Explorar", r)
-        if [norm(x) for x in r["opcionesTxt"]] != [norm(x) for x in e["opciones"]]:
-            p.mal(f"{id_}: las opciones de «Explorar» son {r['opcionesTxt']}, se esperaba {e['opciones']}")
-        for i in range(r["opciones"]):
-            p.pg.locator(".cuerpo .e3-opciones [role=radio]").nth(i).click()
-            p.quieto(80)
-            revisar_estado(p, id_, f"Explorar, opción {i + 1}", p.pg.evaluate(LEER_VISTA))
-        boton.click()
-        p.quieto(80)
-        r = p.pg.evaluate(LEER_VISTA)
-        if r["explorar"] != "false" or r["graficos"] != 1 or r["opciones"]:
-            p.mal(f"{id_}: «Cerrar» no vuelve a la vista presentada")
     for cifra, vs in centrales.items():
         if len(vs) > 1:
             p.mal(f"la cifra central «{cifra}» se repite en {', '.join(vs)} (regla 3)")
@@ -530,40 +560,13 @@ def anclas_datos():
     return mal
 
 
-# ---------------------------------------------------------------- 8. respaldo y «Explorar» (crítica del W3)
+# ---------------------------------------------------------------- 8. respaldo y lo que iba detrás de «Explorar»
 
 def riesgo_12(seg):
     """(F6b, 28/10) El riesgo 12 como lo deja la D 11.2, con el alto valor y el género X (e3/src/riesgo12.js)."""
     return (f"La lista acierta menos en el 20 % de mayor facturación "
             f"({fijo(seg['alto_valor']['diferencia_pp'], 1, True)} puntos en test) y en género X "
             f"({fijo(seg['genero_x']['diferencia_pp'], 1, True)}, {fijo(seg['genero_x']['en_lista'])} lugares)")
-
-
-def riesgo_12_vista_6(p: Pagina):
-    """(F6b, 28/10, hallazgo H-2-072) La vista 6, «Explorar», «Los 13 riesgos», con el riesgo 12 elegido: el detalle y su
-    aria-label dicen lo mismo que el A4 (riesgo12.js) y no el texto de validación de la C 6.2 («en mujeres»)."""
-    D3 = leer_js("datos_e3.js", "D3")
-    texto = riesgo_12({f["id"]: f for f in D3["test"]["segmentos"]["filas"]})
-    p.ir("v01")
-    p.ir("v06")
-    p.pg.locator(".cuerpo .e3-explorar").click()
-    p.quieto(80)
-    p.pg.locator(".cuerpo .e3-opciones [role=radio]", has_text="riesgos").first.click()
-    p.quieto(80)
-    boton = p.pg.locator('.cuerpo [role=button][aria-label^="Riesgo 12"]').first
-    boton.click()
-    p.quieto(80)
-    r = p.pg.evaluate(LEER_VISTA)
-    aria = norm(boton.get_attribute("aria-label"))
-    pantalla = norm(r["pantalla"])
-    if norm(texto) not in pantalla:
-        p.mal(f"v06 (Explorar, riesgo 12): el detalle no dice «{texto}»")
-    if norm(texto) not in aria:
-        p.mal(f"v06 (Explorar, riesgo 12): el aria-label dice «{aria[:90]}»")
-    for x in (pantalla, aria):
-        if "en mujeres" in x.casefold():
-            p.mal("v06 (Explorar, riesgo 12): sigue el texto de validación de la C 6.2 («en mujeres»)")
-    revisar_estado(p, "v06", "Explorar, riesgo 12", r)
 
 
 def respaldo_esperado():
@@ -587,44 +590,34 @@ def respaldo_esperado():
     CO, SF, SFV = T["contra_regla"], T["sin_filtro"], D3["lista"]["modelo_menos_regla_500_sin_filtro"]
     ids_l = sorted((a["id"] for t in dia[10]["plan"] for a in t["acciones"]), key=lambda x: int(x[1:]))
     pedidos = ["alcance", "regla_y_operador_del_piloto", "designa_l1", "operador_despues_del_piloto", "decision"]
+    # (30/10) Sin «Explorar»: todo se busca al llegar, en la vista o el anexo donde quedó.
     return [
-        # la vista 4: el test que antes estaba en la 7 (J03, J17) y la logística de la Parte B con su nombre
-        ("v04", "Test", ["Precisión de la lista de 500 contactables por mes, en test"]
-         + [pct(m["precision"], 1) for m in M.values()], []),
-        ("v04", "Validación", ["Logística de la Parte B", pct(logb["validacion"]["precision"], 1), "lugares"],
-         ["contactos"]),
-        # (28/10) la vista 4, «Explorar» abre en «Diferencia»: las cuatro filas, validación (H06 y la de J09) y test
-        ("v04", "", ["Sin filtrar · validación", "Sin filtrar · test", "Lista que sale · validación",
-                     "Lista que sale · test", fijo(SFV["diferencia_pp"], 2, True), fijo(SF["diferencia_pp"], 2, True),
-                     fijo(CO["validacion_diferencia_pp"], 2, True), fijo(CO["diferencia_pp"], 2, True),
-                     "gana la regla", "gana la logística", "empate"], []),
-        # (28/10) la vista 7 al llegar: la regla del piloto, sin la lista de lo que decide María G.
-        ("v07", None, ["A producción solo si"], ["Lo que decide María G.", "Quién opera la lista después del piloto"]),
-        # lo que decide María G. con su semana (D 12.3 y 12.4), en «Explorar», «Qué decide» (abre ahí)
-        # (el grupo de control no es un pedido a María G.: se busca al comienzo de un renglón, porque la banda dice
-        # «más que el grupo de control»)
-        ("v07", "", ["Lo que decide María G."] + [f"semana {hs[k]}\n" for k in pedidos],
-         ["\nEl grupo de control", "lo revisa Sofía R.", "quien elija Casa Óga"]),
-        ("v07", "El flujo", ["El equipo; el resumen por local, Sofía R."], [f"{P['meses']} listas, del"]),
-        # la vista 5: de qué lista es el beneficio de la regla (G41)
-        ("v05", None, ["lista de 500 sin filtro en validación"], []),
-        # (28/10) el costo con modelo, el presupuesto y el ROI del modelo sobre la regla, en «Explorar»
-        ("v05", "", ["Costo del año 1, con modelo", usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
-                     f"presupuesto {usd(E['costos']['presupuesto_usd'])}", "ROI del modelo sobre la regla"], []),
-        # (28/10) la vista 3: el MVP de la diapositiva 5, en «Explorar»
-        ("v03", "", [plano(dia[5]["titulo"])] + [plano(x["titulo"]) for x in dia[5]["pasos"]], []),
-        # (28/10) la vista 6: las cinco dimensiones (lo que antes era el gráfico), el plan y la matriz, en «Explorar»
-        ("v06", "dimensiones", [d["nombre"] for d in LE["dimensiones"]], []),
-        ("v06", "Plan", ids_l, []),
+        # la vista 4 al llegar: solo las dos filas de test; la validación y las precisiones, en el A7
+        ("v04", None, ["Sin filtrar", "Lista que sale"], ["Lista que sale · validación"]),
+        # la vista 10 (el piloto): la regla, sin la lista de lo que decide María G., que está en la 11
+        ("v10", None, ["A producción solo si"], ["Lo que decide María G.", "Quién opera la lista después del piloto"]),
+        # lo que decide María G. con su semana (D 12.3 y 12.4), en la vista 11: las precondiciones marcadas y los hitos
+        ("v11", None, ["Precondiciones; marcadas, las que decide María G.", "Aprobar el alcance",
+                       "Elegir el operador de después del piloto", "Decisión de producción"]
+         + [str(hs[k]) for k in ("alcance", "regla_y_operador_del_piloto", "operador_despues_del_piloto", "decision")],
+         ["\nEl grupo de control lo aprueba María G.", "quien elija Casa Óga"]),
+        # el flujo de cada mes y el MVP de la diapositiva 5 (hasta el 30/10 en la vista 3 y en la 7, detrás de «Explorar»)
+        ("v08", None, ["Juan Manuel R.", "Lucía O. (Operaciones)", plano(dia[5]["hechos"][0]["valor"]),
+                       plano(dia[5]["hechos"][1]["valor"])], []),
+        ("v03", None, [], ["MVP:"]),
+        # la vista 5: de qué lista es el beneficio de la regla (G41); el costo con modelo, en el A6
+        ("v05", None, ["lista de 500 sin filtro en validación"], ["presupuesto"]),
+        # la vista 6: el plan legal y las dimensiones, a la vista
+        ("v06", None, [d["nombre"].lower() for d in LE["dimensiones"][1:]] + ids_l, []),
         # el respaldo
         ("a1", None, [f"test medido una vez, el {T['apertura']['fecha'][8:10]}/{T['apertura']['fecha'][5:7]}/"
                       f"{T['apertura']['fecha'][:4]}"] + filas_a1
          + [fijo(T["entrenamiento"]["filas"]), fijo(T["entrenamiento"]["positivos"]), pct(T["entrenamiento"]["tasa"], 2)],
          [pct(T["entrenamiento"]["tasa"], 1)]),
         ("a2", None, ["la que sale: " + a2["filas"][a2["destacar"][0]][a2["columnas"].index("Precisión")],
-                      "Logística, lista de 500 contactables"] + prec_a2, []),
-        ("a2", "", ["lugares"], ["contactos"]),
-        ("a3", None, ["escenario base de la B 3.4 (vista 5)",
+                      "Logística, lista de 500 contactables"] + prec_a2, ["contactos"]),
+        # el A3, con el simulador de la tasa de éxito a la vista (hasta el 30/10, en la vista 5 detrás de «Explorar»)
+        ("a3", None, ["escenario base de la B 3.4 (vista 5)", "ROI del modelo sobre la regla", "Tasa de éxito",
                       pct_directo(roi["modelo_sobre_la_regla"]["contactables"]["roi_pct"], 2),
                       pct_directo(roi["regla_sin_modelo"]["contactables"]["roi_pct"], 2)], ["diapositiva"]),
         ("a4", None, [f"{fijo(LE['riesgos_criticos'])} críticos de {fijo(LE['riesgos'])}", riesgo_12(seg)],
@@ -637,27 +630,22 @@ def respaldo_esperado():
         ("a6", None, [usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
                       usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"])]
          + [f[a6["columnas"].index("Con modelo (USD)")] for f in a6["filas"]], ["(L3", "L3 a L5"]),
-        ("a7", None, ["Regresión logística (Parte B)", fijo(E["matrices"]["modelo"]["vp"]),
-                      fijo(E["matrices"]["regla"]["vp"], 2), "empates del último puesto"], ["Logística ajustada"]),
-        ("a7", "Test", ["Logística ajustada", fijo(M["logistica_ajustada"]["vp"]), fijo(M["regla"]["vp"], 2)],
-         ["Regresión logística (Parte B)"]),
+        # el A7: validación y test a la vista; la diferencia en las cuatro listas (H06, J09, J11) y la precisión de cada
+        # método (J03, J17), que hasta el 30/10 estaban detrás de «Explorar» en la vista 4
+        ("a7", None, ["Logística (Parte B)", fijo(E["matrices"]["modelo"]["vp"]), fijo(E["matrices"]["regla"]["vp"], 2),
+                      "empates del último puesto", "Logística ajustada", fijo(M["logistica_ajustada"]["vp"]),
+                      fijo(M["regla"]["vp"], 2), "Sin filtrar · validación", "Lista que sale · validación",
+                      fijo(SFV["diferencia_pp"], 2, True), fijo(CO["validacion_diferencia_pp"], 2, True),
+                      fijo(CO["diferencia_pp"], 2, True), fijo(SF["diferencia_pp"], 2, True), "gana la regla"]
+         + [pct(m["precision"], 1) for m in M.values()], ["Regresión logística (Parte B)"]),
     ]
 
 
 def respaldo(p: Pagina, casos):
-    for id_, opcion, deben, no_deben in casos:
-        # pasar por otra vista: con el mismo hash la vista no se monta de nuevo y «Explorar» seguiría abierto
+    for id_, _opcion, deben, no_deben in casos:
         p.ir("v01" if id_ != "v01" else "v02")
         p.ir(id_)
         estado = "al llegar"
-        if opcion is not None:
-            p.pg.locator(".cuerpo .e3-explorar").click()
-            p.quieto(80)
-            estado = "Explorar"
-            if opcion:
-                p.pg.locator(".cuerpo .e3-opciones [role=radio]", has_text=opcion).first.click()
-                p.quieto(80)
-                estado = f"Explorar, «{opcion}»"
         r = p.pg.evaluate(LEER_VISTA)
         # todo en un renglón (una celda partida en dos se lee entera); lo que termina en «\n» se busca al final de un
         # renglón de la pantalla («semana 1» no es «semana 13»), y lo que empieza con «\n», al comienzo
@@ -937,7 +925,6 @@ def main():
                 vistas(p, w, h, out, (w, h) in CAPTURAR and not a.sin_capturas, a.sin_esqueletos)
                 contenido(p, esperado)
                 respaldo(p, casos_r)
-                riesgo_12_vista_6(p)
                 if (w, h) in NOTAS_RES:
                     notas_entran(p, w, h)
                     guion_en_notas(p, w, h, guion)

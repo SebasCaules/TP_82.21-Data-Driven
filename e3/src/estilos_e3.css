@@ -61,22 +61,9 @@
 /* ---------- pantalla en negro («.» o B, como en PowerPoint) ---------- */
 .e3-negro { position: fixed; inset: 0; z-index: 100; background: #000; cursor: none; }
 
-/* ---------- controles detrás de «Explorar» (controles.jsx) ---------- */
-/* Cerrado al llegar a cada vista. Mismo trazo que las etiquetas que llevan a otra vista en el E2
-   (borde --acc, mono, mayúsculas): se ve que se puede tocar y no compite con las cifras. */
-.e3-explorar {
-  align-self: flex-start; padding: 4px 12px;
-  border: 1px solid var(--acc); border-radius: 3px; background: var(--sup); color: var(--acc);
-  font: 600 var(--e2-rot)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
-  cursor: pointer;
-}
-.e3-explorar:hover { background: #eaeef4; }
-.e3-explorar.on { background: var(--acc); color: #fff; }
-.e3-explorar:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+/* ---------- (30/10) sin «Explorar»: sale .e3-explorar; los controles de abajo los usa el simulador del A3 ---------- */
 
-/* .e3-opciones: el selector detrás de «Explorar» de la vista 4 (validación o entrenamiento) y de la 6
-   (plan o matriz de riesgos); verificar_e3.py lo abre en cada resolución y mira __fit (W2).
-   .e3-desliz*: sin uso todavía; es del simulador de la tasa de éxito de la vista 5. */
+/* .e3-opciones y .e3-desliz*: el descuento y la tasa de éxito del simulador del anexo A3 (30/10), a la vista. */
 .e3-opciones {
   display: inline-flex; gap: 2px; padding: 2px;
   border: 1px solid var(--bd); border-radius: 3px; background: var(--papel);
@@ -199,3 +186,10 @@
   .e3-vp { zoom: 1 !important; width: auto !important; height: auto !important; container-type: normal; overflow: visible; }
   .e3-notas, .e3-negro { display: none; }
 }
+
+/* ---------- riel con once vistas (30/10, sin «Explorar») ----------
+   Con las once vistas y los siete anexos, el riel del E2 no entra en la ventana lógica de 1152 × 640 y 1366 × 768: el
+   A7 pisaba el pie. Los anexos (y su rótulo de grupo) van más juntos: mismo ancho y misma letra, menos relleno. Las
+   vistas presentadas no cambian (paridad_e3.py mide la letra y la caja del riel en una vista, no en un anexo). */
+.e3-vp .lat-item.e3-lat-anexo { padding-top: 1px; padding-bottom: 1px; }
+.e3-vp .lat-grupo.e3-lat-anexo { padding-top: 6px; padding-bottom: 2px; }

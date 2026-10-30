@@ -1,5 +1,8 @@
-// V05 · el simulador de la tasa de éxito (Parte B 3.2 y 3.4 a 3.6; diapositiva 9 de C3), detrás de
-// «Explorar» en la tarjeta del gráfico de la vista 5 (27/10, W3). Es la tarjeta del gráfico de V05 entera.
+// V05 · la tarjeta del gráfico de la vista 5 y el simulador de la tasa de éxito (Parte B 3.2 y 3.4 a 3.6;
+// diapositiva 9 de C3). (30/10, sin «Explorar») El simulador ya no va detrás de «Explorar» en la vista 5: se ve
+// entero, con sus controles a la vista, en el anexo A3 (SimuladorTasa, que importa R_A3_Sensibilidad.jsx). El
+// costo con modelo y el presupuesto están en el anexo A6 (la tabla de costos y su frase). Lo que sigue describe
+// las piezas; donde dice «Explorar», hoy es el A3.
 //
 // (28/10, unidad V05 de .workforce/PLAN.md) Al llegar, dos barras con BarrasH (src/graficos.jsx; paridad_e3.py
 // mide sus rótulos en esta vista): el costo del año 1 de la regla sola (D3.economia.costos.regla_sin_modelo,
@@ -39,7 +42,7 @@ import { D3 } from '../datos_e3.js'
 import { C3 } from '../contenido_e3.js'
 import { fijo, pct, pctDirecto, tasa, usd } from '../formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
-import { BotonExplorar, Deslizante, Opciones } from '../controles.jsx'
+import { Deslizante, Opciones } from '../controles.jsx'
 
 const E = D3.economia
 const G = E.grilla
@@ -129,8 +132,7 @@ function Escala({ ancho, i, setI, desc }) {
   )
 }
 
-/** Lo que «Explorar» agrega: el descuento, las lecturas y el deslizante. Es un componente propio para que
- *  useMedida mida la caja al montarse (con «Explorar» cerrado no existe). */
+/** El descuento, las lecturas y el deslizante. Es un componente propio para que useMedida mida su caja. */
 function PanelSimulador({ i, setI, desc, setDesc, reglaRoi, modeloRoi }) {
   const [caja, medida] = useMedida()
   return (
@@ -154,40 +156,40 @@ function PanelSimulador({ i, setI, desc, setDesc, reglaRoi, modeloRoi }) {
   )
 }
 
-/** La tarjeta del gráfico de V05, con el simulador detrás de «Explorar». */
-export function TarjetaCostoBeneficio() {
-  const k = useEscalaTexto()
-  const [explorar, setExplorar] = useState(false)
+/** El simulador del anexo A3 (30/10): el descuento, las lecturas y el deslizante, a la vista. Arranca en la tasa
+ *  observada con descuento; la frase de abajo dice lo que deja la regla con la tasa elegida. */
+export function SimuladorTasa() {
   const [i, setI] = useState(OBS.i)
   const [desc, setDesc] = useState('con')
-  const cambiarExplorar = (v) => {
-    setExplorar(v)
-    if (!v) { setI(OBS.i); setDesc('con') }
-  }
-
-  const regla = explorar ? col('regla_usd', desc)[i] : E.observada.regla_usd
-  const reglaRoi = explorar ? col('regla_roi_pct', desc)[i] : E.observada.regla_roi_pct
+  const regla = col('regla_usd', desc)[i]
+  const reglaRoi = col('regla_roi_pct', desc)[i]
   const modeloRoi = col('modelo_roi_pct', desc)[i]
-  // Al llegar, dos barras: el costo de la regla sola (contexto) y su beneficio (--acc). «Explorar» suma el
-  // costo con modelo arriba y el presupuesto, para leer el ROI del modelo junto al de la regla.
+  return (
+    <div className="e3-v05-simulador" title={`Simulación sobre la grilla de la Parte B (B 3.4 a 3.6): beneficio de la regla con la `
+      + `lista de 500 sin filtro en los cortes de validación, el escenario base de la B 3.4. ${D9.pie_figura}`}>
+      <PanelSimulador i={i} setI={setI} desc={desc} setDesc={setDesc} reglaRoi={reglaRoi} modeloRoi={modeloRoi} />
+      <p className="e2-nota" style={{ margin: 0 }}>
+        {reglaRoi < 0 ? `${NO_RECUPERA}: deja ` : 'Con esta tasa de éxito, la regla se paga: deja '}
+        <b className="tabular" {...sim}>{monto(regla)}</b>{' por año'}
+      </p>
+    </div>
+  )
+}
+
+/** La tarjeta del gráfico de V05: el costo del año 1 de la regla sola contra su beneficio anual. */
+export function TarjetaCostoBeneficio() {
+  const k = useEscalaTexto()
   const barras = [
-    ...(explorar ? [{ etiqueta: 'Costo del año 1, con modelo', valor: COSTO_MODELO, color: CTX }] : []),
     { etiqueta: 'Costo del año 1, regla sola', valor: COSTO_REGLA, color: CTX },
-    { etiqueta: 'Beneficio anual de la regla', valor: regla, enfasis: true, anchoMin: 3 },
+    { etiqueta: 'Beneficio anual de la regla', valor: E.observada.regla_usd, enfasis: true, anchoMin: 3 },
   ]
-
-  // La conclusión dice lo que muestra el gráfico; con el deslizante, cambia si la regla llega a pagarse.
-  const conclusion = reglaRoi < 0
-    ? <>{`${NO_RECUPERA}: deja `}<b className="tabular" {...(explorar ? sim : {})}>{monto(regla)}</b>{' por año'}</>
-    : <>{'Con esta tasa de éxito, la regla se paga: deja '}<b className="tabular" {...sim}>{monto(regla)}</b>{' por año'}</>
-
+  const conclusion = <>{`${NO_RECUPERA}: deja `}<b className="tabular">{monto(E.observada.regla_usd)}</b>{' por año'}</>
   const titulo = `Beneficio anual de la regla con la lista de 500 sin filtro en los cortes de validación, el escenario `
     + `base de la B 3.4: ${monto(E.observada.regla_usd)}, ROI ${pctDirecto(E.observada.regla_roi_pct, 2)}. Con la lista `
     + `que sale, 500 contactables: ${monto(RC.usd_anio)} en validación (ROI ${pctDirecto(RC.roi_pct, 2)}) y `
     + `${monto(RT.contactables.usd)} en test (ROI ${pctDirecto(RT.contactables.roi_pct, 2)}, Parte D 11.2). Ninguna `
     + `recupera el costo en el año. Con modelo, el año 1 cuesta ${monto(COSTO_MODELO)} (presupuesto `
-    + `${monto(E.costos.presupuesto_usd)}).`
-    + (explorar ? ` Simulación sobre la grilla de la Parte B. ${D9.pie_figura}` : '')
+    + `${monto(E.costos.presupuesto_usd)}): anexo A6. El simulador de la tasa de éxito, en el anexo A3.`
   return (
     <div className="tarjeta e3-v05-graf" title={titulo}>
       <div className="e3-v05-cab">
@@ -195,12 +197,7 @@ export function TarjetaCostoBeneficio() {
           <p className="e3-v05-mide">{`${D9.pie_figura.replace(/\.$/, '')} · lista de 500 sin filtro en validación`}</p>
           <p className="e3-conclusion">{conclusion}</p>
         </div>
-        <BotonExplorar abierto={explorar} onCambio={cambiarExplorar} />
       </div>
-
-      {explorar && (
-        <PanelSimulador i={i} setI={setI} desc={desc} setDesc={setDesc} reglaRoi={reglaRoi} modeloRoi={modeloRoi} />
-      )}
 
       <div className="e3-v05-lienzo">
         <Lienzo className="lienzo">
@@ -211,10 +208,6 @@ export function TarjetaCostoBeneficio() {
               formatoEje={(v) => fijo(v, 0)}
               anchoEtiqueta={Math.round(230 * k)}
               tituloEje="Dólares"
-              tope={explorar ? Math.max(col('regla_usd', desc)[ULTIMA], COSTO_MODELO) : undefined}
-              referencia={explorar
-                ? { valor: E.costos.presupuesto_usd, etiqueta: `presupuesto ${monto(E.costos.presupuesto_usd)}` }
-                : undefined}
             />
           )}
         </Lienzo>

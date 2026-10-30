@@ -22,6 +22,9 @@
 //   a producción (vista 7; Parte D 11.1 y 12.2, hito 8; G49 y H49). Hasta entonces la vista 7 usaba D-PRO
 //   con otra frase corta: una decisión, una frase.
 //
+// - D-SOL · propuesta (30/10, vista 7 nueva, sin «Explorar»): la solución que sale de la escalera de la lámina 4,
+//   identidad unida, tablero y regla con cálculo mensual (Parte D 9.1).
+//
 // (28/10, F6b, hallazgo H-2-077 de la auditoría) Los ids son internos: ningún documento que lee la cátedra los
 // define (en el E2, los DC-xx estaban en la Parte B). La tarjeta muestra en su lugar el área de la decisión,
 // «Legal · viable con condiciones», que se entiende sola (sección 8 del CLAUDE.md: cada rótulo se entiende solo).
@@ -47,6 +50,7 @@ const PROPIAS = [
   { id: 'C-MOD', area: 'Modelo', estado: 'sale la regla' },
   { id: 'D-PRO', area: 'Alcance', estado: 'propuesta' },
   { id: 'D-PIL', area: 'Piloto', estado: 'propuesta' },
+  { id: 'D-SOL', area: 'Solución', estado: 'propuesta' },
 ]
 
 export const DECISIONES = Object.fromEntries([

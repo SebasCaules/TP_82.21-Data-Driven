@@ -44,7 +44,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "984dc98e81630ef2e4db6a5259e369955cdbd059d328b00859852e3abcff0d48"
+   "sha256": "2140ab850a394d8555f5145fb068874f84a9f4ea19f4eadead484028fa3a38d5"
   }
  },
  "caso": {
@@ -2005,7 +2005,74 @@ export const D3 = {
    "go_live": 6,
    "operador_despues_del_piloto": 13,
    "decision": 20
+  },
+  "hitos": [
+   {
+    "n": 1,
+    "clave": "alcance",
+    "semana": 1,
+    "desde": "2026-11-02"
+   },
+   {
+    "n": 2,
+    "clave": "regla_y_operador_del_piloto",
+    "semana": 2,
+    "desde": "2026-11-09"
+   },
+   {
+    "n": 3,
+    "clave": "acciones_legales_y_control",
+    "semana": 4,
+    "desde": "2026-11-23"
+   },
+   {
+    "n": 4,
+    "clave": "acciones_legales_y_control",
+    "semana": 4,
+    "desde": "2026-11-23"
+   },
+   {
+    "n": 5,
+    "clave": "extracto_regenerado",
+    "semana": 6,
+    "desde": "2026-12-07"
+   },
+   {
+    "n": 6,
+    "clave": "go_live",
+    "semana": 6,
+    "desde": "2026-12-07"
+   },
+   {
+    "n": 7,
+    "clave": "operador_despues_del_piloto",
+    "semana": 13,
+    "desde": "2027-01-25"
+   },
+   {
+    "n": 8,
+    "clave": "decision",
+    "semana": 20,
+    "desde": "2027-03-15"
+   }
+  ],
+  "plazos": {
+   "aviso_extracto": 5,
+   "adenda_crm_desde": 5,
+   "talleres": [
+    5,
+    19
+   ]
   }
+ },
+ "solucion": {
+  "completitud_minima": 0.6,
+  "alto_valor": 0.2,
+  "oferta_dias": 7,
+  "talleres": 2,
+  "alerta_adopcion": 0.5,
+  "horas_carga_crm": 8,
+  "decisiones_calidad": 15
  },
  "monitoreo": {
   "campanias_noviembre": [
@@ -4467,6 +4534,30 @@ export const D3 = {
   },
   {
    "id": "J50",
+   "nombre": "plan: semana de cada hito",
+   "documento": "1 · 2 · 4 · 4 · 6 · 6 · 13 · 20",
+   "donde": "D 12.2"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: aviso del extracto y adenda del CRM (semana)",
+   "documento": "5 y 5",
+   "donde": "D 12.3"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: talleres (semanas)",
+   "documento": "5 y 19",
+   "donde": "D 10.1"
+  },
+  {
+   "id": "J50",
+   "nombre": "plan: primera lista en el go-live, el lunes de la semana 6",
+   "documento": "2026-12-07",
+   "donde": "D 12.2 (07/12/2026)"
+  },
+  {
+   "id": "J50",
    "nombre": "plan: semanas de cada fase",
    "documento": "2 · 3 · 4 · 1 · 13 · 2",
    "donde": "D 12.1"
@@ -4506,6 +4597,48 @@ export const D3 = {
    "nombre": "plan: operador antes del tercer mes del piloto",
    "documento": true,
    "donde": "D 12.2 (C 6.3, riesgo 2)"
+  },
+  {
+   "id": "H46",
+   "nombre": "solución: completitud mínima del mes (%)",
+   "documento": "60",
+   "donde": "D 9.2 y 10.3"
+  },
+  {
+   "id": "G50",
+   "nombre": "solución: control fuera del alto valor (%)",
+   "documento": "20",
+   "donde": "D 9.2 y 9.5"
+  },
+  {
+   "id": "G32",
+   "nombre": "solución: la oferta vence a los (días)",
+   "documento": "7",
+   "donde": "D 9.2 y 9.5"
+  },
+  {
+   "id": "G37",
+   "nombre": "solución: talleres",
+   "documento": "2",
+   "donde": "D 9.5 y 10.1"
+  },
+  {
+   "id": "H46",
+   "nombre": "solución: alerta de adopción (%)",
+   "documento": "50",
+   "donde": "D 10.2"
+  },
+  {
+   "id": "H46",
+   "nombre": "solución: carga manual que justifica el CRM (horas/mes)",
+   "documento": "8",
+   "donde": "D 9.5"
+  },
+  {
+   "id": "F15",
+   "nombre": "solución: decisiones de calidad del pipeline",
+   "documento": "15",
+   "donde": "D 9.2"
   },
   {
    "id": "J51",

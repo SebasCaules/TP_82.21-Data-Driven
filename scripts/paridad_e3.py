@@ -43,6 +43,11 @@ real (vite.e3.config.js). Lo que se declara y se mide:
 5. Hoja de contacto: /e2/ (vista 4) y /e3/ (vista 5) lado a lado, las dos a 1536 × 864, en
    entregas/entregable-3/_build/workforce/fase-w1/e2-e3-1536.png del vault.
 
+(30/10) /e3/ tiene 11 vistas y ningún «Explorar»: la regla 4 recorre las 18 entradas del riel (V01 a V11 y A1 a A7)
+y además falla si aparece un botón .e3-explorar o la palabra «Explorar» en pantalla. Las vistas 8, 9 y 11 no tienen
+banda: la regla 11 no les pide tarjeta de decisión. Para no escribir fuera del worktree, correr con --sin-hoja (la
+hoja de contacto va al vault).
+
 Termina con «PARIDAD OK» o con la lista de diferencias y código 1.
 """
 from __future__ import annotations
@@ -229,6 +234,9 @@ LEER = r"""(piezas) => {
 
 REGLAS = r"""() => {
   const p = []
+  // (30/10, e3/DISENO.md, «Decisiones (30/10): sin Explorar, 11 vistas») ni el botón ni la palabra, en ninguna vista
+  if (document.querySelector('.e3-explorar')) p.push('hay un botón «Explorar»')
+  if (/explorar/i.test(document.querySelector('.e3-vp')?.innerText ?? '')) p.push('en pantalla dice «Explorar»')
   const preg = document.querySelector('.e2-enc .e2-preg')
   if (!preg) p.push('sin pregunta en el encabezado')
   else {
