@@ -1,6 +1,7 @@
 # Diseño de la presentación E3 (`/e3/`)
 
-> **Desde el 28/10 manda la última sección, «Decisiones (28/10): auditoría de contraste y gráficos».** Las
+> **Desde el 01/11 manda la última sección, «Decisiones (01/11): Explorar a la vista»; la del 28/10, «auditoría
+> de contraste y gráficos», sigue valiendo en lo que esa no cambia.** Las
 > de W1 y W2 (27/10) siguen valiendo en lo que esa no cambia. Las reglas transversales y la tabla por
 > diapositiva de abajo describen el escenario fijo de 1600 × 900, que se fue; quedan como referencia del
 > contenido de cada diapositiva (el código está en el commit `a06f88c`, `e3/src/diapositivas/`).
@@ -321,3 +322,53 @@ que se impone y dice qué significa, y un gráfico con un solo mensaje, con cont
   secundaria tinta 600 al 72/70 de la del E2; rótulo de la decisión × 1,06 en 700; fondo y borde de la
   decisión; qué mide del gráfico en `--e3-ctx`; conclusión del gráfico en tinta 700, al menos 1,3 veces el
   rótulo del E2). Cualquier otra diferencia con /e2/ sigue fallando.
+
+## Decisiones (01/11): Explorar a la vista
+
+Pedido del usuario: «quiero que las vistas de explorar las saques a las slides normales sin agrandar mucho, pero no
+quiero que haya información importante de la presentación oculta detrás de un botón». Se conservan las siete vistas
+del 28/10 (estructura, banda, decisión y gráfico) y se suma una sola, la 8. La versión de 11 vistas del 30/10 (rama
+`e3-sin-explorar`) quedó descartada; de ella se reusan la vista 6, el simulador del A3 y piezas del A7. Regla:
+**denso está bien, oculto no.** Lo importante va en su vista; el detalle técnico, a un anexo que se ve completo. Sale
+el botón (`BotonExplorar`, `.e3-explorar`) y la palabra de las fuentes, la pantalla y el guion.
+
+| Antes, detrás del botón | Ahora |
+|---|---|
+| Vista 3: el MVP (cinco pasos y tres hechos) | vista 3, al pie de la tarjeta del puntaje, en una fila |
+| Vista 4: la diferencia en validación | vista 4, de entrada: cuatro filas (sin filtrar y la que sale, validación fina y test gruesa) |
+| Vista 4: precisión de cada método en test y listas de la Parte B en validación y entrenamiento | anexo A7, arriba: una tabla de precisión por método (Parte B sin filtrar en entrenamiento y validación; 500 contactables en validación y test) |
+| Vista 5: costo con modelo y presupuesto | vista 5, una barra más (USD 30.660) y la línea del presupuesto |
+| Vista 5: simulador de la tasa de éxito | anexo A3, arriba de la tabla, con sus controles a la vista |
+| Vista 6: plan L1 a L6 | vista 6, a la derecha de la barra, con dueño y tramo |
+| Vista 6: cinco dimensiones | vista 6, una línea al pie, con las normas |
+| Vista 6: matriz de 13 riesgos y la señal de los críticos | anexo A4: la tabla de los 13 y, arriba, los tres críticos con qué se mide, umbral y quién |
+| Vista 7: lo que decide María G. y en qué semana, el flujo de cada mes y el plan de 20 semanas | vista 8 nueva |
+| A2: selector de filtro y largo | sale: la tabla ya trae cada forma de cortar la lista |
+| A7: matrices de test | A7, abajo, junto a las de validación |
+
+### Vista 8: ¿Cómo funciona cada mes y en qué semana?
+
+`V08_CadaMes.jsx`, diapositiva 13 de C3, grupo «Parte D y propuesta». Misma forma que las demás. Banda: semana 6
+(sale la primera lista, central), semana 13 (elige quién opera después del piloto) y semana 20 (decide producción);
+«semana» va un escalón más chico, como «USD». Decisión `D-PLA · propuesta` («Plan · propuesta»). Un solo svg: arriba,
+el flujo de seis pasos de la D 9.2 (la regla en `--acc`); abajo a la izquierda, las seis fases sobre las 20 semanas
+con la primera lista y la decisión marcadas en dos renglones; abajo a la derecha, lo que decide María G. con su
+semana (D 12.3 y 12.4). La vista 7 queda con la regla del piloto; su fuente pasa a «Parte D 11.1 y 12.2».
+
+### Guion
+
+`contenido.py`: la 12 deja el plan a la 13 (nueva, Sebastian C.); la 6 y la 7 nombran las filas de validación; la 9
+pierde una palabra. 8:00 con la cuenta del guion (130 palabras por minuto, un número cuenta tres, 3 s por
+diapositiva), en el tope. En el guion explicado (`armar.py`), «Qué mostrar» de cada vista nombra lo que se ve y la
+V08 tiene su entrada.
+
+### Verificación (desde el 01/11)
+
+- `verificar_e3.py --sin-esqueletos`: las 8 vistas y los 7 anexos a cinco resoluciones; falla con un `.e3-explorar`,
+  la palabra «Explorar» en pantalla o en un title, controles fuera del A3, una tabla en svg con `data-desborda` o una
+  celda cortada en el A7; lo que iba detrás del botón se busca donde quedó, al llegar. Sin navegador, falla si
+  «Explorar» aparece en `dist-e3/index.html` o en `e3/src`.
+- `paridad_e3.py --sin-hoja`: la regla 4 recorre las 15 entradas del riel y falla con el botón o la palabra; el control
+  estático, con la palabra en las fuentes o en el tablero armado.
+- `verificar.py --web` (vault, presentación): cada número visible contra las partes A a D.
+

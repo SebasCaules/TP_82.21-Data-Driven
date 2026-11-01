@@ -4,11 +4,12 @@
 // alcanza con crear el archivo. Una vista sin archivo se muestra como esqueleto con su pregunta. Un
 // `V*.jsx` sin `default` (V05_Simulador.jsx, una pieza de la vista 5) no se registra.
 //
-// La historia (PLAN.md del E3, «La historia»): siete vistas presentadas y el grupo «Respaldo» con los
+// La historia (PLAN.md del E3, «La historia»): siete vistas presentadas (ocho desde el 01/11) y el grupo «Respaldo» con los
 // anexos A1 a A7 de C3. Desde W3 (27/10), las vistas 7 a 9 de la tabla del plan van en una sola, la V07
 // («7 a 9 en una»): con las dos o tres de la corrección al otro grupo (W5) quedan nueve como mucho. Desde
 // la crítica del W3 (hallazgo 5), el test (la 7 del plan) va en la vista 4, que decide con él, y la V07
-// responde una sola pregunta: qué decide María G. con el piloto. `de`
+// responde una sola pregunta: qué decide María G. con el piloto. (01/11) La V08 muestra lo que hasta ese día iba
+// detrás de un botón en la V07: el flujo de cada mes, el plan de 20 semanas y lo que decide María G. `de`
 // dice de qué diapositivas de C3 sale cada vista: de ahí toman el guion las notas del orador (N). La
 // pregunta va en una línea de hasta 74 caracteres (regla 12 del E2). `fuente` reemplaza la que el
 // encabezado arma con las diapositivas cuando la vista sale de una Parte que C3 todavía no tiene (la D).
@@ -32,7 +33,9 @@ const HISTORIA = [
   { id: 'V05', corto: 'Se paga', pregunta: '¿Se paga?', de: [8, 9] },
   { id: 'V06', corto: 'Legal y seguro', pregunta: '¿Es legal y seguro?', de: [10, 11] },
   { id: 'V07', corto: 'El piloto', pregunta: '¿Qué decide María G. con el piloto?', de: [12],
-    fuente: 'Parte D 9, 11.1 y 12' },
+    fuente: 'Parte D 11.1 y 12.2' },
+  { id: 'V08', corto: 'Cada mes y semana', pregunta: '¿Cómo funciona cada mes y en qué semana?', de: [13],
+    fuente: 'Parte D 9.2 y 12' },
 ]
 // El respaldo: un anexo de C3 por vista. El nombre corto es el título del anexo hasta los dos puntos. Los
 // anexos que suman lo medido en test nombran también la sección de la Parte D de donde sale.
@@ -59,7 +62,7 @@ const RESPALDO = C3.ANEXOS.map((a) => ({
 const GRUPOS = [
   { nombre: null, ids: ['V01'] },
   { nombre: 'Partes A, B y C', ids: ['V02', 'V03', 'V04', 'V05', 'V06'] },
-  { nombre: 'Parte D y propuesta', ids: ['V07'] },
+  { nombre: 'Parte D y propuesta', ids: ['V07', 'V08'] },
   { nombre: 'Respaldo', ids: RESPALDO.map((a) => a.id) },
 ]
 

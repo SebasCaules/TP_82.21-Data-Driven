@@ -3,7 +3,7 @@
    .pant, .tarjeta, encabezado (.e2-enc, .e2-preg), banda de cifras (.e2-banda, .e2-kpis, .ban-par) y
    tarjeta de decisión (.tarjeta-dec). Acá va SOLO lo que el E2 no tiene, con el prefijo e3-: la caja del
    zoom, el esqueleto de las vistas que faltan, las notas del orador, la pantalla en negro y los
-   controles detrás de «Explorar». Ninguna regla de esta hoja nombra una clase del armazón ni :root
+   controles del simulador del anexo A3. Ninguna regla de esta hoja nombra una clase del armazón ni :root
    (lo controla scripts/paridad_e3.py), salvo el bloque «Contraste de proyector» del final (N0-1,
    28/10): todas sus reglas van bajo .e3-vp, que solo existe en /e3/, así /e2/ no cambia. */
 
@@ -61,22 +61,9 @@
 /* ---------- pantalla en negro («.» o B, como en PowerPoint) ---------- */
 .e3-negro { position: fixed; inset: 0; z-index: 100; background: #000; cursor: none; }
 
-/* ---------- controles detrás de «Explorar» (controles.jsx) ---------- */
-/* Cerrado al llegar a cada vista. Mismo trazo que las etiquetas que llevan a otra vista en el E2
-   (borde --acc, mono, mayúsculas): se ve que se puede tocar y no compite con las cifras. */
-.e3-explorar {
-  align-self: flex-start; padding: 4px 12px;
-  border: 1px solid var(--acc); border-radius: 3px; background: var(--sup); color: var(--acc);
-  font: 600 var(--e2-rot)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
-  cursor: pointer;
-}
-.e3-explorar:hover { background: #eaeef4; }
-.e3-explorar.on { background: var(--acc); color: #fff; }
-.e3-explorar:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
-
-/* .e3-opciones: el selector detrás de «Explorar» de la vista 4 (validación o entrenamiento) y de la 6
-   (plan o matriz de riesgos); verificar_e3.py lo abre en cada resolución y mira __fit (W2).
-   .e3-desliz*: sin uso todavía; es del simulador de la tasa de éxito de la vista 5. */
+/* ---------- controles (controles.jsx) ----------
+   (01/11) Ninguna vista ni anexo esconde nada detrás de un botón. .e3-opciones y .e3-desliz* son el descuento y la
+   tasa de éxito del simulador del anexo A3, a la vista. */
 .e3-opciones {
   display: inline-flex; gap: 2px; padding: 2px;
   border: 1px solid var(--bd); border-radius: 3px; background: var(--papel);

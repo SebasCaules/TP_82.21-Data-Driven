@@ -21,6 +21,8 @@
 // - D-PIL · propuesta (crítica del W3, hallazgo 12): la regla de decisión del piloto, con 40,4 puntos o más
 //   a producción (vista 7; Parte D 11.1 y 12.2, hito 8; G49 y H49). Hasta entonces la vista 7 usaba D-PRO
 //   con otra frase corta: una decisión, una frase.
+// - D-PLA · propuesta (01/11, vista 8): el plan de 20 semanas, con la primera lista en la semana 6 y la decisión de
+//   producción en la 20 (Parte D 12.1 a 12.4; J50).
 //
 // (28/10, F6b, hallazgo H-2-077 de la auditoría) Los ids son internos: ningún documento que lee la cátedra los
 // define (en el E2, los DC-xx estaban en la Parte B). La tarjeta muestra en su lugar el área de la decisión,
@@ -47,6 +49,7 @@ const PROPIAS = [
   { id: 'C-MOD', area: 'Modelo', estado: 'sale la regla' },
   { id: 'D-PRO', area: 'Alcance', estado: 'propuesta' },
   { id: 'D-PIL', area: 'Piloto', estado: 'propuesta' },
+  { id: 'D-PLA', area: 'Plan', estado: 'propuesta' },
 ]
 
 export const DECISIONES = Object.fromEntries([

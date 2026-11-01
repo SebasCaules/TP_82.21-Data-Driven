@@ -16,14 +16,12 @@
 //   identificado»). Solo «Capacidad humana» va en --acc y peso 700: es el límite que dice la decisión.
 //   Sin eje ni tramo sombreado.
 // - Conclusión del gráfico (.e3-conclusion, arriba a la izquierda): la cola del título de la diapositiva
-//   4, «Los datos alcanzan y el límite es quién opera la lista», con el límite en --acc. A la derecha, lo
-//   barato del MVP (diapositiva 5) si hay lugar (V03.css lo oculta en la ventana lógica de 1152) y el
-//   botón que lo abre.
-// - Explorar: el MVP de la diapositiva 5 (cinco pasos y tres hechos), en el lugar del gráfico y centrado
-//   en el alto de la tarjeta. Cerrado al llegar; el guion de la 5 está en las notas (N).
+//   4, «Los datos alcanzan y el límite es quién opera la lista», con el límite en --acc.
+// - (01/11, a la vista) Debajo del puntaje, en la misma tarjeta, el producto mínimo de la diapositiva 5: el
+//   título y los tres hechos en un renglón y los cinco pasos en una fila. Hasta el 01/11 iba detrás de un
+//   botón; el puntaje cede el alto que ocupa (sus filas se achican con el Lienzo).
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y el texto de C3 (contenido_e3.js).
 
-import { useState } from 'react'
 import { Lienzo } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
@@ -32,7 +30,6 @@ import { C3 } from '../contenido_e3.js'
 import { fijo, pctDirecto } from '../formato.js'
 import { Rico, plano, sinCodigos } from '../texto.jsx'
 import { decision } from '../decisiones.js'
-import { BotonExplorar } from '../controles.jsx'
 import { Cifra } from '../cifra.jsx'
 import { TarjetaPuntaje } from './V03Puntaje.jsx'
 import './V03.css'
@@ -74,10 +71,6 @@ const FILAS = T.condiciones.map((c) => ({
   id: c.id, nombre: c.nombre, puntaje: c.puntaje, limite: c.id === ID_LIMITE, ...razonDe(c),
 }))
 
-// Lo barato del MVP (diapositiva 5): «USD 0 en licencias y 1 computadora».
-const [LIC, PC] = D5.hechos
-const MVP_CORTO = `MVP: ${plano(LIC.valor)} ${plano(LIC.texto)} y ${plano(PC.valor)}`
-
 // La decisión: el título de la diapositiva 4 sin «los datos alcanzan y». Si C3 cambia de forma, queda el
 // título entero y la verificación avisa si pasa de 60 caracteres. La conclusión del gráfico es la cola
 // entera del título («los datos alcanzan y el límite es quién opera la lista»).
@@ -94,29 +87,26 @@ const DECISION = decision('A-TEC', {
   justificacion: `${plano(filaDe(LIMITE)?.texto)} ${plano(D4.nota)}`,
 })
 
-// El MVP de la diapositiva 5, detrás de «Explorar»: los pasos en orden y los tres hechos debajo.
+// El MVP de la diapositiva 5, a la vista: el título y los hechos en un renglón; los pasos en orden, en una fila.
 function Mvp() {
   return (
-    <div style={{ flex: '1 1 0', minHeight: 0, marginTop: 'clamp(6px, 1.6cqh, 20px)',
-                  display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'clamp(8px, 2cqh, 22px)' }}>
-      <ol style={{ display: 'grid', gridTemplateColumns: `repeat(${D5.pasos.length}, minmax(0, 1fr))`,
-                   gap: 'clamp(8px, 1cqw, 16px)', margin: 0, padding: 0, listStyle: 'none' }}>
+    <div className="e3-v03-mvp" title={`${plano(D5.titulo)}. ${D5.pasos.map((p) => `${p.titulo}: ${plano(p.texto)}`).join(' ')} ${D5.hechos.map((x) => `${plano(x.valor)} ${plano(x.texto)}`).join(' · ')}`}>
+      <p className="e3-v03-mvp-cab">
+        <span className="e3-v03-mvp-tit">{`Producto mínimo: ${plano(D5.titulo).replace(/^Con /, '').replace(/^./, (c) => c.toLowerCase())}`}</span>
+        <span className="e3-v03-mvp-hechos">
+          {D5.hechos.map((h, i) => (
+            <span key={h.valor}>{i ? ' · ' : ''}<b><Rico t={h.valor} /></b>{' '}<Rico t={sinCodigos(h.texto)} /></span>
+          ))}
+        </span>
+      </p>
+      <ol className="e3-v03-pasos" style={{ gridTemplateColumns: `repeat(${D5.pasos.length}, minmax(0, 1fr))` }}>
         {D5.pasos.map((p, i) => (
-          <li key={p.titulo} style={{ minWidth: 0, border: '1px solid var(--bd)', borderTop: '3px solid var(--azul3)',
-                                      padding: 'clamp(6px, 1.4cqh, 14px) clamp(8px, 0.9cqw, 14px)' }}>
-            <span className="kpi-lbl"><span>{`${i + 1} · ${p.titulo}`}</span></span>
-            <p className="e2-nota"><Rico t={p.texto} /></p>
+          <li key={p.titulo}>
+            <span className="e3-v03-paso-tit">{`${i + 1} · ${p.titulo}`}</span>
+            <span className="e3-v03-paso-txt"><Rico t={p.texto} /></span>
           </li>
         ))}
       </ol>
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${D5.hechos.length}, minmax(0, 1fr))`,
-                    gap: 'clamp(8px, 1cqw, 16px)' }}>
-        {D5.hechos.map((h) => (
-          <p key={h.valor} className="e2-linea" style={{ margin: 0 }}>
-            <b><Rico t={h.valor} /></b>{' '}<Rico t={sinCodigos(h.texto)} />
-          </p>
-        ))}
-      </div>
     </div>
   )
 }
@@ -125,11 +115,8 @@ export const meta = { id: 'V03', dc: 'A-TEC' }
 
 export default function V03SePuedeHacer() {
   const k = useEscalaTexto()
-  const [explorar, setExplorar] = useState(false)
   const datos = filaDe(T.condiciones.find((c) => c.id === 'datos'))
   const calidad = filaDe(T.condiciones.find((c) => c.id === 'calidad'))
-  // Tocado con el mouse, el botón suelta el foco: las flechas siguen pasando de vista (patrón de V07).
-  const soltar = (e) => { if (e.detail) e.target.closest?.('button')?.blur() }
   return (
     <section className="pant v03">
       <Banda dcs={[DECISION]}>
@@ -165,26 +152,16 @@ export default function V03SePuedeHacer() {
         </div>
       </Banda>
 
-      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
+      <div className="tarjeta e3-v03-tarjeta">
         <div className="e3-v03-cab">
-          {explorar
-            ? <p className="e3-conclusion">{plano(D5.titulo)}</p>
-            : <p className="e3-conclusion">{CONCLUSION_ANTES}<b>{CONCLUSION_LIMITE}</b></p>}
-          {!explorar && (
-            <span className="e3-v03-mvp tabular"
-                  title={D5.hechos.map((x) => `${plano(x.valor)} ${plano(x.texto)}`).join(' · ')}>{MVP_CORTO}</span>
-          )}
-          <span style={{ alignSelf: 'center', display: 'flex' }} onClick={soltar}>
-            <BotonExplorar abierto={explorar} onCambio={setExplorar} />
-          </span>
+          <p className="e3-conclusion">{CONCLUSION_ANTES}<b>{CONCLUSION_LIMITE}</b></p>
         </div>
-        {explorar ? <Mvp /> : (
-          <div className="e3-v03-graf">
-            <Lienzo className="lienzo">
-              {({ w, h }) => <TarjetaPuntaje filas={FILAS} tope={TOPE_ESCALA} k={k} w={w} h={h} />}
-            </Lienzo>
-          </div>
-        )}
+        <div className="e3-v03-graf">
+          <Lienzo className="lienzo">
+            {({ w, h }) => <TarjetaPuntaje filas={FILAS} tope={TOPE_ESCALA} k={k} w={w} h={h} />}
+          </Lienzo>
+        </div>
+        <Mvp />
       </div>
     </section>
   )

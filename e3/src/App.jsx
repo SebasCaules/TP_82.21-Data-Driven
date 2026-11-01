@@ -7,8 +7,8 @@
 //    pantalla en negro hasta la próxima tecla; una tecla mantenida no recorre el tablero.
 // 3. Dos ventanas con la misma dirección se siguen (BroadcastChannel): la del proyector y la de la
 //    laptop con las notas, en panel (N) o solas (?notas).
-// Sin controles a la vista: lo que una vista deje tocar va detrás de «Explorar» (controles.jsx),
-// cerrado al llegar.
+// (01/11) Nada detrás de un botón: cada vista llega completa. El único control es el simulador de la tasa de
+// éxito del anexo A3, a la vista (controles.jsx).
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'

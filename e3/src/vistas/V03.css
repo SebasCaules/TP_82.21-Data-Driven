@@ -1,23 +1,42 @@
 /* Vista 3 (28/10, .workforce/PLAN.md, unidad V03; N0-7: clases e3-v03-*). */
 
-/* Encabezado de la tarjeta del gráfico: la conclusión a la izquierda (crece), lo barato del MVP y el
-   botón «Explorar» a la derecha. */
+/* La tarjeta del gráfico: la conclusión, el puntaje (crece) y el producto mínimo debajo (01/11). */
+.e3-v03-tarjeta { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+
+/* Encabezado de la tarjeta del gráfico: la conclusión. */
 .e3-v03-cab {
   display: flex; align-items: baseline; gap: clamp(10px, 1.2cqw, 20px);
 }
 .e3-v03-cab > .e3-conclusion { flex: 1 1 auto; }
-.e3-v03-mvp {
-  flex: none; white-space: nowrap;
-  font: 600 var(--e2-txt2)/1.2 var(--fuente); color: var(--e3-ctx, #5a6478);
-}
-/* En la ventana lógica de 1152 (1152 × 640 y 1366 × 768) no entra al lado de la conclusión: queda
-   detrás de «Explorar», que lo muestra entero. */
-@container e3vp (max-width: 1200px) {
-  .e3-v03-mvp { display: none; }
-}
 
-/* El gráfico llena el alto que deja el encabezado. */
+/* El gráfico llena el alto que dejan el encabezado y el producto mínimo. */
 .e3-v03-graf {
-  flex: 1 1 0; min-height: 0; margin-top: clamp(8px, 1.8cqh, 22px);
+  flex: 1 1 0; min-height: 0; margin-top: clamp(4px, 1cqh, 14px);
   display: flex; flex-direction: column;
 }
+
+/* El producto mínimo de la diapositiva 5, a la vista (01/11): un renglón con el título y los hechos, y los cinco
+   pasos en una fila, con el filete de los pasos del E2 arriba. */
+.e3-v03-mvp {
+  flex: none; margin-top: clamp(4px, 1cqh, 12px); padding-top: clamp(6px, 1.2cqh, 12px);
+  border-top: 1px solid var(--bd);
+  display: flex; flex-direction: column; gap: clamp(4px, .9cqh, 10px);
+}
+.e3-v03-mvp-cab {
+  margin: 0; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap;
+  gap: 2px clamp(10px, 1.4cqw, 24px);
+}
+.e3-v03-mvp-tit {
+  font: 600 var(--e2-rot, 12px)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink);
+}
+.e3-v03-mvp-hechos { font: 400 var(--e2-txt2, 14px)/1.25 var(--fuente); color: var(--e3-ctx, #5a6478); }
+.e3-v03-mvp-hechos b { color: var(--ink); font-weight: 700; }
+.e3-v03-pasos {
+  display: grid; gap: clamp(6px, .8cqw, 12px); margin: 0; padding: 0; list-style: none;
+}
+.e3-v03-pasos li {
+  min-width: 0; display: flex; flex-direction: column; gap: 2px;
+  border-top: 3px solid var(--azul3); padding-top: clamp(3px, .6cqh, 6px);
+}
+.e3-v03-paso-tit { font: 700 var(--e2-txt2, 14px)/1.2 var(--fuente); color: var(--ink); }
+.e3-v03-paso-txt { font: 400 var(--e2-txt2, 14px)/1.25 var(--fuente); color: var(--e3-ctx, #5a6478); }
