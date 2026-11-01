@@ -106,7 +106,7 @@ Las diapositivas 2, 5, 10 y 11 y los anexos A1 a A6 salen solo de `C3`.
 
 ## 3. `D3` (datos)
 
-`{meta, caso, tecnica, modelos, lista, economia, piloto, encuadre, legal, test, plan, solucion, monitoreo, anclas}`. Entre paréntesis: cómo lo escribe
+`{meta, caso, tecnica, modelos, lista, economia, piloto, encuadre, legal, test, plan, monitoreo, anclas}`. Entre paréntesis: cómo lo escribe
 el documento y la fila del registro (`wiki/entregables/cifras-entregable-3.md`).
 
 ### `caso`: diapositiva 3 (H23, C 7.3)
@@ -312,18 +312,7 @@ la de 500 contactables por corte, salvo en `sin_filtro`.
   desde_semana, hasta_semana, semanas, desde, hasta}` (fechas ISO: el piloto, semanas 6 a 18, del 2026-12-07
   al 2027-03-07; la decisión termina el 2027-03-21), `semanas` 20 y `hitos_semana` (alcance 1, regla del target
   y operador del piloto 2, María G. designa quién inscribe las bases (`designa_l1`) 2, acciones legales y control
-  4, extracto regenerado y go-live 6, operador de después del piloto 13, decisión 20). (30/10) `hitos[] = {n, clave,
-  semana, desde}`: los ocho hitos de la D 12.2 en su orden, con la clave de `hitos_semana` que da su semana y el lunes
-  de esa semana (el 6, go-live, «2026-12-07»); `plazos` (D 12.3 y 10.1): `aviso_extracto` 5, `adenda_crm_desde` 5,
-  `talleres` [5, 19]. Los usan las vistas 9 y 11.
-
-### `solucion` (30/10, D 9 y 10: vistas 7 a 9)
-
-Constantes del diseño de la solución que las vistas escriben y que no vienen en los JSON, cada una con su ancla:
-`completitud_minima` 0,60 (H46: un mes con menos del 60 % de las operaciones del mismo mes del año anterior no se
-usa; D 9.2, 10.1 a 10.3), `alto_valor` 0,20 (G50: el control se sortea fuera del 20 % de mayor facturación),
-`oferta_dias` 7 (G32), `talleres` 2 (G37), `alerta_adopcion` 0,50 (H46, D 10.2), `horas_carga_crm` 8 (H46, D 9.5) y
-`decisiones_calidad` 15 (F15, D 9.2).
+  4, extracto regenerado y go-live 6, operador de después del piloto 13, decisión 20).
 - `monitoreo.campanias_noviembre[] = {anio, fecha, id_campania}` (J51): el primer envío de noviembre de cada año,
   calculado del CSV. `monitoreo.drift` (J53, desde el 28/10; hasta la D v1.2 era el semáforo del E1, J52): la
   alerta de la D 10.2 sale de `data/e3/serie_riesgo.json` (`_build/D/drift/serie_riesgo.py`): `umbral_suba_pp` 2,1
@@ -335,7 +324,7 @@ usa; D 9.2, 10.1 a 10.3), `alto_valor` 0,20 (G50: el control se sortea fuera del
 
 `meta.fuentes[] = {archivo, sha256}` de los siete JSON, `src/datos.js` y `data/raw/Campanias_marketing.csv`;
 `meta.contenido = {archivo, version, sha256}`
-del `contenido_e3.js` con que se armó `D3`. `anclas[] = {id, nombre, documento, donde}`: las 425
+del `contenido_e3.js` con que se armó `D3`. `anclas[] = {id, nombre, documento, donde}`: las 409
 comprobaciones, con el texto del documento y dónde lo escribe («B 3.6 · C3 d9»). Cuando `donde` nombra
 una diapositiva o un anexo de `C3`, el script comprobó que ese texto está ahí. Sirven para un
 `title` de fuente.
@@ -353,9 +342,8 @@ una diapositiva o un anexo de `C3`, el script comprobó que ese texto está ahí
 | Diferencias de aciertos por largo y filtro (diapositiva 7) | las partes escriben solo la de 500 contactables (29) | `comparaciones`, anclado a la fila H48 del registro |
 | Legal, riesgos, sensibilidad, matriz, segmentos y costos por componente (10, 11, A3 a A6) | el pedido los deja en texto | `C3`; los números de A3 y A6 que también están en `D3` son anclas. Desde W3, el puntaje legal, el 30,1 % y los 13 riesgos (3 críticos) están en `D3.legal` |
 | Puntajes de las cinco dimensiones legales y su tramo (C 5.3) | ningún JSON los trae | constantes en `build_e3.py`; el script comprueba nombres y puntajes contra `C3` d10 |
-| Fases, semanas e hitos del plan (D 12) | `contenido_d_solucion.py` no escribe un JSON | constantes en `build_e3.py` (la tabla `FASES` de la D, con sus mismas comprobaciones de duración y orden; desde el 30/10 también `HITOS_D` y `PLAZOS_PLAN`); las fechas se calculan desde el lunes 02/11/2026 |
-| Umbrales y constantes del diseño de la solución (D 9 y 10) | ningún JSON los trae | `D3.solucion`, constantes en `build_e3.py` con su fila del registro |
-| Texto de las vistas 7 a 11 (Parte D) | (30/10) `contenido.py` suma las diapositivas 13 a 16 con su guion, no sus tablas | el texto de las tablas va en cada vista (`V07_Solucion.jsx` a `V11_Plan.jsx`), en fragmentos de la D, con todos los números de `D3`; `verificar.py --web` de la presentación busca cada número visible en las partes |
+| Fases, semanas e hitos del plan (D 12) | `contenido_d_solucion.py` no escribe un JSON | constantes en `build_e3.py` (la tabla `FASES` de la D, con sus mismas comprobaciones de duración y orden); las fechas se calculan desde el lunes 02/11/2026 |
+| Texto de las vistas 7 y 8 (Parte D) | `contenido.py` de la presentación (v1.2) no tiene diapositivas de la D | los números ya están en `D3.test` y `D3.plan`; el texto entra a `C3` cuando `contenido.py` sume esas diapositivas y se vuelva a correr `exportar_web.py` |
 
 > **Nota.** En la importancia, `reclamos_90d` (0,5 puntos, H21) pesa más que `edad` (0,4) y no está ni
 > en el gráfico de la diapositiva 7 ni en la tabla de la C 7.3, que eligen variables con lectura de

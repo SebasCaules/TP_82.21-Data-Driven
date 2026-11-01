@@ -12,12 +12,6 @@
 // dice de qué diapositivas de C3 sale cada vista: de ahí toman el guion las notas del orador (N). La
 // pregunta va en una línea de hasta 74 caracteres (regla 12 del E2). `fuente` reemplaza la que el
 // encabezado arma con las diapositivas cuando la vista sale de una Parte que C3 todavía no tiene (la D).
-//
-// (30/10, e3/DISENO.md, «Decisiones (30/10): sin Explorar, 11 vistas») Once vistas y ningún «Explorar». La Parte D
-// sigue el orden de la lámina 23 de la clase 13: primero el diseño de la solución y los criterios de go-live (7, ¿qué
-// solución?; 8, ¿cómo funciona cada mes?; 9, ¿qué tiene que estar listo para el go-live?), después el piloto (10, la
-// que era la 7) y el plan que lleva hasta ahí (11). Cada vista nueva sale de su diapositiva de C3 (13 a 16); la 8 dice
-// también la diapositiva 5 (el MVP, que hasta el 30/10 iba detrás de «Explorar» en la vista 3).
 
 import { C3 } from '../contenido_e3.js'
 import Esqueleto from './Esqueleto.jsx'
@@ -32,21 +26,13 @@ for (const [ruta, m] of Object.entries(modulos)) {
 const HISTORIA = [
   { id: 'V01', corto: 'La respuesta', pregunta: '¿Conviene anticipar a quien deja de comprar?', de: [2] },
   { id: 'V02', corto: 'Quién se va', pregunta: '¿Quién se va?', de: [3] },
-  { id: 'V03', corto: 'Se puede hacer', pregunta: '¿Se puede hacer?', de: [4] },
+  { id: 'V03', corto: 'Se puede hacer', pregunta: '¿Se puede hacer?', de: [4, 5] },
   { id: 'V04', corto: 'Modelo o regla', pregunta: '¿El modelo mejora a la regla?', de: [6, 7],
     fuente: 'Partes A, B, C y D' },
   { id: 'V05', corto: 'Se paga', pregunta: '¿Se paga?', de: [8, 9] },
   { id: 'V06', corto: 'Legal y seguro', pregunta: '¿Es legal y seguro?', de: [10, 11] },
-  { id: 'V07', corto: 'Qué solución', pregunta: '¿Qué solución?', de: [13],
-    fuente: 'Parte D 9.1' },
-  { id: 'V08', corto: 'Cada mes', pregunta: '¿Cómo funciona cada mes?', de: [5, 14],
-    fuente: 'Partes A 1.6 · D 9.2 a 9.5' },
-  { id: 'V09', corto: 'Go-live', pregunta: '¿Qué tiene que estar listo para el go-live?', de: [15],
-    fuente: 'Parte D 10.1 a 10.3' },
-  { id: 'V10', corto: 'El piloto', pregunta: '¿Qué decide María G. con el piloto?', de: [12],
+  { id: 'V07', corto: 'El piloto', pregunta: '¿Qué decide María G. con el piloto?', de: [12],
     fuente: 'Parte D 9, 11.1 y 12' },
-  { id: 'V11', corto: 'El plan', pregunta: '¿Cómo se llega?', de: [16],
-    fuente: 'Parte D 12.1 a 12.4' },
 ]
 // El respaldo: un anexo de C3 por vista. El nombre corto es el título del anexo hasta los dos puntos. Los
 // anexos que suman lo medido en test nombran también la sección de la Parte D de donde sale.
@@ -73,7 +59,7 @@ const RESPALDO = C3.ANEXOS.map((a) => ({
 const GRUPOS = [
   { nombre: null, ids: ['V01'] },
   { nombre: 'Partes A, B y C', ids: ['V02', 'V03', 'V04', 'V05', 'V06'] },
-  { nombre: 'Parte D y propuesta', ids: ['V07', 'V08', 'V09', 'V10', 'V11'] },
+  { nombre: 'Parte D y propuesta', ids: ['V07'] },
   { nombre: 'Respaldo', ids: RESPALDO.map((a) => a.id) },
 ]
 

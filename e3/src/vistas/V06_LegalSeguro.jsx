@@ -21,13 +21,13 @@
 //   tramo «antes de la primera lista del piloto»). Conclusión arriba, en .e3-conclusion: la cola del
 //   título de la diapositiva 10, «El riesgo es contactar sin consentimiento». Una sola idea: los tres
 //   riesgos críticos quedan en la banda y en «Explorar».
-// - (30/10, sin «Explorar») El plan de acción legal L1 a L6, con su dueño y su tramo (lo pide la Parte C 5.4),
-//   pasa a verse en la vista, a la derecha de la barra, en el mismo svg. Debajo, a todo el ancho, las cinco
-//   dimensiones en una línea («2 de 3 cada una», D3.legal.dimensiones) y las normas (nota de la diapositiva 10).
-//   La matriz de los 13 riesgos queda en el anexo A4, a la vista; la señal y el umbral de cada riesgo crítico
-//   están en la vista 9 (monitoreo) y en el title de la tarjeta de riesgos.
+// - «Explorar», cerrado al llegar, con tres paneles: las cinco dimensiones en pips (D3.legal.dimensiones,
+//   lo que antes era el gráfico; ya no usa PuntajeDimensiones), el plan L1 a L6 en sus dos tramos con dueño
+//   y la matriz de los 13 riesgos (anexo A4), donde cada riesgo crítico muestra qué se mide, su umbral y
+//   quién lo mira. Las normas, la escala y los límites, en el pie de cada panel.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js; el texto, de C3.
 
+import { useState } from 'react'
 import { Lienzo, Tramas } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
@@ -36,6 +36,7 @@ import { NBSP, entero, fijo, pct } from '../formato.js'
 import { plano, sinCortes } from '../texto.jsx'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
+import { BotonExplorar, Opciones } from '../controles.jsx'
 import { Cifra } from '../cifra.jsx'
 import { anchoTexto as ancho } from '../medir.js'
 import { RIESGO_12 } from '../riesgo12.js'
@@ -82,6 +83,7 @@ const RIESGOS = A4.filas.map((f, i) => ({
 }))
 A4.destacar.forEach((i, j) => { if (D11.columnas[j]) RIESGOS[i].senal = D11.columnas[j] })
 const CRITICOS = RIESGOS.filter((r) => r.critico)
+const PRIMERO = RIESGOS[A4.destacar[0]] ?? CRITICOS[0]
 if (CRITICOS.length !== L.riesgos_criticos || RIESGOS.length !== L.riesgos) {
   throw new Error(`V06: A4 (${CRITICOS.length} de ${RIESGOS.length}) no coincide con D3.legal (${L.riesgos_criticos} de ${L.riesgos})`)
 }
@@ -180,56 +182,153 @@ function Rotulo({ x, y, texto, f, color = MUT2, ancla = 'start' }) {
   )
 }
 
-// ---------------------------------------------------------------- el plan L1 a L6, a la vista (30/10)
+// ---------------------------------------------------------------- Explorar: el plan L1 a L6
 
 function PlanLegal({ w, h, k }) {
-  // (30/10) Los dos tramos uno debajo del otro, una acción por renglón: la sigla, qué se hace y quién responde, en
-  // columnas. La letra baja hasta que todo entra en el alto; nada se corta.
-  const filas = D10.plan.reduce((n, t) => n + 1 + t.acciones.length, 0)
-  const anchoId = (id, fr) => ancho(id, fr, 700, true) + 10 * k
-  let f = 15 * k
-  const medir = (fx) => {
-    const fr = fx * 0.78
-    const wId = Math.max(...ACCIONES.map((a) => anchoId(a.id, fr)))
-    const xQue = wId + 10 * k
-    const xQuien = xQue + (w - xQue) * 0.56
-    const lineas = D10.plan.map((t) => t.acciones.map((a) => Math.max(
-      envolver(a.que, xQuien - xQue - 12 * k, fx, 600).length, envolver(a.quien, w - xQuien, fx * 0.9).length)))
-    const alto = D10.plan.length * (fr * 2.2) + lineas.flat().reduce((x, n) => x + n * fx * 1.3 + fx * 0.55, 0)
-    return { fr, wId, xQue, xQuien, lineas, alto }
-  }
-  let m = medir(f)
-  while (m.alto > h && f > 10 * k) { f -= 0.25; m = medir(f) }
-  let y = 0
-  const out = []
-  D10.plan.forEach((t, i) => {
-    y += i ? m.fr * 0.7 : 0
-    out.push(
-      <g key={t.cuando}>
-        <Rotulo x={0} y={y + 2} texto={t.cuando} f={m.fr} color={INK} />
-        <line x1={0} x2={w} y1={y + m.fr * 1.55} y2={y + m.fr * 1.55} stroke={EJE} strokeWidth="1" />
-      </g>,
-    )
-    y += m.fr * 2.2 - (i ? m.fr * 0.7 : 0) + (i ? m.fr * 0.7 : 0)
-    t.acciones.forEach((a, j) => {
-      const n = m.lineas[i][j]
-      out.push(
-        <g key={a.id}>
-          <title>{`${a.id} · ${plano(a.que)} · ${plano(a.quien)} · ${t.cuando}`}</title>
-          <rect x={0} y={y} width={m.wId} height={m.fr + 7 * k} rx="2" fill="var(--azul1)" />
-          <text x={m.wId / 2} y={y + (m.fr + 7 * k) / 2} fontSize={m.fr} fontWeight={700} fill={ACC}
-                fontFamily="var(--mono)" textAnchor="middle" dominantBaseline="central">{a.id}</text>
-          <Renglones lineas={envolver(a.que, m.xQuien - m.xQue - 12 * k, f, 600)} x={m.xQue} y={y + 1} f={f} peso={600} />
-          <Renglones lineas={envolver(a.quien, w - m.xQuien, f * 0.9)} x={m.xQuien} y={y + 1 + f * 0.08} f={f * 0.9} color={MUT2} />
-        </g>,
-      )
-      y += n * f * 1.3 + f * 0.55
-    })
-  })
+  const f = 14 * k
+  const f2 = 12.5 * k
+  const fRot = 11 * k
+  const sep = 28 * k
+  const pie = envolver(D10.nota, w, f2)
+  const altoPie = pie.length * f2 * 1.3 + 8 * k
+  const cols = D10.plan.map((t) => t.acciones.length)
+  const anchoId = (id) => ancho(id, fRot, 700, true) + 10 * k
+  // Cada tramo mide lo que necesita su rótulo o su acción más larga; lo que sobra se reparte en proporción.
+  const necesita = D10.plan.map((t) => Math.max(anchoRotulo(t.cuando, fRot),
+    ...t.acciones.map((a) => anchoId(a.id) + 8 * k + Math.max(ancho(plano(a.que), f, 600), ancho(plano(a.quien), f2)))))
+  const factor = (w - sep * (cols.length - 1)) / necesita.reduce((a, b) => a + b, 0)
+  const anchos = necesita.map((x) => x * factor)
+  const y0 = arriba(fRot)
+  const yIni = y0 + fRot + 14 * k
+  const fila = Math.min(54 * k, (h - yIni - altoPie) / Math.max(...cols))
+  const dosRenglones = fila >= (f + f2) * 1.35
+  let xc = 0
   return (
-    <svg width={w} height={h} role="img" style={{ display: 'block' }} aria-label={`Plan legal: ${DECISION.decision}`}
-         data-filas={filas}>
-      {out}
+    <svg width={w} height={h} role="img" style={{ display: 'block' }}
+         aria-label={`Plan legal: ${DECISION.decision}`}>
+      {D10.plan.map((t, i) => {
+        const wc = anchos[i]
+        const x = xc
+        xc += wc + sep
+        return (
+          <g key={t.cuando}>
+            <Rotulo x={x} y={y0} texto={t.cuando} f={fRot} color={INK} />
+            <line x1={x} x2={x + wc} y1={y0 + fRot + 6 * k} y2={y0 + fRot + 6 * k} stroke={EJE} strokeWidth="1" />
+            {t.acciones.map((a, j) => {
+              const y = yIni + j * fila
+              const wId = anchoId(a.id)
+              const xt = x + wId + 8 * k
+              return (
+                <g key={a.id}>
+                  <title>{`${a.id} · ${plano(a.que)} · ${plano(a.quien)} · ${t.cuando}`}</title>
+                  <rect x={x} y={y} width={wId} height={fRot + 8 * k} rx="2" fill="var(--azul1)" />
+                  <text x={x + wId / 2} y={y + (fRot + 8 * k) / 2} fontSize={fRot} fontWeight={700} fill={ACC}
+                        fontFamily="var(--mono)" textAnchor="middle" dominantBaseline="central">{a.id}</text>
+                  <Renglones lineas={envolver(a.que, x + wc - xt, f, 600)} x={xt} y={y} f={f} peso={600} />
+                  {dosRenglones && <Renglones lineas={envolver(a.quien, x + wc - xt, f2)} x={xt} y={y + f * 1.35} f={f2} color={MUT2} />}
+                </g>
+              )
+            })}
+          </g>
+        )
+      })}
+      <Renglones lineas={pie} x={0} y={h - altoPie + 8 * k} f={f2} color={MUT2} />
+    </svg>
+  )
+}
+
+// ---------------------------------------------------------------- Explorar: la matriz de los 13 riesgos
+
+const NIVELES = ['A', 'M', 'B']                         // la probabilidad, alta arriba
+const IMPACTOS = ['B', 'M', 'A']                        // el impacto crece a la derecha
+const PROB = { A: 'alta', M: 'media', B: 'baja' }
+const IMP = { A: 'alto', M: 'medio', B: 'bajo' }
+
+function MatrizRiesgos({ w, h, k, sel, setSel }) {
+  const f = 14 * k
+  const f2 = 12.5 * k
+  const fRot = 11 * k
+  const pie = envolver(D11.nota, w, f2)
+  const altoPie = pie.length * f2 * 1.3 + 8 * k
+  const gw = Math.min(w * 0.46, 520 * k)
+  const labW = Math.max(...NIVELES.map((p) => ancho(PROB[p], f2))) + 12 * k
+  const y0 = arriba(fRot)
+  const top = y0 + fRot + 10 * k
+  const bajo = fRot + f2 + 18 * k
+  const cw = (gw - labW) / 3
+  const ch = (h - altoPie - top - bajo) / 3
+  const r = Math.min(13 * k, ch / 5)
+  const paso = 2 * r + 5 * k
+  const porFila = Math.max(1, Math.floor((cw - 8 * k) / paso))
+  const riesgo = RIESGOS.find((x) => x.n === sel) ?? PRIMERO
+
+  // detalle del riesgo elegido, a la derecha
+  const dx = gw + 28 * k
+  const dw = w - dx
+  const bloques = []
+  let y = y0
+  const push = (el, alto) => { bloques.push(el); y += alto }
+  if (riesgo) {
+    push(<Rotulo key="r" x={dx} y={y} f={fRot} color={riesgo.critico ? ACC : MUT2}
+                 texto={`Riesgo ${riesgo.n} · ${riesgo.tipo}${riesgo.critico ? ' · crítico' : ''}`} />, fRot + 10 * k)
+    const lt = envolver(riesgo.texto, dw, f, 600)
+    push(<Renglones key="t" lineas={lt} x={dx} y={y} f={f} peso={600} />, lt.length * f * 1.3 + 4 * k)
+    push(<text key="p" x={dx} y={y} fontSize={f2} fill={MUT2} dominantBaseline="hanging">
+      {`Probabilidad ${PROB[riesgo.prob]} · impacto ${IMP[riesgo.imp]} · ${riesgo.estrategia}`}</text>, f2 * 1.3 + 12 * k)
+    for (const fl of riesgo.senal?.filas ?? []) {
+      push(<Rotulo key={'r' + fl.rotulo} x={dx} y={y} f={fRot} texto={fl.rotulo} />, fRot + 6 * k)
+      const l = envolver(fl.texto, dw, f2)
+      push(<Renglones key={'t' + fl.rotulo} lineas={l} x={dx} y={y} f={f2} />, l.length * f2 * 1.3 + 8 * k)
+    }
+  }
+
+  return (
+    <svg width={w} height={h} role="group" style={{ display: 'block' }}
+         aria-label="Matriz de riesgos: probabilidad por impacto">
+      <Rotulo x={labW} y={y0} f={fRot} texto="Probabilidad" color={MUT2} />
+      {NIVELES.map((p, i) => (
+        <g key={p}>
+          <text x={labW - 8 * k} y={top + i * ch + ch / 2} fontSize={f2} fill={MUT2} textAnchor="end"
+                dominantBaseline="central">{PROB[p]}</text>
+          {IMPACTOS.map((im, j) => {
+            const cx = labW + j * cw
+            const cy = top + i * ch
+            const aqui = RIESGOS.filter((x) => x.prob === p && x.imp === im)
+            return (
+              <g key={im}>
+                <rect x={cx + 1} y={cy + 1} width={cw - 2} height={ch - 2} fill="var(--zona)" />
+                {aqui.map((x, m) => {
+                  const filas = Math.ceil(aqui.length / porFila)
+                  const enFila = Math.min(porFila, aqui.length - Math.floor(m / porFila) * porFila)
+                  const px = cx + cw / 2 + ((m % porFila) - (enFila - 1) / 2) * paso
+                  const py = cy + ch / 2 + (Math.floor(m / porFila) - (filas - 1) / 2) * paso
+                  const on = riesgo && x.n === riesgo.n
+                  return (
+                    <g key={x.n} tabIndex={0} role="button" data-control="" style={{ cursor: 'pointer', outline: 'none' }}
+                       aria-label={`Riesgo ${x.n}${x.critico ? ', crítico' : ''}: ${x.texto}`} aria-pressed={on}
+                       onFocus={() => setSel(x.n)}
+                       onClick={(e) => { setSel(x.n); if (e.detail) e.currentTarget.blur() }}>
+                      <title>{`Riesgo ${x.n} · ${x.texto}`}</title>
+                      {on && <circle cx={px} cy={py} r={r + 3.5 * k} fill="none" stroke={INK} strokeWidth={2} />}
+                      <circle cx={px} cy={py} r={r} fill={x.critico ? ACC : 'var(--sup)'}
+                              stroke={x.critico ? ACC : GRIS} strokeWidth="1.5" />
+                      <text x={px} y={py} fontSize={f2} fontWeight={700} textAnchor="middle" dominantBaseline="central"
+                            fill={x.critico ? '#fff' : MUT2} className="tabular">{x.n}</text>
+                    </g>
+                  )
+                })}
+              </g>
+            )
+          })}
+        </g>
+      ))}
+      {IMPACTOS.map((im, j) => (
+        <text key={im} x={labW + j * cw + cw / 2} y={top + 3 * ch + 6 * k} fontSize={f2} fill={MUT2}
+              textAnchor="middle" dominantBaseline="hanging">{IMP[im]}</text>
+      ))}
+      <Rotulo x={labW + 3 * cw} y={top + 3 * ch + f2 + 12 * k} f={fRot} texto="Impacto" ancla="end" />
+      {bloques}
+      <Renglones lineas={pie} x={0} y={h - altoPie + 8 * k} f={f2} color={MUT2} />
     </svg>
   )
 }
@@ -257,8 +356,7 @@ function BarraEnvios({ w, h, k }) {
 
   // Alto fijo de todo lo que no es la barra; la barra se queda con el resto, entre un piso y un tope.
   const arribaAlto = arriba(fRot) + fRot + gap * 1.2 + fEtq + gap * 0.7
-  const como = envolver(COMO, w - 2, fSub, 500)
-  const abajoAlto = gap + llave + gap + fBig * 1.15 + fSub * 1.3 * como.length + fSub * 0.2
+  const abajoAlto = gap + llave + gap + fBig * 1.15 + fSub * 1.5
   const barra = Math.max(48 * k, Math.min(120 * k, (h - arribaAlto - abajoAlto) * 0.7))
   const alto = arribaAlto + barra + abajoAlto
   const y0 = Math.max(0, (h - alto) * 0.4)       // un poco arriba del centro: más cerca de la conclusión
@@ -312,42 +410,45 @@ function BarraEnvios({ w, h, k }) {
       <text x={xIni} y={yLista} fontSize={fBig} fontWeight={700} fill={INK} dominantBaseline="hanging">
         la lista sale sin ellos
       </text>
-      <Renglones lineas={como} x={xIni} y={yLista + fBig * 1.2} f={fSub} peso={500} color={CTX} />
+      <text x={xIni} y={yLista + fBig * 1.2} fontSize={fSub} fontWeight={500} fill={CTX}
+            dominantBaseline="hanging">{COMO}</text>
     </svg>
   )
 }
 
-// ---------------------------------------------------------------- la barra, el plan y la línea de las dimensiones
+// ---------------------------------------------------------------- Explorar: las cinco dimensiones
 
-const DIMS_LINEA = `Las ${DIMS.length} dimensiones, ${PAREJAS ? `${fijo(DIMS[0].puntaje, 0)}${PROM_UNIDAD} cada una` : `promedio ${PROM_TXT}`}: `
-  + DIMS.map((d, i) => (i ? minus(d.nombre) : d.nombre)).join(', ').replace(/, ([^,]+)$/, ' y $1') + '.'
-
-/** Un solo svg: la barra de los envíos a la izquierda, el plan L1 a L6 a la derecha y, abajo, las dimensiones y las normas. */
-function Cuerpo({ w, h, k }) {
+function Dimensiones({ w, h, k }) {
   const f2 = 12.5 * k
-  const fRot = 11 * k
-  const gap = 36 * k
-  const pieDims = envolver(DIMS_LINEA, w, f2)
-  const pieNormas = envolver(D10.nota, w, f2)
-  const altoPie = (pieDims.length + pieNormas.length) * f2 * 1.3 + 14 * k
-  const hArriba = h - altoPie
-  const wBarra = Math.round((w - gap) * 0.42)
-  const wPlan = w - gap - wBarra
-  const yPie = hArriba + 12 * k
+  const pie = envolver(D10.escala, w, f2)
+  const altoPie = pie.length * f2 * 1.3 + 8 * k
+  const paso = Math.min(64 * k, (h - altoPie) / DIMS.length)
+  const f = Math.min(18 * k, paso * 0.4)
+  const r = f * 0.42
+  const sep = r * 2.9
+  const anchoNom = Math.max(...DIMS.map((d) => ancho(d.nombre, f, 600)))
+  const xPip = anchoNom + 28 * k
+  const xVal = xPip + (TOPE - 1) * sep + r + 14 * k
   return (
-    <svg width={w} height={h} role="group" style={{ display: 'block' }}
-         aria-label={`${CONCLUSION}. Plan legal: ${DECISION.decision}. ${DIMS_LINEA}`}>
-      <g><BarraEnvios w={wBarra} h={hArriba} k={k * 0.9} /></g>
-      <line x1={wBarra + gap / 2} x2={wBarra + gap / 2} y1={0} y2={hArriba} stroke="var(--bd)" strokeWidth="1" />
-      <g transform={`translate(${wBarra + gap}, 0)`}>
-        <Rotulo x={0} y={arriba(fRot)} texto={`Plan de acción legal, ${RANGO_L}, con su dueño`} f={fRot} color={CTX} />
-        <g transform={`translate(0, ${arriba(fRot) + fRot + 16 * k})`}>
-          <PlanLegal w={wPlan} h={hArriba - (arriba(fRot) + fRot + 16 * k)} k={k} />
-        </g>
-      </g>
-      <line x1={0} x2={w} y1={hArriba + 4 * k} y2={hArriba + 4 * k} stroke="var(--bd)" strokeWidth="1" />
-      <Renglones lineas={pieDims} x={0} y={yPie} f={f2} color={INK} />
-      <Renglones lineas={pieNormas} x={0} y={yPie + pieDims.length * f2 * 1.3} f={f2} color={MUT2} />
+    <svg width={w} height={h} role="img" style={{ display: 'block' }}
+         aria-label={`Puntaje de cada dimensión legal: ${DIMS.map((d) => `${d.nombre} ${fijo(d.puntaje, 0)}`).join(', ')}`}>
+      {DIMS.map((d, i) => {
+        const y = i * paso + paso / 2
+        return (
+          <g key={d.id}>
+            <title>{`${d.nombre}: ${fijo(d.puntaje, 0)}${PROM_UNIDAD}`}</title>
+            {i > 0 && <line x1={0} x2={w} y1={i * paso} y2={i * paso} stroke="var(--bd, #d9dde3)" strokeWidth="1" />}
+            <text x={0} y={y} fontSize={f} fontWeight={600} fill={INK} dominantBaseline="central">{d.nombre}</text>
+            {Array.from({ length: TOPE }, (_, j) => (
+              <circle key={j} cx={xPip + j * sep} cy={y} r={r}
+                      fill={j < d.puntaje ? CONTORNO : 'none'} stroke={CONTORNO} strokeWidth={1.5} />
+            ))}
+            <text x={xVal} y={y} fontSize={f} fontWeight={700} fill={INK} dominantBaseline="central"
+                  className="tabular">{`${fijo(d.puntaje, 0)}${PROM_UNIDAD}`}</text>
+          </g>
+        )
+      })}
+      <Renglones lineas={pie} x={0} y={h - altoPie + 8 * k} f={f2} color={MUT2} />
     </svg>
   )
 }
@@ -356,6 +457,18 @@ function Cuerpo({ w, h, k }) {
 
 export default function V06LegalSeguro() {
   const k = useEscalaTexto()
+  const [abierto, setAbierto] = useState(false)
+  const [panel, setPanel] = useState('dimensiones')
+  const [sel, setSel] = useState(PRIMERO?.n)
+  // Tocado con el mouse, el control cambia y suelta el foco: las flechas siguen pasando de vista.
+  const soltar = (e) => { if (e.detail) e.target.closest?.('button')?.blur() }
+  const conclusion = !abierto
+    ? <>{CONCLUSION}</>
+    : panel === 'dimensiones'
+      ? <>{`Las ${DIMS.length} dimensiones, `}<b>{PAREJAS ? `todas en ${fijo(DIMS[0].puntaje, 0)}` : `promedio ${PROM_TXT}`}</b></>
+      : panel === 'plan'
+        ? <>{`${ACCIONES.length} acciones en ${D10.plan.length} tramos, `}<b>con dueño</b></>
+        : <>{'En azul, '}<b>{`los ${CRITICOS.length} críticos`}</b></>
   return (
     <section className="pant v06">
       <Banda dcs={[DECISION]}>
@@ -393,11 +506,24 @@ export default function V06LegalSeguro() {
 
       <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}>
         <div className="e3-v06-cab">
-          <p className="e3-conclusion tabular">{CONCLUSION}</p>
+          <p className="e3-conclusion tabular">{conclusion}</p>
+          <span className="e3-v06-ctl" onClick={soltar}>
+            {abierto && (
+              <Opciones etiqueta="Qué mostrar" valor={panel} onCambio={setPanel}
+                        opciones={[{ valor: 'dimensiones', texto: `Las ${DIMS.length} dimensiones` },
+                                   { valor: 'plan', texto: `Plan ${RANGO_L}` },
+                                   { valor: 'riesgos', texto: `Los ${RIESGOS.length} riesgos` }]} />
+            )}
+            <BotonExplorar abierto={abierto} onCambio={setAbierto} />
+          </span>
         </div>
         <div className="e3-v06-graf">
           <Lienzo className="lienzo">
-            {({ w, h }) => <Cuerpo w={w} h={h} k={k} />}
+            {({ w, h }) => (!abierto
+              ? <BarraEnvios w={w} h={h} k={k} />
+              : panel === 'dimensiones' ? <Dimensiones w={w} h={h} k={k} />
+                : panel === 'plan' ? <PlanLegal w={w} h={h} k={k} />
+                  : <MatrizRiesgos w={w} h={h} k={k} sel={sel} setSel={setSel} />)}
           </Lienzo>
         </div>
       </div>

@@ -9,9 +9,6 @@
 //   estimado, y tampoco llega a 0.
 // - El pie de C3 (ROI a un año, la regla con descuento) entra en la frase con el descuento de D3; el resto,
 //   al title (sin pie en pantalla, regla 12 del E2).
-// - (30/10, sin «Explorar») Arriba de la tabla, el simulador de la tasa de éxito que iba detrás de «Explorar» en
-//   la vista 5 (SimuladorTasa de V05_Simulador.jsx), con sus controles a la vista: el descuento, la tasa y lo que
-//   dan el ROI de la regla y el del modelo sobre la regla. La tabla achica su letra para entrar en lo que queda.
 // - (Crítica del W3, hallazgo 9) La fila base de C3 dice «lo que usan las diapositivas 8 y 9»: en el
 //   tablero no hay diapositivas, así que la celda dice de dónde sale el escenario y en qué vista se ve.
 // Ninguna cifra escrita acá: la tabla es la de C3, la fila del test y el descuento salen de D3.
@@ -22,8 +19,6 @@ import { entero, pct, pctDirecto } from '../formato.js'
 import { plano } from '../texto.jsx'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { TablaSvg, TarjetaRespaldo, columnasDeAnexo, filasDeAnexo } from '../Respaldo.jsx'
-import { SimuladorTasa } from './V05_Simulador.jsx'
-import './V05.css'
 
 const A = C3.ANEXOS.find((a) => a.n === 'A3')
 const T = D3.test
@@ -65,7 +60,6 @@ export default function RA3Sensibilidad() {
       frase={`ROI a un año, la regla con ${pct(D3.economia.parametros.descuento, 0)} de descuento: ningún supuesto, movido solo, llega a 0`}
       cifra={`mejor caso, ${MEJOR[COL['ROI regla sin modelo']]}`}
       title={`${plano(A.titulo)}. ${plano(A.pie ?? '')} Fuente: ${A.fuente} y D 11.2 · registro ${A.ids.join(', ')}, J12`}
-      arriba={<SimuladorTasa />}
       dibujo={({ w, h }) => (
         <TablaSvg w={w} h={h} k={k} columnas={columnasDeAnexo(A)} filas={FILAS} etiqueta={plano(A.titulo)} />
       )}

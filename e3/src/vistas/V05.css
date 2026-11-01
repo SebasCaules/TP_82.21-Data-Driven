@@ -1,7 +1,7 @@
 /* V05 · ¿Se paga? (28/10, unidad V05 de .workforce/PLAN.md). Estilos propios de la vista (N0-7): solo
    clases e3-v05-*. Los tokens --e3-* los define estilos_e3.css bajo .e3-vp; cada uso lleva su valor de
-   respaldo. Mismo encabezado que las vistas 1 y 4: qué mide (mono) y debajo la conclusión (30/10: sin
-   «Explorar»; el simulador está en el anexo A3). */
+   respaldo. Mismo encabezado que las vistas 1 y 4: qué mide (mono) y debajo la conclusión, con «Explorar»
+   a la derecha. */
 
 /* Tarjeta del gráfico: encabezado arriba y el SVG llena el resto del alto. */
 .e3-v05-graf { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
@@ -13,9 +13,7 @@
   font: 600 var(--e2-rot, 12px)/1.25 var(--mono); text-transform: uppercase; letter-spacing: .06em;
   color: var(--e3-ctx, #5a6478);
 }
+.e3-v05-cab .e3-explorar { flex: none; }
 
 .e3-v05-lienzo { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;
                  margin-top: clamp(8px, 2vh, 24px); }
-
-/* El simulador de la tasa de éxito, a la vista en el anexo A3 (30/10): los controles y su frase, arriba de la tabla. */
-.e3-v05-simulador { flex: none; display: flex; flex-direction: column; gap: clamp(2px, .6cqh, 8px); }
