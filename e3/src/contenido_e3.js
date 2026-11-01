@@ -242,7 +242,7 @@ export const C3 = {
         "H06",
         "J11"
       ],
-      "guion": "Comparamos la regla con un modelo por la precisión de la lista de 500: qué parte de la lista realmente se iba. Cada fila es la logística menos la regla en el test, que abrimos una sola vez, con su intervalo. Arriba, la lista sin filtrar: la logística gana por 1,06 puntos.",
+      "guion": "Comparamos la regla con un modelo por la precisión de la lista de 500: qué parte realmente se iba. Cada fila es la logística menos la regla, con su intervalo: las finas son validación y las gruesas, el test, que abrimos una sola vez. Sin filtrar, en el test la logística gana por 1,06 puntos.",
       "segundos": 30
     },
     {
@@ -281,8 +281,8 @@ export const C3 = {
         "J09",
         "J10"
       ],
-      "guion": "Pero esa lista no se puede mandar: un tercio son clientes que no aceptaron marketing o pidieron la baja. Abajo, la lista que sale, sin esos clientes: en el test empatan, −0,25 puntos, con un intervalo que cruza el cero. Para pagar los USD 10.400 que agrega, el modelo tendría que acertar 8.595 clientes más por mes, y la lista tiene 500: ni una lista perfecta lo paga. Por eso la lista sale con la regla, sin modelo.",
-      "segundos": 45
+      "guion": "Pero esa lista no se puede mandar: un tercio son clientes que no aceptaron marketing o pidieron la baja. Con la lista que sale, en validación ganaba la regla y en el test empatan: −0,25 puntos, con un intervalo que cruza el cero. Para pagar los USD 10.400 que agrega, el modelo tendría que acertar 8.595 clientes más por mes, y la lista tiene 500. Por eso la lista sale con la regla.",
+      "segundos": 40
     },
     {
       "n": 8,
@@ -386,8 +386,8 @@ export const C3 = {
         "G42",
         "J12"
       ],
-      "guion": "Tampoco la regla sola se paga: su ROI a un año es −98,52 %. Con modelo, el primer año pasa el presupuesto; sin modelo cuesta 20.260 dólares y la regla deja 299,49 por año con la lista sin filtrar; con la que sale, 264,54 en validación y 327,06 en el test. Para pagarse tendría que volver el 49,6 % de los contactados que se iban a ir. No es viable tal como está planteado.",
-      "segundos": 45
+      "guion": "Tampoco la regla sola se paga: su ROI a un año es −98,52 %. Con modelo, el primer año pasa el presupuesto; sin modelo cuesta 20.260 dólares y la regla deja 299,49 por año con la lista sin filtrar; con la que sale, 264,54 en validación y 327,06 en test. Para pagarse tendría que volver el 49,6 % de los contactados que se iban a ir. No es viable tal como está planteado.",
+      "segundos": 40
     },
     {
       "n": 10,
@@ -585,8 +585,24 @@ export const C3 = {
         "G50",
         "J50"
       ],
-      "guion": "La propuesta de la Parte D. La lista sale cada mes con la regla, sin modelo, y durante tres meses 80 clientes por mes quedan sin contactar: son el grupo de control. Con 1.260 contactados y 240 de control, el piloto distingue de cero una diferencia de 2,87 puntos. Al cierre del tercer mes, si los contactados compran 40,4 puntos más que el control, se pasa a producción. Si no, María G. elige entre cerrar o repetir el piloto sin descuento. El plan dura 20 semanas. La primera lista sale en la semana 6, en diciembre, con cinco condiciones: acciones legales, extracto nuevo, target y operador aprobados, grupo de control aprobado y 379 aciertos por mes, que el test ya da. En «Explorar», lo que decide María G. y en qué semana. Gracias.",
-      "segundos": 70
+      "guion": "La propuesta de la Parte D. La lista sale cada mes con la regla, sin modelo, y durante tres meses 80 clientes por mes quedan sin contactar: son el grupo de control. Con ese tamaño, el piloto distingue de cero una diferencia de 2,87 puntos. Al cierre del tercer mes, si los contactados compran 40,4 puntos más que el control, se pasa a producción. Si no, María G. elige entre cerrar o repetir el piloto sin descuento.",
+      "segundos": 40
+    },
+    {
+      "n": 13,
+      "quien": "Sebastian C.",
+      "tipo": "plan",
+      "kicker": "La propuesta",
+      "pregunta": "¿Cómo funciona cada mes y en qué semana?",
+      "titulo": "La primera lista sale en la semana 6 y María G. decide en la 20",
+      "fuente": "Parte D 9.2 y 12.1 a 12.4",
+      "ids": [
+        "J50",
+        "J13",
+        "G49"
+      ],
+      "guion": "Cada mes, la regla arma la lista, Sofía R. decide a quién escribir y medimos contra el control. La primera lista sale en la semana 6, en diciembre, con cinco condiciones: acciones legales, extracto nuevo, target y operador aprobados, grupo de control aprobado y 379 aciertos por mes, que el test ya da. María G. decide el alcance en la semana 1, la regla en la 2, quién opera después en la 13 y si pasa a producción en la 20. Gracias.",
+      "segundos": 45
     }
   ],
   "ANEXOS": [
@@ -1281,7 +1297,7 @@ export const C3 = {
   "TIEMPOS": {
     "palabras_por_minuto": 130,
     "cambio_s": 3,
-    "total_s": 475,
+    "total_s": 480,
     "turnos": [
       {
         "quien": "Sebastian C.",
@@ -1305,7 +1321,7 @@ export const C3 = {
           6,
           7
         ],
-        "segundos": 75
+        "segundos": 70
       },
       {
         "quien": "Francisco C.",
@@ -1313,7 +1329,7 @@ export const C3 = {
           8,
           9
         ],
-        "segundos": 85
+        "segundos": 80
       },
       {
         "quien": "Matías S.",
@@ -1326,9 +1342,10 @@ export const C3 = {
       {
         "quien": "Sebastian C.",
         "diapositivas": [
-          12
+          12,
+          13
         ],
-        "segundos": 70
+        "segundos": 85
       }
     ]
   }

@@ -1,6 +1,6 @@
 // Riesgo 12 de la matriz (Parte C 6.2, fila 12) como lo deja la Parte D 11.2, en un solo lugar (F6b, 28/10,
-// hallazgos H-2-071 y H-2-072 de la auditoría). Lo usan el anexo A4 y el detalle de la vista 6 («Explorar»,
-// «Los 13 riesgos»): hasta el F6b la vista 6 mostraba el texto de validación de la C 6.2 («acierta menos en
+// hallazgos H-2-071 y H-2-072 de la auditoría). Lo usa el anexo A4 (hasta el 01/11 también el detalle de
+// los 13 riesgos de la vista 6): hasta el F6b la vista 6 mostraba el texto de validación de la C 6.2 («acierta menos en
 // mujeres…») y el A4 nombraba solo el alto valor.
 //
 // En test (D 11.2, fila 1 y 2; D3.test.segmentos, J15, J21 y J23): entre mujeres y hombres la brecha no aparece,

@@ -104,10 +104,11 @@ para Pages y no se versiona.
 
 La presentación del Entregable 3 (Partes A a D) en el navegador, con el armazón del tablero del E2:
 riel de capítulos a la izquierda, la pregunta de cada vista como encabezado, una banda de cifras con
-la tarjeta de decisión y un gráfico. Siete vistas presentadas y siete anexos de respaldo (A1 a A7)
-que se abren solo si preguntan. Los controles para explorar (precisión por método, simulador de la
-tasa de éxito, acciones legales, riesgos, flujo y plan del piloto) llegan cerrados detrás de
-«Explorar». La letra es la del E2 por un factor uniforme, k = mín(1,2; ancho / 1152; alto / 640) y nunca menos de 1. Un solo HTML
+la tarjeta de decisión y un gráfico. Ocho vistas presentadas y siete anexos de respaldo (A1 a A7)
+que se abren solo si preguntan. Desde el 01/11 nada va detrás de un botón: lo importante está en su vista
+(el MVP en la 3, validación y test en la 4, el costo con modelo en la 5, el plan legal en la 6, el flujo y el plan
+del piloto en la 8) y el detalle técnico en los anexos, completo (el simulador de la tasa de éxito en el A3, la
+señal de los riesgos críticos en el A4, la precisión por método y las matrices en el A7). La letra es la del E2 por un factor uniforme, k = mín(1,2; ancho / 1152; alto / 640) y nunca menos de 1. Un solo HTML
 autocontenido en `dist-e3/index.html`: se abre con doble clic, sin red.
 
 | # | Pregunta | Sale de |
@@ -118,7 +119,8 @@ autocontenido en `dist-e3/index.html`: se abre con doble clic, sin red.
 | 4 | ¿El modelo mejora a la regla? | B 4; C 7; D 8.1, 8.2 y 11.2 (el test) |
 | 5 | ¿Se paga? | B 3 y 4; C 7.2 |
 | 6 | ¿Es legal y seguro? | C 5 y 6 |
-| 7 | ¿Qué decide María G. con el piloto? | D 9, 11.1 y 12 |
+| 7 | ¿Qué decide María G. con el piloto? | D 11.1 y 12.2 |
+| 8 | ¿Cómo funciona cada mes y en qué semana? | D 9.2 y 12.1 a 12.4 |
 
 El texto y el guion de cada vista salen del vault y los números de las salidas de las partes; el
 navegador no calcula (contrato en `pipeline/CONTRACT_E3.md`; el diseño, en la última sección de

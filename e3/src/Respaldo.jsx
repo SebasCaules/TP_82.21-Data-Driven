@@ -5,8 +5,8 @@
 // título ni pie propios); debajo, una sola pieza a todo el ancho, dibujada en SVG dentro de un Lienzo
 // (scripts/paridad_e3.py cuenta un gráfico por vista con contenido, también en el respaldo).
 //
-// - TarjetaRespaldo: la tarjeta con la frase, los controles detrás de «Explorar» (si el anexo los tiene)
-//   y el Lienzo.
+// - TarjetaRespaldo: la tarjeta con la frase, lo que el anexo muestra arriba de su pieza (`arriba`: el simulador
+//   del A3) y el Lienzo. (01/11) Ningún anexo esconde nada detrás de un clic.
 // - TablaSvg: una tabla de anexo de C3 dibujada en SVG, con el aspecto de la tabla del detalle de la V01
 //   del E2 (rótulos de columna en mono y mayúsculas, filete de 1,5 px en tinta bajo los rótulos, filas
 //   separadas por --bd2, la fila marcada sobre --azul1). La letra arranca en la de los SVG del E3
@@ -28,10 +28,10 @@ export const ES_NUMERO = /^[−+-]?(?:(?:USD|ARS)[\s ])?[\d.,]+(?:[\s ]%)?$/
 /**
  * La tarjeta de un anexo. `frase`: la respuesta en palabras (sans, como .kpi-lbl.frase del E2);
  * `cifra`: lo que la sostiene, en --acc y sin partir; `title`: fuente y filas del registro, para quien
- * presenta. `controles`: lo que va al lado de la frase (las opciones y el botón «Explorar»).
+ * presenta. `arriba`: lo que va entre la frase y la pieza, a la vista (el simulador del A3).
  * `dibujo({ w, h })`: la pieza, en el tamaño que mide el Lienzo.
  */
-export function TarjetaRespaldo({ frase, cifra, title, controles, opciones, dibujo, clase = '' }) {
+export function TarjetaRespaldo({ frase, cifra, title, arriba, dibujo, clase = '' }) {
   return (
     <section className={`pant e3-respaldo ${clase}`}>
       <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }} title={title}>
@@ -40,20 +40,8 @@ export function TarjetaRespaldo({ frase, cifra, title, controles, opciones, dibu
             <span>{frase}</span>
             {cifra && <b className="tabular">{cifra}</b>}
           </span>
-          {controles}
         </div>
-        {/* Con «Explorar» abierto, los controles van en su propio renglón, debajo de la frase. */}
-        {opciones && (
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap',
-                        gap: 'clamp(6px, 0.8cqh, 10px) clamp(14px, 2cqw, 28px)', marginTop: 'clamp(6px, 1.2cqh, 14px)' }}>
-            {opciones.map(({ rotulo, control }) => (
-              <span key={rotulo} style={{ display: 'inline-flex', alignItems: 'center', gap: 'clamp(6px, 0.8cqw, 10px)' }}>
-                <span className="kpi-lbl">{rotulo}</span>
-                {control}
-              </span>
-            ))}
-          </div>
-        )}
+        {arriba && <div style={{ marginTop: 'clamp(6px, 1.2cqh, 14px)' }}>{arriba}</div>}
         <div style={{ flex: '1 1 0', minHeight: 0, marginTop: 'clamp(6px, 1.6cqh, 20px)',
                       display: 'flex', flexDirection: 'column' }}>
           <Lienzo className="lienzo">{(caja) => dibujo(caja)}</Lienzo>
@@ -97,6 +85,10 @@ export function renglones(texto, max, medir, tope = 2) {
  *   (la línea de tiempo del A1): recibe { x, y, w, h, f } y la fila mide `renglones` (1 si no se dice).
  * filas: [{ celdas: [texto], marcada?, tenue?, title? }]
  * k: la escala de letra del E2 (useEscalaTexto). base: la letra del cuerpo a k = 1.
+ * tope: renglones por celda; lo que no entra se corta con «…». (01/11) El A7 pasa tope = Infinity: nada se corta y la
+ * letra baja hasta que la tabla entra. El svg lleva data-cortado si alguna celda se cortó y data-desborda si ni con
+ * la letra mínima entra (verificar_e3.py falla con data-desborda en cualquier vista y con data-cortado en el A7);
+ * data-letra dice la letra final, en px lógicos.
  */
 export function TablaSvg({ w, h, k, columnas, filas, base = 13, minimo = 9, tope = 2, etiqueta }) {
   const total = columnas.reduce((s, c) => s + c.ancho, 0)
@@ -148,8 +140,11 @@ export function TablaSvg({ w, h, k, columnas, filas, base = 13, minimo = 9, tope
   let y = t.altoTit
   const yFilas = t.cuerpo.map((r) => { const y0 = y; y += r.alto + extra; return y0 })
 
+  const cortado = t.cuerpo.some((r) => r.celdas.some((c) => c.cortado)) || t.titulos.some((c) => c.cortado)
   return (
-    <svg width={w} height={h} role="table" aria-label={etiqueta} style={{ display: 'block' }}>
+    <svg width={w} height={h} role="table" aria-label={etiqueta} style={{ display: 'block' }}
+         data-letra={t.f.toFixed(2)} {...(cortado ? { 'data-cortado': '' } : {})}
+         {...(t.alto > h + 1 ? { 'data-desborda': '' } : {})}>
       {/* rótulos de columna: mono, mayúsculas, como los Th de la V01 del E2 */}
       <g aria-hidden="true">
         {columnas.map((c, j) => (c.dibujarTitulo
