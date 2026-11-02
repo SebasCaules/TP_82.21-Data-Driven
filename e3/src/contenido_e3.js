@@ -150,7 +150,7 @@ export const C3 = {
         "F11",
         "C19"
       ],
-      "guion": "Puntuamos cuatro condiciones de 1 a 3. Los datos alcanzan con margen: hay 4.636 casos positivos para entrenar. Las otras tres quedan en 2: el 44,8 % de las ventas no tiene cliente, todo se exporta a mano y Casa Óga no tiene quién opere la lista. El promedio, 2,25, es factibilidad media. Lo que más pesa es quién opera: el proyecto anterior se cortó porque nadie lo mantuvo. En el piloto la opera nuestro equipo.",
+      "guion": "Puntuamos cuatro condiciones de 1 a 3. Los datos alcanzan con margen: hay 4.636 casos positivos para entrenar. Las otras tres quedan en 2: el 44,8 % de las ventas no tiene cliente, todo se exporta a mano y Casa Óga no tiene quien opere la lista. El promedio, 2,25, es factibilidad media. Lo que más pesa es quién opera: el proyecto anterior se cortó porque nadie lo mantuvo. En el piloto la opera nuestro equipo.",
       "segundos": 45
     },
     {

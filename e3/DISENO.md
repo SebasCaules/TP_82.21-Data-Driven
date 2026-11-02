@@ -1,6 +1,6 @@
 # Diseño de la presentación E3 (`/e3/`)
 
-> **Desde el 01/11 manda la última sección, «Decisiones (01/11): Explorar a la vista»; la del 28/10, «auditoría
+> **Desde el 02/11 manda la última sección, «Decisiones (02/11, W6): auditoría antes de presentar»; después, la del 01/11, «Decisiones (01/11): Explorar a la vista»; la del 28/10, «auditoría
 > de contraste y gráficos», sigue valiendo en lo que esa no cambia.** Las
 > de W1 y W2 (27/10) siguen valiendo en lo que esa no cambia. Las reglas transversales y la tabla por
 > diapositiva de abajo describen el escenario fijo de 1600 × 900, que se fue; quedan como referencia del
@@ -372,3 +372,26 @@ V08 tiene su entrada.
   estático, con la palabra en las fuentes o en el tablero armado.
 - `verificar.py --web` (vault, presentación): cada número visible contra las partes A a D.
 
+
+## Decisiones (02/11, W6): auditoría antes de presentar
+
+Auditoría de cinco dimensiones (datos, diseño, leyes de UX, cobertura y correcciones, oral y pantalla) sobre las diez
+vistas del 02/11: 108 hallazgos, adjudicados en `entregas/entregable-3/_build/workforce/fase-w6/hallazgos.md` del vault.
+Lo que cambia en la pantalla:
+
+- **Qué se paga y el veredicto.** V01: el 49,6 % es lo que paga la regla, no el modelo; la decisión abre con el
+  veredicto de la D 11.1 (`D-PRO`: «Veredicto · con condiciones»). La cifra central de V01 y V05 va en terracota, el
+  mismo mecanismo que la V09 (`--acc: var(--terra)`): lo que no cierra, sea nuestro o del Grupo 5.
+- **Definiciones a la vista.** V02 define la regla y el 500; V03 escribe la escala de la cátedra; V04 dice que los
+  puntos son de precisión, la partición (con el embargo) y la precisión de la lista que sale en test contra la
+  práctica actual; V05 la base (Parte B, validación sin filtro), los tres escenarios y la sensibilidad «dentro de su
+  rango»; V07 el puente 40,4 = 49,6 % y el grupo de control (240, 80 por mes).
+- **Menos texto.** Sale la tira de cinco pasos de V03 (repetía el flujo de V08); los riesgos críticos de V06 pasan de
+  una oración al pie a tres celdas (riesgo, señal y umbral, dueño) y sale la línea de las cinco dimensiones; V08
+  cambia el Gantt y la tabla de María G. por una línea de hitos con su dueño y la llave de los criterios de go-live
+  (D 10.3 y 12.2), de 334 a unas 210 palabras; V09 deja la cita «Dice» en el title; V10 resume «lo que hacen bien» en
+  tres ítems y pone la escala del AUC debajo de cada línea.
+- **Quien presenta.** El pie del riel se oculta en pantalla completa (`.lat-pie:where(:fullscreen *)`); las notas N no
+  muestran quién habla (el guion v6.0 del equipo va sin división por persona), solo el tiempo.
+- `verificar_e3.py` exige lo nuevo de cada vista y prohíbe lo que salió; `CODIGOS` y `PROHIBIDAS` no cambian, así que
+  los «envío N» que pedía la auditoría quedan en el oral y en el guion, no en pantalla.
