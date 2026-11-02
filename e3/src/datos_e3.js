@@ -34,7 +34,7 @@ export const D3 = {
    },
    {
     "archivo": "data/e3/correcciones.json",
-    "sha256": "09612a3937fe584b39a7b39d555fe6d832a9d69ad8173b84e48fd0a35e2922b8"
+    "sha256": "62ecba9c5fa2d3e4abb6ae95aa416a5d3cf3e2de33e909fb08c3d7602eaef4df"
    },
    {
     "archivo": "src/datos.js",
@@ -48,7 +48,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "0763fce70f3db60e74c71e3c55fd7bea42acfe851dfaa99de824882e3979661d"
+   "sha256": "f20c3aacd017ae0e891fc7d9366008df2e368908ae4d5852b0c6b66acfe17654"
   }
  },
  "caso": {
@@ -2056,7 +2056,7 @@ export const D3 = {
  },
  "correccion": {
   "grupo": 5,
-  "version": "v2.0",
+  "version": "v2.1",
   "fecha": "01/11/2026",
   "documento": {
    "archivo": "Entregable_3_Consolidado_CasaOga_Grupo5_v2.0.pdf",
@@ -4689,7 +4689,7 @@ export const D3 = {
   {
    "id": "W5",
    "nombre": "corrección: versión de la planilla",
-   "documento": "v2.0",
+   "documento": "v2.1",
    "donde": "E, carátula (index.jsx: fuente)"
   },
   {

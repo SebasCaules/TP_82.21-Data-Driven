@@ -15,7 +15,7 @@
 // encabezado arma con las diapositivas cuando la vista sale de una Parte que C3 todavía no tiene (la D).
 // (01/11, W5) La V09 y la V10 son la corrección del Grupo 2 al consolidado del E3 del Grupo 5, en su grupo del riel. Sus
 // datos salen de D3.correccion (correcciones.json de _build/E/, copiado por exportar_web.py); su fuente es la planilla.
-// El «(v2.0)» de la fuente lo controla build_e3.py (ancla W5 de la versión; la v1.0, de 56 filas, quedó archivada).
+// El «(v2.1)» de la fuente lo controla build_e3.py (ancla W5 de la versión; la v1.0, de 56 filas, quedó archivada).
 
 import { C3 } from '../contenido_e3.js'
 import Esqueleto from './Esqueleto.jsx'
@@ -40,9 +40,9 @@ const HISTORIA = [
   { id: 'V08', corto: 'Cada mes y semana', pregunta: '¿Cómo funciona cada mes y en qué semana?', de: [13],
     fuente: 'Parte D 9.2 y 12' },
   { id: 'V09', corto: 'Lo que corregimos', pregunta: '¿Qué le corregimos al Grupo 5?', de: [14],
-    fuente: 'Planilla de correcciones al Grupo 5 (v2.0)' },
+    fuente: 'Planilla de correcciones al Grupo 5 (v2.1)' },
   { id: 'V10', corto: 'Lo que hacen bien', pregunta: '¿Qué está bien y qué nos deja?', de: [15],
-    fuente: 'Planilla de correcciones al Grupo 5 (v2.0)' },
+    fuente: 'Planilla de correcciones al Grupo 5 (v2.1)' },
 ]
 // El respaldo: un anexo de C3 por vista. El nombre corto es el título del anexo hasta los dos puntos. Los
 // anexos que suman lo medido en test nombran también la sección de la Parte D de donde sale.

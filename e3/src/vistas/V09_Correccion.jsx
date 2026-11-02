@@ -34,7 +34,7 @@ const DECISION = decision('E-CRI', {
   llano: 'Un bloque de secciones queda en «Revisar» solo si tiene un error que cambia una cifra o el método, o algo '
     + `que la cátedra ya nos pidió corregir. De ${entero(T.filas)} bloques, ${entero(T.revisar)} quedan en «Revisar» `
     + `y ${entero(T.completo)} en «Completo».`,
-  decision: 'una fila por bloque de secciones, «Completo» o «Revisar», con la lectura de Carlos F. y la sugerencia',
+  decision: 'una fila por bloque de secciones, «Completo» o «Revisar» y la sugerencia, como consultores externos',
   justificacion: 'el formato de la devolución de la cátedra al Grupo 2 en el E2; las cifras se recalcularon con los '
     + 'CSV del caso, y lo que el Grupo 5 cita de respuestas de Casa Óga que no tenemos no se marca como error.',
 })

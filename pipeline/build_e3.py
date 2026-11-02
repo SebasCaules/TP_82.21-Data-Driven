@@ -1311,7 +1311,7 @@ def armar_correccion(co: dict, e2: dict) -> dict:
     for t in top:
         if not t.get("ref"):
             raise SystemExit(f"correcciones.json: la observación {t['id']} no trae «ref» (generar_e.py la exporta)")
-    ancla("W5", "corrección: versión de la planilla", co["version"], "v2.0", donde="E, carátula (index.jsx: fuente)")
+    ancla("W5", "corrección: versión de la planilla", co["version"], "v2.1", donde="E, carátula (index.jsx: fuente)")
     # (la planilla cambió con la crítica del 01/11: de 18 a 20 Revisar, y en la v2.0, a 13 bloques con 5 Revisar. El
     # guion de la vista 9 dice el total; con c3="d14" un cambio de la planilla corta acá hasta que contenido.py diga lo
     # mismo, y «5 de 13» entero, porque un «5» suelto aparece en cualquier texto)
