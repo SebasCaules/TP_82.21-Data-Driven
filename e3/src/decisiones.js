@@ -37,6 +37,15 @@
 // `decision()` devuelve el área como `id`, que es lo que TarjetaDecision (del E2, sin tocar) escribe; el id
 // interno sigue en `meta.dc` de cada vista. D-PRO pasa de «Propuesta · propuesta» a «Alcance · propuesta» (D 12.3:
 // «Aprobar el alcance: regla sin modelo y piloto con control»). «Parte C · …» no entraba en la tarjeta a 1366 × 768.
+//
+// (02/11, W6, _build/workforce/fase-w6/hallazgos.md) Tres etiquetas que confundían:
+// - D-PRO · «Veredicto · con condiciones» (COB-01, UX-08): la V01 abre con el veredicto integrado de la D 11.1
+//   («Veredicto integrado: viable con condiciones»), no con el alcance.
+// - A-UMB · «Umbral · del equipo» (COB-24): «vigente» se leía aprobado por el negocio; María G. lo aprueba en la
+//   semana 2 (D 12.2, hito 2).
+// - C-LEG · «Legal · con condiciones» (VIS-16): sale de la tarjeta Legal de la diapositiva 2 de C3, cuya escala pasó a
+//   «con condiciones» (VIS-17), por el mismo mecanismo que A-TEC y B-ECO; «viable con condiciones» partía la etiqueta
+//   en dos renglones a 1280 × 720.
 
 import { C3 } from './contenido_e3.js'
 
@@ -52,9 +61,9 @@ function parteDe(area) {
 }
 
 const PROPIAS = [
-  { id: 'A-UMB', area: 'Umbral', estado: 'vigente' },
+  { id: 'A-UMB', area: 'Umbral', estado: 'del equipo' },
   { id: 'C-MOD', area: 'Modelo', estado: 'sale la regla' },
-  { id: 'D-PRO', area: 'Alcance', estado: 'propuesta' },
+  { id: 'D-PRO', area: 'Veredicto', estado: 'con condiciones' },
   { id: 'D-PIL', area: 'Piloto', estado: 'propuesta' },
   { id: 'D-PLA', area: 'Plan', estado: 'propuesta' },
   { id: 'E-CRI', area: 'Criterio', estado: 'aplicado' },
