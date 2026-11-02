@@ -47,8 +47,8 @@ const DECISION = decision('E-CRU', {
   llano: 'Cruzamos las cifras del Grupo 5 con nuestro registro: ninguna nuestra está mal. Donde difieren, cambia la '
     + 'base (envíos con o sin duplicados) o el target, o la cifra viene de una respuesta de Casa Óga que no tenemos.',
   decision: 'nuestras cifras quedan como están',
-  justificacion: 'las dos reglas ordenan por cuánto se atrasó el cliente; los grupos concluyen distinto porque el '
-    + 'target es otro. No es un error suyo.',
+  justificacion: 'las dos reglas ordenan por cuánto se atrasó el cliente; los grupos concluyen distinto sobre todo '
+    + 'porque el target es otro.',
 })
 
 const CONCLUSION = 'Concluimos distinto sobre todo por el target'
