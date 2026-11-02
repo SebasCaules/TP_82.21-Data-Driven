@@ -1,5 +1,6 @@
 // Notas del orador de /e3/ (27/10, W1, decisión N0-6). El guion de C3 de las diapositivas de las que
-// sale la vista, con quién lo dice y su tiempo. Dos formas, las dos fuera del tablero:
+// sale la vista y su tiempo. (02/11, ORA-22) Sin el nombre de quien habla: el guion va sin división por
+// persona. Dos formas, las dos fuera del tablero:
 // - el panel (N), debajo: la caja del tablero se achica para dejarle lugar, nunca lo tapa;
 // - la ventana aparte («Abrir en otra ventana» del panel, o la dirección con ?notas): solo las notas,
 //   para la laptop mientras el proyector muestra el tablero. Las dos ventanas se siguen (App.jsx).
@@ -20,13 +21,13 @@ function Cuerpo({ vista }) {
       <p className="e3-notas-cab">
         <b>{`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}</b>
         {' · '}{vista.pregunta}
-        {ds.length > 0 && <span>{` · ${[...new Set(ds.map((d) => d.quien))].join(', ')} · ${mmss(segundos)}`}</span>}
+        {ds.length > 0 && <span>{` · ${mmss(segundos)}`}</span>}
         <span>{` · total ${mmss(C3.TIEMPOS.total_s)}`}</span>
       </p>
       <div className="e3-notas-txt">
         {ds.length === 0 && <p>Esta vista todavía no tiene guion en C3.</p>}
         {ds.map((d) => (
-          <p key={d.n}><span className="e3-notas-quien">{d.quien}</span><Rico t={d.guion} /></p>
+          <p key={d.n}><Rico t={d.guion} /></p>
         ))}
       </div>
       {sigue && <p className="e3-notas-sigue">Sigue: {sigue.pregunta}</p>}

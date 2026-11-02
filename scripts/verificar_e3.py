@@ -226,8 +226,10 @@ def contenido_esperado():
                     cifras=[pct_directo(E["observada"]["modelo_roi_pct"], 2), f"{fijo(T['promedio'], 2)}/{tope}",
                             plano(leg["valor"])],
                     grafico=[pct(E["parametros"]["s_observada"], 2), pct(U["s_equilibrio_con_descuento"], 1),
-                             f"{fijo(U['veces_con_descuento'], 1)} veces", "techo, sin control"],
-                    sin=["lo mide el piloto"]),
+                             f"{fijo(U['veces_con_descuento'], 1)} veces", "techo, sin control",
+                             "Haría falta para pagar la regla"],
+                    # (02/11, DAT-01) la barra nombra a la regla; «lo que se ve hoy» salió de la cota
+                    sin=["lo mide el piloto", "Haría falta para pagarse", "lo que se ve hoy"]),
         # la central, la parte que se va en 90 días (J02, test.conjunto.tasa), sola; la línea de tiempo, igual
         "v02": dict(dec="A-UMB", cifras=[pct(TE["conjunto"]["tasa"], 2)],
                     grafico=[f"{fijo(C['recency_dias'])} días sin comprar", f"umbral {fijo(C['umbral_dias'])} días",
@@ -291,12 +293,12 @@ def contenido_esperado():
                   "aria": [norm(x) for x in e.get("aria", [])], "acc": e.get("acc"),
                   "terracota": e.get("terracota", False),
                   "fragmento": e.get("fragmento", {})}
-    # el guion de cada vista: quién y el comienzo de lo que dice, por diapositiva (vistas/index.jsx)
+    # el guion de cada vista: el comienzo de lo que dice, por diapositiva (vistas/index.jsx); (02/11, ORA-22) sin quién
     de = dict(re.findall(r"\{ id: '(V\d\d)'.*?de: \[([\d, ]*)\]", (SRC / "vistas" / "index.jsx").read_text()))
     guion = {}
     for v, ns in de.items():
         ds = [dia[int(n)] for n in re.findall(r"\d+", ns)]
-        guion[v.lower()] = [(d["quien"], norm(plano(d["guion"]))[:40]) for d in ds]
+        guion[v.lower()] = [(d["n"], norm(plano(d["guion"]))[:40]) for d in ds]
     return out, guion
 
 
@@ -434,15 +436,18 @@ def contenido(p: Pagina, esperado):
 
 
 def guion_en_notas(p: Pagina, w, h, guion):
-    """Con N abierto, las notas de cada vista traen su guion: quién lo dice y el comienzo de cada parte."""
+    """Con N abierto, las notas de cada vista traen el comienzo del guion de cada diapositiva. (02/11, ORA-22) Sin el
+    nombre de quien habla: el guion va sin división por persona."""
     p.ir("v01")
     p.tecla("n")
     for id_, partes in guion.items():
         p.ir(id_)
         txt = norm(p.pg.evaluate("() => document.querySelector('.e3-notas')?.innerText ?? ''"))
-        for quien, comienzo in partes:
-            if quien not in txt or comienzo not in txt:
-                p.mal(f"notas {w}x{h}: #{id_} no trae el guion de {quien} («{comienzo}…»)")
+        for n, comienzo in partes:
+            if comienzo not in txt:
+                p.mal(f"notas {w}x{h}: #{id_} no trae el guion de la diapositiva {n} («{comienzo}…»)")
+        if p.pg.locator(".e3-notas-quien").count():
+            p.mal(f"notas {w}x{h}: #{id_} muestra quién habla (ORA-22)")
     p.tecla("n")
 
 
@@ -551,7 +556,14 @@ def a_la_vista_esperado():
     d5 = dia[5]
     d11 = dia[11]
     umbral = lambda c: re.search(r"\*\*(.+?)\*\*", next(f["texto"] for f in c["filas"] if f["rotulo"].lower().startswith("umbral")))[1]  # noqa: E731
+    C = D3["caso"]
     return [
+        # (02/11, W6) la vista 1: la conclusión dice qué se paga (DAT-01) y la decisión abre con el veredicto (COB-01)
+        ("v01", None, ["Para que la regla se pague", "Viable:"], ["Para pagarse,"]),
+        # (02/11, W6) la vista 2: la línea de definición define la regla y el 500, con el período del 25,35 % (ORA-03,
+        # DAT-07); el id del cliente, solo en el title (VIS-15)
+        ("v02", None, ["La regla toma a los 500", "en los cortes de enero a mayo de 2025", "Cliente real"],
+         [C["id_cliente"]]),
         # (01/11) la vista 4: las cuatro filas, validación (H06 y la de J09) y test, al llegar; (02/11, del A1) el test,
         # medido una vez
         ("v04", None, ["Sin filtrar · validación", "Sin filtrar · test", "Lista que sale · validación",
@@ -830,7 +842,10 @@ def recorrido(p: Pagina):
         notas = p.pg.locator(".e3-notas").bounding_box()
         esperar(vp["y"] + vp["height"] <= notas["y"] + 1, "las notas tapan el tablero")
         txt = p.pg.locator(".e3-notas").inner_text()
-        esperar("Francisco C." in txt and "dólares" in txt, "las notas de la 5 no traen el guion de las diapositivas 8 y 9")
+        dia5 = {d["n"]: d for d in leer_js("contenido_e3.js", "C3")["DIAPOSITIVAS"]}
+        esperar(all(norm(plano(dia5[n]["guion"]))[:30] in norm(txt) for n in (8, 9)),
+                "las notas de la 5 no traen el guion de las diapositivas 8 y 9")
+        esperar("Francisco C." not in txt, "las notas de la 5 muestran quién habla (ORA-22)")
         fit = p.pg.evaluate("() => window.__fit().problemas.filter((x) => !/scroll-contenedor/.test(x.tipo) || !/e3-notas/.test(x.detalle))")
         esperar(not fit, f"con las notas abiertas el tablero desborda: {fit}")
         # el riel no se encima con su pie: la ventana lógica sigue en 640 de alto o más

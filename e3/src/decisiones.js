@@ -12,12 +12,12 @@
 //
 // (27/10, W2) Tres decisiones más, con el mismo esquema (letra de la Parte y área): no son veredictos de
 // la diapositiva 2, así que su estado se escribe acá, en palabras que el público entiende.
-// - A-UMB · vigente: el umbral propio de cada cliente (vista 2; Parte A 2.1). Es DEF-UMBRAL del registro
-//   de decisiones de los hitos, vigente desde el E1.
+// - A-UMB · del equipo: el umbral propio de cada cliente (vista 2; Parte A 2.1). Es DEF-UMBRAL del registro
+//   de decisiones de los hitos; María G. lo aprueba en la semana 2 (D 12.2, hito 2).
 // - C-MOD · sale la regla: ningún modelo reemplaza a la regla del umbral (vista 4; Parte C 7, que cierra
 //   la comparación). MOD-05, MOD-06 y VER-MVP del registro.
-// - D-PRO · propuesta: la lista sale con la regla y un piloto mide (vista 1; la Parte D, diseño de la
-//   solución). D6 del registro.
+// - D-PRO · con condiciones: el veredicto integrado de la D 11.1, viable con condiciones (vista 1). La lista
+//   sale con la regla, sin modelo, y un piloto mide si paga. D6 del registro.
 // - D-PIL · propuesta (crítica del W3, hallazgo 12): la regla de decisión del piloto, con 40,4 puntos o más
 //   a producción (vista 7; Parte D 11.1 y 12.2, hito 8; G49 y H49). Hasta entonces la vista 7 usaba D-PRO
 //   con otra frase corta: una decisión, una frase.
@@ -29,14 +29,14 @@
 //   nos pidió corregir (en la v1.0, toda sección con una observación que pidiera una acción). E es la parte de la
 //   corrección (E-consignas.md del E3).
 // - E-CRU · sin cambios (01/11, W5, vista 10): el cruce de las cifras del Grupo 5 con nuestro registro no cambia ninguna
-//   nuestra (_build/E/cruce.md). Los dos grupos concluyen distinto por el target, no por un error.
+//   nuestra (_build/E/cruce.md). Los dos grupos concluyen distinto sobre todo por el target.
 //
 // (28/10, F6b, hallazgo H-2-077 de la auditoría) Los ids son internos: ningún documento que lee la cátedra los
 // define (en el E2, los DC-xx estaban en la Parte B). La tarjeta muestra en su lugar el área de la decisión,
-// «Legal · viable con condiciones», que se entiende sola (sección 8 del CLAUDE.md: cada rótulo se entiende solo).
+// «Legal · con condiciones», que se entiende sola (sección 8 del CLAUDE.md: cada rótulo se entiende solo).
 // `decision()` devuelve el área como `id`, que es lo que TarjetaDecision (del E2, sin tocar) escribe; el id
-// interno sigue en `meta.dc` de cada vista. D-PRO pasa de «Propuesta · propuesta» a «Alcance · propuesta» (D 12.3:
-// «Aprobar el alcance: regla sin modelo y piloto con control»). «Parte C · …» no entraba en la tarjeta a 1366 × 768.
+// interno sigue en `meta.dc` de cada vista. «Parte C · …» no entraba en la tarjeta a 1366 × 768. D-PRO fue «Propuesta ·
+// propuesta» y después «Alcance · propuesta» hasta el 02/11 (abajo).
 //
 // (02/11, W6, _build/workforce/fase-w6/hallazgos.md) Tres etiquetas que confundían:
 // - D-PRO · «Veredicto · con condiciones» (COB-01, UX-08): la V01 abre con el veredicto integrado de la D 11.1

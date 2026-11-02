@@ -2,6 +2,10 @@
    clases e3-v01-*. Los tokens --e3-* los define estilos_e3.css bajo .e3-vp; cada uno lleva su valor de
    respaldo por si la vista se monta fuera de esa caja. */
 
+/* (02/11, VIS-14) La central no cierra («no viable»): toma la terracota en lugar de --acc (cifra y filete), con el
+   mismo mecanismo que .e3-v09-central, sin nombrar clases del armazón. */
+.e3-v01-central { --acc: var(--terra); }
+
 /* Tarjeta del gráfico: encabezado arriba y el SVG llena el resto del alto. */
 .e3-v01-graf { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
 
@@ -9,7 +13,8 @@
 .e3-v01-cab { display: flex; flex-direction: column; gap: clamp(2px, .5vh, 6px); min-width: 0; }
 .e3-v01-mide {
   margin: 0;
-  font: 600 var(--e2-rot, 12px)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  /* (02/11, VIS-13) ×1,2: es la definición que evita leer mal la cifra; a 1280 × 720 pasa de 12 a 14,4 px. */
+  font: 600 calc(var(--e2-rot, 12px) * 1.2)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
   color: var(--e3-ctx, #5a6478);
 }
 

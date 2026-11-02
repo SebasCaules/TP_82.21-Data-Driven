@@ -45,10 +45,6 @@
 .e3-notas-cab b { color: var(--ink); }
 .e3-notas-txt { max-width: 70em; }
 .e3-notas-txt p { margin: 0 0 8px; }
-.e3-notas-quien {
-  display: inline-block; margin-right: 8px;
-  font: 600 .72em/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--acc);
-}
 .e3-notas-sigue, .e3-notas-ayuda { margin: 6px 0 0; color: var(--mut); font-size: .85em; }
 .e3-notas-abrir {
   float: right; margin: 0 0 6px 16px; padding: 4px 10px;
@@ -163,6 +159,11 @@
   color: var(--ink); letter-spacing: -.01em; text-wrap: balance;
 }
 .e3-conclusion b { font-weight: 700; color: var(--acc); }
+
+/* ---------- pie del riel en pantalla completa (02/11, VIS-18 y UX-21) ---------- */
+/* Las teclas son para quien presenta: con F (pantalla completa) el pie no se proyecta; ensayando en ventana,
+   sigue. visibility y no display: el alto del riel no cambia. Las teclas siguen en el title del pie. */
+.e3-vp .lat-pie:where(:fullscreen *) { visibility: hidden; }
 
 @media print {
   .e3-vp { zoom: 1 !important; width: auto !important; height: auto !important; container-type: normal; overflow: visible; }

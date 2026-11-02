@@ -15,12 +15,12 @@
 //   que la regla se pague (D3.economia.umbral.s_equilibrio_con_descuento, 49,6 %, en relleno de contexto). Entre
 //   las dos, una cota de un extremo al otro con «48,6 veces» (D3.economia.umbral.veces_con_descuento) grande: es el
 //   mensaje. La escala sale de escalaNice sobre el 49,6 %. Sale la fila «Vuelven por el contacto · lo
-//   mide el piloto» (la cuenta la V07). Conclusión arriba, en .e3-conclusion: «Para pagarse, tendría que
-//   volver casi la mitad de los que se iban» (el callout del 49,6 % de la Parte B en C3, sin la cifra). El rango al 95 % y los 16 de 1.570 envíos, al
-//   title de la barra.
-// - Decisión: «D-PRO · propuesta» de decisiones.js (D6 del registro de decisiones de los hitos; la
-//   comparte la vista 9) y la respuesta en una línea de la tabla de la historia (PLAN.md, fila 1),
-//   ≤ 60 caracteres; la decisión completa de C3 va al title.
+//   mide el piloto» (la cuenta la V07). El rango al 95 % y los 16 de 1.570 envíos, al title de la barra.
+// - Decisión: D-PRO de decisiones.js, «Veredicto · con condiciones»; la decisión completa de C3, al title.
+// - (02/11, W6, fase-w6/hallazgos.md) El gráfico dice qué se paga (DAT-01, ORA-07, UX-07): el 49,6 % es lo que
+//   necesita la regla sola; el modelo no se paga con ninguna tasa (G43). La frase de la decisión abre con el
+//   veredicto integrado de la D 11.1 (COB-01, UX-08). La central va en terracota, como la de la V09: lo que no
+//   cierra (VIS-14). El renglón de qué mide, ×1,2 (VIS-13).
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y el texto de C3 (contenido_e3.js).
 
 import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
@@ -58,19 +58,20 @@ const ROT_ECO = 'ROI modelo sobre regla'
 const HORIZONTE = plano(ECO.escala).replace(/^ROI\s*[−-]?[\d.,]+\s*%\s*/, '')
 
 const DECISION = decision('D-PRO', {
-  llano_corto: 'La lista sale con la regla; el piloto mide',
+  // (02/11) «Viable con condiciones: la regla, sin modelo, y un piloto que mide si paga» (hallazgos.md) iba en tres
+  // renglones a 1280 × 720 y a 1920 × 1080; la etiqueta de arriba ya dice «Veredicto · con condiciones».
+  llano_corto: 'Viable: regla sin modelo y piloto que mide si paga',
   llano: sinCortes(plano(D2.decision).replace(/^Decisión\.\s*/, '')),
   decision: plano(D2.titulo),
 })
 
 // Rótulos del gráfico.
 const ROT_HOY = 'Hoy compra a 7 días'
-const ROT_FALTA = 'Haría falta para pagarse'
+const ROT_FALTA = 'Haría falta para pagar la regla'
 const NOTA_HOY = 'techo, sin control'
-// La conclusión dice lo que muestra el dibujo, sin cifra (la cifra va en la barra): el callout del
-// 49,6 % de la diapositiva de la Parte B («de los que se iban tendría que volver para pagar la regla»)
-// en palabras. «Ni la regla sola recupera su costo» es la conclusión de la V05: acá quedaba repetida.
-const CONCLUSION = 'Para pagarse, tendría que volver casi la mitad de los que se iban'
+// La conclusión dice lo que muestra el dibujo, sin cifra (la cifra va en la barra), y nombra a la regla: bajo
+// el −99,95 % del modelo, «para pagarse» se leía como lo que necesita el modelo (DAT-01).
+const CONCLUSION = 'Para que la regla se pague, tendría que volver casi la mitad de los que se iban'
 
 // Tasa con la precisión de la Parte B: dos decimales debajo del 5 %, uno arriba; el cero, sin decimales.
 const tasaTxt = (v) => (v === 0 ? `${fijo(v, 0)}${NBSP}%` : pct(v, v < 0.05 ? 2 : 1))
@@ -125,6 +126,8 @@ function BarrasVeces({ w, h, k }) {
   const txtHoy = tasaTxt(S)
   const txtFalta = tasaTxt(S_EQ)
   const txtVeces = `${fijo(VECES, 1)} veces`
+  // «lo que se ve hoy» ya no se dibuja debajo de la cota (02/11, sacar antes que agregar): la flecha va de una
+  // barra a la otra. Queda en el aria-label y en los title.
   const sufijo = 'lo que se ve hoy'
   // El valor de la barra larga, adentro y alineado al final, si entra; si no, a la derecha.
   const dentro = anchoTexto(txtFalta, fVal, 700) + 20 < xFalta - x0
@@ -187,8 +190,6 @@ function BarrasVeces({ w, h, k }) {
         <path d={`M${xFalta},${yCota} l${-flecha * 1.6},${-flecha * 0.7} v${flecha * 1.4} z`} fill={ACC} />
         <text x={xCentro} y={yCota - fBig * 0.28} fontSize={fBig} fontWeight={700} fill={ACC}
               textAnchor="middle" className="tabular" style={{ letterSpacing: '-.02em' }}>{txtVeces}</text>
-        <text x={xCentro} y={yCota + fSub * 0.9 + 8} fontSize={Math.round(15 * k)} fontWeight={500} fill={INK}
-              textAnchor="middle" dominantBaseline="hanging">{sufijo}</text>
       </g>
     </svg>
   )
@@ -201,7 +202,7 @@ export default function V01Respuesta() {
   return (
     <section className="pant v01">
       <Banda dcs={[DECISION]}>
-        <div className="tarjeta e2-central" style={{ gridColumn: 'span 3' }}
+        <div className="tarjeta e2-central e3-v01-central" style={{ gridColumn: 'span 3' }}
              title={`ROI del modelo sobre la regla a un año, escenario esperado: ${pctDirecto(ROI, 2)}. ${plano(ECO.texto)}`}>
           <span className="kpi-lbl"><span>{ROT_ECO}</span></span>
           <div className="ban-par">

@@ -8,15 +8,18 @@
 //   pasan su umbral en los 90 días siguientes. Responde la pregunta de la vista. El rótulo arma «90» con
 //   D3.caso.ventana_dias. Es la única tarjeta de cifra (28/10, fix del verificador): la caída de ventas de
 //   2025 (−35,6 %) salió porque cualquier fragmento corto deja afuera que 2025 llegó con meses incompletos y
-//   se lee como caída limpia; queda en el guion. La capacidad de Marketing (500/mes) también salió: no
-//   responde quién se va.
-// - Decisión: la definición del umbral, «A-UMB · vigente» de decisiones.js (DEF-UMBRAL). La frase corta se
-//   arma con el factor y el piso de D3.caso; la definición completa de C3 va al title.
+//   se lee como caída limpia; tampoco entró en el guion (DAT-13, 02/11): va a «Si preguntan». La capacidad de
+//   Marketing (500/mes) salió de la banda: no responde quién se va.
+// - Decisión: la definición del umbral, A-UMB de decisiones.js, «Umbral · del equipo» (DEF-UMBRAL). La frase
+//   corta se arma con el factor y el piso de D3.caso; la definición completa de C3 va al title.
 // - Gráfico: la línea de tiempo del cliente real CLI03296 (H23), el mejor gráfico del tablero. Llena el alto
 //   de su tarjeta: la barra crece con lo que sobra y el eje baja al pie. El dato en --acc (los días sin
 //   comprar, el umbral y el punto donde «se va»); el contexto en --e3-ctx y --e3-eje; la ventana de 90 días
 //   marcada con contorno (--e3-contorno) y rótulo en tinta, con un lavado leve (--e3-zona) detrás. La
 //   conclusión del gráfico es su título (.e3-conclusion); la definición de «se va» (C3), debajo.
+// - (02/11, W6, fase-w6/hallazgos.md) La línea de definición (D(3).definicion[1]) define también la regla y el
+//   500, con el período del 25,35 % (ORA-03, COB-11, DAT-07); va a la letra del texto y en tinta (VIS-15). El
+//   rótulo de la derecha queda «Cliente real»: el id del cliente, al title (VIS-15).
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js, y el texto de C3.
 // Los códigos internos («envío 29», la nota «Envío N») van solo en los title (regla 13 H13 del E2).
 
@@ -228,7 +231,7 @@ export default function V02QuienSeVa() {
         <div className="e3-v02-cab">
           <div className="e3-v02-fila">
             <p className="e3-conclusion">{conclusion}</p>
-            <span className="e3-v02-quien tabular">{`Cliente real · ${C.id_cliente}`}</span>
+            <span className="e3-v02-quien" title={`Cliente ${C.id_cliente}`}>Cliente real</span>
           </div>
           <p className="e3-v02-def">{DEF_SE_VA}</p>
         </div>
