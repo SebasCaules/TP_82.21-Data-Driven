@@ -27,8 +27,9 @@ export function TarjetaPuntaje({ filas, tope, k, w, h }) {
   const x0 = Math.round(22 * k)
   const derecha = w - Math.round(14 * k)
 
-  // Línea chica: pips y nombre.
-  const fNom = Math.min(14 * k, paso * 0.15)
+  // Línea chica: pips y nombre. (02/11, W6: VIS-05) Sin la tira de pasos la fila tiene más alto y el nombre sube
+  // (era 10,7 px reales a 1280 × 720): 14 px por k, con un piso de 12 (13,3 px reales con el zoom de 1280).
+  const fNom = Math.min(14 * k, Math.max(12 * k, paso * 0.2))
   const r = fNom * 0.42
   const sepPip = r * 2.9
   const xNom = x0 + (tope - 1) * sepPip + 2 * r + fNom * 0.8

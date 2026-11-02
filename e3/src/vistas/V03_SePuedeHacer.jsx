@@ -17,9 +17,13 @@
 //   Sin eje ni tramo sombreado.
 // - Conclusión del gráfico (.e3-conclusion, arriba a la izquierda): la cola del título de la diapositiva
 //   4, «Los datos alcanzan y el límite es quién opera la lista», con el límite en --acc.
-// - (01/11, a la vista) Debajo del puntaje, en la misma tarjeta, el producto mínimo de la diapositiva 5: el
-//   título y los tres hechos en un renglón y los cinco pasos en una fila. Hasta el 01/11 iba detrás de un
-//   botón; el puntaje cede el alto que ocupa (sus filas se achican con el Lienzo).
+// - (01/11, a la vista) Debajo del puntaje, en la misma tarjeta, el producto mínimo de la diapositiva 5.
+// - (02/11, W6: UX-06, VIS-05, ORA-10) Sale la tira de cinco pasos del producto mínimo: repetía con otros nombres
+//   el flujo de seis pasos de la vista 8 y no se decía. Queda un renglón: el título y los tres hechos de C3 (los
+//   pasos, al title). Entra la escala de la cátedra (D4.escala, UX-15 y COB-21) debajo de la conclusión, para leer
+//   los pips antes de las filas. Una fila de C3 con `detalle` lo muestra tal cual (Datos: «datos al 31/12/2025»,
+//   COB-16; Capacidad humana: el operador del piloto, COB-12). Fragmentos de la banda más cortos (VIS-17), en un
+//   renglón a 1280 × 720.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y el texto de C3 (contenido_e3.js).
 
 import { Lienzo } from '../../../src/graficos.jsx'
@@ -67,9 +71,12 @@ function razonDe(c) {
   }
   return { razon: mayuscula(t.split(/[;:.]\s+/).find(sinCifraDeBanda) ?? c.nombre) }
 }
-const FILAS = T.condiciones.map((c) => ({
-  id: c.id, nombre: c.nombre, puntaje: c.puntaje, limite: c.id === ID_LIMITE, ...razonDe(c),
-}))
+// Si la fila de C3 trae `detalle`, va tal cual (W6); si no, el que deriva razonDe.
+const FILAS = T.condiciones.map((c) => {
+  const r = razonDe(c)
+  const detalle = filaDe(c)?.detalle ?? r.detalle
+  return { id: c.id, nombre: c.nombre, puntaje: c.puntaje, limite: c.id === ID_LIMITE, ...r, detalle }
+})
 
 // La decisión: el título de la diapositiva 4 sin «los datos alcanzan y». Si C3 cambia de forma, queda el
 // título entero y la verificación avisa si pasa de 60 caracteres. La conclusión del gráfico es la cola
@@ -87,7 +94,7 @@ const DECISION = decision('A-TEC', {
   justificacion: `${plano(filaDe(LIMITE)?.texto)} ${plano(D4.nota)}`,
 })
 
-// El MVP de la diapositiva 5, a la vista: el título y los hechos en un renglón; los pasos en orden, en una fila.
+// El MVP de la diapositiva 5, a la vista: el título y los hechos en un renglón. Los pasos, solo en el title (W6).
 function Mvp() {
   return (
     <div className="e3-v03-mvp" title={`${plano(D5.titulo)}. ${D5.pasos.map((p) => `${p.titulo}: ${plano(p.texto)}`).join(' ')} ${D5.hechos.map((x) => `${plano(x.valor)} ${plano(x.texto)}`).join(' · ')}`}>
@@ -95,18 +102,10 @@ function Mvp() {
         <span className="e3-v03-mvp-tit">{`Producto mínimo: ${plano(D5.titulo).replace(/^Con /, '').replace(/^./, (c) => c.toLowerCase())}`}</span>
         <span className="e3-v03-mvp-hechos">
           {D5.hechos.map((h, i) => (
-            <span key={h.valor}>{i ? ' · ' : ''}<b><Rico t={h.valor} /></b>{' '}<Rico t={sinCodigos(h.texto)} /></span>
+            <span key={h.valor}>{i ? ' · ' : ''}<b><Rico t={h.valor} /></b>{h.texto ? ' ' : ''}<Rico t={sinCodigos(h.texto)} /></span>
           ))}
         </span>
       </p>
-      <ol className="e3-v03-pasos" style={{ gridTemplateColumns: `repeat(${D5.pasos.length}, minmax(0, 1fr))` }}>
-        {D5.pasos.map((p, i) => (
-          <li key={p.titulo}>
-            <span className="e3-v03-paso-tit">{`${i + 1} · ${p.titulo}`}</span>
-            <span className="e3-v03-paso-txt"><Rico t={p.texto} /></span>
-          </li>
-        ))}
-      </ol>
     </div>
   )
 }
@@ -138,7 +137,7 @@ export default function V03SePuedeHacer() {
               <Cifra num={fijo(T.positivos_entrenamiento, 0)} sec />
             </div>
           </div>
-          <p className="e2-linea">casos positivos para entrenar</p>
+          <p className="e2-linea">casos para entrenar</p>
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 2' }} title={`${calidad.rotulo}. ${plano(calidad.texto)}`}>
@@ -148,7 +147,7 @@ export default function V03SePuedeHacer() {
               <Cifra texto={pctDirecto(T.ventas_sin_cliente_pct, 1)} sec />
             </div>
           </div>
-          <p className="e2-linea">de las ventas no tiene cliente</p>
+          <p className="e2-linea">ventas sin cliente</p>
         </div>
       </Banda>
 
@@ -156,6 +155,7 @@ export default function V03SePuedeHacer() {
         <div className="e3-v03-cab">
           <p className="e3-conclusion">{CONCLUSION_ANTES}<b>{CONCLUSION_LIMITE}</b></p>
         </div>
+        <p className="e3-v03-escala">{plano(D4.escala)}</p>
         <div className="e3-v03-graf">
           <Lienzo className="lienzo">
             {({ w, h }) => <TarjetaPuntaje filas={FILAS} tope={TOPE_ESCALA} k={k} w={w} h={h} />}
