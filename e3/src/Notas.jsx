@@ -14,18 +14,17 @@ function Cuerpo({ vista }) {
   const ds = diapositivasDe(vista)
   const segundos = ds.reduce((s, d) => s + (d.segundos || 0), 0)
   const i = VISTAS.indexOf(vista)
-  const sigue = VISTAS[i + 1] && !VISTAS[i + 1].respaldo ? VISTAS[i + 1] : null
+  const sigue = VISTAS[i + 1] ?? null
   return (
     <>
       <p className="e3-notas-cab">
-        <b>{vista.respaldo ? `Anexo ${vista.id}` : `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}</b>
+        <b>{`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}</b>
         {' · '}{vista.pregunta}
         {ds.length > 0 && <span>{` · ${[...new Set(ds.map((d) => d.quien))].join(', ')} · ${mmss(segundos)}`}</span>}
         <span>{` · total ${mmss(C3.TIEMPOS.total_s)}`}</span>
       </p>
       <div className="e3-notas-txt">
-        {vista.respaldo && <p>Respaldo para preguntas. Fuente: {vista.fuente}.</p>}
-        {!vista.respaldo && ds.length === 0 && <p>Esta vista todavía no tiene guion en C3.</p>}
+        {ds.length === 0 && <p>Esta vista todavía no tiene guion en C3.</p>}
         {ds.map((d) => (
           <p key={d.n}><span className="e3-notas-quien">{d.quien}</span><Rico t={d.guion} /></p>
         ))}

@@ -111,7 +111,7 @@ C3_TEXTO: dict[str, str] = {}
 def ancla(id_: str, nombre: str, valor, doc: str, dec: int | None = None, x: float = 1.0,
           donde: str = "", c3: str | None = None) -> None:
     """valor × x formateado con dec decimales tiene que dar doc, el número que escribe el documento.
-    Con dec None compara valor == doc tal cual. c3: «d6» o «A2», donde C3 tiene que escribir doc."""
+    Con dec None compara valor == doc tal cual. c3: «d6» (una diapositiva) o «riesgos» (la matriz de la C 6.2), donde C3 tiene que escribir doc."""
     mostrado = valor if dec is None else es(valor * x, dec)
     ok = mostrado == doc
     nota = ""
@@ -413,27 +413,10 @@ def armar_lista(e3: dict) -> dict:
             ancla(id_, f"lista: precisión {metodo} {filtro} {largo}", busca(metodo, filtro, largo)["precision"],
                   doc, 1, 100, donde=f"registro {id_}")
 
-    # anexo A2 (C 7.2): una fila por fila del anexo
-    a2 = [
-        (busca("logistica_ajustada", "sin_filtro", tipo="umbral"), "1.485", "82,4", "71,4", "301,17", "H11"),
-        (m500, "1.500", "82,6", "72,3", "305,68", "H11"),
-        (busca("logistica_ajustada", "sin_filtro", 700), "2.100", "75,3", "92,3", "366,00", "H11"),
-        (busca("logistica_ajustada", "contactables", 400), "1.200", "79,8", "81,5", "231,15", "H15"),
-        (m500c, "1.500", "73,9", "94,3", "252,84", "H15"),
-        (busca("logistica_ajustada", "contactables", 600), "1.800", "64,4", "98,6", "234,60", "H15"),
-        (r500c, "1.500", "75,8", "96,8", "264,54", "H16"),
-        (busca("practica_actual", "contactables", 500), "1.500", "32,8", "41,8", "4,15", "H13"),
-    ]
-    for f, casos, prec, rec, usd, id_ in a2:
-        q = f"{f['metodo']} {f['filtro']} {f['largo_mes'] or f['tipo']}"
-        ancla(id_, f"A2 {q}: casos", f["casos"], casos, 0, donde="C 7.2", c3="A2")
-        ancla(id_, f"A2 {q}: precisión", f["precision"], prec, 1, 100, donde="C 7.2", c3="A2")
-        ancla(id_, f"A2 {q}: recall", f["recall"], rec, 1, 100, donde="C 7.2", c3="A2")
-        ancla(id_, f"A2 {q}: USD por año", f["usd_anio"], usd, 2, donde="C 7.2", c3="A2")
+    # (02/11) Sin el anexo A2 salen sus anclas (una por celda de la C 7.2): las precisiones de la lista que sale
+    # siguen ancladas arriba (H15, H16) y la diferencia que muestra la vista 4, en J09.
     ancla("H16", "lista: aciertos de más de la regla, 500 contactables",
           lista["regla_menos_modelo_500_contactables"]["aciertos"], "29", 0, donde="C 7.2")
-    ancla("H45", "lista: no contactables en la de 500 sin filtro", lista["no_contactables_lista_500"], "483", 0,
-          donde="C 7.2", c3="A2")
     h06 = lista["modelo_menos_regla_500_sin_filtro"]
     ancla("H06", "lista: logística ajustada − regla, 500 sin filtro (puntos)", h06["diferencia_pp"], "1,02", 2,
           donde="C 7.1; D 11.2")
@@ -637,11 +620,9 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
     control("regla 500 contactables USD", regla_cont, fr["valor_neto_anual_usd"])
     control("costo incremental", C_PROY - C_MVP, C_INC)
 
-    # --- anclas (d8, d9, A3, A6 y la Parte B)
+    # --- anclas (d2, d8, d9 y la Parte B). (02/11) Salen las que solo servían a los anexos A3 y A6.
     ancla("G31", "economía: s observada (%)", S_OBS, "1,02", 2, 100, donde="B supuestos")
-    ancla("G31", "economía: s, IC 95 % inferior (%)", S_LO, "0,63", 2, 100, donde="B 3.5", c3="A3")
     ancla("G31", "economía: s, IC 95 % superior (%)", S_HI, "1,65", 2, 100, donde="B 3.5")
-    ancla("G52", "economía: s solo los que cruzan (%)", S_CRUZAN, "1,12", 2, 100, donde="B 3.5", c3="A3")
     ancla("G31", "economía: contactados por cada uno que vuelve", 1 / S_OBS, "98", 0, donde="B 4.4", c3="d8")
     ancla("G31", "economía: r (%)", R, "0,74", 2, 100, donde="B 4.4")
     ancla("G08", "economía: margen anual por cliente (ARS)", M, "15.282", 0, donde="B 4.4")
@@ -653,24 +634,12 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
     ancla("G40", "economía: modelo sobre la regla (USD/año)", g("modelo_usd", "observada"), "5,38", 2,
           donde="B 3.4", c3="d8")
     ancla("G40", "economía: ROI del modelo sobre la regla (%)", g("modelo_roi_pct", "observada"), "−99,95", 2,
-          donde="B 3.6", c3="A3")
+          donde="B 3.6", c3="d2")
     ancla("G41", "economía: regla (USD/año)", g("regla_usd", "observada"), "299,49", 2, donde="B 3.6", c3="d9")
     ancla("G41", "economía: ROI de la regla (%)", g("regla_roi_pct", "observada"), "−98,52", 2,
           donde="B 3.6", c3="d9")
     ancla("G41", "economía: regla sin descuento (USD/año)", g("regla_usd_sin", "observada"), "419,53", 2,
           donde="B 3.4")
-    ancla("G42", "economía: ROI de la regla sin descuento (%)", g("regla_roi_pct_sin", "observada"), "−97,93", 2,
-          donde="B 3.5", c3="A3")
-    ancla("G42", "economía: ROI del modelo sin descuento (%)", g("modelo_roi_pct_sin", "observada"), "−99,95", 2,
-          donde="B 3.5", c3="A3")
-    ancla("G42", "economía: s inferior, ROI del modelo (%)", g("modelo_roi_pct", "ic95_inferior"), "−99,97", 2,
-          donde="B 3.5", c3="A3")
-    ancla("G42", "economía: s inferior, ROI de la regla (%)", g("regla_roi_pct", "ic95_inferior"), "−99,32", 2,
-          donde="B 3.5", c3="A3")
-    ancla("G42", "economía: s solo cruzan, ROI del modelo (%)", g("modelo_roi_pct", "solo_cruzan"), "−99,94", 2,
-          donde="B 3.5", c3="A3")
-    ancla("G42", "economía: s solo cruzan, ROI de la regla (%)", g("regla_roi_pct", "solo_cruzan"), "−98,32", 2,
-          donde="B 3.5", c3="A3")
     ancla("G43", "economía: s de equilibrio con descuento (%)", g("s", "equilibrio_con_descuento"), "49,6", 1, 100,
           donde="B 3.6", c3="d9")
     ancla("G43", "economía: s de equilibrio sin descuento (%)", g("s", "equilibrio_sin_descuento"), "39,7", 1, 100,
@@ -699,13 +668,9 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
           donde="B 3.6")
     ancla("G46", "economía: puntos para pagar con s = 100 %", g("puntos_para_pagar", "cien"), "20,6", 1,
           donde="B 3.6")
-    ancla("G38", "economía: año 1 con modelo (USD)", C_PROY, "30.660", 0, donde="B 3.2", c3="A6")
-    ancla("G38", "economía: inversión inicial con modelo (USD)", cp["inversion_inicial"], "23.460", 0,
-          donde="B 3.2", c3="A6")
+    ancla("G38", "economía: año 1 con modelo (USD)", C_PROY, "30.660", 0, donde="B 3.2")
     ancla("G38", "economía: recurrente con modelo (USD/año)", cp["recurrente_anual"], "7.200", 0, donde="B 3.2")
-    ancla("G39", "economía: año 1 de la regla (USD)", C_MVP, "20.260", 0, donde="B 3.2", c3="A6")
-    ancla("G39", "economía: inversión inicial de la regla (USD)", cm["inversion_inicial"], "14.260", 0,
-          donde="B 3.2", c3="A6")
+    ancla("G39", "economía: año 1 de la regla (USD)", C_MVP, "20.260", 0, donde="B 3.2", c3="d9")
     ancla("G40", "economía: costo incremental del modelo (USD)", C_INC, "10.400", 0, donde="B 3.2", c3="d8")
     ancla("C28", "economía: presupuesto (USD)", PRESUPUESTO, "30.000", 0, donde="B 3.2")
     ancla("G38", "economía: con modelo, sobre el presupuesto (USD)", C_PROY - PRESUPUESTO, "660", 0,
@@ -804,7 +769,7 @@ def armar_encuadre(e1: dict) -> dict:
 
 def armar_legal(e1: dict, c3: dict) -> dict:
     d10 = next(d for d in c3["DIAPOSITIVAS"] if d["n"] == 10)
-    a4 = next(a for a in c3["ANEXOS"] if a["n"] == "A4")
+    a4 = c3["RIESGOS"]          # la matriz de la C 6.2 (el que era el anexo A4; 02/11)
     co = e1["series"]["consentimiento"]
     puntajes = [p for _, _, p in LEGAL]
     leg = {
@@ -828,9 +793,9 @@ def armar_legal(e1: dict, c3: dict) -> dict:
           donde="C 5.1", c3="d10")
     ancla("C18", "legal: no consintieron y fueron contactados (%)", leg["no_consintieron_contactados_tasa"], "98,3",
           1, 100, donde="registro C18")
-    ancla("J22", "legal: riesgos en la matriz", leg["riesgos"], "13", 0, donde="C 6.2", c3="A4")
-    ancla("J22", "legal: riesgos críticos (destacados en A4)", leg["riesgos_criticos"], "3", 0,
-          donde="C 6.2 · C3 A4 destacar")
+    ancla("J22", "legal: riesgos en la matriz", leg["riesgos"], "13", 0, donde="C 6.2", c3="riesgos")
+    ancla("J22", "legal: riesgos críticos (destacados en la matriz)", leg["riesgos_criticos"], "3", 0,
+          donde="C 6.2 · C3 RIESGOS destacar")
     return leg
 
 
@@ -1353,8 +1318,7 @@ def main() -> int:
     c3 = cargar_c3()
     for d in c3["DIAPOSITIVAS"]:
         C3_TEXTO[f"d{d['n']}"] = json.dumps(d, ensure_ascii=False)
-    for a in c3["ANEXOS"]:
-        C3_TEXTO[a["n"]] = json.dumps(a, ensure_ascii=False)
+    C3_TEXTO["riesgos"] = json.dumps(c3["RIESGOS"], ensure_ascii=False)
 
     d3 = {
         "meta": {

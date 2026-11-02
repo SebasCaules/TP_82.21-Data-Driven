@@ -1,7 +1,8 @@
 # Contrato de datos E3: presentación interactiva `/e3/`
 
 Versión interactiva de la presentación del Entregable 3 (27/10/2026): doce diapositivas y seis
-anexos. Dos módulos, los dos generados; la interfaz solo los lee:
+anexos. (02/11) Sin los anexos: `/e3/` tiene diez vistas y `C3` trae solo la matriz de riesgos de la C 6.2
+(`RIESGOS`, el que era el A4). Dos módulos, los dos generados; la interfaz solo los lee:
 
 | Archivo | Exporta | Lo escribe | Desde |
 |---|---|---|---|
@@ -63,7 +64,7 @@ Las anclas de `build_e3.py` formatean con esta misma regla.
 
 ## 2. `C3` (texto)
 
-`{VERSION, EQUIPO, PIE, DIAPOSITIVAS, ANEXOS, TIEMPOS}`. Los campos de cada diapositiva son los de
+`{VERSION, EQUIPO, PIE, DIAPOSITIVAS, RIESGOS, TIEMPOS}` (hasta el 01/11, `ANEXOS` en lugar de `RIESGOS`). Los campos de cada diapositiva son los de
 `contenido.py`, con el texto sin tocar. El marcado `**negrita**` llega sin resolver: lo resuelve la
 interfaz. Las tuplas de `contenido.py` llegan como objetos con nombre:
 
@@ -90,7 +91,7 @@ El resto de los campos son texto o listas de texto: `n`, `quien`, `tipo`, `kicke
 - `segundos` de cada diapositiva: el tiempo del guion (130 palabras por minuto, un número vale 3,
   3 s por cambio, redondeo a 5 s), comprobado contra `_gen/tiempos.txt`. `TIEMPOS.total_s` = 655
   (10:55); `TIEMPOS.turnos` = los seis turnos consecutivos con su integrante, diapositivas y segundos.
-- `ANEXOS[i]`: `{n: "A1"…"A6", titulo, fuente, ids, columnas, anchos, filas, destacar, pie?}`. `anchos`
+- `RIESGOS`: `{n: "A4", titulo, fuente, ids, columnas, anchos, filas, destacar, pie}`, la forma que tenían los anexos. `anchos`
   son pulgadas del PPTX: sirven como proporción. `destacar` son índices de fila (desde 0).
 - `figura` nombra el PNG del PPTX. En `/e3/` la figura se dibuja con los datos de `D3`:
 
@@ -103,7 +104,7 @@ El resto de los campos son texto o listas de texto: `n`, `quien`, `tipo`, `kicke
 | `costos.png` (9) | `D3.economia.costos` |
 | `piloto.png` (12) | `D3.piloto` |
 
-Las diapositivas 2, 5, 10 y 11 y los anexos A1 a A6 salen solo de `C3`.
+Las diapositivas 2, 5, 10 y 11 salen solo de `C3`.
 
 ## 3. `D3` (datos)
 
@@ -251,7 +252,7 @@ que `C3` escribe lo mismo.
 - `legal`: `dimensiones[] = {id, nombre, puntaje}` (las cinco de la C 5.3, todas en 2), `promedio` «2,0»,
   `tramo = {desde 1,6, hasta 2,5, nivel}` (H40); `envios_sin_consentimiento` 7.078,
   `envios_sin_consentimiento_tasa` «30,1 %», `no_consintieron_contactados_tasa` «98,3 %» (C18); `riesgos` 13
-  y `riesgos_criticos` 3, contados en el anexo A4 de `C3` (J22).
+  y `riesgos_criticos` 3, contados en `C3.RIESGOS` (J22).
 
 ### `test`: la etapa 4 (J01 a J21, Parte D 8.1 a 8.3 y 11.2)
 

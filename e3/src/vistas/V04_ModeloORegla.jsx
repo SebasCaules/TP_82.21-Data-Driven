@@ -30,7 +30,9 @@
 // - (01/11, a la vista) El gráfico muestra de entrada las cuatro filas: sin filtrar y la lista que sale, cada una en
 //   validación (julio a septiembre de 2024, H06 y la validación de J09, más finas) y en test. Hasta el 01/11 la
 //   validación iba detrás de un botón. La precisión de cada método (J03, J17) y las listas de la Parte B en
-//   validación y entrenamiento (F07, F08, G11 a G15) pasan al anexo A7, a la vista.
+//   validación y entrenamiento (F07, F08, G11 a G15) pasaron al anexo A7. (02/11) Sin el respaldo, el A7 sale; lo
+//   que el A1 decía del test (medido una vez, en la etapa 4: A 2.2 y D 8.1; Juan Manuel R. lo dice en voz alta) va
+//   en la línea de qué mide el gráfico.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y se escriben con formato.js. Las notas
 // (N) siguen leyendo el guion de las diapositivas 6 y 7 de C3 (vistas/index.jsx).
 
@@ -236,7 +238,7 @@ export const meta = { id: 'V04', dc: 'C-MOD' }
 
 export default function V04ModeloORegla() {
   const k = useEscalaTexto()
-  const mide = `Logística menos regla, en puntos · validación, ${VALID} · test, ${TEST}`
+  const mide = `Logística menos regla, en puntos · validación, ${VALID} · test, ${TEST}, medido una vez`
   const conclusion = <>En validación ganaba la regla; en test, la lista que sale <b>empata</b></>
 
   return (

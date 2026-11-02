@@ -48,7 +48,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "f20c3aacd017ae0e891fc7d9366008df2e368908ae4d5852b0c6b66acfe17654"
+   "sha256": "c88913b9b44ab592435343b7d8e28d8ca615ce9b063852063d9cff41e8e04086"
   }
  },
  "caso": {
@@ -2669,208 +2669,10 @@ export const D3 = {
    "donde": "registro H16"
   },
   {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro umbral: casos",
-   "documento": "1.485",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro umbral: precisión",
-   "documento": "82,4",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro umbral: recall",
-   "documento": "71,4",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro umbral: USD por año",
-   "documento": "301,17",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro 500: casos",
-   "documento": "1.500",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro 500: precisión",
-   "documento": "82,6",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro 500: recall",
-   "documento": "72,3",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro 500: USD por año",
-   "documento": "305,68",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro 700: casos",
-   "documento": "2.100",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro 700: precisión",
-   "documento": "75,3",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro 700: recall",
-   "documento": "92,3",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H11",
-   "nombre": "A2 logistica_ajustada sin_filtro 700: USD por año",
-   "documento": "366,00",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 400: casos",
-   "documento": "1.200",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 400: precisión",
-   "documento": "79,8",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 400: recall",
-   "documento": "81,5",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 400: USD por año",
-   "documento": "231,15",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 500: casos",
-   "documento": "1.500",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 500: precisión",
-   "documento": "73,9",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 500: recall",
-   "documento": "94,3",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 500: USD por año",
-   "documento": "252,84",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 600: casos",
-   "documento": "1.800",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 600: precisión",
-   "documento": "64,4",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 600: recall",
-   "documento": "98,6",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H15",
-   "nombre": "A2 logistica_ajustada contactables 600: USD por año",
-   "documento": "234,60",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H16",
-   "nombre": "A2 regla contactables 500: casos",
-   "documento": "1.500",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H16",
-   "nombre": "A2 regla contactables 500: precisión",
-   "documento": "75,8",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H16",
-   "nombre": "A2 regla contactables 500: recall",
-   "documento": "96,8",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H16",
-   "nombre": "A2 regla contactables 500: USD por año",
-   "documento": "264,54",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H13",
-   "nombre": "A2 practica_actual contactables 500: casos",
-   "documento": "1.500",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H13",
-   "nombre": "A2 practica_actual contactables 500: precisión",
-   "documento": "32,8",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H13",
-   "nombre": "A2 practica_actual contactables 500: recall",
-   "documento": "41,8",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
-   "id": "H13",
-   "nombre": "A2 practica_actual contactables 500: USD por año",
-   "documento": "4,15",
-   "donde": "C 7.2 · C3 A2"
-  },
-  {
    "id": "H16",
    "nombre": "lista: aciertos de más de la regla, 500 contactables",
    "documento": "29",
    "donde": "C 7.2"
-  },
-  {
-   "id": "H45",
-   "nombre": "lista: no contactables en la de 500 sin filtro",
-   "documento": "483",
-   "donde": "C 7.2 · C3 A2"
   },
   {
    "id": "H06",
@@ -2982,21 +2784,9 @@ export const D3 = {
   },
   {
    "id": "G31",
-   "nombre": "economía: s, IC 95 % inferior (%)",
-   "documento": "0,63",
-   "donde": "B 3.5 · C3 A3"
-  },
-  {
-   "id": "G31",
    "nombre": "economía: s, IC 95 % superior (%)",
    "documento": "1,65",
    "donde": "B 3.5"
-  },
-  {
-   "id": "G52",
-   "nombre": "economía: s solo los que cruzan (%)",
-   "documento": "1,12",
-   "donde": "B 3.5 · C3 A3"
   },
   {
    "id": "G31",
@@ -3050,7 +2840,7 @@ export const D3 = {
    "id": "G40",
    "nombre": "economía: ROI del modelo sobre la regla (%)",
    "documento": "−99,95",
-   "donde": "B 3.6 · C3 A3"
+   "donde": "B 3.6 · C3 d2"
   },
   {
    "id": "G41",
@@ -3069,42 +2859,6 @@ export const D3 = {
    "nombre": "economía: regla sin descuento (USD/año)",
    "documento": "419,53",
    "donde": "B 3.4"
-  },
-  {
-   "id": "G42",
-   "nombre": "economía: ROI de la regla sin descuento (%)",
-   "documento": "−97,93",
-   "donde": "B 3.5 · C3 A3"
-  },
-  {
-   "id": "G42",
-   "nombre": "economía: ROI del modelo sin descuento (%)",
-   "documento": "−99,95",
-   "donde": "B 3.5 · C3 A3"
-  },
-  {
-   "id": "G42",
-   "nombre": "economía: s inferior, ROI del modelo (%)",
-   "documento": "−99,97",
-   "donde": "B 3.5 · C3 A3"
-  },
-  {
-   "id": "G42",
-   "nombre": "economía: s inferior, ROI de la regla (%)",
-   "documento": "−99,32",
-   "donde": "B 3.5 · C3 A3"
-  },
-  {
-   "id": "G42",
-   "nombre": "economía: s solo cruzan, ROI del modelo (%)",
-   "documento": "−99,94",
-   "donde": "B 3.5 · C3 A3"
-  },
-  {
-   "id": "G42",
-   "nombre": "economía: s solo cruzan, ROI de la regla (%)",
-   "documento": "−98,32",
-   "donde": "B 3.5 · C3 A3"
   },
   {
    "id": "G43",
@@ -3200,13 +2954,7 @@ export const D3 = {
    "id": "G38",
    "nombre": "economía: año 1 con modelo (USD)",
    "documento": "30.660",
-   "donde": "B 3.2 · C3 A6"
-  },
-  {
-   "id": "G38",
-   "nombre": "economía: inversión inicial con modelo (USD)",
-   "documento": "23.460",
-   "donde": "B 3.2 · C3 A6"
+   "donde": "B 3.2"
   },
   {
    "id": "G38",
@@ -3218,13 +2966,7 @@ export const D3 = {
    "id": "G39",
    "nombre": "economía: año 1 de la regla (USD)",
    "documento": "20.260",
-   "donde": "B 3.2 · C3 A6"
-  },
-  {
-   "id": "G39",
-   "nombre": "economía: inversión inicial de la regla (USD)",
-   "documento": "14.260",
-   "donde": "B 3.2 · C3 A6"
+   "donde": "B 3.2 · C3 d9"
   },
   {
    "id": "G40",
@@ -3398,13 +3140,13 @@ export const D3 = {
    "id": "J22",
    "nombre": "legal: riesgos en la matriz",
    "documento": "13",
-   "donde": "C 6.2 · C3 A4"
+   "donde": "C 6.2 · C3 riesgos"
   },
   {
    "id": "J22",
-   "nombre": "legal: riesgos críticos (destacados en A4)",
+   "nombre": "legal: riesgos críticos (destacados en la matriz)",
    "documento": "3",
-   "donde": "C 6.2 · C3 A4 destacar"
+   "donde": "C 6.2 · C3 RIESGOS destacar"
   },
   {
    "id": "J01",

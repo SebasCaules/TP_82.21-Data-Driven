@@ -23,8 +23,9 @@
 // - (01/11, a la vista; lo que hasta ese día iba detrás de un botón) El plan de acción legal L1 a L6, con su dueño
 //   y su tramo (lo pide la Parte C 5.4), se ve en la vista, a la derecha de la barra, en el mismo svg. Debajo, a
 //   todo el ancho, las cinco dimensiones en una línea («2/3 cada una», D3.legal.dimensiones) y las normas (nota de
-//   la diapositiva 10). La matriz de los 13 riesgos está en el anexo A4, con la señal, el umbral y quién mira
-//   cada riesgo crítico (diapositiva 11); los tres críticos, también en el title de la tarjeta de riesgos.
+//   la diapositiva 10). (02/11) Sin el anexo A4, una línea más en ese pie: los tres riesgos críticos de los 13 de la
+//   matriz (C 6.2 y 6.3), cada uno con su umbral (diapositiva 11), que Matías S. dice en voz alta. La señal y quién
+//   mira cada uno siguen en el title de la tarjeta de riesgos.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js; el texto, de C3.
 
 import { Lienzo, Tramas } from '../../../src/graficos.jsx'
@@ -37,13 +38,12 @@ import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
 import { Cifra } from '../cifra.jsx'
 import { anchoTexto as ancho } from '../medir.js'
-import { RIESGO_12 } from '../riesgo12.js'
 import './V06.css'
 
 const D2 = C3.DIAPOSITIVAS.find((d) => d.n === 2)
 const D10 = C3.DIAPOSITIVAS.find((d) => d.n === 10)
 const D11 = C3.DIAPOSITIVAS.find((d) => d.n === 11)
-const A4 = C3.ANEXOS.find((a) => a.n === 'A4')
+const A4 = C3.RIESGOS          // la matriz de la C 6.2 (el que era el anexo A4)
 const T_LEGAL = D2.tarjetas.find((t) => t.area === 'Legal')
 const L = D3.legal
 
@@ -70,12 +70,11 @@ const A_QUIEN = (ALERTA.match(/fue a quien (.+?)\.?$/) ?? [, 'sin consentimiento
 const TASA = L.envios_sin_consentimiento_tasa
 const TASA_TXT = pct(TASA, 1)
 
-// Riesgos: los 13 de A4 y los críticos (A4.destacar, en el orden de las columnas de la diapositiva 11). El 12, como
-// lo deja la Parte D 11.2 (riesgo12.js, el mismo texto del anexo A4; F6b, H-2-072): hasta el 28/10 decía el de
-// validación de la C 6.2.
+// Riesgos: los 13 de la matriz y los críticos (A4.destacar, en el orden de las columnas de la diapositiva 11). (02/11)
+// Sale riesgo12.js (el riesgo 12 como lo deja la D 11.2): solo lo mostraba el anexo A4, y el 12 no es crítico.
 const COL = Object.fromEntries(A4.columnas.map((c, i) => [c, i]))
 const RIESGOS = A4.filas.map((f, i) => ({
-  n: f[COL['#']], tipo: f[COL['Tipo']], texto: f[COL['#']] === '12' ? RIESGO_12 : f[COL['Riesgo']],
+  n: f[COL['#']], tipo: f[COL['Tipo']], texto: f[COL['Riesgo']],
   prob: f[COL['Prob.']], imp: f[COL['Impacto']],
   estrategia: f[COL['Estrategia']], critico: A4.destacar.includes(i),
 }))
@@ -318,6 +317,13 @@ function BarraEnvios({ w, h, k }) {
 
 // ---------------------------------------------------------------- la barra, el plan y la línea de las dimensiones
 
+// (02/11) Los críticos con su umbral: el riesgo de cada columna de la diapositiva 11 y la parte en negrita de su
+// fila «Umbral» («**40,4 puntos** al tercer mes…» → «40,4 puntos»).
+const umbral = (c) => (c.filas.find((f) => /^umbral/i.test(f.rotulo))?.texto.match(/\*\*(.+?)\*\*/) ?? [])[1]
+if (D11.columnas.some((c) => !umbral(c))) throw new Error('V06: una columna de la diapositiva 11 no trae su umbral en negrita')
+const CRITICOS_LINEA = `**Riesgos críticos, ${fijo(L.riesgos_criticos, 0)} de ${fijo(L.riesgos, 0)}, con su umbral:** `
+  + D11.columnas.map((c) => `${minus(c.riesgo)}, ${umbral(c)}`).join(' · ') + '.'
+
 const DIMS_LINEA = `Las ${DIMS.length} dimensiones, ${PAREJAS ? `${fijo(DIMS[0].puntaje, 0)}${PROM_UNIDAD} cada una` : `promedio ${PROM_TXT}`}: `
   + DIMS.map((d, i) => (i ? minus(d.nombre) : d.nombre)).join(', ').replace(/, ([^,]+)$/, ' y $1') + '.'
 
@@ -326,16 +332,17 @@ function Cuerpo({ w, h, k }) {
   const f2 = 12.5 * k
   const fRot = 11 * k
   const gap = 36 * k
+  const pieCriticos = envolver(CRITICOS_LINEA, w, f2)
   const pieDims = envolver(DIMS_LINEA, w, f2)
   const pieNormas = envolver(D10.nota, w, f2)
-  const altoPie = (pieDims.length + pieNormas.length) * f2 * 1.3 + 14 * k
+  const altoPie = (pieCriticos.length + pieDims.length + pieNormas.length) * f2 * 1.3 + 14 * k
   const hArriba = h - altoPie
   const wBarra = Math.round((w - gap) * 0.42)
   const wPlan = w - gap - wBarra
   const yPie = hArriba + 12 * k
   return (
     <svg width={w} height={h} role="group" style={{ display: 'block' }}
-         aria-label={`${CONCLUSION}. Plan legal: ${DECISION.decision}. ${DIMS_LINEA}`}>
+         aria-label={`${CONCLUSION}. Plan legal: ${DECISION.decision}. ${plano(CRITICOS_LINEA)} ${DIMS_LINEA}`}>
       <g><BarraEnvios w={wBarra} h={hArriba} k={k * 0.9} /></g>
       <line x1={wBarra + gap / 2} x2={wBarra + gap / 2} y1={0} y2={hArriba} stroke="var(--bd)" strokeWidth="1" />
       <g transform={`translate(${wBarra + gap}, 0)`}>
@@ -345,8 +352,9 @@ function Cuerpo({ w, h, k }) {
         </g>
       </g>
       <line x1={0} x2={w} y1={hArriba + 4 * k} y2={hArriba + 4 * k} stroke="var(--bd)" strokeWidth="1" />
-      <Renglones lineas={pieDims} x={0} y={yPie} f={f2} color={INK} />
-      <Renglones lineas={pieNormas} x={0} y={yPie + pieDims.length * f2 * 1.3} f={f2} color={MUT2} />
+      <Renglones lineas={pieCriticos} x={0} y={yPie} f={f2} color={INK} />
+      <Renglones lineas={pieDims} x={0} y={yPie + pieCriticos.length * f2 * 1.3} f={f2} color={INK} />
+      <Renglones lineas={pieNormas} x={0} y={yPie + (pieCriticos.length + pieDims.length) * f2 * 1.3} f={f2} color={MUT2} />
     </svg>
   )
 }
