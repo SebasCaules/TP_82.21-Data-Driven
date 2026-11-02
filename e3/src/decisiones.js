@@ -24,6 +24,12 @@
 // - D-PLA · propuesta (01/11, vista 8): el plan de 20 semanas, con la primera lista en la semana 6 y la decisión de
 //   producción en la 20 (Parte D 12.1 a 12.4; J50).
 //
+// - E-CRI · aplicado (01/11, W5, vista 9): el criterio de la corrección al Grupo 5, el de la planilla v1.0: una sección
+//   queda en «Revisar» si tiene al menos una observación que pide una acción. E es la parte de la corrección
+//   (E-consignas.md del E3).
+// - E-CRU · sin cambios (01/11, W5, vista 10): el cruce de las cifras del Grupo 5 con nuestro registro no cambia ninguna
+//   nuestra (_build/E/cruce.md).
+//
 // (28/10, F6b, hallazgo H-2-077 de la auditoría) Los ids son internos: ningún documento que lee la cátedra los
 // define (en el E2, los DC-xx estaban en la Parte B). La tarjeta muestra en su lugar el área de la decisión,
 // «Legal · viable con condiciones», que se entiende sola (sección 8 del CLAUDE.md: cada rótulo se entiende solo).
@@ -50,6 +56,8 @@ const PROPIAS = [
   { id: 'D-PRO', area: 'Alcance', estado: 'propuesta' },
   { id: 'D-PIL', area: 'Piloto', estado: 'propuesta' },
   { id: 'D-PLA', area: 'Plan', estado: 'propuesta' },
+  { id: 'E-CRI', area: 'Criterio', estado: 'aplicado' },
+  { id: 'E-CRU', area: 'Cruce', estado: 'sin cambios' },
 ]
 
 export const DECISIONES = Object.fromEntries([

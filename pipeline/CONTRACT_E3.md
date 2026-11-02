@@ -19,7 +19,7 @@ python3 -I pipeline/build_e3.py
 
 - **El navegador no calcula.** Busca en `D3` y formatea. Ninguna cifra se escribe en el JSX ni se
   deriva (ni una resta: `piloto.contactados_mes` ya viene). El texto sale de `C3` tal cual.
-- `build_e3.py` usa solo la biblioteca estándar y corre con `python3 -I`. Si una de sus 409 anclas
+- `build_e3.py` usa solo la biblioteca estándar y corre con `python3 -I`. Si una de sus 422 anclas
   no da el número del documento, sale con código 1 y no escribe nada. Además compara su fórmula
   económica con `economia.json` (26 controles).
 - Los dos scripts son deterministas: dos corridas, los mismos bytes.
@@ -28,7 +28,8 @@ python3 -I pipeline/build_e3.py
   `economia.json` ← `_build/B/economia/salida/`, `condiciones.json` ← `_build/A/factibilidad/salida/`;
   desde W3 (27/10), `etapa4.json` y `etapa4_validacion.json` ← `_build/D/modelado/salida/` (la etapa 4 de la
   Parte D: el test, abierto una sola vez, y la misma medición en validación); desde el F6b (28/10),
-  `serie_riesgo.json` ← `_build/D/drift/` (la alerta de drift de la D 10.2, J53).
+  `serie_riesgo.json` ← `_build/D/drift/` (la alerta de drift de la D 10.2, J53); desde el 01/11 (W5),
+  `correcciones.json` ← `_build/E/` (la corrección del Grupo 2 al consolidado del E3 del Grupo 5, vistas 9 y 10).
   Se copian enteras: 340 KB en total, y una copia fiel se verifica con el hash. Un recorte sería un
   formato más que mantener. `etapa4.json` además tiene que tener la huella que cita el registro (J01:
   sha256 `0368611d…`): si cambia, el test se habría vuelto a correr, y el script sale con código 1.
@@ -106,7 +107,7 @@ Las diapositivas 2, 5, 10 y 11 y los anexos A1 a A6 salen solo de `C3`.
 
 ## 3. `D3` (datos)
 
-`{meta, caso, tecnica, modelos, lista, economia, piloto, encuadre, legal, test, plan, monitoreo, anclas}`. Entre paréntesis: cómo lo escribe
+`{meta, caso, tecnica, modelos, lista, economia, piloto, encuadre, legal, test, plan, monitoreo, correccion, anclas}`. Entre paréntesis: cómo lo escribe
 el documento y la fila del registro (`wiki/entregables/cifras-entregable-3.md`).
 
 ### `caso`: diapositiva 3 (H23, C 7.3)
@@ -319,6 +320,25 @@ la de 500 contactables por corte, salvo en `sin_filtro`.
   (la mayor suba mensual de clientes en riesgo sobre elegibles, con DC-04, de 12/2023 a 08/2025, `umbral_corte`
   2025-05-31), `referencia` «50,4 %» = `en_riesgo` 2.372 / `elegibles` 4.710 al `referencia_corte` 2025-12-31 (D22),
   `antes_dc09` «38,5 %» al 2025-08-31 (E01) y `saltaria_en` (octubre a diciembre de 2025).
+
+### `correccion`: la corrección al Grupo 5 (W5, 01/11; vistas 9 y 10, diapositivas 14 y 15)
+
+Copia de `correcciones.json` de `_build/E/` (lo escribe `generar_e.py`; puede cambiar con la crítica, y entonces se
+vuelve a correr `exportar_web.py`) con lo que la interfaz no debe sumar:
+
+- `grupo`, `version` («v1.0»), `fecha`, `documento = {archivo, titulo, version, fecha, paginas}` (el consolidado del
+  Grupo 5: v2.0, 76 páginas).
+- `conteo[] = {parte, rotulo, filas, completo, revisar}`: General y A a D, en ese orden; `rotulo` es «General» o
+  «Parte A». `total = {filas, completo, revisar}` (56, 36 y 20 con la planilla del 01/11).
+- `top[] = {n, id, parte, seccion, pagina, titulo_corto, cita, problema, correccion, cifra}`: las cinco observaciones de
+  más peso; `cita` es textual del PDF del Grupo 5 (lo controla `generar_e.py`).
+- `bien[] = {seccion, que}`: lo que hacen bien (tres).
+
+Anclas con id `W5`, contra la planilla (`finales/E-Correcciones consolidado 3 - Grupo 5.pdf`): la versión, el total de
+filas, Completo y Revisar, Revisar por parte, cinco observaciones, tres cosas bien y las 76 páginas. El total de filas y
+el de Revisar se buscan también en el guion de la diapositiva 14 (`c3="d14"`): si la planilla cambia, el armado corta
+hasta que el guion diga lo mismo. Estas cifras no salen de nuestras partes: `presentacion/verificar.py --web` busca los
+números de las vistas 9 y 10 en el texto de la planilla y del PDF del Grupo 5.
 
 ### `meta` y `anclas`
 

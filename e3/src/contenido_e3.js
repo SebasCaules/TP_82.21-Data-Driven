@@ -601,8 +601,32 @@ export const C3 = {
         "J13",
         "G49"
       ],
-      "guion": "Cada mes, la regla arma la lista, Sofía R. decide a quién escribir y medimos contra el control. La primera lista sale en la semana 6, en diciembre, con cinco condiciones: acciones legales, extracto nuevo, target y operador aprobados, grupo de control aprobado y 379 aciertos por mes, que el test ya da. María G. decide el alcance en la semana 1, la regla en la 2, quién opera después en la 13 y si pasa a producción en la 20. Gracias.",
+      "guion": "Cada mes, la regla arma la lista, Sofía R. decide a quién escribir y medimos contra el control. La primera lista sale en la semana 6, en diciembre, con cinco condiciones: acciones legales, extracto nuevo, target y operador aprobados, grupo de control aprobado y 379 aciertos por mes, que el test ya da. María G. decide el alcance en la semana 1, la regla en la 2, quién opera después en la 13 y si pasa a producción en la 20.",
       "segundos": 45
+    },
+    {
+      "n": 14,
+      "quien": "Tomas F.",
+      "tipo": "correccion",
+      "kicker": "Corrección al Grupo 5",
+      "pregunta": "¿Qué le corregimos al Grupo 5?",
+      "titulo": "20 de 56 secciones a revisar; dos observaciones cambian cifras del documento",
+      "fuente": "Planilla de correcciones al Grupo 5 (v1.0)",
+      "ids": [],
+      "guion": "Nos tocó corregir el consolidado del Grupo 5, de 76 páginas, con el formato de las devoluciones de la cátedra: una fila por sección. De 56 secciones, 20 quedan para revisar, seis en la Parte A y siete en la D. Dos observaciones cambian cifras. La 8.2 compara el test contra la base equivocada: la caída es de 5 %, no de 0,5 %. Y la etiqueta de entrenamiento mira compras de los meses de validación. Las otras tres piden escribir lo que falta, como el 73 % del beneficio, que no se puede rehacer.",
+      "segundos": 55
+    },
+    {
+      "n": 15,
+      "quien": "Juan Manuel R.",
+      "tipo": "correccion",
+      "kicker": "Corrección al Grupo 5",
+      "pregunta": "¿Qué está bien y qué nos deja?",
+      "titulo": "Su modelo le gana a una regla de sí o no; la nuestra ordena por días",
+      "fuente": "Planilla de correcciones al Grupo 5 (v1.0)",
+      "ids": [],
+      "guion": "También hay mucho bien hecho. Las cifras de sus ocho fuentes se reproducen una por una con los CSV, la cuenta del modelo se rehace al centavo y el plan legal termina en algo que se puede verificar: cero clientes con baja en cada listado. El cruce nos sirvió a nosotros: ninguna cifra nuestra está mal. Y explica por qué concluimos distinto. Su modelo le gana a su regla, 0,750 de AUC contra 0,569, pero esa regla marca sí o no. La nuestra ordena a cada cliente por los días que le faltan para cruzar su umbral, y contra esa el modelo no gana. Gracias.",
+      "segundos": 55
     }
   ],
   "ANEXOS": [
@@ -1297,7 +1321,7 @@ export const C3 = {
   "TIEMPOS": {
     "palabras_por_minuto": 130,
     "cambio_s": 3,
-    "total_s": 480,
+    "total_s": 590,
     "turnos": [
       {
         "quien": "Sebastian C.",
@@ -1346,6 +1370,20 @@ export const C3 = {
           13
         ],
         "segundos": 85
+      },
+      {
+        "quien": "Tomas F.",
+        "diapositivas": [
+          14
+        ],
+        "segundos": 55
+      },
+      {
+        "quien": "Juan Manuel R.",
+        "diapositivas": [
+          15
+        ],
+        "segundos": 55
       }
     ]
   }

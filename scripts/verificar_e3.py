@@ -6,7 +6,7 @@
 (27/10, W1) Rehecho para el armazón del E2 (riel, encabezado con la pregunta, banda de cifras, zoom
 uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; esto cubre lo demás:
 
-1. Cada vista del riel (V01 a V08 y A1 a A7) a 1152×640, 1280×720, 1366×768, 1536×864 y 1920×1080:
+1. Cada vista del riel (V01 a V10 y A1 a A7) a 1152×640, 1280×720, 1366×768, 1536×864 y 1920×1080:
    - monta, la página no scrollea y window.__fit() (src/fit.js) no encuentra desbordes;
    - el zoom es el declarado: k = máx(1; mín(1,2; ancho / 1152; alto / 640));
    - (01/11) nada detrás de un botón: ninguna vista ni anexo tiene el botón que abría paneles (.e3-explorar) ni la
@@ -66,6 +66,13 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
    críticos (A4) y la precisión de cada método con las matrices de validación y test (A7).
 9. (01/11) Sin navegador: «Explorar» no aparece en el tablero armado (dist-e3/index.html) ni en las fuentes de /e3/
    (e3/src, también el texto generado contenido_e3.js).
+10. (01/11, W5) La corrección al Grupo 5, en cada resolución, contra D3.correccion (correcciones.json de _build/E/):
+   la vista 9 escribe el total en «Revisar» sobre las secciones, el conteo de cada parte y, de las cinco observaciones
+   de más peso, el título, la sección con su página, la cita y la corrección; la terracota marca solo lo que está en
+   «Revisar» (la tarjeta central, las celdas de esas secciones y el número de cada observación). La vista 10 escribe
+   el total en «Completo», lo que hacen bien con su sección y las dos reglas; sin terracota. En las dos, ni
+   «pendiente» ni «abierto» ni códigos internos (revisar_estado). Sus cifras no salen de nuestras partes: las controla
+   presentacion/verificar.py --web contra el texto de la planilla y del PDF del Grupo 5.
 
 Termina con «E3 OK» o con la lista de problemas y código 1.
 """
@@ -87,7 +94,7 @@ HTML = APP / "dist-e3" / "index.html"
 RES = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
 CAPTURAR = {(1280, 720), (1920, 1080)}
 NOTAS_RES = {(1366, 768), (1536, 864)}   # laptops donde se ensaya con el panel de notas
-HISTORIA = [f"v{i:02d}" for i in range(1, 9)]   # 01/11: la V08 muestra lo que la V07 tenía detrás de un botón
+HISTORIA = [f"v{i:02d}" for i in range(1, 11)]  # 01/11: la V08, y la V09 y la V10 de la corrección al Grupo 5 (W5)
 RESPALDO = [f"a{i}" for i in range(1, 8)]
 VISTAS = HISTORIA + RESPALDO
 SRC = APP / "e3" / "src"
@@ -621,6 +628,59 @@ def respaldo_esperado():
     ]
 
 
+# ---------------------------------------------------------------- 10. la corrección al Grupo 5 (01/11, W5)
+
+def correccion_esperada():
+    """(vista, None, textos que tiene que escribir, textos que no puede escribir) de las vistas 9 y 10, desde D3.correccion,
+    con el mismo formato que respaldo_esperado()."""
+    D3 = leer_js("datos_e3.js", "D3")
+    CO = D3["correccion"]
+    T = CO["total"]
+    v09 = [f"{fijo(T['revisar'])} de {fijo(T['filas'])}", "Revisar por parte"]
+    v09 += [x for c in CO["conteo"] for x in (c["rotulo"], f"{fijo(c['revisar'])} de {fijo(c['filas'])}")]
+    for o in CO["top"]:
+        v09 += [o["titulo_corto"], f"{o['parte']} {o['seccion'].split(' ')[0]} · pág. {o['pagina']}",
+                f"Dice: «{o['cita']}»", f"Corrección. {o['correccion']}"]
+    v10 = [f"{fijo(T['completo'])} de {fijo(T['filas'])}", "Lo que hacen bien", "Su regla marca sí o no",
+           "Nuestra regla ordena por días"]
+    v10 += [x for b in CO["bien"] for x in (b["seccion"], b["que"])]
+    return [("v09", None, v09, []), ("v10", None, v10, [])]
+
+
+TERRACOTA = r"""() => {
+  const el = document.createElement('i'); el.style.color = 'var(--terra)'; document.querySelector('.e3-vp').appendChild(el)
+  const T = getComputedStyle(el).color; el.remove()
+  const cuerpo = document.querySelector('.cuerpo')
+  const todos = [...cuerpo.querySelectorAll('*')].filter((e) => {
+    const cs = getComputedStyle(e); return cs.color === T || cs.fill === T || cs.backgroundColor === T
+  })
+  // lo que la vista 9 pinta a propósito: la cifra central, el número de cada parte, las celdas en «Revisar» y el
+  // número de cada observación (el filete de la tarjeta central es borde, no entra en el filtro)
+  const permitidos = todos.filter((e) => e.closest('.e3-v09-central') || e.closest('.e3-v09-n')
+    || (e.closest('.e3-v09-conteo svg') && (e.tagName === 'rect' || e.tagName === 'text')))
+  const celdas = [...cuerpo.querySelectorAll('.e3-v09-conteo svg rect')].filter((r) => getComputedStyle(r).fill === T).length
+  return { total: todos.length, fuera: todos.length - permitidos.length, celdas }
+}"""
+
+
+def correccion(p: Pagina, casos):
+    """Los textos de las vistas 9 y 10 (respaldo() con sus casos) y dónde va la terracota."""
+    respaldo(p, casos)
+    D3 = leer_js("datos_e3.js", "D3")
+    revisar = D3["correccion"]["total"]["revisar"]
+    p.ir("v01")
+    p.ir("v09")
+    r = p.pg.evaluate(TERRACOTA)
+    if r["fuera"]:
+        p.mal(f"v09: {r['fuera']} elementos en terracota fuera de lo que está en «Revisar»")
+    if r["celdas"] != revisar:
+        p.mal(f"v09: {r['celdas']} celdas en terracota en el conteo; las secciones en «Revisar» son {revisar}")
+    p.ir("v10")
+    r = p.pg.evaluate(TERRACOTA)
+    if r["total"]:
+        p.mal(f"v10: {r['total']} elementos en terracota (la vista no tiene nada en «Revisar»)")
+
+
 def respaldo(p: Pagina, casos):
     for id_, opcion, deben, no_deben in casos:
         # pasar por otra vista: con el mismo hash la vista no se monta de nuevo
@@ -899,6 +959,7 @@ def explorar_en_fuentes():
 def main():
     esperado, guion = contenido_esperado()
     casos_r = respaldo_esperado()
+    casos_c = correccion_esperada()
     ap = argparse.ArgumentParser()
     ap.add_argument("--capturas", default=str(APP / "e3" / "capturas-verif"))
     ap.add_argument("--sin-capturas", action="store_true")
@@ -921,6 +982,7 @@ def main():
                 vistas(p, w, h, out, (w, h) in CAPTURAR and not a.sin_capturas, a.sin_esqueletos)
                 contenido(p, esperado)
                 respaldo(p, casos_r)
+                correccion(p, casos_c)
                 if (w, h) in NOTAS_RES:
                     notas_entran(p, w, h)
                     guion_en_notas(p, w, h, guion)

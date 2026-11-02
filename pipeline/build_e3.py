@@ -8,6 +8,7 @@ Lee, sin modificarlos:
   de los generadores de las partes A, B y C del Entregable 3; etapa4.json y etapa4_validacion.json, de la
   etapa 4 de la Parte D (el test, abierto una sola vez). Las deja
   entregas/entregable-3/_build/F/presentacion/exportar_web.py.
+- data/e3/correcciones.json (01/11, W5): la corrección al consolidado del Grupo 5, de _build/E/ del E3.
 - src/datos.js (payload del tablero del E1) y data/raw/Campanias_marketing.csv (copia de la cátedra).
 - e3/src/contenido_e3.js: el texto de la presentación (C3), para comprobar que cada ancla que la
   diapositiva escribe está escrita igual ahí.
@@ -36,11 +37,15 @@ DATOS = APP / "data" / "e3"
 CONTENIDO = APP / "e3" / "src" / "contenido_e3.js"
 SALIDA = APP / "e3" / "src" / "datos_e3.js"
 ENTRADAS = ("etapa2.json", "etapa3.json", "economia.json", "condiciones.json", "etapa4.json", "etapa4_validacion.json",
-            "serie_riesgo.json")
+            "serie_riesgo.json", "correcciones.json")
 # (27/10, W3) dos fuentes de la app que no son de las partes del E3: el payload del tablero del E1 (C08, C14, C18)
 # y la copia de los datos crudos de la cátedra (J51). Su sha256 también va en D3.meta.fuentes.
 # (28/10, F6b) serie_riesgo.json es la serie de la alerta de drift de la D v1.3, 10.2 (J53), que escribe
 # entregas/entregable-3/_build/D/drift/serie_riesgo.py; reemplaza al semáforo del E1 (J52).
+# (01/11, W5) correcciones.json es la corrección del Grupo 2 al consolidado del E3 del Grupo 5, que escribe
+# entregas/entregable-3/_build/E/generar_e.py: conteo por parte, las cinco observaciones de más peso y lo que hacen
+# bien. Lo leen las vistas 9 y 10 (D3.correccion). No tiene filas en el registro de cifras: sus anclas comparan con lo
+# que escribe la planilla (finales/E-Correcciones consolidado 3 - Grupo 5.pdf, v1.0) y van con el id «W5».
 E1_PAYLOAD = APP / "src" / "datos.js"
 CAMPANIAS = APP / "data" / "raw" / "Campanias_marketing.csv"
 
@@ -1278,6 +1283,34 @@ def armar_monitoreo(drift: dict) -> dict:
     return mon
 
 
+def armar_correccion(co: dict) -> dict:
+    """(01/11, W5) La corrección al Grupo 5 tal como la escribe correcciones.json, con los totales ya sumados (el
+    navegador no suma) y cada parte con su rótulo de pantalla. Las anclas comparan con la tabla «Conteo por parte» y
+    la carátula de la planilla v1.0."""
+    conteo = []
+    for c in co["conteo"]:
+        if c["completo"] + c["revisar"] != c["filas"]:
+            raise SystemExit(f"correcciones.json: la parte {c['parte']} no suma ({c})")
+        conteo.append({**c, "rotulo": c["parte"] if c["parte"] == "General" else f"Parte {c['parte']}"})
+    total = {k: sum(c[k] for c in conteo) for k in ("filas", "completo", "revisar")}
+    top = [{**t, "n": i + 1} for i, t in enumerate(co["top"])]
+    cor = {"grupo": co["grupo"], "version": co["version"], "fecha": co["fecha"], "documento": co["documento"],
+           "conteo": conteo, "total": total, "top": top, "bien": co["bien"]}
+    ancla("W5", "corrección: versión de la planilla", co["version"], "v1.0", donde="E, carátula (index.jsx: fuente)")
+    # (la planilla cambió con la crítica del 01/11: de 18 a 20 Revisar. El guion de la vista 9 dice el total; con
+    # c3="d14" un cambio de la planilla corta acá hasta que contenido.py diga lo mismo)
+    ancla("W5", "corrección: secciones revisadas", total["filas"], "56", 0, donde="E, conteo por parte", c3="d14")
+    ancla("W5", "corrección: Completo", total["completo"], "36", 0, donde="E, conteo por parte")
+    ancla("W5", "corrección: Revisar", total["revisar"], "20", 0, donde="E, conteo por parte", c3="d14")
+    ancla("W5", "corrección: Revisar por parte (General, A a D)", " · ".join(str(c["revisar"]) for c in conteo),
+          "1 · 6 · 3 · 3 · 7", donde="E, conteo por parte")
+    ancla("W5", "corrección: observaciones de más peso", len(top), "5", 0, donde="E, «Las cinco observaciones»")
+    ancla("W5", "corrección: lo que hacen bien", len(co["bien"]), "3", 0, donde="E, «Lo que hacen bien»")
+    ancla("W5", "corrección: páginas del consolidado del Grupo 5", co["documento"]["paginas"], "76", 0,
+          donde="E, «Qué se revisó»")
+    return cor
+
+
 # ============================================================ main
 
 def main() -> int:
@@ -1285,7 +1318,7 @@ def main() -> int:
         if not (DATOS / n).exists():
             print(f"falta {DATOS / n}: corre antes entregas/entregable-3/_build/F/presentacion/exportar_web.py")
             return 1
-    e2, e3, eco, co, e4, v4, drift = (cargar(n) for n in ENTRADAS)
+    e2, e3, eco, co, e4, v4, drift, corr = (cargar(n) for n in ENTRADAS)
     e1 = cargar_e1()
     c3 = cargar_c3()
     for d in c3["DIAPOSITIVAS"]:
@@ -1311,6 +1344,7 @@ def main() -> int:
         "test": armar_test(e4, v4, eco, e3),
         "plan": armar_plan(),
         "monitoreo": armar_monitoreo(drift),
+        "correccion": armar_correccion(corr),
     }
 
     print(f"{'ID':6s}{'ANCLA':58s}{'DOCUMENTO':>14s}{'PANTALLA':>14s}  OK")

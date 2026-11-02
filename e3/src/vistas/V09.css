@@ -1,0 +1,34 @@
+/* V09 · Lo que corregimos al Grupo 5 (01/11, W5). Estilos propios de la vista (N0-7): solo clases e3-v09-*. La
+   terracota marca lo que no cierra: las secciones en «Revisar». */
+
+/* La cifra central es «Revisar»: la tarjeta toma la terracota en lugar de --acc (cifra y filete), sin nombrar clases
+   del armazón (paridad_e3.py). */
+.e3-v09-central { --acc: var(--terra); }
+
+/* La tarjeta del conteo: el rótulo arriba y el SVG llena el resto del alto de la banda. */
+.e3-v09-conteo { display: flex; flex-direction: column; }
+.e3-v09-lienzo { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;
+                 margin-top: clamp(6px, 1.2cqh, 14px); }
+
+/* Las observaciones: la conclusión arriba y cinco filas que se reparten el alto. */
+.e3-v09-obs { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.e3-v09-lista {
+  flex: 1 1 0; min-height: 0; margin: clamp(6px, 1.4cqh, 16px) 0 0; padding: 0; list-style: none;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.e3-v09-item {
+  display: grid; grid-template-columns: 1.6em minmax(0, 1fr); column-gap: clamp(6px, .8cqw, 12px);
+  padding-top: clamp(4px, .9cqh, 10px); border-top: 1px solid var(--bd);
+  font: 400 var(--e2-txt)/1.28 var(--fuente); color: var(--ink);
+}
+.e3-v09-n { font: 700 calc(var(--e2-txt) * 1.15)/1.15 var(--fuente); color: var(--terra); }
+.e3-v09-txt { min-width: 0; }
+.e3-v09-txt p { margin: 0; }
+.e3-v09-tit { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.e3-v09-tit b { font-size: calc(var(--e2-txt) * 1.06); font-weight: 700; }
+.e3-v09-donde {
+  flex-shrink: 0; white-space: nowrap;
+  font: 600 var(--e2-rot)/1.2 var(--mono); letter-spacing: .04em; color: var(--e3-ctx, #5a6478);
+}
+.e3-v09-cita { color: var(--e3-ctx, #5a6478); font-style: italic; }
+.e3-v09-corr b { font-weight: 700; }
