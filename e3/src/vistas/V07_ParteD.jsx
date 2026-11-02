@@ -31,6 +31,9 @@
 //   «mínimo que se distingue» al lado, y sale «◄ no se distingue de cero» (VIS-11). Sale «la lista se paga» de la
 //   zona de producción, el eje rotula solo sus puntas y el fragmento de la central dice «más que el control», para
 //   no sumar palabras.
+// - (02/11, verificador de la fase B) El eje marca solo sus puntas (la marca muda del 40 quedaba pegada a la línea del
+//   40,4). Para no terminar con más palabras que antes: la decisión corta pasa a «Con 40,4 puntos o más, a producción»
+//   (los meses están en qué mide) y la conclusión deja «que el control», que ya dice el eje.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y el texto nuevo de C3 (contenido_e3.js).
 
 import { Lienzo, escalaNice } from '../../../src/graficos.jsx'
@@ -67,7 +70,7 @@ const rango = (f) => (f.desde_semana === f.hasta_semana ? `semana ${f.desde_sema
 
 // La decisión: la regla del piloto en una línea; el resto, al title.
 const DECISION = decision('D-PIL', {
-  llano_corto: `Piloto de ${P.meses} meses; con ${T_PAGA} puntos o más, a producción`,
+  llano_corto: `Con ${T_PAGA} puntos o más, a producción`,
   llano: `La lista de ${entero(P.lista_mes)} por mes sale con la regla del umbral, sin modelo. Un piloto de `
     + `${P.meses} meses, con ${entero(P.control)} clientes de control, mide la compra a 7 días. Con ${T_PAGA} puntos `
     + 'o más sobre el control, María G. invierte en producción; debajo, elige entre cerrar o repetir el piloto sin '
@@ -88,7 +91,7 @@ const TITULO_CONTROL = `${TITULO_PILOTO} Plan del proyecto: ${semanas(PL.semanas
   + `. La primera lista sale el ${fecha(PILOTO.desde)}; María G. decide el ${fecha(DECIDE.hasta)}.`
 // Textos del gráfico. La conclusión dice lo que muestra el dibujo, sin cifra (la cifra va en la banda y en la
 // marca): la zona de producción empieza muy a la derecha del cero.
-const CONCLUSION = 'A producción solo si los contactados compran mucho más que el control'
+const CONCLUSION = 'A producción solo si los contactados compran mucho más'
 const Z1_QUIEN = 'María G. elige:'
 const Z1_QUE = `cerrar o repetir sin${NBSP}descuento`
 const Z2_QUE = 'a producción'
@@ -247,13 +250,11 @@ function ReglaPiloto({ w, h, k }) {
       {/* Eje, con su título en la punta. */}
       <g>
         <line x1={x0} x2={xf} y1={yEje} y2={yEje} stroke={EJE} strokeWidth="1.5" />
-        {ticks.map((t, i) => (
+        {[ticks[0], ticks[ticks.length - 1]].map((t, i) => (
           <g key={t}>
             <line x1={x(t)} x2={x(t)} y1={yEje} y2={yEje + 5} stroke={EJE} strokeWidth="1" />
-            {(i === 0 || i === ticks.length - 1) && (
-              <text x={x(t)} y={yEje + 6 + fTick} fontSize={fTick} fill={MUT} fontWeight={500} className="tabular"
-                    data-escala="" textAnchor={i === 0 ? 'start' : 'end'}>{fijo(t, 0)}</text>
-            )}
+            <text x={x(t)} y={yEje + 6 + fTick} fontSize={fTick} fill={MUT} fontWeight={500} className="tabular"
+                  data-escala="" textAnchor={i === 0 ? 'start' : 'end'}>{fijo(t, 0)}</text>
           </g>
         ))}
         <TituloEje x={xf} y={yEje + 6 + fTick + 10 * k + fTit} f={fTit} texto="contactados menos control, en puntos" />

@@ -287,8 +287,9 @@ def contenido_esperado():
                             fijo(sum(1 for h in dia[13]["hitos"] if h["criterio"])),
                             f"semana {PL['hitos_semana']['operador_despues_del_piloto']}"],
                     grafico=[plano(x["titulo"]) for x in dia[13]["flujo"]]
-                    + [plano(dia[13]["rotulo_hitos"]), plano(dia[13]["llave_go_live"])]
-                    + sorted({fijo(PL["hitos_semana"][h["clave"]]) for h in dia[13]["hitos"]}),
+                    + [plano(dia[13]["rotulo_hitos"]), plano(dia[13]["llave_go_live"])],
+                    # cada marcador de la línea de hitos: un texto del svg que es solo el número de su semana
+                    exactos=sorted({fijo(PL["hitos_semana"][h["clave"]]) for h in dia[13]["hitos"]}, key=int),
                     sin=[f["nombre"] for f in PL["fases"] if f["id"] != "piloto"]
                     + ["Lo que decide María G.", "1 · Exportar"]),
     }
@@ -299,7 +300,7 @@ def contenido_esperado():
                   "grafico": [norm(x) for x in e["grafico"]], "sin": [norm(x) for x in e.get("sin", [])],
                   "aria": [norm(x) for x in e.get("aria", [])], "acc": e.get("acc"),
                   "terracota": e.get("terracota", False),
-                  "fragmento": e.get("fragmento", {})}
+                  "fragmento": e.get("fragmento", {}), "exactos": [norm(x) for x in e.get("exactos", [])]}
     # el guion de cada vista: quién y el comienzo de lo que dice, por diapositiva (vistas/index.jsx)
     de = dict(re.findall(r"\{ id: '(V\d\d)'.*?de: \[([\d, ]*)\]", (SRC / "vistas" / "index.jsx").read_text()))
     guion = {}
@@ -421,6 +422,10 @@ def contenido(p: Pagina, esperado):
         for x in e["grafico"]:
             if x not in svg:
                 p.mal(f"{id_}: el gráfico no escribe «{x}»")
+        solos = {norm(t) for t in r["textosSvg"]}
+        for x in e["exactos"]:
+            if x not in solos:
+                p.mal(f"{id_}: el gráfico no tiene un texto que sea solo «{x}»")
         for x in e["sin"]:
             if x.casefold() in svg.casefold():
                 p.mal(f"{id_}: el gráfico sigue escribiendo «{x}»")
@@ -552,11 +557,9 @@ def a_la_vista_esperado():
     if "ANEXOS" in C3:
         raise SystemExit("C3 trae ANEXOS: desde el 02/11 exportar_web.py exporta solo RIESGOS")
     T, E, PL, LE = D3["test"], D3["economia"], D3["plan"], D3["legal"]
-    hs = PL["hitos_semana"]
     dia = {d["n"]: d for d in C3["DIAPOSITIVAS"]}
     CO, SF, SFV = T["contra_regla"], T["sin_filtro"], D3["lista"]["modelo_menos_regla_500_sin_filtro"]
     ids_l = sorted((a["id"] for t in dia[10]["plan"] for a in t["acciones"]), key=lambda x: int(x[1:]))
-    pedidos = ["alcance", "regla_y_operador_del_piloto", "designa_l1", "operador_despues_del_piloto", "decision"]
     d5 = dia[5]
     d11 = dia[11]
     d12, d13 = dia[12], dia[13]
@@ -579,7 +582,7 @@ def a_la_vista_esperado():
         # tabla de lo que decide María G., las fases del Gantt y el dueño genérico «el equipo»
         ("v08", None, [plano(x[c]) for x in d13["flujo"] for c in ("titulo", "texto", "quien")]
          + [plano(x[c]) for x in d13["hitos"] for c in ("hito", "quien")]
-         + [plano(d13["rotulo_hitos"]), plano(d13["llave_go_live"]), "sí o no, hasta el go-live"],
+         + [plano(d13["rotulo_hitos"]), plano(d13["llave_go_live"]), "sí o no, hasta la lista"],
          ["Lo que decide María G. y en qué semana", "El equipo, en el piloto", "El equipo; el resumen por local",
           "Plan de 20", "lo revisa Sofía R.", "quien elija Casa Óga"]
          + [f["nombre"] for f in PL["fases"] if f["id"] != "piloto"]),

@@ -18,6 +18,10 @@
 //     por semana con hito, con su número; el piloto como franja (D3.plan.fases, piloto); los hitos de cada semana con
 //     su dueño en una columna, unida a su marcador; la llave «criterios de go-live» (D13.llave_go_live) sobre las
 //     semanas de los hitos con criterio. La primera lista, en --acc.
+// - (02/11, verificador de la fase B) Para bajar palabras: sale el rótulo «semana» del eje (el número va en cada
+//   marcador), la conclusión y la decisión corta se acortan y el fragmento de la tarjeta 2 no repite «go-live». El eje se
+//   corta donde va «piloto», para que ni la línea ni las marcas lo tachen. El dueño lleva un espacio duro antes de la
+//   inicial, para que «C.» no quede sola en un renglón.
 // Ninguna cifra escrita acá: las semanas salen de D3 (datos_e3.js) con formato.js y los textos de C3 (contenido_e3.js).
 
 import { Lienzo } from '../../../src/graficos.jsx'
@@ -48,6 +52,8 @@ const GRUPOS = [...new Set(HITOS.map((h) => h.semana))].sort((a, b) => a - b)
   .map((s) => ({ semana: s, hitos: HITOS.filter((h) => h.semana === s) }))
 const CRITERIOS = HITOS.filter((h) => h.criterio)
 const GO_LIVE = HITOS.find((h) => h.clave === 'go_live')
+/** El dueño con un espacio duro antes de cada inicial («Francisco C.»): el renglón no deja la inicial sola. */
+const duro = (t) => String(t).replace(/ (\p{Lu}\.)/gu, `${NBSP}$1`)
 
 /** La cifra de la banda: el número de la semana grande y «semana» delante, un escalón más chica (como «USD»). */
 function CifraSemana({ n, sec = false }) {
@@ -59,7 +65,7 @@ function CifraSemana({ n, sec = false }) {
 }
 
 const DECISION = decision('D-PLA', {
-  llano_corto: `${semanas(PL.semanas)}: primera lista en la ${HS.go_live}, decisión en la ${HS.decision}`,
+  llano_corto: `María G. decide en la semana${NBSP}${HS.decision}`,
   llano: `El plan dura ${semanas(PL.semanas)} desde el ${fecha(PL.semana_1)}. La primera lista sale en la semana `
     + `${HS.go_live}, el ${fecha(PILOTO.desde)}, con los ${entero(CRITERIOS.length)} criterios de go-live; el piloto `
     + `cierra en la semana ${PILOTO.hasta_semana} y María G. decide en la ${HS.decision}, el ${fecha(DECIDE.hasta)}.`,
@@ -73,7 +79,7 @@ const TITULO_PLAN = `Plan del proyecto: ${semanas(PL.semanas)} desde el ${fecha(
   + `. La primera lista sale el ${fecha(PILOTO.desde)}; María G. decide el ${fecha(DECIDE.hasta)}.`
 const TITULO_FLUJO = `Parte D 9.2. Una lista por mes, ${P.meses} en total, desde el ${fecha(PILOTO.desde)}; el piloto `
   + `cierra el ${fecha(PILOTO.hasta)}.`
-const CONCLUSION = ['Cada mes la regla arma la lista; ', 'la primera sale con los criterios cumplidos']
+const CONCLUSION = ['Cada mes, una lista; ', 'la primera, con los criterios cumplidos']
 
 export const meta = { id: 'V08', dc: 'D-PLA' }
 
@@ -127,7 +133,7 @@ function anchosFlujo(w, f, flecha, pad) {
   const peso = D13.flujo.map((p) => (ancho(p.texto, f) + 0.6 * ancho(p.quien, f * 0.95, 600)) ** 0.6)
   const suma = peso.reduce((a, b) => a + b, 0)
   const minimo = D13.flujo.map((p) => Math.max(ancho(p.titulo, f * 1.08, 700),
-    ...`${p.texto} ${p.quien}`.split(' ').map((x) => ancho(x, f, 600))) + 2 * pad)
+    ...`${p.texto} ${duro(p.quien)}`.split(' ').map((x) => ancho(x, f, 600))) + 2 * pad)
   let anchos = peso.map((x) => (x / suma) * util)
   const falta = anchos.reduce((a, x, i) => a + Math.max(0, minimo[i] - x), 0)
   if (falta > 0) {
@@ -146,7 +152,7 @@ function medirFlujo(w, f, k) {
   const cajas = D13.flujo.map((p, i) => {
     const tw = anchos[i] - 2 * pad
     const lt = envolver(p.texto, tw, f)
-    const lq = envolver(p.quien, tw, fQ, 600)
+    const lq = envolver(duro(p.quien), tw, fQ, 600)
     return { ...p, lt, lq, alto: pad * 1.3 + fT * 1.3 + lt.length * f * 1.25 + f * 0.45 + lq.length * fQ * 1.25 + pad }
   })
   return { anchos, cajas, alto: Math.max(...cajas.map((c) => c.alto)), pad, flecha, fT, fQ }
@@ -189,7 +195,7 @@ function medirHitos(w, f, k) {
   const fQ = f * 0.95
   const fEje = f
   const r = fEje * 0.9
-  const xIni = anchoMono('semana', fEje) + 12 * k
+  const xIni = 0
   const dw = (w - xIni) / PL.semanas
   const xs = (s) => xIni + (s - 0.5) * dw         // centro de la semana s
   // columnas: una por semana con hito, en el orden del plan, a todo el ancho; el ancho de cada una sigue a su texto
@@ -233,6 +239,9 @@ function Hitos({ m, f, k, w }) {
   // rótulo del piloto entre su primer marcador y el siguiente
   const dentro = GRUPOS.map((g) => g.semana).filter((s) => s > PILOTO.desde_semana && s <= PILOTO.hasta_semana)
   const xPr = (xs(PILOTO.desde_semana) + r + (dentro.length ? xs(dentro[0]) - r : xPb)) / 2
+  const nPiloto = PILOTO.nombre.toLowerCase()
+  const mPr = ancho(nPiloto, f, 700) / 2 + 6 * k
+  const hueco = [xPr - mPr, xPr + mPr]
   // la llave, de la primera a la última semana con un hito con criterio
   const sc = CRITERIOS.map((h) => h.semana)
   const xa = xs(Math.min(...sc)) - r
@@ -257,14 +266,16 @@ function Hitos({ m, f, k, w }) {
         <rect x={xPa} y={yEje - hP / 2} width={Math.max(1, xPb - xPa)} height={hP} fill={ZONA} stroke={ACC}
               strokeWidth={1.25} />
         <text x={xPr} y={yEje} fontSize={f} fontWeight={700} fill={ACC} textAnchor="middle"
-              dominantBaseline="central">{PILOTO.nombre.toLowerCase()}</text>
+              dominantBaseline="central">{nPiloto}</text>
       </g>
-      <Titulo x={0} y={yEje + fEje * 0.35} f={fEje} texto="semana" />
-      <line x1={xIni} x2={w} y1={yEje} y2={yEje} stroke={EJE} strokeWidth={1.25} />
-      {Array.from({ length: PL.semanas + 1 }, (_, s) => (
-        <line key={s} x1={xIni + s * m.dw} x2={xIni + s * m.dw} y1={yEje - 3 * k} y2={yEje + 3 * k} stroke={EJE}
-              strokeWidth={1} />
-      ))}
+      {/* el eje se corta donde va el rótulo del piloto: ni la línea ni las marcas lo cruzan */}
+      <line x1={xIni} x2={hueco[0]} y1={yEje} y2={yEje} stroke={EJE} strokeWidth={1.25} />
+      <line x1={hueco[1]} x2={w} y1={yEje} y2={yEje} stroke={EJE} strokeWidth={1.25} />
+      {Array.from({ length: PL.semanas + 1 }, (_, s) => xIni + s * m.dw)
+        .filter((x) => x < hueco[0] || x > hueco[1])
+        .map((x) => (
+          <line key={x} x1={x} x2={x} y1={yEje - 3 * k} y2={yEje + 3 * k} stroke={EJE} strokeWidth={1} />
+        ))}
 
       {/* una columna por semana con hito, unida a su marcador */}
       {cols.map((c) => {
@@ -284,7 +295,7 @@ function Hitos({ m, f, k, w }) {
                   <Renglones lineas={x.lt} x={c.x + sangria} y={y0} f={f} peso={x.fuerte ? 700 : 600}
                              color={x.fuerte ? ACC : INK} />
                   <text x={c.x + sangria} y={y0 + x.lt.length * f * 1.25 + fQ * 0.05} fontSize={fQ} fontWeight={500}
-                        fill={CTX} dominantBaseline="hanging">{x.h.quien}</text>
+                        fill={CTX} dominantBaseline="hanging">{duro(x.h.quien)}</text>
                 </g>
               )
             })}
@@ -315,7 +326,7 @@ function Dibujo({ w, h, k }) {
   const yH = mf.alto + gapY
   return (
     <svg width={w} height={h} role="group" style={{ display: 'block' }}
-         aria-label="Cómo funciona cada mes y en qué semana: el flujo de cada mes y los hitos del plan de 20 semanas, con su dueño">
+         aria-label={`Cómo funciona cada mes y en qué semana: el flujo de cada mes y los hitos del plan de ${semanas(PL.semanas)}, con su dueño`}>
       <Flujo m={mf} f={f} k={k} />
       <Titulo y={yH + fT} f={fT} max={w} texto={D13.rotulo_hitos} />
       <g transform={`translate(0, ${yH + altoTit})`}>
@@ -349,7 +360,7 @@ export default function V08CadaMes() {
           <div className="ban-par">
             <div className="par-item par-unico"><Cifra num={entero(CRITERIOS.length)} sec /></div>
           </div>
-          <p className="e2-linea">sí o no, hasta el go-live</p>
+          <p className="e2-linea">sí o no, hasta la lista</p>
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 3' }}
