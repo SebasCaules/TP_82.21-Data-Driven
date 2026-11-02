@@ -70,7 +70,10 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
    la vista 9 escribe el total en «Revisar» sobre las secciones, el conteo de cada parte y, de las cinco observaciones
    de más peso, el título, la sección con su página, la cita y la corrección; la terracota marca solo lo que está en
    «Revisar» (la tarjeta central, las celdas de esas secciones y el número de cada observación). La vista 10 escribe
-   el total en «Completo», lo que hacen bien con su sección y las dos reglas; sin terracota. En las dos, ni
+   el total en «Completo», lo que hacen bien con su sección y las dos reglas; sin terracota. (01/11, planilla v2.0) La
+   sección de cada observación es la puntual que escribe la planilla («A 2.2 · pág. 18»; la carátula, «General ·
+   pág. 1»), y la vista 10 escribe el target de cada grupo con el AUC-ROC en validación de su regla y de su modelo, y
+   no escribe «sí o no» (su regla también ordena: verificacion-2.json, «cruce-regla»). En las dos, ni
    «pendiente» ni «abierto» ni códigos internos (revisar_estado). Sus cifras no salen de nuestras partes: las controla
    presentacion/verificar.py --web contra el texto de la planilla y del PDF del Grupo 5.
 
@@ -639,12 +642,16 @@ def correccion_esperada():
     v09 = [f"{fijo(T['revisar'])} de {fijo(T['filas'])}", "Revisar por parte"]
     v09 += [x for c in CO["conteo"] for x in (c["rotulo"], f"{fijo(c['revisar'])} de {fijo(c['filas'])}")]
     for o in CO["top"]:
-        v09 += [o["titulo_corto"], f"{o['parte']} {o['seccion'].split(' ')[0]} · pág. {o['pagina']}",
+        lugar = o["parte"] if o["parte"] == "General" else f"{o['parte']} {o['ref']}"
+        v09 += [o["titulo_corto"], f"{lugar} · pág. {o['pagina']}",
                 f"Dice: «{o['cita']}»", f"Corrección. {o['correccion']}"]
-    v10 = [f"{fijo(T['completo'])} de {fijo(T['filas'])}", "Lo que hacen bien", "Su regla marca sí o no",
-           "Nuestra regla ordena por días"]
+    TG = CO["target"]
+    v10 = [f"{fijo(T['completo'])} de {fijo(T['filas'])}", "Lo que hacen bien", "Cruza su umbral en 90 días",
+           "No compra en el doble de su intervalo", f"regla {fijo(TG['nuestro']['regla'], 3)}",
+           f"logística {fijo(TG['nuestro']['modelo'], 3)}", f"regla {fijo(TG['suyo']['regla'], 3)}",
+           f"modelo {fijo(TG['suyo']['modelo'], 3)}"]
     v10 += [x for b in CO["bien"] for x in (b["seccion"], b["que"])]
-    return [("v09", None, v09, []), ("v10", None, v10, [])]
+    return [("v09", None, v09, []), ("v10", None, v10, ["sí o no", "marca sí"])]
 
 
 TERRACOTA = r"""() => {

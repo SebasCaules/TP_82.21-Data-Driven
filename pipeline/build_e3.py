@@ -45,7 +45,13 @@ ENTRADAS = ("etapa2.json", "etapa3.json", "economia.json", "condiciones.json", "
 # (01/11, W5) correcciones.json es la corrección del Grupo 2 al consolidado del E3 del Grupo 5, que escribe
 # entregas/entregable-3/_build/E/generar_e.py: conteo por parte, las cinco observaciones de más peso y lo que hacen
 # bien. Lo leen las vistas 9 y 10 (D3.correccion). No tiene filas en el registro de cifras: sus anclas comparan con lo
-# que escribe la planilla (finales/E-Correcciones consolidado 3 - Grupo 5.pdf, v1.0) y van con el id «W5».
+# que escribe la planilla (finales/E-Correcciones consolidado 3 - Grupo 5.pdf, v2.0 desde el 01/11: 13 bloques de
+# secciones, 8 Completo y 5 Revisar; la v1.0, de 56 filas, en _build/E/v1.0/) y van con el id «W5».
+# (01/11, W5) La vista 10 explica por qué los dos grupos concluyen distinto: el target (_build/E/cruce.md, última fila;
+# verificacion-2.json, «cruce-regla»). Nuestro AUC sale de etapa2.json; el del Grupo 5, de su consolidado v2.0, que no
+# trae JSON: AUC-ROC en validación de su regla (atraso_relativo como puntaje continuo, A 2.5, pág. 21) y de su modelo
+# final (D 8.1, pág. 64). verificar.py --web busca esos números en su PDF.
+AUC_GRUPO5 = {"regla": 0.589, "modelo": 0.783}
 E1_PAYLOAD = APP / "src" / "datos.js"
 CAMPANIAS = APP / "data" / "raw" / "Campanias_marketing.csv"
 
@@ -1283,10 +1289,12 @@ def armar_monitoreo(drift: dict) -> dict:
     return mon
 
 
-def armar_correccion(co: dict) -> dict:
+def armar_correccion(co: dict, e2: dict) -> dict:
     """(01/11, W5) La corrección al Grupo 5 tal como la escribe correcciones.json, con los totales ya sumados (el
     navegador no suma) y cada parte con su rótulo de pantalla. Las anclas comparan con la tabla «Conteo por parte» y
-    la carátula de la planilla v1.0."""
+    la carátula de la planilla v2.0. (01/11) Suma el target de cada grupo y el AUC-ROC en validación de su regla y de
+    su modelo (vista 10), y la sección puntual de cada observación («ref»: «2.2», o «0» para la carátula), que es la que
+    escribe la planilla."""
     conteo = []
     for c in co["conteo"]:
         if c["completo"] + c["revisar"] != c["filas"]:
@@ -1294,16 +1302,38 @@ def armar_correccion(co: dict) -> dict:
         conteo.append({**c, "rotulo": c["parte"] if c["parte"] == "General" else f"Parte {c['parte']}"})
     total = {k: sum(c[k] for c in conteo) for k in ("filas", "completo", "revisar")}
     top = [{**t, "n": i + 1} for i, t in enumerate(co["top"])]
+    m = e2["modelos"]
+    target = {"nuestro": {"regla": m["regla_umbral"]["validacion"]["auc_roc"],
+                          "modelo": m["logistica"]["validacion"]["auc_roc"]},
+              "suyo": dict(AUC_GRUPO5)}
     cor = {"grupo": co["grupo"], "version": co["version"], "fecha": co["fecha"], "documento": co["documento"],
-           "conteo": conteo, "total": total, "top": top, "bien": co["bien"]}
-    ancla("W5", "corrección: versión de la planilla", co["version"], "v1.0", donde="E, carátula (index.jsx: fuente)")
-    # (la planilla cambió con la crítica del 01/11: de 18 a 20 Revisar. El guion de la vista 9 dice el total; con
-    # c3="d14" un cambio de la planilla corta acá hasta que contenido.py diga lo mismo)
-    ancla("W5", "corrección: secciones revisadas", total["filas"], "56", 0, donde="E, conteo por parte", c3="d14")
-    ancla("W5", "corrección: Completo", total["completo"], "36", 0, donde="E, conteo por parte")
-    ancla("W5", "corrección: Revisar", total["revisar"], "20", 0, donde="E, conteo por parte", c3="d14")
+           "conteo": conteo, "total": total, "top": top, "bien": co["bien"], "target": target}
+    for t in top:
+        if not t.get("ref"):
+            raise SystemExit(f"correcciones.json: la observación {t['id']} no trae «ref» (generar_e.py la exporta)")
+    ancla("W5", "corrección: versión de la planilla", co["version"], "v2.0", donde="E, carátula (index.jsx: fuente)")
+    # (la planilla cambió con la crítica del 01/11: de 18 a 20 Revisar, y en la v2.0, a 13 bloques con 5 Revisar. El
+    # guion de la vista 9 dice el total; con c3="d14" un cambio de la planilla corta acá hasta que contenido.py diga lo
+    # mismo, y «5 de 13» entero, porque un «5» suelto aparece en cualquier texto)
+    ancla("W5", "corrección: bloques de secciones revisados", total["filas"], "13", 0, donde="E, conteo por parte",
+          c3="d14")
+    ancla("W5", "corrección: Completo", total["completo"], "8", 0, donde="E, conteo por parte")
+    ancla("W5", "corrección: Revisar", total["revisar"], "5", 0, donde="E, conteo por parte", c3="d14")
+    ancla("W5", "corrección: Revisar de total", f"{total['revisar']} de {total['filas']}", "5 de 13",
+          donde="E, conteo por parte", c3="d14")
     ancla("W5", "corrección: Revisar por parte (General, A a D)", " · ".join(str(c["revisar"]) for c in conteo),
-          "1 · 6 · 3 · 3 · 7", donde="E, conteo por parte")
+          "1 · 1 · 1 · 0 · 2", donde="E, conteo por parte")
+    ancla("W5", "corrección: secciones del top 5", " · ".join(t["ref"] for t in top), "2.2 · 3.3 · 10.3 · 11.2 · 0",
+          donde="E, «Las cinco observaciones en Revisar»")
+    # el target (vista 10, diapositiva 15): AUC-ROC en validación de cada regla y cada modelo
+    ancla("F09", "target: AUC-ROC de nuestra regla en validación", target["nuestro"]["regla"], "0,968", 3,
+          donde="B 4.2", c3="d15")
+    ancla("G13", "target: AUC-ROC de nuestra logística en validación", target["nuestro"]["modelo"], "0,966", 3,
+          donde="B 4.2", c3="d15")
+    ancla("W5", "target: AUC-ROC de la regla del Grupo 5 en validación", target["suyo"]["regla"], "0,589", 3,
+          donde="su A 2.5, pág. 21", c3="d15")
+    ancla("W5", "target: AUC-ROC del modelo del Grupo 5 en validación", target["suyo"]["modelo"], "0,783", 3,
+          donde="su D 8.1, pág. 64", c3="d15")
     ancla("W5", "corrección: observaciones de más peso", len(top), "5", 0, donde="E, «Las cinco observaciones»")
     ancla("W5", "corrección: lo que hacen bien", len(co["bien"]), "3", 0, donde="E, «Lo que hacen bien»")
     ancla("W5", "corrección: páginas del consolidado del Grupo 5", co["documento"]["paginas"], "76", 0,
@@ -1344,7 +1374,7 @@ def main() -> int:
         "test": armar_test(e4, v4, eco, e3),
         "plan": armar_plan(),
         "monitoreo": armar_monitoreo(drift),
-        "correccion": armar_correccion(corr),
+        "correccion": armar_correccion(corr, e2),
     }
 
     print(f"{'ID':6s}{'ANCLA':58s}{'DOCUMENTO':>14s}{'PANTALLA':>14s}  OK")

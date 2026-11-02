@@ -2,20 +2,24 @@
 // pregunta del pedido («¿Qué hacen bien y qué nos llevamos?») pasaba a dos renglones a 1366 × 768 con la fuente de la
 // planilla al lado; esta es la única de las probadas que entra en un renglón de 1152 × 640 a 1920 × 1080.
 //
-// - Banda: la central, las secciones en «Completo» sobre el total (lo que cierra, en --acc); al lado, cuántas cosas
-//   destaca la planilla. Ni una ni otra repite la central de la vista 9.
+// - Banda: la central, los bloques en «Completo» sobre el total (lo que cierra, en --acc); al lado, lo que hacen bien
+//   (cuántas secciones, y que sus cifras se rehicieron). Ni una ni otra repite la central de la vista 9.
 // - Decisión: «E-CRU · sin cambios»: el cruce de sus cifras con nuestro registro no cambia ninguna nuestra
 //   (_build/E/cruce.md: donde difieren, cambia la base o el target).
 // - Debajo, a la izquierda, lo que hacen bien (las tres de la planilla, con su sección); a la derecha, el gráfico: por
-//   qué los dos grupos concluyen distinto. Su modelo le gana a una regla que marca sí o no (los marcados quedan
-//   empatados); la nuestra ordena a cada cliente por los días que le faltan para cruzar su umbral (cruce.md, última
-//   fila). Es un esquema, sin datos: cada celda es un cliente de la lista, en el orden en que se lo contacta.
-// Ningún texto ni cifra de la planilla escrito acá: salen de D3.correccion (correcciones.json de _build/E/).
+//   qué los dos grupos concluyen distinto. (01/11, planilla v2.0) Hasta acá decía que su regla «marca sí o no» y por
+//   eso su modelo le ganaba: es falso, su AUC usa atraso_relativo como puntaje continuo (su A 2.5, pág. 21;
+//   verificacion-2.json, «cruce-regla»). Las dos reglas ordenan por cuánto se atrasó el cliente; lo que cambia es el
+//   target. El nuestro (cruza su umbral en 90 días) casi coincide con lo que ordena la regla, que ya separa casi todo;
+//   el suyo (no compra en el doble de su intervalo) le deja lugar al modelo. El gráfico pone, para cada target, el
+//   AUC-ROC en validación de la regla (círculo hueco) y del modelo (lleno) sobre una escala de 0,5 (azar) a 1,0.
+// Ningún texto ni cifra de la planilla escrito acá: salen de D3.correccion (correcciones.json de _build/E/; el AUC, de
+// etapa2.json y del consolidado del Grupo 5, con sus anclas en build_e3.py).
 
 import { Lienzo } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
-import { NBSP, entero } from '../formato.js'
+import { NBSP, entero, fijo } from '../formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
 import { Cifra } from '../cifra.jsx'
@@ -25,38 +29,40 @@ import './V10.css'
 
 const CO = D3.correccion
 const T = CO.total
+const TG = CO.target
 
 const DECISION = decision('E-CRU', {
   llano_corto: 'Ninguna cifra nuestra cambia con el cruce',
   llano: 'Cruzamos las cifras del Grupo 5 con nuestro registro: ninguna nuestra está mal. Donde difieren, cambia la '
     + 'base (envíos con o sin duplicados) o el target, o la cifra viene de una respuesta de Casa Óga que no tenemos.',
   decision: 'nuestras cifras quedan como están',
-  justificacion: 'su modelo se mide contra una regla que marca sí o no; la nuestra ordena por días para cruzar el '
-    + 'umbral. No es un error suyo: explica por qué los dos grupos concluyen distinto.',
+  justificacion: 'las dos reglas ordenan por cuánto se atrasó el cliente; los grupos concluyen distinto porque el '
+    + 'target es otro. No es un error suyo.',
 })
 
-const CONCLUSION = 'Concluimos distinto porque las reglas son distintas, no por un error'
+const CONCLUSION = 'Concluimos distinto por el target, no por un error'
 
 export const meta = { id: 'V10', dc: 'E-CRU' }
 
-// ---------------------------------------------------------------- el gráfico: cómo ordena la lista cada regla
+// ---------------------------------------------------------------- el gráfico: el AUC de la regla y del modelo, por target
 
 const ACC = 'var(--acc)'
 const INK = 'var(--ink)'
 const CTX = 'var(--e3-ctx, #5a6478)'
-const CTX_R = 'var(--e3-ctx-relleno, #a9b1bf)'
-const TINTE = 'var(--e3-tinte, #bccfe2)'
+const EJE = 'var(--e3-eje, #6a7489)'
 const CONTORNO = 'var(--e3-contorno, #4f5a6e)'
-
-const N = 20          // clientes del esquema
-const MARCADOS = 9    // los que su regla marca
+const DESDE = 0.5    // AUC del azar: el piso de la escala
+const HASTA = 1      // separa todo
 
 const FILAS = [
-  { quien: 'Grupo 5', regla: 'Su regla marca sí o no', bajo: 'los marcados quedan empatados: entre ellos, sin orden',
-    gana: 'su modelo le gana', propia: false },
-  { quien: 'Grupo 2', regla: 'Nuestra regla ordena por días', bajo: 'cada cliente, por los días que le faltan para cruzar su umbral',
-    gana: 'nuestro modelo empata', propia: true },
+  { quien: 'Grupo 2 · nuestro target', target: 'Cruza su umbral en 90 días', modelo: 'logística', d: TG.nuestro,
+    bajo: 'La regla ordena por los días que faltan para cruzarlo: ya separa casi todo y al modelo no le queda dónde '
+      + 'ganar.', propia: true },
+  { quien: 'Grupo 5 · su target', target: 'No compra en el doble de su intervalo', modelo: 'modelo', d: TG.suyo,
+    bajo: 'Su regla ordena por cuánto se atrasó el cliente: separa poco y el modelo gana.', propia: false },
 ]
+
+const auc = (x) => fijo(x, 3)
 
 /** Renglones de hasta `w` px, cortando entre palabras. */
 function envolver(texto, w, f, peso = 400) {
@@ -73,66 +79,87 @@ function envolver(texto, w, f, peso = 400) {
   return out
 }
 
-/** Mezcla lineal de dos colores #rrggbb (el tono de cada cliente en la fila ordenada). */
-function mezcla(a, b, t) {
-  const h = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16))
-  const [x, y] = [h(a), h(b)]
-  return `rgb(${x.map((v, i) => Math.round(v + (y[i] - v) * t)).join(',')})`
-}
-
-function Reglas({ w, h, k }) {
-  const ajuste = Math.max(0.75, Math.min(1, h / (260 * k)))
+function Targets({ w, h, k }) {
+  const ajuste = Math.max(0.72, Math.min(1, h / (300 * k)))
   const fQuien = 11.5 * k * ajuste
-  const fRegla = 17 * k * ajuste
+  const fTarget = 17 * k * ajuste
+  const fVal = 13.5 * k * ajuste
   const fBajo = 13.5 * k * ajuste
-  const fGana = 14 * k * ajuste
   const fEje = 11 * k * ajuste
-  const sep = 2 * k
-  const anchoGana = Math.max(...FILAS.map((f) => ancho(f.gana, fGana, 700))) + 14 * k
-  const wCel = w - anchoGana
-  const celda = (wCel - sep * (N - 1)) / N
-  const yEje = h - fEje * 0.3
-  const altoEje = fEje * 1.6
+  const r = 6.5 * k * ajuste
+  const izq = r + 1
+  const der = w - r - 1
+  const x = (v) => izq + (der - izq) * (v - DESDE) / (HASTA - DESDE)
+  const altoEje = fEje * 3.4
   const altoFila = (h - altoEje) / FILAS.length
+  const yEje = h - altoEje + fEje * 0.6
   return (
     <svg width={w} height={h} role="img" style={{ display: 'block' }}
-         aria-label={'Cómo ordena la lista cada regla, una celda por cliente en el orden en que se lo contacta. '
-           + 'Grupo 5: la regla marca sí o no y los marcados quedan empatados; su modelo le gana. Grupo 2: la regla '
-           + 'ordena por los días que le faltan a cada cliente para cruzar su umbral; nuestro modelo empata.'}>
+         aria-label={FILAS.map((f) => `${f.quien}: ${f.target.toLowerCase()}. AUC-ROC en validación: regla `
+           + `${auc(f.d.regla)}, ${f.modelo} ${auc(f.d.modelo)}. ${f.bajo}`).join(' ')}>
       {FILAS.map((f, i) => {
         const y0 = i * altoFila
         const yQuien = y0 + fQuien
-        const yRegla = yQuien + fQuien * 0.3 + fRegla * 0.95 + 3 * k
-        const yCel = yRegla + 8 * k
-        const bajo = envolver(f.bajo, wCel, fBajo, 500)
-        const hCel = Math.max(10, altoFila - (yCel - y0) - bajo.length * fBajo * 1.25 - 14 * k)
-        const yBajo = yCel + hCel + 6 * k + fBajo * 0.8
+        const yTarget = yQuien + fQuien * 0.3 + fTarget * 0.95 + 3 * k
+        const bajo = envolver(f.bajo, w, fBajo, 500)
+        const yVal = yTarget + fTarget * 0.25 + fVal * 0.95 + 10 * k * ajuste
+        const yPunto = yVal + fVal * 0.25 + r + 5 * k * ajuste
+        const yBajo = yPunto + r + 8 * k * ajuste + fBajo * 0.8
+        const [xr, xm] = [x(f.d.regla), x(f.d.modelo)]
+        const tR = `regla ${auc(f.d.regla)}`
+        const tM = `${f.modelo} ${auc(f.d.modelo)}`
+        // los dos rótulos van sobre su punto; si se pisan (nuestro target: 0,968 y 0,966), uno solo que termina
+        // sobre el punto de más a la derecha
+        const juntos = Math.abs(xm - xr) < (ancho(tR, fVal, 600) + ancho(tM, fVal, 700)) / 2 + 12 * k
         return (
           <g key={f.quien}>
-            <title>{`${f.quien}: ${f.regla.toLowerCase()}; ${f.bajo}. Contra esta regla, ${f.gana}.`}</title>
+            <title>{`${f.quien}: ${f.target.toLowerCase()}. AUC-ROC en validación: regla ${auc(f.d.regla)}, `
+              + `${f.modelo} ${auc(f.d.modelo)}. ${f.bajo}`}</title>
             <text x={0} y={yQuien} fontSize={fQuien} fontWeight={600} fill={CTX} fontFamily="var(--mono)"
                   letterSpacing={`${0.08 * fQuien}`} style={{ textTransform: 'uppercase' }}>{f.quien}</text>
-            <text x={0} y={yRegla} fontSize={fRegla} fontWeight={700} fill={f.propia ? ACC : INK}>{f.regla}</text>
-            {Array.from({ length: N }, (_, j) => {
-              const fill = f.propia ? mezcla('#22456f', '#dfe6ee', j / (N - 1)) : (j < MARCADOS ? CTX_R : TINTE)
-              return <rect key={j} x={j * (celda + sep)} y={yCel} width={celda} height={hCel} fill={fill} />
-            })}
-            {!f.propia && (
-              <rect x={-0.5} y={yCel - 0.5} width={MARCADOS * (celda + sep) - sep + 1} height={hCel + 1} fill="none"
-                    stroke={CONTORNO} strokeWidth="1.5" />
+            <text x={0} y={yTarget} fontSize={fTarget} fontWeight={700} fill={f.propia ? ACC : INK}>{f.target}</text>
+            <line x1={izq} x2={der} y1={yPunto} y2={yPunto} stroke={EJE} strokeWidth="1" />
+            <line x1={xr} x2={xm} y1={yPunto} y2={yPunto} stroke={ACC} strokeWidth={3 * k} />
+            {/* la regla, hueca, debajo; el modelo, lleno y encima: con 0,968 y 0,966 se ven los dos */}
+            <circle cx={xr} cy={yPunto} r={r} fill="var(--sup, #fff)" stroke={CONTORNO} strokeWidth="1.5" />
+            <circle cx={xm} cy={yPunto} r={r * (Math.abs(xm - xr) < 2 * r ? 0.6 : 1)} fill={ACC} />
+            {juntos ? (
+              <text x={Math.min(der + r, Math.max(xr, xm) + r)} y={yVal} fontSize={fVal} textAnchor="end"
+                    className="tabular">
+                <tspan fontWeight={600} fill={CTX}>{tR}</tspan>
+                <tspan fontWeight={700} fill={ACC}>{` · ${tM}`}</tspan>
+              </text>
+            ) : (
+              <>
+                <text x={xr} y={yVal} fontSize={fVal} fontWeight={600} fill={CTX} textAnchor="middle"
+                      className="tabular">{tR}</text>
+                <text x={Math.min(xm, der + r - ancho(tM, fVal, 700) / 2)} y={yVal} fontSize={fVal} fontWeight={700}
+                      fill={ACC} textAnchor="middle" className="tabular">{tM}</text>
+              </>
             )}
-            {bajo.map((t, r) => (
-              <text key={r} x={0} y={yBajo + r * fBajo * 1.25} fontSize={fBajo} fontWeight={500} fill={INK}>{t}</text>
+            {bajo.map((s, j) => (
+              <text key={j} x={0} y={yBajo + j * fBajo * 1.25} fontSize={fBajo} fontWeight={500} fill={INK}>{s}</text>
             ))}
-            <text x={w} y={yCel + hCel / 2} fontSize={fGana} fontWeight={700} fill={f.propia ? ACC : INK}
-                  textAnchor="end" dominantBaseline="central">{f.gana}</text>
           </g>
         )
       })}
-      <text x={0} y={yEje} fontSize={fEje} fontWeight={600} fill={CTX} fontFamily="var(--mono)"
-            letterSpacing={`${0.08 * fEje}`} style={{ textTransform: 'uppercase' }}>
-        {`orden de contacto: primero${NBSP}→${NBSP}último`}
-      </text>
+      <g data-escala="">
+        <line x1={izq} x2={der} y1={yEje - fEje * 0.6} y2={yEje - fEje * 0.6} stroke={EJE} strokeWidth="1" />
+        {[DESDE, 0.75, HASTA].map((v, j) => (
+          <g key={v}>
+            <line x1={x(v)} x2={x(v)} y1={yEje - fEje * 0.6} y2={yEje - fEje * 0.6 + 4 * k} stroke={EJE} />
+            <text x={x(v)} y={yEje + fEje * 0.9} fontSize={fEje} fill={CTX} className="tabular" data-escala=""
+                  textAnchor={j === 0 ? 'start' : j === 2 ? 'end' : 'middle'}>
+              {`${fijo(v, v === 0.75 ? 2 : 1)}${v === DESDE ? `${NBSP}azar` : v === HASTA ? `${NBSP}separa todo` : ''}`}
+            </text>
+          </g>
+        ))}
+        <text x={x(0.75)} y={yEje + fEje * 2.3} fontSize={fEje} fontWeight={600} fill={CTX} fontFamily="var(--mono)"
+              textAnchor="middle" letterSpacing={`${0.08 * fEje}`} style={{ textTransform: 'uppercase' }}
+              data-escala="">
+          {`AUC-ROC en validación: ○${NBSP}regla · ●${NBSP}modelo`}
+        </text>
+      </g>
     </svg>
   )
 }
@@ -145,9 +172,9 @@ export default function V10NosLlevamos() {
     <section className="pant v10">
       <Banda dcs={[DECISION]}>
         <div className="tarjeta e2-central" style={{ gridColumn: 'span 3' }}
-             title={`${entero(T.completo)} de ${entero(T.filas)} secciones en «Completo»: cumplen la plantilla y sus `
-               + 'cifras se reproducen.'}>
-          <span className="kpi-lbl"><span>Secciones completas</span></span>
+             title={`${entero(T.completo)} de ${entero(T.filas)} bloques de secciones en «Completo»: no tienen un `
+               + 'error que cambie una cifra o el método.'}>
+          <span className="kpi-lbl"><span>Bloques completos</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
               <Cifra num={entero(T.completo)} unidad={`${NBSP}de${NBSP}${entero(T.filas)}`} />
@@ -160,9 +187,11 @@ export default function V10NosLlevamos() {
              title={CO.bien.map((b) => `${b.seccion}: ${b.que}`).join('\n')}>
           <span className="kpi-lbl"><span>Lo que hacen bien</span></span>
           <div className="ban-par">
-            <div className="par-item par-unico"><Cifra num={entero(CO.bien.length)} sec /></div>
+            <div className="par-item par-unico">
+              <Cifra num={entero(CO.bien.length)} unidad={`${NBSP}secciones`} sec />
+            </div>
           </div>
-          <p className="e2-linea">secciones con cifras que reprodujimos</p>
+          <p className="e2-linea">rehicimos sus cifras y cierran</p>
         </div>
       </Banda>
 
@@ -181,10 +210,10 @@ export default function V10NosLlevamos() {
             </ul>
           </div>
           <div className="e3-v10-reglas">
-            <p className="e3-v10-rot">Lo que nos llevamos: cómo ordena la lista cada regla</p>
+            <p className="e3-v10-rot">Por qué concluimos distinto: el target de cada grupo</p>
             <div className="e3-v10-lienzo">
               <Lienzo className="lienzo">
-                {({ w, h }) => <Reglas w={w} h={h} k={k} />}
+                {({ w, h }) => <Targets w={w} h={h} k={k} />}
               </Lienzo>
             </div>
           </div>
