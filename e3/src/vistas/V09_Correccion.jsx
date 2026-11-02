@@ -30,7 +30,7 @@ const T = CO.total
 const DOC = CO.documento
 
 const DECISION = decision('E-CRI', {
-  llano_corto: 'Revisar solo si cambia una cifra o el método',
+  llano_corto: 'Revisar: cifra, método o lo que la cátedra ya pidió',
   llano: 'Un bloque de secciones queda en «Revisar» solo si tiene un error que cambia una cifra o el método, o algo '
     + `que la cátedra ya nos pidió corregir. De ${entero(T.filas)} bloques, ${entero(T.revisar)} quedan en «Revisar» `
     + `y ${entero(T.completo)} en «Completo».`,
