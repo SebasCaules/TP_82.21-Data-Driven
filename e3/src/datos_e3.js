@@ -34,7 +34,7 @@ export const D3 = {
    },
    {
     "archivo": "data/e3/correcciones.json",
-    "sha256": "da0bcf2c19d194e928e19a5d9c26a60ff64e09fda2afec6a97d6f84207742679"
+    "sha256": "09612a3937fe584b39a7b39d555fe6d832a9d69ad8173b84e48fd0a35e2922b8"
    },
    {
     "archivo": "src/datos.js",
@@ -48,7 +48,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "baf669de2d7c378b583696513a0f374c6a781ba34853c2cfb6aaaa623779eb81"
+   "sha256": "0763fce70f3db60e74c71e3c55fd7bea42acfe851dfaa99de824882e3979661d"
   }
  },
  "caso": {
@@ -2056,7 +2056,7 @@ export const D3 = {
  },
  "correccion": {
   "grupo": 5,
-  "version": "v1.0",
+  "version": "v2.0",
   "fecha": "01/11/2026",
   "documento": {
    "archivo": "Entregable_3_Consolidado_CasaOga_Grupo5_v2.0.pdf",
@@ -2075,114 +2075,129 @@ export const D3 = {
    },
    {
     "parte": "A",
-    "filas": 13,
-    "completo": 7,
-    "revisar": 6,
+    "filas": 2,
+    "completo": 1,
+    "revisar": 1,
     "rotulo": "Parte A"
    },
    {
     "parte": "B",
-    "filas": 12,
-    "completo": 9,
-    "revisar": 3,
+    "filas": 2,
+    "completo": 1,
+    "revisar": 1,
     "rotulo": "Parte B"
    },
    {
     "parte": "C",
-    "filas": 15,
-    "completo": 12,
-    "revisar": 3,
+    "filas": 3,
+    "completo": 3,
+    "revisar": 0,
     "rotulo": "Parte C"
    },
    {
     "parte": "D",
-    "filas": 14,
-    "completo": 7,
-    "revisar": 7,
+    "filas": 4,
+    "completo": 2,
+    "revisar": 2,
     "rotulo": "Parte D"
    }
   ],
   "total": {
-   "filas": 56,
-   "completo": 36,
-   "revisar": 20
+   "filas": 13,
+   "completo": 8,
+   "revisar": 5
   },
   "top": [
    {
     "id": "T1",
-    "parte": "D",
-    "seccion": "8.2 ¿El modelo generaliza?",
-    "pagina": 64,
-    "titulo_corto": "La 8.2 compara el test contra la base equivocada",
-    "cita": "USD 1.639 por año, contra 1.647 del escenario base de 3.4. El ROI queda en −72,9%: no hace falta actualizarlo.",
-    "problema": "Compara los USD 1.639 de test con los 1.647 de la Etapa 2 y no con los 1.731 de validación al mismo umbral (pág. 61): la caída es de 5%, no de 0,5%.",
-    "correccion": "Comparar contra validación al umbral 0,45 y registrar en la 11.2 el cambio de la 7.5 en beneficio y ROI.",
-    "cifra": "USD 1.639 en test contra 1.731 en validación al umbral 0,45",
+    "parte": "A",
+    "seccion": "2.1 a 2.7 Modelado, Etapa 1",
+    "ref": "2.2",
+    "pagina": 18,
+    "titulo_corto": "Las etiquetas de train miran los meses de validación",
+    "cita": "Cortes de jun-2023 a jun-2024 (13 cortes, un año completo) del 70% de los clientes",
+    "problema": "Con ventanas de hasta 360 días, las etiquetas de train llegan a jun-2025 y test repite los cortes de validación con otros clientes.",
+    "correccion": "Sacar de train las filas cuya ventana cierra después de jun-2024 (o acotar W) y decir que test mide clientes nuevos, no meses nuevos.",
+    "cifra": "Ventanas de hasta 360 días desde el corte de jun-2024",
     "n": 1
    },
    {
     "id": "T2",
-    "parte": "A",
-    "seccion": "2.2 Esquema de partición",
-    "pagina": 18,
-    "titulo_corto": "La etiqueta de entrenamiento mira los meses de validación",
-    "cita": "Cortes de jun-2023 a jun-2024 (13 cortes, un año completo) del 70% de los clientes",
-    "problema": "Con W de hasta 360 días, la etiqueta del corte de jun-2024 usa compras hasta jun-2025: el modelo ya vio en otros clientes el churn del período de validación.",
-    "correccion": "Sacar de entrenamiento las filas cuya ventana cierra después de jun-2024, o acotar W, y recalcular.",
-    "cifra": "W de hasta 360 días",
+    "parte": "B",
+    "seccion": "3.1 a 3.6 Factibilidad económica",
+    "ref": "3.3",
+    "pagina": 31,
+    "titulo_corto": "El 73% del beneficio no se puede rehacer",
+    "cita": "48 h/mes repartidas en 3 tareas y costo por hora USD 12 (analistas) / USD 22",
+    "problema": "El ahorro operativo de USD 4.378 no dice cuántas horas ni qué tarifa lleva cada tarea.",
+    "correccion": "Una tabla por tarea con horas por mes, tarifa, % que se ahorra y USD por año.",
+    "cifra": "USD 4.378 de 6.025 (73%)",
     "n": 2
    },
    {
     "id": "T3",
-    "parte": "B",
-    "seccion": "3.3 Estimación de beneficios esperados",
-    "pagina": 31,
-    "titulo_corto": "El 73% del beneficio no se puede rehacer",
-    "cita": "48 h/mes repartidas en 3 tareas y costo por hora USD 12 (analistas) / USD 22",
-    "problema": "El ahorro operativo no da horas ni tarifa por tarea, así que nadie puede llegar a los USD 4.378 con lo declarado.",
-    "correccion": "Abrir el ahorro en una tabla por tarea: horas por mes, tarifa, % reducible y USD por año.",
-    "cifra": "USD 4.378 de 6.025 (73%)",
+    "parte": "D",
+    "seccion": "10.1 a 10.3 Go-live",
+    "ref": "10.3",
+    "pagina": 72,
+    "titulo_corto": "El go-live baja el recall mínimo sin decirlo",
+    "cita": "Desempeño mínimo del modelo en test: AUC ≥ 0,70 y recall ≥ 65%",
+    "problema": "La 7.2 elige el umbral por el 70% y la 10.3 da «cumplido» un 68,6% contra un mínimo de 65%.",
+    "correccion": "Escribir en la 10.3 que el mínimo baja de 70% a 65% y por qué.",
+    "cifra": "Recall 68,6% en test contra la meta de 70%",
     "n": 3
    },
    {
     "id": "T4",
     "parte": "D",
-    "seccion": "11.1 ¿Es viable el proyecto?",
+    "seccion": "11.1 a 11.3 Veredicto integrado",
+    "ref": "11.2",
     "pagina": 74,
-    "titulo_corto": "El veredicto no trae el costo ni el plazo del piloto",
-    "cita": "Sí recomendamos un piloto acotado: una campaña con grupo de control, sin contratar el abono de mantenimiento",
-    "problema": "El piloto ya tiene costo (USD 10.824 más 600 de nube) y plazo en la 3.6 y la 6.3, pero el veredicto no los trae.",
-    "correccion": "Escribir en la 11.1 el costo y el plazo del piloto junto a la regla del 15% contra el control.",
-    "cifra": "USD 10.824 más 600 de nube",
+    "titulo_corto": "El cambio de la 7.5 no llega a la 11.2 ni a la 3.4",
+    "cita": "el incremental anual baja de USD 8.216 a 1.647 y el ROI base de −43,3% a −72,9%",
+    "problema": "La 7.5 (pág. 61) lleva el valor del modelo a USD 1.731 y el ROI a −72,5%, pero la 11.2 no lo registra y la 3.4 sigue con 1.647 y −72,9%.",
+    "correccion": "Registrar el cambio en la 11.2 y usar una sola base; el veredicto no cambia.",
+    "cifra": "USD 1.731 contra 1.647",
     "n": 4
    },
    {
     "id": "T5",
-    "parte": "C",
-    "seccion": "6.3 Top 3 riesgos críticos: análisis en profundidad",
-    "pagina": 55,
-    "titulo_corto": "El top 3 deja fuera un riesgo A/A de la matriz",
-    "cita": "Extracto de 2025 incompleto y cambio en la señal de soporte (datos y modelo)",
-    "problema": "La 6.2 puntúa A/A el recurrente que supera el techo anual y M/A el extracto de 2025, y el top 3 elige el extracto, con un tema que no tiene fila.",
-    "correccion": "Escribir el criterio de selección o poner el recurrente como riesgo crítico.",
-    "cifra": "USD 11.400 por año contra un techo de 6.000",
+    "parte": "General",
+    "seccion": "0. Carátula, estructura y entregables",
+    "ref": "0",
+    "pagina": 1,
+    "titulo_corto": "Lo que cambió de la v1 está en la página 74",
+    "cita": "Los cambios se listan en la Parte D (11.2).",
+    "problema": "El índice no tiene páginas, la página 2 está en blanco y los cambios están al final.",
+    "correccion": "Usar la página 2 para el índice con páginas y una primera página con lo que cambia.",
+    "cifra": "Página 74 de 76",
     "n": 5
    }
   ],
   "bien": [
    {
     "seccion": "1.4 Inventario de fuentes de datos",
-    "que": "Las cifras de registros y calidad de las ocho fuentes se reproducen una por una con los CSV del caso."
+    "que": "Las cifras se reproducen con los CSV del caso: 44,8% de transacciones sin cliente, operaciones de 1.390 en enero a 255 en diciembre de 2025 y 613 filas negativas."
    },
    {
     "seccion": "3.2 y 4.4 Costos y dinero del modelo",
-    "que": "La tabla de costos cierra al dólar y la cuenta del modelo se rehace al centavo (2.085,01 contra 813,43 de la regla)."
+    "que": "La tabla de costos cierra al dólar y la cuenta de la 4.4 se rehace con sus supuestos: 2.085,01 del modelo contra 813,43 de la regla, con un centavo de redondeo."
    },
    {
-    "seccion": "5.1 y 5.4 Consentimiento y plan legal",
-    "que": "El diagnóstico de bajas y consentimiento se reproduce con los CSV y termina en una condición verificable: 0 clientes con baja en cada listado."
+    "seccion": "5.1 y 5.2 Consentimiento y bajas",
+    "que": "El diagnóstico se reproduce con los CSV del caso: 1.211 bajas y 7.143 envíos a 1.778 clientes sin consentimiento."
    }
-  ]
+  ],
+  "target": {
+   "nuestro": {
+    "regla": 0.9681792327151346,
+    "modelo": 0.9659183490181739
+   },
+   "suyo": {
+    "regla": 0.589,
+    "modelo": 0.783
+   }
+  }
  },
  "anclas": [
   {
@@ -4674,32 +4689,68 @@ export const D3 = {
   {
    "id": "W5",
    "nombre": "corrección: versión de la planilla",
-   "documento": "v1.0",
+   "documento": "v2.0",
    "donde": "E, carátula (index.jsx: fuente)"
   },
   {
    "id": "W5",
-   "nombre": "corrección: secciones revisadas",
-   "documento": "56",
+   "nombre": "corrección: bloques de secciones revisados",
+   "documento": "13",
    "donde": "E, conteo por parte · C3 d14"
   },
   {
    "id": "W5",
    "nombre": "corrección: Completo",
-   "documento": "36",
+   "documento": "8",
    "donde": "E, conteo por parte"
   },
   {
    "id": "W5",
    "nombre": "corrección: Revisar",
-   "documento": "20",
+   "documento": "5",
+   "donde": "E, conteo por parte · C3 d14"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: Revisar de total",
+   "documento": "5 de 13",
    "donde": "E, conteo por parte · C3 d14"
   },
   {
    "id": "W5",
    "nombre": "corrección: Revisar por parte (General, A a D)",
-   "documento": "1 · 6 · 3 · 3 · 7",
+   "documento": "1 · 1 · 1 · 0 · 2",
    "donde": "E, conteo por parte"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: secciones del top 5",
+   "documento": "2.2 · 3.3 · 10.3 · 11.2 · 0",
+   "donde": "E, «Las cinco observaciones en Revisar»"
+  },
+  {
+   "id": "F09",
+   "nombre": "target: AUC-ROC de nuestra regla en validación",
+   "documento": "0,968",
+   "donde": "B 4.2 · C3 d15"
+  },
+  {
+   "id": "G13",
+   "nombre": "target: AUC-ROC de nuestra logística en validación",
+   "documento": "0,966",
+   "donde": "B 4.2 · C3 d15"
+  },
+  {
+   "id": "W5",
+   "nombre": "target: AUC-ROC de la regla del Grupo 5 en validación",
+   "documento": "0,589",
+   "donde": "su A 2.5, pág. 21 · C3 d15"
+  },
+  {
+   "id": "W5",
+   "nombre": "target: AUC-ROC del modelo del Grupo 5 en validación",
+   "documento": "0,783",
+   "donde": "su D 8.1, pág. 64 · C3 d15"
   },
   {
    "id": "W5",

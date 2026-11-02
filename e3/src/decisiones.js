@@ -24,11 +24,12 @@
 // - D-PLA · propuesta (01/11, vista 8): el plan de 20 semanas, con la primera lista en la semana 6 y la decisión de
 //   producción en la 20 (Parte D 12.1 a 12.4; J50).
 //
-// - E-CRI · aplicado (01/11, W5, vista 9): el criterio de la corrección al Grupo 5, el de la planilla v1.0: una sección
-//   queda en «Revisar» si tiene al menos una observación que pide una acción. E es la parte de la corrección
-//   (E-consignas.md del E3).
+// - E-CRI · aplicado (01/11, W5, vista 9): el criterio de la corrección al Grupo 5, el de la planilla v2.0: un bloque
+//   de secciones queda en «Revisar» solo si tiene un error que cambia una cifra o el método, o algo que la cátedra ya
+//   nos pidió corregir (en la v1.0, toda sección con una observación que pidiera una acción). E es la parte de la
+//   corrección (E-consignas.md del E3).
 // - E-CRU · sin cambios (01/11, W5, vista 10): el cruce de las cifras del Grupo 5 con nuestro registro no cambia ninguna
-//   nuestra (_build/E/cruce.md).
+//   nuestra (_build/E/cruce.md). Los dos grupos concluyen distinto por el target, no por un error.
 //
 // (28/10, F6b, hallazgo H-2-077 de la auditoría) Los ids son internos: ningún documento que lee la cátedra los
 // define (en el E2, los DC-xx estaban en la Parte B). La tarjeta muestra en su lugar el área de la decisión,

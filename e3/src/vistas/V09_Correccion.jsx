@@ -1,12 +1,17 @@
 // V09 · ¿Qué le corregimos al Grupo 5? (01/11, W5; diapositiva 14 de C3). La corrección del Grupo 2 al consolidado
-// del E3 del Grupo 5, en el formato de las devoluciones de la cátedra: una fila por sección, «Completo» o «Revisar».
+// del E3 del Grupo 5, en el formato de la devolución de la cátedra al E2: una fila por bloque de secciones, «Completo»
+// o «Revisar». (01/11) Con la planilla v2.0: 13 bloques, 5 en «Revisar» (la v1.0 tenía 56 filas y 20).
 //
-// - Banda: la central, las secciones a revisar sobre el total (en terracota: es lo que no cierra); al lado, el conteo
-//   por parte (General, A a D), una celda por sección, las de «Revisar» en terracota y primero. Es el gráfico de la
+// - Banda: la central, los bloques a revisar sobre el total (en terracota: es lo que no cierra); al lado, el conteo
+//   por parte (General, A a D), una celda por bloque, las de «Revisar» en terracota y primero. Es el gráfico de la
 //   vista (el único .lienzo).
-// - Decisión: «E-CRI · aplicado», el criterio de la planilla: una sección queda en «Revisar» si pide una acción.
-// - Debajo, las cinco observaciones de más peso: título, sección y página del PDF del Grupo 5, lo que dice el
-//   documento (cita textual) y la corrección en una línea. El problema y la cifra van al title.
+// - Decisión: «E-CRI · aplicado», el criterio de la planilla v2.0: un bloque queda en «Revisar» solo si tiene un error
+//   que cambia una cifra o el método, o algo que la cátedra ya nos pidió corregir.
+// - Debajo, las cinco observaciones en «Revisar»: título, sección puntual («ref») y página del PDF del Grupo 5, como
+//   las escribe la planilla, lo que dice el documento (cita textual) y la corrección en una línea. El problema y la
+//   cifra van al title. El subtítulo dice de qué son las cinco: cuatro de cifras o de método (A 2.2, B 3.3, D 10.3 y
+//   D 11.2) y la quinta, del orden del documento (la carátula). Hasta la v1.0 decía «dos cambian cifras; tres piden
+//   escribir lo que falta», que dejó de ser cierto con el top nuevo.
 // Ninguna cifra ni texto de la corrección escrito acá: todo sale de D3.correccion (correcciones.json de _build/E/).
 
 import { Lienzo } from '../../../src/graficos.jsx'
@@ -25,20 +30,22 @@ const T = CO.total
 const DOC = CO.documento
 
 const DECISION = decision('E-CRI', {
-  llano_corto: 'Revisar: la sección pide al menos una acción',
-  llano: `Una sección queda en «Revisar» si tiene al menos una observación que pide una acción. De ${entero(T.filas)} `
-    + `secciones, ${entero(T.revisar)} quedan en «Revisar» y ${entero(T.completo)} en «Completo».`,
-  decision: 'una fila por sección, «Completo» o «Revisar», con el comentario y la sugerencia',
-  justificacion: 'el formato de las dos devoluciones de la cátedra al Grupo 2; las cifras se recalcularon con los CSV '
-    + 'del caso, y lo que el Grupo 5 cita de respuestas de Casa Óga que no tenemos no se marca como error.',
+  llano_corto: 'Revisar solo si cambia una cifra o el método',
+  llano: 'Un bloque de secciones queda en «Revisar» solo si tiene un error que cambia una cifra o el método, o algo '
+    + `que la cátedra ya nos pidió corregir. De ${entero(T.filas)} bloques, ${entero(T.revisar)} quedan en «Revisar» `
+    + `y ${entero(T.completo)} en «Completo».`,
+  decision: 'una fila por bloque de secciones, «Completo» o «Revisar», con la lectura de Carlos F. y la sugerencia',
+  justificacion: 'el formato de la devolución de la cátedra al Grupo 2 en el E2; las cifras se recalcularon con los '
+    + 'CSV del caso, y lo que el Grupo 5 cita de respuestas de Casa Óga que no tenemos no se marca como error.',
 })
 
-const TITULO_CENTRAL = `${entero(T.revisar)} de ${entero(T.filas)} secciones en «Revisar» y ${entero(T.completo)} en `
-  + `«Completo». Consolidado del Grupo 5 ${DOC.version}, del ${DOC.fecha}, ${entero(DOC.paginas)} páginas.`
-const CONCLUSION = 'Dos cambian cifras; tres piden escribir lo que falta'
+const TITULO_CENTRAL = `${entero(T.revisar)} de ${entero(T.filas)} bloques de secciones en «Revisar» y `
+  + `${entero(T.completo)} en «Completo». Consolidado del Grupo 5 ${DOC.version}, del ${DOC.fecha}, `
+  + `${entero(DOC.paginas)} páginas.`
+const CONCLUSION = 'Cuatro son de cifras o de método; la quinta, del orden del documento'
 
-/** «8.2 ¿El modelo generaliza?» → «D 8.2 · pág. 64», como la planilla. */
-const donde = (t) => `${t.parte} ${t.seccion.split(' ')[0]} · pág.${NBSP}${t.pagina}`
+/** «D 11.2 · pág. 74», como la planilla: la sección puntual (ref); la carátula, solo la parte. */
+const donde = (t) => `${t.parte}${t.parte === 'General' ? '' : ` ${t.ref}`} · pág.${NBSP}${t.pagina}`
 
 export const meta = { id: 'V09', dc: 'E-CRI' }
 
@@ -55,7 +62,7 @@ function Conteo({ w, h, k }) {
   const gap = 14 * k
   const cw = (w - gap * (n - 1)) / n
   // letra: el rótulo mono, la cifra de «Revisar» y su «de N»; baja si el alto no alcanza (1152 × 640)
-  // y también si el ancho de una columna no alcanza para «Parte D» o «7 de 14»
+  // y también si el ancho de una columna no alcanza para «Parte D» o «2 de 4»
   const alto = Math.max(0.6, Math.min(1, h / (92 * k)))
   const necesita = Math.max(...CO.conteo.map((c) => Math.max(
     ancho(c.rotulo.toUpperCase(), 11.5 * k, 600, true) + 0.08 * 11.5 * k * c.rotulo.length,
@@ -111,7 +118,7 @@ export default function V09Correccion() {
               <Cifra num={entero(T.revisar)} unidad={`${NBSP}de${NBSP}${entero(T.filas)}`} />
             </div>
           </div>
-          <p className="e2-linea">piden una acción concreta</p>
+          <p className="e2-linea">bloques con algo que corregir</p>
         </div>
 
         <div className="tarjeta e3-v09-conteo" style={{ gridColumn: 'span 4' }}>

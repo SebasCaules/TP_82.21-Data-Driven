@@ -610,10 +610,10 @@ export const C3 = {
       "tipo": "correccion",
       "kicker": "Corrección al Grupo 5",
       "pregunta": "¿Qué le corregimos al Grupo 5?",
-      "titulo": "20 de 56 secciones a revisar; dos observaciones cambian cifras del documento",
-      "fuente": "Planilla de correcciones al Grupo 5 (v1.0)",
+      "titulo": "5 de 13 bloques de secciones a revisar; cuatro son de cifras o de método",
+      "fuente": "Planilla de correcciones al Grupo 5 (v2.0)",
       "ids": [],
-      "guion": "Nos tocó corregir el consolidado del Grupo 5, de 76 páginas, con el formato de las devoluciones de la cátedra: una fila por sección. De 56 secciones, 20 quedan para revisar, seis en la Parte A y siete en la D. Dos observaciones cambian cifras. La 8.2 compara el test contra la base equivocada: la caída es de 5 %, no de 0,5 %. Y la etiqueta de entrenamiento mira compras de los meses de validación. Las otras tres piden escribir lo que falta, como el 73 % del beneficio, que no se puede rehacer.",
+      "guion": "Corregimos el consolidado del Grupo 5, de 76 páginas, con el formato de la devolución de la cátedra a nuestro E2: una fila por bloque de secciones. De 13 bloques, 5 quedan para revisar: dos en la Parte D y ninguno en la C. El primero es el que la cátedra nos marcó a nosotros: las etiquetas de entrenamiento miran los meses de validación. En la D, el go-live da por cumplido un recall de 68,6 % con una meta de 70 %. Y lo que cambió de la v1 recién aparece en la página 74.",
       "segundos": 55
     },
     {
@@ -622,10 +622,10 @@ export const C3 = {
       "tipo": "correccion",
       "kicker": "Corrección al Grupo 5",
       "pregunta": "¿Qué está bien y qué nos deja?",
-      "titulo": "Su modelo le gana a una regla de sí o no; la nuestra ordena por días",
-      "fuente": "Planilla de correcciones al Grupo 5 (v1.0)",
+      "titulo": "Concluimos distinto por el target: el nuestro casi coincide con lo que ordena la regla",
+      "fuente": "Planilla de correcciones al Grupo 5 (v2.0)",
       "ids": [],
-      "guion": "También hay mucho bien hecho. Las cifras de sus ocho fuentes se reproducen una por una con los CSV, la cuenta del modelo se rehace al centavo y el plan legal termina en algo que se puede verificar: cero clientes con baja en cada listado. El cruce nos sirvió a nosotros: ninguna cifra nuestra está mal. Y explica por qué concluimos distinto. Su modelo le gana a su regla, 0,750 de AUC contra 0,569, pero esa regla marca sí o no. La nuestra ordena a cada cliente por los días que le faltan para cruzar su umbral, y contra esa el modelo no gana. Gracias.",
+      "guion": "Lo que hacen bien: sus cifras de fuentes y de bajas se reproducen con los CSV del caso, y la cuenta del dinero del modelo se rehace con sus supuestos. El cruce no cambió ninguna cifra nuestra, y explica por qué concluimos distinto. Las dos reglas ordenan por cuánto se atrasó el cliente; lo que cambia es el target. El nuestro es cruzar su umbral en 90 días, casi lo mismo que ordena la regla: en validación su AUC es 0,968, y la logística, 0,966. El suyo es no comprar en el doble de su intervalo: su regla da 0,589 y su modelo sube a 0,783. Gracias.",
       "segundos": 55
     }
   ],
