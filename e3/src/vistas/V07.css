@@ -9,11 +9,19 @@
 .e3-v07-cab { display: flex; align-items: flex-start; justify-content: space-between;
               gap: clamp(8px, 1.2cqw, 16px); min-width: 0; }
 .e3-v07-txt { display: flex; flex-direction: column; gap: clamp(2px, .5cqh, 6px); min-width: 0; flex: 1 1 auto; }
+/* (02/11, VIS-13) qué mide, a 1,2 veces el rótulo de la banda; debajo, la línea del grupo de control (D12.control),
+   mono sin mayúsculas, como la línea de partición de la vista 4. */
 .e3-v07-mide {
   margin: 0;
-  font: 600 var(--e2-rot, 12px)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  font: 600 calc(var(--e2-rot, 12px) * 1.2)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
   color: var(--e3-ctx, #5a6478);
 }
+.e3-v07-ctl {
+  margin: 0;
+  font: 500 calc(var(--e2-rot, 12px) * 1.2)/1.2 var(--mono); letter-spacing: .02em;
+  color: var(--e3-ctx, #5a6478);
+}
+.e3-v07-ctl::first-letter { text-transform: uppercase; }
 
 .e3-v07-lienzo { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;
                  margin-top: clamp(8px, 1.8cqh, 22px); }

@@ -277,20 +277,30 @@ def contenido_esperado():
                     grafico=[pct(LE["envios_sin_consentimiento_tasa"], 1), "la lista sale sin ellos"] + ids_l,
                     terracota=True,
                     fragmento=({0: f"cada dimensión en {fijo(dims[0]['puntaje'])}"} if parejas else {})),
-        # la central, lo que tiene que dar el piloto (H49); el tamaño (G49) y las semanas (J50). El gráfico, la regla
-        # en dos zonas con la subfranja de 0 a 2,87
+        # la central, lo que tiene que dar el piloto (H49); (02/11, W6: COB-14, ORA-09, UX-24) el grupo de control
+        # (G49), «80 por mes, sin contactar»: la excepción de la regla del fragmento la pide hallazgos.md. Salen el
+        # tamaño (1.260) y las semanas (J50). El gráfico, la regla en dos zonas con la subfranja de 0 a 2,87; el 2,87
+        # con «mínimo que se distingue» (VIS-11) y el puente de C3 debajo del 40,4 (COB-09, ORA-05, UX-02)
         "v07": dict(dec="D-PIL",
-                    cifras=[f"{fijo(P['umbral_produccion_pp'], 1)} puntos", fijo(P["tratados"]),
-                            f"{fijo(PL['semanas'])} semanas"],
+                    cifras=[f"{fijo(P['umbral_produccion_pp'], 1)} puntos", fijo(P["control"])],
                     grafico=[fijo(P["diferencia_detectable_pp"], 2), fijo(P["umbral_produccion_pp"], 1),
-                             "no se distingue de cero", "María G. elige", "a producción"]),
-        # (01/11) la central, la semana de la primera lista (J50, hito 6); la del operador de después y la de la
-        # decisión. El gráfico, el flujo de cada mes, las fases sobre las 20 semanas y lo que decide María G.
+                             "mínimo que se distingue", "María G. elige", "a producción", plano(dia[12]["puente"])],
+                    sin=["no se distingue de cero", "la lista se paga"],
+                    fragmento={1: f"{fijo(P['control_mes'])} por mes, sin contactar"}),
+        # (01/11) la central, la semana de la primera lista (J50, hito 6). (02/11, W6: DAT-11, UX-22) Después, los
+        # criterios de go-live contados en C3 (los hitos con criterio) y la semana del operador de después. El gráfico
+        # (VIS-01, UX-03): el flujo de C3 (D13.flujo) y la línea de hitos de 20 semanas (D13.hitos, un marcador por
+        # semana con hito, con su número), con la llave de go-live; salen el Gantt y lo que decide María G.
         "v08": dict(dec="D-PLA",
-                    cifras=[f"semana {PL['hitos_semana'][x]}" for x in ("go_live", "operador_despues_del_piloto",
-                                                                        "decision")],
-                    grafico=["1 · Exportar", "3 · Ordenar", "6 · Medir"] + [f["nombre"] for f in PL["fases"]]
-                    + [f"semana {PL['hitos_semana'][x]}" for x in ("alcance", "operador_despues_del_piloto", "decision")]),
+                    cifras=[f"semana {PL['hitos_semana']['go_live']}",
+                            fijo(sum(1 for h in dia[13]["hitos"] if h["criterio"])),
+                            f"semana {PL['hitos_semana']['operador_despues_del_piloto']}"],
+                    grafico=[plano(x["titulo"]) for x in dia[13]["flujo"]]
+                    + [plano(dia[13]["rotulo_hitos"]), plano(dia[13]["llave_go_live"])],
+                    # cada marcador de la línea de hitos: un texto del svg que es solo el número de su semana
+                    exactos=sorted({fijo(PL["hitos_semana"][h["clave"]]) for h in dia[13]["hitos"]}, key=int),
+                    sin=[f["nombre"] for f in PL["fases"] if f["id"] != "piloto"]
+                    + ["Lo que decide María G.", "1 · Exportar"]),
     }
     out = {}
     for v, e in esperado.items():
@@ -299,7 +309,7 @@ def contenido_esperado():
                   "grafico": [norm(x) for x in e["grafico"]], "sin": [norm(x) for x in e.get("sin", [])],
                   "aria": [norm(x) for x in e.get("aria", [])], "acc": e.get("acc"),
                   "terracota": e.get("terracota", False),
-                  "fragmento": e.get("fragmento", {})}
+                  "fragmento": e.get("fragmento", {}), "exactos": [norm(x) for x in e.get("exactos", [])]}
     # el guion de cada vista: el comienzo de lo que dice, por diapositiva (vistas/index.jsx); (02/11, ORA-22) sin quién
     de = dict(re.findall(r"\{ id: '(V\d\d)'.*?de: \[([\d, ]*)\]", (SRC / "vistas" / "index.jsx").read_text()))
     guion = {}
@@ -421,6 +431,10 @@ def contenido(p: Pagina, esperado):
         for x in e["grafico"]:
             if x not in svg:
                 p.mal(f"{id_}: el gráfico no escribe «{x}»")
+        solos = {norm(t) for t in r["textosSvg"]}
+        for x in e["exactos"]:
+            if x not in solos:
+                p.mal(f"{id_}: el gráfico no tiene un texto que sea solo «{x}»")
         for x in e["sin"]:
             if x.casefold() in svg.casefold():
                 p.mal(f"{id_}: el gráfico sigue escribiendo «{x}»")
@@ -555,14 +569,13 @@ def a_la_vista_esperado():
     if "ANEXOS" in C3:
         raise SystemExit("C3 trae ANEXOS: desde el 02/11 exportar_web.py exporta solo RIESGOS")
     T, E, PL, LE = D3["test"], D3["economia"], D3["plan"], D3["legal"]
-    hs = PL["hitos_semana"]
     dia = {d["n"]: d for d in C3["DIAPOSITIVAS"]}
     CO, SF, SFV = T["contra_regla"], T["sin_filtro"], D3["lista"]["modelo_menos_regla_500_sin_filtro"]
     ids_l = sorted((a["id"] for t in dia[10]["plan"] for a in t["acciones"]), key=lambda x: int(x[1:]))
-    pedidos = ["alcance", "regla_y_operador_del_piloto", "designa_l1", "operador_despues_del_piloto", "decision"]
     d5 = dia[5]
     d11 = dia[11]
     C = D3["caso"]
+    d12, d13 = dia[12], dia[13]
     return [
         # (02/11, W6) la vista 1: la conclusión dice qué se paga (DAT-01) y la decisión abre con el veredicto (COB-01)
         ("v01", None, ["Para que la regla se pague", "Viable:"], ["Para pagarse,"]),
@@ -581,15 +594,21 @@ def a_la_vista_esperado():
                        "ni una lista perfecta lo paga", "La lista que sale: en validación ganaba la regla",
                        plano(dia[6]["particion"]), plano(dia[6]["pie_test"]), plano(dia[6]["pie_800"])],
          ["más que toda la lista", "aciertos más/mes"]),
-        # la vista 7: la regla del piloto, sin la lista de lo que decide María G. (está en la 8)
-        ("v07", None, ["A producción solo si"], ["Lo que decide María G.", "Quién opera la lista después del piloto"]),
-        # (01/11) la vista 8: el flujo de cada mes (D 9.2), las fases (D 12.1) y lo que decide María G. con su semana
-        # (D 12.3 y 12.4). El grupo de control no es un pedido a María G.: se busca al comienzo de un renglón, porque
-        # la banda de la 7 dice «más que el grupo de control»
-        ("v08", None, ["Lo que decide María G. y en qué semana", "El equipo; el resumen por local, Sofía R.",
-                       "Juan Manuel R."] + [f"semana {hs[k]}\n" for k in pedidos]
-         + [f["nombre"] for f in PL["fases"]],
-         ["\nEl grupo de control", "lo revisa Sofía R.", "quien elija Casa Óga"]),
+        # la vista 7: la regla del piloto, sin la lista de lo que decide María G. (está en la 8). (02/11, W6) El puente
+        # del 40,4 y la línea del grupo de control (C3); salen la duración del plan y el tamaño del piloto
+        ("v07", None, ["A producción solo si", plano(d12["puente"]), plano(d12["control"]), "mínimo que se distingue",
+                       "Grupo de control"],
+         ["Lo que decide María G.", "Quién opera la lista después del piloto", "no se distingue de cero",
+          "Duración del plan", "clientes contactados"]),
+        # (02/11, W6) la vista 8: el flujo de cada mes de C3 (D13.flujo: texto y dueño de cada paso, la alerta en
+        # «Medir») y la línea de hitos (D13.hitos: cada hito con su dueño, el rótulo y la llave de go-live). Salen la
+        # tabla de lo que decide María G., las fases del Gantt y el dueño genérico «el equipo»
+        ("v08", None, [plano(x[c]) for x in d13["flujo"] for c in ("titulo", "texto", "quien")]
+         + [plano(x[c]) for x in d13["hitos"] for c in ("hito", "quien")]
+         + [plano(d13["rotulo_hitos"]), plano(d13["llave_go_live"]), "sí o no, hasta la lista"],
+         ["Lo que decide María G. y en qué semana", "El equipo, en el piloto", "El equipo; el resumen por local",
+          "Plan de 20", "lo revisa Sofía R.", "quien elija Casa Óga"]
+         + [f["nombre"] for f in PL["fases"] if f["id"] != "piloto"]),
         # la vista 5: de qué lista es el beneficio de la regla (G41); (01/11) el costo con modelo y el presupuesto
         # (02/11, del A7 y del A3) el valor de cada caso (celdas de la diapositiva 8) y la sensibilidad. (02/11, W6)
         # qué mide es D9.mide, con la base de la Parte B (COB-06); los escenarios a un año (COB-07); la sensibilidad,
