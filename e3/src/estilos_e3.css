@@ -133,6 +133,13 @@
   --zona: var(--e3-zona);
 }
 
+/* ---------- riel (01/11, W5) ---------- */
+/* Con las dos vistas de la corrección al Grupo 5 (diez presentadas, siete anexos y cuatro grupos), el último anexo
+   quedaba debajo del pie del riel a 1152 × 640 y 1366 × 768 (y con las notas abiertas, en todas). Los encabezados de grupo y la lista ganan ese alto con
+   menos aire arriba y abajo; el ítem, el rótulo del grupo y el pie (lo que mide paridad_e3.py) no cambian. */
+.e3-vp .lat-lista { padding-top: 2px; }
+.e3-vp .lat-grupo { padding-top: 3px; padding-bottom: 1px; }
+
 /* ---------- banda de cifras ---------- */
 /* Cifra secundaria (Cifra con `sec`): en tinta y no en gris, peso 600, el 72 % de la central (antes
    70 % y --mut2). La central, en --acc, al mismo tamaño del E2 (más grande, el −99,95 % no entra a

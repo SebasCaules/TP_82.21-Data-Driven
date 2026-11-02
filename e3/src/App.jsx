@@ -370,9 +370,10 @@ function Lateral({ indice, irA }) {
       </ol>
 
       <div className="lat-pie" title="↑ ↓ o Av Pág y Re Pág: cambiar de vista · Inicio / Fin: primera y última · N: notas del orador · B o «.»: pantalla en negro · F: pantalla completa · I: imprimir">
-        <span>↑ ↓ cambiar de vista</span>
-        <span>N: notas · B: negro</span>
-        <span>F: pantalla completa</span>
+        {/* (01/11, W5) Dos renglones y no tres: con las dos vistas de la corrección al Grupo 5, el riel no entraba sobre su
+            pie a 1152 × 640 y 1366 × 768. La lista completa de teclas sigue en el title. */}
+        <span>↑ ↓ vista · N: notas</span>
+        <span>F: pantalla · B: negro</span>
       </div>
     </nav>
   )

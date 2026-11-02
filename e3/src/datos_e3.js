@@ -33,6 +33,10 @@ export const D3 = {
     "sha256": "0c240afbe870eece9cd8c1f34baf61f9bd8d3a037bcbafb0ddd59c59332719ac"
    },
    {
+    "archivo": "data/e3/correcciones.json",
+    "sha256": "da0bcf2c19d194e928e19a5d9c26a60ff64e09fda2afec6a97d6f84207742679"
+   },
+   {
     "archivo": "src/datos.js",
     "sha256": "29a919a236f672c73179ff03d9228d96a5311a788b62aacdb0b6e9b9f98843ee"
    },
@@ -44,7 +48,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "d96179401b252e29764c10abaf73b7ad4517e555a32cf941d66e577d7498ec0f"
+   "sha256": "baf669de2d7c378b583696513a0f374c6a781ba34853c2cfb6aaaa623779eb81"
   }
  },
  "caso": {
@@ -2049,6 +2053,136 @@ export const D3 = {
    "antes_dc09": 0.3848504693298406,
    "antes_dc09_corte": "2025-08-31"
   }
+ },
+ "correccion": {
+  "grupo": 5,
+  "version": "v1.0",
+  "fecha": "01/11/2026",
+  "documento": {
+   "archivo": "Entregable_3_Consolidado_CasaOga_Grupo5_v2.0.pdf",
+   "titulo": "Entregable 3 · Consolidado · Casa Óga · Grupo 5",
+   "version": "v2.0",
+   "fecha": "30/10/2026",
+   "paginas": 76
+  },
+  "conteo": [
+   {
+    "parte": "General",
+    "filas": 2,
+    "completo": 1,
+    "revisar": 1,
+    "rotulo": "General"
+   },
+   {
+    "parte": "A",
+    "filas": 13,
+    "completo": 7,
+    "revisar": 6,
+    "rotulo": "Parte A"
+   },
+   {
+    "parte": "B",
+    "filas": 12,
+    "completo": 9,
+    "revisar": 3,
+    "rotulo": "Parte B"
+   },
+   {
+    "parte": "C",
+    "filas": 15,
+    "completo": 12,
+    "revisar": 3,
+    "rotulo": "Parte C"
+   },
+   {
+    "parte": "D",
+    "filas": 14,
+    "completo": 7,
+    "revisar": 7,
+    "rotulo": "Parte D"
+   }
+  ],
+  "total": {
+   "filas": 56,
+   "completo": 36,
+   "revisar": 20
+  },
+  "top": [
+   {
+    "id": "T1",
+    "parte": "D",
+    "seccion": "8.2 ¿El modelo generaliza?",
+    "pagina": 64,
+    "titulo_corto": "La 8.2 compara el test contra la base equivocada",
+    "cita": "USD 1.639 por año, contra 1.647 del escenario base de 3.4. El ROI queda en −72,9%: no hace falta actualizarlo.",
+    "problema": "Compara los USD 1.639 de test con los 1.647 de la Etapa 2 y no con los 1.731 de validación al mismo umbral (pág. 61): la caída es de 5%, no de 0,5%.",
+    "correccion": "Comparar contra validación al umbral 0,45 y registrar en la 11.2 el cambio de la 7.5 en beneficio y ROI.",
+    "cifra": "USD 1.639 en test contra 1.731 en validación al umbral 0,45",
+    "n": 1
+   },
+   {
+    "id": "T2",
+    "parte": "A",
+    "seccion": "2.2 Esquema de partición",
+    "pagina": 18,
+    "titulo_corto": "La etiqueta de entrenamiento mira los meses de validación",
+    "cita": "Cortes de jun-2023 a jun-2024 (13 cortes, un año completo) del 70% de los clientes",
+    "problema": "Con W de hasta 360 días, la etiqueta del corte de jun-2024 usa compras hasta jun-2025: el modelo ya vio en otros clientes el churn del período de validación.",
+    "correccion": "Sacar de entrenamiento las filas cuya ventana cierra después de jun-2024, o acotar W, y recalcular.",
+    "cifra": "W de hasta 360 días",
+    "n": 2
+   },
+   {
+    "id": "T3",
+    "parte": "B",
+    "seccion": "3.3 Estimación de beneficios esperados",
+    "pagina": 31,
+    "titulo_corto": "El 73% del beneficio no se puede rehacer",
+    "cita": "48 h/mes repartidas en 3 tareas y costo por hora USD 12 (analistas) / USD 22",
+    "problema": "El ahorro operativo no da horas ni tarifa por tarea, así que nadie puede llegar a los USD 4.378 con lo declarado.",
+    "correccion": "Abrir el ahorro en una tabla por tarea: horas por mes, tarifa, % reducible y USD por año.",
+    "cifra": "USD 4.378 de 6.025 (73%)",
+    "n": 3
+   },
+   {
+    "id": "T4",
+    "parte": "D",
+    "seccion": "11.1 ¿Es viable el proyecto?",
+    "pagina": 74,
+    "titulo_corto": "El veredicto no trae el costo ni el plazo del piloto",
+    "cita": "Sí recomendamos un piloto acotado: una campaña con grupo de control, sin contratar el abono de mantenimiento",
+    "problema": "El piloto ya tiene costo (USD 10.824 más 600 de nube) y plazo en la 3.6 y la 6.3, pero el veredicto no los trae.",
+    "correccion": "Escribir en la 11.1 el costo y el plazo del piloto junto a la regla del 15% contra el control.",
+    "cifra": "USD 10.824 más 600 de nube",
+    "n": 4
+   },
+   {
+    "id": "T5",
+    "parte": "C",
+    "seccion": "6.3 Top 3 riesgos críticos: análisis en profundidad",
+    "pagina": 55,
+    "titulo_corto": "El top 3 deja fuera un riesgo A/A de la matriz",
+    "cita": "Extracto de 2025 incompleto y cambio en la señal de soporte (datos y modelo)",
+    "problema": "La 6.2 puntúa A/A el recurrente que supera el techo anual y M/A el extracto de 2025, y el top 3 elige el extracto, con un tema que no tiene fila.",
+    "correccion": "Escribir el criterio de selección o poner el recurrente como riesgo crítico.",
+    "cifra": "USD 11.400 por año contra un techo de 6.000",
+    "n": 5
+   }
+  ],
+  "bien": [
+   {
+    "seccion": "1.4 Inventario de fuentes de datos",
+    "que": "Las cifras de registros y calidad de las ocho fuentes se reproducen una por una con los CSV del caso."
+   },
+   {
+    "seccion": "3.2 y 4.4 Costos y dinero del modelo",
+    "que": "La tabla de costos cierra al dólar y la cuenta del modelo se rehace al centavo (2.085,01 contra 813,43 de la regla)."
+   },
+   {
+    "seccion": "5.1 y 5.4 Consentimiento y plan legal",
+    "que": "El diagnóstico de bajas y consentimiento se reproduce con los CSV y termina en una condición verificable: 0 clientes con baja en cada listado."
+   }
+  ]
  },
  "anclas": [
   {
@@ -4536,6 +4670,54 @@ export const D3 = {
    "nombre": "drift: cortes en que habría saltado",
    "documento": "2025-10-31 · 2025-11-30 · 2025-12-31",
    "donde": "registro J53"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: versión de la planilla",
+   "documento": "v1.0",
+   "donde": "E, carátula (index.jsx: fuente)"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: secciones revisadas",
+   "documento": "56",
+   "donde": "E, conteo por parte · C3 d14"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: Completo",
+   "documento": "36",
+   "donde": "E, conteo por parte"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: Revisar",
+   "documento": "20",
+   "donde": "E, conteo por parte · C3 d14"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: Revisar por parte (General, A a D)",
+   "documento": "1 · 6 · 3 · 3 · 7",
+   "donde": "E, conteo por parte"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: observaciones de más peso",
+   "documento": "5",
+   "donde": "E, «Las cinco observaciones»"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: lo que hacen bien",
+   "documento": "3",
+   "donde": "E, «Lo que hacen bien»"
+  },
+  {
+   "id": "W5",
+   "nombre": "corrección: páginas del consolidado del Grupo 5",
+   "documento": "76",
+   "donde": "E, «Qué se revisó»"
   }
  ]
 };
