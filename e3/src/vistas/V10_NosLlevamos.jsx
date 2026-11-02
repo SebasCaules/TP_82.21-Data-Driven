@@ -158,11 +158,11 @@ export default function V10NosLlevamos() {
 
         <div className="tarjeta" style={{ gridColumn: 'span 2' }}
              title={CO.bien.map((b) => `${b.seccion}: ${b.que}`).join('\n')}>
-          <span className="kpi-lbl"><span>Para destacar</span></span>
+          <span className="kpi-lbl"><span>Lo que hacen bien</span></span>
           <div className="ban-par">
             <div className="par-item par-unico"><Cifra num={entero(CO.bien.length)} sec /></div>
           </div>
-          <p className="e2-linea">cifras que se rehacen</p>
+          <p className="e2-linea">secciones con cifras que reprodujimos</p>
         </div>
       </Banda>
 
