@@ -1,7 +1,7 @@
 {
   "grupo": 5,
-  "version": "v2.1",
-  "fecha": "01/11/2026",
+  "version": "v2.2",
+  "fecha": "02/11/2026",
   "documento": {
     "archivo": "Entregable_3_Consolidado_CasaOga_Grupo5_v2.0.pdf",
     "titulo": "Entregable 3 · Consolidado · Casa Óga · Grupo 5",
@@ -77,6 +77,18 @@
       "problema": "La 7.2 elige el umbral por el 70% y la 10.3 da «cumplido» un 68,6% contra un mínimo de 65%.",
       "correccion": "Escribir en la 10.3 que el mínimo baja de 70% a 65% y por qué.",
       "cifra": "Recall 68,6% en test contra la meta de 70%"
+    },
+    {
+      "id": "T6",
+      "parte": "D",
+      "seccion": "10.1 a 10.3 Go-live",
+      "ref": "10.2",
+      "pagina": 72,
+      "titulo_corto": "El umbral del piloto no mide lo mismo que el 15% de la 3.1",
+      "cita": "recompra de los contactados menos recompra del grupo de control",
+      "problema": "La 10.2 compara el 15% por verdadero positivo de la 3.1 con la recompra extra de todos los contactados.",
+      "correccion": "Comparar contra 15% por la precisión, o dividir la diferencia por la parte del control que no recompra.",
+      "cifra": "15% por 52,9% de precisión en test"
     },
     {
       "id": "T4",

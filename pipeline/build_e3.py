@@ -1276,7 +1276,7 @@ def armar_correccion(co: dict, e2: dict) -> dict:
     for t in top:
         if not t.get("ref"):
             raise SystemExit(f"correcciones.json: la observación {t['id']} no trae «ref» (generar_e.py la exporta)")
-    ancla("W5", "corrección: versión de la planilla", co["version"], "v2.1", donde="E, carátula (index.jsx: fuente)")
+    ancla("W5", "corrección: versión de la planilla", co["version"], "v2.2", donde="E, carátula (index.jsx: fuente)")
     # (la planilla cambió con la crítica del 01/11: de 18 a 20 Revisar, y en la v2.0, a 13 bloques con 5 Revisar. El
     # guion de la vista 9 dice el total; con c3="d14" un cambio de la planilla corta acá hasta que contenido.py diga lo
     # mismo, y «5 de 13» entero, porque un «5» suelto aparece en cualquier texto)
@@ -1288,8 +1288,9 @@ def armar_correccion(co: dict, e2: dict) -> dict:
           donde="E, conteo por parte", c3="d14")
     ancla("W5", "corrección: Revisar por parte (General, A a D)", " · ".join(str(c["revisar"]) for c in conteo),
           "1 · 1 · 1 · 0 · 2", donde="E, conteo por parte")
-    ancla("W5", "corrección: secciones del top 5", " · ".join(t["ref"] for t in top), "2.2 · 3.3 · 10.3 · 11.2 · 0",
-          donde="E, «Las cinco observaciones en Revisar»")
+    # (02/11, W7) v2.2: seis observaciones en los mismos cinco bloques; la 10.2 (umbral del piloto) va junto a la 10.3
+    ancla("W5", "corrección: secciones de las observaciones", " · ".join(t["ref"] for t in top),
+          "2.2 · 3.3 · 10.3 · 10.2 · 11.2 · 0", donde="E, «Las observaciones de los bloques en Revisar»")
     # el target (vista 10, diapositiva 15): AUC-ROC en validación de cada regla y cada modelo
     ancla("F09", "target: AUC-ROC de nuestra regla en validación", target["nuestro"]["regla"], "0,968", 3,
           donde="B 4.2", c3="d15")
@@ -1299,7 +1300,7 @@ def armar_correccion(co: dict, e2: dict) -> dict:
           donde="su A 2.5, pág. 21", c3="d15")
     ancla("W5", "target: AUC-ROC del modelo del Grupo 5 en validación", target["suyo"]["modelo"], "0,783", 3,
           donde="su D 8.1, pág. 64", c3="d15")
-    ancla("W5", "corrección: observaciones de más peso", len(top), "5", 0, donde="E, «Las cinco observaciones»")
+    ancla("W5", "corrección: observaciones", len(top), "6", 0, donde="E, «Las observaciones de los bloques en Revisar»")
     ancla("W5", "corrección: lo que hacen bien", len(co["bien"]), "3", 0, donde="E, «Lo que hacen bien»")
     ancla("W5", "corrección: páginas del consolidado del Grupo 5", co["documento"]["paginas"], "76", 0,
           donde="E, «Qué se revisó»")

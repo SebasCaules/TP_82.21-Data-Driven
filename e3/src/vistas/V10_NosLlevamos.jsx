@@ -185,7 +185,9 @@ export default function V10NosLlevamos() {
               <Cifra num={entero(T.completo)} unidad={`${NBSP}de${NBSP}${entero(T.filas)}`} />
             </div>
           </div>
-          <p className="e2-linea">cierran sin cambios</p>
+          {/* (02/11, W7) Era «cierran sin cambios»: desde la planilla v2.2, cinco de los ocho llevan una sugerencia de
+              claridad. «Completo» dice que no hay error de cifra ni de método. */}
+          <p className="e2-linea">sin error de cifra ni de método</p>
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 2' }}

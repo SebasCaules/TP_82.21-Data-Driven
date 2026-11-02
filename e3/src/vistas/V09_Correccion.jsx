@@ -14,6 +14,9 @@
 //   las citas quedan textuales (UX-18). El subtítulo dice de qué son las cinco: cuatro de cifras o de método (A 2.2, B 3.3, D 10.3 y
 //   D 11.2) y la quinta, del orden del documento (la carátula). Hasta la v1.0 decía «dos cambian cifras; tres piden
 //   escribir lo que falta», que dejó de ser cierto con el top nuevo.
+// (02/11, W7) Planilla v2.2: seis observaciones en los mismos cinco bloques. La cuarta (T6, el umbral del piloto de
+//   su 10.2) va en el bloque de go-live junto a la tercera; salió de revisarlos con lo que el Grupo 4 nos marcó a
+//   nosotros. La conclusión pasa a «Cinco son de cifras o de método; la sexta, del orden del documento».
 // Ninguna cifra ni texto de la corrección escrito acá: todo sale de D3.correccion (correcciones.json de _build/E/).
 
 import { Lienzo } from '../../../src/graficos.jsx'
@@ -46,7 +49,7 @@ const DECISION = decision('E-CRI', {
 const TITULO_CENTRAL = `${entero(T.revisar)} de ${entero(T.filas)} bloques de secciones en «Revisar» y `
   + `${entero(T.completo)} en «Completo». Consolidado del Grupo 5 ${DOC.version}, del ${DOC.fecha}, `
   + `${entero(DOC.paginas)} páginas.`
-const CONCLUSION = 'Cuatro son de cifras o de método; la quinta, del orden del documento'
+const CONCLUSION = 'Cinco son de cifras o de método; la sexta, del orden del documento'
 
 /** «70%» → «70 %» en los textos propios (no en las citas del Grupo 5): el mismo espacio que pone pct(). */
 const conEspacio = (t) => String(t).replace(/(\d)%/g, `$1${NBSP}%`)
@@ -125,7 +128,8 @@ export default function V09Correccion() {
               <Cifra num={entero(T.revisar)} unidad={`${NBSP}de${NBSP}${entero(T.filas)}`} />
             </div>
           </div>
-          <p className="e2-linea">bloques con algo que corregir</p>
+          {/* (02/11, W7) Era «bloques con algo que corregir»: desde la v2.2, los Completo también llevan sugerencias */}
+          <p className="e2-linea">bloques en «Revisar»</p>
         </div>
 
         <div className="tarjeta e3-v09-conteo" style={{ gridColumn: 'span 4' }}>

@@ -713,11 +713,11 @@ export const C3 = {
       "tipo": "correccion",
       "kicker": "Corrección al Grupo 5",
       "pregunta": "¿Qué le corregimos al Grupo 5?",
-      "titulo": "5 de 13 bloques de secciones a revisar; cuatro son de cifras o de método",
+      "titulo": "5 de 13 bloques a revisar: seis observaciones, cinco de cifras o de método",
       "contexto": "Consolidado E3 del Grupo 5 (v2.0, 76 págs.) · 13 bloques · formato de la devolución de la cátedra",
-      "fuente": "Planilla de correcciones al Grupo 5 (v2.1)",
+      "fuente": "Planilla de correcciones al Grupo 5 (v2.2)",
       "ids": [],
-      "guion": "Corregimos como consultores externos el consolidado del Grupo 5: una fila por bloque de secciones, con la sección, la página y la corrección. De 13 bloques, 5 quedan para revisar, ninguno en la Parte C: cuatro por cifras o método y uno por el orden del documento. Uno: las etiquetas de entrenamiento miran los meses de validación. La cátedra nos marcó lo mismo en el E2 y lo corregimos con dos meses de embargo. Dos: el 73 % del beneficio no se puede rehacer: no dice horas ni tarifa por tarea. Tres: el go-live baja el recall mínimo de 70 % a 65 % sin decirlo. Cuatro: el cambio de la 7.5 no llega a la 11.2 ni a la 3.4. Cinco: lo que cambió de la v1 está en la página 74.",
+      "guion": "Corregimos como consultores externos el consolidado del Grupo 5, una fila por bloque de secciones. De 13 bloques, 5 quedan para revisar, ninguno en la Parte C, con seis observaciones. Uno: las etiquetas de entrenamiento miran los meses de validación. La cátedra nos marcó lo mismo en el E2 y lo corregimos con dos meses de embargo. Dos: el 73 % del beneficio no se puede rehacer. Tres: el go-live baja el recall mínimo de 70 % a 65 % sin decirlo. Cuatro: el piloto mide la recuperación en otra escala que el 15 % de su Parte B, y no lo alcanza ni el escenario optimista. Cinco: el cambio de la 7.5 no llega a la 11.2 ni a la 3.4. Seis: lo que cambió de la v1 está en la página 74.",
       "segundos": 75
     },
     {
@@ -741,9 +741,9 @@ export const C3 = {
           "texto": "1.211 bajas: igual con los CSV del caso."
         }
       ],
-      "fuente": "Planilla de correcciones al Grupo 5 (v2.1)",
+      "fuente": "Planilla de correcciones al Grupo 5 (v2.2)",
       "ids": [],
-      "guion": "Ocho de los 13 bloques cierran sin cambios. Rehicimos las cifras de cinco secciones y cierran: el 44,8 % de transacciones sin cliente y las 1.211 bajas salen igual de los CSV del caso, y sus costos cierran al dólar. El cruce explica por qué concluimos distinto. Las dos reglas ordenan por atraso; lo que cambia, sobre todo, es el target. El nuestro es cruzar su umbral en 90 días, casi lo mismo que ordena la regla: su AUC es 0,968 y la logística, 0,966. Al modelo no le queda dónde ganar. El suyo es no comprar en el doble de su intervalo: su regla da 0,589 y su modelo, 0,783. Con su target gana el modelo; con el nuestro alcanza la regla, y ninguna cifra nuestra cambia. Gracias.",
+      "guion": "Ocho de los 13 bloques están completos. Rehicimos las cifras de cinco secciones y cierran: el 44,8 % de transacciones sin cliente y las 1.211 bajas salen igual de los CSV del caso, y sus costos cierran al dólar. El cruce explica por qué concluimos distinto. Las dos reglas ordenan por atraso; lo que cambia, sobre todo, es el target. El nuestro es cruzar su umbral en 90 días, casi lo mismo que ordena la regla: su AUC es 0,968 y la logística, 0,966. Al modelo no le queda dónde ganar. El suyo es no comprar en el doble de su intervalo: su regla da 0,589 y su modelo, 0,783. Con su target gana el modelo; con el nuestro alcanza la regla, y ninguna cifra nuestra cambia. Gracias.",
       "segundos": 70
     }
   ],

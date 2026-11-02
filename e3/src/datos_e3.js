@@ -34,7 +34,7 @@ export const D3 = {
    },
    {
     "archivo": "data/e3/correcciones.json",
-    "sha256": "62ecba9c5fa2d3e4abb6ae95aa416a5d3cf3e2de33e909fb08c3d7602eaef4df"
+    "sha256": "db8235241ad452e8affc345223a8cdf7ac4b8113ea40dfdd4780b6184f62495b"
    },
    {
     "archivo": "src/datos.js",
@@ -48,7 +48,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "6666477983b91dd797acf2e03d02f22848f7fd5d16b7a4f6f6dfb13dd10d1d67"
+   "sha256": "564c69103a4a92d72bda18648a984abbe984fa20b258a482fdfbee7f847d9409"
   }
  },
  "caso": {
@@ -2056,8 +2056,8 @@ export const D3 = {
  },
  "correccion": {
   "grupo": 5,
-  "version": "v2.1",
-  "fecha": "01/11/2026",
+  "version": "v2.2",
+  "fecha": "02/11/2026",
   "documento": {
    "archivo": "Entregable_3_Consolidado_CasaOga_Grupo5_v2.0.pdf",
    "titulo": "Entregable 3 · Consolidado · Casa Óga · Grupo 5",
@@ -2148,6 +2148,19 @@ export const D3 = {
     "n": 3
    },
    {
+    "id": "T6",
+    "parte": "D",
+    "seccion": "10.1 a 10.3 Go-live",
+    "ref": "10.2",
+    "pagina": 72,
+    "titulo_corto": "El umbral del piloto no mide lo mismo que el 15% de la 3.1",
+    "cita": "recompra de los contactados menos recompra del grupo de control",
+    "problema": "La 10.2 compara el 15% por verdadero positivo de la 3.1 con la recompra extra de todos los contactados.",
+    "correccion": "Comparar contra 15% por la precisión, o dividir la diferencia por la parte del control que no recompra.",
+    "cifra": "15% por 52,9% de precisión en test",
+    "n": 4
+   },
+   {
     "id": "T4",
     "parte": "D",
     "seccion": "11.1 a 11.3 Veredicto integrado",
@@ -2158,7 +2171,7 @@ export const D3 = {
     "problema": "La 7.5 (pág. 61) lleva el valor del modelo a USD 1.731 y el ROI a −72,5%, pero la 11.2 no lo registra y la 3.4 sigue con 1.647 y −72,9%.",
     "correccion": "Registrar el cambio en la 11.2 y usar una sola base; el veredicto no cambia.",
     "cifra": "USD 1.731 contra 1.647",
-    "n": 4
+    "n": 5
    },
    {
     "id": "T5",
@@ -2171,7 +2184,7 @@ export const D3 = {
     "problema": "El índice no tiene páginas, la página 2 está en blanco y los cambios están al final.",
     "correccion": "Usar la página 2 para el índice con páginas y una primera página con lo que cambia.",
     "cifra": "Página 74 de 76",
-    "n": 5
+    "n": 6
    }
   ],
   "bien": [
@@ -4431,7 +4444,7 @@ export const D3 = {
   {
    "id": "W5",
    "nombre": "corrección: versión de la planilla",
-   "documento": "v2.1",
+   "documento": "v2.2",
    "donde": "E, carátula (index.jsx: fuente)"
   },
   {
@@ -4466,9 +4479,9 @@ export const D3 = {
   },
   {
    "id": "W5",
-   "nombre": "corrección: secciones del top 5",
-   "documento": "2.2 · 3.3 · 10.3 · 11.2 · 0",
-   "donde": "E, «Las cinco observaciones en Revisar»"
+   "nombre": "corrección: secciones de las observaciones",
+   "documento": "2.2 · 3.3 · 10.3 · 10.2 · 11.2 · 0",
+   "donde": "E, «Las observaciones de los bloques en Revisar»"
   },
   {
    "id": "F09",
@@ -4496,9 +4509,9 @@ export const D3 = {
   },
   {
    "id": "W5",
-   "nombre": "corrección: observaciones de más peso",
-   "documento": "5",
-   "donde": "E, «Las cinco observaciones»"
+   "nombre": "corrección: observaciones",
+   "documento": "6",
+   "donde": "E, «Las observaciones de los bloques en Revisar»"
   },
   {
    "id": "W5",
