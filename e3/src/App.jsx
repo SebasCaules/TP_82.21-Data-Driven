@@ -7,8 +7,8 @@
 //    pantalla en negro hasta la próxima tecla; una tecla mantenida no recorre el tablero.
 // 3. Dos ventanas con la misma dirección se siguen (BroadcastChannel): la del proyector y la de la
 //    laptop con las notas, en panel (N) o solas (?notas).
-// (01/11) Nada detrás de un botón: cada vista llega completa. El único control es el simulador de la tasa de
-// éxito del anexo A3, a la vista (controles.jsx).
+// (01/11) Nada detrás de un botón: cada vista llega completa. (02/11) Sin el grupo «Respaldo» (anexos A1 a A7) ni
+// el simulador de la tasa de éxito del A3: el riel tiene las diez vistas y ningún control.
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -298,11 +298,10 @@ function fuenteDe(ds) {
 /** El encabezado del E2 (regla 12): la pregunta, grande, es el h1. A la derecha, chico, en qué vista se
  *  está y de qué parte del documento sale. */
 function Encabezado({ vista }) {
-  // (W3) `vista.fuente`, cuando la trae (vistas/index.jsx), pisa la de las diapositivas: la V07 y los anexos
-  // con lo medido en test salen de la Parte D, que C3 todavía no tiene.
+  // (W3) `vista.fuente`, cuando la trae (vistas/index.jsx), pisa la de las diapositivas: la V07 sale de la Parte D,
+  // que C3 todavía no tiene.
   const fuente = vista.fuente ?? fuenteDe(diapositivasDe(vista))
-  const donde = vista.respaldo ? `${vista.id} · ${fuente}`
-    : `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}${fuente ? ` · ${fuente}` : ''}`
+  const donde = `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}${fuente ? ` · ${fuente}` : ''}`
   return (
     <header className="e2-enc">
       <h1 className="e2-preg">{vista.pregunta}</h1>
@@ -315,18 +314,15 @@ function Encabezado({ vista }) {
 }
 
 /** (27/10, W1) En el lugar de la miniatura del mapa de calidad del E2, el avance de la historia: una
- *  barra por vista presentada, las ya vistas en azul claro y la actual en tinta. Mide lo mismo que la
- *  miniatura (118 × 46 con su marco), así el encabezado tiene el alto del E2. En el respaldo, ninguna
- *  barra se marca. */
+ *  barra por vista, las ya vistas en azul claro y la actual en tinta. Mide lo mismo que la miniatura
+ *  (118 × 46 con su marco), así el encabezado tiene el alto del E2. */
 function Avance({ vista }) {
-  const historia = VISTAS.filter((v) => !v.respaldo)
-  const i = historia.indexOf(vista)
+  const i = VISTAS.indexOf(vista)
   return (
-    <span className="e3-avance" aria-hidden="true"
-          title={i >= 0 ? `Vista ${i + 1} de ${historia.length}` : `Respaldo · ${vista.id}`}>
-      <span className="e3-avance-barras" style={{ gridTemplateColumns: `repeat(${historia.length}, minmax(0, 1fr))` }}>
-        {historia.map((v, j) => (
-          <i key={v.id} className={i < 0 ? '' : j < i ? 'vista' : j === i ? 'actual' : ''} />
+    <span className="e3-avance" aria-hidden="true" title={`Vista ${i + 1} de ${VISTAS.length}`}>
+      <span className="e3-avance-barras" style={{ gridTemplateColumns: `repeat(${VISTAS.length}, minmax(0, 1fr))` }}>
+        {VISTAS.map((v, j) => (
+          <i key={v.id} className={j < i ? 'vista' : j === i ? 'actual' : ''} />
         ))}
       </span>
     </span>
@@ -371,7 +367,8 @@ function Lateral({ indice, irA }) {
 
       <div className="lat-pie" title="↑ ↓ o Av Pág y Re Pág: cambiar de vista · Inicio / Fin: primera y última · N: notas del orador · B o «.»: pantalla en negro · F: pantalla completa · I: imprimir">
         {/* (01/11, W5) Dos renglones y no tres: con las dos vistas de la corrección al Grupo 5, el riel no entraba sobre su
-            pie a 1152 × 640 y 1366 × 768. La lista completa de teclas sigue en el title. */}
+            pie a 1152 × 640 y 1366 × 768. La lista completa de teclas sigue en el title. (02/11) Sin el respaldo, el riel
+            tiene diez entradas y el pie no nombra los anexos. */}
         <span>↑ ↓ vista · N: notas</span>
         <span>F: pantalla · B: negro</span>
       </div>

@@ -1,5 +1,5 @@
 // Tarjeta de puntaje de la vista 3 (28/10, .workforce/PLAN.md, unidad V03). No exporta `default` ni
-// `meta`: vistas/index.jsx no la registra como vista (como V05_Simulador.jsx).
+// `meta`: vistas/index.jsx no la registra como vista (como V05Grafico.jsx).
 //
 // Una fila por condición técnica. Arriba, chico: el puntaje en pips (●●○, de `tope`) y el nombre. Debajo,
 // grande: la razón, que es lo que se lee. La fila que limita (limite: true) lleva el único color (--acc):

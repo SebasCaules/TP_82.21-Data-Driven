@@ -6,12 +6,12 @@
 (27/10, W1) Rehecho para el armazón del E2 (riel, encabezado con la pregunta, banda de cifras, zoom
 uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; esto cubre lo demás:
 
-1. Cada vista del riel (V01 a V10 y A1 a A7) a 1152×640, 1280×720, 1366×768, 1536×864 y 1920×1080:
+1. Cada vista del riel (V01 a V10; sin el respaldo A1 a A7 desde el 02/11) a 1152×640, 1280×720, 1366×768, 1536×864 y 1920×1080:
    - monta, la página no scrollea y window.__fit() (src/fit.js) no encuentra desbordes;
    - el zoom es el declarado: k = máx(1; mín(1,2; ancho / 1152; alto / 640));
    - (01/11) nada detrás de un botón: ninguna vista ni anexo tiene el botón que abría paneles (.e3-explorar) ni la
-     palabra «Explorar» en pantalla o en un title, y los únicos controles son los del simulador del A3; ninguna tabla
-     en svg desborda (data-desborda) y en el A7 ninguna celda se corta (data-cortado). Las vistas
+     palabra «Explorar» en pantalla o en un title, y (02/11) ninguna vista tiene controles (el simulador del A3 salió
+     con el respaldo); ninguna tabla en svg desborda (data-desborda). Las vistas
      esqueleto solo se montan: su contenido se verifica cuando W2 y W3 las construyan. Con
      --sin-esqueletos, una vista que todavía muestre .e3-esqueleto es un problema (obligatorio antes de
      exportar: el esqueleto dice «se arma en la etapa siguiente» y la tecla I lo imprime);
@@ -55,15 +55,14 @@ uniforme de e3/src/zoom.js). La paridad con /e2/ la mide scripts/paridad_e3.py; 
 7. (27/10, W3) Datos de la Parte D, sin navegador: D3 trae las filas J01 a J22, J50, J51, J53 y las cinco cifras de las
    vistas 2 y 6 que antes solo tenía C3 (C14, C08, H40, C18, J22); cada valor, escrito con formato.js, da lo que
    dice el registro, y los del test coinciden con data/e3/etapa4.json.
-8. (27/10, crítica del W3, hallazgo 13) El respaldo y lo que quedó a la vista el 01/11, en cada resolución: cada anexo A1
-   a A7 y los paneles que la crítica encontró mal (la vista 4 en test y en validación, la 7 al llegar, la A2 y la
-   A7 en cada medición) escriben lo que dicen D3 y C3, y no escriben lo que la crítica sacó (la logística de la
-   Parte B rotulada «ajustada», la fila 12 de la C 6.2 sin la D 11.2, «diapositivas», «(L3 a L5)», el grupo de
-   control como decisión de María G.). La precisión del test (J03) se lee ahora en el anexo A7.
-   (01/11) Lo que iba detrás de un botón se busca donde quedó, al llegar: la diferencia en validación y test (vista
-   4), el MVP (vista 3), el costo con modelo y el presupuesto (vista 5), las cinco dimensiones y el plan (vista 6),
-   el flujo, el plan y lo que decide María G. con su semana (vista 8), el simulador (A3), la señal de los riesgos
-   críticos (A4) y la precisión de cada método con las matrices de validación y test (A7).
+8. (27/10, crítica del W3, hallazgo 13) Lo que quedó a la vista el 01/11, en cada resolución: los paneles que la
+   crítica encontró mal (la vista 4 en test y en validación, la 7 al llegar) escriben lo que dicen D3 y C3, y no
+   escriben lo que la crítica sacó (el grupo de control como decisión de María G.). (01/11) Lo que iba detrás de un
+   botón se busca donde quedó, al llegar: la diferencia en validación y test (vista 4), el MVP (vista 3), el costo con
+   modelo y el presupuesto (vista 5), las cinco dimensiones y el plan (vista 6) y el flujo, el plan y lo que decide
+   María G. con su semana (vista 8). (02/11) Sin el respaldo A1 a A7, lo vital de los anexos se busca en su vista: el
+   test medido una vez (A1, vista 4), el valor de cada caso y la sensibilidad (A7 y A3, vista 5) y los riesgos
+   críticos de los 13 con su umbral (A4, vista 6). El riel no trae ningún anexo.
 9. (01/11) Sin navegador: «Explorar» no aparece en el tablero armado (dist-e3/index.html) ni en las fuentes de /e3/
    (e3/src, también el texto generado contenido_e3.js).
 10. (01/11, W5) La corrección al Grupo 5, en cada resolución, contra D3.correccion (correcciones.json de _build/E/):
@@ -98,8 +97,7 @@ RES = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
 CAPTURAR = {(1280, 720), (1920, 1080)}
 NOTAS_RES = {(1366, 768), (1536, 864)}   # laptops donde se ensaya con el panel de notas
 HISTORIA = [f"v{i:02d}" for i in range(1, 11)]  # 01/11: la V08, y la V09 y la V10 de la corrección al Grupo 5 (W5)
-RESPALDO = [f"a{i}" for i in range(1, 8)]
-VISTAS = HISTORIA + RESPALDO
+VISTAS = HISTORIA   # (02/11) sin el respaldo A1 a A7
 SRC = APP / "e3" / "src"
 
 
@@ -120,17 +118,16 @@ CHEQUEO = r"""() => {
     if (s.getClientRects().length > 1 || s.getBoundingClientRect().height > lh * 1.5)
       p.push(`rótulo de la banda en dos renglones: «${s.textContent}»`)
   }
-  // (01/11) nada detrás de un botón: ni el botón, ni la palabra, ni controles fuera del simulador del A3
+  // (01/11) nada detrás de un botón: ni el botón, ni la palabra; (02/11) ni controles: el simulador del A3 salió
   if (document.querySelector('.e3-explorar')) p.push('hay un botón «Explorar» (.e3-explorar)')
   const vp = document.querySelector('.e3-vp')
   const titulos = [...vp.querySelectorAll('[title]')].map((e) => e.getAttribute('title'))
     .concat([...vp.querySelectorAll('svg title')].map((e) => e.textContent))
   if (/explorar/i.test(vp.innerText) || titulos.some((x) => /explorar/i.test(x || '')))
     p.push('la palabra «Explorar» en pantalla o en un title')
-  if (!esqueleto && location.hash !== '#a3' && document.querySelector('.cuerpo [role=slider], .cuerpo .e3-opciones'))
-    p.push('controles fuera del simulador del A3')
+  if (!esqueleto && document.querySelector('.cuerpo [role=slider], .cuerpo [role=radiogroup], .cuerpo input'))
+    p.push('controles en la vista (desde el 02/11 ninguna tiene)')
   if (document.querySelector('.cuerpo svg[data-desborda]')) p.push('una tabla en svg no entra (data-desborda)')
-  if (location.hash === '#a7' && document.querySelector('.cuerpo svg[data-cortado]')) p.push('el A7 corta una celda (data-cortado)')
   return { problemas: p, esqueleto, zoom: document.querySelector('.e3-vp')?.currentCSSZoom ?? 1 }
 }"""
 
@@ -211,7 +208,6 @@ def contenido_esperado():
     tope = fijo(T["escala"][-1]["hasta"], 0)
     leg = next(t for t in dia[2]["tarjetas"] if t["area"] == "Legal")
 
-    a4 = next(a for a in C3["ANEXOS"] if a["n"] == "A4")
     LE, U, CO, SF = D3["legal"], E["umbral"], TE["contra_regla"], TE["sin_filtro"]
     pp = lambda x: fijo(x, 2, True)                       # noqa: E731
     ic = lambda par: [pp(x) for x in par]                 # noqa: E731
@@ -536,46 +532,32 @@ def anclas_datos():
     return mal
 
 
-# ---------------------------------------------------------------- 8. respaldo y lo que quedó a la vista (W3 y 01/11)
+# ---------------------------------------------------------------- 8. lo que quedó a la vista (W3, 01/11 y 02/11)
 
-def riesgo_12(seg):
-    """(F6b, 28/10) El riesgo 12 como lo deja la D 11.2, con el alto valor y el género X (e3/src/riesgo12.js)."""
-    return (f"La lista acierta menos en el 20 % de mayor facturación "
-            f"({fijo(seg['alto_valor']['diferencia_pp'], 1, True)} puntos en test) y en género X "
-            f"({fijo(seg['genero_x']['diferencia_pp'], 1, True)}, {fijo(seg['genero_x']['en_lista'])} lugares)")
-
-
-def respaldo_esperado():
+def a_la_vista_esperado():
     """(vista, None, textos que tiene que escribir, textos que no puede escribir), calculado desde D3 y C3. (01/11) Todo
-    se mira al llegar: ninguna vista ni anexo tiene nada detrás de un botón."""
+    se mira al llegar: ninguna vista tiene nada detrás de un botón. (02/11) Sin el respaldo: lo vital de los anexos A1,
+    A3, A4 y A7 se busca en las vistas 4, 5 y 6."""
     D3 = leer_js("datos_e3.js", "D3")
     C3 = leer_js("contenido_e3.js", "C3")
-    anexo = {a["n"]: a for a in C3["ANEXOS"]}
-    T, MD, E, P, PL, LE = D3["test"], D3["modelos"], D3["economia"], D3["piloto"], D3["plan"], D3["legal"]
-    M = {k: T["metodos"][k]["test"] for k in ("regla", "logistica_ajustada", "practica_actual")}
-    seg = {f["id"]: f for f in T["segmentos"]["filas"]}
-    roi = {f["fila"]: f for f in T["roi_b_3_4"]}
-    logb = next(f for f in MD["filas"] if f["id"] == "logistica")
+    if "ANEXOS" in C3:
+        raise SystemExit("C3 trae ANEXOS: desde el 02/11 exportar_web.py exporta solo RIESGOS")
+    T, E, PL, LE = D3["test"], D3["economia"], D3["plan"], D3["legal"]
     hs = PL["hitos_semana"]
-    a1 = anexo["A1"]
-    filas_a1 = [f[a1["columnas"].index("Filas")] for f in a1["filas"]]
-    a2 = anexo["A2"]
-    prec_a2 = [f[a2["columnas"].index("Precisión")] for f in a2["filas"]]
-    a6 = anexo["A6"]
     dia = {d["n"]: d for d in C3["DIAPOSITIVAS"]}
     CO, SF, SFV = T["contra_regla"], T["sin_filtro"], D3["lista"]["modelo_menos_regla_500_sin_filtro"]
     ids_l = sorted((a["id"] for t in dia[10]["plan"] for a in t["acciones"]), key=lambda x: int(x[1:]))
     pedidos = ["alcance", "regla_y_operador_del_piloto", "designa_l1", "operador_despues_del_piloto", "decision"]
     d5 = dia[5]
-    tm = {k: T["metodos"][k] for k in ("regla", "logistica_ajustada", "practica_actual")}
-    pb = {f["id"]: f for f in MD["filas"]}
     d11 = dia[11]
+    umbral = lambda c: re.search(r"\*\*(.+?)\*\*", next(f["texto"] for f in c["filas"] if f["rotulo"].lower().startswith("umbral")))[1]  # noqa: E731
     return [
-        # (01/11) la vista 4: las cuatro filas, validación (H06 y la de J09) y test, al llegar
+        # (01/11) la vista 4: las cuatro filas, validación (H06 y la de J09) y test, al llegar; (02/11, del A1) el test,
+        # medido una vez
         ("v04", None, ["Sin filtrar · validación", "Sin filtrar · test", "Lista que sale · validación",
                        "Lista que sale · test", fijo(SFV["diferencia_pp"], 2, True), fijo(SF["diferencia_pp"], 2, True),
                        fijo(CO["validacion_diferencia_pp"], 2, True), fijo(CO["diferencia_pp"], 2, True),
-                       "gana la regla", "gana la logística", "empate"], []),
+                       "gana la regla", "gana la logística", "empate", "medido una vez"], []),
         # la vista 7: la regla del piloto, sin la lista de lo que decide María G. (está en la 8)
         ("v07", None, ["A producción solo si"], ["Lo que decide María G.", "Quién opera la lista después del piloto"]),
         # (01/11) la vista 8: el flujo de cada mes (D 9.2), las fases (D 12.1) y lo que decide María G. con su semana
@@ -586,48 +568,21 @@ def respaldo_esperado():
          + [f["nombre"] for f in PL["fases"]],
          ["\nEl grupo de control", "lo revisa Sofía R.", "quien elija Casa Óga"]),
         # la vista 5: de qué lista es el beneficio de la regla (G41); (01/11) el costo con modelo y el presupuesto
+        # (02/11, del A7 y del A3) el valor de cada caso (celdas de la diapositiva 8) y la sensibilidad
         ("v05", None, ["lista de 500 sin filtro en validación", "Costo del año 1, con modelo",
                        usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
-                       f"presupuesto {usd(E['costos']['presupuesto_usd'])}"], []),
+                       f"presupuesto {usd(E['costos']['presupuesto_usd'])}", "Por caso:",
+                       "ningún supuesto lleva el ROI a 0"]
+         + [f"{c['celda'].lower()} {c['valor']}" for c in dia[8]["celdas"]], ["simulador", "anexo"]),
         # (01/11) la vista 3: el MVP de la diapositiva 5, al pie
         ("v03", None, ["Producto mínimo"] + [plano(x["titulo"]) for x in d5["pasos"]]
          + [plano(x["valor"]) for x in d5["hechos"]], []),
         # (01/11) la vista 6: las cinco dimensiones en una línea y el plan L1 a L6 con su dueño
+        # (02/11, del A4) los críticos de los 13, cada uno con su umbral (diapositiva 11)
         ("v06", None, [d["nombre"] for d in LE["dimensiones"]] + ids_l
-         + [plano(a["quien"]) for tr in dia[10]["plan"] for a in tr["acciones"]], ["en mujeres"]),
-        # el respaldo
-        ("a1", None, [f"test medido una vez, el {T['apertura']['fecha'][8:10]}/{T['apertura']['fecha'][5:7]}/"
-                      f"{T['apertura']['fecha'][:4]}"] + filas_a1
-         + [fijo(T["entrenamiento"]["filas"]), fijo(T["entrenamiento"]["positivos"]), pct(T["entrenamiento"]["tasa"], 2)],
-         [pct(T["entrenamiento"]["tasa"], 1)]),
-        ("a2", None, ["la que sale: " + a2["filas"][a2["destacar"][0]][a2["columnas"].index("Precisión")],
-                      "Logística, lista de 500 contactables"] + prec_a2, []),
-        ("a3", None, ["escenario base de la B 3.4 (vista 5)",
-                      pct_directo(roi["modelo_sobre_la_regla"]["contactables"]["roi_pct"], 2),
-                      pct_directo(roi["regla_sin_modelo"]["contactables"]["roi_pct"], 2),
-                      # (01/11) el simulador de la tasa de éxito, a la vista
-                      "Tasa de éxito", "ROI de la regla", "ROI del modelo sobre la regla", "Sin descuento"],
-         ["diapositiva"]),
-        ("a4", None, [f"{fijo(LE['riesgos_criticos'])} críticos de {fijo(LE['riesgos'])}", riesgo_12(seg)]
-         # (01/11) la señal de cada crítico (diapositiva 11), arriba de la tabla
-         + [plano(c["riesgo"]) for c in d11["columnas"]] + [plano(f["texto"]) for c in d11["columnas"] for f in c["filas"]],
-         ["en mujeres"]),
-        ("a5", None, ["Logística ajustada, lista de 500 sin filtro", "lugares en la lista de test",
-                      f"en test, mujeres {pct(seg['mujeres']['precision'], 1)} y hombres "
-                      f"{pct(seg['hombres']['precision'], 1)}; género X, {fijo(seg['genero_x']['en_lista'])} lugares, "
-                      f"{pct(seg['genero_x']['precision'], 1)}"]
-         + [fijo(f["diferencia_pp"], 1, True) for f in seg.values()], []),
-        ("a6", None, [usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
-                      usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"])]
-         + [f[a6["columnas"].index("Con modelo (USD)")] for f in a6["filas"]], ["(L3", "L3 a L5"]),
-        # (01/11) el A7 junta lo que iba detrás de un botón: la precisión de cada método (Parte B en entrenamiento y
-        # validación; 500 contactables en validación y test) y las matrices de test y de validación
-        ("a7", None, ["Regresión logística (Parte B)", "Logística ajustada", fijo(E["matrices"]["modelo"]["vp"]),
-                      fijo(E["matrices"]["regla"]["vp"], 2), fijo(M["logistica_ajustada"]["vp"]),
-                      fijo(M["regla"]["vp"], 2), "empates del último puesto",
-                      pct(logb["validacion"]["precision"], 1), pct(pb["hgb"]["entrenamiento"]["precision"], 1)]
-         + [pct(tm[x]["test"]["precision"], 1) for x in tm] + [pct(tm[x]["validacion"]["precision"], 1) for x in tm],
-         []),
+         + [plano(a["quien"]) for tr in dia[10]["plan"] for a in tr["acciones"]]
+         + [f"Riesgos críticos, {fijo(LE['riesgos_criticos'])} de {fijo(LE['riesgos'])}"]
+         + [f"{plano(c['riesgo'])}, {umbral(c)}" for c in d11["columnas"]], ["en mujeres", "anexo"]),
     ]
 
 
@@ -635,7 +590,7 @@ def respaldo_esperado():
 
 def correccion_esperada():
     """(vista, None, textos que tiene que escribir, textos que no puede escribir) de las vistas 9 y 10, desde D3.correccion,
-    con el mismo formato que respaldo_esperado()."""
+    con el mismo formato que a_la_vista_esperado()."""
     D3 = leer_js("datos_e3.js", "D3")
     CO = D3["correccion"]
     T = CO["total"]
@@ -671,8 +626,8 @@ TERRACOTA = r"""() => {
 
 
 def correccion(p: Pagina, casos):
-    """Los textos de las vistas 9 y 10 (respaldo() con sus casos) y dónde va la terracota."""
-    respaldo(p, casos)
+    """Los textos de las vistas 9 y 10 (en_pantalla() con sus casos) y dónde va la terracota."""
+    en_pantalla(p, casos)
     D3 = leer_js("datos_e3.js", "D3")
     revisar = D3["correccion"]["total"]["revisar"]
     p.ir("v01")
@@ -688,7 +643,7 @@ def correccion(p: Pagina, casos):
         p.mal(f"v10: {r['total']} elementos en terracota (la vista no tiene nada en «Revisar»)")
 
 
-def respaldo(p: Pagina, casos):
+def en_pantalla(p: Pagina, casos):
     for id_, opcion, deben, no_deben in casos:
         # pasar por otra vista: con el mismo hash la vista no se monta de nuevo
         p.ir("v01" if id_ != "v01" else "v02")
@@ -849,19 +804,23 @@ def recorrido(p: Pagina):
     p.pg.locator(".lat-item", has_text="Se paga").click()
     p.quieto()
     esperar(p.estado()["hash"] == "#v05" and p.estado()["activa"] == "05", "el riel no lleva a la 5")
-    p.pg.locator(".lat-item", has_text="Matriz de riesgos").click()
+    # (02/11) el riel trae las diez vistas y ningún anexo
+    riel = p.pg.evaluate("() => [...document.querySelectorAll('.lat-item .lat-n')].map((x) => x.textContent)")
+    esperar(riel == [v[1:] for v in VISTAS], f"el riel trae {riel}, se esperaban las diez vistas")
+    esperar(not p.pg.locator(".lat-grupo", has_text="Respaldo").count(), "el riel sigue con el grupo «Respaldo»")
+    p.pg.locator(".lat-item", has_text="Lo que hacen bien").click()
     p.quieto()
-    esperar(p.estado()["hash"] == "#a4", "el riel no lleva al A4")
+    esperar(p.estado()["hash"] == "#v10", "el riel no lleva a la 10")
     # con el foco en el riel después de un clic, las flechas siguen pasando de vista
     p.tecla("ArrowUp")
-    esperar(p.estado()["hash"] == "#a3", "con el foco en el riel, ↑ no vuelve a la anterior")
+    esperar(p.estado()["hash"] == "#v09", "con el foco en el riel, ↑ no vuelve a la anterior")
     # URL: recargar no pierde el lugar; Atrás recorre
     p.pg.reload()
     p.quieto(200)
-    esperar(p.estado()["hash"] == "#a3", "recargar pierde la vista")
+    esperar(p.estado()["hash"] == "#v09", "recargar pierde la vista")
     p.pg.go_back()
     p.quieto(200)
-    esperar(p.estado()["hash"] == "#a4", "Atrás del navegador no vuelve a la vista anterior")
+    esperar(p.estado()["hash"] == "#v10", "Atrás del navegador no vuelve a la vista anterior")
     # notas: N las abre con el guion de C3 y no tapan el tablero
     p.ir("v05")
     p.tecla("n")
@@ -965,7 +924,7 @@ def explorar_en_fuentes():
 
 def main():
     esperado, guion = contenido_esperado()
-    casos_r = respaldo_esperado()
+    casos_r = a_la_vista_esperado()
     casos_c = correccion_esperada()
     ap = argparse.ArgumentParser()
     ap.add_argument("--capturas", default=str(APP / "e3" / "capturas-verif"))
@@ -988,7 +947,7 @@ def main():
             try:
                 vistas(p, w, h, out, (w, h) in CAPTURAR and not a.sin_capturas, a.sin_esqueletos)
                 contenido(p, esperado)
-                respaldo(p, casos_r)
+                en_pantalla(p, casos_r)
                 correccion(p, casos_c)
                 if (w, h) in NOTAS_RES:
                     notas_entran(p, w, h)

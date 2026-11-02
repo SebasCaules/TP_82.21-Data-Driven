@@ -15,11 +15,12 @@
 //   1366 × 768, y ningún reparto de la grilla de 7 le da más sin dejar afuera el −98,52 %): va «10.400» y el
 //   fragmento empieza con «dólares». El año 1 del costo, al title.
 // - Decisión: el veredicto de C3 (diapositiva 9), solo la frase corta en negrita; el resto, al title.
-// - Gráfico (V05_Simulador.jsx, TarjetaCostoBeneficio): el costo del año 1 de la regla sola
+// - Gráfico (V05Grafico.jsx, TarjetaCostoBeneficio): el costo del año 1 de la regla sola
 //   (USD 20.260, contexto) contra su beneficio anual (USD 299,49, --acc). La astilla del beneficio es el
 //   mensaje; la conclusión, arriba en .e3-conclusion, es la frase de la tarjeta «Económica» de la
 //   diapositiva 2 de C3. (01/11, a la vista) Una barra más arriba, el costo del año 1 con modelo, y la línea del
-//   presupuesto: la barra con modelo la pasa. El simulador de la tasa de éxito está en el anexo A3.
+//   presupuesto: la barra con modelo la pasa. (02/11) Debajo, una línea con el valor de cada caso y la sensibilidad,
+//   que estaban en los anexos A7 y A3.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js y el texto de C3
 // (contenido_e3.js).
 
@@ -30,7 +31,7 @@ import { fijo, pctDirecto, usd } from '../formato.js'
 import { plano } from '../texto.jsx'
 import { decision } from '../decisiones.js'
 import { Cifra } from '../cifra.jsx'
-import { TarjetaCostoBeneficio } from './V05_Simulador.jsx'
+import { TarjetaCostoBeneficio } from './V05Grafico.jsx'
 import './V05.css'
 
 const E = D3.economia

@@ -43,7 +43,8 @@ real (vite.e3.config.js). Lo que se declara y se mide:
 5. Hoja de contacto: /e2/ (vista 4) y /e3/ (vista 5) lado a lado, las dos a 1536 × 864, en
    entregas/entregable-3/_build/workforce/fase-w1/e2-e3-1536.png del vault.
 
-(01/11) Nada detrás de un botón: la regla 4 recorre las 15 entradas del riel (V01 a V08 y A1 a A7) y falla si hay un
+(01/11) Nada detrás de un botón: la regla 4 recorre las entradas del riel (desde el 02/11, las diez vistas: sin el
+respaldo A1 a A7) y falla si hay un
 botón .e3-explorar o la palabra «Explorar» en pantalla o en un title; el control estático (1) falla si la palabra
 aparece en las fuentes de /e3/ (e3/src) o en el tablero armado. Para no escribir fuera del worktree, correr con
 --sin-hoja (la hoja de contacto va al vault).

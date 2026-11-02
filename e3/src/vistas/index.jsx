@@ -1,11 +1,12 @@
 // Registro de vistas de /e3/ (27/10, W1). Mismo patrón que e2/src/vistas/index.jsx: el orden ES el
-// recorrido, cada vista es un archivo `Vnn_Nombre.jsx` (o `R_An_Nombre.jsx` para el respaldo) que exporta
+// recorrido, cada vista es un archivo `Vnn_Nombre.jsx` que exporta
 // `default` (el componente) y `meta = { id }`. Ningún builder toca este archivo para sumar la suya:
 // alcanza con crear el archivo. Una vista sin archivo se muestra como esqueleto con su pregunta. Un
-// `V*.jsx` sin `default` (V05_Simulador.jsx, una pieza de la vista 5) no se registra.
+// `V*.jsx` sin `default` (V05Grafico.jsx, una pieza de la vista 5) no se registra.
 //
-// La historia (PLAN.md del E3, «La historia»): siete vistas presentadas (ocho desde el 01/11, diez con las dos de la corrección) y el grupo «Respaldo» con los
-// anexos A1 a A7 de C3. Desde W3 (27/10), las vistas 7 a 9 de la tabla del plan van en una sola, la V07
+// La historia (PLAN.md del E3, «La historia»): siete vistas presentadas (ocho desde el 01/11, diez con las dos de la
+// corrección). (02/11) Sale el grupo «Respaldo» con los anexos A1 a A7 de C3: lo vital de cada uno quedó en las vistas 4,
+// 5 y 6 (entregas/entregable-3/_build/F/presentacion/respaldo-cobertura.md). Desde W3 (27/10), las vistas 7 a 9 de la tabla del plan van en una sola, la V07
 // («7 a 9 en una»): con las dos o tres de la corrección al otro grupo (W5) quedan nueve como mucho. Desde
 // la crítica del W3 (hallazgo 5), el test (la 7 del plan) va en la vista 4, que decide con él, y la V07
 // responde una sola pregunta: qué decide María G. con el piloto. (01/11) La V08 muestra lo que hasta ese día iba
@@ -20,10 +21,10 @@
 import { C3 } from '../contenido_e3.js'
 import Esqueleto from './Esqueleto.jsx'
 
-const modulos = import.meta.glob(['./V*.jsx', './A*.jsx', './R_*.jsx'], { eager: true })
+const modulos = import.meta.glob('./V*.jsx', { eager: true })
 const porId = {}
 for (const [ruta, m] of Object.entries(modulos)) {
-  const id = m.meta?.id ?? ruta.replace(/^\.\/(?:R_)?([VA]\d+[a-z]?).*$/, '$1')
+  const id = m.meta?.id ?? ruta.replace(/^\.\/(V\d+[a-z]?).*$/, '$1')
   if (typeof m.default === 'function') porId[id] = m
 }
 
@@ -44,48 +45,27 @@ const HISTORIA = [
   { id: 'V10', corto: 'Lo que hacen bien', pregunta: '¿Qué está bien y qué nos deja?', de: [15],
     fuente: 'Planilla de correcciones al Grupo 5 (v2.1)' },
 ]
-// El respaldo: un anexo de C3 por vista. El nombre corto es el título del anexo hasta los dos puntos. Los
-// anexos que suman lo medido en test nombran también la sección de la Parte D de donde sale.
-const PREGUNTA_ANEXO = {
-  A1: '¿Cómo se parten los datos en el tiempo?',
-  A2: '¿Dónde se corta la lista?',
-  A3: '¿Qué supuesto mueve el ROI?',
-  A4: '¿Qué riesgos hay y qué se hace con cada uno?',
-  A5: '¿El error es parejo entre segmentos?',
-  A6: '¿Cuánto cuesta el año 1?',
-  A7: '¿Dónde fallan el modelo y la regla?',
-}
-// El A4 cita la D 11.2 en el title de la tarjeta y de la fila 12, no acá: con «Partes C 6.2 · D 11.2» en el
-// encabezado, a 1366 × 768 la pregunta del A4 pasaba a dos renglones (paridad_e3.py, regla 12 del E2).
-const FUENTE_D = { A1: 'D 8.1 y 8.3', A3: 'D 11.2', A5: 'D 11.2', A7: 'D 8.1' }
-const RESPALDO = C3.ANEXOS.map((a) => ({
-  id: a.n, corto: a.titulo.split(':')[0], pregunta: PREGUNTA_ANEXO[a.n] ?? a.titulo, de: [], anexo: a,
-  fuente: FUENTE_D[a.n] ? `${a.fuente.replace(/^Parte /, 'Partes ')} · ${FUENTE_D[a.n]}` : a.fuente,
-}))
-
 // Grupos del riel, como en el E2: la respuesta va sola y sin rótulo; después, las partes A a C, la
-// Parte D con la propuesta (una vista) y el respaldo. «Partes A, B y C» y no «Partes A a C»: el riel va en
+// Parte D con la propuesta y la corrección al Grupo 5 (sin respaldo desde el 02/11). «Partes A, B y C» y no «Partes A a C»: el riel va en
 // mayúsculas y «PARTES A A C» no se lee (crítica del W3, hallazgo 6).
 const GRUPOS = [
   { nombre: null, ids: ['V01'] },
   { nombre: 'Partes A, B y C', ids: ['V02', 'V03', 'V04', 'V05', 'V06'] },
   { nombre: 'Parte D y propuesta', ids: ['V07', 'V08'] },
   { nombre: 'Corrección Grupo 5', ids: ['V09', 'V10'] },
-  { nombre: 'Respaldo', ids: RESPALDO.map((a) => a.id) },
 ]
 
-export const VISTAS = [...HISTORIA, ...RESPALDO].map((v) => ({
+export const VISTAS = HISTORIA.map((v) => ({
   ...v,
-  respaldo: !!v.anexo,
   esqueleto: !porId[v.id],
   dc: porId[v.id]?.meta?.dc,
   Componente: porId[v.id]?.default ?? Esqueleto,
 }))
 
-/** «05» para la quinta vista, «A3» para un anexo: el mismo rótulo en el riel y en el encabezado. */
-export const etiquetaDe = (v) => (v.respaldo ? v.id : v.id.slice(1))
+/** «05» para la quinta vista: el mismo rótulo en el riel y en el encabezado. */
+export const etiquetaDe = (v) => v.id.slice(1)
 export const grupoDe = (v) => GRUPOS.find((g) => g.ids.includes(v.id)) ?? GRUPOS[GRUPOS.length - 1]
-/** Vistas presentadas (sin el respaldo): el «/ 7» del encabezado. */
+/** Vistas presentadas: el «/ 10» del encabezado. */
 export const TOTAL_VISTAS = HISTORIA.length
 export const indiceDe = (id) => VISTAS.findIndex((v) => v.id === id)
 /** Las diapositivas de C3 de las que sale la vista (guion, quién, segundos y fuente). */
