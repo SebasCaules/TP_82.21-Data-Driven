@@ -20,3 +20,15 @@
    estaban en los anexos A7 y A3. */
 .e3-v05-pie { flex: none; margin: clamp(4px, 1cqh, 10px) 0 0; font: 400 var(--e2-txt2)/1.3 var(--fuente); color: var(--ink); }
 .e3-v05-pie b { font-weight: 700; }
+
+/* (02/11, W6 fase B) La central es lo que no cierra: toma la terracota en lugar de --acc (cifra y filete), el mismo
+   mecanismo que la vista 9 (VIS-14). El rótulo de qué mide, un 20 % más grande (VIS-13); el pie, a la letra del
+   texto (VIS-12). */
+.e3-v05-central { --acc: var(--terra); }
+.e3-v05-mide { font-size: calc(var(--e2-rot, 12px) * 1.2); }
+.e3-v05-pie { font-size: var(--e2-txt); }
+/* La etiqueta del presupuesto (la Plaqueta de BarrasH, fija en 10) se agranda sobre su centro hasta la letra de los
+   valores de las barras (VIS-12): --e3-v05-ref lo calcula V05Grafico.jsx con la fórmula de BarrasH. */
+.e3-v05-lienzo svg > g > g:has(> rect[rx]) {
+  transform-box: fill-box; transform-origin: 50% 50%; transform: scale(var(--e3-v05-ref, 1.3));
+}

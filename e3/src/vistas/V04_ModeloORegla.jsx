@@ -33,12 +33,22 @@
 //   validación y entrenamiento (F07, F08, G11 a G15) pasaron al anexo A7. (02/11) Sin el respaldo, el A7 sale; lo
 //   que el A1 decía del test (medido una vez, en la etapa 4: A 2.2 y D 8.1; Juan Manuel R. lo dice en voz alta) va
 //   en la línea de qué mide el gráfico.
-// Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y se escriben con formato.js. Las notas
-// (N) siguen leyendo el guion de las diapositivas 6 y 7 de C3 (vistas/index.jsx).
+// - (02/11, W6 fase B, hallazgos.md) Los puntos son de precisión: lo dicen el rótulo, el eje y el fragmento de la
+//   central (VIS-03, UX-05). Debajo del rótulo, la partición de C3 (D6.particion, A 2.2); al pie, lo que acierta la
+//   lista que sale en test (D6.pie_test, COB-03) y, en el mismo renglón, la lista de 800 (D6.pie_800, COB-04: entra
+//   a 1280 × 720). Los cuatro veredictos en una columna fija a la derecha y, bajo el eje, pegados al cero, hacia
+//   qué lado gana cada uno (UX-19, VIS-08). Los extremos del intervalo, solo en la fila que decide; los subrótulos de
+//   fila, a 13 px reales a 1280 × 720 (VIS-09). La tarjeta del costo dice «ni una lista perfecta lo paga» (UX-14,
+//   VIS-10, DAT-16) y su unidad, «aciertos extra/mes» (la de VIS-10): «8.595 aciertos extra por mes» y «−0,25 puntos»
+//   no entran juntos en la banda a 1366 × 768, 1536 × 864 ni 1920 × 1080 con ningún reparto (faltan de 12 a 18 px
+//   reales). Con «/mes», anchos 8 / 9: la central y la del costo entran con 10 px o más de aire en las cinco.
+// Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y se escriben con formato.js; el texto nuevo, de
+// C3 (contenido_e3.js). Las notas (N) siguen leyendo el guion de las diapositivas 6 y 7 de C3 (vistas/index.jsx).
 
 import { Lienzo } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
+import { C3 } from '../contenido_e3.js'
 import { NBSP, entero, fijo, mesAnio, pct, usd } from '../formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
@@ -55,6 +65,11 @@ const CO = TE.contra_regla     // J09: lista de 500 contactables, test (y su val
 const DE = TE.decision         // J10: el criterio de la C 6.2, fila 13, medido en test
 const MET = TE.metodos         // J03: precisión de cada método en test
 const SFV = L.modelo_menos_regla_500_sin_filtro   // H06: lista de 500 sin filtro, validación, logística ajustada
+// La partición (A 2.2) y lo que acierta la lista que sale en test (D 8.1), de la diapositiva 6 de C3.
+const D6 = C3.DIAPOSITIVAS.find((d) => d.n === 6)
+if (!D6?.particion || !D6?.pie_test || !D6?.pie_800) {
+  throw new Error('V04: la diapositiva 6 de C3 no trae particion, pie_test o pie_800')
+}
 
 /** «enero a mayo de 2025»; con años distintos, los dos. */
 function periodo(desde, hasta) {
@@ -109,7 +124,7 @@ const TITULO_PAGA = `El modelo agrega ${usd(DE.costo_incremental_usd)} al costo 
 
 // Filas del gráfico. `decide`: la fila que decide, en --acc. `tenue`: validación, más fina. Los períodos van en el
 // rótulo de arriba del gráfico; debajo de cada nombre, qué lista es.
-const NO_SALE = 'incluye a quien no acepta marketing'
+const NO_SALE = 'incluye bajas y a quien no acepta marketing'
 const SALE = `${entero(LARGO)} contactables por mes`
 export const FILAS_TODAS = [
   { id: 'sfv', nombre: 'Sin filtrar · validación', sub: NO_SALE, valor: SFV.diferencia_pp, ic: SFV.ic95_pp,
@@ -121,20 +136,27 @@ export const FILAS_TODAS = [
 ]
 
 const marca = (t) => (t === 0 ? '0' : fijo(t, 0, true))
+// (UX-19, VIS-08) los dos lados del cero, debajo del eje
+const IZQ = '← gana la regla'
+const DER = 'gana la logística →'
 
 /**
  * Diferencia con su intervalo, una fila por lista. Marcas gruesas para proyector; la línea del 0 es el
  * empate. `k`: escala de la letra (useEscalaTexto). Con más filas que alto, todo se achica junto (`s`).
  */
 export function Diferencias({ filas, w, h, k, tituloEje }) {
-  const pasoBruto = Math.min((h - 80 * k) / filas.length, 165 * k)
+  // Abajo del eje, tres renglones: las marcas, hacia qué lado gana cada uno y el título.
+  const ABAJO = 70 * k
+  const pasoBruto = Math.min((h - (30 * k + ABAJO)) / filas.length, 165 * k)
   const s = Math.max(0.72, Math.min(1, pasoBruto / (118 * k)))
   const f = k * s
   const fsNom = 19 * f
-  const fsSub = 14 * f
+  // (VIS-09) el subrótulo de fila y los extremos de la fila que decide, nunca debajo de 12 × k: 13 px reales a
+  // 1280 × 720 con el zoom de .e3-vp
+  const fsSub = Math.max(16.5 * f, 12 * k)
   const fsVer = 23 * f
   const fsVal = 17 * f
-  const fsExt = 14 * f
+  const fsExt = Math.max(14 * f, 12 * k)
   const fsEje = 13.5 * k
   const fsEmp = 16 * k
 
@@ -152,8 +174,8 @@ export function Diferencias({ filas, w, h, k, tituloEje }) {
   const X = (v) => x0 + ((v - lo) / (hi - lo)) * (x1 - x0)
   // Paso entre filas con tope: en una pantalla alta las filas no se separan tanto que cueste compararlas.
   // El bloque (rótulo del empate, filas, eje) va centrado en el alto del lienzo.
-  const paso = Math.min((h - 80 * k) / filas.length, 165 * k)
-  const yTop = (h - paso * filas.length - 80 * k) / 2 + 30 * k
+  const paso = Math.min((h - (30 * k + ABAJO)) / filas.length, 165 * k)
+  const yTop = (h - paso * filas.length - (30 * k + ABAJO)) / 2 + 30 * k
   const yBase = yTop + paso * filas.length
 
   const lectura = filas.map((d) => `${d.nombre} ${pp(d.valor)} (intervalo ${intervalo(d.ic)}), ${veredicto(d.ic)}`)
@@ -170,8 +192,13 @@ export function Diferencias({ filas, w, h, k, tituloEje }) {
               fill={t === 0 ? 'var(--ink)' : 'var(--e3-ctx, #5a6478)'} fontWeight={t === 0 ? 700 : 500}
               className="tabular">{marca(t)}</text>
       ))}
-      <text x={(x0 + x1) / 2} y={yBase + 46 * k} fontSize={fsEje} textAnchor="middle" fill="var(--e3-ctx, #5a6478)"
-            fontWeight="500">{tituloEje}</text>
+      {/* (UX-19, VIS-08) hacia qué lado gana cada uno, pegado al cero; debajo, el título del eje */}
+      <text x={X(0) - 8 * k} y={yBase + 8 * k + fsEje * 2.25} fontSize={fsEje} textAnchor="end"
+            fill="var(--e3-ctx, #5a6478)" fontWeight="600">{IZQ}</text>
+      <text x={X(0) + 8 * k} y={yBase + 8 * k + fsEje * 2.25} fontSize={fsEje} textAnchor="start"
+            fill="var(--e3-ctx, #5a6478)" fontWeight="600">{DER}</text>
+      <text x={(x0 + x1) / 2} y={yBase + 8 * k + fsEje * 3.8} fontSize={fsEje} textAnchor="middle"
+            fill="var(--e3-ctx, #5a6478)" fontWeight="500">{tituloEje}</text>
 
       {/* el empate: la línea del 0, rotulada arriba */}
       <line x1={X(0)} x2={X(0)} y1={yTop - 4 * k} y2={yBase} stroke="var(--e3-contorno, #4f5a6e)"
@@ -193,9 +220,8 @@ export function Diferencias({ filas, w, h, k, tituloEje }) {
         const pisa = Math.abs(X(d.valor) - X(0)) < anchoVal / 2 + 6 * k
         const xVal = !pisa ? X(d.valor) : d.valor < 0 ? X(0) - 8 * k : X(0) + 8 * k
         const anclaVal = !pisa ? 'middle' : d.valor < 0 ? 'end' : 'start'
-        // El veredicto, a la derecha del intervalo; si el intervalo termina antes del 0, del otro lado de la
-        // línea del empate, para que la línea no lo cruce.
-        const xVer = Math.max(X(b) + 16 * k, b < 0 ? X(0) + 14 * k : 0)
+        // (UX-19) El veredicto, en una columna fija a la derecha del eje: los cuatro alineados.
+        const xVer = x1 + 16 * k
         return (
           <g key={d.id}>
             <title>{`${d.nombre}, ${d.sub}: logística menos regla ${pp(d.valor)} puntos, intervalo del 95 % de ` +
@@ -214,15 +240,16 @@ export function Diferencias({ filas, w, h, k, tituloEje }) {
                   strokeWidth={gros * 0.7} />
             <circle cx={X(d.valor)} cy={y} r={r} fill={color} stroke="var(--sup, #fff)" strokeWidth={3 * f} />
 
-            {/* el valor, sobre el punto; los extremos, debajo de sus remates */}
+            {/* el valor, sobre el punto; los extremos, a los costados de sus remates, solo en la fila que decide (VIS-09) */}
             <text x={xVal} y={y - r - 9 * f} fontSize={fsVal} textAnchor={anclaVal} fill={tinta}
                   fontWeight={d.decide ? 700 : 600} className="tabular e3-v04-halo">{pp(d.valor)}</text>
-            {[a, b].map((v) => (
-              <text key={v} x={X(v)} y={y + remate / 2 + fsExt * 1.05} fontSize={fsExt} textAnchor="middle"
-                    fill="var(--e3-ctx, #5a6478)" fontWeight="500" className="tabular e3-v04-halo">{pp(v)}</text>
+            {d.decide && [a, b].map((v, j) => (
+              <text key={v} x={j ? X(v) + 10 * k : X(v) - 10 * k} y={y} fontSize={fsExt} dominantBaseline="central"
+                    textAnchor={j ? 'start' : 'end'} fill="var(--e3-ctx, #5a6478)" fontWeight="500"
+                    className="tabular e3-v04-halo">{pp(v)}</text>
             ))}
 
-            {/* el veredicto, grande y pegado al intervalo */}
+            {/* el veredicto, grande, en la columna de la derecha */}
             <text x={xVer} y={y} fontSize={fsVer} dominantBaseline="central"
                   fill={d.decide ? 'var(--acc)' : 'var(--e3-ctx, #5a6478)'} fontWeight="700">
               {veredicto(d.ic)}
@@ -238,28 +265,28 @@ export const meta = { id: 'V04', dc: 'C-MOD' }
 
 export default function V04ModeloORegla() {
   const k = useEscalaTexto()
-  const mide = `Logística menos regla, en puntos · validación, ${VALID} · test, ${TEST}, medido una vez`
-  const conclusion = <>En validación ganaba la regla; en test, la lista que sale <b>empata</b></>
+  const mide = 'Precisión de la lista: logística menos regla, en puntos'
+  const conclusion = <>La lista que sale: en validación ganaba la regla; en test, <b>empata</b></>
 
   return (
     <section className="pant v04">
       <Banda dcs={[DECISION]}>
-        <div className="tarjeta e2-central" style={{ gridColumn: 'span 1' }} title={TITULO_LISTA}>
+        <div className="tarjeta e2-central" style={{ gridColumn: 'span 8' }} title={TITULO_LISTA}>
           <span className="kpi-lbl"><span>Lista que sale · test</span></span>
           <div className="ban-par">
             <div className="par-item par-unico"><Cifra num={pp(CO.diferencia_pp)} unidad={`${NBSP}puntos`} /></div>
           </div>
-          <p className="e2-linea">empata con la regla</p>
+          <p className="e2-linea">de precisión: empata</p>
         </div>
 
-        <div className="tarjeta" style={{ gridColumn: 'span 1' }} title={TITULO_PAGA}>
+        <div className="tarjeta" style={{ gridColumn: 'span 9' }} title={TITULO_PAGA}>
           <span className="kpi-lbl"><span>Para pagar el modelo</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
-              <Cifra num={entero(DE.aciertos_por_mes_para_pagar)} unidad={`${NBSP}aciertos más/mes`} sec />
+              <Cifra num={entero(DE.aciertos_por_mes_para_pagar)} unidad={`${NBSP}aciertos extra/mes`} sec />
             </div>
           </div>
-          <p className="e2-linea">más que toda la lista</p>
+          <p className="e2-linea">ni una lista perfecta lo paga</p>
         </div>
 
       </Banda>
@@ -268,16 +295,18 @@ export default function V04ModeloORegla() {
         <div className="e3-v04-cab">
           <div className="e3-v04-titulos">
             <p className="e3-v04-mide">{mide}</p>
+            <p className="e3-v04-particion">{D6.particion}</p>
             <p className="e3-conclusion">{conclusion}</p>
           </div>
         </div>
         <div className="e3-v04-lienzo">
           <Lienzo className="lienzo">
             {({ w, h }) => (
-              <Diferencias filas={FILAS_TODAS} w={w} h={h} k={k} tituloEje="Logística menos regla (puntos)" />
+              <Diferencias filas={FILAS_TODAS} w={w} h={h} k={k} tituloEje="Logística menos regla (puntos de precisión)" />
             )}
           </Lienzo>
         </div>
+        <p className="e3-v04-pie">{`${D6.pie_test} ${D6.pie_800}`}</p>
       </div>
     </section>
   )
