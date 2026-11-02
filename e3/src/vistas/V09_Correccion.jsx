@@ -8,8 +8,10 @@
 // - Decisión: «E-CRI · aplicado», el criterio de la planilla v2.0: un bloque queda en «Revisar» solo si tiene un error
 //   que cambia una cifra o el método, o algo que la cátedra ya nos pidió corregir.
 // - Debajo, las cinco observaciones en «Revisar»: título, sección puntual («ref») y página del PDF del Grupo 5, como
-//   las escribe la planilla, lo que dice el documento (cita textual) y la corrección en una línea. El problema y la
-//   cifra van al title. El subtítulo dice de qué son las cinco: cuatro de cifras o de método (A 2.2, B 3.3, D 10.3 y
+//   las escribe la planilla, y la corrección en una línea. La cita textual («Dice»), el problema y la cifra van al
+//   title del ítem (02/11, W6: UX-11 y VIS-06; el oral no la lee). Arriba de la lista, qué se revisó y en qué formato
+//   (C3, diapositiva 14, «contexto»; COB-20). Los textos propios llevan NBSP antes de «%», como pct() de formato.js;
+//   las citas quedan textuales (UX-18). El subtítulo dice de qué son las cinco: cuatro de cifras o de método (A 2.2, B 3.3, D 10.3 y
 //   D 11.2) y la quinta, del orden del documento (la carátula). Hasta la v1.0 decía «dos cambian cifras; tres piden
 //   escribir lo que falta», que dejó de ser cierto con el top nuevo.
 // Ninguna cifra ni texto de la corrección escrito acá: todo sale de D3.correccion (correcciones.json de _build/E/).
@@ -17,6 +19,7 @@
 import { Lienzo } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
+import { C3 } from '../contenido_e3.js'
 import { NBSP, entero } from '../formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { decision } from '../decisiones.js'
@@ -28,6 +31,7 @@ import './V09.css'
 const CO = D3.correccion
 const T = CO.total
 const DOC = CO.documento
+const D14 = C3.DIAPOSITIVAS.find((d) => d.n === 14)
 
 const DECISION = decision('E-CRI', {
   llano_corto: 'Revisar: cifra, método o lo que la cátedra ya pidió',
@@ -43,6 +47,9 @@ const TITULO_CENTRAL = `${entero(T.revisar)} de ${entero(T.filas)} bloques de se
   + `${entero(T.completo)} en «Completo». Consolidado del Grupo 5 ${DOC.version}, del ${DOC.fecha}, `
   + `${entero(DOC.paginas)} páginas.`
 const CONCLUSION = 'Cuatro son de cifras o de método; la quinta, del orden del documento'
+
+/** «70%» → «70 %» en los textos propios (no en las citas del Grupo 5): el mismo espacio que pone pct(). */
+const conEspacio = (t) => String(t).replace(/(\d)%/g, `$1${NBSP}%`)
 
 /** «D 11.2 · pág. 74», como la planilla: la sección puntual (ref); la carátula, solo la parte. */
 const donde = (t) => `${t.parte}${t.parte === 'General' ? '' : ` ${t.ref}`} · pág.${NBSP}${t.pagina}`
@@ -133,17 +140,18 @@ export default function V09Correccion() {
 
       <div className="tarjeta e3-v09-obs">
         <p className="e3-conclusion">{CONCLUSION}</p>
+        <p className="e3-v09-ctx">{D14.contexto}</p>
         <ol className="e3-v09-lista">
           {CO.top.map((t) => (
-            <li key={t.id} className="e3-v09-item" title={`${t.problema} (${t.cifra})`}>
+            <li key={t.id} className="e3-v09-item"
+                title={`Dice: «${t.cita}»\n${conEspacio(t.problema)} (${conEspacio(t.cifra)})`}>
               <span className="e3-v09-n tabular">{t.n}</span>
               <div className="e3-v09-txt">
                 <p className="e3-v09-tit">
-                  <b>{sinCortes(t.titulo_corto)}</b>
+                  <b>{sinCortes(conEspacio(t.titulo_corto))}</b>
                   <span className="e3-v09-donde tabular">{donde(t)}</span>
                 </p>
-                <p className="e3-v09-cita">{`Dice: «${sinCortes(t.cita)}»`}</p>
-                <p className="e3-v09-corr"><b>Corrección.</b>{` ${sinCortes(t.correccion)}`}</p>
+                <p className="e3-v09-corr"><b>Corrección.</b>{` ${sinCortes(conEspacio(t.correccion))}`}</p>
               </div>
             </li>
           ))}
