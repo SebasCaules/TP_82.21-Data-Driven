@@ -26,7 +26,8 @@
 //   13 px reales); la señal y el umbral (D11.columnas, umbral en negrita); el dueño. Salen la línea de las cinco
 //   dimensiones (repetía la banda y «2/3» se leía dos tercios) y el renglón gris bajo «la lista sale sin ellos»
 //   (repetía la L3 del plan). Las normas y la escala de la cátedra quedan en un renglón (D10.nota). El 30,1 % va
-//   sobre terracota lisa, sin trama debajo del número (VIS-16).
+//   sobre terracota lisa, sin trama debajo del número (VIS-16). Para no terminar con más palabras que antes, el
+//   rótulo del plan queda «Plan legal» y el tramo gris va sin rótulo (la cota del período dice que es el total).
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js; el texto, de C3.
 
 import { Lienzo } from '../../../src/graficos.jsx'
@@ -87,8 +88,6 @@ if (CRITICOS.length !== L.riesgos_criticos || RIESGOS.length !== L.riesgos) {
 
 // Plan L1 a L6 (diapositiva 10), en sus dos tramos.
 const ACCIONES = D10.plan.flatMap((t) => t.acciones)
-const IDS_L = ACCIONES.map((a) => a.id).sort((a, b) => num(a.slice(1)) - num(b.slice(1)))
-const RANGO_L = `${IDS_L[0]} a ${IDS_L[IDS_L.length - 1]}`
 
 // «Sí, con condiciones: el riesgo es contactar sin consentimiento» → la conclusión del gráfico.
 const CONCLUSION = mayus((plano(D10.titulo).match(/:\s*(.+)$/) ?? [, plano(D10.titulo)])[1])
@@ -236,7 +235,7 @@ function PlanLegal({ w, h, k }) {
 /**
  * Barra 100 % de los envíos del período: el tramo sin consentimiento en terracota lisa (sin trama debajo del
  * número, VIS-16) y su valor adentro; el resto en relleno de contexto, sin número. Arriba, el período con una cota
- * de punta a punta y a quién fue cada tramo; debajo del tramo, una llave con «la lista sale sin ellos».
+ * de punta a punta y a quién fue el tramo terracota; debajo del tramo, una llave con «la lista sale sin ellos».
  * El bloque se centra en el alto; la barra crece con el alto hasta un tope.
  */
 function BarraEnvios({ w, h, k }) {
@@ -265,11 +264,8 @@ function BarraEnvios({ w, h, k }) {
 
   // Valor adentro del tramo: lo más grande que entra en el ancho y en el alto.
   const fVal = Math.min(barra * 0.4, 36 * k, ((wExc - 28 * k) / Math.max(1, ancho(TASA_TXT, 100, 700))) * 100)
-  // «el resto de los envíos» al principio de su tramo; si choca con el rótulo del tramo sin consentimiento,
-  // al final.
+  // (02/11, W6) Sin rótulo en el resto: la cota del período ya dice que la barra es el total.
   const etqExc = A_QUIEN
-  const etqResto = 'el resto de los envíos'
-  const choca = xIni + ancho(etqExc, fEtq, 700) + 16 * k > xResto + 10 * k
   const tituloExc = `Sin consentimiento: ${TASA_TXT} ${ALERTA} (${entero(L.envios_sin_consentimiento)} envíos)`
 
   return (
@@ -280,10 +276,8 @@ function BarraEnvios({ w, h, k }) {
       <path d={`M${xIni + 0.5} ${yCota + 5 * k} V${yCota} H${xFin - 0.5} V${yCota + 5 * k}`}
             fill="none" stroke={EJE} strokeWidth="1" />
 
-      {/* a quién fue cada tramo */}
+      {/* a quién fue el tramo terracota */}
       <text x={xIni} y={yEtq} fontSize={fEtq} fontWeight={700} fill={INK}>{etqExc}</text>
-      <text x={choca ? xFin : xResto + 10 * k} y={yEtq} fontSize={fEtq} fontWeight={500} fill={CTX}
-            textAnchor={choca ? 'end' : 'start'}>{etqResto}</text>
 
       {/* la barra */}
       <g>
@@ -393,7 +387,7 @@ function Cuerpo({ w, h, k }) {
       <g><BarraEnvios w={wBarra} h={hArriba} k={k * 0.9} /></g>
       <line x1={wBarra + gap / 2} x2={wBarra + gap / 2} y1={0} y2={hArriba} stroke="var(--bd)" strokeWidth="1" />
       <g transform={`translate(${wBarra + gap}, 0)`}>
-        <Rotulo x={0} y={arriba(fRot)} texto={`Plan de acción legal, ${RANGO_L}, con su dueño`} f={fRot} color={CTX} />
+        <Rotulo x={0} y={arriba(fRot)} texto="Plan legal" f={fRot} color={CTX} />
         <g transform={`translate(0, ${cabPlan})`}>
           <PlanLegal w={wPlan} h={hArriba - cabPlan} k={k} />
         </g>
