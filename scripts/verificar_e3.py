@@ -555,7 +555,6 @@ def a_la_vista_esperado():
     pedidos = ["alcance", "regla_y_operador_del_piloto", "designa_l1", "operador_despues_del_piloto", "decision"]
     d5 = dia[5]
     d11 = dia[11]
-    umbral = lambda c: re.search(r"\*\*(.+?)\*\*", next(f["texto"] for f in c["filas"] if f["rotulo"].lower().startswith("umbral")))[1]  # noqa: E731
     C = D3["caso"]
     return [
         # (02/11, W6) la vista 1: la conclusión dice qué se paga (DAT-01) y la decisión abre con el veredicto (COB-01)
@@ -586,15 +585,21 @@ def a_la_vista_esperado():
                        f"presupuesto {usd(E['costos']['presupuesto_usd'])}", "Por caso:",
                        "ningún supuesto lleva el ROI a 0"]
          + [f"{c['celda'].lower()} {c['valor']}" for c in dia[8]["celdas"]], ["simulador", "anexo"]),
-        # (01/11) la vista 3: el MVP de la diapositiva 5, al pie
-        ("v03", None, ["Producto mínimo"] + [plano(x["titulo"]) for x in d5["pasos"]]
-         + [plano(x["valor"]) for x in d5["hechos"]], []),
-        # (01/11) la vista 6: las cinco dimensiones en una línea y el plan L1 a L6 con su dueño
-        # (02/11, del A4) los críticos de los 13, cada uno con su umbral (diapositiva 11)
-        ("v06", None, [d["nombre"] for d in LE["dimensiones"]] + ids_l
-         + [plano(a["quien"]) for tr in dia[10]["plan"] for a in tr["acciones"]]
-         + [f"Riesgos críticos, {fijo(LE['riesgos_criticos'])} de {fijo(LE['riesgos'])}"]
-         + [f"{plano(c['riesgo'])}, {umbral(c)}" for c in d11["columnas"]], ["en mujeres", "anexo"]),
+        # (01/11) la vista 3: el MVP de la diapositiva 5, al pie. (02/11, W6: UX-06, VIS-05) Sin la tira de cinco
+        # pasos: el renglón del producto mínimo con sus hechos, la escala de la cátedra (UX-15, COB-21) y el detalle de
+        # la fila Datos (COB-16); los textos de los pasos no se ven
+        ("v03", None, ["Producto mínimo"] + [plano(x["valor"]) for x in d5["hechos"]]
+         + [plano(x["texto"]) for x in d5["hechos"] if x["texto"]] + [plano(dia[4]["escala"])]
+         + [f["detalle"] for f in dia[4]["filas"] if f.get("detalle")],
+         [plano(x["texto"]) for x in d5["pasos"]]),
+        # (01/11) la vista 6: el plan L1 a L6 con su dueño. (02/11, W6: UX-04, VIS-04, COB-08, ORA-11) Los tres críticos
+        # de los 13 en una fila de tres celdas (diapositiva 11): riesgo, señal y umbral, dueño. Sale la línea de las
+        # cinco dimensiones; las normas y la escala de la cátedra, en su renglón
+        ("v06", None, ids_l + [plano(a["quien"]) for tr in dia[10]["plan"] for a in tr["acciones"]]
+         + [f"Riesgos críticos, {fijo(LE['riesgos_criticos'])} de {fijo(LE['riesgos'])}: señal y umbral"]
+         + [plano(x) for c in d11["columnas"] for x in (c["riesgo"], *(f["texto"] for f in c["filas"]))]
+         + [plano(dia[10]["nota"])],
+         ["en mujeres", "anexo", "cada una:"] + [d["nombre"] for d in LE["dimensiones"]]),
     ]
 
 
