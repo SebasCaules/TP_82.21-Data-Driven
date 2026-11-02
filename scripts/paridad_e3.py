@@ -89,6 +89,7 @@ INK = "rgb(22, 35, 58)"           # --ink, #16233a
 E3_CTX = "rgb(90, 100, 120)"      # --e3-ctx, #5a6478
 DEC_FONDO = "rgb(214, 235, 227)"  # --dec-fondo del E3, #d6ebe3
 DEC_BORDE = "rgb(159, 207, 192)"  # --dec-borde del E3, #9fcfc0
+TERRA = "rgb(184, 67, 58)"        # --terra, #b8433a: la central de la vista 5 es lo que no cierra (02/11, W6, VIS-14)
 
 # ---- 2. Letra: /e2/ y /e3/ en la misma ventana. (nombre, vista de /e2/, selector en /e2/, selector en /e3/,
 # opciones). La vista de /e3/ es siempre la 5, salvo «vista3». «solo_tam»: solo el tamaño y la muestra (el
@@ -113,7 +114,7 @@ TEXTOS = [
     # en la vista 4 del E2 la tarjeta central es un par antes → después: se mide la cifra de después
     # N0-5: la central domina por tamaño y peso, en 700
     ("banda · cifra grande", "v04", ".e2-central .par-despues .e2-cifra", ".e2-central .e2-cifra",
-     {"est3": {"fontWeight": "700"}}),
+     {"est3": {"fontWeight": "700", "color": TERRA}}),
     # N0-1: la secundaria, en tinta 600 y al 72 % de la central; en el E2, gris al 70 %
     ("banda · cifra secundaria", "v07b", ".e2-banda .e2-cifra.sec", ".e2-banda .e2-cifra.sec",
      {"factor": 72 / 70, "est3": {"color": INK, "fontWeight": "600"}}),
@@ -127,8 +128,9 @@ TEXTOS = [
     # N0-1: el encabezado del gráfico es propio del E3. Qué mide, mono a la letra del rótulo de la banda del E2 (el
     # rótulo del gráfico de la vista 4 del E2 es una frase en sans), en --e3-ctx; la conclusión, que en el E2 era
     # la cifra azul del rótulo, en tinta 700 y más grande.
+    # (02/11, W6, VIS-13) qué mide, un 20 % más grande que el rótulo de la banda
     ("gráfico · qué mide", "v04", ".e2-central .kpi-lbl > span", ".e3-v05-mide",
-     {"espaciado_libre": True, "interlineado_libre": True, "est3": {"color": E3_CTX}}),
+     {"factor": 1.2, "espaciado_libre": True, "interlineado_libre": True, "est3": {"color": E3_CTX}}),
     ("gráfico · conclusión", "v04", ".pant > .tarjeta > .kpi-lbl > b", ".e3-v05-graf .e3-conclusion",
      {"tam_min": 1.3, "est3": {"color": INK, "fontWeight": "700", "textTransform": "none"}}),
     # BarrasH: la barra que se destaca va en negrita; se miden las otras
@@ -137,7 +139,9 @@ TEXTOS = [
     ("gráfico · valor de barra", "v04", ".lienzo svg text:not([text-anchor])[font-weight='500']",
      ".lienzo svg text:not([text-anchor])[font-weight='500']", {}),
     ("gráfico · marca del eje", "v04", ".lienzo svg text[font-size='10.5']", ".lienzo svg text[font-size='10.5']", {}),
-    ("gráfico · título del eje", "v04", ".lienzo svg text[font-size='11']", ".lienzo svg text[font-size='11']", {}),
+    # (02/11, W6, VIS-12) la vista 5 ya no tiene título de eje: cada barra dice USD. Si vuelve, se mide
+    ("gráfico · título del eje", "v04", ".lienzo svg text[font-size='11']", ".lienzo svg text[font-size='11']",
+     {"opcional": True}),
     # el esqueleto: 400 y --e2-txt2, como la leyenda de la vista 11b del E2
     ("esqueleto", "v11b", ".v11b-leyenda", ".e3-esqueleto-caja", {"vista3": "esqueleto", "solo_tam": True, "opcional": True}),
 ]
@@ -205,8 +209,12 @@ PIEZAS = [
     # usa; el encabezado del gráfico es propio (qué mide y la conclusión) y su letra se mide en TEXTOS.
 ]
 # (28/10, N0-1 y N0-5) Propiedades del armazón que en /e3/ tienen que dar otro valor, declarado.
+# (02/11, W6, VIS-14) La central de la vista 5, la que se mide, va en terracota: cifra y filete.
 DISTINTO = {
-    "tarjeta central · cifra": {"fontWeight": "700"},
+    "tarjeta central": {"borderTopColor": TERRA},
+    # el borde de la cifra (sin dibujar) toma su color: currentColor
+    "tarjeta central · cifra": {"fontWeight": "700", "color": TERRA, "borderTopColor": TERRA,
+                                "borderRightColor": TERRA, "borderBottomColor": TERRA, "borderLeftColor": TERRA},
     "decisión": {"backgroundColor": DEC_FONDO, "borderRightColor": DEC_BORDE, "borderBottomColor": DEC_BORDE,
                  "borderLeftColor": DEC_BORDE},
     "decisión · rótulo": {"fontWeight": "700"},

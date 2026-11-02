@@ -11,6 +11,10 @@
 // Debajo del gráfico, una línea con lo vital de los anexos A7 y A3: el valor de cada caso (las celdas de la
 // diapositiva 8, B 4.4) y la sensibilidad (la decisión de la diapositiva 9, B 3.5: ningún supuesto lleva el ROI a 0).
 //
+// (02/11, W6 fase B, hallazgos.md) Qué mide: D9.mide de C3, con la base de la Parte B (COB-06, VIS-13). Sale el
+// título de eje «Dólares»: cada barra ya dice USD; la etiqueta del presupuesto, a la letra de los valores (VIS-12).
+// En el pie, a la letra del texto, los escenarios a un año (D9.escenarios, COB-07, B 3.4) y la sensibilidad nueva.
+//
 // Este archivo NO exporta `default`: vistas/index.jsx registra como vista todo `V*.jsx` con default.
 // Ninguna cifra escrita acá: los montos salen de D3 con formato.js y el texto, de C3.
 
@@ -24,6 +28,7 @@ import { useEscalaTexto } from '../../../e2/src/escala.js'
 const E = D3.economia
 const D8 = C3.DIAPOSITIVAS.find((d) => d.n === 8)
 const D9 = C3.DIAPOSITIVAS.find((d) => d.n === 9)
+if (!D9?.mide || !D9?.escenarios) throw new Error('V05Grafico: la diapositiva 9 de C3 no trae mide o escenarios')
 // La conclusión del gráfico: la frase de la tarjeta «Económica» de la diapositiva 2 de C3, sin el punto.
 const ECO = C3.DIAPOSITIVAS.find((d) => d.n === 2).tarjetas.find((t) => t.area === 'Económica')
 if (!ECO) throw new Error('V05Grafico: la diapositiva 2 de C3 no trae la tarjeta «Económica»')
@@ -36,6 +41,9 @@ const RT = D3.test.roi_b_3_4.find((f) => f.fila === 'regla_sin_modelo')   // J12
 if (!RT) throw new Error('V05Grafico: D3.test.roi_b_3_4 no trae la fila de la regla')
 const COSTO_MODELO = E.costos.con_modelo.total_anio_1_usd
 const COSTO_REGLA = E.costos.regla_sin_modelo.total_anio_1_usd
+
+/** La letra de los valores de BarrasH (src/graficos.jsx, sin título de eje: 26 de eje y 8 arriba). */
+const valoresDe = (h, n) => Math.max(10.5, Math.min(13, ((h - 8 - 26) / n) * 0.42))
 
 // Montos de las barras: centavos solo debajo de mil (USD 299,49; USD 30.660), como V05.
 const monto = (v) => usd(v, v < 1000 ? 2 : 0)
@@ -53,8 +61,9 @@ if (!/supuesto/.test(SENSIBILIDAD ?? '')) throw new Error('V05Grafico: la decisi
 export function TarjetaCostoBeneficio() {
   const k = useEscalaTexto()
   const barras = [
-    { etiqueta: 'Costo del año 1, con modelo', valor: COSTO_MODELO, color: CTX },
-    { etiqueta: 'Costo del año 1, regla sola', valor: COSTO_REGLA, color: CTX },
+    // (02/11, W6) «Costo año 1», como el rótulo de qué mide (D9.mide): dos palabras menos por el renglón de escenarios
+    { etiqueta: 'Costo año 1, con modelo', valor: COSTO_MODELO, color: CTX },
+    { etiqueta: 'Costo año 1, regla sola', valor: COSTO_REGLA, color: CTX },
     { etiqueta: 'Beneficio anual de la regla', valor: E.observada.regla_usd, enfasis: true, anchoMin: 3 },
   ]
   const conclusion = <>{`${NO_RECUPERA}: deja `}<b className="tabular">{monto(E.observada.regla_usd)}</b>{' por año'}</>
@@ -68,7 +77,7 @@ export function TarjetaCostoBeneficio() {
     <div className="tarjeta e3-v05-graf" title={titulo}>
       <div className="e3-v05-cab">
         <div className="e3-v05-titulos">
-          <p className="e3-v05-mide">{`${D9.pie_figura.replace(/\.$/, '')} · lista de 500 sin filtro en validación`}</p>
+          <p className="e3-v05-mide">{D9.mide}</p>
           <p className="e3-conclusion">{conclusion}</p>
         </div>
       </div>
@@ -76,19 +85,22 @@ export function TarjetaCostoBeneficio() {
       <div className="e3-v05-lienzo">
         <Lienzo className="lienzo">
           {({ w, h }) => (
+            // --e3-v05-ref: la etiqueta del presupuesto (Plaqueta de 10) crece hasta la letra de los valores de BarrasH
+            <div style={{ '--e3-v05-ref': valoresDe(h, barras.length) / 10 }}>
             <BarrasH
               datos={barras} w={w} h={h}
               formato={monto}
               formatoEje={(v) => fijo(v, 0)}
               anchoEtiqueta={Math.round(230 * k)}
-              tituloEje="Dólares"
               referencia={{ valor: E.costos.presupuesto_usd, etiqueta: `presupuesto ${monto(E.costos.presupuesto_usd)}` }}
             />
+            </div>
           )}
         </Lienzo>
       </div>
 
       <p className="e3-v05-pie" title={`${plano(D8.celdas.map((c) => `${c.celda}: ${c.texto}`).join(' '))} ${plano(D9.decision)}`}>
+        {D9.escenarios}<br />
         <b>Por caso:</b> {CELDAS.join(' · ')}. <b>Sensibilidad:</b> {SENSIBILIDAD.charAt(0).toLowerCase() + SENSIBILIDAD.slice(1)}.
       </p>
     </div>

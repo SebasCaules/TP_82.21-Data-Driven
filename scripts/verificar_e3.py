@@ -243,25 +243,32 @@ def contenido_esperado():
                     aria=[f"{c['nombre']}: {puntaje(c['puntaje'])} de {tope}" for c in T["condiciones"]],
                     acc=[limite["nombre"]]),
         # la central, la lista que sale en test (J09); para pagar el modelo (J10). El gráfico (01/11), las cuatro filas:
-        # sin filtrar y la lista que sale, en validación (H06 y la de J09) y en test (J11 y J09), con su veredicto
+        # sin filtrar y la lista que sale, en validación (H06 y la de J09) y en test (J11 y J09), con su veredicto.
+        # (02/11, W6: VIS-03, UX-19, VIS-08, VIS-09) el eje dice que son puntos de precisión; bajo el eje, hacia qué lado
+        # gana cada uno; los extremos del intervalo, solo en la fila que decide (los de las otras tres salen)
         "v04": dict(dec="C-MOD",
                     cifras=[f"{pp(CO['diferencia_pp'])} puntos",
-                            f"{fijo(TE['decision']['aciertos_por_mes_para_pagar'])} aciertos más/mes"],
+                            f"{fijo(TE['decision']['aciertos_por_mes_para_pagar'])} aciertos extra/mes"],
                     grafico=["Sin filtrar · validación", "Sin filtrar · test", "Lista que sale · validación",
                              "Lista que sale · test", pp(SF["diferencia_pp"]), pp(CO["diferencia_pp"]),
                              pp(D3["lista"]["modelo_menos_regla_500_sin_filtro"]["diferencia_pp"]),
                              pp(CO["validacion_diferencia_pp"])]
-                    + ic(SF["ic95_pp"]) + ic(CO["ic95_pp"]) + ["empate", "gana la logística", "gana la regla"]),
+                    + ic(CO["ic95_pp"]) + ["empate", "gana la logística", "gana la regla", "← gana la regla",
+                                           "gana la logística →", "Logística menos regla (puntos de precisión)",
+                                           "incluye bajas y a quien no acepta marketing"],
+                    sin=ic(SF["ic95_pp"]) + ic(D3["lista"]["modelo_menos_regla_500_sin_filtro"]["ic95_pp"])
+                    + ic(CO["validacion_ic95_pp"])),
         # la central, el ROI de la regla sola (G41), que no repite el de la vista 1; lo que suma y lo que cuesta el
         # modelo, separados. El gráfico (01/11), el costo del año 1 con modelo y con la regla sola contra el beneficio
-        # de la regla, con la línea del presupuesto
+        # de la regla, con la línea del presupuesto. (02/11, W6: VIS-12) sin el título de eje «Dólares»
         "v05": dict(dec="B-ECO",
                     cifras=[pct_directo(E["observada"]["regla_roi_pct"], 2), usd(E["observada"]["modelo_usd"], 2),
                             fijo(E["costos"]["incremental_usd"])],
-                    grafico=["Costo del año 1, con modelo", usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
-                             "Costo del año 1, regla sola", usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"]),
+                    grafico=["Costo año 1, con modelo", usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
+                             "Costo año 1, regla sola", usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"]),
                              "Beneficio anual de la regla", usd(E["observada"]["regla_usd"], 2),
-                             f"presupuesto {usd(E['costos']['presupuesto_usd'])}"]),
+                             f"presupuesto {usd(E['costos']['presupuesto_usd'])}"],
+                    sin=["Dólares"]),
         # la central, el puntaje legal (H40); los envíos sin consentimiento (C18) y los riesgos críticos (J22). El
         # gráfico, la barra 100 % con el 30,1 % en terracota
         "v06": dict(dec="C-LEG",
@@ -564,11 +571,16 @@ def a_la_vista_esperado():
         ("v02", None, ["La regla toma a los 500", "en los cortes de enero a mayo de 2025", "Cliente real"],
          [C["id_cliente"]]),
         # (01/11) la vista 4: las cuatro filas, validación (H06 y la de J09) y test, al llegar; (02/11, del A1) el test,
-        # medido una vez
+        # medido una vez. (02/11, W6) qué mide dice precisión (VIS-03, UX-05); la partición de la A 2.2 (COB-04) y, al
+        # pie, lo que acierta la lista que sale en test y la lista de 800 (COB-03, COB-04), de la diapositiva 6
         ("v04", None, ["Sin filtrar · validación", "Sin filtrar · test", "Lista que sale · validación",
                        "Lista que sale · test", fijo(SFV["diferencia_pp"], 2, True), fijo(SF["diferencia_pp"], 2, True),
                        fijo(CO["validacion_diferencia_pp"], 2, True), fijo(CO["diferencia_pp"], 2, True),
-                       "gana la regla", "gana la logística", "empate", "medido una vez"], []),
+                       "gana la regla", "gana la logística", "empate", "medido una vez",
+                       "Precisión de la lista: logística menos regla, en puntos", "de precisión: empata",
+                       "ni una lista perfecta lo paga", "La lista que sale: en validación ganaba la regla",
+                       plano(dia[6]["particion"]), plano(dia[6]["pie_test"]), plano(dia[6]["pie_800"])],
+         ["más que toda la lista", "aciertos más/mes"]),
         # la vista 7: la regla del piloto, sin la lista de lo que decide María G. (está en la 8)
         ("v07", None, ["A producción solo si"], ["Lo que decide María G.", "Quién opera la lista después del piloto"]),
         # (01/11) la vista 8: el flujo de cada mes (D 9.2), las fases (D 12.1) y lo que decide María G. con su semana
@@ -579,12 +591,17 @@ def a_la_vista_esperado():
          + [f["nombre"] for f in PL["fases"]],
          ["\nEl grupo de control", "lo revisa Sofía R.", "quien elija Casa Óga"]),
         # la vista 5: de qué lista es el beneficio de la regla (G41); (01/11) el costo con modelo y el presupuesto
-        # (02/11, del A7 y del A3) el valor de cada caso (celdas de la diapositiva 8) y la sensibilidad
-        ("v05", None, ["lista de 500 sin filtro en validación", "Costo del año 1, con modelo",
+        # (02/11, del A7 y del A3) el valor de cada caso (celdas de la diapositiva 8) y la sensibilidad. (02/11, W6)
+        # qué mide es D9.mide, con la base de la Parte B (COB-06); los escenarios a un año (COB-07); la sensibilidad,
+        # «dentro de su rango» (DAT-02, COB-05); «USD 5,38» dice que es de la Parte B (DAT-03) y el costo, su horizonte
+        # (DAT-15)
+        ("v05", None, [plano(dia[9]["mide"]), "Costo año 1, con modelo",
                        usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
                        f"presupuesto {usd(E['costos']['presupuesto_usd'])}", "Por caso:",
-                       "ningún supuesto lleva el ROI a 0"]
-         + [f"{c['celda'].lower()} {c['valor']}" for c in dia[8]["celdas"]], ["simulador", "anexo"]),
+                       "movido dentro de su rango, ningún supuesto lleva el ROI a 0", plano(dia[9]["escenarios"]),
+                       "por año, en la Parte B", "dólares más el primer año"]
+         + [f"{c['celda'].lower()} {c['valor']}" for c in dia[8]["celdas"]],
+         ["simulador", "anexo", "lista de 500 sin filtro en validación", "por año, sin filtrar", "dólares de más"]),
         # (01/11) la vista 3: el MVP de la diapositiva 5, al pie. (02/11, W6: UX-06, VIS-05) Sin la tira de cinco
         # pasos: el renglón del producto mínimo con sus hechos, la escala de la cátedra (UX-15, COB-21) y el detalle de
         # la fila Datos (COB-16); los textos de los pasos no se ven

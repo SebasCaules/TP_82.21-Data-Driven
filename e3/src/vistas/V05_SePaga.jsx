@@ -21,13 +21,18 @@
 //   diapositiva 2 de C3. (01/11, a la vista) Una barra más arriba, el costo del año 1 con modelo, y la línea del
 //   presupuesto: la barra con modelo la pasa. (02/11) Debajo, una línea con el valor de cada caso y la sensibilidad,
 //   que estaban en los anexos A7 y A3.
+// - (02/11, W6 fase B, hallazgos.md) «USD 5,38» dice su base, «por año, en la Parte B» (DAT-03, UX-09). El costo
+//   dice su horizonte, «10.400 · dólares más el primer año» (DAT-15). «USD 10.400», con la moneda de la vecina
+//   (VIS-02, ORA-21), no entra: a 1366 × 768 y 1536 × 864 las tres cifras piden 9 px reales más que lo que la banda
+//   reparte, con cualquier ancho; y «año 1» en el fragmento es un segundo número (N0-8). La central va en
+//   terracota, con el mismo mecanismo que la vista 9 (VIS-14): es lo que no cierra.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js y el texto de C3
 // (contenido_e3.js).
 
 import Banda from '../../../e2/src/Banda.jsx'
 import { D3 } from '../datos_e3.js'
 import { C3 } from '../contenido_e3.js'
-import { fijo, pctDirecto, usd } from '../formato.js'
+import { NBSP, fijo, pctDirecto, usd } from '../formato.js'
 import { plano } from '../texto.jsx'
 import { decision } from '../decisiones.js'
 import { Cifra } from '../cifra.jsx'
@@ -65,13 +70,13 @@ const ROI = {
 const SUMA = {
   rotulo: 'Suma el modelo',
   valor: usd(E.observada.modelo_usd, 2),
-  linea: 'por año, sin filtrar',
+  linea: `por año, en la Parte${NBSP}B`,   // «Parte B» no se parte en dos renglones
   title: `Lo que suma el modelo sobre la regla con la lista de 500 sin filtrar en validación: ${usd(E.observada.modelo_usd, 2)} por año. ${plano(D8.cadena)} ${plano(D8.filtro)}`,
 }
 const CUESTA = {
   rotulo: 'Cuesta el modelo',
   valor: fijo(E.costos.incremental_usd),
-  linea: 'dólares de más',
+  linea: 'dólares más el primer año',
   title: `El modelo cuesta ${usd(E.costos.incremental_usd)} más que la regla en el año 1: ${usd(C_MOD)} con modelo contra ${usd(C_REG)} con la regla sola; el presupuesto es `
     + `${usd(E.costos.presupuesto_usd)}.`,
 }
@@ -80,7 +85,7 @@ export const meta = { id: 'V05', dc: 'B-ECO' }
 
 function TarjetaCifra({ c, central, span }) {
   return (
-    <div className={`tarjeta${central ? ' e2-central' : ''}`} style={{ gridColumn: `span ${span}` }} title={c.title}>
+    <div className={`tarjeta${central ? ' e2-central e3-v05-central' : ''}`} style={{ gridColumn: `span ${span}` }} title={c.title}>
       <span className="kpi-lbl"><span>{c.rotulo}</span></span>
       <div className="ban-par">
         <div className="par-item par-unico"><Cifra texto={c.valor} sec={!central} /></div>
