@@ -641,25 +641,51 @@ def a_la_vista_esperado():
 
 # ---------------------------------------------------------------- 10. la corrección al Grupo 5 (01/11, W5)
 
+def con_espacio(t):
+    """«70%» → «70 %»: la vista 9 pinta así sus textos propios (UX-18, 02/11); las citas del Grupo 5 quedan textuales."""
+    return re.sub(r"(\d)%", r"\1 %", t)
+
+
 def correccion_esperada():
-    """(vista, None, textos que tiene que escribir, textos que no puede escribir) de las vistas 9 y 10, desde D3.correccion,
-    con el mismo formato que a_la_vista_esperado()."""
+    """(vista, None, textos que tiene que escribir, textos que no puede escribir) de las vistas 9 y 10, desde D3.correccion
+    y C3 (diapositivas 14 y 15), con el mismo formato que a_la_vista_esperado(). (02/11, W6) La 9 ya no escribe la cita
+    «Dice» (UX-11: va al title, lo mira correccion()) y suma la línea de qué se revisó (COB-20); la 10 escribe la
+    versión corta de lo que hacen bien (ORA-14), cuenta las secciones (DAT-05) y no tiene eje ni leyenda al pie
+    (UX-17)."""
     D3 = leer_js("datos_e3.js", "D3")
+    C3 = leer_js("contenido_e3.js", "C3")
+    dia = {d["n"]: d for d in C3["DIAPOSITIVAS"]}
     CO = D3["correccion"]
-    T = CO["total"]
-    v09 = [f"{fijo(T['revisar'])} de {fijo(T['filas'])}", "Revisar por parte"]
+    T, DOC = CO["total"], CO["documento"]
+    ctx = dia[14]["contexto"]
+    # las cifras de la línea de contexto (texto de C3) son las de D3: versión, páginas y bloques
+    for x in (f"{DOC['version']},", f"{fijo(DOC['paginas'])} págs.", f"{fijo(T['filas'])} bloques"):
+        if x not in ctx:
+            raise SystemExit(f"C3 diapositiva 14, contexto: no dice «{x}» (D3.correccion)")
+    v09 = [f"{fijo(T['revisar'])} de {fijo(T['filas'])}", "Revisar por parte", ctx]
     v09 += [x for c in CO["conteo"] for x in (c["rotulo"], f"{fijo(c['revisar'])} de {fijo(c['filas'])}")]
     for o in CO["top"]:
         lugar = o["parte"] if o["parte"] == "General" else f"{o['parte']} {o['ref']}"
-        v09 += [o["titulo_corto"], f"{lugar} · pág. {o['pagina']}",
-                f"Dice: «{o['cita']}»", f"Corrección. {o['correccion']}"]
+        v09 += [con_espacio(o["titulo_corto"]), f"{lugar} · pág. {o['pagina']}",
+                f"Corrección. {con_espacio(o['correccion'])}"]
     TG = CO["target"]
-    v10 = [f"{fijo(T['completo'])} de {fijo(T['filas'])}", "Lo que hacen bien", "Cruza su umbral en 90 días",
-           "No compra en el doble de su intervalo", f"regla {fijo(TG['nuestro']['regla'], 3)}",
+    corto = dia[15]["bien_corto"]
+    if [b["seccion"] for b in corto] != [b["seccion"] for b in CO["bien"]]:
+        raise SystemExit("C3 diapositiva 15, bien_corto: las secciones no son las de D3.correccion.bien, en su orden")
+    secciones = sum(len(re.findall(r"\d+\.\d+", b["seccion"])) for b in CO["bien"])
+    v10 = [f"{fijo(T['completo'])} de {fijo(T['filas'])}", "Lo que hacen bien", f"{fijo(secciones)} secciones",
+           "Concluimos distinto sobre todo por el target",
+           "Por qué concluimos distinto: AUC-ROC en validación con el target de cada grupo",
+           "Cruza su umbral en 90 días", "No compra en el doble de su intervalo",
+           "Nuestra regla ordena por el atraso frente al umbral", "Su regla también ordena por el atraso",
+           f"regla {fijo(TG['nuestro']['regla'], 3)}",
            f"logística {fijo(TG['nuestro']['modelo'], 3)}", f"regla {fijo(TG['suyo']['regla'], 3)}",
            f"modelo {fijo(TG['suyo']['modelo'], 3)}"]
-    v10 += [x for b in CO["bien"] for x in (b["seccion"], b["que"])]
-    return [("v09", None, v09, []), ("v10", None, v10, ["sí o no", "marca sí"])]
+    v10 += [x for b in corto for x in (b["seccion"], b["texto"])]
+    # salen: el texto largo de la planilla (sus cifras van al title), el eje y la leyenda del pie, «no por un error»
+    v10_no = ["sí o no", "marca sí", "no por un error", "separa todo", "○ regla", "● modelo"]
+    v10_no += [b["que"] for b in CO["bien"] if b["que"] not in [c["texto"] for c in corto]]
+    return [("v09", None, v09, ["Dice: «"]), ("v10", None, v10, v10_no)]
 
 
 TERRACOTA = r"""() => {
@@ -679,18 +705,35 @@ TERRACOTA = r"""() => {
 
 
 def correccion(p: Pagina, casos):
-    """Los textos de las vistas 9 y 10 (en_pantalla() con sus casos) y dónde va la terracota."""
+    """Los textos de las vistas 9 y 10 (en_pantalla() con sus casos) y dónde va la terracota. (02/11, W6) La cita
+    «Dice» de cada observación de la 9 está en el title de su fila y no en pantalla, y los textos propios de la 9
+    llevan espacio antes de «%»; cada ítem de lo que hacen bien de la 10 lleva en el title el texto de la planilla."""
     en_pantalla(p, casos)
     D3 = leer_js("datos_e3.js", "D3")
-    revisar = D3["correccion"]["total"]["revisar"]
+    CO = D3["correccion"]
+    revisar = CO["total"]["revisar"]
     p.ir("v01")
     p.ir("v09")
+    r = p.pg.evaluate(LEER_VISTA)
+    titulos = [norm(t) for t in r["titulos"]]
+    for o in CO["top"]:
+        cita = norm(f"Dice: «{o['cita']}»")
+        if not any(cita in t for t in titulos):
+            p.mal(f"v09: la cita de la observación {o['n']} no está en el title de su fila")
+    m = re.search(r".{0,30}\d%", r["cuerpo"])
+    if m:
+        p.mal(f"v09: un porcentaje sin espacio en pantalla: «{m[0]}»")
     r = p.pg.evaluate(TERRACOTA)
     if r["fuera"]:
         p.mal(f"v09: {r['fuera']} elementos en terracota fuera de lo que está en «Revisar»")
     if r["celdas"] != revisar:
         p.mal(f"v09: {r['celdas']} celdas en terracota en el conteo; las secciones en «Revisar» son {revisar}")
     p.ir("v10")
+    r = p.pg.evaluate(LEER_VISTA)
+    titulos = [norm(t) for t in r["titulos"]]
+    for b in CO["bien"]:
+        if norm(b["que"]) not in titulos:
+            p.mal(f"v10: el texto de la planilla de {b['seccion']} no está en el title de su ítem")
     r = p.pg.evaluate(TERRACOTA)
     if r["total"]:
         p.mal(f"v10: {r['total']} elementos en terracota (la vista no tiene nada en «Revisar»)")
