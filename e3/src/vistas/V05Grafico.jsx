@@ -1,5 +1,6 @@
 // V05 · la tarjeta del gráfico de la vista 5 (Parte B 3.2 a 3.6; diapositivas 8 y 9 de C3).
 //
+// (03/11) Cuatro barras, por opción: costo y beneficio con modelo, costo y beneficio con la regla sola.
 // (01/11, a la vista) TarjetaCostoBeneficio muestra tres barras con BarrasH (src/graficos.jsx; paridad_e3.py mide sus
 // rótulos en esta vista): el costo del año 1 con modelo (D3.economia.costos.con_modelo, USD 30.660) y con la regla sola
 // (USD 20.260), en --e3-ctx-relleno, contra el beneficio anual de la regla (D3.economia.observada.regla_usd, USD 299,49,
@@ -65,12 +66,16 @@ export function TarjetaCostoBeneficio() {
   const k = useEscalaTexto()
   const barras = [
     // (02/11, W6) «Costo año 1», como el rótulo de qué mide (D9.mide): dos palabras menos por el renglón de escenarios
+    // (03/11, pedido del usuario) Por opción: cada costo con su beneficio debajo. El del modelo (G34, USD 304,87) es la
+    // regla más los 5,38 de la tarjeta: las dos astillas casi iguales al lado de costos que difieren en 10.400.
     { etiqueta: 'Costo año 1, con modelo', valor: COSTO_MODELO, color: CTX },
+    { etiqueta: 'Beneficio, con modelo', valor: E.observada.proyecto_usd, enfasis: true, anchoMin: 3 },
     { etiqueta: 'Costo año 1, regla sola', valor: COSTO_REGLA, color: CTX },
-    { etiqueta: 'Beneficio anual de la regla', valor: E.observada.regla_usd, enfasis: true, anchoMin: 3 },
+    { etiqueta: 'Beneficio, regla sola', valor: E.observada.regla_usd, enfasis: true, anchoMin: 3 },
   ]
   const conclusion = <>{`${NO_RECUPERA}: deja `}<b className="tabular">{monto(E.observada.regla_usd)}</b>{' por año'}</>
-  const titulo = `Beneficio anual de la regla con la lista de 500 sin filtro en los cortes de validación, el escenario `
+  const titulo = `Beneficio por año con modelo: ${monto(E.observada.proyecto_usd)}, ${monto(E.observada.modelo_usd)} más que la regla. `
+    + `Beneficio anual de la regla con la lista de 500 sin filtro en los cortes de validación, el escenario `
     + `base de la B 3.4: ${monto(E.observada.regla_usd)}, ROI ${pctDirecto(E.observada.regla_roi_pct, 2)}. Con la lista `
     + `que sale, 500 contactables: ${monto(RC.usd_anio)} en validación (ROI ${pctDirecto(RC.roi_pct, 2)}) y `
     + `${monto(RT.contactables.usd)} en test (ROI ${pctDirecto(RT.contactables.roi_pct, 2)}, Parte D 11.2). Ninguna `

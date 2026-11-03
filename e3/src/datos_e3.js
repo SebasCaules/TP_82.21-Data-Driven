@@ -1172,6 +1172,7 @@ export const D3 = {
    "regla_roi_pct_sin": -97.9292575329139,
    "modelo_usd": 5.378014097430056,
    "modelo_roi_pct": -99.94828832598624,
+   "proyecto_usd": 304.87259696662704,
    "punto_usd": 6.050265859608848,
    "puntos_para_pagar": 1718.9327281350847
   },
@@ -2854,6 +2855,12 @@ export const D3 = {
    "nombre": "economía: ROI del modelo sobre la regla (%)",
    "documento": "−99,95",
    "donde": "B 3.6 · C3 d2"
+  },
+  {
+   "id": "G34",
+   "nombre": "economía: proyecto con modelo (USD/año)",
+   "documento": "304,87",
+   "donde": "B 3.4"
   },
   {
    "id": "G41",

@@ -269,7 +269,8 @@ def contenido_esperado():
                             fijo(E["costos"]["incremental_usd"])],
                     grafico=["Costo año 1, con modelo", usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
                              "Costo año 1, regla sola", usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"]),
-                             "Beneficio anual de la regla", usd(E["observada"]["regla_usd"], 2),
+                             "Beneficio, regla sola", usd(E["observada"]["regla_usd"], 2),
+                             "Beneficio, con modelo", usd(E["observada"]["proyecto_usd"], 2),
                              f"presupuesto {usd(E['costos']['presupuesto_usd'])}", "Dólares"]),
         # la central, el puntaje legal (H40); los envíos sin consentimiento (C18) y los riesgos críticos (J22). El
         # gráfico, la barra 100 % con el 30,1 % en terracota
@@ -638,8 +639,8 @@ def a_la_vista_esperado():
         # de los 13 en una fila de tres celdas (diapositiva 11): riesgo, señal y umbral, dueño. Sale la línea de las
         # cinco dimensiones; las normas y la escala de la cátedra, en su renglón
         ("v06", None, ids_l + [plano(a["quien"]) for tr in dia[10]["plan"] for a in tr["acciones"]]
-         + [f"Riesgos críticos, {fijo(LE['riesgos_criticos'])} de {fijo(LE['riesgos'])}", "Mide:", "Alerta:", "Dueño:"]
-         + [plano(x) for c in d11["columnas"] for x in (c["riesgo"], *(f["texto"] for f in c["filas"]))]
+         + [f"Riesgos críticos, {fijo(LE['riesgos_criticos'])} de {fijo(LE['riesgos'])}"]
+         + [plano(c["riesgo"]) for c in d11["columnas"]]  # (03/11) sin viñetas: señal, umbral y dueño van al title
          + [plano(dia[10]["nota"])],
          ["en mujeres", "anexo", "cada una:"] + [d["nombre"] for d in LE["dimensiones"]]),
     ]

@@ -569,6 +569,8 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
                       "regla_usd_sin": regla_usd(S_OBS, 0.0, 0.0),
                       "regla_roi_pct_sin": roi(regla_usd(S_OBS, 0.0, 0.0), C_MVP),
                       "modelo_usd": modelo_usd(S_OBS), "modelo_roi_pct": roi(modelo_usd(S_OBS), C_INC),
+                      # (03/11) el proyecto con modelo frente a no contactar: la regla más lo que suma el modelo (G34)
+                      "proyecto_usd": regla_usd(S_OBS) + modelo_usd(S_OBS),
                       "punto_usd": punto_usd(S_OBS), "puntos_para_pagar": C_INC / punto_usd(S_OBS)},
         "regla_contactables": {"vp": fr["vp"], "fp": fr["fp"], "usd_anio": regla_cont,
                                "roi_pct": roi(regla_cont, C_MVP)},
@@ -635,6 +637,8 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
           donde="B 3.4", c3="d8")
     ancla("G40", "economía: ROI del modelo sobre la regla (%)", g("modelo_roi_pct", "observada"), "−99,95", 2,
           donde="B 3.6", c3="d2")
+    ancla("G34", "economía: proyecto con modelo (USD/año)", regla_usd(S_OBS) + modelo_usd(S_OBS), "304,87", 2,
+          donde="B 3.4")
     ancla("G41", "economía: regla (USD/año)", g("regla_usd", "observada"), "299,49", 2, donde="B 3.6", c3="d9")
     ancla("G41", "economía: ROI de la regla (%)", g("regla_roi_pct", "observada"), "−98,52", 2,
           donde="B 3.6", c3="d9")

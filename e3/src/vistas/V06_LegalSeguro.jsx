@@ -340,7 +340,7 @@ function medirCriticos(w, fR, fS, k) {
   const sangria = fS * 0.95
   const celdas = CRITICOS_FILA.map((c) => ({
     riesgo: envolver(c.riesgo, wCel, fR, 700),
-    vinetas: VINETAS(c).map((t) => envolver(t, wCel - sangria, fS)),
+    vinetas: [],                                 // (03/11) sin viñetas: el detalle va al title
   }))
   const altoCelda = (x) => 6 * k + x.riesgo.length * fR * 1.25 + fR * 0.25
     + x.vinetas.reduce((a, v) => a + v.length * fS * 1.25 + fS * 0.15, 0)
