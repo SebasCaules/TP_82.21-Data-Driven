@@ -42,6 +42,11 @@
 //   VIS-10, DAT-16) y su unidad, «aciertos extra/mes» (la de VIS-10): «8.595 aciertos extra por mes» y «−0,25 puntos»
 //   no entran juntos en la banda a 1366 × 768, 1536 × 864 ni 1920 × 1080 con ningún reparto (faltan de 12 a 18 px
 //   reales). Con «/mes», anchos 8 / 9: la central y la del costo entran con 10 px o más de aire en las cinco.
+// - (03/11, pedido del usuario: el forest tenía mucho texto) Las filas se agrupan por lista: a la izquierda, una vez por
+//   grupo, «Sin filtrar · no se puede mandar» y «Lista que sale · 500 contactables por mes»; al lado, solo el período
+//   de cada fila. Una línea fina separa los dos grupos. La conclusión dice el mensaje: «En la lista que sale, el modelo
+//   empata con la regla». El renglón de qué mide pasa a los dos períodos (la partición completa y la lista de 800, al
+//   title); al pie queda solo lo que acierta la lista que sale en test.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y se escriben con formato.js; el texto nuevo, de
 // C3 (contenido_e3.js). Las notas (N) siguen leyendo el guion de las diapositivas 6 y 7 de C3 (vistas/index.jsx).
 
@@ -122,17 +127,19 @@ const TITULO_PAGA = `El modelo agrega ${usd(DE.costo_incremental_usd)} al costo 
   `lista perfecta lo paga. En test suma ${fijo(CO.aciertos_extra_por_mes, 2, true)} aciertos por mes en la ` +
   `lista que sale y ${fijo(SF.aciertos_de_mas_por_mes, 2, true)} sin filtrar.`
 
-// Filas del gráfico. `decide`: la fila que decide, en --acc. `tenue`: validación, más fina. Los períodos van en el
-// rótulo de arriba del gráfico; debajo de cada nombre, qué lista es.
-const NO_SALE = 'incluye bajas y a quien no acepta marketing'
+// Filas del gráfico. `decide`: la fila que decide, en --acc. `tenue`: validación, más fina. `grupo` y `sub` se escriben
+// una vez por grupo de filas seguidas (03/11); `periodo`, en cada fila; `nombre`, en el aria-label y el title.
+const NO_SALE = 'no se puede mandar'
 const SALE = `${entero(LARGO)} contactables por mes`
 export const FILAS_TODAS = [
-  { id: 'sfv', nombre: 'Sin filtrar · validación', sub: NO_SALE, valor: SFV.diferencia_pp, ic: SFV.ic95_pp,
-    tenue: true },
-  { id: 'sf', nombre: 'Sin filtrar · test', sub: NO_SALE, valor: SF.diferencia_pp, ic: SF.ic95_pp },
-  { id: 'cov', nombre: 'Lista que sale · validación', sub: SALE, valor: CO.validacion_diferencia_pp,
-    ic: CO.validacion_ic95_pp, tenue: true },
-  { id: 'co', nombre: 'Lista que sale · test', sub: SALE, valor: CO.diferencia_pp, ic: CO.ic95_pp, decide: true },
+  { id: 'sfv', nombre: 'Sin filtrar · validación', grupo: 'Sin filtrar', sub: NO_SALE, periodo: 'validación',
+    valor: SFV.diferencia_pp, ic: SFV.ic95_pp, tenue: true },
+  { id: 'sf', nombre: 'Sin filtrar · test', grupo: 'Sin filtrar', sub: NO_SALE, periodo: 'test',
+    valor: SF.diferencia_pp, ic: SF.ic95_pp },
+  { id: 'cov', nombre: 'Lista que sale · validación', grupo: 'Lista que sale', sub: SALE, periodo: 'validación',
+    valor: CO.validacion_diferencia_pp, ic: CO.validacion_ic95_pp, tenue: true },
+  { id: 'co', nombre: 'Lista que sale · test', grupo: 'Lista que sale', sub: SALE, periodo: 'test',
+    valor: CO.diferencia_pp, ic: CO.ic95_pp, decide: true },
 ]
 
 const marca = (t) => (t === 0 ? '0' : fijo(t, 0, true))
@@ -158,10 +165,19 @@ export function Diferencias({ filas, w, h, k, tituloEje }) {
   const fsVal = 17 * f
   const fsExt = Math.max(14 * f, 12 * k)
   const fsEje = 13.5 * k
-  const fsEmp = 16 * k
+  const fsPer = 17 * f
 
-  const anchoIzq = Math.max(...filas.map((d) => Math.max(anchoTexto(d.nombre, fsNom, 700),
-    anchoTexto(d.sub, fsSub, 500)))) + 28 * k
+  // (03/11) Grupos de filas seguidas con la misma lista: el nombre y el subrótulo, una vez por grupo.
+  const grupos = []
+  filas.forEach((d, i) => {
+    const g = grupos[grupos.length - 1]
+    if (g && g.grupo === d.grupo) g.hasta = i
+    else grupos.push({ grupo: d.grupo, sub: d.sub, desde: i, hasta: i, decide: false })
+    if (d.decide) grupos[grupos.length - 1].decide = true
+  })
+  const anchoGrupo = Math.max(...grupos.map((g) => Math.max(anchoTexto(g.grupo, fsNom, 700),
+    anchoTexto(g.sub, fsSub, 500)))) + 24 * k
+  const anchoIzq = anchoGrupo + Math.max(...filas.map((d) => anchoTexto(d.periodo, fsPer, 700))) + 22 * k
   const anchoDer = Math.max(...filas.map((d) => anchoTexto(veredicto(d.ic), fsVer, 700))) + 22 * k
   const lo = Math.floor(Math.min(0, ...filas.map((d) => d.ic[0])))
   const hi = Math.ceil(Math.max(0, ...filas.map((d) => d.ic[1])))
@@ -197,14 +213,32 @@ export function Diferencias({ filas, w, h, k, tituloEje }) {
             fill="var(--e3-ctx, #5a6478)" fontWeight="600">{IZQ}</text>
       <text x={X(0) + 8 * k} y={yBase + 8 * k + fsEje * 2.25} fontSize={fsEje} textAnchor="start"
             fill="var(--e3-ctx, #5a6478)" fontWeight="600">{DER}</text>
-      <text x={(x0 + x1) / 2} y={yBase + 8 * k + fsEje * 3.8} fontSize={fsEje} textAnchor="middle"
-            fill="var(--e3-ctx, #5a6478)" fontWeight="500">{tituloEje}</text>
+      {/* (03/11) el título del eje como en las vistas 1, 2, 5, 7 y 8: mono, mayúsculas, en la punta derecha */}
+      <text x={x1} y={yBase + 8 * k + fsEje * 3.8} fontSize={fsEje} textAnchor="end" fill="var(--e3-ctx, #5a6478)"
+            fontWeight="600" fontFamily="var(--mono)" letterSpacing=".09em"
+            style={{ textTransform: 'uppercase' }}>{tituloEje}</text>
 
-      {/* el empate: la línea del 0, rotulada arriba */}
+      {/* el empate: la línea del 0. (03/11) Sin el rótulo «empate» encima: lo dicen el 0 del eje y los veredictos */}
       <line x1={X(0)} x2={X(0)} y1={yTop - 4 * k} y2={yBase} stroke="var(--e3-contorno, #4f5a6e)"
             strokeWidth={2.5 * k} />
-      <text x={X(0)} y={yTop - 10 * k} fontSize={fsEmp} textAnchor="middle" fill="var(--e3-contorno, #4f5a6e)"
-            fontWeight="700" letterSpacing=".02em">empate</text>
+
+      {/* (03/11) la lista de cada grupo, una vez, centrada en sus filas; una línea fina separa los grupos */}
+      {grupos.map((g, j) => {
+        const yc = yTop + paso * ((g.desde + g.hasta + 1) / 2)
+        return (
+          <g key={g.grupo}>
+            {j > 0 && (
+              <line x1={0} x2={anchoIzq - 10 * k} y1={yTop + paso * g.desde} y2={yTop + paso * g.desde}
+                    stroke="var(--trk, #dfe1e0)" strokeWidth="1.5" />
+            )}
+            <text x={0} y={yc - fsSub * 0.25} fontSize={fsNom} fontWeight={g.decide ? 700 : 600}
+                  fill={g.decide ? 'var(--ink)' : 'var(--e3-ctx, #5a6478)'}>{g.grupo}</text>
+            <text x={0} y={yc + fsSub * 1.05} fontSize={fsSub} fill="var(--e3-ctx, #5a6478)" fontWeight="500">
+              {g.sub}
+            </text>
+          </g>
+        )
+      })}
 
       {filas.map((d, i) => {
         const y = yTop + paso * (i + 0.5)
@@ -226,12 +260,8 @@ export function Diferencias({ filas, w, h, k, tituloEje }) {
           <g key={d.id}>
             <title>{`${d.nombre}, ${d.sub}: logística menos regla ${pp(d.valor)} puntos, intervalo del 95 % de ` +
               `${intervalo(d.ic)}. ${veredicto(d.ic)}.`}</title>
-            <text x={0} y={y - fsSub * 0.25} fontSize={fsNom} fill={tinta} fontWeight={d.decide ? 700 : 600}>
-              {d.nombre}
-            </text>
-            <text x={0} y={y + fsSub * 1.05} fontSize={fsSub} fill="var(--e3-ctx, #5a6478)" fontWeight="500">
-              {d.sub}
-            </text>
+            <text x={anchoGrupo} y={y} fontSize={fsPer} fill={tinta} fontWeight={d.decide ? 700 : 600}
+                  dominantBaseline="central">{d.periodo}</text>
 
             <line x1={X(a)} x2={X(b)} y1={y} y2={y} stroke={color} strokeWidth={gros} strokeLinecap="butt" />
             <line x1={X(a)} x2={X(a)} y1={y - remate / 2} y2={y + remate / 2} stroke={color}
@@ -265,8 +295,8 @@ export const meta = { id: 'V04', dc: 'C-MOD' }
 
 export default function V04ModeloORegla() {
   const k = useEscalaTexto()
-  const mide = 'Precisión de la lista: logística menos regla, en puntos'
-  const conclusion = <>La lista que sale: en validación ganaba la regla; en test, <b>empata</b></>
+  const mide = `Validación: ${VALID} · test: ${TEST}, medido una vez`
+  const conclusion = <>En la lista que sale, el modelo <b>empata</b> con la regla</>
 
   return (
     <section className="pant v04">
@@ -291,11 +321,10 @@ export default function V04ModeloORegla() {
 
       </Banda>
 
-      <div className="tarjeta e3-v04-graf" title={TITULO_SF}>
+      <div className="tarjeta e3-v04-graf" title={`${TITULO_SF} ${D6.particion}. ${D6.pie_800}`}>
         <div className="e3-v04-cab">
           <div className="e3-v04-titulos">
             <p className="e3-v04-mide">{mide}</p>
-            <p className="e3-v04-particion">{D6.particion}</p>
             <p className="e3-conclusion">{conclusion}</p>
           </div>
         </div>
@@ -306,7 +335,7 @@ export default function V04ModeloORegla() {
             )}
           </Lienzo>
         </div>
-        <p className="e3-v04-pie">{`${D6.pie_test} ${D6.pie_800}`}</p>
+        <p className="e3-v04-pie">{D6.pie_test}</p>
       </div>
     </section>
   )

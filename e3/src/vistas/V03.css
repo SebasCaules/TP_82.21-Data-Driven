@@ -32,9 +32,10 @@
   margin: 0; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap;
   gap: 2px clamp(10px, 1.4cqw, 24px);
 }
+/* (03/11, pedido del usuario) El producto mínimo, más grande: el título a 1,7 veces el rótulo y los hechos a 1,5 veces el texto. */
 .e3-v03-mvp-tit {
-  font: 600 calc(var(--e2-rot, 12px) * 1.2)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  font: 600 calc(var(--e2-rot, 12px) * 1.7)/1.2 var(--mono); text-transform: uppercase; letter-spacing: .06em;
   color: var(--ink);
 }
-.e3-v03-mvp-hechos { font: 400 var(--e2-txt, 15px)/1.25 var(--fuente); color: var(--e3-ctx, #5a6478); }
+.e3-v03-mvp-hechos { font: 400 calc(var(--e2-txt, 15px) * 1.5)/1.25 var(--fuente); color: var(--e3-ctx, #5a6478); }
 .e3-v03-mvp-hechos b { color: var(--ink); font-weight: 700; }

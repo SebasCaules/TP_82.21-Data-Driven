@@ -249,26 +249,28 @@ def contenido_esperado():
         "v04": dict(dec="C-MOD",
                     cifras=[f"{pp(CO['diferencia_pp'])} puntos",
                             f"{fijo(TE['decision']['aciertos_por_mes_para_pagar'])} aciertos extra/mes"],
-                    grafico=["Sin filtrar · validación", "Sin filtrar · test", "Lista que sale · validación",
-                             "Lista que sale · test", pp(SF["diferencia_pp"]), pp(CO["diferencia_pp"]),
+                    # (03/11) las filas, agrupadas por lista: el nombre y el subrótulo una vez por grupo, el período en
+                    # cada fila (los nombres completos, en el aria-label)
+                    grafico=["Sin filtrar", "Lista que sale", "validación", "test", pp(SF["diferencia_pp"]),
+                             pp(CO["diferencia_pp"]),
                              pp(D3["lista"]["modelo_menos_regla_500_sin_filtro"]["diferencia_pp"]),
                              pp(CO["validacion_diferencia_pp"])]
                     + ic(CO["ic95_pp"]) + ["empate", "gana la logística", "gana la regla", "← gana la regla",
                                            "gana la logística →", "Logística menos regla (puntos de precisión)",
-                                           "incluye bajas y a quien no acepta marketing"],
+                                           "no se puede mandar"],
                     sin=ic(SF["ic95_pp"]) + ic(D3["lista"]["modelo_menos_regla_500_sin_filtro"]["ic95_pp"])
                     + ic(CO["validacion_ic95_pp"])),
         # la central, el ROI de la regla sola (G41), que no repite el de la vista 1; lo que suma y lo que cuesta el
         # modelo, separados. El gráfico (01/11), el costo del año 1 con modelo y con la regla sola contra el beneficio
-        # de la regla, con la línea del presupuesto. (02/11, W6: VIS-12) sin el título de eje «Dólares»
+        # de la regla, con la línea del presupuesto. (02/11, W6: VIS-12) sin el título de eje «Dólares»; (03/11, pedido
+        # del usuario: ejes rotulados) vuelve
         "v05": dict(dec="B-ECO",
                     cifras=[pct_directo(E["observada"]["regla_roi_pct"], 2), usd(E["observada"]["modelo_usd"], 2),
                             fijo(E["costos"]["incremental_usd"])],
                     grafico=["Costo año 1, con modelo", usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
                              "Costo año 1, regla sola", usd(E["costos"]["regla_sin_modelo"]["total_anio_1_usd"]),
                              "Beneficio anual de la regla", usd(E["observada"]["regla_usd"], 2),
-                             f"presupuesto {usd(E['costos']['presupuesto_usd'])}"],
-                    sin=["Dólares"]),
+                             f"presupuesto {usd(E['costos']['presupuesto_usd'])}", "Dólares"]),
         # la central, el puntaje legal (H40); los envíos sin consentimiento (C18) y los riesgos críticos (J22). El
         # gráfico, la barra 100 % con el 30,1 % en terracota
         "v06": dict(dec="C-LEG",
@@ -581,19 +583,22 @@ def a_la_vista_esperado():
         ("v01", None, ["Para que la regla se pague", "Viable:"], ["Para pagarse,"]),
         # (02/11, W6) la vista 2: la línea de definición define la regla y el 500, con el período del 25,35 % (ORA-03,
         # DAT-07); el id del cliente, solo en el title (VIS-15)
-        ("v02", None, ["La regla toma a los 500", "en los cortes de enero a mayo de 2025", "Cliente real"],
-         [C["id_cliente"]]),
+        # (03/11, pedido del usuario) sin la línea de definición: el título dice que es un cliente de ejemplo
+        ("v02", None, ["Un cliente real, de ejemplo"],
+         [C["id_cliente"], "La regla toma a los 500"]),
         # (01/11) la vista 4: las cuatro filas, validación (H06 y la de J09) y test, al llegar; (02/11, del A1) el test,
         # medido una vez. (02/11, W6) qué mide dice precisión (VIS-03, UX-05); la partición de la A 2.2 (COB-04) y, al
         # pie, lo que acierta la lista que sale en test y la lista de 800 (COB-03, COB-04), de la diapositiva 6
-        ("v04", None, ["Sin filtrar · validación", "Sin filtrar · test", "Lista que sale · validación",
-                       "Lista que sale · test", fijo(SFV["diferencia_pp"], 2, True), fijo(SF["diferencia_pp"], 2, True),
+        # (03/11, pedido del usuario: el forest tenía mucho texto) filas agrupadas por lista; qué mide dice los dos
+        # períodos; salen la partición y la lista de 800 (al title)
+        ("v04", None, ["Sin filtrar", "Lista que sale", "validación", "test", "no se puede mandar",
+                       fijo(SFV["diferencia_pp"], 2, True), fijo(SF["diferencia_pp"], 2, True),
                        fijo(CO["validacion_diferencia_pp"], 2, True), fijo(CO["diferencia_pp"], 2, True),
                        "gana la regla", "gana la logística", "empate", "medido una vez",
-                       "Precisión de la lista: logística menos regla, en puntos", "de precisión: empata",
-                       "ni una lista perfecta lo paga", "La lista que sale: en validación ganaba la regla",
-                       plano(dia[6]["particion"]), plano(dia[6]["pie_test"]), plano(dia[6]["pie_800"])],
-         ["más que toda la lista", "aciertos más/mes"]),
+                       "de precisión: empata", "ni una lista perfecta lo paga",
+                       "En la lista que sale, el modelo empata con la regla", plano(dia[6]["pie_test"])],
+         ["más que toda la lista", "aciertos más/mes", plano(dia[6]["particion"]), plano(dia[6]["pie_800"]),
+          "incluye bajas y a quien no acepta marketing"]),
         # la vista 7: la regla del piloto, sin la lista de lo que decide María G. (está en la 8). (02/11, W6) El puente
         # del 40,4 y la línea del grupo de control (C3); salen la duración del plan y el tamaño del piloto
         ("v07", None, ["A producción solo si", plano(d12["puente"]), plano(d12["control"]), "mínimo que se distingue",
@@ -617,7 +622,7 @@ def a_la_vista_esperado():
         ("v05", None, [plano(dia[9]["mide"]), "Costo año 1, con modelo",
                        usd(E["costos"]["con_modelo"]["total_anio_1_usd"]),
                        f"presupuesto {usd(E['costos']['presupuesto_usd'])}", "Por caso:",
-                       "movido dentro de su rango, ningún supuesto lleva el ROI a 0", plano(dia[9]["escenarios"]),
+                       "Ningún escenario recupera el costo en un año", "Dólares",
                        "por año, en la Parte B", "dólares más el primer año"]
          + [f"{c['celda'].lower()} {c['valor']}" for c in dia[8]["celdas"]],
          ["simulador", "anexo", "lista de 500 sin filtro en validación", "por año, sin filtrar", "dólares de más"]),
@@ -967,10 +972,11 @@ def recorrido(p: Pagina):
     notas.goto(f"{p.url}?notas#v01")
     notas.wait_for_selector(".e3-notas-ventana")
     notas.wait_for_timeout(300)
-    esperar("¿Se paga?" in notas.inner_text(".e3-notas-ventana"), "la ventana de notas no toma la vista abierta")
+    # (03/11) las preguntas de las vistas 5 y 6 dicen de qué factibilidad hablan
+    esperar("Factibilidad económica: ¿se paga?" in notas.inner_text(".e3-notas-ventana"), "la ventana de notas no toma la vista abierta")
     p.tecla("PageDown")
     notas.wait_for_timeout(400)
-    esperar("¿Es legal y seguro?" in notas.inner_text(".e3-notas-ventana"), "la ventana de notas no sigue al tablero")
+    esperar("Factibilidad legal: ¿es legal y seguro?" in notas.inner_text(".e3-notas-ventana"), "la ventana de notas no sigue al tablero")
     notas.close()
 
 

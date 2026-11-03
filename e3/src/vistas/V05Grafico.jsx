@@ -15,6 +15,9 @@
 // título de eje «Dólares»: cada barra ya dice USD; la etiqueta del presupuesto, a la letra de los valores (VIS-12).
 // En el pie, a la letra del texto, los escenarios a un año (D9.escenarios, COB-07, B 3.4) y la sensibilidad nueva.
 //
+// (03/11, pedido del usuario) Menos texto alrededor del gráfico y el eje rotulado: vuelve el título de eje «Dólares»
+// (en la punta, mono, como las vistas 2 y 7) y el pie queda en un renglón, el valor de cada caso y que ningún escenario
+// recupera el costo en un año. Los escenarios con su ROI y la sensibilidad pasan al title del pie (los dice el guion).
 // Este archivo NO exporta `default`: vistas/index.jsx registra como vista todo `V*.jsx` con default.
 // Ninguna cifra escrita acá: los montos salen de D3 con formato.js y el texto, de C3.
 
@@ -42,8 +45,8 @@ if (!RT) throw new Error('V05Grafico: D3.test.roi_b_3_4 no trae la fila de la re
 const COSTO_MODELO = E.costos.con_modelo.total_anio_1_usd
 const COSTO_REGLA = E.costos.regla_sin_modelo.total_anio_1_usd
 
-/** La letra de los valores de BarrasH (src/graficos.jsx, sin título de eje: 26 de eje y 8 arriba). */
-const valoresDe = (h, n) => Math.max(10.5, Math.min(13, ((h - 8 - 26) / n) * 0.42))
+/** La letra de los valores de BarrasH (src/graficos.jsx, con título de eje: 48 de eje y 8 arriba). */
+const valoresDe = (h, n) => Math.max(10.5, Math.min(13, ((h - 8 - 48) / n) * 0.42))
 
 // Montos de las barras: centavos solo debajo de mil (USD 299,49; USD 30.660), como V05.
 const monto = (v) => usd(v, v < 1000 ? 2 : 0)
@@ -91,6 +94,7 @@ export function TarjetaCostoBeneficio() {
               datos={barras} w={w} h={h}
               formato={monto}
               formatoEje={(v) => fijo(v, 0)}
+              tituloEje="Dólares"
               anchoEtiqueta={Math.round(230 * k)}
               referencia={{ valor: E.costos.presupuesto_usd, etiqueta: `presupuesto ${monto(E.costos.presupuesto_usd)}` }}
             />
@@ -99,9 +103,8 @@ export function TarjetaCostoBeneficio() {
         </Lienzo>
       </div>
 
-      <p className="e3-v05-pie" title={`${plano(D8.celdas.map((c) => `${c.celda}: ${c.texto}`).join(' '))} ${plano(D9.decision)}`}>
-        {D9.escenarios}<br />
-        <b>Por caso:</b> {CELDAS.join(' · ')}. <b>Sensibilidad:</b> {SENSIBILIDAD.charAt(0).toLowerCase() + SENSIBILIDAD.slice(1)}.
+      <p className="e3-v05-pie" title={`${plano(D8.celdas.map((c) => `${c.celda}: ${c.texto}`).join(' '))} ${plano(D9.escenarios)} ${SENSIBILIDAD}. ${plano(D9.decision)}`}>
+        <b>Por caso:</b> {CELDAS.join(' · ')}. Ningún escenario recupera el costo en un año.
       </p>
     </div>
   )

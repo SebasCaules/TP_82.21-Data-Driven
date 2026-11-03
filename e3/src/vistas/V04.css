@@ -20,10 +20,9 @@
 /* Halo del color de la tarjeta detrás de los números del gráfico: la línea del 0 o la grilla no los cortan. */
 .e3-v04-halo { paint-order: stroke; stroke: var(--sup, #fff); stroke-width: 4px; stroke-linejoin: round; }
 
-/* (02/11, W6 fase B) El rótulo de qué mide, un 20 % más grande (VIS-13). Debajo, la partición (D6.particion de C3,
-   A 2.2) en una línea de contexto: sans, para que entre en un renglón a 1280 × 720 sin bajar de 13 px. Al pie, lo
-   que acierta la lista que sale en test (D6.pie_test, COB-03), a la letra del texto. */
+/* (02/11, W6 fase B) El rótulo de qué mide, un 20 % más grande (VIS-13). Al pie, lo que acierta la lista que sale en
+   test (D6.pie_test, COB-03), a la letra del texto. (03/11) Sale la línea de la partición: el rótulo dice los dos
+   períodos y la partición completa va al title. */
 .e3-v04-mide { font-size: calc(var(--e2-rot, 12px) * 1.2); }
-.e3-v04-particion { margin: 0; font: 500 var(--e2-txt2, 13px)/1.25 var(--fuente); color: var(--e3-ctx, #5a6478); }
 .e3-v04-pie { flex: none; margin: clamp(4px, 1cqh, 10px) 0 0; font: 400 var(--e2-txt, 14px)/1.3 var(--fuente);
               color: var(--ink); }

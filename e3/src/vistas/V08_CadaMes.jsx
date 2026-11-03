@@ -259,6 +259,9 @@ function Hitos({ m, f, k, w }) {
         <path d={llave} fill="none" stroke={INK} strokeWidth={1.5} />
         <Titulo x={Math.max(0, xc)} y={yLlave} f={fLlave} anchor="middle" texto={D13.llave_go_live} />
       </g>
+      {/* (03/11, pedido del usuario: ejes rotulados) qué cuenta el eje, en la punta derecha, a la altura de la llave */}
+      <Titulo x={w} y={yLlave} f={fLlave} anchor="end" max={Math.max(40, w - xb - 24 * k)}
+              texto={`Semanas desde la entrega, de 1 a ${entero(PL.semanas)}`} />
 
       {/* el eje de semanas y la franja del piloto */}
       <g>

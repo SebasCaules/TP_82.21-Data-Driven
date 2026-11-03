@@ -141,6 +141,11 @@ function Targets({ w, h, k }) {
                 </text>
               </g>
             ))}
+            {/* (03/11, pedido del usuario: ejes rotulados) el nombre de la escala, en el renglón de las marcas, entre el
+                0,5 y el 0,75 */}
+            <text x={x((DESDE + MARCAS[1]) / 2)} y={yMarca} fontSize={fEje} fill={CTX} fontWeight={600}
+                  fontFamily="var(--mono)" letterSpacing={`${0.08 * fEje}`} textAnchor="middle"
+                  style={{ textTransform: 'uppercase' }}>AUC-ROC</text>
             <line x1={xr} x2={xm} y1={yPunto} y2={yPunto} stroke={ACC} strokeWidth={3 * k} />
             {/* la regla, hueca, debajo; el modelo, lleno y encima: con 0,968 y 0,966 se ven los dos */}
             <circle cx={xr} cy={yPunto} r={r} fill="var(--sup, #fff)" stroke={CONTORNO} strokeWidth="1.5" />

@@ -20,6 +20,9 @@
 // - (02/11, W6, fase-w6/hallazgos.md) La línea de definición (D(3).definicion[1]) define también la regla y el
 //   500, con el período del 25,35 % (ORA-03, COB-11, DAT-07); va a la letra del texto y en tinta (VIS-15). El
 //   rótulo de la derecha queda «Cliente real»: el id del cliente, al title (VIS-15).
+// - (03/11, pedido del usuario) Sale la línea de definición de debajo del título: la definición de «se va», de la regla
+//   y del 500 va al title de la tarjeta (y la dice el guion). El título dice que es un cliente de ejemplo («Un cliente
+//   real, de ejemplo: …») y sale el rótulo «Cliente real» de la derecha, que repetía lo mismo.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js, y el texto de C3.
 // Los códigos internos («envío 29», la nota «Envío N») van solo en los title (regla 13 H13 del E2).
 
@@ -219,21 +222,18 @@ function TarjetaCifra({ c, central, span }) {
 export default function V02QuienSeVa() {
   const k = useEscalaTexto()
   const conclusion = C.cruzo_en_la_ventana
-    ? <>Este cliente pasó su umbral <b className="tabular">{`${entero(C.dias_para_cruzar)} días`}</b> después del corte: se va</>
-    : <>Este cliente no pasó su umbral en los <b className="tabular">{`${entero(C.ventana_dias)} días`}</b> siguientes</>
+    ? <>Un cliente real, de ejemplo: pasó su umbral <b className="tabular">{`${entero(C.dias_para_cruzar)} días`}</b> después del corte y se va</>
+    : <>Un cliente real, de ejemplo: no pasó su umbral en los <b className="tabular">{`${entero(C.ventana_dias)} días`}</b> siguientes</>
   return (
     <section className="pant v02">
       <Banda dcs={[DECISION]}>
         <TarjetaCifra c={SE_VAN} central span={3} />
       </Banda>
 
-      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }} title={plano(D.pie_figura)}>
+      <div className="tarjeta" style={{ flex: '1 1 0', minHeight: 0 }}
+           title={`${plano(D.pie_figura)} Cliente ${C.id_cliente}. ${DEF_SE_VA}`}>
         <div className="e3-v02-cab">
-          <div className="e3-v02-fila">
-            <p className="e3-conclusion">{conclusion}</p>
-            <span className="e3-v02-quien" title={`Cliente ${C.id_cliente}`}>Cliente real</span>
-          </div>
-          <p className="e3-v02-def">{DEF_SE_VA}</p>
+          <p className="e3-conclusion">{conclusion}</p>
         </div>
         <div style={{ flex: '1 1 0', minHeight: 0, marginTop: 'clamp(8px, 2cqh, 24px)', display: 'flex', flexDirection: 'column' }}>
           <Lienzo className="lienzo">

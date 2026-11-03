@@ -31,11 +31,12 @@ for (const [ruta, m] of Object.entries(modulos)) {
 const HISTORIA = [
   { id: 'V01', corto: 'La respuesta', pregunta: '¿Conviene anticipar a quien deja de comprar?', de: [2] },
   { id: 'V02', corto: 'Quién se va', pregunta: '¿Quién se va?', de: [3] },
-  { id: 'V03', corto: 'Se puede hacer', pregunta: '¿Se puede hacer?', de: [4, 5] },
+  // (03/11, pedido del usuario) Las preguntas de las vistas 3, 5 y 6 dicen de qué factibilidad hablan.
+  { id: 'V03', corto: 'Se puede hacer', pregunta: 'Factibilidad técnica: ¿se puede hacer?', de: [4, 5] },
   { id: 'V04', corto: 'Modelo o regla', pregunta: '¿El modelo mejora a la regla?', de: [6, 7],
     fuente: 'Partes A, B, C y D' },
-  { id: 'V05', corto: 'Se paga', pregunta: '¿Se paga?', de: [8, 9] },
-  { id: 'V06', corto: 'Legal y seguro', pregunta: '¿Es legal y seguro?', de: [10, 11] },
+  { id: 'V05', corto: 'Se paga', pregunta: 'Factibilidad económica: ¿se paga?', de: [8, 9] },
+  { id: 'V06', corto: 'Legal y seguro', pregunta: 'Factibilidad legal: ¿es legal y seguro?', de: [10, 11] },
   { id: 'V07', corto: 'El piloto', pregunta: '¿Qué decide María G. con el piloto?', de: [12],
     fuente: 'Parte D 11.1 y 12.2' },
   { id: 'V08', corto: 'Cada mes y semana', pregunta: '¿Cómo funciona cada mes y en qué semana?', de: [13],

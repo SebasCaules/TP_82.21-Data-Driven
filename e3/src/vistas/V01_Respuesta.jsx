@@ -69,6 +69,9 @@ const DECISION = decision('D-PRO', {
 const ROT_HOY = 'Hoy compra a 7 días'
 const ROT_FALTA = 'Haría falta para pagar la regla'
 const NOTA_HOY = 'techo, sin control'
+// La población de las dos barras no es la misma (el 1,02 % es sobre los envíos cerca del umbral; el 49,6 %, sobre los
+// contactados que se iban): el eje dice solo qué es.
+const TITULO_EJE = 'Tasa de éxito, en %'
 // La conclusión dice lo que muestra el dibujo, sin cifra (la cifra va en la barra), y nombra a la regla: bajo
 // el −99,95 % del modelo, «para pagarse» se leía como lo que necesita el modelo (DAT-01).
 const CONCLUSION = 'Para que la regla se pague, tendría que volver casi la mitad de los que se iban'
@@ -98,8 +101,11 @@ function BarrasVeces({ w, h, k }) {
   const fSub = Math.round(13 * k)
   const fVal = Math.round(20 * k)
   const fTick = Math.round(12 * k)
+  // (03/11, pedido del usuario: ejes rotulados) el título del eje, en la punta derecha y debajo de las marcas, mono y en
+  // mayúsculas como en las vistas 2 y 7
+  const fTit = Math.round(12 * k)
 
-  const altoEje = fTick + 14
+  const altoEje = fTick + 14 + fTit + Math.round(8 * k)
   const padTop = 6
   const disp = Math.max(60, h - padTop - altoEje)
   const alto = Math.max(22, Math.min(disp * 0.17, 50 * k))
@@ -152,6 +158,9 @@ function BarrasVeces({ w, h, k }) {
                 textAnchor="middle" className="tabular">{tickTxt(t)}</text>
         </g>
       ))}
+      <text x={xDe(max) + margenDer - 2} y={yBase + 8 + fTick * 0.8 + 8 * k + fTit} fontSize={fTit} fill={CTX}
+            textAnchor="end" fontFamily="var(--mono)" fontWeight={600} letterSpacing=".09em"
+            style={{ textTransform: 'uppercase' }}>{TITULO_EJE}</text>
 
       {/* hoy: el dato que hay que mirar */}
       <g>

@@ -138,7 +138,7 @@ export const C3 = {
         },
         {
           "rotulo": "Capacidad humana",
-          "texto": "Casa Óga no tiene quien opere la lista: en el piloto, el equipo consultor (envío 71).",
+          "texto": "Casa Óga no definió quién opera la lista: en el piloto, el equipo consultor (envío 71).",
           "detalle": "en el piloto, el equipo consultor"
         }
       ],
@@ -150,7 +150,7 @@ export const C3 = {
         "F11",
         "C19"
       ],
-      "guion": "Puntuamos cuatro condiciones de 1 a 3. Los datos alcanzan con margen: hay 4.636 casos positivos para entrenar. Las otras tres quedan en 2: el 44,8 % de las ventas no tiene cliente, todo se exporta a mano y Casa Óga no tiene quien opere la lista. El promedio, 2,25, es factibilidad media. Lo que más pesa es quién opera: el proyecto anterior se cortó porque nadie lo mantuvo. En el piloto la opera nuestro equipo.",
+      "guion": "Puntuamos cuatro condiciones de 1 a 3. Los datos alcanzan con margen: hay 4.636 casos positivos para entrenar. Las otras tres quedan en 2: el 44,8 % de las ventas no tiene cliente, todo se exporta a mano y Casa Óga todavía no definió quién opera la lista. El promedio, 2,25, es factibilidad media. Lo que más pesa es quién opera: el proyecto anterior se cortó porque nadie lo mantuvo. En el piloto la opera nuestro equipo.",
       "segundos": 45
     },
     {
@@ -381,7 +381,7 @@ export const C3 = {
         ]
       },
       "decision": "**No viable tal como está planteado.** Movido dentro de su rango, ningún supuesto lleva el ROI a 0; la regla depende de la tasa de éxito, que no está medida.",
-      "mide": "Costo año 1 y beneficio anual · Parte B, validación sin filtro",
+      "mide": "Costo del año 1 contra beneficio por año",
       "escenarios": "Escenarios a un año: conservador −100,12 % · esperado −98,52 % · optimista −96,76 %: no recupera en ninguno.",
       "fuente": "Parte B 3.2 y 3.4 a 3.6",
       "ids": [
