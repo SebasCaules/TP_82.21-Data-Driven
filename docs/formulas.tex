@@ -13,6 +13,7 @@
 \usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
 \usepackage{xcolor}
+\usepackage{url}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 
@@ -28,7 +29,7 @@
 \shorthandoff{"}
 
 \ifdefined\consolidado
-% variante para el consolidado del Entregable 1 (entregas/entregable-1/_build/F/armar.py, que pasa
+% variante para el consolidado (el generador de los consolidados pasa
 % \def\consolidado{<primera página global>}): título de parte al frente, sin integrantes ni fecha
 % (van en la carátula única), sin numeración propia y con el índice interno en páginas del consolidado
 \pagestyle{empty}
@@ -37,12 +38,12 @@
 \setcounter{tocdepth}{1}  % en el consolidado el índice interno lista solo secciones: los incisos están en la página de contenido global y en el pie
 \noindent{\small\bfseries\color[HTML]{B8433A} ANEXO 1}\\[1mm]
 {\Large\bfseries Formulación del tablero de riesgo de clientes}\\[1mm]
-{\small\color[HTML]{8A8680} Anexo de fórmulas · v2.7 · 30/10/2026}
+{\small\color[HTML]{8A8680} Anexo de fórmulas · v3.0 · 03/11/2026}
 \else
 \begin{center}
 {\LARGE \textbf{Casa Óga --- Formulación del tablero de riesgo de clientes}}\\[4mm]
 Materia 82.21 --- Factibilidad de Proyectos Data Driven\\
-Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v2.7\\[3mm]
+Entregables 1 a 3 --- Grupo 2 --- Anexo de fórmulas, v3.0\\[3mm]
 \begin{tabular}{ll}
 Sebastián Caules & 64331 \\
 Tomás Ferreccio & 64934 \\
@@ -50,12 +51,12 @@ Matías Sola & 64322 \\
 Francisco Cattaneo & 64900 \\
 Juan Manuel Rilo & 64037 \\
 \end{tabular}\\[3mm]
-30/10/2026 (v1.0: 01/09/2026)
+03/11/2026 (v1.0: 01/09/2026)
 \end{center}
 \fi
 
 \vspace{4mm}
-\noindent Este documento fija la notación y la trazabilidad de las fórmulas del tablero de riesgo de clientes de Casa Óga. Cada fórmula indica la línea de código que la implementa y el valor que produce sobre el corte de referencia, 31/12/2025. El tablero del Entregable 1 tiene el mes de corte móvil (25 cortes): por eso cada fórmula lleva el parámetro $t$ explícito en la notación, nunca implícito. El pipeline recalcula todo desde cero en cada corte, usando solo transacciones con \texttt{fecha}~$\le t$ (\texttt{pipeline/features.py:69}). Los valores citados corresponden a la corrida de \texttt{pipeline/build.py}, que verificó 134 anclas del contrato de datos (\texttt{pipeline/CONTRACT.md} sección 5) antes de escribir el payload. Desde la v2.3, las secciones~\ref{sec:anticipacion}, \ref{sec:experimento} y~\ref{sec:exposicion-recupero} definen también los términos y las cifras derivadas que usan las Partes A a D del Entregable 3; cada una dice su población y su corte, que no siempre es el 31/12/2025. La v2.4 suma la evaluación en test de la Parte D del Entregable 3 (subsecciones~\ref{sec:evaluacion-test} a~\ref{sec:criterio-reemplazo}).
+\noindent Este documento fija la notación y la trazabilidad de las fórmulas del tablero de riesgo de clientes de Casa Óga y del modelado del Entregable 3. Cada fórmula indica el script y la función que la implementan y el valor que produce. El código del tablero está en el repositorio público \url{https://github.com/SebasCaules/TP_82.21-Data-Driven} (carpeta \texttt{pipeline/}); el del modelado y la evaluación económica, en el zip de scripts de cada parte del Entregable 3, de \texttt{A-scripts\_etapa1.zip} a \texttt{D-scripts\_etapa4.zip}. El tablero del Entregable 1 tiene el mes de corte móvil (25 cortes): por eso cada fórmula lleva el parámetro $t$ explícito en la notación, nunca implícito. El pipeline recalcula todo desde cero en cada corte, usando solo transacciones con \texttt{fecha}~$\le t$ (\texttt{pipeline/features.py}, \texttt{client\_facts}). Los valores del tablero son los de la corrida de \texttt{pipeline/build.py}, que verificó 134 anclas del contrato de datos (\texttt{pipeline/CONTRACT.md} sección 5) antes de escribir el payload, sobre el corte de referencia 31/12/2025. Las secciones~\ref{sec:anticipacion}, \ref{sec:experimento} y~\ref{sec:exposicion-recupero} definen los términos y las cifras derivadas que usan las Partes A a D del Entregable 3; cada una dice su población y su corte, que no siempre es el 31/12/2025.
 
 \vspace{2mm}
 \tableofcontents
@@ -63,14 +64,14 @@ Juan Manuel Rilo & 64037 \\
 \newpage
 \section{Tabla de símbolos}
 
-Un símbolo tiene un único significado en todo el documento. La tabla cubre las 25 fechas de corte, los campos por cliente y los agregados de la tabla de contingencia, y desde la v2.3 los símbolos del Entregable 3 (la v2.4 suma los de la evaluación en test). Los escalares $s$, $r$, $m$, $d$ y $c$ son los de la Parte B del Entregable 3; el ticket medio, que esa parte escribe $t$, va acá como $\bar t$ para no confundirlo con el corte.
+Un símbolo tiene un único significado en todo el documento. La tabla cubre las 25 fechas de corte, los campos por cliente, los agregados de la tabla de contingencia y, debajo del filete, los símbolos del Entregable 3. Los escalares $s$, $r$, $m$, $d$ y $c$ son los de la Parte B del Entregable 3; el ticket medio, que esa parte escribe $t$, va acá como $\bar t$ para no confundirlo con el corte.
 
 \begin{longtable}{@{}l p{10.7cm}@{}}
 \toprule
 Símbolo & Significado \\
 \midrule
 \endhead
-$t$ & Corte: fin de mes usado como parámetro móvil. 25 valores, 2023-12-31 a 2025-12-31 (\texttt{pipeline/loader.py:20-22}). Corte de referencia de este documento: 2025-12-31. \\
+$t$ & Corte: fin de mes usado como parámetro móvil. 25 valores, 2023-12-31 a 2025-12-31 (\texttt{pipeline/loader.py}, \texttt{cortes}). Corte de referencia de este documento: 2025-12-31. \\
 $i$ & Índice de un cliente individual (\texttt{id\_cliente}). \\
 $F_i(t)$ & Facturación acumulada del cliente $i$ con \texttt{fecha}~$\le t$: suma de \texttt{monto\_neto}. \\
 $n_i(t)$ & Cantidad de compras del cliente $i$ hasta $t$. \\
@@ -107,10 +108,12 @@ $\mathrm{cerca}_i(T)$ & Indicador de cercanía al umbral, $1$ si $h_i(T) < 90$. 
 $L(T)$, $L^{c}(T)$ & Lista de 500 del corte $T$, y la misma lista armada solo con clientes contactables. \\
 $P_{500}$, $M_1$ & Precisión de la lista de 500 y meta del criterio de éxito 1, en aciertos por mes. \\
 $N_1, N_2$, $\delta$ & Tamaños de dos grupos del piloto y efecto mínimo detectable entre ellos. \\
+$c_0$ & Parte de los clientes de la lista sin contactar que cruza su umbral en los 90 días siguientes, fuera del 20\% de mayor facturación. \\
 $s$, $r$ & Tasa de éxito de la acción y parte de los falsos positivos que usa el descuento. \\
 $m$, $d$, $\bar t$, $c$ & Margen que vuelve con un cliente, descuento, ticket medio y costo de la acción. \\
 $v_{VP}$, $v_{FP}$ & Valor esperado de un verdadero y de un falso positivo, frente a no hacer nada. \\
-$V$, $s^*$, $\Delta$ & Valor anual de la lista, tasa de éxito de equilibrio y diferencia de compra que mide el piloto. \\
+$V$, $s^*$, $\Delta$ & Valor anual de la lista, tasa de éxito de equilibrio y diferencia de cruce a 90 días entre el control y una rama del piloto. \\
+$C_1$, $C_{\text{rec}}$ & Costo del primer año de la regla y su costo recurrente anual, en dólares. \\
 $\mathcal C$, $V_{\mathcal C}$ & Cortes evaluados (3 en validación, 5 en test) y valor de la lista en esos cortes llevado a un año. \\
 $P^{c}$, $R^{c}$, $\mathrm{F1}^{c}$ & Precisión, recall y F1 de la lista de 500 contactables, sumadas sobre los cortes de $\mathcal C$. \\
 $\pi_i(T)$, $\mathrm{AUC}^{c}$ & Puntaje con que se ordena la lista, y AUC-ROC de ese puntaje sobre todas las filas contactables. \\
@@ -141,10 +144,10 @@ monto $>$ 0 & \texttt{monto\_neto} $>$ 0 & 27.276 \\
 \end{tabular}
 \end{center}
 
-\impl{pipeline/loader.py:35 (dedupe), :36 (identificado), :37 (monto\_neto\,$>$\,0); los mismos filtros se repiten en \texttt{stage\_counts}, pipeline/loader.py:54-56.}
-\valor{50.250 $\to$ 50.000 $\to$ 27.606 $\to$ 27.276, los cuatro chequeados como anclas en \texttt{pipeline/build.py:213-219}.}
+\impl{pipeline/loader.py (\texttt{load\_transacciones}: dedupe, identificado, monto\_neto\,$>$\,0); los mismos filtros se repiten en \texttt{stage\_counts}.}
+\valor{50.250 $\to$ 50.000 $\to$ 27.606 $\to$ 27.276, los cuatro chequeados como anclas en \texttt{pipeline/build.py} (\texttt{\_anclas}).}
 
-Dos notas de calidad que el pipeline declara en vez de corregir en silencio: las 250 filas que saca el dedupe son exactamente las de \texttt{id\_transaccion} duplicado (\texttt{dup\_ids\_crudo}~=~250, \texttt{dup\_ids\_post}~=~0); y los montos $\le 0$ son 613 en crudo y 608 tras el dedupe, todos estrictamente negativos, ninguno en cero. El canal se normaliza de 4 etiquetas a 2 (\texttt{Tienda}/\texttt{tienda}~$\to$~\texttt{fisico}, \texttt{Online}/\texttt{E-commerce}~$\to$~\texttt{online}), \texttt{pipeline/loader.py:12-17,40}. No se deflacta por IPC. Casa Óga declaró que \texttt{monto\_neto} está en pesos corrientes del día de la venta (relevamiento, envío 55), pero el extracto no tiene deriva de precios (precio unitario implícito $-$7,6\% de 2022 a 2025, plano en las siete categorías; medición del 27/08/2026): no hay inflación en el dato que corregir. Todo importe de este documento es en pesos del extracto tal como llegan, y la pregunta de si el extracto se normalizó al exportarlo vuelve al negocio en el Entregable 2.
+Dos notas de calidad que el pipeline declara en vez de corregir en silencio: las 250 filas que saca el dedupe son exactamente las de \texttt{id\_transaccion} duplicado (\texttt{dup\_ids\_crudo}~=~250, \texttt{dup\_ids\_post}~=~0); y los montos $\le 0$ son 613 en crudo y 608 tras el dedupe, todos estrictamente negativos, ninguno en cero. El canal se normaliza de 4 etiquetas a 2 (\texttt{Tienda}/\texttt{tienda}~$\to$~\texttt{fisico}, \texttt{Online}/\texttt{E-commerce}~$\to$~\texttt{online}), en \texttt{load\_transacciones}. No se deflacta por IPC. Casa Óga declaró que \texttt{monto\_neto} está en pesos corrientes del día de la venta (relevamiento, envío 55), pero el extracto no tiene deriva de precios (precio unitario implícito $-$7,6\% de 2022 a 2025, plano en las siete categorías): no hay inflación en el dato que corregir. Todo importe de este documento es en pesos del extracto tal como llegan. Casa Óga confirmó en la consulta 3 del Entregable 2 que son pesos corrientes sin ajuste, y los montos no se deflactan (decisión DC-10 del Entregable 2). Llevarlos a una escala común con el IPC queda como limitación: el informe del INDEC no está entre las fuentes del proyecto.
 
 \section{Métricas por cliente}
 
@@ -155,7 +158,7 @@ F_i(t) = \sum_{\substack{j:\ \text{cliente}(j)=i \\ \text{fecha}_j \le t}} \text
 \label{eq:facturacion}
 \end{equation}
 
-\impl{pipeline/features.py:71-72 (\texttt{agg.facturacion}, \texttt{groupby("id\_cliente").sum()}).}
+\impl{pipeline/features.py (\texttt{client\_facts}, columna \texttt{facturacion}: \texttt{groupby("id\_cliente").sum()}).}
 \valor{facturación de toda la base $=$ ARS 550,2 M; facturación de los clientes en riesgo $=$ ARS 262,8 M.}
 
 \subsection{Recency}
@@ -165,7 +168,7 @@ F_i(t) = \sum_{\substack{j:\ \text{cliente}(j)=i \\ \text{fecha}_j \le t}} \text
 \label{eq:recency}
 \end{equation}
 
-\impl{pipeline/features.py:78.}
+\impl{pipeline/features.py (\texttt{client\_facts}, columna \texttt{recency}).}
 \valor{mediana 277 días sobre los 5.978 clientes con compra válida (rango 2 a 1.438 días). Ejemplo \texttt{CLI00002}: $\rho = 73$ días.}
 
 \subsection{Gap mediano propio}
@@ -175,7 +178,7 @@ F_i(t) = \sum_{\substack{j:\ \text{cliente}(j)=i \\ \text{fecha}_j \le t}} \text
 \label{eq:gap}
 \end{equation}
 
-\impl{pipeline/features.py:18-23 (\texttt{\_gap\_mediano\_por\_cliente}), :79 (asignación).}
+\impl{pipeline/features.py (\texttt{\_gap\_mediano\_por\_cliente}, asignado en \texttt{client\_facts}).}
 \valor{mediana de la base 163 días, sobre los 5.663 clientes con dos compras o más. Ejemplo \texttt{CLI00002}: $\gamma = 57$ días; \texttt{CLI00004}: $\gamma = 120{,}5$ días.}
 
 Los 315 clientes con una sola compra no tienen $\gamma_i(t)$ definido (diferencia sobre una serie de un solo punto). Verificado: esos 315 coinciden exactamente con los clientes de $n_i(t)=1$, y ninguno es elegible, así que el valor indefinido nunca llega a la regla de riesgo (sección \ref{sec:riesgo}).
@@ -187,7 +190,7 @@ E_i(t) = \mathbf 1\bigl[n_i(t) \ge 3\bigr]
 \label{eq:elegible}
 \end{equation}
 
-\impl{pipeline/features.py:81.}
+\impl{pipeline/features.py (\texttt{client\_facts}, columna \texttt{elegible}).}
 \valor{4.940 elegibles de 5.978 clientes (82,6\%).}
 
 \subsection{Riesgo}
@@ -203,7 +206,7 @@ B_i(t) = E_i(t) \wedge \bigl[\rho_i(t) > \theta_i(t)\bigr]
 \label{eq:riesgo}
 \end{equation}
 
-\impl{pipeline/features.py:82-84.}
+\impl{pipeline/features.py (\texttt{client\_facts}, columna \texttt{en\_riesgo}).}
 \valor{2.452 clientes en riesgo de 5.978 (41,0\%).}
 
 Un cliente no elegible nunca puede estar en riesgo, aunque lleve años sin comprar: la ecuación~\eqref{eq:riesgo} exige $E_i(t)=1$ antes de evaluar el umbral. La sección~\ref{sec:proxy-churn} desarrolla la consecuencia aritmética de esta exigencia.
@@ -223,12 +226,11 @@ A_i(t) = \frac{t - p_i(t)}{365{,}25} \quad \text{(años)}
 \label{eq:anualizado}
 \end{equation}
 
-\impl{pipeline/features.py:86-87.}
+\impl{pipeline/features.py (\texttt{client\_facts}, columna \texttt{anualizado}).}
 \valor{base anualizada total $=$ ARS 204,6 M; exposición (anualizado de los en riesgo) $=$ ARS 94,9 M.}
 
 \supuesto{$A_i(t)$ se mide desde la \emph{primera} compra hasta el corte, no hasta la última. Es el punto no obvio del caso: la alternativa intuitiva sería medir la ventana de compras observada, de $p_i(t)$ a $u_i(t)$. Esa alternativa castiga exactamente a los clientes que interesa medir bien: un cliente que compró seguido durante seis meses y después dejó de comprar tendría una ventana corta (0,5 años) sobre una facturación ya alta, y su gasto anualizado se dispararía por el solo hecho de estar inactivo. Usar $t$ (el corte, no $u_i(t)$) como fin de la ventana evita ese sesgo: el denominador sigue creciendo mes a mes aunque el cliente no vuelva a comprar, así que la inactividad no infla la proyección anual. La contrapartida es la opuesta: un cliente nuevo con muy poca historia (denominador chico) puede anualizar de más. Se mide en vez de corregir en silencio: 111 clientes (1,9\% de la base) tienen menos de un año de historia al corte de referencia, contra 2.661 (52,0\%) en el primer corte de la serie (2023-12-31), cuando casi toda la base era reciente. Ninguno de los 111 con historia corta del corte de referencia está en riesgo antes de los 0,605 años de antigüedad (el mínimo de $A_i(t)$ entre los $B_i(t)=1$), así que el sesgo de historia corta no contamina la exposición $X(t)$ de la sección~\ref{sec:exposicion}, sólo infla algunos términos de la base anualizada total que no están en riesgo.}
 
-El comentario original en \texttt{pipeline/build.py:74-75} declara para este mismo corte ``31 clientes y 2,8\% de la base'': ese número no reprodujo al correr el código (\texttt{pipeline/build.py:76-77}, \texttt{corta~=~anios~<~1.0}, sobre \texttt{facts} del corte 2025-12-31 da 111 clientes). El valor que viaja en el payload bajo \texttt{exposicion\_por\_corte[-1].clientes\_historia\_corta} es 111, y es el que se reporta acá; el comentario del código quedó desactualizado y no se fuerza para que coincida.
 
 \subsection{Quintil de facturación}
 
@@ -237,7 +239,7 @@ Q_i(t) = \operatorname{qcut}_5\bigl(F_i(t)\bigr) \in \{1,\ldots,5\}
 \label{eq:quintil}
 \end{equation}
 
-\impl{pipeline/features.py:89 (\texttt{pd.qcut(facturacion, 5, ...)}).}
+\impl{pipeline/features.py (\texttt{client\_facts}, columna \texttt{quintil}: \texttt{pd.qcut(facturacion, 5, ...)}).}
 \valor{ver tabla~\ref{tab:quintiles} (sección~\ref{sec:proxy-churn}). Rangos de facturación: Q1 de ARS 500 a 42.953; Q5 de ARS 135.867 a 415.135.}
 
 \subsection{Región dominante}
@@ -250,7 +252,7 @@ Q_i(t) = \operatorname{qcut}_5\bigl(F_i(t)\bigr) \in \{1,\ldots,5\}
 \label{eq:region}
 \end{equation}
 
-\impl{pipeline/features.py:26-32 (\texttt{\_region\_dominante}); asignación en la línea 91.}
+\impl{pipeline/features.py (\texttt{\_region\_dominante}, asignada en \texttt{client\_facts}).}
 \valor{317 clientes \texttt{Solo online} al 31/12/2025 (5,3\% de la base). Ejemplo \texttt{CLI00002}: \texttt{Centro}.}
 
 \subsection{Categoría dominante}
@@ -260,7 +262,7 @@ Q_i(t) = \operatorname{qcut}_5\bigl(F_i(t)\bigr) \in \{1,\ldots,5\}
 \label{eq:categoria}
 \end{equation}
 
-\impl{pipeline/features.py:35-38 (\texttt{\_categoria\_dominante}), :92 (asignación).}
+\impl{pipeline/features.py (\texttt{\_categoria\_dominante}, asignada en \texttt{client\_facts}).}
 \valor{Muebles concentra la mayor cantidad de clientes (1.897, 44,4\% en riesgo); Baño la menor (166, 28,9\% en riesgo). Ejemplo \texttt{CLI00002}: \texttt{Muebles}.}
 
 \section{Segmentación RFM}
@@ -282,12 +284,12 @@ Q_i(t) = \operatorname{qcut}_5\bigl(F_i(t)\bigr) \in \{1,\ldots,5\}
 
 donde $\operatorname{rank}^{\uparrow}_{\text{first}}$ ordena de menor a mayor y $\operatorname{rank}^{\downarrow}_{\text{first}}$ de mayor a menor, empates resueltos por orden de aparición (\texttt{method="first"}), y $\operatorname{qcut}_5$ reparte esos rangos en 5 bloques del mismo tamaño, etiquetados 1 a 5 en el orden del ranking. El score $\mathcal R_i(t)$ queda invertido respecto de $\rho_i(t)$: recency baja (compró hace poco) da score alto, como pide el contrato.
 
-\impl{pipeline/features.py:41-45 (\texttt{\_qcut\_rank\_5}), :94-96 (asignación de R, F, M).}
+\impl{pipeline/features.py (\texttt{\_qcut\_rank\_5}; R, F y M asignados en \texttt{client\_facts}).}
 \valor{sin valor único por ser cálculo por cliente. Cada score reparte 1.195 o 1.196 clientes por quintil, por construcción de \texttt{qcut}.}
 
 \subsection{Reglas de segmento}
 
-Siete reglas excluyentes, evaluadas en este orden; la primera que aplica gana y saca al cliente de la evaluación de las siguientes (\texttt{pipeline/features.py:48-65}, variable \texttt{aun\_sin\_asignar}):
+Siete reglas excluyentes, evaluadas en este orden; la primera que aplica gana y saca al cliente de la evaluación de las siguientes (\texttt{pipeline/features.py}, \texttt{\_segmento\_rfm}, variable \texttt{aun\_sin\_asignar}):
 
 \begin{enumerate}
 \item \texttt{Campeones}: $\mathcal R_i(t)\ge 4 \,\wedge\, \mathcal F_i(t)\ge 4 \,\wedge\, \mathcal M_i(t)\ge 4$
@@ -299,7 +301,7 @@ Siete reglas excluyentes, evaluadas en este orden; la primera que aplica gana y 
 \item \texttt{Perdidos}: el resto
 \end{enumerate}
 
-\impl{pipeline/features.py:48-65 (\texttt{\_segmento\_rfm}), :98 (asignación de $S_i(t)$).}
+\impl{pipeline/features.py (\texttt{\_segmento\_rfm}; $S_i(t)$ asignado en \texttt{client\_facts}).}
 \valor{ver tabla~\ref{tab:rfm-conteo}.}
 
 \begin{table}[h]
@@ -338,7 +340,7 @@ k(i,t) = \bigl((r_i(t)\cdot 7 + c_i(t))\cdot 7 + s_i(t)\bigr)\cdot 5 + (q_i(t) -
 
 donde $r_i(t), c_i(t), s_i(t)$ son los índices 0-based de $\mathrm{reg}_i(t)$, $\mathrm{cat}_i(t)$ y $S_i(t)$ en las listas fijas del contrato, y $q_i(t)=Q_i(t)$. Es una codificación posicional de base mixta (como convertir un número de varios dígitos, cada uno con su propia base): región no lleva módulo por ser el dígito más significativo, categoría y segmento usan base 7, quintil usa base 5. El espacio total es $6\times7\times7\times5=$ 1.470 combinaciones posibles, $k$ entre 0 y 1.469.
 
-\impl{pipeline/features.py:104-109 (\texttt{contingency}, línea 109 la fórmula de $k$).}
+\impl{pipeline/features.py (\texttt{contingency}, la fórmula de $k$).}
 \valor{ejemplo a mano, cliente \texttt{CLI00002}: región \texttt{Centro} ($r=1$), categoría \texttt{Muebles} ($c=4$), segmento \texttt{Campeones} ($s=0$), quintil $5$ ($q=5$). $k = ((1\cdot7+4)\cdot7+0)\cdot5+(5-1) = 389$, verificado contra la salida real de \texttt{contingency()}. La primera celda ocupada de la tabla ordenada por $k$ es $k=3$ (región \texttt{AMBA}, categoría \texttt{Baño}, segmento \texttt{Campeones}, quintil 4), con 2 clientes.}
 
 \subsection{Celdas agregadas}
@@ -362,7 +364,7 @@ ar_k(t) = \!\!\sum_{i:\,k(i,t)=k}\!\! B_i(t)\cdot \hat F_i(t)
 \label{eq:celda-montos-a}
 \end{equation}
 
-\impl{pipeline/features.py:111-125 (construcción de la tabla y \texttt{groupby("k").sum()}).}
+\impl{pipeline/features.py (\texttt{contingency}: construcción de la tabla y \texttt{groupby("k").sum()}).}
 \valor{664 celdas ocupadas de 1.470 posibles (45,2\%) al corte de referencia. Reconciliación exacta: $\sum_k n_k(t) =$ 5.978, $\sum_k nr_k(t) =$ 2.452, $\sum_k ar_k(t) =$ 94.925.989 (ARS 94,9 M), igual a $X(t)$ de la sección~\ref{sec:exposicion}. Toda combinación de filtros del tablero es una suma de estas celdas: el navegador no recalcula riesgo, recency, quintiles ni RFM.}
 
 \section{Exposición agregada}
@@ -373,7 +375,7 @@ X(t) = \sum_{i:\ B_i(t)=1} \hat F_i(t) \;=\; \sum_k ar_k(t)
 \label{eq:exposicion}
 \end{equation}
 
-\impl{pipeline/build.py:185. La igualdad con $\sum_k ar_k(t)$ es la que usa pipeline/pack.py:13-16 para derivar la serie \texttt{exposicion\_por\_corte}: suma \texttt{ar} de cada contingencia y no vuelve a tocar \texttt{facts}.}
+\impl{pipeline/build.py (\texttt{main}, serie \texttt{exposicion\_por\_corte}). La igualdad con $\sum_k ar_k(t)$ es la que usa pipeline/pack.py (\texttt{pack\_payload}) para derivar la serie \texttt{exposicion\_por\_corte}: suma \texttt{ar} de cada contingencia y no vuelve a tocar \texttt{facts}.}
 \valor{$X(31/12/2025) = $ ARS 94.925.989 ($\approx$ ARS 94,9 M).}
 
 \subsection{Descomposición por dimensión}
@@ -422,21 +424,21 @@ Los siete indicadores de la Parte D sección 2.1 se trazan acá contra su implem
 
 Un trimestre solo entra en el cálculo si su cierre más 90 días cae dentro del horizonte de datos disponible; si no, $\tau_q$ queda indefinido en vez de calcularse sobre una muestra sesgada de clientes con última compra temprana en el trimestre.
 
-\impl{pipeline/series.py:12-90 (\texttt{recompra\_trimestral}). Gate de observabilidad: líneas 44-59. Conteo de retorno: líneas 61-71.}
+\impl{pipeline/series.py (\texttt{recompra\_trimestral}, con el filtro de observabilidad y el conteo de retorno).}
 \valor{2025Q3 (último trimestre observable con horizonte al 31/12/2025): $\tau = 8{,}5\%$ ($n=$ 1.330 clientes calculables), contra la meta de 10-11\% y la referencia de 8-9\% que estimó el negocio en el relevamiento (envío 3, ``un nivel base cercano al 8-9\%''; no es una línea base medida: la serie estuvo entre 16\% y 19\% de 2023Q1 a 2025Q1) (\texttt{pipeline/build.py} meta, \texttt{meta\_recompra}/\texttt{base\_recompra}). Pico de la serie: 2024Q2 con 19,0\%.}
 
 \subsection{Ingreso anual en riesgo (exposición)}
 
 Ya definido en la ecuación~\eqref{eq:exposicion}.
 
-\impl{pipeline/build.py:185.}
+\impl{pipeline/build.py (\texttt{main}, serie \texttt{exposicion\_por\_corte}).}
 \valor{ARS 94,9 M.}
 
 \subsection{Clientes en riesgo}
 
 Ya definido en la ecuación~\eqref{eq:riesgo}.
 
-\impl{pipeline/features.py:82-84.}
+\impl{pipeline/features.py (\texttt{client\_facts}, columna \texttt{en\_riesgo}).}
 \valor{2.452 de 5.978 (41,0\%).}
 
 \subsection{Riesgo en el quintil de mayor valor (Q5)}
@@ -446,7 +448,7 @@ Ya definido en la ecuación~\eqref{eq:riesgo}.
 \label{eq:q5}
 \end{equation}
 
-\impl{pipeline/build.py:187,210. Agrupa \texttt{facts} por \texttt{quintil} y promedia \texttt{en\_riesgo}.}
+\impl{pipeline/build.py (\texttt{\_anclas}). Agrupa \texttt{facts} por \texttt{quintil} y promedia \texttt{en\_riesgo}.}
 \valor{51,8\% (619 de 1.196 clientes de Q5; facturación histórica de esos 619, ARS 113,6 M).}
 
 \subsection{Cobertura de contacto}
@@ -472,7 +474,7 @@ donde $\text{top}_k(t)$ son los $k$ clientes en riesgo de mayor anualizado y $\t
 \label{eq:ejecutable}
 \end{equation}
 
-\impl{pipeline/features.py (\texttt{top\_lista}, columna \texttt{mk} = \texttt{acepta\_marketing} de Clientes.csv sobre los 800); reproducido en entregas/entregable-1/\_build/F/recalc\_e1.py, líneas C11.}
+\impl{pipeline/features.py (\texttt{top\_lista}, columna \texttt{mk} = \texttt{acepta\_marketing} de Clientes.csv sobre los 800).}
 \valor{568 de los 800 de mayor exposición (71,0\%) se pueden contactar; los 232 restantes no dieron consentimiento y no se contactan sin incumplir la Ley 25.326.}
 
 \subsection{Compra a 7 días sobre contactados}
@@ -484,7 +486,7 @@ donde $\text{top}_k(t)$ son los $k$ clientes en riesgo de mayor anualizado y $\t
 
 para un grupo $g$ de envíos de \texttt{Campanias\_marketing.csv} con \texttt{fecha\_envio}$\le t$ (base limpia, sin duplicados de fila completa).
 
-\impl{pipeline/series.py:149-158 (\texttt{tasas}). Marca a superar: líneas 171-178, sobre el segmento \texttt{Inactivos 90d}.}
+\impl{pipeline/series.py (\texttt{embudo\_campanias}, función interna \texttt{tasas}; la marca a superar, sobre el segmento \texttt{Inactivos 90d}).}
 \valor{global (23.529 envíos limpios al 31/12/2025): abre 35,1\%, clic 8,8\%, compra a 7 días 1,21\%. Marca a superar (segmento \texttt{Inactivos 90d}, criterio actual): 1,39\%, 61 compras en 4.399 envíos, intervalo de Wilson al 95\% de 1,08\% a 1,78\%. El desglose por segmento corre sobre el extracto tal cual llega (23.729 envíos, con los 200 \texttt{id\_envio} repetidos), como lo hace el tablero; sobre la base limpia da 61 en 4.359, 1,40\% (1,09\% a 1,79\%). La diferencia es 0,01 pp y no cambia ninguna conclusión; se declara para que papel y pantalla digan lo mismo.}
 
 
@@ -498,7 +500,7 @@ X_{90}(t) = X(t)\cdot\frac{90}{365}
 \label{eq:exposicion90}
 \end{equation}
 
-\impl{entregas/entregable-1/\_build/F/recalc\_e1.py, línea C04b (derivada de \texttt{exposicion anual (M)}).}
+\impl{cuenta directa sobre $X(t)$ de la ecuación~\eqref{eq:exposicion}.}
 \valor{$X_{90} = 94{,}9 \cdot 90/365 = $ ARS 23,4 M por ventana de 90 días.}
 
 \supuesto{Es un prorrateo a ritmo constante, no una predicción: reparte la exposición anual de los clientes hoy en riesgo en cuatro ventanas iguales. Sirve para que la magnitud del problema esté en la misma escala que el período declarado (observación B~1.3 de la devolución del 15/09); no dice cuántos de esos pesos se pierden en el próximo trimestre, cosa que sólo un modelo validado podría estimar. Las dos escalas se muestran juntas: ARS 94,9 M/año y ARS 23,4 M por 90 días, ambas al corte 31/12/2025.}
@@ -543,8 +545,8 @@ Feature & $D(x)$ & Lectura \\
 \label{tab:discriminante}
 \end{table}
 
-\impl{entregas/entregable-1/\_build/F/recalc\_e1.py, líneas C21, sobre \texttt{features.client\_facts} del corte de referencia.}
-\valor{los seis valores de la tabla~\ref{tab:discriminante}, reproducidos el 15/09/2026.}
+\impl{cálculo sobre \texttt{client\_facts} del corte de referencia (pipeline/features.py), con \texttt{pd.qcut} y la definición de arriba.}
+\valor{los seis valores de la tabla~\ref{tab:discriminante}.}
 
 \textbf{Por qué se descartan las dos primeras.} $B_i(t)$ se calcula con $\rho_i(t)$ y $\gamma_i(t)$: que ``predigan'' el riesgo es aritmética, no señal. Entrenar un modelo con ellas como features y $B_i(t)$ como target es el \emph{leakage} que advierte Provost y Fawcett. Descontadas, la mejor señal genuina disponible con los seis datasets del Entregable 1 es \texttt{n\_tiendas\_distintas} con 1,22$\times$. Hasta el Entregable 3, el criterio de éxito 1 de la Parte C pedía un lift de $1{,}30\times$ en el decil superior contra la línea base de recency. La regla del umbral, sin modelo, ya da $2{,}30\times$ (subsección~\ref{sec:regla-umbral}), y con las señales de reclamos, consultas y devoluciones que llegaron el 08/09 ningún modelo le gana en la lista de contactables con un intervalo que excluya el cero (subsección~\ref{sec:bootstrap}). Por eso el criterio se reescribió contra la regla (subsección~\ref{sec:meta-criterio-1}). La pasada exploratoria del 05/08 reportó además una feature ``tendencia'' con 4,5$\times$; su definición no quedó registrada y no se reproduce, así que no se cita.
 
@@ -560,12 +562,12 @@ Y_i(T) = \mathbb{1}\bigl[\,E_i(T)=1 \ \wedge\ B_i(T)=0 \ \wedge\ \exists\, t \in
 \label{eq:target}
 \end{equation}
 
-es decir, entre los clientes elegibles que al corte $T$ todavía no cruzaron su umbral, cuáles lo cruzan dentro de los 90 días siguientes. La condición $E_i(T)=1$ se agrega en la v2.1 (22/09/2026): un cliente con menos de tres compras no tiene umbral propio y no puede cruzarlo, así que sin esa condición la población del target mezclaría clientes que nunca pueden dar $Y_i(T)=1$ (sección~\ref{sec:proxy-churn}). Un modelo puntúa en $T$ la probabilidad de $Y_i(T)=1$ con señales que se mueven \emph{antes} del cruce: caída de frecuencia y de ticket respecto del propio historial, y desde el 08/09 reclamos, consultas de soporte y devoluciones. Se valida con holdout temporal (entrenar hasta un corte, evaluar sobre los 90 días siguientes), contra la línea base de ordenar por $\rho_i(T)$ y, desde el Entregable 3, contra la regla del umbral. El dataset de entrenamiento del Entregable 2 materializa esta definición como una fila por cliente elegible y no en riesgo en cada corte mensual $T$, del 31/01/2023 al 30/09/2025, con las features calculadas solo con datos de fecha $\le T$ y el target medido en $(T,\,T+90]$; la partición es por corte (entrenamiento hasta 2024, prueba en 2025), nunca aleatoria, y la del Entregable 3 suma un embargo (subsección~\ref{sec:particion}). En la versión 0.1 del dataset la existencia se evalúa en tres puntos de la ventana, $t \in \{T+30,\,T+60,\,T+90\}$ días: un cliente que cruza su umbral y vuelve a comprar entre dos evaluaciones queda con $Y_i(T)=0$. Desde la v0.2 (Entregable 3) el target se evalúa cada día de la ventana, como dice la ecuación~\eqref{eq:target}: suma 885 positivos y ninguno pasa a 0.
+es decir, entre los clientes elegibles que al corte $T$ todavía no cruzaron su umbral, cuáles lo cruzan dentro de los 90 días siguientes. La condición $E_i(T)=1$ hace falta porque un cliente con menos de tres compras no tiene umbral propio y no puede cruzarlo, así que sin esa condición la población del target mezclaría clientes que nunca pueden dar $Y_i(T)=1$ (sección~\ref{sec:proxy-churn}). Un modelo puntúa en $T$ la probabilidad de $Y_i(T)=1$ con señales que se mueven \emph{antes} del cruce: caída de frecuencia y de ticket respecto del propio historial, y desde el 08/09 reclamos, consultas de soporte y devoluciones. Se valida con holdout temporal (entrenar hasta un corte, evaluar sobre los 90 días siguientes), contra la línea base de ordenar por $\rho_i(T)$ y, desde el Entregable 3, contra la regla del umbral. El dataset de entrenamiento del Entregable 2 materializa esta definición como una fila por cliente elegible y no en riesgo en cada corte mensual $T$, del 31/01/2023 al 30/09/2025, con las features calculadas solo con datos de fecha $\le T$ y el target medido en $(T,\,T+90]$; la partición es por corte (entrenamiento hasta 2024, prueba en 2025), nunca aleatoria, y la del Entregable 3 suma un embargo (subsección~\ref{sec:particion}). En la versión 0.1 del dataset la existencia se evalúa en tres puntos de la ventana, $t \in \{T+30,\,T+60,\,T+90\}$ días: un cliente que cruza su umbral y vuelve a comprar entre dos evaluaciones queda con $Y_i(T)=0$. Desde la v0.2 (Entregable 3) el target se evalúa cada día de la ventana, como dice la ecuación~\eqref{eq:target}: suma 885 positivos y ninguno pasa a 0.
 % registro de cifras: F02
 
 \textbf{Las ``dos semanas posteriores al corte''} del alcance (Parte C, sección 1.2) son el plazo para enviar la lista, no un horizonte de predicción: ese es el de la ecuación~\eqref{eq:target}, 90 días.
 
-En el Entregable 3 la anticipación no la da un modelo sino la regla del umbral de la subsección~\ref{sec:regla-umbral}: ordenar a los clientes por los días que les faltan para cruzar su umbral acierta 81,6\% de la lista mensual en validación y 86,1\% de la lista de contactables en test. En esa lista ningún modelo la supera con un intervalo que excluya el cero; sin filtro, en test, la logística suma 1,06 puntos, pero esa lista no se puede mandar y la ventaja no paga lo que el modelo agrega al costo (subsecciones~\ref{sec:bootstrap} y~\ref{sec:criterio-reemplazo}).
+En el Entregable 3 la anticipación no la da un modelo sino la regla del umbral de la subsección~\ref{sec:regla-umbral}: ordenar a los clientes por los días que les faltan para cruzar su umbral acierta 81,6\% de la lista mensual en validación sin filtro y 86,1\% en test contactables (tabla~\ref{tab:precisiones}). En la lista de contactables ningún modelo la supera con un intervalo que excluya el cero; sin filtro, en test, la logística suma 1,06 puntos, pero esa lista no se puede mandar y la ventaja no paga lo que el modelo agrega al costo (subsecciones~\ref{sec:bootstrap} y~\ref{sec:criterio-reemplazo}).
 % registro de cifras: J03, J11
 
 \subsection{Días para cruzar el umbral y cercanía}
@@ -597,7 +599,7 @@ Es la línea base 2 de la etapa 1 del modelado (Parte A del Entregable 3) y la r
 Como orden, la lista del mes se llena empezando por los clientes con menos días para cruzar, $h_i(T)$ de menor a mayor. Los empates en el último lugar se reparten en proporción, y de ahí los aciertos con decimales. La práctica actual ordena por $\rho_i(T)$ de mayor a menor (más días sin comprar primero). El lift de un orden es la precisión de su decil superior (el 10\% de mayor puntaje de cada corte) dividida por la de la práctica actual.
 
 \impl{A-scripts\_etapa1.zip: etapa1.py, salida \texttt{etapa1.json} ($\to$ \texttt{lineas\_base\_validacion}).}
-\valoren{validación, cortes de julio a septiembre de 2024, 7.173 filas}{como clasificador, VP 1.713, FP 540, FN 0 y VN 4.920 (precisión 76,0\%, recall 100\%). En la lista de 500, 81,6\% (1.223,67 aciertos en 1.500) contra 36,2\% de la práctica actual. Decil superior, 90,7\% contra 39,4\%: un lift de 2,30$\times$.}
+\valoren{validación, cortes de julio a septiembre de 2024, 7.173 filas}{como clasificador, VP 1.713, FP 540, FN 0 y VN 4.920 (precisión 76,0\%, recall 100\%, F1 0,864). En la lista de 500 sin filtro, VP 1.223,67, FP 276,33, FN 489,33 y VN 5.183,67: 81,6\% contra 36,2\% de la práctica actual. Decil superior, 90,7\% contra 39,4\%: un lift de 2,30$\times$.}
 % registro de cifras: F07, F09, G11, G21
 
 \subsection{Precisión de la lista mensual}
@@ -610,11 +612,37 @@ P_{500} = \frac{\sum_{T} \sum_{i \in L(T)} Y_i(T)}{\sum_{T} |L(T)|}, \qquad R_{5
 \label{eq:precision-lista}
 \end{equation}
 
-La lista de contactables $L^{c}(T)$ se arma igual, pero solo con clientes que aceptan marketing y no pidieron la baja con fecha $\le T$, el filtro L3 de la Parte C del Entregable 3; su recall es sobre los positivos contactables. El ajuste de la etapa 3 busca con una lista proporcional, el 20,9\% de cada corte, la porción que ocupa la lista de 500 en validación (1.500 de 7.173 filas), porque 5 de los 16 cortes de entrenamiento tienen menos de 500 filas.
+La lista de contactables $L^{c}(T)$ se arma igual, pero solo con clientes que aceptan marketing y no pidieron la baja con fecha $\le T$, el filtro L3 de la Parte C del Entregable 3; su recall es sobre los positivos contactables. El F1 de la lista combina las dos con el largo de la lista y los positivos del corte:
+
+\begin{equation}
+\mathrm{F1}_{500} = \frac{2\,P_{500}\,R_{500}}{P_{500} + R_{500}} = \frac{2\sum_{T} \sum_{i \in L(T)} Y_i(T)}{\sum_{T} |L(T)| + \sum_{T} \sum_{i} Y_i(T)}
+\label{eq:f1-lista}
+\end{equation}
+
+El ajuste de la etapa 3 busca con una lista proporcional, el 20,9\% de cada corte, la porción que ocupa la lista de 500 en validación (1.500 de 7.173 filas), porque 5 de los 16 cortes de entrenamiento tienen menos de 500 filas.
 
 \impl{C-scripts\_etapa3.zip: etapa3.py, salida \texttt{etapa3.json} ($\to$ \texttt{umbral.filas} y \texttt{umbral.filtradas}).}
-\valoren{validación}{la regla del umbral acierta 81,6\% de la lista sin filtro y 75,8\% de la de contactables (1.137 aciertos, recall 96,8\%); la regresión logística ajustada, 82,6\% y 73,9\%. Son contactables 5.038 de las 7.173 filas.}
-% registro de cifras: G11, G13, G12, H01, H05, H14, H15, H16
+\valoren{validación}{la precisión de cada lista está en la tabla~\ref{tab:precisiones}. Son contactables 5.038 de las 7.173 filas; en su lista de 500 la regla acierta 1.137 (recall 96,8\%). $\mathrm{F1}_{500}$ sin filtro, con 1.500 lugares y 1.713 positivos: 0,762 la regla, 0,338 la práctica actual y 0,223 una lista sin orden, que acierta la tasa base (23,9\%).}
+% registro de cifras: G11, G13, G12, H01, H05, H14, H15, H16, F08, F20
+
+Cada precisión del Entregable 3 dice su columna: \emph{validación sin filtro} (los tres cortes de validación, todas las filas), \emph{validación contactables} (los mismos cortes, solo filas contactables) y \emph{test contactables} (los cinco cortes de test, solo contactables, subsección~\ref{sec:evaluacion-test}).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Lista de 500 por corte & Validación & Validación & Test \\
+ & sin filtro & contactables & contactables \\
+\midrule
+Práctica actual (más días sin comprar) & 36,2\% & 32,8\% & 37,6\% \\
+Regla del umbral (menos días para cruzar) & 81,6\% & 75,8\% & 86,1\% \\
+Regresión logística ajustada & 82,6\% & 73,9\% & 85,9\% \\
+\bottomrule
+\end{tabular}
+\caption{Precisión de la lista de 500 por corte, ecuación~\eqref{eq:precision-lista}. Validación: julio a septiembre de 2024 (\texttt{etapa3.json}); test: enero a mayo de 2025 (\texttt{etapa4.json}).}
+\label{tab:precisiones}
+\end{table}
+% registro de cifras: F07, H13, J17 (práctica actual); F09, G11, H16, J03 (regla); H05, H15, J03 (logística ajustada)
 
 \subsection{Meta del criterio de éxito 1}
 \label{sec:meta-criterio-1}
@@ -635,14 +663,14 @@ P_{\text{alerta}} = P^{c}_{500} - 1{,}96\sqrt{\frac{P^{c}_{500}\,(1-P^{c}_{500})
 
 la precisión de validación de la lista de contactables menos el medio intervalo del 95\% de una lista de 500.
 
-\impl{entregas/entregable-3/\_build/B/contenido\_b.py (\texttt{META\_FILT\_MES}) y \_build/C/contenido\_c.py (\texttt{ALERTA\_DRIFT}), que leen \texttt{etapa3.json}.}
+\impl{C-scripts\_etapa3.zip: etapa3.py, salida \texttt{etapa3.json} ($\to$ \texttt{umbral.filtradas.regla\_umbral}, lista de 500): $M_1$ y $P_{\text{alerta}}$ salen de sus aciertos.}
 \valoren{validación}{$M_1$ = 1.137 / 3 = 379 aciertos por mes (75,8\%). La logística ajustada acierta 29 menos en los tres meses, con un intervalo de $-3{,}25$ a $-1{,}07$ puntos. $P_{\text{alerta}}$ = 75,8\% $-$ 3,8 = 72,0\%.}
 % registro de cifras: G56, H16, H44
 
 % (28/10, v2.6) alerta de drift del monitoreo en producción (fila J53), sin ecuación numerada para no correr las que citan las partes; sin número de sección de la D, que el armado del consolidado no reescribe en el anexo
 El monitoreo en producción de la Parte D del Entregable 3 suma una alerta de drift sobre la proporción de clientes en riesgo entre los elegibles, con el riesgo de la subsección~\ref{sec:riesgo} y la identidad unida del Entregable 2, en cada corte de fin de mes. La alerta salta si esa proporción sube más de 2,1 puntos de un mes al siguiente. Los 2,1 puntos son la mayor suba mensual entre los cortes de diciembre de 2023 y agosto de 2025.
 
-\impl{entregas/entregable-3/\_build/D/drift/serie\_riesgo.py.}
+\impl{D-scripts\_etapa4.zip: drift/serie\_riesgo.py, salida \texttt{serie\_riesgo.json} (\texttt{umbral\_suba\_pp} y \texttt{serie}). Usa las funciones del pipeline del repositorio (\texttt{loader}, \texttt{features.client\_facts} y la identidad unida de \texttt{calidad}).}
 \valoren{cortes de fin de mes}{la mayor suba, de 32,67\% al 30/04/2025 a 34,76\% al 31/05/2025. La proporción es 38,5\% al 31/08/2025 y 50,4\% al 31/12/2025. Con ese umbral la alerta habría saltado en octubre (+2,64), noviembre (+3,55) y diciembre de 2025 (+3,84), meses de cobertura no confirmada (DC-09).}
 % registro de cifras: J53
 
@@ -679,7 +707,7 @@ Fuera de la evaluación & 2025-06 a 2025-09 & 11.294 & 3.031 (26,84\%) \\
 \subsection{Evaluación en test}
 \label{sec:evaluacion-test}
 
-\textbf{Población.} Las filas contactables de los cinco cortes de test, del 31/01 al 31/05/2025, con target medido hasta el 29/08/2025: clientes que aceptan marketing y no pidieron la baja con fecha $\le T$, el filtro L3 de la Parte C del Entregable 3. Son 9.962 de las 14.211 filas, con 2.521 positivos. $\mathcal C$ es el conjunto de cortes evaluados: 5 en test, 3 en validación. El test decidió en su apertura del 27/10/2026, con el modelo, la lista y el criterio de la subsección~\ref{sec:criterio-reemplazo} fijados antes en \texttt{preregistro.json} (v1.1); el 30/10 se releyó para la lista de 800, sin elegir nada.
+\textbf{Población.} Las filas contactables de los cinco cortes de test, del 31/01 al 31/05/2025, con target medido hasta el 29/08/2025: clientes que aceptan marketing y no pidieron la baja con fecha $\le T$, el filtro L3 de la Parte C del Entregable 3. Son 9.962 de las 14.211 filas, con 2.521 positivos. $\mathcal C$ es el conjunto de cortes evaluados: 5 en test, 3 en validación. El test decidió en su apertura del 27/10/2026, con el modelo, la lista y el criterio de la subsección~\ref{sec:criterio-reemplazo} fijados antes en \texttt{preregistro.json} (v1.1).
 
 La tabla de la evaluación final de la Parte D del Entregable 3 mide la lista de contactables $L^{c}(T)$ de la subsección~\ref{sec:precision-lista}. Predicho positivo es estar en la lista de su corte. Con $VP$ los aciertos, $FP$ los lugares de la lista sin acierto y $FN$ los positivos contactables que quedan fuera, sumados sobre los cortes de $\mathcal C$,
 
@@ -741,13 +769,13 @@ q_{0{,}025}\bigl(D^{(b)}\bigr) > 0 \qquad \text{y} \qquad \frac{VP_{\text{modelo
 La primera pide que la ventaja no sea azar: el intervalo de la ecuación~\eqref{eq:bootstrap} excluye el cero. La segunda pide que los aciertos de más por mes paguen lo que el modelo agrega al costo del año 1, $C_{\text{extra}}$ = USD 10.400: dos meses más de data scientist y la nube. Cada acierto de más reemplaza un falso positivo, y por eso vale $v_{VP} - v_{FP}$; $a^*$ son los puntos de la subsección~\ref{sec:valor-punto} pasados a aciertos por mes, 5 por punto.
 
 \impl{\texttt{preregistro.json} ($\to$ \texttt{criterio\_de\_decision.operativo}) y etapa4.py (\texttt{medir}, \texttt{decidir}), en D-scripts\_etapa4.zip; $a^*$ en \texttt{economia.json} ($\to$ \texttt{meta\_criterio\_1}), de B-scripts\_etapa2.zip.}
-\valoren{test}{el límite inferior es $-1{,}45$ puntos y la logística acierta 1,27 clientes menos por mes, cuando $a^*$ = 8.595. No se cumple ninguna de las dos condiciones: la lista sigue con la regla del umbral.}
+\valoren{test}{el límite inferior es $-1{,}45$ puntos y la logística acierta 1,27 clientes menos por mes. Para pagar los USD 10.400 que agrega, el modelo necesitaría más aciertos por mes de los que caben en la lista de 500 ($a^* > 500$): no puede pagar su costo. No se cumple ninguna de las dos condiciones y la lista sigue con la regla del umbral.}
 % registro de cifras: J09, J10, G40, G53, G56
 
 \section{Experimento propuesto y efecto mínimo detectable}
 \label{sec:experimento}
 
-El criterio de éxito 5 de la Parte C mide el piloto que propone la Parte B del Entregable 3: tres meses con la lista de 500 por mes, de la que 80 clientes por mes quedan sin contactar como grupo de control. El control se sortea fuera de los clientes de alto valor, el 20\% de mayor facturación acumulada al corte (\texttt{monetary}) de cada corte, como pidió Sofía R.: ``siempre que ese grupo sea una porción menor y no comprometa a los clientes de mayor valor identificado'' (envío 45). Quedan 1.260 tratados y 240 de control. El efecto que mide el piloto vale para el resto de los clientes; para el 20\% de mayor facturación sigue siendo un supuesto.
+El criterio de éxito 5 de la Parte C mide el piloto que propone la Parte B del Entregable 3: tres meses con la lista de 500 contactables por mes. El 20\% de mayor facturación acumulada al corte (\texttt{monetary}), unos 149 clientes por mes, se contacta entero con la oferta con 15\% de descuento y se reporta aparte, como pidió Sofía R.: ``siempre que ese grupo sea una porción menor y no comprometa a los clientes de mayor valor identificado'' (envío 45). El grupo de control se sortea al azar, cada mes, entre los clientes de la lista que no están en ese 20\%: 100 por mes, 300 en los tres meses. El resto de esos clientes se reparte en dos ramas iguales, de unos 126 por mes, una con 15\% de descuento y otra sin descuento, contra el mismo control. Son 1.200 contactados. El efecto que mide el piloto vale fuera del 20\%; para ese grupo sigue siendo un supuesto.
 
 El control sale de la lista y no del excedente de capacidad: la lista se ordena y se corta, así que el excedente es por construcción el tramo que quedó último, y compararlo contra los contactados mide el ordenamiento, no la campaña.
 
@@ -758,28 +786,42 @@ El efecto mínimo detectable (MDE) entre dos grupos de tamaños $N_1$ y $N_2$, p
 \label{eq:mde}
 \end{equation}
 
-con $p_1 = p_0+\delta$ y $\bar p = (N_1 p_0+N_2 p_1)/(N_1+N_2)$, resuelto por bisección sobre $\delta$. Con $N_1 = N_2$ es la fórmula de dos ramas iguales que usa el tablero.
+con $p_1 = p_0+\delta$ y $\bar p = (N_1 p_0+N_2 p_1)/(N_1+N_2)$, resuelto por bisección sobre $\delta$. $N_1$ es el grupo contactado, con la tasa $p_0$, y $N_2$ el control: es la convención que da el 2,95 del Entregable 1. Con el control en $p_0$ (los argumentos invertidos) una rama da 9,68 puntos, las dos juntas 8,53 y una rama con 80 de control 10,24: las conclusiones no cambian, porque 9,68 sigue debajo del umbral sin descuento (9,92) y 10,24 queda arriba. Con $N_1 = N_2$ es la fórmula de dos ramas iguales que usa el tablero.
 
-\impl{B-scripts\_etapa2.zip: economia.py (\texttt{mde\_desigual}), con $p_0$ igual a la compra a 7 días global de la ecuación~\eqref{eq:compra7d}; la misma función reproduce el 2,95 de la vista 13 (entregas/entregable-1/\_build/F/recalc\_e1.py, líneas C24b), y con ramas iguales da el 1,71 de pipeline/series.py (\texttt{potencia\_experimento}).}
-\valoren{$p_0$ = 1,21\%, los 23.529 envíos}{piloto, 1.260 tratados contra 240 de control: MDE $= 2{,}87$ puntos porcentuales. Es lo mínimo que el piloto distingue de cero: prueba que el contacto tiene efecto, no que la lista se pague (subsección~\ref{sec:umbral-piloto}). La vista 13 del tablero del Entregable 1 muestra el diseño anterior, sobre la lista de 800 ordenada por $\hat F_i(t)$: 360 reactivación, 360 cuidado y 80 control por corte, en 3 cortes, asignados por un ciclo fijo de 20 clientes (9, 9 y 2). Ahí el MDE es 1,71 puntos entre las dos ramas de mensaje (1.080 cada una), 2,95 entre una rama y el control (240) y 2,68 entre las dos ramas juntas (2.160) y el control.}
-% registro de cifras: G49, G50, C24, C24b
+\textbf{Qué decide.} El cruce del umbral a 90 días: la parte de cada grupo que cruza su umbral en los 90 días siguientes al corte de su lista, $Y_i(T)$ de la ecuación~\eqref{eq:target}, control menos rama. Sin contacto cruza
+
+\begin{equation}
+c_0 = \frac{\sum_{T}\sum_{i \in L^{c}(T),\ i \notin \text{20\%}} Y_i(T)}{\sum_{T} \bigl|\{i \in L^{c}(T):\ i \notin \text{20\%}\}\bigr|}
+\label{eq:cruce-control}
+\end{equation}
+
+los aciertos de la regla en los lugares de la lista de contactables que no son del 20\% de mayor facturación, sobre esos lugares, en los tres cortes de validación. Para el MDE a 90 días, $p_0 = 1 - c_0$, la parte que no cruza sin contacto. La compra a 7 días de la ecuación~\eqref{eq:compra7d} es una señal temprana, con $p_0$ la compra a 7 días global; no decide.
+
+\impl{B-scripts\_etapa2.zip: economia.py (\texttt{mde\_desigual} y \texttt{mdes}), salida \texttt{economia.json} ($\to$ \texttt{piloto.poblacion} y \texttt{piloto.metrica\_decision}). La misma función reproduce el 2,95 de la vista 13 del tablero del Entregable 1, y con ramas iguales da el 1,71 de pipeline/series.py (\texttt{potencia\_experimento}).}
+\valoren{lista de 500 contactables, tres cortes de validación}{$c_0$ = 77,41\% (815,33 de 1.053,33 lugares fuera del 20\%; en el 20\%, 72,0\%). Cada rama, 376,67 en los tres meses. MDE a 90 días: 9,63 puntos una rama contra el control, 9,06 entre ramas y 8,38 las dos ramas juntas contra el control. Con 80 de control por mes una rama daría 10,12, más que el umbral sin descuento de la subsección~\ref{sec:umbral-piloto}: por eso el control es de 100. Señal a 7 días, con $p_0$ = 1,21\% (los 23.529 envíos): 2,91 puntos las dos ramas juntas contra el control, 3,66 una rama y 3,43 entre ramas. La vista 13 del tablero del Entregable 1 muestra el diseño anterior, sobre la lista de 800 ordenada por $\hat F_i(t)$: 360 reactivación, 360 cuidado y 80 control por corte, en 3 cortes. Ahí el MDE a 7 días es 1,71 puntos entre las dos ramas de mensaje (1.080 cada una), 2,95 entre una rama y el control (240) y 2,68 entre las dos ramas juntas y el control.}
+% registro de cifras: G49, G50, G61, C24, C24b
 
 \subsection{Umbral de producción del piloto}
 \label{sec:umbral-piloto}
 
-El piloto mide la compra a 7 días de todos los contactados menos la del control. La tasa de éxito $s$ y su equilibrio $s^*$ (subsecciones~\ref{sec:tasa-exito} y~\ref{sec:valor-lista}) se cuentan sobre los contactados que se iban a ir. Si el contacto cambia solo la compra de esos clientes (los falsos positivos compran igual, como supone la Parte B del Entregable 3), la diferencia que mide el piloto es
+Se pasa a producción si la diferencia a 90 días paga el costo recurrente de seguir un año: al decidir, la inversión inicial ya está gastada. Si el contacto cambia solo a los clientes que se iban a ir (los falsos positivos compran igual, como supone la Parte B del Entregable 3), en el control cruza $c_0$ y en una rama $c_0\,(1-s)$. La diferencia que mide el piloto es
 
 \begin{equation}
-\Delta = s \cdot P_{500}
+\Delta = s \cdot c_0
 \label{eq:diferencia-piloto}
 \end{equation}
 
-con $P_{500}$ la precisión de la lista, la parte de los contactados que se iba a ir. Para invertir en producción la diferencia tiene que llegar a $\Delta^* = s^* \cdot P_{500}$.
+El umbral es $\Delta^* = s^*_{\text{rec}}\, c_0$, con $s^*_{\text{rec}}$ la tasa de éxito de equilibrio de la ecuación~\eqref{eq:s-equilibrio} sobre la matriz de la lista de 500 contactables y con $C_{\text{rec}}$ en lugar de $C_1$. Sin descuento, $d = r = 0$. Con $C_1$ se obtiene lo que pagaría también el primer año, inversión incluida: es solo una referencia. Cada tasa de equilibrio dice su lista: el 49,6\% de la subsección~\ref{sec:valor-lista} es de la lista sin filtro; las de esta subsección, de la lista de contactables.
 
-\impl{entregas/entregable-3/\_build/C/contenido\_c.py (\texttt{DIF\_EQ}, \texttt{S\_EQ\_FILT}), que reproduce $s^*$ con la ecuación~\eqref{eq:s-equilibrio}.}
-\valoren{validación}{con la lista de 500 de la regla sin filtro, $s^* = 49{,}56\%$ y $P_{500} = 81{,}58\%$: $\Delta^* = 40{,}4$ puntos. Con la lista de contactables da lo mismo: $s^* = 53{,}35\%$ y $P^{c}_{500} = 75{,}8\%$. Con los factores redondeados a un decimal la cuenta da 40,5, por eso se citan sin redondear. Entre 2,87 y 40,4 puntos el contacto funciona pero no paga la lista, y no se invierte en producción.}
-\valoren{test, lista de 500 contactables}{la regla acierta 86,1\% y su equilibrio baja a $s^* = 46{,}9\%$: $\Delta^*$ sigue en 40,4 puntos.}
-% registro de cifras: H49, G43, J19
+Con la tasa de éxito observada, $s$ = 1,02\% (subsección~\ref{sec:tasa-exito}), la ecuación~\eqref{eq:diferencia-piloto} da la diferencia más probable. El piloto se diseña sabiendo que lo esperable es no llegar al umbral: mide si la tasa real es otra.
+
+\supuesto{El umbral supone la misma tasa de éxito en el 20\% de mayor facturación que fuera de él, y el piloto no la mide en ese 20\%.}
+
+\textbf{Calendario.} La semana 1 del plan es la del 02/11/2026. La primera lista sale en la semana 6 (07/12/2026) y la tercera en la 14 (01/02/2027, corte 31/01/2027). El cruce a 90 días de la primera cierra el 28/02/2027 (semana 17) y el de la tercera el 01/05/2027 (semana 26). La decisión preliminar es en la semana 20 (desde el 15/03/2027), con la compra a 7 días de las tres listas y el cruce de la primera; la final, en la semana 28 (lunes 10/05/2027), con el cruce de las tres. Esperar de la semana 19 a la 28 cuesta $C_{\text{rec}} \cdot 10/52$. Las tres listas salen entre diciembre y febrero: el efecto medido vale para esos meses y puede no repetirse en otros.
+
+\impl{B-scripts\_etapa2.zip: economia.py (\texttt{s\_equilibrio}), salida \texttt{economia.json} ($\to$ \texttt{piloto.umbral\_produccion} y \texttt{piloto.calendario}).}
+\valoren{lista de 500 contactables, validación}{con $C_{\text{rec}}$ = USD 6.000 por año (operador y soporte) y 15\% de descuento, $s^*_{\text{rec}}$ = 16,03\% y $\Delta^*$ = 12,41 puntos; sin descuento, 12,82\% y 9,92 puntos. Con $C_1$ = USD 20.260, 53,35\% y 41,29 puntos con descuento (42,76\% y 33,10 sin descuento). Con $s$ = 1,02\%, $\Delta$ = 0,79 puntos, debajo del MDE. Esperar de la semana 19 a la 28 cuesta USD 1.153,85.}
+% registro de cifras: G61, G62, G63, G39, G31
 
 % (30/10, v2.7, crítica del acumulado) «es bajo en los dos extremos», «diciembre de 2022» y el ticket «casi no cambia» (baja 5,7 %), igual que la Parte A del E2
 % (30/10, v2.7) sin «carga parcial»: Casa Óga no sabe la causa (consulta 2), con la formulación de la condición 2 de la Parte A del E3 (pendiente 132, devolución del E2)
@@ -793,7 +835,7 @@ El extracto de transacciones es bajo en los dos extremos. Sube de 44 ventas en e
 
 $X(t)$ (ecuación~\eqref{eq:exposicion}) es la facturación anual proyectada de clientes que hoy están en riesgo, calculada con su propio ritmo histórico de gasto. No mide cuánto recuperaría una campaña de retención: recuperar es una afirmación causal (\emph{si contactamos a estos clientes, vuelven a comprar tanto como antes}) y $X(t)$ no compara contactados contra un grupo de control. Afirmar que Casa Óga ``recupera ARS 94,9 M'' es una lectura que el dato no sostiene.
 
-Esta distinción ya está declarada en tres lugares del proyecto, y este documento la reafirma como cuarto: en \texttt{pipeline/CONTRACT.md} sección 3 (\texttt{perdida\_esperada} se define como ``exposición, no recupero''), en la Parte D sección 2.1 (``Es exposición, no recupero'') y en la misma Parte D, sección 6.1, que deja fuera de alcance de la V1 ``la medición de efecto incremental (necesita grupo de control)''. La V2 del proyecto contempla el grupo de control del piloto (Parte D, sección 6.1, ``Plan de evolución'', y sección~\ref{sec:experimento} de este anexo), que es el diseño mínimo para poder hablar de recupero.
+La misma distinción está en \texttt{pipeline/CONTRACT.md} sección 3 (\texttt{perdida\_esperada} se define como ``exposición, no recupero''), en la Parte D sección 2.1 (``Es exposición, no recupero'') y en la misma Parte D, sección 6.1, que deja fuera de alcance de la V1 ``la medición de efecto incremental (necesita grupo de control)''. La V2 del proyecto contempla el grupo de control del piloto (Parte D, sección 6.1, ``Plan de evolución'', y sección~\ref{sec:experimento} de este anexo), que es el diseño mínimo para poder hablar de recupero.
 
 Mientras no exista ese grupo de control, cualquier pantalla que muestre $X(t)$ debe rotularlo como \emph{exposición} y no como \emph{ahorro} o \emph{recupero potencial}, y la nota al pie del tablero (Parte D, sección 4.1, \texttt{[NOTAS FIJAS AL PIE]}) tiene que sostener esa distinción en cada corte, no solo en el primero.
 
@@ -813,8 +855,8 @@ s = \frac{1}{|E|}\sum_{j\in E}\text{compra\_7dias}_j, \qquad r = \frac{1}{|E^{0}
 $s$ es la tasa de éxito de la acción y $r$ la parte de los falsos positivos que usa el descuento, medida en la misma semana. Sin grupo de control, $s$ mide conversión y no efecto: es un techo. $r$ vale para una oferta de 7 días; si la oferta valiera hasta la próxima compra, la usaría todo el que la abre.
 
 \impl{B-scripts\_etapa2.zip: economia.py, salida \texttt{economia.json} ($\to$ \texttt{tasa\_exito} y \texttt{tasa\_exito\_cruzan}).}
-\valoren{envíos cerca del umbral}{$s$ = 16 / 1.570 = 1,02\%, con un intervalo de Wilson al 95\% de 0,63\% a 1,65\%: vuelve 1 de cada 98. $r$ = 3 / 408 = 0,74\%, 1 de cada 136. Con una oferta hasta la próxima compra, $r$ sería la apertura de esos 408 envíos, 34,8\%. Sobre los 1.162 envíos a clientes que cruzaron, $s$ = 1,12\%.}
-% registro de cifras: G31, G52
+\valoren{envíos cerca del umbral}{$s$ = 16 / 1.570 = 1,02\%, con un intervalo de Wilson al 95\% de 0,63\% a 1,65\%: vuelve 1 de cada 98. $r$ = 3 / 408 = 0,74\%, 1 de cada 136. Con una oferta hasta la próxima compra, $r$ sería la apertura de esos 408 envíos, 34,8\%. Sobre los 1.162 envíos a clientes que cruzaron, $s$ = 13 / 1.162 = 1,12\%; contra los 3 de 408 de los que no cruzaron no se separa del azar (prueba exacta de Fisher a dos colas, $p$ = 0,77), y la base sigue en 1,02\%.}
+% registro de cifras: G31, G52 (Fisher)
 
 \subsection{Valor de cada celda de la matriz de confusión}
 \label{sec:valor-celda}
@@ -849,11 +891,18 @@ s^* = \frac{C_1\,\mathrm{TC}/4 + VP\,c + FP\,(c + r\,d\,\bar t)}{VP\,(m - d\,\ba
 \label{eq:s-equilibrio}
 \end{equation}
 
-El tipo de cambio de equilibrio, $\mathrm{TC}^* = V / C_1$, es el que deja el ROI en 0 con el beneficio en pesos.
+El tipo de cambio de equilibrio, $\mathrm{TC}^* = V / C_1$, es el que deja el ROI en 0 con el beneficio en pesos. Despejando $m$ en lugar de $s$ sale el margen por cliente que vuelve con el que el ROI da 0,
 
-\impl{B-scripts\_etapa2.zip: economia.py (\texttt{regla\_anual}, \texttt{s\_equilibrio\_mvp}, \texttt{tc\_equilibrio}).}
-\valoren{validación, lista de 500 de la regla sin filtro}{con VP 1.223,67 y FP 276,33, $V$ = USD 299,49 por año; con $C_1$ = USD 20.260, ROI $-98{,}52\%$. $s^*$ = 49,6\% con 15\% de descuento, 48,6 veces $s$, y 39,7\% sin descuento ($d = r = 0$). TC$^*$ = 21,57 ARS/USD. Con la lista de 500 contactables (VP 1.137, FP 363), $V$ = USD 264,54 y ROI $-98{,}69\%$.}
-% registro de cifras: G34, G39, G41, G43, G44, G54
+\begin{equation}
+m^* = \frac{C_1\,\mathrm{TC}/4 + VP\,c + FP\,(c + r\,d\,\bar t)}{VP\,s} + d\,\bar t
+\label{eq:m-equilibrio}
+\end{equation}
+
+y las horas por mes de Marketing que, reasignadas a la tarifa del analista (USD 37,50 la hora), dejan el ROI en 0 son $h^* = (C_1 - V/\mathrm{TC})/(37{,}50 \times 12)$. El costo recurrente de la regla, $C_{\text{rec}}$, comparado con lo que deja la lista, $C_{\text{rec}}\,\mathrm{TC}/V$, dice si la lista se paga en algún plazo: si el cociente pasa de 1, no se paga en ninguno.
+
+\impl{B-scripts\_etapa2.zip: economia.py (\texttt{regla\_anual}, \texttt{s\_equilibrio\_mvp}, \texttt{tc\_equilibrio} y \texttt{m\_equilibrio\_mvp}), salida \texttt{economia.json} ($\to$ \texttt{equilibrios}, \texttt{horas\_equilibrio} y \texttt{recurrente\_contra\_beneficio}).}
+\valoren{validación, lista de 500 de la regla sin filtro}{con VP 1.223,67 y FP 276,33, $V$ = USD 299,49 por año; con $C_1$ = USD 20.260, ROI $-98{,}52\%$. $s^*$ = 49,6\% con 15\% de descuento, 48,6 veces $s$, y 39,7\% sin descuento ($d = r = 0$). TC$^*$ = 21,57 ARS/USD. $m^*$ = ARS 599.274 por año, 39,2 veces $m$. $h^*$ = 44,4 horas por mes. $C_{\text{rec}}$ = USD 6.000 por año, 20,0 veces $V$: no recupera en ningún plazo. Con la lista de 500 contactables (VP 1.137, FP 363), $V$ = USD 264,54 y ROI $-98{,}69\%$.}
+% registro de cifras: G34, G39, G41, G43, G44, G54, G58, G59, G60
 
 \subsection{Valor de un punto de precisión}
 \label{sec:valor-punto}
@@ -873,7 +922,7 @@ p^* = \frac{-v_{FP}}{v_{VP} - v_{FP}}
 \end{equation}
 
 \impl{B-scripts\_etapa2.zip: economia.py (\texttt{valor\_punto\_usd}); C-scripts\_etapa3.zip: etapa3.py (\texttt{umbral.precision\_de\_equilibrio}).}
-\valoren{validación}{$v_{VP} - v_{FP}$ = ARS 147,16 y $v_{\text{punto}}$ = USD 6,05 por año. El modelo agrega USD 10.400 al costo de la regla: hacen falta 1.719 puntos, y entre la regla (81,6\%) y una lista perfecta hay 18,4. Con $s$ = 100\%, un punto vale USD 505,02 y harían falta 20,6. $p^*$ = 47,21 / 147,16 = 32,1\%.}
+\valoren{validación}{$v_{VP} - v_{FP}$ = ARS 147,16 y $v_{\text{punto}}$ = USD 6,05 por año. El modelo agrega USD 10.400 al costo de la regla: hacen falta 1.719 puntos, y entre la regla (81,6\%, validación sin filtro) y una lista perfecta hay 18,4. Con $s$ = 100\%, un punto vale USD 505,02 y harían falta 20,6. $p^*$ = 47,21 / 147,16 = 32,1\%.}
 % registro de cifras: G40, G46, H17
 
 \subsection{Costo por cliente que vuelve}
@@ -914,7 +963,7 @@ Q4 & 1.195 & 1.173 & 98,2\% & 49,7\% & 50,6\% \\
 Q5 & 1.196 & 1.188 & 99,3\% & 51,8\% & 52,1\% \\
 \bottomrule
 \end{tabular}
-\caption{Composición de elegibilidad y tasa de riesgo por quintil, corte 31/12/2025. Fuente: \texttt{pipeline/features.py:81-84,89}, agrupado por \texttt{quintil}.}
+\caption{Composición de elegibilidad y tasa de riesgo por quintil, corte 31/12/2025. Fuente: \texttt{pipeline/features.py} (\texttt{client\_facts}), agrupado por \texttt{quintil}.}
 \label{tab:quintiles}
 \end{table}
 
@@ -927,7 +976,7 @@ Q5 & 1.196 & 1.188 & 99,3\% & 51,8\% & 52,1\% \\
 \label{eq:gradiente-elegibles}
 \end{equation}
 
-\impl{cálculo propio sobre \texttt{pipeline/features.py:81-84,89}. Verificación independiente de las anclas publicadas: \texttt{pipeline/build.py:210-211} solo chequea 51,8\% y 13,3\% sobre el total, no el gradiente.}
+\impl{cálculo sobre \texttt{client\_facts} (\texttt{pipeline/features.py}), agrupado por \texttt{quintil}.}
 \valor{$3{,}89\times$ midiendo sobre toda la base, $1{,}27\times$ midiendo solo entre elegibles.}
 
 El gradiente que se muestra en el tablero (Q5 casi cuadruplica a Q1) es en su mayor parte composición: en Q1 solo 1 de cada 3 clientes llegó a las 3 compras que exige la elegibilidad, así que 2 de cada 3 no podían estar en riesgo pase lo que pase; en Q5 esa restricción casi no filtra a nadie (99,3\% elegibles). Entre los clientes que sí pudieron estar en riesgo en ambos quintiles, la diferencia de comportamiento es bastante más chica: $1{,}27\times$, no $3{,}89\times$. Cualquier lectura del tipo ``los clientes de más valor abandonan cuatro veces más'' sobreestima el efecto real en un factor de aproximadamente 3; la lectura defendible es que abandonan proporcionalmente más, una vez que se descuenta que en Q1 la mayoría ni siquiera acumuló historia suficiente para entrar en la medición.
