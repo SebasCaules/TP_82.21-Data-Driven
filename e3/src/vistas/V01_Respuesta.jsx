@@ -60,7 +60,8 @@ const HORIZONTE = plano(ECO.escala).replace(/^ROI\s*[−-]?[\d.,]+\s*%\s*/, '')
 const DECISION = decision('D-PRO', {
   // (02/11) «Viable con condiciones: la regla, sin modelo, y un piloto que mide si paga» (hallazgos.md) iba en tres
   // renglones a 1280 × 720 y a 1920 × 1080; la etiqueta de arriba ya dice «Veredicto · con condiciones».
-  llano_corto: 'Viable: regla sin modelo y piloto que mide si paga',
+  // (03/11, W9, cambio 151) El rótulo único del veredicto integrado de la D v2.0.
+  llano_corto: 'Viable con condiciones, solo como piloto',
   llano: sinCortes(plano(D2.decision).replace(/^Decisión\.\s*/, '')),
   decision: plano(D2.titulo),
 })

@@ -14,7 +14,7 @@ export const D3 = {
    },
    {
     "archivo": "data/e3/economia.json",
-    "sha256": "bf163aeda3a63a0e69b0c02db84ee42869d0ef4f88517466d33b4663a04d3411"
+    "sha256": "9b4bdafd9ea553c69d1ed4d09cf53deaedabaf5a710e551f0b3ae6d6027f0e92"
    },
    {
     "archivo": "data/e3/condiciones.json",
@@ -48,7 +48,7 @@ export const D3 = {
   "contenido": {
    "archivo": "e3/src/contenido_e3.js",
    "version": "v1.2",
-   "sha256": "146557467593e3a27154a846bfbd888b0a84db818ff0cf266b9e482e80585be1"
+   "sha256": "d0adb784838ccbdaa37ad8298a967bac02bb9dff14705c4a31d6d9edb8fd95c1"
   }
  },
  "caso": {
@@ -1276,19 +1276,32 @@ export const D3 = {
  "piloto": {
   "meses": 3,
   "lista_mes": 500,
-  "control_mes": 80,
-  "contactados_mes": 420,
-  "tratados": 1260,
-  "control": 240,
-  "diferencia_detectable_pp": 2.872566723190802,
+  "control_mes": 100,
+  "contactados_mes": 400,
+  "tratados": 1200,
+  "control": 300,
+  "por_rama_mes": 125.55555555555554,
+  "alto_valor_mes": 148.88888888888889,
+  "diferencia_detectable_pp": 2.9119464714381276,
   "compra_7d_base": 0.012070211228696502,
+  "cruce_90d_control": 0.7740506329113924,
+  "mde_90d_por_rama_pp": 9.628873035602329,
+  "mde_90d_entre_ramas_pp": 9.062335121167568,
   "horas_equipo": 32,
   "horas_operador": 4,
   "costo_horas_usd": 1350.0,
-  "acciones_ars": 68288.89824383339,
-  "acciones_usd": 46.79191230567211,
-  "costo_por_tratado_ars": 54.19753828875666,
-  "umbral_produccion_pp": 40.427515009982606
+  "acciones_ars": 53538.489961257095,
+  "acciones_usd": 36.684854956954446,
+  "costo_por_tratado_ars": 44.61540830104758,
+  "umbral_produccion_pp": 12.407340465729456,
+  "umbral_produccion_sin_descuento_pp": 9.919484967300326,
+  "umbral_primer_anio_pp": 41.29425172894433,
+  "costo_recurrente_usd": 6000.0,
+  "diferencia_esperada_pp": 0.7888414093364509,
+  "semana_preliminar": 20,
+  "fecha_preliminar": "2027-03-15",
+  "semana_final": 28,
+  "fecha_final": "2027-05-10"
  },
  "encuadre": {
   "ventas_2024_ars": 349704254,
@@ -1992,16 +2005,17 @@ export const D3 = {
    },
    {
     "id": "decision",
-    "nombre": "Informe y decisión",
+    "nombre": "Medición a 90 días y decisión",
     "desde_semana": 19,
-    "hasta_semana": 20,
-    "semanas": 2,
+    "hasta_semana": 28,
+    "semanas": 10,
     "desde": "2027-03-08",
-    "hasta": "2027-03-21"
+    "hasta": "2027-05-16"
    }
   ],
-  "semanas": 20,
+  "semanas": 28,
   "hitos_semana": {
+   "confidencialidad": 1,
    "alcance": 1,
    "regla_y_operador_del_piloto": 2,
    "designa_l1": 2,
@@ -2009,7 +2023,8 @@ export const D3 = {
    "extracto_regenerado": 6,
    "go_live": 6,
    "operador_despues_del_piloto": 13,
-   "decision": 20
+   "preliminar": 20,
+   "decision": 28
   }
  },
  "monitoreo": {
@@ -3033,50 +3048,50 @@ export const D3 = {
   {
    "id": "G49",
    "nombre": "piloto: control por mes",
-   "documento": "80",
+   "documento": "100",
    "donde": "B 3.6 · C3 d12"
   },
   {
    "id": "G49",
    "nombre": "piloto: contactados por mes",
-   "documento": "420",
-   "donde": "gráfico d12 (500 − 80)"
+   "documento": "400",
+   "donde": "B 3.6 (500 − 100)"
   },
   {
    "id": "G49",
-   "nombre": "piloto: tratados",
-   "documento": "1.260",
-   "donde": "B 3.6 · C3 d12"
+   "nombre": "piloto: contactados",
+   "documento": "1.200",
+   "donde": "B 3.6"
   },
   {
    "id": "G49",
    "nombre": "piloto: control",
-   "documento": "240",
-   "donde": "B 3.6 · C3 d12"
+   "documento": "300",
+   "donde": "B 3.6"
   },
   {
    "id": "G49",
-   "nombre": "piloto: diferencia detectable (puntos)",
-   "documento": "2,87",
-   "donde": "B 3.6 · C3 d12"
+   "nombre": "piloto: señal a 7 días, ramas juntas (puntos)",
+   "documento": "2,91",
+   "donde": "B 3.6; C 6.3"
   },
   {
    "id": "G49",
    "nombre": "piloto: horas (USD)",
    "documento": "1.350",
-   "donde": "B 3.6 · C3 d12"
+   "donde": "B 3.6"
   },
   {
    "id": "G49",
    "nombre": "piloto: acciones (ARS)",
-   "documento": "68.289",
+   "documento": "53.538",
    "donde": "B 3.6"
   },
   {
    "id": "G49",
    "nombre": "piloto: acciones (USD)",
-   "documento": "46,79",
-   "donde": "B 3.6 · C3 d12"
+   "documento": "36,68",
+   "donde": "registro G49"
   },
   {
    "id": "G49",
@@ -3085,10 +3100,46 @@ export const D3 = {
    "donde": "B 3.6 (tres meses)"
   },
   {
-   "id": "H49",
-   "nombre": "piloto: umbral de producción (puntos)",
-   "documento": "40,4",
-   "donde": "C 6.2 y 6.3; gráfico d12 · C3 d12"
+   "id": "G61",
+   "nombre": "piloto: efecto mínimo a 90 días por rama (puntos)",
+   "documento": "9,63",
+   "donde": "B 3.6; C 6.3"
+  },
+  {
+   "id": "G61",
+   "nombre": "piloto: cruce a 90 días del control (%)",
+   "documento": "77,41",
+   "donde": "B 3.6"
+  },
+  {
+   "id": "G62",
+   "nombre": "piloto: umbral de producción con descuento (puntos)",
+   "documento": "12,41",
+   "donde": "B 3.6; C 6.3; D 11.1 y 12.2 · C3 d12"
+  },
+  {
+   "id": "G62",
+   "nombre": "piloto: umbral de producción sin descuento (puntos)",
+   "documento": "9,92",
+   "donde": "B 3.6; C 6.3; D 11.1 y 12.2 · C3 d12"
+  },
+  {
+   "id": "G62",
+   "nombre": "piloto: diferencia esperada con 1,02 % (puntos)",
+   "documento": "0,79",
+   "donde": "D resumen y 11.1 · C3 d12"
+  },
+  {
+   "id": "G63",
+   "nombre": "piloto: decisión preliminar",
+   "documento": "semana 20, 2027-03-15",
+   "donde": "D 12.2"
+  },
+  {
+   "id": "G63",
+   "nombre": "piloto: decisión final",
+   "documento": "semana 28, 2027-05-10",
+   "donde": "D 11.2 y 12.2 (10/05/2027)"
   },
   {
    "id": "C14",
@@ -3610,7 +3661,7 @@ export const D3 = {
    "id": "J10",
    "nombre": "decisión: aciertos por mes que pagan el costo",
    "documento": "8.595",
-   "donde": "D 8.2"
+   "donde": "registro J10 (etapa4.json)"
   },
   {
    "id": "J10",
@@ -4374,18 +4425,18 @@ export const D3 = {
    "id": "J19",
    "nombre": "test: diferencia de compra a 7 días que paga la regla (puntos)",
    "documento": "40,4",
-   "donde": "D 11.2 (igual que H49)"
+   "donde": "registro J19 (escala de H49; la D v2.0 ya no la escribe)"
   },
   {
    "id": "J50",
    "nombre": "plan: semanas de cada fase",
-   "documento": "2 · 3 · 4 · 1 · 13 · 2",
+   "documento": "2 · 3 · 4 · 1 · 13 · 10",
    "donde": "D 12.1"
   },
   {
    "id": "J50",
    "nombre": "plan: semanas en total",
-   "documento": "20",
+   "documento": "28",
    "donde": "D 12.1"
   },
   {
@@ -4408,9 +4459,21 @@ export const D3 = {
   },
   {
    "id": "J50",
-   "nombre": "plan: decisión hasta",
-   "documento": "2027-03-21",
-   "donde": "D 12.1 (21/03/2027)"
+   "nombre": "plan: decisión desde",
+   "documento": "2027-03-08",
+   "donde": "D 12.1 (semana 19)"
+  },
+  {
+   "id": "G63",
+   "nombre": "plan: la decisión final es el lunes de la semana 28",
+   "documento": "2027-05-10",
+   "donde": "D 11.2 y 12.2 (10/05/2027)"
+  },
+  {
+   "id": "G63",
+   "nombre": "plan: la decisión preliminar es el lunes de la semana 20",
+   "documento": "2027-03-15",
+   "donde": "D 12.2"
   },
   {
    "id": "J50",

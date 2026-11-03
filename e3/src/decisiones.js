@@ -21,8 +21,10 @@
 // - D-PIL · propuesta (crítica del W3, hallazgo 12): la regla de decisión del piloto, con 40,4 puntos o más
 //   a producción (vista 7; Parte D 11.1 y 12.2, hito 8; G49 y H49). Hasta entonces la vista 7 usaba D-PRO
 //   con otra frase corta: una decisión, una frase.
+//   (03/11, W9) Desde la D v2.0: con 12,41 puntos menos de cruce a 90 días que el control (9,92 sin descuento), a
+//   producción (G62); el 40,4 (H49) salió.
 // - D-PLA · propuesta (01/11, vista 8): el plan de 20 semanas, con la primera lista en la semana 6 y la decisión de
-//   producción en la 20 (Parte D 12.1 a 12.4; J50).
+//   producción en la 20 (Parte D 12.1 a 12.4; J50). (03/11, W9) 28 semanas: preliminar en la 20 y final en la 28 (G63).
 //
 // - E-CRI · aplicado (01/11, W5, vista 9): el criterio de la corrección al Grupo 5, el de la planilla v2.0: un bloque
 //   de secciones queda en «Revisar» solo si tiene un error que cambia una cifra o el método, o algo que la cátedra ya

@@ -248,7 +248,8 @@ def contenido_esperado():
         # gana cada uno; los extremos del intervalo, solo en la fila que decide (los de las otras tres salen)
         "v04": dict(dec="C-MOD",
                     cifras=[f"{pp(CO['diferencia_pp'])} puntos",
-                            f"{fijo(TE['decision']['aciertos_por_mes_para_pagar'])} aciertos extra/mes"],
+                            # (03/11, W9, P3) sale el 8.595: la tarjeta dice que ni la lista entera alcanza
+                            f"{fijo(D3['lista']['elegida']['largo_mes'])} aciertos/mes"],
                     # (03/11) las filas, agrupadas por lista: el nombre y el subrótulo una vez por grupo, el período en
                     # cada fila (los nombres completos, en el aria-label)
                     grafico=["Sin filtrar", "Lista que sale", "validación", "test", pp(SF["diferencia_pp"]),
@@ -259,7 +260,7 @@ def contenido_esperado():
                                            "gana la logística →", "Logística menos regla (puntos de precisión)",
                                            "no se puede mandar"],
                     sin=ic(SF["ic95_pp"]) + ic(D3["lista"]["modelo_menos_regla_500_sin_filtro"]["ic95_pp"])
-                    + ic(CO["validacion_ic95_pp"])),
+                    + ic(CO["validacion_ic95_pp"]) + [fijo(TE["decision"]["aciertos_por_mes_para_pagar"])]),
         # la central, el ROI de la regla sola (G41), que no repite el de la vista 1; lo que suma y lo que cuesta el
         # modelo, separados. El gráfico (01/11), el costo del año 1 con modelo y con la regla sola contra el beneficio
         # de la regla, con la línea del presupuesto. (02/11, W6: VIS-12) sin el título de eje «Dólares»; (03/11, pedido
@@ -285,11 +286,15 @@ def contenido_esperado():
         # (G49), «80 por mes, sin contactar»: la excepción de la regla del fragmento la pide hallazgos.md. Salen el
         # tamaño (1.260) y las semanas (J50). El gráfico, la regla en dos zonas con la subfranja de 0 a 2,87; el 2,87
         # con «mínimo que se distingue» (VIS-11) y el puente de C3 debajo del 40,4 (COB-09, ORA-05, UX-02)
+        # (03/11, W9) el piloto del 03/11: umbral que paga seguir un año (G62, 12,41) y efecto mínimo por rama (G61,
+        # 9,63, «efecto mínimo que detecta», no «se distingue»); debajo del umbral el proyecto cierra (sale «María G.
+        # elige»)
         "v07": dict(dec="D-PIL",
-                    cifras=[f"{fijo(P['umbral_produccion_pp'], 1)} puntos", fijo(P["control"])],
-                    grafico=[fijo(P["diferencia_detectable_pp"], 2), fijo(P["umbral_produccion_pp"], 1),
-                             "mínimo que se distingue", "María G. elige", "a producción", plano(dia[12]["puente"])],
-                    sin=["no se distingue de cero", "la lista se paga"],
+                    cifras=[f"{fijo(P['umbral_produccion_pp'], 2)} puntos", fijo(P["control"])],
+                    grafico=[fijo(P["mde_90d_por_rama_pp"], 2), fijo(P["umbral_produccion_pp"], 2),
+                             "efecto mínimo que detecta", "No llega:", "a producción", plano(dia[12]["puente"])],
+                    sin=["no se distingue de cero", "la lista se paga", "mínimo que se distingue", "María G. elige",
+                         "2,87", "40,4"],
                     fragmento={1: f"{fijo(P['control_mes'])} por mes, sin contactar"}),
         # (01/11) la central, la semana de la primera lista (J50, hito 6). (02/11, W6: DAT-11, UX-22) Después, los
         # criterios de go-live contados en C3 (los hitos con criterio) y la semana del operador de después. El gráfico
@@ -432,8 +437,10 @@ def contenido(p: Pagina, esperado):
         if not norm(r["conclusion"]):
             p.mal(f"{id_}: el gráfico no tiene su conclusión arriba (.e3-conclusion)")
         svg = norm(" | ".join(r["textosSvg"]))
+        # (03/11, W9) un texto partido en renglones (el puente de la vista 7) también vale
+        svg_seguido = norm(" ".join(r["textosSvg"]))
         for x in e["grafico"]:
-            if x not in svg:
+            if x not in svg and x not in svg_seguido:
                 p.mal(f"{id_}: el gráfico no escribe «{x}»")
         solos = {norm(t) for t in r["textosSvg"]}
         for x in e["exactos"]:
@@ -536,7 +543,7 @@ def anclas_datos():
         ("J21", "alto valor en test", fijo(next(x for x in T["segmentos"]["filas"]
                                                if x["id"] == "alto_valor")["diferencia_pp"], 1, True), "−2,7"),
         ("J22", "riesgos de la matriz", fijo(LE["riesgos"]), "13"),
-        ("J50", "semanas del plan", fijo(PL["semanas"]), "20"),
+        ("J50", "semanas del plan", fijo(PL["semanas"]), "28"),
         ("J51", "campaña de noviembre de 2025", MO["campanias_noviembre"][-1]["fecha"], "2025-11-12"),
         ("J53", "suba que dispara la alerta de drift", fijo(MO["drift"]["umbral_suba_pp"], 1) + " puntos", "2,1 puntos"),
         ("J53", "en riesgo sobre elegibles al 31/12/2025", pct(MO["drift"]["referencia"], 1), "50,4 %"),
@@ -582,7 +589,9 @@ def a_la_vista_esperado():
     d12, d13 = dia[12], dia[13]
     return [
         # (02/11, W6) la vista 1: la conclusión dice qué se paga (DAT-01) y la decisión abre con el veredicto (COB-01)
-        ("v01", None, ["Para que la regla se pague", "Viable:"], ["Para pagarse,"]),
+        # (03/11, W9, cambio 151) el rótulo único del veredicto
+        ("v01", None, ["Para que la regla se pague", "Viable con condiciones, solo como piloto"],
+         ["Para pagarse,", "Viable:"]),
         # (02/11, W6) la vista 2: la línea de definición define la regla y el 500, con el período del 25,35 % (ORA-03,
         # DAT-07); el id del cliente, solo en el title (VIS-15)
         # (03/11, pedido del usuario) sin la línea de definición: el título dice que es un cliente de ejemplo
@@ -597,13 +606,15 @@ def a_la_vista_esperado():
                        fijo(SFV["diferencia_pp"], 2, True), fijo(SF["diferencia_pp"], 2, True),
                        fijo(CO["validacion_diferencia_pp"], 2, True), fijo(CO["diferencia_pp"], 2, True),
                        "gana la regla", "gana la logística", "empate", "medido una vez",
-                       "de precisión: empata", "ni una lista perfecta lo paga",
+                       "de precisión: empata", "La lista perfecta", "no paga el modelo",
                        "En la lista que sale, el modelo empata con la regla", plano(dia[6]["pie_test"])],
-         ["más que toda la lista", "aciertos más/mes", plano(dia[6]["particion"]), plano(dia[6]["pie_800"]),
+         ["más que toda la lista", "aciertos más/mes", "aciertos extra/mes", "Para pagar el modelo",
+          plano(dia[6]["particion"]),
+          plano(dia[6]["pie_800"]),
           "incluye bajas y a quien no acepta marketing"]),
         # la vista 7: la regla del piloto, sin la lista de lo que decide María G. (está en la 8). (02/11, W6) El puente
         # del 40,4 y la línea del grupo de control (C3); salen la duración del plan y el tamaño del piloto
-        ("v07", None, ["A producción solo si", plano(d12["puente"]), plano(d12["control"]), "mínimo que se distingue",
+        ("v07", None, ["A producción solo si", plano(d12["puente"]), plano(d12["control"]), "efecto mínimo que detecta",
                        "Grupo de control"],
          ["Lo que decide María G.", "Quién opera la lista después del piloto", "no se distingue de cero",
           "Duración del plan", "clientes contactados"]),
@@ -638,7 +649,9 @@ def a_la_vista_esperado():
         # (01/11) la vista 6: el plan L1 a L6 con su dueño. (02/11, W6: UX-04, VIS-04, COB-08, ORA-11) Los tres críticos
         # de los 13 en una fila de tres celdas (diapositiva 11): riesgo, señal y umbral, dueño. Sale la línea de las
         # cinco dimensiones; las normas y la escala de la cátedra, en su renglón
-        ("v06", None, ids_l + [plano(a["quien"]) for tr in dia[10]["plan"] for a in tr["acciones"]]
+        # (03/11, W9, P1) la tercera columna del plan es la semana de cada acción (`plazo`); el dueño va al title
+        ("v06", None, ids_l + [plano(a.get("plazo") or a["quien"]) for tr in dia[10]["plan"] for a in tr["acciones"]]
+         + [plano(tr["cuando"]) for tr in dia[10]["plan"]]
          + [f"Riesgos críticos, {fijo(LE['riesgos_criticos'])} de {fijo(LE['riesgos'])}"]
          + [plano(c["riesgo"]) for c in d11["columnas"]]  # (03/11) sin viñetas: señal, umbral y dueño van al title
          + [plano(dia[10]["nota"])],

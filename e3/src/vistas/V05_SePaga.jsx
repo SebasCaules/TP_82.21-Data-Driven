@@ -64,7 +64,8 @@ const C_REG = E.costos.regla_sin_modelo.total_anio_1_usd
 const ROI = {
   rotulo: 'ROI de la regla sola',
   valor: pctDirecto(E.observada.regla_roi_pct, 2),
-  linea: 'a un año, escenario esperado',
+  // (03/11, W9, canon) El −98,52 % es la base de la B 3.4: dice su columna, para no leerse como el de la lista que sale.
+  linea: 'a un año, validación sin filtro',
   title: `ROI de la regla sin modelo a un año, lista de 500 sin filtro en validación: ${ESCENARIOS}.`,
 }
 const SUMA = {

@@ -64,7 +64,7 @@ export const C3 = {
           "texto": "Un techo: el efecto no está medido."
         }
       ],
-      "decision": "**Viable con condiciones.** La lista de 500 por mes sale con la regla del umbral, sin modelo. Un piloto de tres meses con grupo de control mide la tasa de éxito antes de invertir más.",
+      "decision": "**Viable con condiciones, solo como piloto.** La lista de 500 por mes sale con la regla del umbral, sin modelo; tres meses con grupo de control deciden si se invierte más.",
       "fuente": "Parte D 11.1",
       "ids": [
         "F16",
@@ -74,7 +74,7 @@ export const C3 = {
         "G31",
         "J09"
       ],
-      "guion": "Somos el grupo 2. Casa Óga quiere saber a tiempo qué clientes van a dejar de comprar, para que Marketing los contacte. ¿Conviene anticiparlos? Con un modelo, no. Con la regla, depende de cuántos vuelvan, y eso lo mide un piloto. El veredicto es viable con condiciones. Lo técnico y lo legal también lo son. Lo económico no cierra: el modelo sobre la regla da un ROI de −99,95 % a un año. Y para que la regla sola se pague, tendría que volver casi la mitad de los que se iban: 48,6 veces este 1,02 %.",
+      "guion": "Somos el grupo 2. Casa Óga quiere saber a tiempo qué clientes van a dejar de comprar, para que Marketing los contacte. ¿Conviene anticiparlos? Con un modelo, no. Con la regla, depende de cuántos vuelvan: lo mide un piloto. El veredicto es viable con condiciones, solo como piloto. Lo técnico y lo legal son viables con condiciones. Lo económico no cierra: el modelo sobre la regla da un ROI de −99,95 % a un año. Y para que la regla sola se pague, tendría que volver casi la mitad de los que se iban: 48,6 veces este 1,02 %.",
       "segundos": 50
     },
     {
@@ -95,7 +95,7 @@ export const C3 = {
       "cifras": [
         {
           "valor": "−35,6 %",
-          "texto": "ventas de 2025, con meses incompletos. Contra 2024; el rubro, +0,3 % en el año y −15,0 % en diciembre (CAME)"
+          "texto": "ventas de 2025, con meses incompletos. Contra 2024; el rubro, +0,3 % en el año (CAME)"
         },
         {
           "valor": "500[[/mes]]",
@@ -287,7 +287,7 @@ export const C3 = {
         "J09",
         "J10"
       ],
-      "guion": "Pero esa lista no se puede mandar: un tercio no aceptó marketing o pidió la baja. Con la lista que sale, en validación ganaba la regla y en el test empatan: −0,25 puntos, con un intervalo que cruza el cero. Para pagar los USD 10.400 que agrega, el modelo tendría que acertar 8.595 clientes más por mes, y la lista tiene 500. Por eso la lista sale con la regla.",
+      "guion": "Pero esa lista no se puede mandar: un tercio no aceptó marketing o pidió la baja. Con la lista que sale, en validación ganaba la regla y en el test empatan: −0,25 puntos, con un intervalo que cruza el cero. Para pagar los USD 10.400 que agrega, el modelo necesitaría más aciertos de los que caben en la lista de 500. Por eso la lista sale con la regla.",
       "segundos": 40
     },
     {
@@ -333,7 +333,7 @@ export const C3 = {
         "H42",
         "J12"
       ],
-      "guion": "Pasamos a dinero. La regla sola tampoco se paga: su ROI a un año es −98,52 %. El modelo de la Parte B suma sobre ella 5,38 dólares por año, con la lista sin filtrar, la que más lo favorece, y cuesta 10.400 más en el año 1.",
+      "guion": "Pasamos a dinero. La regla sola tampoco se paga: su ROI a un año, sin filtro, es −98,52 %. El modelo de la Parte B suma sobre ella 5,38 dólares por año, con la lista sin filtrar, la que más lo favorece, y cuesta 10.400 más en el año 1.",
       "segundos": 30
     },
     {
@@ -437,42 +437,48 @@ export const C3 = {
       },
       "plan": [
         {
+          "cuando": "Primero: bloqueante",
+          "acciones": [
+            {
+              "id": "L4",
+              "que": "Acuerdo de confidencialidad",
+              "quien": "Sebastian C. lo propone; lo firma María G.",
+              "plazo": "semana 1; sin él, ningún dato más"
+            }
+          ]
+        },
+        {
           "cuando": "Antes de la primera lista del piloto",
           "acciones": [
             {
               "id": "L1",
               "que": "Inscribir las bases en la AAIP",
-              "quien": "María G. designa, semana 2"
-            },
-            {
-              "id": "L3",
-              "que": "Filtro de consentimiento y bajas",
-              "quien": "Sebastian C."
-            },
-            {
-              "id": "L4",
-              "que": "Acuerdo de confidencialidad",
-              "quien": "Sebastian C. y María G."
+              "quien": "quien designe María G.",
+              "plazo": "semana 2"
             },
             {
               "id": "L5",
               "que": "Retención y borrado de extractos",
-              "quien": "Matías S. y María G."
+              "quien": "Matías S. y María G.",
+              "plazo": "semana 2"
+            },
+            {
+              "id": "L2",
+              "que": "Adenda del contrato del CRM",
+              "quien": "asesor legal de Casa Óga",
+              "plazo": "desde la semana 2; firma antes de producción"
+            },
+            {
+              "id": "L3",
+              "que": "Filtro de consentimiento y bajas",
+              "quien": "Sebastian C.",
+              "plazo": "semana 4 y antes de cada lista"
             },
             {
               "id": "L6",
               "que": "Revisar avisos y el cruce con No Llame",
-              "quien": "asesor legal de Casa Óga"
-            }
-          ]
-        },
-        {
-          "cuando": "Antes de pasar a producción",
-          "acciones": [
-            {
-              "id": "L2",
-              "que": "Adenda del contrato del CRM",
-              "quien": "asesor legal de Casa Óga"
+              "quien": "asesor legal de Casa Óga",
+              "plazo": "semana 4"
             }
           ]
         }
@@ -487,7 +493,7 @@ export const C3 = {
         "H41",
         "H47"
       ],
-      "guion": "Las cinco dimensiones legales quedan en 2: viable con condiciones. El riesgo más grande ya ocurre: el 30,1 % de los envíos fue a clientes que no aceptaron marketing. Nuestra planilla sale sin ellos. Son seis acciones: cinco antes de la primera lista y la adenda del CRM antes de producción.",
+      "guion": "Las cinco dimensiones legales quedan en 2: viable con condiciones. El riesgo más grande ya ocurre: el 30,1 % de los envíos fue a quien no aceptó marketing. Nuestra planilla sale sin ellos. Son seis acciones; la primera, en la semana 1, es el acuerdo de confidencialidad: sin él no recibimos ningún dato más.",
       "segundos": 30
     },
     {
@@ -504,11 +510,11 @@ export const C3 = {
           "filas": [
             {
               "rotulo": "Señal",
-              "texto": "compra a 7 días, contactados menos control"
+              "texto": "cruce a 90 días, control menos cada rama"
             },
             {
               "rotulo": "Umbral",
-              "texto": "menos de **40,4 puntos** al tercer mes"
+              "texto": "menos de **12,41 puntos** en la semana 28 (9,92 sin descuento)"
             },
             {
               "rotulo": "Dueño",
@@ -556,8 +562,8 @@ export const C3 = {
       "nota": "**Límites:** solo clientes identificados · no distingue compradores profesionales · datos al 31/12/2025 · el piloto no mide al 20 % de mayor facturación.",
       "fuente": "Parte C 6.2 a 6.5",
       "ids": [
-        "H49",
-        "G49",
+        "G62",
+        "G61",
         "H46",
         "C18",
         "H45"
@@ -574,8 +580,8 @@ export const C3 = {
       "titulo": "Un piloto de tres meses con grupo de control decide si se invierte más",
       "figura": "piloto.png",
       "hechos": [
-        "**1.260** contactados · **240** de control: 80 por mes, fuera de los de mayor valor (envío 45)",
-        "**USD 1.350** de horas + **USD 46,79** de acciones, que paga Marketing"
+        "**1.200** contactados en dos ramas · **300** de control: 100 por mes, sorteados entre los de la lista fuera del 20 % de mayor facturación (envío 45)",
+        "**USD 1.350** de horas + **ARS 53.538** de acciones, que paga Marketing"
       ],
       "pedidos_titulo": "Para que decida María G.",
       "pedidos": [
@@ -583,19 +589,20 @@ export const C3 = {
         "La regla del target, con revisión de Sofía R. (semana 2).",
         "Quién inscribe las bases en la AAIP (semana 2).",
         "Quién opera la lista después del piloto (semana 13).",
-        "Si pasa a producción, con 40,4 puntos o más (semana 20)."
+        "Si pasa a producción, con 12,41 puntos o más (semana 28)."
       ],
-      "nota": "Plan de 20 semanas desde la entrega; la primera lista sale en la semana 6 y la decisión se toma en la semana 20, con el tercer mes cerrado en la 18. El grupo de control lo aprueba Sofía R. (semana 2).",
-      "puente": "= el 49,6 % de la vista 1, contado sobre todos los contactados",
-      "control": "control fuera del 20 % de mayor facturación",
+      "nota": "Plan de 28 semanas desde la entrega; la primera lista sale en la semana 6, la decisión preliminar es en la 20 y la final en la 28 (10/05/2027). El grupo de control lo aprueba Sofía R. (semana 2).",
+      "puente": "lo que paga seguir un año",
+      "control": "control sorteado cada mes en la lista, fuera del 20 % de mayor facturación",
       "fuente": "Parte B 3.6 · Parte C 6.3 · Parte D 12.1 a 12.4",
       "ids": [
         "G49",
-        "H49",
+        "G61",
+        "G62",
         "G50",
         "J50"
       ],
-      "guion": "Lo que falta medir es la tasa de éxito. Durante tres meses la lista sale con la regla, y cada mes 80 clientes quedan sin contactar: son el grupo de control. Con ese tamaño, el piloto distingue de cero una diferencia de 2,87 puntos. Si al tercer mes los contactados compran 40,4 puntos más que el control, se pasa a producción: es el 49,6 % de la primera vista, contado sobre todos los contactados. Si no, María G., de Dirección Comercial, elige entre cerrar o repetir el piloto sin descuento.",
+      "guion": "Falta medir la tasa de éxito. Tres meses la lista sale con la regla, en dos ramas, con y sin descuento, y cada mes 100 clientes quedan sin contactar: el grupo de control. Decide el cruce del umbral a 90 días. Si los contactados cruzan 12,41 puntos menos que el control, 9,92 sin descuento, lo que paga seguir un año, María G. pasa a producción; si no, el proyecto cierra. Con la tasa de hoy, lo esperable es 0,79 puntos: el piloto mide si la tasa real es otra.",
       "segundos": 50
     },
     {
@@ -604,7 +611,7 @@ export const C3 = {
       "tipo": "plan",
       "kicker": "La propuesta",
       "pregunta": "¿Cómo funciona cada mes y en qué semana?",
-      "titulo": "La primera lista sale en la semana 6 y María G. decide en la 20",
+      "titulo": "La primera lista sale en la semana 6 y María G. decide en la 28",
       "flujo": [
         {
           "titulo": "Exportar",
@@ -624,72 +631,79 @@ export const C3 = {
         },
         {
           "titulo": "Entregar",
-          "texto": "Planilla con 80 de control",
+          "texto": "Planilla con 100 de control",
           "quien": "Sebastian C.; el sorteo, Francisco C."
         },
         {
           "titulo": "Contactar",
-          "texto": "WhatsApp con 15 % de descuento",
+          "texto": "WhatsApp con y sin 15 % de descuento",
           "quien": "Sofía R."
         },
         {
           "titulo": "Medir",
-          "texto": "Compra a 7 días contra el control; alerta si la precisión baja de 72,0 % dos meses seguidos",
+          "texto": "Cruce a 90 días contra el control; alerta si la precisión baja de 72,0 % dos meses seguidos",
           "quien": "Juan Manuel R."
         }
       ],
       "hitos": [
         {
-          "n": 1,
+          "n": 2,
           "clave": "alcance",
           "hito": "Alcance aprobado",
           "quien": "María G.",
           "criterio": false
         },
         {
-          "n": 2,
+          "n": 3,
           "clave": "regla_y_operador_del_piloto",
           "hito": "Regla del target y operador del piloto",
           "quien": "María G.",
           "criterio": true
         },
         {
-          "n": 3,
+          "n": 4,
           "clave": "acciones_legales_y_control",
           "hito": "Acciones legales hechas",
           "quien": "María G.",
           "criterio": true
         },
         {
-          "n": 4,
+          "n": 5,
           "clave": "acciones_legales_y_control",
           "hito": "Control y planilla de prueba",
           "quien": "Sofía R.",
           "criterio": true
         },
         {
-          "n": 5,
+          "n": 6,
           "clave": "extracto_regenerado",
           "hito": "Extracto completo, mismo corte",
           "quien": "Matías S.",
           "criterio": true
         },
         {
-          "n": 6,
+          "n": 7,
           "clave": "go_live",
           "hito": "Sale la primera lista",
           "quien": "María G.",
           "criterio": true
         },
         {
-          "n": 7,
+          "n": 8,
           "clave": "operador_despues_del_piloto",
           "hito": "Operador de después del piloto",
           "quien": "María G.",
           "criterio": false
         },
         {
-          "n": 8,
+          "n": 9,
+          "clave": "preliminar",
+          "hito": "Decisión preliminar",
+          "quien": "María G.",
+          "criterio": false
+        },
+        {
+          "n": 10,
           "clave": "decision",
           "hito": "Decisión de producción",
           "quien": "María G.",
@@ -702,9 +716,10 @@ export const C3 = {
       "ids": [
         "J50",
         "J13",
-        "G49"
+        "G49",
+        "G63"
       ],
-      "guion": "Cada mes, la regla arma la lista, Sofía R., de Marketing, decide a quién escribir y medimos contra el control. La primera lista sale en la semana 6 si se cumplen cinco criterios de go-live: acciones legales, extracto nuevo, target y operador aprobados, grupo de control aprobado y un mínimo de aciertos que el test ya cumple. Entonces, ¿conviene anticipar? Con la regla, sin modelo, y solo si el piloto muestra que el contacto paga. Ahora, nuestra corrección al Grupo 5.",
+      "guion": "Cada mes, la regla arma la lista, Sofía R., de Marketing, decide a quién escribir y medimos contra el control. La primera lista sale en la semana 6, con los cinco criterios de go-live cumplidos. María G. decide en la semana 20, de forma preliminar, y en la 28. Entonces, ¿conviene anticipar? Con la regla, sin modelo, y solo si el piloto muestra que el contacto paga. Ahora, nuestra corrección al Grupo 5.",
       "segundos": 40
     },
     {

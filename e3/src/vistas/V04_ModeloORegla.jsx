@@ -47,6 +47,10 @@
 //   de cada fila. Una línea fina separa los dos grupos. La conclusión dice el mensaje: «En la lista que sale, el modelo
 //   empata con la regla». El renglón de qué mide pasa a los dos períodos (la partición completa y la lista de 800, al
 //   title); al pie queda solo lo que acierta la lista que sale en test.
+// - (03/11, W9, P3 de la devolución de la presentación) Sale «8.595 aciertos extra por mes»: la tarjeta del costo dice
+//   la idea con las mismas piezas: «La lista perfecta · 500 aciertos/mes · no paga el modelo» (V6, H1: con el rótulo
+//   «Para pagar el modelo» el 500 se leía como lo que lo paga). El 8.595 (J10) sigue en los datos: la vista corta el
+//   armado si deja de pasar ese largo.
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) y se escriben con formato.js; el texto nuevo, de
 // C3 (contenido_e3.js). Las notas (N) siguen leyendo el guion de las diapositivas 6 y 7 de C3 (vistas/index.jsx).
 
@@ -104,8 +108,8 @@ const DECISION = decision('C-MOD', {
     `puede mandar`,
   decision: DE.resultado,
   justificacion: `para reemplazar a la regla, el intervalo tiene que quedar arriba del cero y los aciertos de ` +
-    `más tienen que pagar los ${usd(DE.costo_incremental_usd)} que el modelo agrega al costo del primer año, ` +
-    `que piden ${entero(DE.aciertos_por_mes_para_pagar)} aciertos más por mes. En test suma ` +
+    `más tienen que pagar los ${usd(DE.costo_incremental_usd)} que el modelo agrega al costo del primer año: ` +
+    `harían falta más aciertos de los que caben en la lista de ${entero(LARGO)}. En test suma ` +
     `${fijo(CO.aciertos_extra_por_mes, 2, true)} por mes en la lista que sale y ` +
     `${fijo(SF.aciertos_de_mas_por_mes, 2, true)} sin filtrar`,
 })
@@ -122,9 +126,10 @@ const TITULO_LISTA = `Logística menos regla en la lista de ${entero(LARGO)} con
   `${pct(MET.logistica_ajustada.test.precision, 1)}. En validación (${VALID}), la regla acertaba ` +
   `${entero(L.regla_menos_modelo_500_contactables.aciertos)} clientes más: ${pp(CO.validacion_diferencia_pp)} ` +
   `puntos, de ${intervalo(CO.validacion_ic95_pp)}.`
-const TITULO_PAGA = `El modelo agrega ${usd(DE.costo_incremental_usd)} al costo del primer año. Pagarlo pide ` +
-  `${entero(DE.aciertos_por_mes_para_pagar)} aciertos más por mes en una lista de ${entero(LARGO)}: ni una ` +
-  `lista perfecta lo paga. En test suma ${fijo(CO.aciertos_extra_por_mes, 2, true)} aciertos por mes en la ` +
+// (03/11, W9, P3) Sale la cifra de aciertos que pagarían el modelo (J10); queda la idea: no caben en la lista.
+const TITULO_PAGA = `El modelo agrega ${usd(DE.costo_incremental_usd)} al costo del primer año. Para pagarlo ` +
+  `necesitaría más aciertos de los que caben en la lista de ${entero(LARGO)} por mes: ni una lista perfecta lo ` +
+  `paga. En test suma ${fijo(CO.aciertos_extra_por_mes, 2, true)} aciertos por mes en la ` +
   `lista que sale y ${fijo(SF.aciertos_de_mas_por_mes, 2, true)} sin filtrar.`
 
 // Filas del gráfico. `decide`: la fila que decide, en --acc. `tenue`: validación, más fina. `grupo` y `sub` se escriben
@@ -310,13 +315,13 @@ export default function V04ModeloORegla() {
         </div>
 
         <div className="tarjeta" style={{ gridColumn: 'span 9' }} title={TITULO_PAGA}>
-          <span className="kpi-lbl"><span>Para pagar el modelo</span></span>
+          <span className="kpi-lbl"><span>La lista perfecta</span></span>
           <div className="ban-par">
             <div className="par-item par-unico">
-              <Cifra num={entero(DE.aciertos_por_mes_para_pagar)} unidad={`${NBSP}aciertos extra/mes`} sec />
+              <Cifra num={entero(LARGO)} unidad={`${NBSP}aciertos/mes`} sec />
             </div>
           </div>
-          <p className="e2-linea">ni una lista perfecta lo paga</p>
+          <p className="e2-linea">no paga el modelo</p>
         </div>
 
       </Banda>

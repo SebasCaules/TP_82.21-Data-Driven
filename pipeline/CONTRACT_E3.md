@@ -237,10 +237,15 @@ Precalculada en Python con la fórmula de `economia.py`. Columnas paralelas, tod
 
 ### `piloto`: diapositiva 12 (G49, B 3.6)
 
-`meses` 3, `lista_mes` 500, `control_mes` 80, `contactados_mes` 420, `tratados` 1.260, `control` 240;
-`diferencia_detectable_pp` «2,87 puntos» (2 decimales); `compra_7d_base` «1,21 %»; `horas_equipo` 32 y
-`horas_operador` 4; `costo_horas_usd` «USD 1.350»; `acciones_ars` «ARS 68.289» (entero) y
-`acciones_usd` «USD 46,79»; `costo_por_tratado_ars` «ARS 54,20».
+(03/11, W9: el piloto del 03/11, U0) `meses` 3, `lista_mes` 500 (contactables), `control_mes` 100, `contactados_mes`
+400, `tratados` 1.200, `control` 300, `por_rama_mes` ~126 y `alto_valor_mes` ~149; `diferencia_detectable_pp` «2,91»
+(compra a 7 días, señal, no se muestra); `cruce_90d_control` «77,41 %», `mde_90d_por_rama_pp` «9,63» y
+`mde_90d_entre_ramas_pp` 9,06 (G61); `umbral_produccion_pp` «12,41» y `umbral_produccion_sin_descuento_pp` «9,92»,
+`umbral_primer_anio_pp` 41,29, `costo_recurrente_usd` 6.000 y `diferencia_esperada_pp` «0,79» (G62);
+`semana_preliminar` 20 (`fecha_preliminar` 2027-03-15) y `semana_final` 28 (`fecha_final` 2027-05-10) (G63);
+`compra_7d_base` «1,21 %»; `horas_equipo` 32 y `horas_operador` 4; `costo_horas_usd` «USD 1.350»; `acciones_ars`
+«ARS 53.538» y `acciones_usd` «USD 36,68»; `costo_por_tratado_ars` «ARS 44,62». Hasta el 03/11: 80 de control,
+1.260 y 240, 2,87 y el 40,4 de H49.
 
 ### `encuadre` y `legal`: lo que las vistas 2 y 6 leían del texto (W3, 27/10)
 
@@ -312,9 +317,10 @@ la de 500 contactables por corte, salvo en `sin_filtro`.
 
 - `plan`: `semana_1` «2026-11-02» (lunes; la semana de la entrega del E3), `fases[] = {id, nombre,
   desde_semana, hasta_semana, semanas, desde, hasta}` (fechas ISO: el piloto, semanas 6 a 18, del 2026-12-07
-  al 2027-03-07; la decisión termina el 2027-03-21), `semanas` 20 y `hitos_semana` (alcance 1, regla del target
-  y operador del piloto 2, María G. designa quién inscribe las bases (`designa_l1`) 2, acciones legales y control
-  4, extracto regenerado y go-live 6, operador de después del piloto 13, decisión 20).
+  al 2027-03-07; desde el 03/11 la fase de medición a 90 días y decisión va de la 19 a la 28), `semanas` 28 y
+  `hitos_semana` (confidencialidad L4 1, alcance 1, regla del target y operador del piloto 2, María G. designa quién
+  inscribe las bases (`designa_l1`) 2, acciones legales y control 4, extracto regenerado y go-live 6, operador de
+  después del piloto 13, decisión preliminar 20, decisión de producción 28).
 - `monitoreo.campanias_noviembre[] = {anio, fecha, id_campania}` (J51): el primer envío de noviembre de cada año,
   calculado del CSV. `monitoreo.drift` (J53, desde el 28/10; hasta la D v1.2 era el semáforo del E1, J52): la
   alerta de la D 10.2 sale de `data/e3/serie_riesgo.json` (`_build/D/drift/serie_riesgo.py`): `umbral_suba_pp` 2,1

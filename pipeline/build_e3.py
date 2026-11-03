@@ -689,33 +689,61 @@ def armar_economia(eco: dict, e2: dict, e3: dict) -> dict:
 
 def armar_piloto(eco: dict, e2: dict) -> dict:
     pi = eco["piloto"]
-    # (26/10) Umbral de producción del piloto (H49): la tasa de éxito que paga la regla (49,56 %), llevada a
-    # todos los contactados con la precisión de la regla en validación (81,58 %).
-    prec_regla = e2["modelos"]["regla_umbral"]["validacion"]["lista_500"]["precision"]
+    # (03/11, W9) Diseño del piloto del 03/11 (U0, economia.py): lista de 500 contactables, 100 de control por mes
+    # sorteados entre los de la lista fuera del 20 % de mayor facturación, dos ramas (con y sin 15 % de descuento).
+    # Decide el cruce del umbral a 90 días, control menos contactados (G61); la compra a 7 días es señal (G49). El
+    # umbral de producción es el que paga el costo recurrente de seguir un año (G62); el 40,4 de H49 sale.
+    # `diferencia_detectable_pp` (2,91, compra a 7 días) queda solo como señal y no se muestra.
+    md = pi["metrica_decision"]
+    up = pi["umbral_produccion"]
+    cal = pi["calendario"]
     pil = {
         "meses": pi["meses"], "lista_mes": pi["lista_mes"], "control_mes": pi["control_mes"],
         "contactados_mes": pi["lista_mes"] - pi["control_mes"],
         "tratados": pi["tratados"], "control": pi["control"],
+        "por_rama_mes": pi["poblacion"]["por_mes"]["por_rama"],
+        "alto_valor_mes": pi["poblacion"]["por_mes"]["alto_valor"],
         "diferencia_detectable_pp": pi["mde_pp"], "compra_7d_base": pi["p0_compra_7d"],
+        "cruce_90d_control": md["p0_cruce_90d_control"],
+        "mde_90d_por_rama_pp": md["mde"]["cruce_90d"]["por_rama_contra_control_pp"],
+        "mde_90d_entre_ramas_pp": md["mde"]["cruce_90d"]["entre_ramas_pp"],
         "horas_equipo": sum(pi["horas_equipo"].values()), "horas_operador": pi["horas_operador"],
         "costo_horas_usd": pi["costo_horas_usd"],
         "acciones_ars": pi["acciones_marketing_ars"], "acciones_usd": pi["acciones_marketing_usd"],
         "costo_por_tratado_ars": pi["costo_por_tratado_ars"],
-        "umbral_produccion_pp": eco["umbral"]["mvp_s_equilibrio_con_descuento"] * prec_regla * 100,
+        "umbral_produccion_pp": up["diferencia_cruce_90d_pp"]["recurrente_con_descuento"],
+        "umbral_produccion_sin_descuento_pp": up["diferencia_cruce_90d_pp"]["recurrente_sin_descuento"],
+        "umbral_primer_anio_pp": up["diferencia_cruce_90d_pp"]["primer_anio_con_descuento"],
+        "costo_recurrente_usd": up["costo_recurrente_usd_anual"],
+        "diferencia_esperada_pp": up["diferencia_esperada_tasa_observada_pp"],
+        "semana_preliminar": cal["preliminar"]["semana"], "fecha_preliminar": cal["preliminar"]["lunes"],
+        "semana_final": cal["final"]["semana"], "fecha_final": cal["final"]["lunes"],
     }
     ancla("G49", "piloto: lista por mes", pil["lista_mes"], "500", 0, donde="B 3.6")
-    ancla("G49", "piloto: control por mes", pil["control_mes"], "80", 0, donde="B 3.6", c3="d12")
-    ancla("G49", "piloto: contactados por mes", pil["contactados_mes"], "420", 0, donde="gráfico d12 (500 − 80)")
-    ancla("G49", "piloto: tratados", pil["tratados"], "1.260", 0, donde="B 3.6", c3="d12")
-    ancla("G49", "piloto: control", pil["control"], "240", 0, donde="B 3.6", c3="d12")
-    ancla("G49", "piloto: diferencia detectable (puntos)", pil["diferencia_detectable_pp"], "2,87", 2,
-          donde="B 3.6", c3="d12")
-    ancla("G49", "piloto: horas (USD)", pil["costo_horas_usd"], "1.350", 0, donde="B 3.6", c3="d12")
-    ancla("G49", "piloto: acciones (ARS)", pil["acciones_ars"], "68.289", 0, donde="B 3.6")
-    ancla("G49", "piloto: acciones (USD)", pil["acciones_usd"], "46,79", 2, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: control por mes", pil["control_mes"], "100", 0, donde="B 3.6", c3="d12")
+    ancla("G49", "piloto: contactados por mes", pil["contactados_mes"], "400", 0, donde="B 3.6 (500 − 100)")
+    ancla("G49", "piloto: contactados", pil["tratados"], "1.200", 0, donde="B 3.6")
+    ancla("G49", "piloto: control", pil["control"], "300", 0, donde="B 3.6")
+    ancla("G49", "piloto: señal a 7 días, ramas juntas (puntos)", pil["diferencia_detectable_pp"], "2,91", 2,
+          donde="B 3.6; C 6.3")
+    ancla("G49", "piloto: horas (USD)", pil["costo_horas_usd"], "1.350", 0, donde="B 3.6")
+    ancla("G49", "piloto: acciones (ARS)", pil["acciones_ars"], "53.538", 0, donde="B 3.6")
+    ancla("G49", "piloto: acciones (USD)", pil["acciones_usd"], "36,68", 2, donde="registro G49")
     ancla("G49", "piloto: meses", pil["meses"], 3, donde="B 3.6 (tres meses)")
-    ancla("H49", "piloto: umbral de producción (puntos)", pil["umbral_produccion_pp"], "40,4", 1,
-          donde="C 6.2 y 6.3; gráfico d12", c3="d12")
+    ancla("G61", "piloto: efecto mínimo a 90 días por rama (puntos)", pil["mde_90d_por_rama_pp"], "9,63", 2,
+          donde="B 3.6; C 6.3")
+    ancla("G61", "piloto: cruce a 90 días del control (%)", pil["cruce_90d_control"], "77,41", 2, 100,
+          donde="B 3.6")
+    ancla("G62", "piloto: umbral de producción con descuento (puntos)", pil["umbral_produccion_pp"], "12,41", 2,
+          donde="B 3.6; C 6.3; D 11.1 y 12.2", c3="d12")
+    ancla("G62", "piloto: umbral de producción sin descuento (puntos)", pil["umbral_produccion_sin_descuento_pp"],
+          "9,92", 2, donde="B 3.6; C 6.3; D 11.1 y 12.2", c3="d12")
+    ancla("G62", "piloto: diferencia esperada con 1,02 % (puntos)", pil["diferencia_esperada_pp"], "0,79", 2,
+          donde="D resumen y 11.1", c3="d12")
+    ancla("G63", "piloto: decisión preliminar", f"semana {pil['semana_preliminar']}, {pil['fecha_preliminar']}",
+          "semana 20, 2027-03-15", donde="D 12.2")
+    ancla("G63", "piloto: decisión final", f"semana {pil['semana_final']}, {pil['fecha_final']}",
+          "semana 28, 2027-05-10", donde="D 11.2 y 12.2 (10/05/2027)")
     return pil
 
 
@@ -743,10 +771,12 @@ FASES_PLAN = [("gobierno", "Precondiciones de gobierno", 1, 2),
               ("planilla", "Planilla, tablero y guía de corrida", 1, 4),
               ("prueba", "Corrida de prueba y capacitación", 5, 5),
               ("piloto", "Piloto", 6, 18),
-              ("decision", "Informe y decisión", 19, 20)]
+              ("decision", "Medición a 90 días y decisión", 19, 28)]
 # (28/10, F6b) designa_l1: María G. designa quién inscribe las bases en la AAIP en la semana 2 (D v1.3, 12.3 y 12.4).
-HITOS_PLAN = {"alcance": 1, "regla_y_operador_del_piloto": 2, "designa_l1": 2, "acciones_legales_y_control": 4,
-              "extracto_regenerado": 6, "go_live": 6, "operador_despues_del_piloto": 13, "decision": 20}
+# (03/11, W9) D v2.0, 12.2: L4 en la semana 1 (confidencialidad), decisión preliminar en la 20 y final en la 28 (G63).
+HITOS_PLAN = {"confidencialidad": 1, "alcance": 1, "regla_y_operador_del_piloto": 2, "designa_l1": 2,
+              "acciones_legales_y_control": 4, "extracto_regenerado": 6, "go_live": 6,
+              "operador_despues_del_piloto": 13, "preliminar": 20, "decision": 28}
 
 
 def cargar_e1() -> dict:
@@ -1052,8 +1082,10 @@ def armar_test(e4: dict, v4: dict, eco: dict, e3: dict) -> dict:
           donde="D 8.2")
     ancla("J10", "decisión: condición 2 (paga lo que agrega)", DE["condicion_2"], False, donde="D 8.2")
     ancla("J10", "decisión: aciertos extra por mes", DE["aciertos_extra_por_mes"], "−1,27", 2, donde="D 8.2")
+    # (03/11, W9, P3) El 8.595 ya no se muestra ni lo escribe la D v2.0: sostiene «más aciertos de los que caben en la
+    # lista de 500» (D 11.2), que V04 controla al armar.
     ancla("J10", "decisión: aciertos por mes que pagan el costo", DE["aciertos_por_mes_para_pagar"], "8.595", 0,
-          donde="D 8.2")
+          donde="registro J10 (etapa4.json)")
     ancla("J10", "decisión: costo incremental (USD)", DE["costo_incremental_usd"], "10.400", 0, donde="D 8.2")
     ancla("J10", "decisión: la lista sigue con la regla", DE["sigue_la_regla"], True, donde="D 8.2")
     # J11
@@ -1186,7 +1218,7 @@ def armar_test(e4: dict, v4: dict, eco: dict, e3: dict) -> dict:
     EQ = test["equilibrio"]
     ancla("J19", "test: s de equilibrio de la regla (%)", EQ["s_equilibrio"], "46,9", 1, 100, donde="D 11.2")
     ancla("J19", "test: diferencia de compra a 7 días que paga la regla (puntos)", EQ["diferencia_compra_7d_pp"],
-          "40,4", 1, donde="D 11.2 (igual que H49)")
+          "40,4", 1, donde="registro J19 (escala de H49; la D v2.0 ya no la escribe)")
     return test
 
 
@@ -1205,15 +1237,19 @@ def armar_plan() -> dict:
     plan = {"semana_1": SEMANA_1, "fases": fases, "semanas": max(f["hasta_semana"] for f in fases),
             "hitos_semana": HITOS_PLAN}
     f = {x["id"]: x for x in fases}
-    ancla("J50", "plan: semanas de cada fase", " · ".join(str(x["semanas"]) for x in fases), "2 · 3 · 4 · 1 · 13 · 2",
+    ancla("J50", "plan: semanas de cada fase", " · ".join(str(x["semanas"]) for x in fases), "2 · 3 · 4 · 1 · 13 · 10",
           donde="D 12.1")
-    ancla("J50", "plan: semanas en total", plan["semanas"], "20", 0, donde="D 12.1")
+    ancla("J50", "plan: semanas en total", plan["semanas"], "28", 0, donde="D 12.1")
     ancla("J50", "plan: el piloto empieza en el go-live", f["piloto"]["desde_semana"] == HITOS_PLAN["go_live"], True,
           donde="D 12.1")
     ancla("J50", "plan: semana 1", f"{SEMANA_1} a {fin(1)}", "2026-11-02 a 2026-11-08", donde="registro J50")
     ancla("J50", "plan: piloto", f"{f['piloto']['desde']} a {f['piloto']['hasta']}", "2026-12-07 a 2027-03-07",
           donde="D 12.1 (07/12/2026 a 07/03/2027)")
-    ancla("J50", "plan: decisión hasta", f["decision"]["hasta"], "2027-03-21", donde="D 12.1 (21/03/2027)")
+    ancla("J50", "plan: decisión desde", f["decision"]["desde"], "2027-03-08", donde="D 12.1 (semana 19)")
+    ancla("G63", "plan: la decisión final es el lunes de la semana 28", inicio(HITOS_PLAN["decision"]), "2027-05-10",
+          donde="D 11.2 y 12.2 (10/05/2027)")
+    ancla("G63", "plan: la decisión preliminar es el lunes de la semana 20", inicio(HITOS_PLAN["preliminar"]),
+          "2027-03-15", donde="D 12.2")
     ancla("J50", "plan: operador antes del tercer mes del piloto",
           f["piloto"]["desde_semana"] < HITOS_PLAN["operador_despues_del_piloto"] < f["piloto"]["desde_semana"] + 8 + 1,
           True, donde="D 12.2 (C 6.3, riesgo 2)")

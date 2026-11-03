@@ -22,6 +22,8 @@
 //   marcador), la conclusión y la decisión corta se acortan y el fragmento de la tarjeta 2 no repite «go-live». El eje se
 //   corta donde va «piloto», para que ni la línea ni las marcas lo tachen. El dueño lleva un espacio duro antes de la
 //   inicial, para que «C.» no quede sola en un renglón.
+// - (03/11, W9) El plan de la D v2.0 (28 semanas): la línea suma la decisión preliminar (semana 20, hito 9) y la de
+//   producción pasa a la 28 (hito 10); «Medir» dice el cruce a 90 días y «Contactar», las dos ramas (C3).
 // Ninguna cifra escrita acá: las semanas salen de D3 (datos_e3.js) con formato.js y los textos de C3 (contenido_e3.js).
 
 import { Lienzo } from '../../../src/graficos.jsx'
@@ -40,7 +42,6 @@ const PL = D3.plan
 const HS = PL.hitos_semana
 const FASE = Object.fromEntries(PL.fases.map((f) => [f.id, f]))
 const PILOTO = FASE.piloto
-const DECIDE = FASE.decision
 const D13 = C3.DIAPOSITIVAS.find((d) => d.n === 13)
 const semanas = (n) => `${n}${NBSP}${n === 1 ? 'semana' : 'semanas'}`
 const rango = (f) => (f.desde_semana === f.hasta_semana ? `semana ${f.desde_semana}`
@@ -64,19 +65,22 @@ function CifraSemana({ n, sec = false }) {
   )
 }
 
+// (03/11, W9, G63) Decisión preliminar en la semana 20 y final en la 28, el lunes 10/05/2027 (D 12.2).
 const DECISION = decision('D-PLA', {
-  llano_corto: `María G. decide en la semana${NBSP}${HS.decision}`,
+  llano_corto: `Decisión preliminar en la ${HS.preliminar}; final en la semana${NBSP}${HS.decision}`,
   llano: `El plan dura ${semanas(PL.semanas)} desde el ${fecha(PL.semana_1)}. La primera lista sale en la semana `
-    + `${HS.go_live}, el ${fecha(PILOTO.desde)}, con los ${entero(CRITERIOS.length)} criterios de go-live; el piloto `
-    + `cierra en la semana ${PILOTO.hasta_semana} y María G. decide en la ${HS.decision}, el ${fecha(DECIDE.hasta)}.`,
-  decision: `Primera lista en la semana ${HS.go_live}; decisión de producción en la ${HS.decision}`,
+    + `${HS.go_live}, el ${fecha(PILOTO.desde)}, con los ${entero(CRITERIOS.length)} criterios de go-live; la tercera `
+    + `sale en febrero. María G. decide en la semana ${HS.preliminar}, de forma preliminar, y en la ${HS.decision}, el `
+    + `${fecha(P.fecha_final)}, con el cruce a 90 días de las tres listas.`,
+  decision: `Primera lista en la semana ${HS.go_live}; decisión preliminar en la ${HS.preliminar} y de producción en `
+    + `la ${HS.decision}`,
   justificacion: 'Parte D 12.1 a 12.4: las fases 1 a 3 van en paralelo con el extracto actual; las tres listas '
     + 'salen después de la campaña de fin de año.',
 })
 
 const TITULO_PLAN = `Plan del proyecto: ${semanas(PL.semanas)} desde el ${fecha(PL.semana_1)}. `
   + PL.fases.map((f) => `${f.nombre}, ${rango(f)}`).join('; ')
-  + `. La primera lista sale el ${fecha(PILOTO.desde)}; María G. decide el ${fecha(DECIDE.hasta)}.`
+  + `. La primera lista sale el ${fecha(PILOTO.desde)}; María G. decide el ${fecha(P.fecha_final)}.`
 const TITULO_FLUJO = `Parte D 9.2. Una lista por mes, ${P.meses} en total, desde el ${fecha(PILOTO.desde)}; el piloto `
   + `cierra el ${fecha(PILOTO.hasta)}.`
 const CONCLUSION = ['Cada mes, una lista; ', 'la primera, con los criterios cumplidos']

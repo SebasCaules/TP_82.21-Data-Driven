@@ -501,7 +501,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": null,
+    "texto": "no existe: haría falta 6.765 % de la lista",
+    "cuenta": 67.64730034816179,
+    "unidad": "veces la lista"
+   }
   },
   {
    "variable": "Beneficio por caso corregido",
@@ -512,7 +518,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": 599274.1983743373,
+    "texto": "ARS 599.274 de margen por cliente que vuelve (39,2 veces G08)",
+    "cuenta": 599274.1983743373,
+    "unidad": "ARS por año"
+   }
   },
   {
    "variable": "Desempeño del modelo (casos detectados / precisión)",
@@ -523,7 +535,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": null
+   "viable_mvp": null,
+   "equilibrio_regla": {
+    "valor": null,
+    "texto": "no aplica a la regla",
+    "cuenta": null,
+    "unidad": null
+   }
   },
   {
    "variable": "Costo de integración técnica",
@@ -534,7 +552,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": null,
+    "texto": "no existe: aun sin costo de integración el ROI es −98,22 %",
+    "cuenta": null,
+    "unidad": null
+   }
   },
   {
    "variable": "Tasa de éxito de la acción",
@@ -545,7 +569,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": 0.49557019216813325,
+    "texto": "tasa de éxito 49,6 %",
+    "cuenta": 0.49557019216813325,
+    "unidad": "fracción"
+   }
   },
   {
    "variable": "Falsos positivos que usan el descuento",
@@ -556,7 +586,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": null,
+    "texto": "no existe: con r = 0 el ROI es −98,44 %",
+    "cuenta": -98.43873359144283,
+    "unidad": "%"
+   }
   },
   {
    "variable": "Margen bruto",
@@ -567,7 +603,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": null,
+    "texto": "no existe: haría falta un margen bruto de 1.474 % de la facturación",
+    "cuenta": 14.737217154592201,
+    "unidad": "fracción"
+   }
   },
   {
    "variable": "Descuento de la oferta",
@@ -578,7 +620,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": 0.397307171229313,
+    "texto": "sin descuento, tasa de éxito 39,7 %",
+    "cuenta": 0.397307171229313,
+    "unidad": "fracción"
+   }
   },
   {
    "variable": "Descuento de la oferta",
@@ -589,7 +637,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": null,
+    "texto": "no existe para el descuento; con 15 % el equilibrio es la tasa de éxito de 49,6 %",
+    "cuenta": null,
+    "unidad": null
+   }
   },
   {
    "variable": "Margen que vuelve con un cliente",
@@ -600,7 +654,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": 599274.1983743373,
+    "texto": "ARS 599.274 de margen por cliente que vuelve (37,3 veces G51)",
+    "cuenta": 599274.1983743373,
+    "unidad": "ARS por año"
+   }
   },
   {
    "variable": "Tasa de éxito de la acción",
@@ -611,7 +671,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": 0.49557019216813325,
+    "texto": "tasa de éxito 49,6 %",
+    "cuenta": 0.49557019216813325,
+    "unidad": "fracción"
+   }
   },
   {
    "variable": "Tipo de cambio",
@@ -622,7 +688,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": 21.57390897328924,
+    "texto": "21,57 ARS/USD",
+    "cuenta": 21.57390897328924,
+    "unidad": "ARS/USD"
+   }
   },
   {
    "variable": "Tipo de cambio",
@@ -633,7 +705,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": 21.57390897328924,
+    "texto": "21,57 ARS/USD",
+    "cuenta": 21.57390897328924,
+    "unidad": "ARS/USD"
+   }
   },
   {
    "variable": "Horizonte de evaluación",
@@ -644,7 +722,13 @@
    "roi_base_proyecto_pct": -99.94828832598624,
    "roi_base_mvp_pct": -98.52174440834553,
    "viable_proyecto": false,
-   "viable_mvp": false
+   "viable_mvp": false,
+   "equilibrio_regla": {
+    "valor": null,
+    "texto": "no existe: el recurrente (USD 6.000 por año) supera lo que deja la lista; con horizonte infinito el ROI tiende a −95,0 %",
+    "cuenta": -95.00842361884672,
+    "unidad": "%"
+   }
   }
  ],
  "umbral": {
@@ -709,21 +793,142 @@
  "piloto": {
   "meses": 3,
   "lista_mes": 500,
-  "control_mes": 80,
-  "tratados": 1260,
-  "control": 240,
+  "control_mes": 100,
+  "tratados": 1200,
+  "control": 300,
   "horas_equipo": {
-   "diseño del sorteo y del registro de resultados": 8,
-   "medición de la compra a 7 días de tratados y control, 4 h por mes": 12,
-   "informe del piloto": 12
+   "diseño del sorteo del control y de las dos ramas, y del registro de resultados": 8,
+   "medición de cada lista, compra a 7 días y cruce a 90 días por rama y control, 4 h por lista": 12,
+   "informes del piloto, preliminar (semana 20) y final (semana 28), 6 h cada uno": 12
   },
   "horas_operador": 4,
   "costo_horas_usd": 1350.0,
-  "costo_por_tratado_ars": 54.19753828875666,
-  "acciones_marketing_ars": 68288.89824383339,
-  "acciones_marketing_usd": 46.79191230567211,
+  "costo_por_tratado_ars": 44.61540830104758,
+  "acciones_marketing_ars": 53538.489961257095,
+  "acciones_marketing_usd": 36.684854956954446,
   "p0_compra_7d": 0.012070211228696502,
-  "mde_pp": 2.872566723190802
+  "mde_pp": 2.9119464714381276,
+  "lista": "500 contactables por mes (filtro L3; H16, G56)",
+  "poblacion": {
+   "alto_valor_contactado": 446.66666666666663,
+   "fuera_del_20": 1053.3333333333333,
+   "tratados_fuera_del_20": 753.3333333333333,
+   "por_rama": 376.66666666666663,
+   "por_mes": {
+    "alto_valor": 148.88888888888889,
+    "control": 100,
+    "por_rama": 125.55555555555554
+   },
+   "alto_valor_en_la_lista": 0.29777777777777775
+  },
+  "ramas": {
+   "con_descuento": {
+    "descuento": 0.15,
+    "contactados": 376.66666666666663,
+    "costo_por_contactado_ars": 53.83989357148354,
+    "acciones_ars": 20279.6932452588
+   },
+   "sin_descuento": {
+    "descuento": 0.0,
+    "contactados": 376.66666666666663,
+    "costo_por_contactado_ars": 25.0,
+    "acciones_ars": 9416.666666666666
+   },
+   "alto_valor": {
+    "descuento": 0.15,
+    "contactados": 446.66666666666663,
+    "costo_por_contactado_ars": 53.37790309551858,
+    "acciones_ars": 23842.13004933163
+   }
+  },
+  "metrica_decision": {
+   "que": "cruce del umbral a 90 días, control menos contactados, fuera del 20 % de mayor facturación",
+   "p0_cruce_90d_control": 0.7740506329113924,
+   "p0_cruce_90d_alto_valor": 0.7201492537313433,
+   "mde": {
+    "tratados_fuera_del_20": 753.3333333333333,
+    "por_rama": 376.66666666666663,
+    "cruce_90d": {
+     "por_rama_contra_control_pp": 9.628873035602329,
+     "entre_ramas_pp": 9.062335121167568,
+     "ramas_juntas_contra_control_pp": 8.379553391660846
+    },
+    "compra_7d": {
+     "por_rama_contra_control_pp": 3.6638699676643496,
+     "entre_ramas_pp": 3.434069234000307,
+     "ramas_juntas_contra_control_pp": 2.9119464714381276
+    }
+   },
+   "mde_con_el_control_en_p0": {
+    "por_rama_contra_control_pp": 9.679152598699462,
+    "ramas_juntas_contra_control_pp": 8.531621003542698,
+    "por_rama_con_80_de_control_pp": 10.242413211785536
+   }
+  },
+  "control_80_no_alcanza": {
+   "control_mes": 80,
+   "mde": {
+    "tratados_fuera_del_20": 813.3333333333333,
+    "por_rama": 406.66666666666663,
+    "cruce_90d": {
+     "por_rama_contra_control_pp": 10.11723446090854,
+     "entre_ramas_pp": 8.70452618733796,
+     "ramas_juntas_contra_control_pp": 9.016257278167835
+    },
+    "compra_7d": {
+     "por_rama_contra_control_pp": 3.8228628318096223,
+     "entre_ramas_pp": 3.2561924615985554,
+     "ramas_juntas_contra_control_pp": 3.12789423760207
+    }
+   },
+   "umbral_recurrente_sin_descuento_pp": 9.919484967300326
+  },
+  "umbral_produccion": {
+   "s_equilibrio": {
+    "recurrente_con_descuento": 0.1602910706120404,
+    "recurrente_sin_descuento": 0.12815033727174582,
+    "primer_anio_con_descuento": 0.533482565263549,
+    "primer_anio_sin_descuento": 0.4275915055944907
+   },
+   "diferencia_cruce_90d_pp": {
+    "recurrente_con_descuento": 12.407340465729456,
+    "recurrente_sin_descuento": 9.919484967300326,
+    "primer_anio_con_descuento": 41.29425172894433,
+    "primer_anio_sin_descuento": 33.09774755329508
+   },
+   "costo_recurrente_usd_anual": 6000.0,
+   "costo_primer_anio_usd": 20260.0,
+   "diferencia_esperada_tasa_observada_pp": 0.7888414093364509,
+   "h49_40_4_escala_anterior_pp": 40.4275150099826
+  },
+  "calendario": {
+   "semana_1": "2026-11-02",
+   "primera_lista": {
+    "semana": 6,
+    "lunes": "2026-12-07"
+   },
+   "tercera_lista": {
+    "semana": 14,
+    "lunes": "2027-02-01",
+    "corte": "2027-01-31",
+    "cierre_90d": "2027-05-01",
+    "semana_cierre_90d": 26
+   },
+   "primera_lista_cierre_90d": {
+    "fecha": "2027-02-28",
+    "semana": 17
+   },
+   "preliminar": {
+    "semana": 20,
+    "lunes": "2027-03-15"
+   },
+   "final": {
+    "semana": 28,
+    "lunes": "2027-05-10"
+   },
+   "semanas_19_a_28": 10,
+   "recurrente_semanas_19_a_28_usd": 1153.8461538461538
+  }
  },
  "alto_valor": {
   "definicion": "20 % de mayor monetary de cada corte",
@@ -740,7 +945,154 @@
  "tasa_exito_cruzan": {
   "envios": 1162,
   "compras_7d": 13,
-  "tasa": 0.011187607573149742
+  "tasa": 0.011187607573149742,
+  "fisher_p_contra_no_cruzan": 0.774606560812638,
+  "no_cruzan": {
+   "envios": 408,
+   "compras_7d": 3,
+   "tasa": 0.007352941176470588
+  }
+ },
+ "equilibrios": {
+  "beneficio_por_caso_ars": {
+   "regla_con_descuento": 599274.1983743373,
+   "veces_g08": 39.21558582914369,
+   "modelo_sobre_la_regla": 27925867.451632578
+  },
+  "tasa_exito": {
+   "regla_con_descuento": 0.49557019216813325,
+   "regla_sin_descuento": 0.397307171229313
+  },
+  "tipo_de_cambio": {
+   "regla_con_descuento": 21.57390897328924,
+   "regla_sin_descuento": 30.220761378646593,
+   "modelo_sobre_la_regla": 0.7546888064062357
+  },
+  "adopcion_veces_la_lista": 67.64730034816179,
+  "margen_bruto_sobre_facturacion": 14.737217154592201,
+  "roi_regla_r_0_pct": -98.43873359144283,
+  "roi_regla_horizonte_infinito_pct": -95.00842361884672
+ },
+ "horas_equilibrio": {
+  "horas_por_mes": 44.35667870473512,
+  "tarifa_usd_hora": 37.5,
+  "costo_primer_anio_usd": 20260.0,
+  "beneficio_regla_usd": 299.49458286919696
+ },
+ "recurrente_contra_beneficio": {
+  "recurrente_regla_usd_anual": 6000.0,
+  "beneficio_regla_usd_anual": 299.49458286919696,
+  "veces": 20.033751337066672
+ },
+ "grafico_3_5": {
+  "que": "ROI a un año de la regla sin modelo (con 15 % de descuento) al mover una variable por vez",
+  "roi_base_pct": -98.52174440834553,
+  "barras": [
+   {
+    "etiqueta": "Adopción 50 %",
+    "variable": "% de adopción del modelo por parte de los usuarios",
+    "probado": "50 %",
+    "roi_regla_pct": -99.26087220417276,
+    "diferencia_con_la_base_pp": -0.7391277958272298,
+    "equilibrio": "no existe: haría falta 6.765 % de la lista"
+   },
+   {
+    "etiqueta": "Margen de una compra",
+    "variable": "Beneficio por caso corregido",
+    "probado": "el margen de una compra",
+    "roi_regla_pct": -99.82338845270647,
+    "diferencia_con_la_base_pp": -1.3016440443609412,
+    "equilibrio": "ARS 599.274 de margen por cliente que vuelve (39,2 veces G08)"
+   },
+   {
+    "etiqueta": "Integración al doble",
+    "variable": "Costo de integración técnica",
+    "probado": "el doble",
+    "roi_regla_pct": -98.73684275466387,
+    "diferencia_con_la_base_pp": -0.21509834631834224,
+    "equilibrio": "no existe: aun sin costo de integración el ROI es −98,22 %"
+   },
+   {
+    "etiqueta": "Éxito 0,63 %",
+    "variable": "Tasa de éxito de la acción",
+    "probado": "límite inferior del intervalo",
+    "roi_regla_pct": -99.31507190465145,
+    "diferencia_con_la_base_pp": -0.7933274963059205,
+    "equilibrio": "tasa de éxito 49,6 %"
+   },
+   {
+    "etiqueta": "Descuento usado por los FP: apertura",
+    "variable": "Falsos positivos que usan el descuento",
+    "probado": "apertura: la oferta vale hasta la próxima compra",
+    "roi_regla_pct": -102.36791225817043,
+    "diferencia_con_la_base_pp": -3.8461678498249086,
+    "equilibrio": "no existe: con r = 0 el ROI es −98,44 %"
+   },
+   {
+    "etiqueta": "Margen bruto de 2025",
+    "variable": "Margen bruto",
+    "probado": "2025",
+    "roi_regla_pct": -98.62601897253978,
+    "diferencia_con_la_base_pp": -0.10427456419425596,
+    "equilibrio": "no existe: haría falta un margen bruto de 1.474 % de la facturación"
+   },
+   {
+    "etiqueta": "Sin descuento",
+    "variable": "Descuento de la oferta",
+    "probado": "sin descuento (a favor)",
+    "roi_regla_pct": -97.9292575329139,
+    "diferencia_con_la_base_pp": 0.5924868754316321,
+    "equilibrio": "sin descuento, tasa de éxito 39,7 %"
+   },
+   {
+    "etiqueta": "20 % a los clientes de alto valor",
+    "variable": "Descuento de la oferta",
+    "probado": "20 % a los clientes de alto valor de la lista (el 20 % de mayor facturación, G50), 15 % al resto",
+    "roi_regla_pct": -98.57776556430275,
+    "diferencia_con_la_base_pp": -0.05602115595722523,
+    "equilibrio": "no existe para el descuento; con 15 % el equilibrio es la tasa de éxito de 49,6 %"
+   },
+   {
+    "etiqueta": "Margen por persona unificada",
+    "variable": "Margen que vuelve con un cliente",
+    "probado": "por persona unificada, id_cliente_canonico (G51; a favor)",
+    "roi_regla_pct": -98.39069895693368,
+    "diferencia_con_la_base_pp": 0.13104545141185042,
+    "equilibrio": "ARS 599.274 de margen por cliente que vuelve (37,3 veces G51)"
+   },
+   {
+    "etiqueta": "Éxito 1,12 % (los que cruzan)",
+    "variable": "Tasa de éxito de la acción",
+    "probado": "compra a 7 días de los que cruzan el umbral (G52; a favor)",
+    "roi_regla_pct": -98.31947085175558,
+    "diferencia_con_la_base_pp": 0.20227355658994384,
+    "equilibrio": "tasa de éxito 49,6 %"
+   },
+   {
+    "etiqueta": "Tipo de cambio de 2024",
+    "variable": "Tipo de cambio",
+    "probado": "30/12/2024, el año de los montos (a favor)",
+    "roi_regla_pct": -97.9105172907226,
+    "diferencia_con_la_base_pp": 0.6112271176229314,
+    "equilibrio": "21,57 ARS/USD"
+   },
+   {
+    "etiqueta": "Tipo de cambio de 2022",
+    "variable": "Tipo de cambio",
+    "probado": "30/12/2022 (a favor)",
+    "roi_regla_pct": -87.82017951208856,
+    "diferencia_con_la_base_pp": 10.701564896256968,
+    "equilibrio": "21,57 ARS/USD"
+   },
+   {
+    "etiqueta": "Horizonte de 3 años",
+    "variable": "Horizonte de evaluación",
+    "probado": "3 años (a favor)",
+    "roi_regla_pct": -97.21486748726723,
+    "diferencia_con_la_base_pp": 1.306876921078299,
+    "equilibrio": "no existe: el recurrente (USD 6.000 por año) supera lo que deja la lista; con horizonte infinito el ROI tiende a −95,0 %"
+   }
+  ]
  },
  "meta_criterio_1": {
   "regla_aciertos_por_mes": 407.88888888888886,

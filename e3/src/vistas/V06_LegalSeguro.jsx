@@ -89,8 +89,10 @@ if (CRITICOS.length !== L.riesgos_criticos || RIESGOS.length !== L.riesgos) {
   throw new Error(`V06: A4 (${CRITICOS.length} de ${RIESGOS.length}) no coincide con D3.legal (${L.riesgos_criticos} de ${L.riesgos})`)
 }
 
-// Plan L1 a L6 (diapositiva 10), en sus dos tramos.
+// Plan L1 a L6 (diapositiva 10), en sus dos tramos. (03/11, W9, P1) En el orden en que dependen, con L4 primero; la
+// tercera columna es la semana de cada acción (`plazo`, C 5.4) y el dueño va al title.
 const ACCIONES = D10.plan.flatMap((t) => t.acciones)
+const col3 = (a) => a.plazo ?? a.quien
 
 // «Sí, con condiciones: el riesgo es contactar sin consentimiento» → la conclusión del gráfico.
 const CONCLUSION = mayus((plano(D10.titulo).match(/:\s*(.+)$/) ?? [, plano(D10.titulo)])[1])
@@ -98,7 +100,7 @@ const CONCLUSION = mayus((plano(D10.titulo).match(/:\s*(.+)$/) ?? [, plano(D10.t
 const DECISION = decision('C-LEG', {
   llano_corto: `Sí, con ${minus(T_LEGAL.texto)}`.replace(/\.$/, ''),
   llano: plano(D10.titulo),
-  decision: D10.plan.map((t) => `${minus(t.cuando)}: ${t.acciones.map((a) => `${a.id} ${minus(plano(a.que))} (${plano(a.quien)})`).join(', ')}`).join('; '),
+  decision: D10.plan.map((t) => `${minus(t.cuando)}: ${t.acciones.map((a) => `${a.id} ${minus(plano(a.que))} (${plano(col3(a))}; ${plano(a.quien)})`).join(', ')}`).join('; '),
   justificacion: `${plano(D10.escala)} ${plano(D10.alerta.valor)} ${plano(D10.alerta.texto)}`,
 })
 
@@ -186,7 +188,7 @@ function medirPlan(w, fx, k) {
   const xQue = wId + 10 * k
   const xQuien = xQue + (w - xQue) * 0.56
   const lineas = D10.plan.map((t) => t.acciones.map((a) => Math.max(
-    envolver(a.que, xQuien - xQue - 12 * k, fx, 600).length, envolver(a.quien, w - xQuien, fx).length)))
+    envolver(a.que, xQuien - xQue - 12 * k, fx, 600).length, envolver(col3(a), w - xQuien, fx).length)))
   const alto = D10.plan.length * (fr * 2.1) + (D10.plan.length - 1) * fr * 0.7
     + lineas.flat().reduce((x, n) => x + n * fx * 1.3 + fx * 0.4, 0)
   return { fr, wId, xQue, xQuien, lineas, alto }
@@ -214,12 +216,12 @@ function PlanLegal({ w, h, k }) {
       const n = m.lineas[i][j]
       out.push(
         <g key={a.id}>
-          <title>{`${a.id} · ${plano(a.que)} · ${plano(a.quien)} · ${t.cuando}`}</title>
+          <title>{`${a.id} · ${plano(a.que)} · ${plano(col3(a))} · ${plano(a.quien)} · ${t.cuando}`}</title>
           <rect x={0} y={y} width={m.wId} height={m.fr + 7 * k} rx="2" fill="var(--azul1)" />
           <text x={m.wId / 2} y={y + (m.fr + 7 * k) / 2} fontSize={m.fr} fontWeight={700} fill={ACC}
                 fontFamily="var(--mono)" textAnchor="middle" dominantBaseline="central">{a.id}</text>
           <Renglones lineas={envolver(a.que, m.xQuien - m.xQue - 12 * k, f, 600)} x={m.xQue} y={y + 1} f={f} peso={600} />
-          <Renglones lineas={envolver(a.quien, w - m.xQuien, f)} x={m.xQuien} y={y + 1} f={f} color={MUT2} />
+          <Renglones lineas={envolver(col3(a), w - m.xQuien, f)} x={m.xQuien} y={y + 1} f={f} color={MUT2} />
         </g>,
       )
       y += n * f * 1.3 + f * 0.4
