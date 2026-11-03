@@ -241,23 +241,35 @@ function PlanLegal({ w, h, k }) {
  * adentro y a quién fue, al lado. Abajo, nuestra lista: el mismo riel vacío, con «la lista sale sin ellos» y el
  * filtro que lo asegura (L3). El riel es solo un filete: marca la escala sin dibujar el resto como un dato.
  */
-function BarraEnvios({ w, h, k }) {
+/** Medidas del bloque de los envíos con letra `k` y alto `h`. La barra va de 26·k a 76·k. */
+function medirBarra(h, k) {
   const fRot = Math.round(12 * k)
   const fEtq = Math.round(17 * k)
-  const fDentro = Math.round(17 * k)
   const gap = Math.round(14 * k)
+  const cab = fEtq * 1.3                         // el rótulo de cada fila
+  const libre = (h - arriba(fRot) - fRot - 2 * cab - gap * 2.2) / 2
+  const barra = Math.max(26 * k, Math.min(76 * k, libre))
+  const alto = arriba(fRot) + fRot + gap + 2 * (cab + barra) + gap * 1.2
+  return { k, fRot, fEtq, gap, cab, barra, alto }
+}
+/** El alto más chico con que el bloque se lee entero (barra de 26·k): Cuerpo lo reserva arriba. */
+const altoBarraMin = (k) => medirBarra(0, k).alto
+
+function BarraEnvios({ w, h, k: k0 }) {
+  // (03/11) Todo baja con un factor hasta que el bloque entra en el alto que deja el plan legal.
+  const medir = (k) => medirBarra(h, k)
+  let m = medir(k0)
+  for (let f = 0.95; m.alto > h && f >= 0.6; f -= 0.05) m = medir(k0 * f)
+  const { k, fRot, fEtq, gap, cab, barra, alto } = m
+  const fDentro = fEtq
   const xIni = 1
   const xFin = w - 1
   const total = xFin - xIni
   const wExc = Math.max(2, total * TASA)
-
-  const cab = fEtq * 1.45                        // el rótulo de cada fila
-  const barra = Math.max(40 * k, Math.min(76 * k, (h - arriba(fRot) - fRot - 2 * cab - 3 * gap) / 2))
-  const alto = arriba(fRot) + fRot + gap + 2 * (cab + barra) + gap * 1.6
   const y0 = Math.max(0, (h - alto) * 0.4)
   const y1 = y0 + arriba(fRot) + fRot + gap      // fila 1: hoy
   const yB1 = y1 + cab
-  const y2 = yB1 + barra + gap * 1.6             // fila 2: nuestra lista
+  const y2 = yB1 + barra + gap * 1.2             // fila 2: nuestra lista
   const yB2 = y2 + cab
 
   // Valor adentro del tramo: lo más grande que entra en el ancho y en el alto.
@@ -282,7 +294,7 @@ function BarraEnvios({ w, h, k }) {
       <g>
         <title>{tituloExc}</title>
         <rect x={xIni} y={yB1} width={wExc} height={barra} fill={EXC} />
-        {fVal >= 14 && (
+        {fVal >= 11 && (
           <text x={xIni + 12 * k} y={yB1 + barra / 2} fontSize={fVal} fontWeight={700} fill="#fff"
                 dominantBaseline="central" className="tabular">{TASA_TXT}</text>
         )}
@@ -378,14 +390,20 @@ function Cuerpo({ w, h, k }) {
   const pieNormas = envolver(D10.nota, w, f2)
   const altoNormas = pieNormas.length * f2 * 1.3
   const fMax = Math.round(20 * k * 0.9)          // la letra del riesgo, a lo sumo
-  const pie = (fR) => {
-    const m = medirCriticos(w, fR, fS, k)
-    return { m, fR, alto: 10 * k + arriba(fRot) + fRot + 8 * k + m.alto + 8 * k + altoNormas }
+  const pie = (fR, fV) => {
+    const m = medirCriticos(w, fR, fV, k)
+    return { m, fR, fV, alto: 10 * k + arriba(fRot) + fRot + 8 * k + m.alto + 8 * k + altoNormas }
   }
-  let p = pie(fMax)
-  for (let fR = fMax; fR >= 14 * k; fR -= 0.5) {
-    p = pie(fR)
-    if (medirPlan(wPlan, fPlan, k).alto <= h - p.alto - cabPlan) break
+  // (03/11) Baja la letra del riesgo y de las viñetas hasta que arriba entran el plan entero y la barra a su alto mínimo.
+  const entra = (q) => {
+    const hA = h - q.alto
+    // el plan entra si entra con su letra mínima (PlanLegal elige después la más grande que entra)
+    return medirPlan(wPlan, 10.5 * k, k).alto <= hA - cabPlan && altoBarraMin(k * 0.9) <= hA
+  }
+  let p = pie(fMax, fS)
+  for (let t = 1; t >= 0.5; t -= 0.025) {
+    p = pie(Math.max(11.5 * k, fMax * t), Math.max(9.5 * k, fS * t))
+    if (entra(p)) break
   }
   const hArriba = h - p.alto
   const yRot = hArriba + 10 * k
@@ -404,7 +422,7 @@ function Cuerpo({ w, h, k }) {
       </g>
       <line x1={0} x2={w} y1={hArriba + 4 * k} y2={hArriba + 4 * k} stroke="var(--bd)" strokeWidth="1" />
       <Rotulo x={0} y={yRot + arriba(fRot)} texto={ROT_CRITICOS} f={fRot} color={INK} />
-      <g transform={`translate(0, ${yFila})`}><FilaCriticos m={p.m} fR={p.fR} fS={fS} k={k} /></g>
+      <g transform={`translate(0, ${yFila})`}><FilaCriticos m={p.m} fR={p.fR} fS={p.fV} k={k} /></g>
       <Renglones lineas={pieNormas} x={0} y={yNormas} f={f2} color={MUT2} />
     </svg>
   )
