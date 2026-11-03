@@ -276,7 +276,8 @@ def contenido_esperado():
         "v06": dict(dec="C-LEG",
                     cifras=[plano(dia[10]["promedio"]["valor"]), pct(LE["envios_sin_consentimiento_tasa"], 1),
                             fijo(LE["riesgos_criticos"])],
-                    grafico=[pct(LE["envios_sin_consentimiento_tasa"], 1), "la lista sale sin ellos"] + ids_l,
+                    grafico=[pct(LE["envios_sin_consentimiento_tasa"], 1), "Hasta hoy", "Nuestra lista",
+                             "la lista sale sin ellos"] + ids_l,
                     terracota=True,
                     fragmento=({0: f"cada dimensión en {fijo(dims[0]['puntaje'])}"} if parejas else {})),
         # la central, lo que tiene que dar el piloto (H49); (02/11, W6: COB-14, ORA-09, UX-24) el grupo de control
@@ -637,7 +638,7 @@ def a_la_vista_esperado():
         # de los 13 en una fila de tres celdas (diapositiva 11): riesgo, señal y umbral, dueño. Sale la línea de las
         # cinco dimensiones; las normas y la escala de la cátedra, en su renglón
         ("v06", None, ids_l + [plano(a["quien"]) for tr in dia[10]["plan"] for a in tr["acciones"]]
-         + [f"Riesgos críticos, {fijo(LE['riesgos_criticos'])} de {fijo(LE['riesgos'])}: señal y umbral"]
+         + [f"Riesgos críticos, {fijo(LE['riesgos_criticos'])} de {fijo(LE['riesgos'])}", "Mide:", "Alerta:", "Dueño:"]
          + [plano(x) for c in d11["columnas"] for x in (c["riesgo"], *(f["texto"] for f in c["filas"]))]
          + [plano(dia[10]["nota"])],
          ["en mujeres", "anexo", "cada una:"] + [d["nombre"] for d in LE["dimensiones"]]),

@@ -508,7 +508,7 @@ export const C3 = {
             },
             {
               "rotulo": "Umbral",
-              "texto": "**40,4 puntos** al tercer mes"
+              "texto": "menos de **40,4 puntos** al tercer mes"
             },
             {
               "rotulo": "Dueño",
@@ -522,15 +522,15 @@ export const C3 = {
           "filas": [
             {
               "rotulo": "Señal",
-              "texto": "operador elegido por María G."
+              "texto": "si María G. eligió quién opera"
             },
             {
               "rotulo": "Umbral",
-              "texto": "**semana 13**, antes del tercer mes"
+              "texto": "sin elegir en la **semana 13**"
             },
             {
               "rotulo": "Dueño",
-              "texto": "Sebastian C., en el resumen de cada mes"
+              "texto": "Sebastian C., cada mes"
             }
           ]
         },
@@ -540,7 +540,7 @@ export const C3 = {
           "filas": [
             {
               "rotulo": "Señal",
-              "texto": "clientes sin consentimiento o con baja en la planilla"
+              "texto": "clientes sin consentimiento o con baja"
             },
             {
               "rotulo": "Umbral",

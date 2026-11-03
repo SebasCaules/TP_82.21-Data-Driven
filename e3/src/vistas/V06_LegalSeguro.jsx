@@ -28,6 +28,9 @@
 //   (repetía la L3 del plan). Las normas y la escala de la cátedra quedan en un renglón (D10.nota). El 30,1 % va
 //   sobre terracota lisa, sin trama debajo del número (VIS-16). Para no terminar con más palabras que antes, el
 //   rótulo del plan queda «Plan legal» y el tramo gris va sin rótulo (la cota del período dice que es el total).
+// - (03/11, pedido del usuario) La barra pasa a dos filas sobre la escala del total: «Hasta hoy», con el tramo
+//   terracota, y «Nuestra lista», el riel vacío con «la lista sale sin ellos (filtro L3)»; sale el tramo gris y la llave.
+//   Cada riesgo crítico lleva tres viñetas: «Mide», «Alerta» y «Dueño».
 // Ninguna cifra escrita acá: los valores salen de D3 (datos_e3.js) con formato.js; el texto, de C3.
 
 import { Lienzo } from '../../../src/graficos.jsx'
@@ -233,72 +236,68 @@ function PlanLegal({ w, h, k }) {
 // ---------------------------------------------------------------- gráfico: la barra de los envíos
 
 /**
- * Barra 100 % de los envíos del período: el tramo sin consentimiento en terracota lisa (sin trama debajo del
- * número, VIS-16) y su valor adentro; el resto en relleno de contexto, sin número. Arriba, el período con una cota
- * de punta a punta y a quién fue el tramo terracota; debajo del tramo, una llave con «la lista sale sin ellos».
- * El bloque se centra en el alto; la barra crece con el alto hasta un tope.
+ * (03/11, pedido del usuario: la barra gris no decía nada y «la lista sale sin ellos» quedaba suelto bajo una llave)
+ * Dos filas sobre la misma escala, el total de los envíos. Arriba, lo que pasa hoy: el tramo terracota con su valor
+ * adentro y a quién fue, al lado. Abajo, nuestra lista: el mismo riel vacío, con «la lista sale sin ellos» y el
+ * filtro que lo asegura (L3). El riel es solo un filete: marca la escala sin dibujar el resto como un dato.
  */
 function BarraEnvios({ w, h, k }) {
   const fRot = Math.round(12 * k)
-  const fEtq = Math.round(18 * k)
-  const fBig = Math.round(24 * k)
+  const fEtq = Math.round(17 * k)
+  const fDentro = Math.round(17 * k)
   const gap = Math.round(14 * k)
   const xIni = 1
   const xFin = w - 1
   const total = xFin - xIni
   const wExc = Math.max(2, total * TASA)
-  const xResto = xIni + wExc + 2                 // 2 px de superficie entre los tramos
-  const llave = Math.round(12 * k)
 
-  // Alto fijo de todo lo que no es la barra; la barra se queda con el resto, entre un piso y un tope.
-  const arribaAlto = arriba(fRot) + fRot + gap * 1.2 + fEtq + gap * 0.7
-  const abajoAlto = gap + llave + gap + fBig * 1.15
-  const barra = Math.max(48 * k, Math.min(120 * k, (h - arribaAlto - abajoAlto) * 0.7))
-  const alto = arribaAlto + barra + abajoAlto
-  const y0 = Math.max(0, (h - alto) * 0.4)       // un poco arriba del centro: más cerca de la conclusión
-  const yCota = y0 + arriba(fRot) + fRot + 7 * k
-  const yEtq = y0 + arribaAlto - gap * 0.7
-  const yBar = y0 + arribaAlto
-  const yLlave = yBar + barra + gap
-  const yLista = yLlave + llave + gap
+  const cab = fEtq * 1.45                        // el rótulo de cada fila
+  const barra = Math.max(40 * k, Math.min(76 * k, (h - arriba(fRot) - fRot - 2 * cab - 3 * gap) / 2))
+  const alto = arriba(fRot) + fRot + gap + 2 * (cab + barra) + gap * 1.6
+  const y0 = Math.max(0, (h - alto) * 0.4)
+  const y1 = y0 + arriba(fRot) + fRot + gap      // fila 1: hoy
+  const yB1 = y1 + cab
+  const y2 = yB1 + barra + gap * 1.6             // fila 2: nuestra lista
+  const yB2 = y2 + cab
 
   // Valor adentro del tramo: lo más grande que entra en el ancho y en el alto.
-  const fVal = Math.min(barra * 0.4, 36 * k, ((wExc - 28 * k) / Math.max(1, ancho(TASA_TXT, 100, 700))) * 100)
-  // (02/11, W6) Sin rótulo en el resto: la cota del período ya dice que la barra es el total.
-  const etqExc = A_QUIEN
+  const fVal = Math.min(barra * 0.45, 34 * k, ((wExc - 24 * k) / Math.max(1, ancho(TASA_TXT, 100, 700))) * 100)
+  const xAQuien = xIni + wExc + 10 * k
+  const entraAQuien = xAQuien + ancho(A_QUIEN, fDentro, 700) <= xFin - 8 * k
+  const LISTA = 'la lista sale sin ellos'
+  const FILTRO = '(filtro L3)'
   const tituloExc = `Sin consentimiento: ${TASA_TXT} ${ALERTA} (${entero(L.envios_sin_consentimiento)} envíos)`
+  const riel = (y) => (
+    <rect x={xIni + 0.5} y={y + 0.5} width={total - 1} height={barra - 1} fill="none" stroke={EJE} strokeWidth="1" />
+  )
 
   return (
     <svg width={w} height={h} role="img" style={{ display: 'block' }}
-         aria-label={`${PERIODO}: ${TASA_TXT} fue a quien ${A_QUIEN}; la lista sale sin ellos.`}>
-      {/* período: rótulo y cota de punta a punta, que dice que la barra es el total */}
-      <Rotulo x={xIni} y={y0 + arriba(fRot)} texto={PERIODO} f={fRot} color={CTX} />
-      <path d={`M${xIni + 0.5} ${yCota + 5 * k} V${yCota} H${xFin - 0.5} V${yCota + 5 * k}`}
-            fill="none" stroke={EJE} strokeWidth="1" />
+         aria-label={`${PERIODO}: ${TASA_TXT} fue a quien ${A_QUIEN}. Nuestra lista: ${LISTA} ${FILTRO}.`}>
+      <Rotulo x={xIni} y={y0 + arriba(fRot)} texto={`${PERIODO}, sobre el total`} f={fRot} color={CTX} />
 
-      {/* a quién fue el tramo terracota */}
-      <text x={xIni} y={yEtq} fontSize={fEtq} fontWeight={700} fill={INK}>{etqExc}</text>
-
-      {/* la barra */}
+      {/* hoy */}
+      <text x={xIni} y={y1} fontSize={fEtq} fontWeight={700} fill={INK} dominantBaseline="hanging">Hasta hoy</text>
+      {riel(yB1)}
       <g>
         <title>{tituloExc}</title>
-        <rect x={xIni} y={yBar} width={wExc} height={barra} fill={EXC} />
+        <rect x={xIni} y={yB1} width={wExc} height={barra} fill={EXC} />
         {fVal >= 14 && (
-          <text x={xIni + 14 * k} y={yBar + barra / 2} fontSize={fVal} fontWeight={700} fill="#fff"
+          <text x={xIni + 12 * k} y={yB1 + barra / 2} fontSize={fVal} fontWeight={700} fill="#fff"
                 dominantBaseline="central" className="tabular">{TASA_TXT}</text>
         )}
       </g>
-      <g>
-        <title>{`El resto de los ${minus(PERIODO)}`}</title>
-        <rect x={xResto} y={yBar} width={Math.max(0, xFin - xResto)} height={barra} fill={CTX_RELLENO} />
-      </g>
+      {entraAQuien && (
+        <text x={xAQuien} y={yB1 + barra / 2} fontSize={fDentro} fontWeight={700} fill={INK}
+              dominantBaseline="central">{A_QUIEN}</text>
+      )}
 
-      {/* llave bajo el tramo y lo que hace la lista */}
-      <path d={`M${xIni + 0.75} ${yLlave} V${yLlave + llave * 0.5} H${xIni + wExc - 0.75} V${yLlave}`
-             + ` M${xIni + 0.75} ${yLlave + llave * 0.5} V${yLlave + llave}`}
-            fill="none" stroke={CONTORNO} strokeWidth={Math.max(1.5, 2 * k)} />
-      <text x={xIni} y={yLista} fontSize={fBig} fontWeight={700} fill={INK} dominantBaseline="hanging">
-        la lista sale sin ellos
+      {/* nuestra lista */}
+      <text x={xIni} y={y2} fontSize={fEtq} fontWeight={700} fill={INK} dominantBaseline="hanging">Nuestra lista</text>
+      {riel(yB2)}
+      <text x={xIni + 12 * k} y={yB2 + barra / 2} fontSize={fDentro} fontWeight={700} fill={INK}
+            dominantBaseline="central">
+        {LISTA}<tspan fontWeight={400} fill={CTX}>{` ${FILTRO}`}</tspan>
       </text>
     </svg>
   )
@@ -317,34 +316,45 @@ if (CRITICOS_FILA.length !== L.riesgos_criticos
     || CRITICOS_FILA.some((c) => !c.senal || !c.dueno || !/\*\*.+?\*\*/.test(c.umbral || ''))) {
   throw new Error('V06: cada columna de la diapositiva 11 trae Señal, Umbral (con su negrita) y Dueño')
 }
-const ROT_CRITICOS = `Riesgos críticos, ${fijo(L.riesgos_criticos, 0)} de ${fijo(L.riesgos, 0)}: señal y umbral`
+const ROT_CRITICOS = `Riesgos críticos, ${fijo(L.riesgos_criticos, 0)} de ${fijo(L.riesgos, 0)}`
 
-/** La fila de tres celdas con letra `fR` para el riesgo y `fS` para lo demás: renglones de cada celda y alto. */
+// (03/11, pedido del usuario) Debajo de cada riesgo, tres viñetas cortas: qué se mide, qué dispara la alerta y quién.
+const VINETAS = (c) => [`**Mide:** ${c.senal}`, `**Alerta:** ${c.umbral}`, `**Dueño:** ${c.dueno}`]
+
+/** La fila de tres celdas con letra `fR` para el riesgo y `fS` para las viñetas: renglones de cada celda y alto. */
 function medirCriticos(w, fR, fS, k) {
   const gapC = 26 * k
   const wCel = (w - gapC * (CRITICOS_FILA.length - 1)) / CRITICOS_FILA.length
+  const sangria = fS * 0.95
   const celdas = CRITICOS_FILA.map((c) => ({
     riesgo: envolver(c.riesgo, wCel, fR, 700),
-    senal: envolver(`${c.senal} · ${c.umbral}`, wCel, fS),
-    dueno: envolver(c.dueno, wCel, fS),
+    vinetas: VINETAS(c).map((t) => envolver(t, wCel - sangria, fS)),
   }))
-  const altoCelda = (x) => 6 * k + x.riesgo.length * fR * 1.25 + fR * 0.2
-    + (x.senal.length + x.dueno.length) * fS * 1.25
-  return { gapC, wCel, celdas, alto: Math.max(...celdas.map(altoCelda)) }
+  const altoCelda = (x) => 6 * k + x.riesgo.length * fR * 1.25 + fR * 0.25
+    + x.vinetas.reduce((a, v) => a + v.length * fS * 1.25 + fS * 0.15, 0)
+  return { gapC, wCel, sangria, celdas, alto: Math.max(...celdas.map(altoCelda)) }
 }
 
 function FilaCriticos({ m, fR, fS, k }) {
   return m.celdas.map((x, i) => {
     const c = CRITICOS_FILA[i]
     const x0 = i * (m.wCel + m.gapC)
-    const ySenal = 6 * k + x.riesgo.length * fR * 1.25 + fR * 0.2
+    let y = 6 * k + x.riesgo.length * fR * 1.25 + fR * 0.25
     return (
       <g key={c.n} transform={`translate(${x0}, 0)`}>
-        <title>{`${c.riesgo}. Señal: ${plano(c.senal)}. Umbral: ${plano(c.umbral)}. Dueño: ${plano(c.dueno)}.`}</title>
+        <title>{`${c.riesgo}. Mide: ${plano(c.senal)}. Alerta: ${plano(c.umbral)}. Dueño: ${plano(c.dueno)}.`}</title>
         <rect x={0} y={0} width={m.wCel} height={Math.max(2, 3 * k)} fill="var(--azul3)" />
         <Renglones lineas={x.riesgo} x={0} y={6 * k} f={fR} peso={700} color={INK} interlinea={1.25} />
-        <Renglones lineas={x.senal} x={0} y={ySenal} f={fS} color={CTX} interlinea={1.25} />
-        <Renglones lineas={x.dueno} x={0} y={ySenal + x.senal.length * fS * 1.25} f={fS} color={MUT2} interlinea={1.25} />
+        {x.vinetas.map((v, j) => {
+          const yv = y
+          y += v.length * fS * 1.25 + fS * 0.15
+          return (
+            <g key={j}>
+              <circle cx={fS * 0.28} cy={yv + fS * 0.55} r={fS * 0.16} fill={CTX} />
+              <Renglones lineas={v} x={m.sangria} y={yv} f={fS} color={CTX} interlinea={1.25} />
+            </g>
+          )
+        })}
       </g>
     )
   })
@@ -367,7 +377,7 @@ function Cuerpo({ w, h, k }) {
   const cabPlan = arriba(fRot) + fRot + 12 * k
   const pieNormas = envolver(D10.nota, w, f2)
   const altoNormas = pieNormas.length * f2 * 1.3
-  const fMax = Math.round(24 * k * 0.9)          // la letra de «la lista sale sin ellos» (BarraEnvios con k·0,9)
+  const fMax = Math.round(20 * k * 0.9)          // la letra del riesgo, a lo sumo
   const pie = (fR) => {
     const m = medirCriticos(w, fR, fS, k)
     return { m, fR, alto: 10 * k + arriba(fRot) + fRot + 8 * k + m.alto + 8 * k + altoNormas }
@@ -383,7 +393,7 @@ function Cuerpo({ w, h, k }) {
   const yNormas = yFila + p.m.alto + 8 * k
   return (
     <svg width={w} height={h} role="group" style={{ display: 'block' }}
-         aria-label={`${CONCLUSION}. Plan legal: ${DECISION.decision}. ${ROT_CRITICOS}: ${CRITICOS_FILA.map((c) => `${c.riesgo} (${plano(c.senal)}; ${plano(c.umbral)}; ${plano(c.dueno)})`).join('; ')}. ${plano(D10.nota)}`}>
+         aria-label={`${CONCLUSION}. Plan legal: ${DECISION.decision}. ${ROT_CRITICOS}: ${CRITICOS_FILA.map((c) => `${c.riesgo} (mide ${plano(c.senal)}; alerta: ${plano(c.umbral)}; dueño: ${plano(c.dueno)})`).join('; ')}. ${plano(D10.nota)}`}>
       <g><BarraEnvios w={wBarra} h={hArriba} k={k * 0.9} /></g>
       <line x1={wBarra + gap / 2} x2={wBarra + gap / 2} y1={0} y2={hArriba} stroke="var(--bd)" strokeWidth="1" />
       <g transform={`translate(${wBarra + gap}, 0)`}>
