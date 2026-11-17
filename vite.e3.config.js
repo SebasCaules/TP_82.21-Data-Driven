@@ -31,14 +31,15 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 // fuente no cambian: dist-e2/ y dist/ siguen idénticos.
 const RAIZ_LOGICA = '.e3-vp-dentro'
 const APP = fileURLToPath(new URL('.', import.meta.url))
-const HOJAS = ['src', 'e2/src', 'e3/src']
+// (17/11) Exportadas para /final/ (vite.final.config.js), que suma su carpeta sin cambiar el armado de /e3/.
+export const HOJAS = ['src', 'e2/src', 'e3/src']
 const PROP_LETRA = /^(font|font-size|line-height|letter-spacing)$/
 
 /** Las variables que fijan un tamaño de letra: las que alguna hoja del tablero usa en una propiedad de
  *  letra. Se leen de las fuentes al cargar la configuración, así no dependen del orden de las hojas. */
-function variablesDeLetra() {
+function variablesDeLetra(hojas) {
   const nombres = new Set()
-  for (const dir of HOJAS) {
+  for (const dir of hojas) {
     for (const f of readdirSync(join(APP, dir), { recursive: true })) {
       if (!String(f).endsWith('.css')) continue
       const css = readFileSync(join(APP, dir, String(f)), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
@@ -50,10 +51,10 @@ function variablesDeLetra() {
   return nombres
 }
 
-function ventanaLogica() {
+export function ventanaLogica(hojas = HOJAS) {
   const UNIDAD = /(\d*\.?\d+)(vw|vh)\b/g
   const RASGO = /\((?:min|max)-(?:width|height)\s*:/
-  const letra = variablesDeLetra()
+  const letra = variablesDeLetra(hojas)
   const esLetra = (d) => PROP_LETRA.test(d.prop) || letra.has(d.prop)
   // Deja solo las declaraciones que cumplen `queda` y borra las reglas que quedan vacías.
   const filtrar = (bloque, queda) => {

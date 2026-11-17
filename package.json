@@ -15,8 +15,10 @@
     "build:e2": "vite build --config vite.e2.config.js",
     "dev:e3": "vite --config vite.e3.config.js",
     "build:e3": "vite build --config vite.e3.config.js",
+    "dev:final": "vite --config vite.final.config.js",
+    "build:final": "vite build --config vite.final.config.js",
     "sitio": "node scripts/armar-sitio.mjs",
-    "build:site": "npm run build && npm run build:e2 && npm run build:e3 && npm run sitio",
+    "build:site": "npm run build && npm run build:e2 && npm run build:e3 && npm run build:final && npm run sitio",
     "preview:site": "vite preview --outDir dist-site",
     "todo": "npm run datos && npm run validar && npm run golden && npm run paridad && npm run build"
   },

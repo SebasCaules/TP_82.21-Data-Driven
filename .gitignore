@@ -2,6 +2,8 @@ node_modules/
 dist/
 dist-e2/
 dist-e3/
+dist-final/
+dist-final-sobre/
 dist-site/
 __pycache__/
 *.pyc
@@ -24,3 +26,4 @@ docs/formulas.log
 e2/capturas/
 e2/capturas-verif/
 e3/capturas-verif/
+final/capturas-verif/
