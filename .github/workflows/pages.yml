@@ -74,9 +74,15 @@ jobs:
 
       - run: npm run build:e3
 
-      # Arma dist-site/: landing estática en /, tablero E1 en /e1/, tablero E2 en /e2/ y
-      # presentación E3 en /e3/ (scripts/armar-sitio.mjs). dist/, dist-e2/ y dist-e3/
-      # quedan intactos: siguen siendo los archivos que se abren por doble clic.
+      # Presentación final (17/11): cuarta página autocontenida. No tiene pipeline propio:
+      # sus cifras salen de e3/src/datos_e3.js (ya comprobado arriba) y su texto de
+      # final/src/contenido_final.js, que se versiona.
+      - run: npm run build:final
+
+      # Arma dist-site/: landing estática en /, tablero E1 en /e1/, tablero E2 en /e2/,
+      # presentación E3 en /e3/ y presentación final en /final/ (scripts/armar-sitio.mjs).
+      # dist/, dist-e2/, dist-e3/ y dist-final/ quedan intactos: siguen siendo los
+      # archivos que se abren por doble clic.
       - run: npm run sitio
 
       - uses: actions/upload-pages-artifact@v3
