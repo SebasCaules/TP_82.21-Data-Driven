@@ -62,7 +62,7 @@ export const CF = {
     {
       id: 'problema',
       titulo: 'Problema, legal, riesgos y adopción',
-      riel: '1 · Problema y riesgos',
+      riel: '1 · Problema',
       integrante: 'Tomás Ferreccio',
       vistas: [
         {
@@ -164,7 +164,7 @@ export const CF = {
     {
       id: 'gestion',
       titulo: 'Gestión del proyecto y solución',
-      riel: '5 · Gestión y solución',
+      riel: '5 · Gestión',
       integrante: 'Sebastian Caules',
       vistas: [
         {

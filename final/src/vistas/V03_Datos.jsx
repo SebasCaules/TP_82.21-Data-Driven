@@ -38,7 +38,7 @@ export default function V03Datos() {
           <Lienzo className="lienzo">
             {({ w, h }) => (
               <BarrasH datos={barras} w={w} h={h} formato={(v) => `${fijo(v, 0)} de ${fijo(TOPE, 0)}`}
-                       formatoEje={(v) => fijo(v, 0)} tope={TOPE} anchoEtiqueta={Math.round(190 * k)} />
+                       formatoEje={(v) => fijo(v, Number.isInteger(v) ? 0 : 1)} tope={TOPE} anchoEtiqueta={Math.round(190 * k)} />
             )}
           </Lienzo>
         </div>
