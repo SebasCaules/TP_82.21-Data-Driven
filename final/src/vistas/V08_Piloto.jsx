@@ -1,5 +1,6 @@
 // V08 · Qué cuesta el piloto (economía, Juan Manuel R.). El piloto mínimo por línea (G64: medición, planilla, taller,
-// legal y contingencia). La medición en --acc: es lo que el piloto viene a saber.
+// legal y contingencia), con BarrasFin (spec f.1 y g V08): la medición en --acc, que es para lo que se hace el piloto; las
+// demás en gris. En la banda, solo las horas de Marketing (G64.horas_marketing): el total es el título. Sin conclusión.
 
 import Vista from '../Plantilla.jsx'
 import { barras } from '../barras.jsx'
@@ -13,22 +14,24 @@ const B = textosDe(ID).barras
 
 export const meta = { id: ID }
 
+const linea = (etiqueta, ancla, foco = false) => ({
+  etiqueta, valor: A[ancla].valor, texto: usd(A[ancla].valor, 0), foco,
+})
+
+const Dibujo = barras({
+  datos: [
+    linea(B.medicion, 'G64.medicion', true),
+    linea(B.planilla, 'G64.planilla'),
+    linea(B.taller, 'G64.taller'),
+    linea(B.legal, 'G64.legal'),
+    linea(B.contingencia, 'G64.contingencia'),
+  ],
+})
+
 export default function V08Piloto() {
-  const datos = [
-    { etiqueta: B.medicion, valor: A['G64.medicion'].valor, enfasis: true },
-    { etiqueta: B.planilla, valor: A['G64.planilla'].valor },
-    { etiqueta: B.taller, valor: A['G64.taller'].valor },
-    { etiqueta: B.legal, valor: A['G64.legal'].valor },
-    { etiqueta: B.contingencia, valor: A['G64.contingencia'].valor },
-  ]
   return (
-    <Vista id={ID}
-           items={[
-             { clave: 'piloto', valor: usd(A.G64.valor) },
-             { clave: 'horas', span: 3, valor: fijo(A['G64.horas_marketing'].valor) },
-           ]}
-           cifras={[fijo(A['G64.horas_equipo'].valor)]}>
-      {barras({ datos, formato: (x) => usd(x, 0), formatoEje: (x) => fijo(x, 0), tituloEje: B.eje })}
+    <Vista id={ID} items={[{ clave: 'horas', valor: fijo(A['G64.horas_marketing'].valor) }]}>
+      {Dibujo}
     </Vista>
   )
 }

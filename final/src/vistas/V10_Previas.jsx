@@ -1,18 +1,18 @@
-// V10 · Qué va antes (legal, Tomas F.). Las acciones legales que se hacen antes de la primera lista, una por fila, con su
-// semana del plan (tabla legal_previas de DF, leída por build_final.py de la tabla «Precondiciones de la primera lista» de
-// la Parte A del E4) y la semana de la primera lista (calendario) como línea en --acc. La tarjeta «Acciones previas»
-// cuenta las mismas filas que dibuja el gráfico (legal_previas.n): el pendiente 198. Puntaje legal 1,8 y protección de
-// datos en 1 (H40 y tabla legal), el pendiente 182.
+// V10 · Qué va antes (legal, Tomas F.). Línea de tiempo con puntos (spec f.6 y g V10): las acciones legales que se hacen
+// antes de la primera lista, una por fila, con su semana del plan (tabla legal_previas de DF, leída por build_final.py de
+// la tabla «Precondiciones de la primera lista» de la Parte A del E4). Cada acción es un punto en su semana, sin trazo
+// desde la semana 0; la semana de la primera lista (calendario) es el único acento: vertical punteada de 3 u en --acc con
+// «primera lista» arriba, en tinta. El gráfico cuenta las mismas filas que legal_previas.n (el pendiente 198). En la
+// banda, solo protección de datos en 1 (tabla legal, el pendiente 182); el puntaje legal 1,8 queda en el title de la
+// decisión y la cantidad de acciones son las cinco filas. Sin conclusión.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
-import { useEscalaTexto } from '../../../e2/src/escala.js'
-import { ACC, BORDE, CTX, EJE, INK, SUP, Renglones, Titulo, ancho, duro, envolver, letra } from '../svg.jsx'
+import { ACC, CONTORNO, CTX, INK, Renglones, Umbral, ancho, duro, envolver, tam, useU } from '../svg.jsx'
 
 const ID = 'V10'
-const A = DF.anclas
 const T = DF.tablas
 const X = textosDe(ID)
 const ACCIONES = T.legal_previas.acciones.map((a) => ({ ...a, ...X.acciones[a.codigo] }))
@@ -24,71 +24,59 @@ if (ACCIONES.length !== T.legal_previas.n) throw new Error('V10: la tarjeta y el
 
 export const meta = { id: ID }
 
-function medir(w, f, k) {
-  const fQ = f * 0.92
-  const col = Math.min(w * 0.5, Math.max(...ACCIONES.map((a) => ancho(a.que, f, 600))) + 12 * k)
-  const x0 = col + 24 * k
-  const dw = (w - x0) / SEM_LISTA
+function Dibujo({ w, h }) {
+  const u = useU()
+  const fFila = tam('fila', u)
+  const fSec = tam('sec', u)
+  const fPrim = tam(24, u)
+  const col = Math.min(0.5 * w, Math.max(...ACCIONES.map((a) => ancho(a.que, fFila, 400))) + 12 * u)
+  const x0 = col + 48 * u
+  // la columna de la primera lista deja lugar para que su rótulo, centrado en la línea, entre en el lienzo
+  const anchoPrim = ancho(X.primera, fPrim, 700)
+  const dw0 = (w - x0) / SEM_LISTA
+  const dw = anchoPrim / 2 <= dw0 / 2 ? dw0 : (w - x0 - anchoPrim / 2) / (SEM_LISTA - 0.5)
   const xs = (s) => x0 + (s - 0.5) * dw
-  const gap = 0.7 * f
   const filas = ACCIONES.map((a) => {
-    const lt = envolver(a.que, col, f, 600)
-    return { ...a, lt, alto: lt.length * f * 1.25 + fQ * 1.3 }
+    const lt = envolver(a.que, col, fFila, 400)
+    return { ...a, lt, necesita: lt.length * fFila * 1.25 + fSec * 1.25 }
   })
-  const yTit = f * 1.1
-  const yEje = yTit + f * 1.9
-  const yFilas = yEje + f * 1.1
-  const alto = yFilas + filas.reduce((s, x) => s + x.alto + gap, 0) - gap
-  return { fQ, col, x0, dw, xs, gap, filas, yTit, yEje, yFilas, alto }
-}
-
-function Dibujo({ w, h, k }) {
-  const f = letra((x) => medir(w, x, k).alto, h, 19 * k)
-  const m = medir(w, f, k)
-  const r = Math.min(f * 0.55, m.dw * 0.3)
-  const xL = m.xs(SEM_LISTA)
-  let y = m.yFilas
+  const yPrim = fPrim * 1.1
+  const yNum = yPrim + 12 * u + fSec * 1.25
+  const cab = yNum + 16 * u
+  const altoFila = Math.max(...filas.map((f) => f.necesita + 16 * u), Math.min(96 * u, (h - cab) / filas.length))
+  const alto = cab + altoFila * filas.length
+  const y0 = Math.max(0, (h - alto) / 2)
+  const xL = xs(SEM_LISTA)
   return (
-    <svg width={w} height={h} role="img" style={{ display: 'block' }}
-         aria-label={`${X.mide}: ${ACCIONES.map((a) => `${a.que}, ${X.semana} ${a.semana}`).join('; ')}`}>
-      <Titulo x={m.x0} y={m.yTit} f={f} texto={X.semana} max={xL - m.x0 - 8 * k} />
-      <text x={w} y={m.yTit} fontSize={f} fontWeight={700} fill={ACC} textAnchor="end">{X.primera}</text>
+    <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
+      <text x={xL} y={y0 + yPrim} fontSize={fPrim} fontWeight={700} fill={INK} textAnchor="middle">{X.primera}</text>
+      <text x={xs(1) - 24 * u} y={y0 + yNum} fontSize={fSec} fill={CTX} textAnchor="end">{X.semana}</text>
       {Array.from({ length: SEM_LISTA }, (_, i) => i + 1).map((s) => (
-        <text key={s} x={m.xs(s)} y={m.yEje} fontSize={f} fontWeight={s === SEM_LISTA ? 700 : 500}
-              fill={s === SEM_LISTA ? ACC : CTX} textAnchor="middle" className="tabular">{fijo(s)}</text>
+        <text key={s} x={xs(s)} y={y0 + yNum} fontSize={fSec} fill={s === SEM_LISTA ? INK : CTX}
+              fontWeight={s === SEM_LISTA ? 700 : 400} textAnchor="middle">{fijo(s)}</text>
       ))}
-      <line x1={m.x0} x2={w} y1={m.yEje + f * 0.45} y2={m.yEje + f * 0.45} stroke={EJE} strokeWidth={1} />
-      {m.filas.map((a) => {
-        const y0 = y
-        y += a.alto + m.gap
-        const yc = y0 + a.alto / 2
+      <Umbral u={u} x1={xL} x2={xL} y1={y0 + yNum + 8 * u} y2={y0 + alto} color={ACC} punteada />
+      {filas.map((a, i) => {
+        const yf = y0 + cab + i * altoFila
+        const yt = yf + (altoFila - a.necesita) / 2
         return (
           <g key={a.codigo}>
             <title>{`${a.que}: ${X.semana} ${a.semana}, ${a.quien}`}</title>
-            <Renglones lineas={a.lt} x={0} y={y0} f={f} peso={600} />
-            <text x={0} y={y0 + a.lt.length * f * 1.25 + m.fQ * 0.1} fontSize={m.fQ} fontWeight={500} fill={CTX}
+            <Renglones lineas={a.lt} x={0} y={yt} f={fFila} />
+            <text x={0} y={yt + a.lt.length * fFila * 1.25} fontSize={fSec} fill={CTX}
                   dominantBaseline="hanging">{duro(a.quien)}</text>
-            <line x1={m.x0} x2={m.xs(a.semana)} y1={yc} y2={yc} stroke={BORDE} strokeWidth={2} />
-            <circle cx={m.xs(a.semana)} cy={yc} r={r} fill={INK} stroke={SUP} strokeWidth={1.5} />
+            <circle cx={xs(a.semana)} cy={yf + altoFila / 2} r={10 * u} fill={CONTORNO} />
           </g>
         )
       })}
-      <line x1={xL} x2={xL} y1={m.yEje + f * 0.45} y2={y - m.gap} stroke={ACC} strokeWidth={2} strokeDasharray="4 3" />
     </svg>
   )
 }
 
 export default function V10Previas() {
-  const k = useEscalaTexto()
   return (
-    <Vista id={ID}
-           items={[
-             { clave: 'puntaje', valor: sobre(A.H40.valor, 1) },
-             { clave: 'proteccion', valor: sobre(proteccion) },
-             { clave: 'previas', valor: fijo(T.legal_previas.n) },
-           ]}
-           cifras={[fijo(SEM_LISTA)]}>
-      {({ w, h }) => <Dibujo w={w} h={h} k={k} />}
+    <Vista id={ID} items={[{ clave: 'proteccion', valor: sobre(proteccion) }]}>
+      {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )
 }

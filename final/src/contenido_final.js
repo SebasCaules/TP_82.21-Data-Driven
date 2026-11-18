@@ -324,8 +324,8 @@ export const CF = {
             sigue: [' puntos; el umbral pide ', ' con descuento y ', ' sin descuento.'],
             barras: {
               hoy: 'Con lo observado',
-              sin: 'Umbral, rama sin descuento',
-              con: 'Umbral, rama con descuento',
+              sin: 'Rama sin descuento',
+              con: 'Rama con descuento',
               eje: 'Puntos de diferencia de cruce',
             },
             decision: {

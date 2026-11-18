@@ -1,36 +1,74 @@
-// V09 · Cuándo pasa (economía, Juan Manuel R.). El umbral de pase del piloto por rama (G67) contra la diferencia que daría
-// la tasa observada (G62), siempre en condicional (canon v1.4). Los umbrales en --acc; lo observado, en gris. En la banda,
-// los umbrales con dos decimales, como las barras, y lo observado como «menos de 1» (build_final.py controla que G62 esté
-// entre 0 y 1). La conclusión: la diferencia con lo observado y el umbral de cada rama; la potencia (G68) va en la voz.
+// V09 · Cuándo pasa (economía, Juan Manuel R.). Escala con umbrales (spec f.5 y g V09): un umbral es una meta, no un
+// resultado. Pista de 0 a Math.ceil(G67.con_descuento) puntos (no se escribe); lo observado (G62.tasa_observada) es la
+// marca en --acc dentro de la pista; los umbrales de cada rama (G67) son líneas verticales en tinta, con el rótulo de la
+// rama sin descuento arriba y el de la rama con descuento abajo, para no encimarse. Sin eje ni corchete: el hueco entre
+// la marca y las líneas es el mensaje. Banda sola: las tres cifras están en la escala. Sin conclusión.
 
 import Vista from '../Plantilla.jsx'
-import { barras } from '../barras.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
+import { ACC, CTX, INK, PISTA, Umbral, ancho, rectRedondo, tam, useU } from '../svg.jsx'
 
 const ID = 'V09'
 const A = DF.anclas
 const B = textosDe(ID).barras
+const HOY = A['G62.tasa_observada'].valor
+const SIN = A['G67.sin_descuento'].valor
+const CON = A['G67.con_descuento'].valor
+const TOPE = Math.ceil(CON)
 
 export const meta = { id: ID }
 
-export default function V09Umbral() {
-  const datos = [
-    { etiqueta: B.hoy, valor: A['G62.tasa_observada'].valor, anchoMin: 3 },
-    { etiqueta: B.sin, valor: A['G67.sin_descuento'].valor, enfasis: true },
-    { etiqueta: B.con, valor: A['G67.con_descuento'].valor, enfasis: true },
-  ]
+function Dibujo({ w, h }) {
+  const u = useU()
+  const fNom = tam(24, u)
+  const fVal = tam('valFoco', u)
+  const altoPista = 44 * u
+  const sobra = 16 * u
+  const largo = 0.85 * w
+  const xP = (w - largo) / 2
+  const xs = (v) => xP + (v / TOPE) * largo
+  // arriba: nombre, valor, 12 u, la línea que sobresale; abajo, lo mismo en espejo
+  const rotulo = fNom * 1.25 + fVal * 1.1
+  const alto = 2 * (rotulo + 12 * u + sobra) + altoPista
+  const y0 = Math.max(0, (h - alto) / 2)
+  const yP = y0 + rotulo + 12 * u + sobra
+  const yAbajo = yP + altoPista + sobra + 12 * u
+  // un rótulo centrado en su línea, sin salir del lienzo
+  const centro = (x, ...ts) => {
+    const a = Math.max(...ts.map(([t, f, p]) => ancho(t, f, p))) / 2
+    return Math.min(w - a, Math.max(a, x))
+  }
+  const xSin = centro(xs(SIN), [B.sin, fNom, 400], [fijo(SIN, 2), fVal, 700])
+  const xCon = centro(xs(CON), [B.con, fNom, 400], [fijo(CON, 2), fVal, 700])
   return (
-    <Vista id={ID}
-           items={[
-             { clave: 'con', valor: fijo(A['G67.con_descuento'].valor, 2) },
-             { clave: 'sin', valor: fijo(A['G67.sin_descuento'].valor, 2) },
-             { clave: 'hoy', valor: fijo(Math.ceil(A['G62.tasa_observada'].valor)) },
-           ]}
-           cifras={[fijo(A['G62.tasa_observada'].valor, 2), fijo(A['G67.con_descuento'].valor, 2),
-                   fijo(A['G67.sin_descuento'].valor, 2)]}>
-      {barras({ datos, formato: (x) => fijo(x, 2), formatoEje: (x) => fijo(x, 0), tituloEje: B.eje })}
+    <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
+      <title>{`${B.hoy}: ${fijo(HOY, 2)} · ${B.sin}: ${fijo(SIN, 2)} · ${B.con}: ${fijo(CON, 2)}`}</title>
+      <rect x={xP} y={yP} width={largo} height={altoPista} rx={4 * u} fill={PISTA} />
+      <path d={rectRedondo(xP, yP, xs(HOY) - xP, altoPista, 4 * u, 'todos')} fill={ACC} />
+      <Umbral u={u} x1={xs(SIN)} x2={xs(SIN)} y1={yP - sobra} y2={yP + altoPista + sobra} />
+      <Umbral u={u} x1={xs(CON)} x2={xs(CON)} y1={yP - sobra} y2={yP + altoPista + sobra} />
+      {/* rama sin descuento, arriba de su línea */}
+      <text x={xSin} y={y0} fontSize={fNom} fill={CTX} textAnchor="middle" dominantBaseline="hanging">{B.sin}</text>
+      <text x={xSin} y={y0 + fNom * 1.25} fontSize={fVal} fontWeight={700} fill={INK} textAnchor="middle"
+            dominantBaseline="hanging">{fijo(SIN, 2)}</text>
+      {/* rama con descuento, abajo de la suya */}
+      <text x={xCon} y={yAbajo} fontSize={fNom} fill={CTX} textAnchor="middle" dominantBaseline="hanging">{B.con}</text>
+      <text x={xCon} y={yAbajo + fNom * 1.25} fontSize={fVal} fontWeight={700} fill={INK} textAnchor="middle"
+            dominantBaseline="hanging">{fijo(CON, 2)}</text>
+      {/* lo observado, abajo de la pista, alineado a 0 */}
+      <text x={xP} y={yAbajo} fontSize={fNom} fill={CTX} dominantBaseline="hanging">{B.hoy}</text>
+      <text x={xP} y={yAbajo + fNom * 1.25} fontSize={fVal} fontWeight={700} fill={INK}
+            dominantBaseline="hanging">{fijo(HOY, 2)}</text>
+    </svg>
+  )
+}
+
+export default function V09Umbral() {
+  return (
+    <Vista id={ID}>
+      {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )
 }
