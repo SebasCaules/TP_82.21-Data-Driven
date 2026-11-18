@@ -3,6 +3,8 @@
 // la tasa de cruce en validación por tramo de días que faltan (F04, tabla tramos_de_cruce de DF), en escala de 0 a 100 %
 // y con un decimal, como la fila F04 (decisión CH-01). Sin el tramo de 90 días o más, que no tiene positivos por
 // definición. El tramo más cercano en --acc, con «cruzan su umbral» pegado a su valor (CH-06). Sin conclusión ni eje.
+// (18/11, intermedio) Vuelven de 8e633e8 la tarjeta central (umbral mínimo, C03.minimo_dias) y la conclusión con la
+// tasa del tramo más cercano, con un decimal como la barra (CH-01); las barras llenan el lienzo (llenar).
 
 import Vista from '../Plantilla.jsx'
 import { barras } from '../barras.jsx'
@@ -23,12 +25,13 @@ export default function V04Irse() {
     nota: i === 0 ? B.eje.charAt(0).toLowerCase() + B.eje.slice(1) : undefined,
   }))
   return (
-    <Vista id={ID}
+    <Vista id={ID} hibrido
            items={[
              { clave: 'minimo', valor: fijo(A['C03.minimo_dias'].valor) },
              { clave: 'factor', valor: fijo(A['C03.factor'].valor, 1) },
-           ]}>
-      {barras({ datos, maximo: 1 })}
+           ]}
+           cifras={[pct(TR[0].tasa, 1)]}>
+      {barras({ datos, maximo: 1, llenar: true })}
     </Vista>
   )
 }

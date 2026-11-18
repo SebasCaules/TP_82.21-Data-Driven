@@ -2,6 +2,8 @@
 // cascada con fantasma. Cada barra es lo que queda y su tramo fantasma, lo que se fue en ese paso; todas en gris, y el
 // foco es la caída sin cliente (fantasma en --acc con su nota adentro), la que explica la tarjeta (C19). Los puntajes de
 // datos y calidad y la conclusión salen de la pantalla: los dice la voz. Sin eje.
+// (18/11, intermedio) Vuelven de 8e633e8 la tarjeta central (ventas sin cliente, C19) y la conclusión con su cifra
+// (C20.positivas); la cascada llena el lienzo (llenar).
 
 import Vista from '../Plantilla.jsx'
 import { barras } from '../barras.jsx'
@@ -28,8 +30,9 @@ export default function V02Ventas() {
       fantasma: v('C20.con_cliente'), nota: B.nota_no_positivas },
   ]
   return (
-    <Vista id={ID} items={[{ clave: 'sin_cliente', valor: pct(A.C19.valor / 100) }]}>
-      {barras({ datos })}
+    <Vista id={ID} hibrido items={[{ clave: 'sin_cliente', valor: pct(A.C19.valor / 100) }]}
+           cifras={[filas(v('C20.positivas'))]}>
+      {barras({ datos, llenar: true })}
     </Vista>
   )
 }

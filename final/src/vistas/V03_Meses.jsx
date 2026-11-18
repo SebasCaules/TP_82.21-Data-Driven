@@ -3,11 +3,13 @@
 // 12 columnas de enero a diciembre, en escala de 0 a 100 %, con la línea punteada del control del mes (H46) y su rótulo a
 // la derecha de diciembre. Los meses que quedan debajo del control, en --acc y con su valor: es lo que dice el título.
 // Los que pasan, en gris y sin valor (la línea da la escala). Banda sola: sin tarjetas, sin conclusión, sin eje.
+// (18/11, intermedio) Vuelven de 8e633e8 la tarjeta central (meses que no se usan, D28.meses_fuera) y la conclusión con
+// el control (H46.umbral_mes).
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
-import { pct } from '../../../e3/src/formato.js'
+import { fijo, pct } from '../../../e3/src/formato.js'
 import { useU } from '../escala.js'
 import { CTX, INK, SUP, Columna, LineaBase, Texto, Umbral, ancho, tam } from '../svg.jsx'
 
@@ -69,7 +71,8 @@ function Dibujo({ w, h }) {
 
 export default function V03Meses() {
   return (
-    <Vista id={ID}>
+    <Vista id={ID} hibrido items={[{ clave: 'fuera', valor: fijo(A['D28.meses_fuera'].valor) }]}
+           cifras={[pct(UMBRAL, 0)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

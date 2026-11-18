@@ -2,6 +2,8 @@
 // prueba final (J03, J17), en escala de 0 a 100 %. Regla y modelo con el mismo tratamiento, las dos en --acc, dicen «lo
 // mismo»; la práctica actual, gris y corta, dice «y mucho mejor que hoy». La diferencia modelo menos regla (J09) es la
 // única tarjeta; el intervalo queda en el title de la decisión. Sin conclusión ni eje.
+// (18/11, intermedio) Vuelven de 8e633e8 la tarjeta central (acierta la regla, J03.regla) y la conclusión con la
+// diferencia en valor absoluto (J09); las barras llenan el lienzo (llenar).
 
 import Vista from '../Plantilla.jsx'
 import { barras } from '../barras.jsx'
@@ -22,8 +24,9 @@ export default function V05ReglaModelo() {
     { etiqueta: B.hoy, valor: A.J17.valor, texto: pct(A.J17.valor) },
   ]
   return (
-    <Vista id={ID} items={[{ clave: 'dif', valor: fijo(A.J09.valor, 2) }]}>
-      {barras({ datos, maximo: 1 })}
+    <Vista id={ID} hibrido items={[{ clave: 'regla', valor: pct(A['J03.regla'].valor) }]}
+           cifras={[fijo(Math.abs(A.J09.valor), 2)]}>
+      {barras({ datos, maximo: 1, llenar: true })}
     </Vista>
   )
 }
