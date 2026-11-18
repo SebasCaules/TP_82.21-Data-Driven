@@ -4,6 +4,8 @@
 // título medía 9 px; como parte de 100 cuadros se ve. La vista ya no repite el gráfico de V01 (sale el costo con modelo).
 // En la banda, el ROI de la regla (G54.roi), que es lo que dibuja la cuadrícula (decisión CH-05); el del modelo (G40.roi)
 // lo dice la voz.
+// (18/11, intermedio) Vuelven de 8e633e8 la tarjeta central (ROI de la regla, G54.roi) y la conclusión con lo que deja
+// la lista (G54); la cuadrícula ocupa el 86 % del alto del lienzo.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -22,7 +24,7 @@ export const meta = { id: ID }
 
 function Dibujo({ w, h }) {
   const u = useU()
-  const lado = Math.min(0.92 * h, 560 * u)
+  const lado = Math.min(0.86 * h, 560 * u)   // (18/11, intermedio) el 86 % del lienzo
   const gap = 6 * u
   const s = (lado - 9 * gap) / 10
   const r = 4 * u
@@ -81,7 +83,12 @@ function Dibujo({ w, h }) {
 
 export default function V07NoSePaga() {
   return (
-    <Vista id={ID} items={[{ clave: 'roi', valor: pctDirecto(A['G54.roi'].valor, 1) }]}>
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'roi', valor: pctDirecto(A['G54.roi'].valor, 1) },
+             { clave: 'roi_modelo', valor: pctDirecto(A['G40.roi'].valor, 1) },
+           ]}
+           cifras={[usd(DEJA, 0)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

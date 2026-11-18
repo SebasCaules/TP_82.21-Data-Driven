@@ -3,11 +3,13 @@
 // mayor facturación (K16), que se contacta entero y no entra al sorteo (16 u de separación); el control (G49.control_mes),
 // en --acc, que es lo que permite medir; y las dos ramas (K18). La suma de los tramos se controla contra la lista del mes
 // (G49.lista_mes), como V10 a V12. En la banda, solo la lista por mes: el control es el título y el tramo en acento.
+// (18/11, intermedio) Vuelven de 8e633e8 la tarjeta central (control por mes, G49.control_mes) y la conclusión con el
+// tramo de mayor facturación (G49.alto_valor); la barra crece hasta llenar el 80 % del lienzo.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
-import { fijo } from '../../../e3/src/formato.js'
+import { fijo, pct } from '../../../e3/src/formato.js'
 import { ACC, CTX, FIN_GRIS, INK, Renglones, envolver, rectRedondo, tam, useU } from '../svg.jsx'
 
 const ID = 'V06'
@@ -26,6 +28,8 @@ if (TRAMOS.reduce((s, t) => s + t.valor, 0) !== LISTA) {
 }
 
 export const meta = { id: ID }
+
+const LLENA = 0.8
 
 /** Los renglones del nombre de un tramo, a 28 u (baja hasta 20 u si no entra en dos renglones). */
 function nombre(t, w, u) {
@@ -54,9 +58,10 @@ function Dibujo({ w, h }) {
   })
   const fVal = tam(48, u)          // cantidad del control; el resto a 36 u
   const fCtx = tam(36, u)
-  const altoBarra = 120 * u
   const fNota = tam(24, u)
   const altoNombres = Math.max(...tramos.map((t) => t.n.lt.length * t.n.f * 1.25 + (t.nota ? fNota * 1.25 : 0)))
+  // (18/11, intermedio) la barra crece con el alto para que el bloque ocupe LLENA del lienzo, entre 120 u y 260 u
+  const altoBarra = Math.min(260 * u, Math.max(120 * u, LLENA * h - (fVal + 12 * u + 16 * u + altoNombres)))
   const alto = fVal + 12 * u + altoBarra + 16 * u + altoNombres
   const y0 = Math.max(0, (h - alto) / 2)
   const yBarra = y0 + fVal + 12 * u
@@ -82,7 +87,13 @@ function Dibujo({ w, h }) {
 
 export default function V06Control() {
   return (
-    <Vista id={ID} items={[{ clave: 'lista', valor: fijo(LISTA) }]}>
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'control', valor: fijo(A['G49.control_mes'].valor) },
+             { clave: 'lista', valor: fijo(LISTA) },
+             { clave: 'meses', valor: fijo(A['G49.meses'].valor) },
+           ]}
+           cifras={[pct(A['G49.alto_valor'].valor, 0)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

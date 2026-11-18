@@ -5,6 +5,8 @@
 // «primera lista» arriba, en tinta. El gráfico cuenta las mismas filas que legal_previas.n (el pendiente 198). En la
 // banda, solo protección de datos en 1 (tabla legal, el pendiente 182); el puntaje legal 1,8 queda en el title de la
 // decisión y la cantidad de acciones son las cinco filas. Sin conclusión.
+// (18/11, intermedio) Vuelven de 8e633e8 la tarjeta central (puntaje legal, H40) y la conclusión con la semana de la
+// primera lista; las filas llenan el 86 % del alto del lienzo.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -13,6 +15,7 @@ import { fijo } from '../../../e3/src/formato.js'
 import { ACC, CONTORNO, CTX, INK, Renglones, Umbral, ancho, duro, envolver, tam, useU } from '../svg.jsx'
 
 const ID = 'V10'
+const A = DF.anclas
 const T = DF.tablas
 const X = textosDe(ID)
 const ACCIONES = T.legal_previas.acciones.map((a) => ({ ...a, ...X.acciones[a.codigo] }))
@@ -23,6 +26,8 @@ const sobre = (n, d = 0) => `${fijo(n, d)}[[/${fijo(T.escala_tecnica.hasta)}]]`
 if (ACCIONES.length !== T.legal_previas.n) throw new Error('V10: la tarjeta y el gráfico no cuentan las mismas acciones')
 
 export const meta = { id: ID }
+
+const LLENA = 0.86
 
 function Dibujo({ w, h }) {
   const u = useU()
@@ -43,7 +48,8 @@ function Dibujo({ w, h }) {
   const yPrim = fPrim * 1.1
   const yNum = yPrim + 12 * u + fSec * 1.25
   const cab = yNum + 16 * u
-  const altoFila = Math.max(...filas.map((f) => f.necesita + 16 * u), Math.min(96 * u, (h - cab) / filas.length))
+  // (18/11, intermedio) las filas reparten LLENA del alto del lienzo, sin bajar de lo que necesita su texto
+  const altoFila = Math.max(...filas.map((f) => f.necesita + 16 * u), (LLENA * h - cab) / filas.length)
   const alto = cab + altoFila * filas.length
   const y0 = Math.max(0, (h - alto) / 2)
   const xL = xs(SEM_LISTA)
@@ -75,7 +81,13 @@ function Dibujo({ w, h }) {
 
 export default function V10Previas() {
   return (
-    <Vista id={ID} items={[{ clave: 'proteccion', valor: sobre(proteccion) }]}>
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'puntaje', valor: sobre(A.H40.valor, 1) },
+             { clave: 'proteccion', valor: sobre(proteccion) },
+             { clave: 'previas', valor: fijo(T.legal_previas.n) },
+           ]}
+           cifras={[fijo(SEM_LISTA)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )
