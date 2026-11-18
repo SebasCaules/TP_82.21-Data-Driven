@@ -3,7 +3,8 @@
 // foco es la caída sin cliente (fantasma en --acc con su nota adentro), la que explica la tarjeta (C19). Los puntajes de
 // datos y calidad y la conclusión salen de la pantalla: los dice la voz. Sin eje.
 // (18/11, intermedio) Vuelven de 8e633e8 la tarjeta central (ventas sin cliente, C19) y la conclusión con su cifra
-// (C20.positivas); la cascada llena el lienzo (llenar).
+// (C20.positivas); la cascada llena el lienzo (llenar). (Cierre CF-02) El acento pasa a la barra de 27.276 (C20.positivas),
+// la cifra de la conclusión; el tramo sin cliente queda en contorno gris con su nota.
 
 import Vista from '../Plantilla.jsx'
 import { barras } from '../barras.jsx'
@@ -25,9 +26,9 @@ export default function V02Ventas() {
     { etiqueta: B.unicas, valor: v('C20.unicas'), texto: filas(v('C20.unicas')),
       fantasma: v('C20.crudo'), nota: B.nota_repetidas },
     { etiqueta: B.con_cliente, valor: v('C20.con_cliente'), texto: filas(v('C20.con_cliente')),
-      fantasma: v('C20.unicas'), fantasmaFoco: true, notaFantasma: B.nota_sin_cliente },
+      fantasma: v('C20.unicas'), notaFantasma: B.nota_sin_cliente },
     { etiqueta: B.positivas, valor: v('C20.positivas'), texto: filas(v('C20.positivas')),
-      fantasma: v('C20.con_cliente'), nota: B.nota_no_positivas },
+      fantasma: v('C20.con_cliente'), nota: B.nota_no_positivas, foco: true },
   ]
   return (
     <Vista id={ID} hibrido items={[{ clave: 'sin_cliente', valor: pct(A.C19.valor / 100) }]}

@@ -54,12 +54,13 @@ function Dibujo({ w, h }) {
         )
       })}
       <Umbral u={u} x1={xIni} y1={yCtl} x2={xFin} y2={yCtl} ancho={2} punteada />
+      {/* (cierre CF-06) halo de 14 u: corta la línea del control donde pasa a menos de 7 u del valor (el 53 % de septiembre) */}
       {MESES.filter((m) => m.foco).map((m) => {
         const i = MESES.indexOf(m)
         const cx = i * paso + paso / 2
         return (
           <text key={m.mes} x={cx} y={yBase - m.parte * alto - 8 * u} fontSize={fVal} fontWeight={700} fill={INK}
-                textAnchor="middle" stroke={SUP} strokeWidth={6 * u} paintOrder="stroke"
+                textAnchor="middle" stroke={SUP} strokeWidth={14 * u} paintOrder="stroke"
                 strokeLinejoin="round">{pct(m.parte, 0)}</text>
         )
       })}

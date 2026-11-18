@@ -23,7 +23,9 @@ const SEMANAS_HITO = [...new Set(PL.hitos.map((h) => h.semana).filter((s) => typ
 
 export const meta = { id: ID }
 
-function medir(w, u) {
+// (cierre CF-07) La fila crece con el alto libre (entre su alto de texto y 1,6 veces) para que el Gantt llene cerca del
+// 84 % del lienzo también en 4:3; en 16:9 ya está ahí y no cambia.
+function medir(w, h, u) {
   const fF = tam(24, u), fR = tam('sec', u), fH = tam('sec', u)
   const col = Math.max(...PL.fases.map((x) => ancho(x.fase, fF, 600)), ancho(X.hito, fH, 400))
   const x0 = col + 32 * u
@@ -31,15 +33,17 @@ function medir(w, u) {
   const xs = (s) => x0 + (s - 0.5) * dw
   const r = Math.min(16 * u, 0.45 * dw)
   const yHitos = Math.max(r, fH * 0.6)
-  const fila = fF * 1.25 + fR * 1.25
+  const fila0 = fF * 1.25 + fR * 1.25
   const gap = 16 * u
   const yFilas = yHitos + r + 24 * u
-  return { fF, fR, fH, col, x0, dw, xs, r, yHitos, fila, gap, yFilas, alto: yFilas + PL.fases.length * (fila + gap) - gap }
+  const n = PL.fases.length
+  const fila = Math.min(1.6 * fila0, Math.max(fila0, (0.84 * h - yFilas + gap) / n - gap))
+  return { fF, fR, fH, col, x0, dw, xs, r, yHitos, fila, dt: (fila - fila0) / 2, gap, yFilas, alto: yFilas + PL.fases.length * (fila + gap) - gap }
 }
 
 function Dibujo({ w, h }) {
   const u = useU()
-  const m = medir(w, u)
+  const m = medir(w, h, u)
   const y0 = Math.max(0, (h - m.alto) / 2)
   const hb = 32 * u
   return (
@@ -68,8 +72,8 @@ function Dibujo({ w, h }) {
           return (
             <g key={x.n}>
               <title>{`${x.fase}: ${X.semana} ${x.desde} a ${x.hasta}, ${x.responsable}`}</title>
-              <text x={0} y={yf} fontSize={m.fF} fontWeight={foco ? 600 : 400} fill={INK} dominantBaseline="hanging">{x.fase}</text>
-              <text x={0} y={yf + m.fF * 1.25} fontSize={m.fR} fill={CTX} dominantBaseline="hanging">{duro(x.responsable)}</text>
+              <text x={0} y={yf + m.dt} fontSize={m.fF} fontWeight={foco ? 600 : 400} fill={INK} dominantBaseline="hanging">{x.fase}</text>
+              <text x={0} y={yf + m.dt + m.fF * 1.25} fontSize={m.fR} fill={CTX} dominantBaseline="hanging">{duro(x.responsable)}</text>
               {hasta >= desde && (
                 <path d={rectRedondo(xa + u, yf + (m.fila - hb) / 2, Math.max(4 * u, xb - xa - 2 * u), hb, TRAZO.radio * u, 'todos')}
                       fill={foco ? ACC : FIN_GRIS} />

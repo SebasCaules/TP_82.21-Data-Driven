@@ -8,7 +8,7 @@ import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
-import { BORDE, CTX, INK, REALCE, Renglones, TRAZO, envolver, tam, useU } from '../svg.jsx'
+import { ACC, BORDE, CTX, INK, REALCE, Renglones, TRAZO, envolver, tam, useU } from '../svg.jsx'
 
 const ID = 'V11'
 const A = DF.anclas
@@ -23,6 +23,8 @@ export const meta = { id: ID }
 // (18/11, intermedio) La lista llena el 90 % del alto del lienzo (el texto visible, un 76 %): el relleno de cada fila y el aire entre filas crecen
 // juntos con lo que sobra (entre 24 y 72 u); la letra no cambia.
 const LLENA = 0.9
+// (cierre CF-07) Tope del relleno: 115 u (1,6 veces 72) para que en 4:3 la lista también llene; en 16:9 no llega al tope.
+const PAD_MAX = 115
 
 function medir(w, h, u) {
   const f = tam('nombre', u)
@@ -38,7 +40,7 @@ function medir(w, h, u) {
   const texto = lineas.reduce((s, r) => s + Math.max(r.ls[0].length, r.ls[1].length) * f * 1.25, 0)
   const n = lineas.length
   // relleno arriba y abajo de cada fila (2n) y aire entre filas (n - 1), todos del mismo tamaño
-  const pad = Math.min(72 * u, Math.max(24 * u, (LLENA * h - texto) / (3 * n - 1)))
+  const pad = Math.min(PAD_MAX * u, Math.max(24 * u, (LLENA * h - texto) / (3 * n - 1)))
   const sep = pad             // aire entre filas
   const filas = lineas.map((r) => ({ ...r, alto: Math.max(r.ls[0].length, r.ls[1].length) * f * 1.25 + 2 * pad }))
   return { f, pad, xs, filas, sep, alto: filas.reduce((s, x) => s + x.alto, 0) + sep * (filas.length - 1) }
@@ -59,6 +61,7 @@ function Dibujo({ w, h }) {
           <g key={r.riesgo}>
             <title>{`${r.riesgo}. ${C.senal}: ${r.senal}. ${C.respuesta}: ${r.respuesta}.`}</title>
             {r.foco && <rect x={0} y={y0} width={w} height={r.alto} rx={TRAZO.radio * u} fill={REALCE} />}
+            {r.foco && <rect x={0} y={y0} width={6 * u} height={r.alto} fill={ACC} />}
             {i > 0 && !r.foco && !previa.foco && (
               <line x1={0} x2={w} y1={y0 - m.sep / 2} y2={y0 - m.sep / 2} stroke={BORDE} strokeWidth={u} />
             )}

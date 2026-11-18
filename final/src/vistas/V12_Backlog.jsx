@@ -27,28 +27,37 @@ const ESTADO_DE = { hecha: 'hecha', piloto: 'piloto', despues: 'condicional' }
 
 export const meta = { id: ID }
 
-function medir(w, u) {
-  const s = 40 * u                 // cuadro
-  const gapC = 10 * u
+// (18/11, cierre CF-01 y CF-07) Las ocho épicas en dos columnas de cuatro (1 a 4 a la izquierda, 5 a 8 a la derecha):
+// en una sola columna el bloque ocupaba el 44 % del ancho. La fila crece con el alto libre (entre 96 u y 1,6 veces) para
+// que el bloque llene cerca del 80 % del lienzo también en 4:3.
+const POR_COL = Math.ceil(BL.epicas.length / 2)
+
+function medir(w, h, u) {
+  const s = 56 * u                 // cuadro
+  const gapC = 12 * u
+  const gapCol = 48 * u
+  const anchoCol = (w - gapCol) / 2
   const lugares = Math.max(...BL.epicas.map((e) => BL.historias.filter((h) => h.epica === e.n).length))
   const xNombre = lugares * s + (lugares - 1) * gapC + 24 * u
   const f = tam('fila', u)
-  const fila = 56 * u
   const fL = tam('sec', u)
   const sL = 20 * u                // cuadro de la leyenda
   const altoLey = Math.max(sL, fL * 1.25)
   const yFilas = altoLey + 24 * u
-  const filas = BL.epicas.map((e) => ({
+  const fila = Math.min(1.6 * 96 * u, Math.max(96 * u, (0.8 * h - yFilas) / POR_COL))
+  const filas = BL.epicas.map((e, i) => ({
     ...e,
-    lt: envolver(e.nombre, w - xNombre, f, 400),
+    col: Math.floor(i / POR_COL),
+    fil: i % POR_COL,
+    lt: envolver(e.nombre, anchoCol - xNombre, f, 400),
     hus: BL.historias.filter((h) => h.epica === e.n),
   }))
-  return { s, gapC, xNombre, f, fila, fL, sL, altoLey, yFilas, filas, alto: yFilas + filas.length * fila }
+  return { s, gapC, xNombre, anchoCol, gapCol, f, fila, fL, sL, altoLey, yFilas, filas, alto: yFilas + POR_COL * fila }
 }
 
 function Dibujo({ w, h }) {
   const u = useU()
-  const m = medir(w, u)
+  const m = medir(w, h, u)
   const y0 = Math.max(0, (h - m.alto) / 2)
   // la leyenda, en una fila encima de los cuadros, alineada a su borde izquierdo
   const items = GRUPOS.map((g) => ({ g, t: `${X.estados[g]} · ${fijo(CUANTAS[g])}` }))
@@ -68,15 +77,16 @@ function Dibujo({ w, h }) {
           )
         })}
         {m.filas.map((e, i) => {
-          const yc = m.yFilas + i * m.fila + m.fila / 2
+          const yc = m.yFilas + e.fil * m.fila + m.fila / 2
+          const xc = e.col * (m.anchoCol + m.gapCol)
           return (
             <g key={e.n}>
               <title>{`${e.nombre}: ${e.hus.map((x) => `${x.id}, ${X.estados[x.grupo]}`).join('; ')}`}</title>
               {e.hus.map((x, j) => (
-                <Cuadro key={x.id} u={u} x={j * (m.s + m.gapC)} y={yc - m.s / 2} s={m.s} estado={ESTADO_DE[x.grupo]} />
+                <Cuadro key={x.id} u={u} x={xc + j * (m.s + m.gapC)} y={yc - m.s / 2} s={m.s} estado={ESTADO_DE[x.grupo]} />
               ))}
               {e.lt.map((l, j) => (
-                <text key={j} x={m.xNombre} y={yc + (j - (e.lt.length - 1) / 2) * m.f * 1.25} fontSize={m.f}
+                <text key={j} x={xc + m.xNombre} y={yc + (j - (e.lt.length - 1) / 2) * m.f * 1.25} fontSize={m.f}
                       fontWeight={400} fill={INK} dominantBaseline="central">{l}</text>
               ))}
             </g>
