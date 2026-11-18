@@ -47,19 +47,19 @@ export const DF = {
    },
    {
     "archivo": "canon.json",
-    "sha256": "60f2940b4161c7f0765815e19060cae414830939d428b55403df32249d38974e"
+    "sha256": "48bfed0ff0d1d00dc6a654f0f6a8aa03b74f74a24145d23dd1d8c82ab9a9001e"
    },
    {
     "archivo": "contenido_c.py",
-    "sha256": "62ca4d101e6d51e78981f9efce8312e3beb57429384541987f6971272624e3e6"
+    "sha256": "203b1c18a1c1d6a99f3b7b172fb18951b4fb4ba254ff197fb9993a45cb8ae3a0"
    },
    {
     "archivo": "contenido_a.py",
-    "sha256": "e02fe48282b859753dfe31bc23d6c5b72e66eda5140d8525d720341850a90bad"
+    "sha256": "18349f91aa3c8f0efdedfb4ae89846d319d451d6ff4a477a37fffe66083277c4"
    },
    {
     "archivo": "contenido_a.py",
-    "sha256": "67eb82e855a688a7faaf5644673dc690ee0a723298f4f5b9e562057e10ac6484"
+    "sha256": "74fa70a028ac91f52bd0fe48b0378b967403062e11dac3743d155a6bfd817482"
    },
    {
     "archivo": "Transacciones_clientes.csv",
@@ -1539,7 +1539,7 @@ export const DF = {
     },
     {
      "n": 2,
-     "semana": 1,
+     "semana": "antes de la semana 1 (la abre)",
      "responsable": "María G."
     },
     {

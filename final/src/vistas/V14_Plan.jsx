@@ -17,7 +17,8 @@ const PL = T.plan
 const CAL = T.calendario
 const X = textosDe(ID)
 const SEM_FIN = DF.anclas['G63.semana_decision'].valor
-const SEMANAS_HITO = [...new Set(PL.hitos.map((h) => h.semana))].sort((a, b) => a - b)
+// el hito de la aprobación va «antes de la semana 1» (canon v1.4, PN0-02): no tiene marca en el eje
+const SEMANAS_HITO = [...new Set(PL.hitos.map((h) => h.semana).filter((s) => typeof s === 'number'))].sort((a, b) => a - b)
 
 export const meta = { id: ID }
 

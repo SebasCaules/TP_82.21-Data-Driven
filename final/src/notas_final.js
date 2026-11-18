@@ -70,7 +70,7 @@ export const NOTAS = {
     "**9** historias ya están hechas en la cursada, cada una con la sección entregada que la muestra. Las **9** historias del piloto suman **80** horas: las mismas del presupuesto del piloto mínimo. Las **3** historias restantes son de la operación mínima o de la producción completa, y solo van si el piloto pasa."
   ],
   "V13": [
-    "La prueba de concepto ya está hecha: la regla corrió sobre el extracto histórico y pasó la validación y la prueba final. Probó que con estos datos la regla arma la lista y acierta **86,1 %**. No probó si contactar cambia la conducta.",
+    "La prueba de concepto está hecha: la regla corrió sobre el extracto histórico y pasó la validación y la prueba final. Probó que con estos datos la regla arma la lista y acierta **86,1 %**. No probó si contactar cambia la conducta.",
     "El MVP es la regla en una planilla mensual, sin modelo, sin licencias y sin integración con el CRM."
   ],
   "V14": [
