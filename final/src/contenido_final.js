@@ -201,7 +201,7 @@ export const CF = {
             sigue: [' puntos debajo, con un intervalo que cruza el cero: queda la regla, sin entrenar nada.'],
             barras: {
               regla: 'Regla del umbral',
-              modelo: 'Modelo (logística)',
+              modelo: 'Modelo',
               hoy: 'Práctica actual',
               eje: 'Precisión de la lista',
             },

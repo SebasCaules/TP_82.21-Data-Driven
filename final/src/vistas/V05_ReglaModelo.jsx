@@ -1,6 +1,7 @@
-// V05 · Regla contra modelo (modelo, Francisco C.). La precisión de la lista mensual en la prueba final (J03, J17): la
-// regla en --acc, el modelo y la práctica actual en gris. La diferencia modelo menos regla (J09) va en la banda, con su
-// signo bajo el rótulo «Diferencia» y el fragmento «modelo menos regla», y en la conclusión sin signo («queda 0,25 puntos debajo», J-WEB-12).
+// V05 · Regla contra modelo (modelo, Francisco C.). Spec de dataviz g V05 (18/11): la precisión de la lista mensual en la
+// prueba final (J03, J17), en escala de 0 a 100 %. Regla y modelo con el mismo tratamiento, las dos en --acc, dicen «lo
+// mismo»; la práctica actual, gris y corta, dice «y mucho mejor que hoy». La diferencia modelo menos regla (J09) es la
+// única tarjeta; el intervalo queda en el title de la decisión. Sin conclusión ni eje.
 
 import Vista from '../Plantilla.jsx'
 import { barras } from '../barras.jsx'
@@ -16,19 +17,13 @@ export const meta = { id: ID }
 
 export default function V05ReglaModelo() {
   const datos = [
-    { etiqueta: B.regla, valor: A['J03.regla'].valor, enfasis: true },
-    { etiqueta: B.modelo, valor: A['J03.logistica'].valor },
-    { etiqueta: B.hoy, valor: A.J17.valor },
+    { etiqueta: B.regla, valor: A['J03.regla'].valor, texto: pct(A['J03.regla'].valor), foco: true },
+    { etiqueta: B.modelo, valor: A['J03.logistica'].valor, texto: pct(A['J03.logistica'].valor), foco: true },
+    { etiqueta: B.hoy, valor: A.J17.valor, texto: pct(A.J17.valor) },
   ]
   return (
-    <Vista id={ID}
-           items={[
-             { clave: 'regla', valor: pct(A['J03.regla'].valor) },
-             { clave: 'dif', valor: fijo(A.J09.valor, 2) },
-             { clave: 'hoy', valor: pct(A.J17.valor) },
-           ]}
-           cifras={[fijo(Math.abs(A.J09.valor), 2)]}>
-      {barras({ datos, formato: (x) => pct(x), formatoEje: (x) => pct(x, 0), tituloEje: B.eje })}
+    <Vista id={ID} items={[{ clave: 'dif', valor: fijo(A.J09.valor, 2) }]}>
+      {barras({ datos, maximo: 1 })}
     </Vista>
   )
 }
