@@ -12,6 +12,7 @@ JSON del vault que escriben los generadores de las partes, sin copia intermedia.
   _build/A/factibilidad/salida/condiciones.json
 - entregas/entregable-3/_build/B/modelado/salida/etapa2.json, _build/C/modelado/salida/etapa3.json,
   _build/D/modelado/salida/etapa4.json
+- entregas/entregable-3/_build/C/modelado/salida/indicador_6_5.json (H50, indicador del mercado de la C)
 - .workforce/presentacion-final/fase-4/cifras-F3.json: las cifras K de la parte de Gestión del E4
 
 Escribe final/src/datos_final.js con «export const DF = {...}». Solo biblioteca estándar.
@@ -61,6 +62,7 @@ FUENTES = {
     "etapa2": E3 / "B" / "modelado" / "salida" / "etapa2.json",
     "etapa3": E3 / "C" / "modelado" / "salida" / "etapa3.json",
     "etapa4": E3 / "D" / "modelado" / "salida" / "etapa4.json",
+    "indicador_6_5": E3 / "C" / "modelado" / "salida" / "indicador_6_5.json",
     "cifras_f3": VAULT / ".workforce" / "presentacion-final" / "fase-4" / "cifras-F3.json",
 }
 OPCIONALES = {"devoluciones": E3 / "A" / "modelado" / "salida" / "devoluciones_v02.json"}
@@ -363,6 +365,16 @@ def devueltas(dv: dict) -> None:
           r["variacion_precision_entre_cortes_validacion_pts"], "puntos", 2, "2,67")
 
 
+def indicador(ind: dict) -> None:
+    ancla("H50", "cruce a 90 días de la lista menos el de toda la base elegible, validación",
+          ind["diferencia_validacion_pp"], "puntos", 1, "51,9")
+    ancla("H50.min", "ídem, el corte más bajo (julio de 2024)", ind["diferencia_min_pp"], "puntos", 1, "48,6")
+    ancla("H50.max", "ídem, el corte más alto (septiembre de 2024)", ind["diferencia_max_pp"], "puntos", 1, "54,1")
+    ancla("H50.lista", "cruce de la lista en validación", ind["cruce_lista_validacion"], "fracción", 1, "75,8", x=100)
+    ancla("H50.base", "cruce de toda la base elegible en validación", ind["cruce_base_validacion"], "fracción", 1,
+          "23,9", x=100)
+
+
 def gestion(k_filas: list, eco: dict, cal: dict) -> None:
     pm = eco["piloto_minimo"]
     por_id = {}
@@ -423,13 +435,16 @@ def main() -> int:
     if falta:
         print("faltan fuentes:\n  " + "\n  ".join(falta))
         return 1
-    eco, cv, e1, co, e2, e3, e4, kf = (cargar(FUENTES[k]) for k in
-                                         ("economia", "cv_temporal", "etapa1", "condiciones", "etapa2", "etapa3",
-                                          "etapa4", "cifras_f3"))
+    eco, cv, e1, co, e2, e3, e4, ind, kf = (cargar(FUENTES[k]) for k in
+                                              ("economia", "cv_temporal", "etapa1", "condiciones", "etapa2", "etapa3",
+                                               "etapa4", "indicador_6_5", "cifras_f3"))
     cal = economia(eco)
     control("E3A-01 de economia.json = cv_temporal.json", eco["rango_anual"]["trimestre_x4_usd"][0],
             cv["roi"]["mvp_proporcional_a_500_sin_filtro"]["beneficio_min"])
     modelado(e1, e2, e3, e4, co)
+    indicador(ind)
+    control("H50.lista = H16 (etapa3, contactables de la regla)", ind["cruce_lista_validacion"],
+            [f for f in e3["umbral"]["filtradas"]["regla_umbral"] if f["umbral"].startswith("lista de 500")][0]["precision"])
     usadas = dict(FUENTES)
     if OPCIONALES["devoluciones"].exists():
         devueltas(cargar(OPCIONALES["devoluciones"]))

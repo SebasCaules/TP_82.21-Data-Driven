@@ -35,6 +35,10 @@ export const DF = {
     "sha256": "0368611d7d797b3bec39f19764d2e3496d9c74e539a8b6c2e8cdf03099844fbd"
    },
    {
+    "archivo": "entregas/entregable-3/_build/C/modelado/salida/indicador_6_5.json",
+    "sha256": "6ab60c087544ddee0aa20b08f00d52c111cfdb676b530c885ac28820b67f8e4f"
+   },
+   {
     "archivo": ".workforce/presentacion-final/fase-4/cifras-F3.json",
     "sha256": "ec6079b3a69eade8a7ecd0e60aebea142cbabfd5e41fb2eca0b7e154db8349d9"
    },
@@ -530,6 +534,36 @@ export const DF = {
    "unidad": "de 3",
    "texto": "1,8",
    "definicion": "puntaje legal del estado actual, promedio de cinco dimensiones"
+  },
+  "H50": {
+   "valor": 51.91877875365955,
+   "unidad": "puntos",
+   "texto": "51,9 puntos",
+   "definicion": "cruce a 90 días de la lista menos el de toda la base elegible, validación"
+  },
+  "H50.min": {
+   "valor": 48.63001328021248,
+   "unidad": "puntos",
+   "texto": "48,6 puntos",
+   "definicion": "ídem, el corte más bajo (julio de 2024)"
+  },
+  "H50.max": {
+   "valor": 54.11464968152866,
+   "unidad": "puntos",
+   "texto": "54,1 puntos",
+   "definicion": "ídem, el corte más alto (septiembre de 2024)"
+  },
+  "H50.lista": {
+   "valor": 0.758,
+   "unidad": "fracción",
+   "texto": "75,8 %",
+   "definicion": "cruce de la lista en validación"
+  },
+  "H50.base": {
+   "valor": 0.23881221246340442,
+   "unidad": "fracción",
+   "texto": "23,9 %",
+   "definicion": "cruce de toda la base elegible en validación"
   },
   "E3A-07.filas_sin": {
    "valor": 59585,
