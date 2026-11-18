@@ -4,11 +4,14 @@
 // rama sin descuento arriba y el de la rama con descuento abajo, para no encimarse. Sin eje ni corchete: el hueco entre
 // la marca y las líneas es el mensaje. Banda sola: las tres cifras están en la escala, cada una con su unidad («puntos»,
 // el texto de DF; decisión CH-06). Sin conclusión.
+// (18/11, prototipo híbrido) Vuelven de 8e633e8 las tres tarjetas (umbral de pase G67.con_descuento, sin descuento
+// G67.sin_descuento y «menos de» Math.ceil(G62.tasa_observada)), qué mide y la conclusión con sus tres cifras.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { ACC, CTX, INK, PISTA, Umbral, ancho, rectRedondo, tam, useU } from '../svg.jsx'
+import { fijo } from '../../../e3/src/formato.js'
 
 const ID = 'V09'
 const A = DF.anclas
@@ -23,18 +26,23 @@ const TOPE = Math.ceil(CON)
 
 export const meta = { id: ID }
 
+// (18/11, prototipo híbrido) Rótulos a 26 u y valores a 34 u (ESCALA de svg.jsx: cat y valFoco); el bloque llena el 82 %
+// del alto del lienzo: la pista crece con el alto (28 %, entre 72 y 160 u) y las líneas de umbral se alargan hasta sus
+// rótulos con lo que sobra.
+const LLENA = 0.82
+
 function Dibujo({ w, h }) {
   const u = useU()
-  const fNom = tam(28, u)
-  const fVal = tam(48, u)
-  const altoPista = 72 * u
-  const sobra = 20 * u
+  const fNom = tam('cat', u)
+  const fVal = tam('valFoco', u)
   const largo = 0.85 * w
   const xP = (w - largo) / 2
   const xs = (v) => xP + (v / TOPE) * largo
   // arriba: nombre, valor, 12 u, la línea que sobresale; abajo, lo mismo en espejo
   const dVal = fNom * 1.25 + 0.25 * fVal   // del nombre al valor: el renglón del nombre más el ascendente del valor
   const rotulo = dVal + fVal * 1.1
+  const altoPista = Math.min(160 * u, Math.max(72 * u, 0.28 * h))
+  const sobra = Math.max(20 * u, (LLENA * h - altoPista - 2 * (rotulo + 12 * u)) / 2)
   const alto = 2 * (rotulo + 12 * u + sobra) + altoPista
   const y0 = Math.max(0, (h - alto) / 2)
   const yP = y0 + rotulo + 12 * u + sobra
@@ -71,7 +79,13 @@ function Dibujo({ w, h }) {
 
 export default function V09Umbral() {
   return (
-    <Vista id={ID}>
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'con', valor: fijo(CON, 2) },
+             { clave: 'sin', valor: fijo(SIN, 2) },
+             { clave: 'hoy', valor: fijo(Math.ceil(HOY)) },
+           ]}
+           cifras={[fijo(HOY, 2), fijo(CON, 2), fijo(SIN, 2)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

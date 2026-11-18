@@ -124,6 +124,87 @@
 /* Notas: el renglón de quién presenta va pegado al de arriba. */
 .fin-notas-quien { margin-top: -4px; }
 
+/* ---------- prototipo híbrido (18/11, fase 6; hibrido.js): solo V01 y V09 ---------- */
+/* El marco y el gráfico del rediseño; la banda de tres tarjetas a 3:2:2 con la verde a un tercio, la fila «Decisión ·
+   área · estado», qué mide y la conclusión de 8e633e8. Presupuesto a 1920 × 1080: encabezado 96 u, banda 190 u, bloque
+   de conclusión unos 110 u y el lienzo con el resto (unos 530 u). Todo bajo .fin-hib o .fin-enc-hib: las otras trece
+   vistas no cambian. */
+.e3-vp {
+  --fin-h-cifra: calc(var(--fin-u) * 60);
+  --fin-h-cifra2: calc(var(--fin-u) * 44);
+  --fin-h-concl: calc(var(--fin-u) * 31);
+  --fin-h-banda: calc(var(--fin-u) * 190);
+}
+/* Encabezado: 96 u. A la derecha, en columna, la barra de avance (en u: 132 × 30 por dentro) y debajo «n / 15 · fuente»
+   en letra secundaria de 20 u. */
+.e3-vp .e2-enc.fin-enc-hib { height: calc(var(--fin-u) * 96); padding: var(--fin-s3) calc(var(--fin-u) * 40) 0; }
+.e3-vp .e2-enc.fin-enc-hib .e2-enc-der {
+  display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: calc(var(--fin-u) * 6);
+  flex-shrink: 0;
+}
+.e3-vp .e2-enc.fin-enc-hib .e3-avance { padding: calc(var(--fin-u) * 3); }
+.e3-vp .e2-enc.fin-enc-hib .e3-avance-barras {
+  width: calc(var(--fin-u) * 132); height: calc(var(--fin-u) * 30); gap: calc(var(--fin-u) * 2);
+}
+.e3-vp .e2-enc .e2-enc-corte.fin-enc-donde {
+  font: 400 var(--fin-t-rotulo)/1.25 var(--fuente); letter-spacing: 0; color: var(--e3-ctx); white-space: nowrap;
+}
+.e3-vp .cuerpo:has(> .pant.fin-hib) { padding-top: var(--fin-s3); }
+
+/* Banda: la misma forma en todas las vistas híbridas. Tres tarjetas a 3:2:2 (span 3, 2, 2 de 8e633e8) y la verde a un
+   tercio del ancho (520 u de 1560 con el riel, como --e2-dec-w a 1920). */
+.e3-vp .fin-hib .fin-banda .e2-banda {
+  height: var(--fin-h-banda); grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+.e3-vp .fin-hib .fin-banda .e2-banda > .e2-banda-cifras {
+  grid-auto-flow: column; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) minmax(0, 2fr);
+}
+/* Tarjeta: rótulo, cifra y fragmento arriba, en filas a la misma altura en las tres (la fila de la cifra mide lo que la
+   central, 60 u, y las cifras apoyan abajo). */
+.e3-vp .fin-hib .fin-banda .e2-banda-cifras > .tarjeta {
+  align-content: start; gap: 0; padding: var(--fin-s2) var(--fin-s3) calc(var(--fin-u) * 8);
+}
+.e3-vp .fin-hib .fin-banda .e2-banda-cifras > .tarjeta:not(.e2-central) { border-top: calc(var(--fin-u) * 5) solid var(--ink); }
+.e3-vp .fin-hib .fin-banda .e2-banda-cifras .kpi-lbl { font: 600 var(--fin-t-rotulo)/1.25 var(--mono); color: var(--ink); }
+.e3-vp .fin-hib .fin-banda .e2-banda-cifras .ban-par { margin-top: calc(var(--fin-u) * 6); }
+.e3-vp .fin-hib .fin-banda .e2-banda-cifras .tarjeta .par-item { min-height: var(--fin-h-cifra); align-items: flex-end; }
+.e3-vp .fin-hib .fin-banda .e2-banda-cifras .tarjeta .par-val.e2-cifra {
+  font: 600 var(--fin-h-cifra2)/1 var(--fuente); letter-spacing: -.02em; color: var(--ink);
+}
+.e3-vp .fin-hib .fin-banda .e2-banda-cifras .tarjeta.e2-central .par-val.e2-cifra {
+  font-size: var(--fin-h-cifra); font-weight: 700; color: var(--acc);
+}
+.e3-vp .fin-hib .fin-banda .e2-banda-cifras .par-val .par-unidad { font-size: .6em; font-weight: 400; }
+.e3-vp .fin-hib .fin-banda .e2-banda-cifras .e2-linea {
+  margin-top: calc(var(--fin-u) * 6); font: 500 var(--fin-t-linea)/1.2 var(--fuente); color: var(--ink);
+  text-wrap: balance;
+}
+/* Tarjeta de decisión: vuelve la fila «Decisión» y «área · estado» (20 u, mono, verde oscuro) y debajo la frase. */
+.e3-vp .fin-hib .fin-banda .e2-banda > .tarjeta-dec {
+  justify-content: flex-start; padding: var(--fin-s2) var(--fin-s4) calc(var(--fin-u) * 12);
+}
+.e3-vp .fin-hib .fin-banda .e2-banda > .tarjeta-dec .kpi-lbl {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: calc(var(--fin-u) * 4) var(--fin-s2);
+  font: 700 var(--fin-t-rotulo)/1.25 var(--mono); letter-spacing: .04em; text-transform: uppercase;
+  color: var(--dec-osc);
+}
+.e3-vp .fin-hib .fin-banda .e2-banda > .tarjeta-dec .kpi-lbl b { font-weight: 700; color: var(--dec-osc); }
+.e3-vp .fin-hib .fin-banda .e2-banda > .tarjeta-dec .dec-llano { margin-top: calc(var(--fin-u) * 14); }
+
+/* Tarjeta del gráfico: qué mide (20 u, mono, secundario) y la conclusión (31 u, 500) arriba; el lienzo llena el resto. */
+.e3-vp .fin-hib .tarjeta.fin-graf { padding: calc(var(--fin-u) * 28) var(--fin-s4); }
+.e3-vp .fin-hib .fin-cab { gap: var(--fin-s1); }
+.e3-vp .fin-hib .fin-mide {
+  margin: 0; font: 600 var(--fin-t-rotulo)/1.25 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--e3-ctx);
+}
+.e3-vp .fin-hib .fin-graf .e3-conclusion {
+  font: 500 var(--fin-h-concl)/1.25 var(--fuente); letter-spacing: -.01em; color: var(--ink); text-wrap: balance;
+}
+/* La cifra de la conclusión: azul de acento y 800 (el azul solo no se distingue de la tinta). */
+.e3-vp .fin-hib .fin-graf .e3-conclusion b { font-weight: 800; color: var(--acc); }
+.e3-vp .fin-hib .fin-cab + .fin-lienzo { margin-top: var(--fin-s3); }
+
 /* Hoja impresa: la unidad de la ventana lógica mínima. */
 @media print {
   .e3-vp { --fin-u: .6px !important; }

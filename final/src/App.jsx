@@ -23,6 +23,7 @@ import { ImpresionCtx } from '../../e2/src/escala.js'
 import { VentanaCtx, medir } from '../../e3/src/zoom.js'
 import { PanelNotas, VentanaNotas } from './Notas.jsx'
 import { UCtx, calcularU } from './escala.js'
+import { esHibrida } from './hibrido.js'
 
 const hashDe = (i) => `#${VISTAS[i].id.toLowerCase()}`
 function indiceDeHash() {
@@ -280,6 +281,21 @@ export default function App() {
  *  pantalla y queda en el title del contador y en la cabecera de las notas. */
 function Encabezado({ vista }) {
   const fuente = vista.fuente ?? ''
+  // (18/11, prototipo híbrido, hibrido.js) En V01 y V09 vuelve la fuente: «n / total · fuente» en un renglón de letra
+  // secundaria, debajo de la barra de avance (en columna, así el título de V09 sigue entrando a 52 u en 1024 × 768).
+  if (esHibrida(vista.id)) {
+    return (
+      <header className="e2-enc fin-enc-hib">
+        <h1 className="e2-preg">{vista.pregunta}</h1>
+        <div className="e2-enc-der">
+          <Avance vista={vista} />
+          <span className="e2-enc-corte fin-enc-donde">
+            {`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}{fuente && ` · ${fuente}`}
+          </span>
+        </div>
+      </header>
+    )
+  }
   return (
     <header className="e2-enc">
       <h1 className="e2-preg">{vista.pregunta}</h1>

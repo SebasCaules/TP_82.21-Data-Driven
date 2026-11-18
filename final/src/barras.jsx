@@ -15,10 +15,15 @@ import { ACC, CTX, FIN_GRIS, INK, TRAZO, BarraH, LineaBase, ancho, rectRedondo, 
 export const anchoEtiquetas = (datos, u) =>
   Math.ceil(Math.max(0, ...datos.map((d) => ancho(d.etiqueta, tam('cat', u), 600)))) + 24 * u
 
-function geometria(datos, w, h, u, maximo, fuera) {
-  const n = datos.length + datos.filter((d) => d.separado).length
-  const paso = Math.min(128 * u, h / Math.max(1, n))
-  const t = Math.min(64 * u, 0.5 * paso)
+// (18/11, prototipo híbrido) Con `llenar`, el bloque ocupa el alto del lienzo: el paso es h / n sin tope, la barra la
+// mitad del paso (hasta 120 u) y el hueco de la fila separada, 0,4 paso. Sin `llenar`, lo del rediseño.
+const HUECO_LLENAR = 0.4
+
+function geometria(datos, w, h, u, maximo, fuera, llenar = false) {
+  const hueco = llenar ? HUECO_LLENAR : 1
+  const n = datos.length + hueco * datos.filter((d) => d.separado).length
+  const paso = llenar ? h / Math.max(1, n) : Math.min(128 * u, h / Math.max(1, n))
+  const t = llenar ? Math.min(120 * u, 0.5 * paso) : Math.min(64 * u, 0.5 * paso)
   const rot = anchoEtiquetas(datos, u)
   const anchoVal = (d) => ancho(d.texto, tam(d.foco ? 'valFoco' : 'val', u), d.foco ? 700 : 600)
   const anchoNota = (d) => Math.max(
@@ -30,28 +35,28 @@ function geometria(datos, w, h, u, maximo, fuera) {
   const max = maximo ?? Math.max(...datos.map((d) => Math.max(d.valor, d.fantasma ?? 0)))
   const largo = Math.max(0, w - rot - cola)
   const escala = (v) => (max > 0 ? (Math.max(0, v) / max) * largo : 0)
-  return { paso, t, rot, escala, alto: n * paso }
+  return { paso, t, rot, escala, alto: n * paso, hueco }
 }
 
-export function BarrasFin({ w, h, datos, maximo }) {
+export function BarrasFin({ w, h, datos, maximo, llenar = false }) {
   const u = useU()
   if (!datos?.length) return null
   // primera pasada con las notas fantasma adentro; las que no entran pasan a la derecha y se mide de nuevo
   let fuera = new Set()
-  let g = geometria(datos, w, h, u, maximo, fuera)
+  let g = geometria(datos, w, h, u, maximo, fuera, llenar)
   const noEntra = (gg, d) => d.notaFantasma &&
     ancho(d.notaFantasma, tam('cat', u), 700) + 32 * u > gg.escala(d.fantasma) - gg.escala(d.valor)
   fuera = new Set(datos.filter((d) => noEntra(g, d)))
   if (fuera.size) {
-    g = geometria(datos, w, h, u, maximo, fuera)
+    g = geometria(datos, w, h, u, maximo, fuera, llenar)
     fuera = new Set(datos.filter((d) => noEntra(g, d)))
   }
-  const { paso, t, rot, escala, alto } = g
+  const { paso, t, rot, escala, alto, hueco } = g
   const x0 = rot
   const y0 = Math.max(0, (h - alto) / 2)
   let y = y0
   const filas = datos.map((d) => {
-    if (d.separado) y += paso
+    if (d.separado) y += hueco * paso
     const fila = { d, yc: y + paso / 2 }
     y += paso
     return fila
@@ -107,6 +112,6 @@ export function BarrasFin({ w, h, datos, maximo }) {
 
 /** El dibujo para Lienzo: recibe { w, h } y devuelve el BarrasFin. */
 export const barras = (props) => function Dibujo({ w, h }) {
-  return <BarrasFin datos={props.datos} maximo={props.maximo} w={w} h={h} />
+  return <BarrasFin datos={props.datos} maximo={props.maximo} llenar={props.llenar} w={w} h={h} />
 }
 

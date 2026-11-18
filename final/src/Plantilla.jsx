@@ -40,8 +40,32 @@ export function Tarjetas({ T, items }) {
   })
 }
 
-export default function Vista({ id, items = [], cifras = [], conclusion = false, children }) {
+/** Modo híbrido (hibrido.js): banda de tres tarjetas a 3:2:2 y la verde, bloque de qué mide y conclusión arriba de la
+ *  tarjeta del gráfico, y el lienzo con todo lo que sobra. Las clases fin-hib* están en estilos_final.css. */
+function VistaHibrida({ id, T, items, cifras, children }) {
+  return (
+    <section className={`pant fin-hib fin-${id.toLowerCase()}`}>
+      <div className="fin-banda fin-banda-hib">
+        <Banda dcs={[decisionDe(T)]}>
+          <Tarjetas T={T} items={items} />
+        </Banda>
+      </div>
+      <div className="tarjeta fin-graf">
+        <div className="fin-cab">
+          <p className="fin-mide">{T.mide}</p>
+          <Conclusion T={T} cifras={cifras} />
+        </div>
+        <div className="fin-lienzo" role="img" aria-label={T.mide}>
+          <Lienzo className="lienzo">{children}</Lienzo>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default function Vista({ id, items = [], cifras = [], conclusion = false, hibrido = false, children }) {
   const T = textosDe(id)
+  if (hibrido) return <VistaHibrida id={id} T={T} items={items} cifras={cifras}>{children}</VistaHibrida>
   return (
     <section className={`pant fin-${id.toLowerCase()}`}>
       <div className={`fin-banda ${items.length ? 'fin-banda-cifra' : 'fin-banda-sola'}`}>
