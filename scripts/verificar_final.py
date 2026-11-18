@@ -24,7 +24,7 @@ scripts/paridad_final.py. Esto cubre lo demás:
    CF la declara (textos.terracota); ni «pendiente», «abierto», «a definir», «sin respuesta» ni «espera respuesta» en
    pantalla ni en los title, ni códigos internos («envío 29», «G40»).
 5. Notas (N), a 1366×768 y 1536×864: el panel no tapa el tablero, el guion de cada vista entra sin desplazar y trae el
-   comienzo de cada párrafo de CF, quién presenta, el bloque con su tiempo acumulado y su total, el tiempo de la vista y
+   comienzo de cada párrafo de notas_final.js (las notas que exporta el guion, canon v1.3), quién presenta, el bloque con su tiempo acumulado y su total, el tiempo de la vista y
    el acumulado de la presentación contra el objetivo, y la vista que sigue.
 6. Recorrido de quien presenta, a 1536×864: → y ← de punta a punta, Av Pág y Re Pág, Inicio y Fin, una tecla mantenida
    no recorre, el riel lleva a cada vista, con el foco en el riel las flechas siguen, la URL sigue a la vista (recargar y
@@ -57,6 +57,15 @@ APP = Path(__file__).resolve().parents[1]
 HTML = APP / "dist-final" / "index.html"
 CF_JS = APP / "final" / "src" / "contenido_final.js"
 DF_JS = APP / "final" / "src" / "datos_final.js"
+NOTAS_JS = APP / "final" / "src" / "notas_final.js"
+# Cadenas del canon que ya no van (lista_negra.cadenas_v1_2 y cadenas_v1_3), si la carpeta de la corrida está: en pantalla,
+# en los title y en las notas. La lista completa la corre scripts/check_final_f6.py sobre el texto renderizado.
+CANON = Path("/Users/sebastiancaules/Desktop/ITBA/26-2C/FPDD/.workforce/presentacion-final/fase-2/canon.json")
+try:
+    _ln = json.loads(CANON.read_text(encoding="utf-8"))["lista_negra"]
+    NEGRA_CANON = [c for k in ("cadenas_v1_2", "cadenas_v1_3") for c in _ln.get(k, [])]
+except (OSError, KeyError, ValueError):
+    NEGRA_CANON = []
 RES = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
 CAPTURAR = {(1280, 720), (1920, 1080)}
 NOTAS_RES = {(1366, 768), (1536, 864)}
@@ -361,9 +370,16 @@ def vistas(p: Pagina, w, h, V, bloques, CF, cadenas_cf, nums, out, capturar, sin
     return hay_muestra
 
 
+def negra_canon(texto):
+    plano_ = norm(texto).lower()
+    return [c for c in NEGRA_CANON if c.lower() in plano_]
+
+
 def revisar_estado(p: Pagina, hid, r):
     if m := PROHIBIDAS.search(r["pantalla"]):
         p.mal(f"{hid}: en pantalla dice «{m.group(0)}»")
+    for c in negra_canon(r["pantalla"] + "\n" + "\n".join(t or "" for t in r["titulos"])):
+        p.mal(f"{hid}: cadena del canon que ya no va «{c}»")
     for t in r["titulos"]:
         if m := PROHIBIDAS.search(t or ""):
             p.mal(f"{hid}: un title dice «{m.group(0)}»: «{(t or '')[:80]}»")
@@ -445,7 +461,7 @@ def riel(p: Pagina, V, bloques, CF):
 
 # ---------------------------------------------------------------- 5. notas
 
-def notas(p: Pagina, w, h, V, CF):
+def notas(p: Pagina, w, h, V, CF, NOTAS):
     objetivo = (CF.get("TIEMPOS") or {}).get("objetivo_s")
     total = sum(v["segundos"] for v in V)
     p.ir(V[0]["hid"])
@@ -464,7 +480,11 @@ def notas(p: Pagina, w, h, V, CF):
                     f"total {mmss(v['total_hasta'])} de {mmss(objetivo or total)}",
                     f"Presenta {v['integrante']}",
                     f"{v['bloque_titulo']}: {mmss(v['bloque_hasta'])} de {mmss(v['bloque_total'])}"]
-        esperado += [norm(plano(x))[:40] for x in v.get("notas") or []]
+        esperado += [norm(plano(x))[:40] for x in NOTAS.get(v["id"]) or []]
+        if not NOTAS.get(v["id"]):
+            p.mal(f"notas: #{v['hid']} sin párrafos en notas_final.js")
+        for c in negra_canon(txt):
+            p.mal(f"notas {w}x{h}: #{v['hid']} dice «{c}», cadena del canon que ya no va")
         if i + 1 < len(V):
             esperado.append(f"Sigue: {norm(V[i + 1]['pregunta'])}")
         for x in esperado:
@@ -630,6 +650,7 @@ def main():
         sys.exit(1)
     CF = leer_modulo(CF_JS, "CF")
     DF = leer_modulo(DF_JS, "DF")
+    NOTAS = leer_modulo(NOTAS_JS, "NOTAS")
     V, bloques, total = historia(CF)
     cadenas_cf = cadenas(CF)
     nums = numeros_df(DF)
@@ -648,7 +669,7 @@ def main():
                                       (w, h) in CAPTURAR and not a.sin_capturas, a.sin_esqueletos)
                 riel(p, V, bloques, CF)
                 if (w, h) in NOTAS_RES:
-                    notas(p, w, h, V, CF)
+                    notas(p, w, h, V, CF, NOTAS)
                 if (w, h) == (1536, 864):
                     recorrido(p, V)
                     paginas = impresion(p, V)

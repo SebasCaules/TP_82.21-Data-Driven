@@ -170,17 +170,24 @@ uniforme y las mismas teclas. Un solo HTML autocontenido en `dist-final/index.ht
 Tiene payload propio: `pipeline/build_final.py` lee los JSON de los generadores de las partes en el vault y escribe
 `final/src/datos_final.js` (DF). `DF.anclas` va por id del registro de cifras (`G67.con_descuento`): valor, unidad y
 texto con las reglas de `e3/src/formato.js`. Todo el texto sale de `final/src/contenido_final.js` (CF), que importa DF
-para interpolar las cifras en preguntas, rótulos y notas: ni CF ni las vistas escriben un número. Desde el 17/11 CF trae
+para interpolar las cifras en preguntas y rótulos: ni CF ni las vistas escriben un número. Desde el 17/11 CF trae
 el contenido real: quince vistas en los siete bloques del canon (apertura, datos, modelo, economía, legal, gestión y
 cierre), 23 minutos de exposición.
 
 CF.BLOQUES es la única lista que ordena la presentación: cada bloque tiene id, título, rótulo del riel, integrante y
-sus vistas; cada vista, id, rótulo del riel, pregunta, fuente, segundos, notas del orador y los textos que escribe. De
-esa lista salen el recorrido, los grupos del riel, el número de cada vista (su posición) y los tiempos de las notas.
+sus vistas; cada vista, id, rótulo del riel, pregunta, fuente, segundos y los textos que escribe. De esa lista salen
+el recorrido, los grupos del riel, el número de cada vista (su posición) y los tiempos de las notas.
+
+Las notas del orador (N) no se escriben en CF: desde el 18/11 (canon v1.3) salen del guion de la presentación.
+`exportar_notas.py`, en `entregas/presentacion-final/_build/F/dossiers/guion-presentacion-final/` del vault, escribe
+`final/src/notas_final.js` con las frases de `guion.py` que no se saltan en la versión de 15 minutos, y `Notas.jsx` lo
+lee. El archivo queda versionado, así el tablero se construye sin el vault; `check_final_f6.py` lo compara con el guion
+cuando el vault está. Para cambiar una nota se cambia el guion y se vuelve a exportar.
 
 | Archivo | Qué es |
 |---|---|
-| `final/src/contenido_final.js` | CF: bloques, vistas, notas, segundos y textos |
+| `final/src/contenido_final.js` | CF: bloques, vistas, segundos y textos |
+| `final/src/notas_final.js` | las notas del orador, exportadas del guion (no se edita a mano) |
 | `final/src/vistas/index.jsx` | registro: deriva el recorrido, el riel y los tiempos de CF |
 | `final/src/vistas/Vnn_*.jsx` | una vista por archivo, con `meta = { id }`; sin archivo, la vista es esqueleto |
 | `final/src/App.jsx`, `Notas.jsx`, `MarcaInicio.jsx` | copias adaptadas de las de `/e3/` |
@@ -191,7 +198,7 @@ esa lista salen el recorrido, los grupos del riel, el número de cada vista (su 
 Las vistas importan los componentes del E2 y del E3 sin copiarlos (`Banda.jsx`, `TarjetaDecision.jsx`, `escala.js`,
 `zoom.js`, `formato.js`, `texto.jsx`, `cifra.jsx`, `src/graficos.jsx`). `/final/` no toca `src/`, `e2/` ni `e3/`.
 
-Para sumar una vista: se lista en el bloque que corresponde de CF (id, título, pregunta, segundos, notas, textos) y se
+Para sumar una vista: se lista en el bloque que corresponde de CF (id, título, pregunta, segundos, textos) y se
 crea `final/src/vistas/Vnn_Nombre.jsx` con `meta = { id }`, que lee sus textos con `textosDe(id)` y sus cifras de
 `DF.anclas`. Para sumar una cifra: un `ancla(id, definición, valor, unidad, decimales, "número del documento")` en
 `build_final.py`, que corta con código 1 si el valor del JSON no da el número que escribe el documento.
@@ -207,7 +214,8 @@ python3 -I scripts/verificar_final.py                # desborde, consola, red, t
 npm run build:e2 && python3 -I scripts/paridad_final.py --vista v07   # letra, cajas y reglas del E2, 4 resoluciones
 npx vite build --config scripts/vite.final-sobre.config.js   # el HTML para mandar, en dist-final-sobre/
 python3 scripts/check_app_f4.py                      # todo lo anterior más /e3/ intacto y el anexo de fórmulas
-python3 scripts/check_final_f6.py                    # contenido de /final/: lo anterior, el HTML del sobre, git y lista negra
+python3 scripts/check_final_f6.py                    # contenido de /final/: lo anterior, el HTML del sobre, git, lista negra
+                                                     # y notas iguales al guion; --textos RUTA escribe el texto de cada vista
 ```
 
 Los dos verificadores terminan con `RESULTADO: OK` o `RESULTADO: FALLA`. Las teclas son las de `/e3/`. Las notas (N o

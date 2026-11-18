@@ -14,14 +14,20 @@ Corre, con rutas absolutas y en este orden:
 6. /e3/ intacto: npm run build:e3 y el md5 de dist-e3/index.html es el del /e3/ presentado (1903979c…).
 7. Git: la rama es final-tablero, main sigue en el commit en que se cortó esta fase, src/**, e2/** y e3/** iguales a
    main, el árbol limpio y los commits de main..HEAD de una línea y sin trailers (ni Co-Authored-By).
-8. Lista negra del canon y regla del 23/10 (pendiente 238) sobre todo el texto de /final/: las cadenas de CF (preguntas,
-   rótulos, conclusiones, decisiones y notas) y el texto renderizado de cada vista a 1280×720 (pantalla, SVG, title y
-   notas abiertas).
+8. Lista negra del canon (cadenas, cadenas_v1_2 y cadenas_v1_3) y regla del 23/10 (pendiente 238) sobre todo el texto
+   de /final/: las cadenas de CF (preguntas, rótulos, conclusiones y decisiones), las notas de final/src/notas_final.js y
+   el texto renderizado de cada vista a 1280×720 (pantalla, SVG, title y notas abiertas).
+9. (18/11, canon v1.3, tableros.notas_v1_3) Las notas salen del guion: si el vault está, notas_final.js es lo que escribe
+   exportar_notas.py desde guion.py (--comprobar); sin el vault, el paso se salta con aviso.
+
+Con --textos RUTA escribe además el texto renderizado de cada vista (pantalla, rótulos del gráfico, title) y debajo su
+nota, separado por líneas «=== V01 · <bloque> ===» (para la auditoría).
 
 Imprime cada paso y cierra con «RESULTADO: OK» o «RESULTADO: FALLA».
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import re
@@ -36,6 +42,9 @@ if not CANON.exists():   # la carpeta de la corrida se puede limpiar: queda la c
     CANON = VAULT / "entregas" / "entregable-4" / "_build" / "A" / "registro" / "canon.json"
 DF_JS = APP / "final" / "src" / "datos_final.js"
 CF_JS = APP / "final" / "src" / "contenido_final.js"
+NOTAS_JS = APP / "final" / "src" / "notas_final.js"
+EXPORTAR_NOTAS = (VAULT / "entregas" / "presentacion-final" / "_build" / "F" / "dossiers" / "guion-presentacion-final"
+                  / "exportar_notas.py")
 SOBRE = APP / "dist-final-sobre" / "index.html"
 MD5_E3 = "1903979ca800a3907a2ae365d30eb48e"
 MAIN = "c0db4f742066d195bc094d22580ca8a2e5ac4874"   # main al empezar la fase 6: no se toca
@@ -73,12 +82,16 @@ def git(*args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-C", str(APP), *args], capture_output=True, text=True)
 
 
-def leer_cf() -> dict:
-    codigo = "const m = await import(process.argv[1]); process.stdout.write(JSON.stringify(m.CF))"
-    r = subprocess.run(["node", "--input-type=module", "-e", codigo, CF_JS.as_uri()], capture_output=True, text=True)
+def leer_modulo(ruta: Path, var: str):
+    codigo = "const m = await import(process.argv[1]); process.stdout.write(JSON.stringify(m[process.argv[2]]))"
+    r = subprocess.run(["node", "--input-type=module", "-e", codigo, ruta.as_uri(), var], capture_output=True, text=True)
     if r.returncode != 0:
-        raise SystemExit(f"No pude leer CF con node: {r.stderr.strip()[:300]}")
+        raise SystemExit(f"No pude leer {var} con node: {r.stderr.strip()[:300]}")
     return json.loads(r.stdout)
+
+
+def leer_cf() -> dict:
+    return leer_modulo(CF_JS, "CF")
 
 
 def cadenas(x) -> list[str]:
@@ -96,11 +109,12 @@ TEXTO_VISTA = r"""() => {
   const svg = [...document.querySelectorAll('.cuerpo svg text, .cuerpo svg title')].map((t) => t.textContent)
   const titulos = [...document.querySelectorAll('[title]')].map((e) => e.getAttribute('title'))
   const notas = document.querySelector('.e3-notas')?.innerText ?? ''
-  return [vp.innerText, ...svg, ...titulos, notas].join('\n')
+  return { pantalla: vp.innerText, svg, titulos, notas }
 }"""
 
 
-def texto_renderizado(V: list[dict]) -> str:
+def textos_por_vista(V: list[dict]) -> list[dict]:
+    """El texto renderizado de cada vista a 1280×720, con las notas abiertas: {id, pantalla, svg, titulos, notas}."""
     from playwright.sync_api import sync_playwright
     url = (APP / "dist-final" / "index.html").as_uri()
     partes = []
@@ -117,9 +131,32 @@ def texto_renderizado(V: list[dict]) -> str:
             pg.goto(f"{url}#{v['id'].lower()}")
             pg.wait_for_selector(".cuerpo .pant")
             pg.wait_for_timeout(150)
-            partes.append(pg.evaluate(TEXTO_VISTA))
+            partes.append({"id": v["id"], **pg.evaluate(TEXTO_VISTA)})
         nav.close()
-    return "\n".join(partes)
+    return partes
+
+
+def unir(t: dict) -> str:
+    return "\n".join([t["pantalla"], *t["svg"], *t["titulos"], t["notas"]])
+
+
+def escribir_textos(ruta: Path, CF: dict, textos: list[dict]) -> None:
+    bloque = {v["id"]: b["titulo"] for b in CF["BLOQUES"] for v in b["vistas"]}
+    salida = []
+    for t in textos:
+        salida.append(f"=== {t['id']} · {bloque.get(t['id'], '')} ===")
+        salida.append(t["pantalla"].strip())
+        if t["svg"]:
+            salida.append("-- rótulos del gráfico --")
+            salida.extend(x.strip() for x in t["svg"] if x.strip())
+        if t["titulos"]:
+            salida.append("-- title --")
+            salida.extend(x.strip() for x in t["titulos"] if x and x.strip())
+        salida.append("-- nota --")
+        salida.append(t["notas"].strip())
+        salida.append("")
+    ruta.parent.mkdir(parents=True, exist_ok=True)
+    ruta.write_text("\n".join(salida), encoding="utf-8")
 
 
 def sobre_sin_red(V: list[dict]) -> tuple[list[str], list[str], list[str]]:
@@ -165,7 +202,8 @@ def lista_negra(texto: str, donde: str) -> None:
         "semana 13 como elección del operador": r"semana 13\b",
         "pipeline en las semanas 1 a 3": r"pipeline",
     }
-    literales = [c for c in lista["cadenas"] + lista.get("cadenas_v1_2", []) if c not in descripciones]
+    literales = [c for c in lista["cadenas"] + lista.get("cadenas_v1_2", []) + lista.get("cadenas_v1_3", [])
+                 if c not in descripciones]
     hits = [c for c in literales if c.lower() in plano.lower()]
     hits += [f"{d} («{re.search(rx, plano, re.I).group(0)}»)" for d, rx in descripciones.items()
              if re.search(rx, plano, re.I)]
@@ -177,6 +215,9 @@ def lista_negra(texto: str, donde: str) -> None:
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--textos", help="escribe el texto renderizado de cada vista y su nota en esta ruta")
+    args = ap.parse_args()
     # 1. payload determinista
     md5s = []
     for i in (1, 2):
@@ -239,11 +280,26 @@ def main() -> int:
     paso("commits de una línea y sin trailers", not malos, f"{n} commits" if not malos else ", ".join(malos))
 
     # 8. lista negra y regla del 23/10 sobre todo el texto de /final/
-    lista_negra("\n".join(cadenas(CF)), "CF (textos y notas)")
+    NOTAS = leer_modulo(NOTAS_JS, "NOTAS")
+    paso("notas_final.js con párrafos para cada vista", all(NOTAS.get(v["id"]) for v in V),
+         ", ".join(v["id"] for v in V if not NOTAS.get(v["id"])) or f"{len(V)} vistas")
+    lista_negra("\n".join(cadenas(CF)), "CF (textos)")
+    lista_negra("\n".join(cadenas(NOTAS)), "notas_final.js")
     try:
-        lista_negra(texto_renderizado(V), "el texto renderizado de las vistas")
+        textos = textos_por_vista(V)
+        lista_negra("\n".join(unir(t) for t in textos), "el texto renderizado de las vistas")
+        if args.textos:
+            escribir_textos(Path(args.textos), CF, textos)
+            print(f"[OK]    textos de las vistas en {args.textos}")
     except Exception as e:   # noqa: BLE001
         paso("texto renderizado de las vistas", False, str(e).splitlines()[0][:160])
+
+    # 9. notas del guion
+    if EXPORTAR_NOTAS.exists():
+        correr("notas_final.js igual a guion.py (exportar_notas.py --comprobar)",
+               [PY, str(EXPORTAR_NOTAS), "--comprobar"])
+    else:
+        print(f"[AVISO] sin el vault ({EXPORTAR_NOTAS.name} no está): salto la paridad de notas_final.js con guion.py")
 
     print()
     if fallas:
