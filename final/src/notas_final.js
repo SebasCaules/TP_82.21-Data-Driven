@@ -54,7 +54,7 @@ export const NOTAS = {
     "Antes de la primera lista hay cosas que tienen que estar en regla: sigue Tomas."
   ],
   "V10": [
-    "María, la lista sale de datos personales de sus clientes. Hoy las bases no están inscriptas y el **30,1 %** de los envíos fue a clientes que no aceptaron marketing. Por eso protección de datos tiene la nota más baja: **1 de 3**. Esa nota quiere decir que ninguna lista sale hasta tener la inscripción y el filtro de consentimiento.",
+    "María, la lista sale de datos personales de sus clientes. Hoy las bases no están inscriptas y el **30,1 %** de los envíos fue a clientes que no aceptaron marketing. Por eso protección de datos tiene la nota más baja, **1 de 3**, y el promedio legal da **1,8 de 3**. Esa nota quiere decir que ninguna lista sale hasta tener la inscripción y el filtro de consentimiento.",
     "En la semana **1** se firma el acuerdo de confidencialidad. Sin él, el equipo no recibe ningún dato más de Casa Óga."
   ],
   "V11": [
