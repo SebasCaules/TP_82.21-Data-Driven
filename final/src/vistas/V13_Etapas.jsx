@@ -1,68 +1,77 @@
 // V13 · PoC y MVP (gestión, Sebastian C.). El camino del canon (poc_y_mvp.camino): PoC hecha, MVP en piloto mínimo,
-// operación mínima si una rama pasa y producción completa si el efecto la paga. Cuatro cajas con flechas: la PoC
-// resuelta (--sem-meta), el MVP en --acc (lo que se pide) y las dos siguientes en gris, cada una con su condición. Los
-// costos van en la banda, los dos del primer año (G64 y G66.primer_anio; USD 15.775 de la producción completa no entra
-// en una tarjeta secundaria y va en la nota, con G65.primer_anio); el texto de cada caja, en CF.
+// operación mínima si una rama pasa y producción completa si el efecto la paga. Cuatro cajas del mismo ancho y del alto
+// del contenido, centradas en vertical, con un chevrón entre cajas (spec de dataviz f.9, 18/11). El estado de cada caja
+// usa ESTADO de svg.jsx, el mismo de V12: la PoC hecha con borde superior en acento, el MVP con borde superior gris y las
+// dos condicionales con el borde entero punteado. Banda sola; la conclusión (única en /final/) dice qué probó la PoC y
+// qué falta, con J03.regla. El texto de cada caja, en CF.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
-import { pct, usd } from '../../../e3/src/formato.js'
-import { useEscalaTexto } from '../../../e2/src/escala.js'
-import { ACC, BORDE, CTX, HECHO, INK, SUP, TINTE, Renglones, envolver, envolverMono, letra } from '../svg.jsx'
+import { pct } from '../../../e3/src/formato.js'
+import { BORDE, CTX, Chevron, ESTADO, INK, Renglones, SUP, TRAZO, envolver, inicial, marcaEstado, rectRedondo, tam, useU }
+  from '../svg.jsx'
 
 const ID = 'V13'
 const A = DF.anclas
 const X = textosDe(ID)
-const TONO = [HECHO, ACC, CTX, CTX]
+// etapa → estado (spec b.6): PoC hecha, MVP en el piloto, las dos siguientes condicionales
+const ESTADOS = ['hecha', 'piloto', 'condicional', 'condicional']
 
 export const meta = { id: ID }
 
-function medir(w, f, k) {
-  const flecha = 22 * k
+function medir(w, u) {
   const n = X.etapas.length
-  const bw = (w - flecha * (n - 1)) / n
-  const pad = 0.8 * f
-  const fT = f * 1.15
-  const fE = f * 0.9
-  const cajas = X.etapas.map((e) => {
-    const ln = envolver(e.nombre, bw - 2 * pad, fT, 700)
-    const le = envolverMono(e.estado, bw - 2 * pad, fE)
-    const lq = envolver(e.que, bw - 2 * pad, f)
-    return { ...e, ln, le, lq, alto: pad + ln.length * fT * 1.25 + 0.3 * f + le.length * fE * 1.3 + 0.6 * f + lq.length * f * 1.25 + pad }
+  const paso = 64 * u                       // entre cajas, con el chevrón de 32 u en el medio
+  const bw = (w - paso * (n - 1)) / n
+  const pad = 24 * u
+  const borde = 6 * u                       // marca de estado arriba
+  const fN = tam('nombre', u), fE = tam('sec', u), fQ = tam(24, u)
+  const cajas = X.etapas.map((e, i) => {
+    const ln = envolver(e.nombre, bw - 2 * pad, fN, 700)
+    const le = envolver(inicial(e.estado), bw - 2 * pad, fE, 600)
+    const lq = envolver(e.que, bw - 2 * pad, fQ)
+    const alto = borde + pad + ln.length * fN * 1.1 + 8 * u + le.length * fE * 1.25 + 16 * u + lq.length * fQ * 1.25 + pad
+    return { ...e, ln, le, lq, alto, marca: ESTADOS[i] }
   })
-  return { flecha, bw, pad, fT, fE, cajas, alto: Math.max(...cajas.map((c) => c.alto)) }
+  return { paso, bw, pad, borde, fN, fE, fQ, cajas, alto: Math.max(...cajas.map((c) => c.alto)) }
 }
 
-function Dibujo({ w, h, k }) {
-  const f = letra((x) => medir(w, x, k).alto, h, 16 * k)
-  const m = medir(w, f, k)
+function Caja({ u, x, y, w, h, estado, borde }) {
+  if (estado === 'condicional') {
+    const m = marcaEstado('condicional', u)
+    const sw = m.strokeWidth
+    return <rect x={x + sw / 2} y={y + sw / 2} width={w - sw} height={h - sw} rx={TRAZO.radio * u} {...m} fill={SUP} />
+  }
+  return (
+    <g>
+      <rect x={x + u / 2} y={y + u / 2} width={w - u} height={h - u} rx={TRAZO.radio * u} fill={SUP} stroke={BORDE}
+            strokeWidth={u} />
+      <path d={rectRedondo(x, y, w, borde, TRAZO.radio * u, 'arr')} fill={ESTADO[estado].fill} />
+    </g>
+  )
+}
+
+function Dibujo({ w, h }) {
+  const u = useU()
+  const m = medir(w, u)
   const yTop = Math.max(0, (h - m.alto) / 2)
   return (
-    <svg width={w} height={h} role="img" style={{ display: 'block' }}
-         aria-label={`${X.mide}: ${X.etapas.map((e) => `${e.nombre}, ${e.estado}`).join('; ')}`}>
+    <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       {m.cajas.map((c, i) => {
-        const x0 = i * (m.bw + m.flecha)
-        const tono = TONO[i]
-        const yE = yTop + m.pad + c.ln.length * m.fT * 1.25 + 0.3 * f
-        const yQ = yE + c.le.length * m.fE * 1.3 + 0.6 * f
+        const x0 = i * (m.bw + m.paso)
+        const xT = x0 + m.pad
+        const yN = yTop + m.borde + m.pad
+        const yE = yN + c.ln.length * m.fN * 1.1 + 8 * u
+        const yQ = yE + c.le.length * m.fE * 1.25 + 16 * u
         return (
           <g key={c.nombre}>
             <title>{`${c.nombre} (${c.estado}): ${c.que}`}</title>
-            <rect x={x0} y={yTop} width={m.bw} height={m.alto} fill={i === 1 ? TINTE : SUP}
-                  stroke={i === 1 ? ACC : i === 0 ? HECHO : BORDE} strokeWidth={i < 2 ? 1.5 : 1} />
-            <rect x={x0} y={yTop} width={m.bw} height={3 * k} fill={i < 2 ? tono : 'var(--azul3)'} />
-            <Renglones lineas={c.ln} x={x0 + m.pad} y={yTop + m.pad} f={m.fT} peso={700} color={i === 1 ? ACC : INK} />
-            {c.le.map((l, j) => (
-              <text key={j} x={x0 + m.pad} y={yE + j * m.fE * 1.3} fontSize={m.fE} fontWeight={600} fill={tono}
-                    fontFamily="var(--mono)" letterSpacing={0.08 * m.fE} dominantBaseline="hanging"
-                    style={{ textTransform: 'uppercase' }}>{l}</text>
-            ))}
-            <Renglones lineas={c.lq} x={x0 + m.pad} y={yQ} f={f} />
-            {i < m.cajas.length - 1 && (
-              <path d={`M${x0 + m.bw + 4 * k},${yTop + m.alto / 2} h${m.flecha - 9 * k} l-${4 * k},-${4 * k} m${4 * k},${4 * k} l-${4 * k},${4 * k}`}
-                    fill="none" stroke={INK} strokeWidth={1.5} />
-            )}
+            <Caja u={u} x={x0} y={yTop} w={m.bw} h={m.alto} estado={c.marca} borde={m.borde} />
+            <Renglones lineas={c.ln} x={xT} y={yN} f={m.fN} peso={700} color={INK} inter={1.1} />
+            <Renglones lineas={c.le} x={xT} y={yE} f={m.fE} peso={600} color={CTX} />
+            <Renglones lineas={c.lq} x={xT} y={yQ} f={m.fQ} peso={400} color={CTX} />
+            {i < m.cajas.length - 1 && <Chevron u={u} x={x0 + m.bw + m.paso / 2} y={yTop + m.alto / 2} />}
           </g>
         )
       })}
@@ -71,15 +80,9 @@ function Dibujo({ w, h, k }) {
 }
 
 export default function V13Etapas() {
-  const k = useEscalaTexto()
   return (
-    <Vista id={ID}
-           items={[
-             { clave: 'mvp', span: 3, valor: usd(A.G64.valor) },
-             { clave: 'minima', span: 3, valor: usd(A['G66.primer_anio'].valor) },
-           ]}
-           cifras={[pct(A['J03.regla'].valor)]}>
-      {({ w, h }) => <Dibujo w={w} h={h} k={k} />}
+    <Vista id={ID} conclusion cifras={[pct(A['J03.regla'].valor)]}>
+      {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )
 }

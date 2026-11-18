@@ -1,84 +1,73 @@
 // V11 · Qué puede fallar (legal, riesgos y adopción, Tomas F.). Los tres riesgos críticos de la C 6.3 (tabla TOP3 de
-// contenido_c.py; DF cuenta cuántos son en riesgos_criticos.n) en tres columnas: el riesgo, la señal que se mira y qué se
-// hace. El de adopción (quién corre la planilla) lleva el énfasis: es el que este bloque cuenta. Textos de CF.
+// contenido_c.py; DF cuenta cuántos son en riesgos_criticos.n) como lista de dos columnas: el riesgo y qué se hace
+// (spec de dataviz f.7, 18/11). Sin cabeceras ni columna de señal (la señal queda en el title de cada fila). La fila de
+// adopción (quién corre la planilla) es la que nombra el título: fondo de realce y texto en tinta; las otras dos en
+// --e3-ctx. La tarjeta de la banda es la de las horas por lista. Textos de CF.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
-import { useEscalaTexto } from '../../../e2/src/escala.js'
-import { ACC, BORDE, INK, Renglones, Titulo, envolver, letra } from '../svg.jsx'
+import { BORDE, CTX, INK, REALCE, Renglones, TRAZO, envolver, tam, useU } from '../svg.jsx'
 
 const ID = 'V11'
 const A = DF.anclas
 const X = textosDe(ID)
 const C = X.columnas
-const ENFASIS = 1   // la fila de adopción
+const FOCO = 1   // la fila de adopción
 
 if (X.filas.length !== DF.tablas.riesgos_criticos.n) throw new Error('V11: la tarjeta y el gráfico no cuentan los mismos riesgos')
 
 export const meta = { id: ID }
 
-function medir(w, f, k) {
-  const gap = 22 * k
-  const barra = 5 * k
-  const util = w - barra - 12 * k - 2 * gap
-  const anchos = [0.28, 0.33, 0.39].map((p) => p * util)
-  const xs = [barra + 12 * k, barra + 12 * k + anchos[0] + gap, barra + 12 * k + anchos[0] + anchos[1] + 2 * gap]
-  const pad = 0.75 * f
+function medir(w, u) {
+  const f = tam('fila', u)
+  const pad = 16 * u          // relleno de cada fila
+  const gap = 48 * u          // entre columnas
+  const util = w - 2 * pad - gap
+  const anchos = [0.4 * util, 0.6 * util]
+  const xs = [pad, pad + anchos[0] + gap]
   const filas = X.filas.map((r, i) => {
-    const ls = [envolver(r.riesgo, anchos[0], f * 1.05, 700), envolver(r.senal, anchos[1], f), envolver(r.respuesta, anchos[2], f)]
-    const alto = Math.max(ls[0].length * f * 1.05 * 1.25, ls[1].length * f * 1.25, ls[2].length * f * 1.25) + 2 * pad
-    return { ...r, ls, alto, i }
+    const foco = i === FOCO
+    const ls = [envolver(r.riesgo, anchos[0], f, foco ? 700 : 400), envolver(r.respuesta, anchos[1], f)]
+    const alto = Math.max(ls[0].length, ls[1].length) * f * 1.25 + 2 * pad
+    return { ...r, ls, alto, foco }
   })
-  const yCab = f * 1.1
-  const yFilas = yCab + f * 0.9
-  return { gap, barra, anchos, xs, pad, filas, yCab, yFilas, alto: yFilas + filas.reduce((s, x) => s + x.alto, 0) }
+  const sep = 16 * u          // aire entre filas
+  return { f, pad, xs, filas, sep, alto: filas.reduce((s, x) => s + x.alto, 0) + sep * (filas.length - 1) }
 }
 
-function Dibujo({ w, h, k }) {
-  const f = letra((x) => medir(w, x, k).alto, h, 20 * k)
-  const m = medir(w, f, k)
-  let y = m.yFilas
-  const dy = Math.max(0, (h - m.alto) / 2)   // la tabla, centrada en el alto (J-WEB-18)
+function Dibujo({ w, h }) {
+  const u = useU()
+  const m = medir(w, u)
+  let y = Math.max(0, (h - m.alto) / 2)   // la lista, centrada en el alto
   return (
-    <svg width={w} height={h} role="img" style={{ display: 'block' }}
-         aria-label={`${X.mide}: ${X.filas.map((r) => r.riesgo).join('; ')}`}>
-      <g transform={`translate(0,${dy})`}>
-      {[C.riesgo, C.senal, C.respuesta].map((t, j) => (
-        <Titulo key={t} x={m.xs[j]} y={m.yCab} f={f * 0.9} texto={t} max={m.anchos[j]} />
-      ))}
-      {m.filas.map((r) => {
+    <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
+      {m.filas.map((r, i) => {
         const y0 = y
-        y += r.alto
-        const fuerte = r.i === ENFASIS
+        y += r.alto + m.sep
+        const previa = m.filas[i - 1]
+        const color = r.foco ? INK : CTX
         return (
           <g key={r.riesgo}>
             <title>{`${r.riesgo}. ${C.senal}: ${r.senal}. ${C.respuesta}: ${r.respuesta}.`}</title>
-            <line x1={0} x2={w} y1={y0} y2={y0} stroke={BORDE} strokeWidth={1} />
-            <rect x={0} y={y0 + m.pad * 0.6} width={m.barra} height={r.alto - m.pad * 1.2} fill={fuerte ? ACC : 'var(--azul3)'} />
-            <Renglones lineas={r.ls[0]} x={m.xs[0]} y={y0 + m.pad} f={f * 1.05} peso={700} color={fuerte ? ACC : INK} />
-            <Renglones lineas={r.ls[1]} x={m.xs[1]} y={y0 + m.pad} f={f} />
-            <Renglones lineas={r.ls[2]} x={m.xs[2]} y={y0 + m.pad} f={f} />
+            {r.foco && <rect x={0} y={y0} width={w} height={r.alto} rx={TRAZO.radio * u} fill={REALCE} />}
+            {i > 0 && !r.foco && !previa.foco && (
+              <line x1={0} x2={w} y1={y0 - m.sep / 2} y2={y0 - m.sep / 2} stroke={BORDE} strokeWidth={u} />
+            )}
+            <Renglones lineas={r.ls[0]} x={m.xs[0]} y={y0 + m.pad} f={m.f} peso={r.foco ? 700 : 400} color={color} />
+            <Renglones lineas={r.ls[1]} x={m.xs[1]} y={y0 + m.pad} f={m.f} peso={400} color={color} />
           </g>
         )
       })}
-      <line x1={0} x2={w} y1={y} y2={y} stroke={BORDE} strokeWidth={1} />
-      </g>
     </svg>
   )
 }
 
 export default function V11Riesgos() {
-  const k = useEscalaTexto()
   return (
-    <Vista id={ID}
-           items={[
-             { clave: 'horas', span: 3, valor: fijo(A['G64.horas_por_lista'].valor) },
-             { clave: 'riesgos', span: 3, valor: fijo(DF.tablas.riesgos_criticos.n) },
-           ]}
-           cifras={[fijo(A['G64.horas_por_lista'].valor)]}>
-      {({ w, h }) => <Dibujo w={w} h={h} k={k} />}
+    <Vista id={ID} items={[{ clave: 'horas', valor: fijo(A['G64.horas_por_lista'].valor) }]}>
+      {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )
 }
