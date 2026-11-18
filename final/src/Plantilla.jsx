@@ -40,7 +40,7 @@ export function Tarjetas({ T, items }) {
   })
 }
 
-export default function Vista({ id, items = [], cifras = [], conclusion = false, lienzo = '', children }) {
+export default function Vista({ id, items = [], cifras = [], conclusion = false, children }) {
   const T = textosDe(id)
   return (
     <section className={`pant fin-${id.toLowerCase()}`}>
@@ -55,7 +55,7 @@ export default function Vista({ id, items = [], cifras = [], conclusion = false,
             <Conclusion T={T} cifras={cifras} />
           </div>
         )}
-        <div className={`fin-lienzo${lienzo ? ` ${lienzo}` : ''}`} role="img" aria-label={T.mide}>
+        <div className="fin-lienzo" role="img" aria-label={T.mide}>
           <Lienzo className="lienzo">{children}</Lienzo>
         </div>
       </div>

@@ -10,7 +10,7 @@ import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
-import { ACC, CONTORNO, CTX, FIN_GRIS, INK, SUP, TRAZO, Umbral, ancho, duro, inicial, rectRedondo, tam, useU }
+import { ACC, CONTORNO, CTX, FIN_GRIS, INK, SUP, TRAZO, Umbral, ancho, duro, rectRedondo, tam, useU }
   from '../svg.jsx'
 
 const ID = 'V14'
@@ -24,7 +24,7 @@ export const meta = { id: ID }
 
 function medir(w, u) {
   const fF = tam(24, u), fR = tam('sec', u), fH = tam('sec', u)
-  const col = Math.max(...PL.fases.map((x) => ancho(x.fase, fF, 600)), ancho(inicial(X.hito), fH, 600))
+  const col = Math.max(...PL.fases.map((x) => ancho(x.fase, fF, 600)), ancho(X.hito, fH, 400))
   const x0 = col + 32 * u
   const dw = (w - x0) / SEM_FIN
   const xs = (s) => x0 + (s - 0.5) * dw
@@ -44,7 +44,7 @@ function Dibujo({ w, h }) {
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       <g transform={`translate(0,${y0})`}>
-        <text x={0} y={m.yHitos} fontSize={m.fH} fontWeight={600} fill={CTX} dominantBaseline="central">{inicial(X.hito)}</text>
+        <text x={0} y={m.yHitos} fontSize={m.fH} fontWeight={400} fill={CTX} dominantBaseline="central">{X.hito}</text>
         <Umbral u={u} x1={m.xs(SEM_FIN)} x2={m.xs(SEM_FIN)} y1={m.yHitos} y2={m.alto} color={ACC} ancho={2} punteada />
         {SEMANAS_HITO.map((s) => {
           const fin = s === SEM_FIN

@@ -9,8 +9,7 @@
 //   CONTORNO marca de otra naturaleza o condicional (sin relleno)
 //   EJE      línea base de 1,5 u; nunca un eje con marcas
 //   PISTA, REALCE  fondos (pista de V09, fila foco de V11)
-// El verde existe solo en la tarjeta de decisión: HECHO queda exportado mientras V12 y V13 lo importen y se borra
-// cuando migren a ESTADO.
+// El verde existe solo en la tarjeta de decisión: los gráficos no lo usan.
 
 import { anchoTexto as ancho } from '../../e3/src/medir.js'
 import { useU } from './escala.js'
@@ -26,11 +25,6 @@ export const PISTA = 'var(--bd2)'
 export const REALCE = 'var(--realce)'
 export const BORDE = 'var(--bd)'
 export const SUP = 'var(--sup, #fff)'
-// (18/11) El gris de contexto pasa de #a9b1bf a #8a94a6 (proyectado se lavaba): RELLENO queda como alias de FIN_GRIS.
-export const RELLENO = FIN_GRIS
-/** @deprecated verde de «hecha»; V12 y V13 pasan a ESTADO. */
-export const HECHO = 'var(--sem-meta, #0f7a52)'
-export const TINTE = 'var(--azul1)'
 
 /** Escala tipográfica de los SVG, en u (spec b.2). */
 export const ESCALA = { nombre: 34, valFoco: 34, val: 28, cat: 26, fila: 26, sec: 22, piso: 20 }
@@ -59,9 +53,6 @@ export function marcaEstado(estado, u) {
 /** Tamaño de letra de un papel de ESCALA (o un número en u), nunca menos de 20 u. */
 export const tam = (papel, u) => Math.max(typeof papel === 'number' ? papel : ESCALA[papel], ESCALA.piso) * u
 
-// Piso de letra viejo (13,2 px reales a 1280 × 720). Solo para letra() sin u, mientras haya vistas sin migrar.
-export const PISO = 13.2 / (1280 / 1152)
-
 /** Renglones de hasta `w` px, cortando entre palabras (un espacio duro no corta). */
 export function envolver(texto, w, f, peso = 400) {
   const out = []
@@ -69,24 +60,6 @@ export function envolver(texto, w, f, peso = 400) {
   for (const p of String(texto).split(' ')) {
     const prueba = linea ? `${linea} ${p}` : p
     if (linea && ancho(prueba, f, peso) > w) {
-      out.push(linea)
-      linea = p
-    } else linea = prueba
-  }
-  if (linea) out.push(linea)
-  return out
-}
-
-/** Ancho de un texto mono en mayúsculas. @deprecated la mono queda solo en el rótulo de la tarjeta de la banda. */
-export const anchoMono = (t, f) => ancho(String(t).toUpperCase(), f, 600, true) + 0.08 * f * String(t).length
-
-/** @deprecated envolver con la medida mono. */
-export function envolverMono(texto, w, f) {
-  const out = []
-  let linea = ''
-  for (const p of String(texto).split(' ')) {
-    const prueba = linea ? `${linea} ${p}` : p
-    if (linea && anchoMono(prueba, f) > w) {
       out.push(linea)
       linea = p
     } else linea = prueba
@@ -128,10 +101,9 @@ export function Texto({ x, y, u, papel = 'val', peso, color, anchor = 'start', b
   )
 }
 
-/** La letra más grande, entre `desde` y el piso, con la que `alto(f)` entra en `h`. Con u, el piso es 20 u (spec b.2);
- *  sin u, el piso viejo (PISO), solo mientras queden vistas sin migrar. */
+/** La letra más grande, entre `desde` y el piso de 20 u (spec b.2), con la que `alto(f)` entra en `h`. */
 export function letra(alto, h, desde, u) {
-  const piso = u != null ? ESCALA.piso * u : PISO
+  const piso = ESCALA.piso * u
   let f = Math.max(desde, piso)
   while (alto(f) > h && f > piso) f = Math.max(piso, f - 0.25)
   return f

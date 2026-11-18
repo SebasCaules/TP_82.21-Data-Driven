@@ -65,14 +65,14 @@ function Dibujo({ w, h }) {
       ))}
       <title>{`${B.deja}: ${usd(DEJA, 0)} · ${B.costo_regla}: ${usd(COSTO, 0)}`}</title>
       {/* lo que deja la lista, a la altura de la primera fila, con su guía hasta el primer cuadro */}
-      <text x={x0} y={yFila1 - 4 * u} fontSize={fCat} fontWeight={600} fill={INK}>{B.deja}</text>
-      <text x={x0} y={yFila1 + 4 * u} fontSize={fFoco} fontWeight={700} fill={INK}
+      <text x={x0} y={yFila1 - 10 * u} fontSize={fCat} fontWeight={600} fill={INK}>{B.deja}</text>
+      <text x={x0} y={yFila1 + 6 * u} fontSize={fFoco} fontWeight={700} fill={INK}
             dominantBaseline="hanging">{usd(DEJA, 0)}</text>
       <Guia u={u} x1={x0 + colIzq + 16 * u} y1={yFila1} x2={xG - 8 * u} y2={yFila1} />
       {/* el costo del primer año, colgado de la llave que recorre el alto de la cuadrícula */}
       <Llave u={u} x={xLlave} y1={yG} y2={yG + lado} lado="der" />
-      <text x={xDer} y={yMedio - 4 * u} fontSize={fCat} fill={CTX}>{B.costo_regla}</text>
-      <text x={xDer} y={yMedio + 4 * u} fontSize={fVal} fontWeight={600} fill={INK}
+      <text x={xDer} y={yMedio - 10 * u} fontSize={fCat} fill={CTX}>{B.costo_regla}</text>
+      <text x={xDer} y={yMedio + 6 * u} fontSize={fVal} fontWeight={600} fill={INK}
             dominantBaseline="hanging">{usd(COSTO, 0)}</text>
     </svg>
   )

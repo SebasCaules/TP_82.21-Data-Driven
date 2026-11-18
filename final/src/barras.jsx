@@ -103,20 +103,8 @@ export function BarrasFin({ w, h, datos, maximo }) {
   )
 }
 
-/** Props de la API vieja (BarrasH: formato, enfasis, formatoEje, tituloEje, referencia, anchoMin) llevadas a BarrasFin,
- *  para que las vistas sin migrar sigan dibujando. Se borra cuando todas pasen `texto` y `foco`. */
-function desdeViejo(props) {
-  if (props.datos.every((d) => d.texto != null)) return props
-  const fmt = props.formato ?? ((x) => String(x))
-  return {
-    datos: props.datos.map((d) => ({ ...d, texto: d.texto ?? fmt(d.valor), foco: d.foco ?? !!d.enfasis })),
-    maximo: props.maximo,
-  }
-}
-
 /** El dibujo para Lienzo: recibe { w, h } y devuelve el BarrasFin. */
 export const barras = (props) => function Dibujo({ w, h }) {
-  const p = desdeViejo(props)
-  return <BarrasFin datos={p.datos} maximo={p.maximo} w={w} h={h} />
+  return <BarrasFin datos={props.datos} maximo={props.maximo} w={w} h={h} />
 }
 

@@ -31,7 +31,7 @@ function medir(w, u) {
     const ln = envolver(e.nombre, bw - 2 * pad, fN, 700)
     const le = envolver(inicial(e.estado), bw - 2 * pad, fE, 600)
     const lq = envolver(e.que, bw - 2 * pad, fQ)
-    const alto = borde + pad + ln.length * fN * 1.1 + 8 * u + le.length * fE * 1.25 + 16 * u + lq.length * fQ * 1.25 + pad
+    const alto = borde + pad + ln.length * fN * 1.25 + 8 * u + le.length * fE * 1.25 + 16 * u + lq.length * fQ * 1.25 + pad
     return { ...e, ln, le, lq, alto, marca: ESTADOS[i] }
   })
   return { paso, bw, pad, borde, fN, fE, fQ, cajas, alto: Math.max(...cajas.map((c) => c.alto)) }
@@ -62,13 +62,13 @@ function Dibujo({ w, h }) {
         const x0 = i * (m.bw + m.paso)
         const xT = x0 + m.pad
         const yN = yTop + m.borde + m.pad
-        const yE = yN + c.ln.length * m.fN * 1.1 + 8 * u
+        const yE = yN + c.ln.length * m.fN * 1.25 + 8 * u
         const yQ = yE + c.le.length * m.fE * 1.25 + 16 * u
         return (
           <g key={c.nombre}>
             <title>{`${c.nombre} (${c.estado}): ${c.que}`}</title>
             <Caja u={u} x={x0} y={yTop} w={m.bw} h={m.alto} estado={c.marca} borde={m.borde} />
-            <Renglones lineas={c.ln} x={xT} y={yN} f={m.fN} peso={700} color={INK} inter={1.1} />
+            <Renglones lineas={c.ln} x={xT} y={yN} f={m.fN} peso={700} color={INK} />
             <Renglones lineas={c.le} x={xT} y={yE} f={m.fE} peso={600} color={CTX} />
             <Renglones lineas={c.lq} x={xT} y={yQ} f={m.fQ} peso={400} color={CTX} />
             {i < m.cajas.length - 1 && <Chevron u={u} x={x0 + m.bw + m.paso / 2} y={yTop + m.alto / 2} />}

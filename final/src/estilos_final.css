@@ -77,6 +77,11 @@
   color: var(--e3-ctx);
 }
 .e3-vp .fin-banda .e2-banda-cifras .ban-par { margin: 0; }
+/* La fila de la cifra mide lo mismo en las dos tarjetas de V04 (48 u y 36 u): rótulo, cifra y fragmento quedan en la misma
+   línea en las dos. */
+.e3-vp .fin-banda .e2-banda-cifras .tarjeta .par-item {
+  display: flex; align-items: flex-end; min-height: calc(var(--fin-t-cifra) * 1.1);
+}
 .e3-vp .fin-banda .e2-banda-cifras .tarjeta .par-val.e2-cifra {
   font: 700 var(--fin-t-cifra)/1.1 var(--fuente); letter-spacing: -.02em; color: var(--ink);
   font-variant-numeric: normal;
