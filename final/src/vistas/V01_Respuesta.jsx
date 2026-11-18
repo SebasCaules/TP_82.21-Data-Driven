@@ -1,10 +1,11 @@
-// V01 de MUESTRA (17/11): prueba el armazón de /final/ con una banda (Banda y TarjetaDecision del E2), dos cifras de D3 y
+// V01 de MUESTRA (17/11): prueba el armazón de /final/ con una banda (Banda y TarjetaDecision del E2), dos cifras de DF y
 // un gráfico de src/graficos.jsx (BarrasH). La reemplaza la unidad de contenido.
-// Ninguna cifra ni texto escrito acá: los valores salen de D3 (e3/src/datos_e3.js) con formato.js y el texto, de CF.
+// Ninguna cifra ni texto escrito acá: los valores salen de DF (final/src/datos_final.js, anclas por id del registro del
+// E4) con formato.js y el texto, de CF.
 
 import { BarrasH, Lienzo } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
-import { D3 } from '../../../e3/src/datos_e3.js'
+import { DF } from '../datos_final.js'
 import { fijo, pct } from '../../../e3/src/formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { textosDe, decisionDe } from '../textos.js'
@@ -12,26 +13,25 @@ import TarjetaCifra from '../TarjetaCifra.jsx'
 
 const ID = 'V01'
 const T = textosDe(ID)
-const TE = D3.test
-const TOPE = fijo(D3.tecnica.escala[D3.tecnica.escala.length - 1].hasta, 0)
-const M = TE.metodos
+const A = DF.anclas
+const TOPE = fijo(DF.tablas.escala_tecnica.hasta, 0)
 
 export const meta = { id: ID }
 
 export default function V01Respuesta() {
   const k = useEscalaTexto()
   const barras = [
-    { etiqueta: T.barras.logistica, valor: M.logistica_ajustada.test.precision },
-    { etiqueta: T.barras.regla, valor: M.regla.test.precision, enfasis: true },
-    { etiqueta: T.barras.practica, valor: M.practica_actual.test.precision },
+    { etiqueta: T.barras.logistica, valor: A['J03.logistica'].valor },
+    { etiqueta: T.barras.regla, valor: A['J03.regla'].valor, enfasis: true },
+    { etiqueta: T.barras.practica, valor: A.J17.valor },
   ]
   return (
     <section className="pant fin-v01">
       <Banda dcs={[decisionDe(T)]}>
         <TarjetaCifra central span={3} rotulo={T.central.rotulo} linea={T.central.linea}
-                      valor={pct(TE.conjunto.tasa, 2)} />
+                      valor={pct(A['J02.tasa'].valor, 2)} />
         <TarjetaCifra span={2} rotulo={T.secundaria.rotulo} linea={T.secundaria.linea}
-                      valor={`${fijo(D3.tecnica.promedio, 2)}[[/${TOPE}]]`} />
+                      valor={`${fijo(A.F16.valor, 2)}[[/${TOPE}]]`} />
       </Banda>
 
       <div className="tarjeta fin-graf">

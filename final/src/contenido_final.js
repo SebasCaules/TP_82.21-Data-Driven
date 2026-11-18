@@ -1,5 +1,5 @@
-// Textos de /final/, la presentación final (24/11). Decisión N0-7 de la corrida «presentación final»: /final/ no tiene
-// pipeline propio. Las cifras salen de D3 (e3/src/datos_e3.js, una sola fuente) y todo el texto sale de acá.
+// Textos de /final/, la presentación final (24/11). Las cifras salen de DF (final/src/datos_final.js, que escribe
+// pipeline/build_final.py desde los JSON del vault) y todo el texto sale de acá.
 //
 // ESTE ARCHIVO ES DE MUESTRA (CF.MUESTRA = true): los textos prueban el andamiaje (riel, notas, tiempos, impresión) y
 // los reemplaza la unidad que carga el contenido cuando exista el canon. scripts/verificar_final.py --sin-muestra falla
@@ -52,7 +52,7 @@ export const CF = {
             decision: {
               area: 'Veredicto',
               estado: 'con condiciones',
-              corta: 'MUESTRA: viable con condiciones, solo como piloto',
+              corta: 'MUESTRA: no viable como proyecto, piloto mínimo',
               larga: 'MUESTRA. Texto completo de la decisión, para el title de la tarjeta.',
             },
           },

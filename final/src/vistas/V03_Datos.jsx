@@ -1,10 +1,11 @@
 // V03 de MUESTRA (17/11): segunda vista de prueba del armazón de /final/, en otro bloque y con otro integrante, para
 // ejercitar el riel, las notas y los tiempos por bloque. La reemplaza la unidad de contenido.
-// Ninguna cifra ni texto escrito acá: los valores salen de D3 (e3/src/datos_e3.js) con formato.js y el texto, de CF.
+// Ninguna cifra ni texto escrito acá: los valores salen de DF (final/src/datos_final.js, anclas por id del registro del
+// E4) con formato.js y el texto, de CF.
 
 import { BarrasH, Lienzo } from '../../../src/graficos.jsx'
 import Banda from '../../../e2/src/Banda.jsx'
-import { D3 } from '../../../e3/src/datos_e3.js'
+import { DF } from '../datos_final.js'
 import { entero, fijo, pctDirecto } from '../../../e3/src/formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { textosDe, decisionDe } from '../textos.js'
@@ -12,21 +13,21 @@ import TarjetaCifra from '../TarjetaCifra.jsx'
 
 const ID = 'V03'
 const T = textosDe(ID)
-const TEC = D3.tecnica
-const TOPE = TEC.escala[TEC.escala.length - 1].hasta
+const A = DF.anclas
+const TOPE = DF.tablas.escala_tecnica.hasta
 
 export const meta = { id: ID }
 
 export default function V03Datos() {
   const k = useEscalaTexto()
-  const barras = TEC.condiciones.map((c) => ({ etiqueta: c.nombre, valor: c.puntaje, enfasis: c.id === 'capacidad_humana' }))
+  const barras = DF.tablas.condiciones.map((c) => ({ etiqueta: c.nombre, valor: c.puntaje, enfasis: c.id === 'capacidad_humana' }))
   return (
     <section className="pant fin-v03">
       <Banda dcs={[decisionDe(T)]}>
         <TarjetaCifra central span={3} rotulo={T.central.rotulo} linea={T.central.linea}
-                      valor={pctDirecto(TEC.ventas_sin_cliente_pct, 1)} />
+                      valor={pctDirecto(A.C19.valor, 1)} />
         <TarjetaCifra span={2} rotulo={T.secundaria.rotulo} linea={T.secundaria.linea}
-                      valor={entero(TEC.positivos_entrenamiento)} />
+                      valor={entero(A.G10.valor)} />
       </Banda>
 
       <div className="tarjeta fin-graf">

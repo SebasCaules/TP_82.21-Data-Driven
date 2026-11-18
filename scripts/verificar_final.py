@@ -4,7 +4,7 @@
                                                                   [--sin-esqueletos] [--sin-muestra]
 
 (17/11) Es scripts/verificar_e3.py para la presentación final, con las expectativas de contenido leídas de CF
-(final/src/contenido_final.js) y de D3 (e3/src/datos_e3.js) en vez de escritas acá: el script no cambia cuando cambian las
+(final/src/contenido_final.js) y de DF (final/src/datos_final.js, de pipeline/build_final.py) en vez de escritas acá: el script no cambia cuando cambian las
 vistas. Los dos módulos se leen con node, tal como los importa el tablero. La paridad de letra y cajas con /e2/ la mide
 scripts/paridad_final.py. Esto cubre lo demás:
 
@@ -17,7 +17,7 @@ scripts/paridad_final.py. Esto cubre lo demás:
    rótulo de cada vista, su número por posición, el rótulo de cada bloque y el subtítulo). En cada vista con contenido:
    la tarjeta de decisión dice «área · estado» y la frase corta de CF; los rótulos y fragmentos de la banda y qué mide
    son textos de CF; la conclusión empieza con la de CF.
-4. Contra D3, en cada vista con contenido: cada cifra de la banda y de la conclusión es un valor de D3 escrito con las
+4. Contra DF, en cada vista con contenido: cada cifra de la banda y de la conclusión es un valor de DF escrito con las
    reglas de e3/src/formato.js (el navegador no inventa números). Reglas de la banda del E3: una cifra por tarjeta, una
    sola al tamaño máximo y en la tarjeta central, que va primera; rótulos de 22 caracteres o menos; fragmentos de 2 a 6
    palabras sin otro número; un gráfico con su conclusión arriba; ningún texto del gráfico pisa a otro; terracota solo si
@@ -56,7 +56,7 @@ from playwright.sync_api import sync_playwright
 APP = Path(__file__).resolve().parents[1]
 HTML = APP / "dist-final" / "index.html"
 CF_JS = APP / "final" / "src" / "contenido_final.js"
-D3_JS = APP / "e3" / "src" / "datos_e3.js"
+DF_JS = APP / "final" / "src" / "datos_final.js"
 RES = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
 CAPTURAR = {(1280, 720), (1920, 1080)}
 NOTAS_RES = {(1366, 768), (1536, 864)}
@@ -68,7 +68,7 @@ def k_de(w, h):
     return max(1.0, min(1.2, w / 1152, h / 640))
 
 
-# ---------------------------------------------------------------- lectura de CF y D3
+# ---------------------------------------------------------------- lectura de CF y DF
 
 def leer_modulo(ruta: Path, var: str):
     """El objeto exportado `var` de un módulo ES, importado con node tal como lo importa el tablero."""
@@ -139,8 +139,8 @@ def cadenas(x):
     return set()
 
 
-def numeros_d3(D3):
-    """Cada número de D3 escrito como lo escribe formato.js: con 0 a 3 decimales, como viene o ×100 (pct), con y sin
+def numeros_df(DF):
+    """Cada número de DF (anclas y tablas) escrito como lo escribe formato.js: con 0 a 3 decimales, como viene o ×100 (pct), con y sin
     signo. Una cifra de la pantalla tiene que ser una de estas."""
     salida = set()
 
@@ -158,7 +158,8 @@ def numeros_d3(D3):
         elif isinstance(x, list):
             for v in x:
                 recorrer(v)
-    recorrer(D3)
+    recorrer(DF["anclas"])
+    recorrer(DF["tablas"])
     return salida
 
 
@@ -408,13 +409,13 @@ def contenido(p: Pagina, v, c, cadenas_cf, nums):
             p.mal(f"{hid}: el fragmento «{lin}» tiene {len(lin.split())} palabras (de 2 a 6)")
         if re.search(r"\d", lin):
             p.mal(f"{hid}: el fragmento «{lin}» trae otro número")
-    # cada cifra de la banda y de la conclusión es un valor de D3
+    # cada cifra de la banda y de la conclusión es un valor de DF
     for x in c["banda"] + c["conclusionCifras"]:
         m = NUMERO.search(norm(x))
         if not m:
             p.mal(f"{hid}: la cifra «{x}» no tiene número")
         elif m.group(0) not in nums:
-            p.mal(f"{hid}: la cifra «{norm(x)}» no es ningún valor de D3 escrito con formato.js")
+            p.mal(f"{hid}: la cifra «{norm(x)}» no es ningún valor de DF escrito con formato.js")
     # el gráfico
     if c["graficos"] != 1:
         p.mal(f"{hid}: {c['graficos']} gráficos (uno por vista)")
@@ -628,10 +629,10 @@ def main():
         print("RESULTADO: FALLA")
         sys.exit(1)
     CF = leer_modulo(CF_JS, "CF")
-    D3 = leer_modulo(D3_JS, "D3")
+    DF = leer_modulo(DF_JS, "DF")
     V, bloques, total = historia(CF)
     cadenas_cf = cadenas(CF)
-    nums = numeros_d3(D3)
+    nums = numeros_df(DF)
     out = Path(a.capturas)
     if not a.sin_capturas:
         out.mkdir(parents=True, exist_ok=True)

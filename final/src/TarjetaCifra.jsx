@@ -1,6 +1,6 @@
 // Una tarjeta de cifra de la banda (17/11), la misma que repetían las vistas del E3 (V02, V05): rótulo de 22 caracteres o
 // menos, una cifra (Cifra de e3/src/cifra.jsx) y un fragmento de 2 a 6 palabras sin otro número. La central va primera,
-// sola al tamaño máximo; las demás, con `sec`. El rótulo y el fragmento salen de CF; la cifra, de D3 con formato.js.
+// sola al tamaño máximo; las demás, con `sec`. El rótulo y el fragmento salen de CF; la cifra, de DF con formato.js.
 
 import { Cifra } from '../../e3/src/cifra.jsx'
 
