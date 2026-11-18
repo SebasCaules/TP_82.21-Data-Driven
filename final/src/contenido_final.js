@@ -312,7 +312,7 @@ export const CF = {
         {
           id: 'V09',
           titulo: 'Cuándo pasa',
-          pregunta: `Hacen falta ${fijo(v('G67.con_descuento'))} puntos; lo observado da menos de ${fijo(MENOS_DE)}`,
+          pregunta: `Pasa con ${fijo(v('G67.con_descuento'))} puntos; lo observado da menos de ${fijo(MENOS_DE)}`,
           fuente: 'E3, Parte B v3.0',
           segundos: 85,
           textos: {
