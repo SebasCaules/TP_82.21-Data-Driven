@@ -60,8 +60,8 @@ function Dibujo({ w, h }) {
   const fCtx = tam(36, u)
   const fNota = tam(24, u)
   const altoNombres = Math.max(...tramos.map((t) => t.n.lt.length * t.n.f * 1.25 + (t.nota ? fNota * 1.25 : 0)))
-  // (18/11, intermedio) la barra crece con el alto para que el bloque ocupe LLENA del lienzo, entre 120 u y 260 u
-  const altoBarra = Math.min(260 * u, Math.max(120 * u, LLENA * h - (fVal + 12 * u + 16 * u + altoNombres)))
+  // (18/11, intermedio) la barra crece con el alto para que el bloque ocupe LLENA del lienzo, desde 120 u
+  const altoBarra = Math.max(120 * u, LLENA * h - (fVal + 12 * u + 16 * u + altoNombres))
   const alto = fVal + 12 * u + altoBarra + 16 * u + altoNombres
   const y0 = Math.max(0, (h - alto) / 2)
   const yBarra = y0 + fVal + 12 * u

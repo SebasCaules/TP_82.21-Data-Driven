@@ -124,11 +124,10 @@
 /* Notas: el renglón de quién presenta va pegado al de arriba. */
 .fin-notas-quien { margin-top: -4px; }
 
-/* ---------- prototipo híbrido (18/11, fase 6; hibrido.js): solo V01 y V09 ---------- */
+/* ---------- modo híbrido (18/11, fases 6 y 7; hibrido.js): las quince vistas, con MODO 'medio' ---------- */
 /* El marco y el gráfico del rediseño; la banda de tres tarjetas a 3:2:2 con la verde a un tercio, la fila «Decisión ·
    área · estado», qué mide y la conclusión de 8e633e8. Presupuesto a 1920 × 1080: encabezado 96 u, banda 190 u, bloque
-   de conclusión unos 110 u y el lienzo con el resto (unos 530 u). Todo bajo .fin-hib o .fin-enc-hib: las otras trece
-   vistas no cambian. */
+   de conclusión unos 110 u y el lienzo con el resto (unos 530 u). Todo bajo .fin-hib o .fin-enc-hib. */
 .e3-vp {
   --fin-h-cifra: calc(var(--fin-u) * 60);
   --fin-h-cifra2: calc(var(--fin-u) * 44);
@@ -209,6 +208,12 @@
    con su fila a 7/12; sin qué mide, el lienzo gana su renglón. */
 .e3-vp .fin-hib.fin-hib-medio .fin-banda .e2-banda { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
 .e3-vp .fin-hib.fin-hib-medio .fin-banda .e2-banda > .e2-banda-cifras { grid-template-columns: minmax(0, 1fr); }
+/* El contenido de las dos tarjetas, centrado en vertical: con una frase corta en la decisión no queda aire abajo. */
+.e3-vp .fin-hib.fin-hib-medio .fin-banda .e2-banda-cifras > .tarjeta { align-content: center; }
+.e3-vp .fin-hib.fin-hib-medio .fin-banda .e2-banda > .tarjeta-dec { justify-content: center; }
+/* La conclusión llena el renglón antes de partirlo (pretty, no balance, que la dejaba en dos renglones cortos) y no deja
+   una palabra sola en el último. */
+.e3-vp .fin-hib.fin-hib-medio .fin-graf .e3-conclusion { text-wrap: pretty; }
 
 /* Hoja impresa: la unidad de la ventana lógica mínima. */
 @media print {

@@ -48,6 +48,16 @@ la especificación nueva (.workforce/auditoria-dataviz/fase-2/spec.md) en lugar 
 - sin código del eje viejo en final/src (BarrasH, formatoEje, tituloEje), sin useEscalaTexto ni HECHO en las vistas;
 - la tecla P oculta y muestra el riel (S-10), que por defecto se ve.
 
+(18/11, fase 7, el intermedio que eligió el usuario: hibrido.js con MODO 'medio') Sobre lo anterior cambian estas reglas:
+- el encabezado dice «n / 15 · fuente» (la referencia del documento, de CF) debajo de la barra de avance;
+- la banda trae UNA tarjeta de cifra en las 15 vistas (la central de 8e633e8), con la cifra en el acento, y la tarjeta
+  verde con su fila «Decisión · área · estado» visible;
+- la conclusión está en las 15 vistas, arriba del gráfico, y empieza con la de CF; sus cifras van en el acento;
+- el acento en un texto solo en esos dos lugares (la cifra central y las cifras de la conclusión), nunca en el gráfico;
+- la familia: la banda, la tarjeta de cifra a 5/12 y la verde a 7/12, la conclusión y el lienzo en el mismo lugar y del
+  mismo tamaño que en V01 (1 u de tolerancia); ningún texto del gráfico fuera del lienzo ni encima de la conclusión;
+- en las ventanas 16:9, el dibujo (sin las líneas de base) ocupa entre el 70 % y el 90 % del alto del lienzo.
+
 Capturas de cada vista con contenido a 1280×720 y 1920×1080 en final/capturas-verif/ (fuera del control de versiones).
 Termina con «RESULTADO: OK» o con la lista de problemas, «RESULTADO: FALLA» y código 1.
 """
@@ -85,11 +95,11 @@ NBSP = " "
 MENOS = "−"
 
 
-# (18/11, spec g y e.1) Las únicas excepciones por vista de la plantilla: dos tarjetas de cifra en V04 (los dos parámetros
-# del umbral) y la conclusión en V13 (dice qué probó la PoC y qué falta).
-DOS_TARJETAS = {"V04"}
-CON_CONCLUSION = {"V13"}
+# (18/11, fase 7, intermedio) Sin excepciones por vista: una tarjeta de cifra y la conclusión en las 15.
+VISTAS = 15
 PISO_U = 20
+LLENA = (0.70, 0.90)      # alto del dibujo / alto del lienzo, en ventanas 16:9
+TOL_U = 1.0               # tolerancia de la familia, en u
 
 
 def k_de(w, h):
@@ -293,12 +303,42 @@ LEER_VISTA = r"""() => {
       const fs = parseFloat(cs.fontSize)
       if (fs < 20 * u - 0.05) chicos.push(`«${t}» a ${(fs / u).toFixed(1)} u`)
       const c = el instanceof SVGElement ? cs.fill : cs.color
-      if (c === ACC) acento.push(`«${t}»`)
+      // (fase 7, intermedio) el acento en un texto, solo en la cifra central y en las cifras de la conclusión
+      if (c === ACC && !el.closest('.e2-central .par-val, .e3-conclusion b')) acento.push(`«${t}»`)
     }
   }
   const lienzo = q('.cuerpo .fin-lienzo')
+  // (fase 7, intermedio) la geometría de la familia, en u desde la esquina de .e3-vp, y el llenado del lienzo
+  const z = vp.currentCSSZoom ?? 1, s = u * z, o = vp.getBoundingClientRect()
+  const caja = (el) => { if (!el) return null; const r = el.getBoundingClientRect()
+    return [(r.left - o.left) / s, (r.top - o.top) / s, r.width / s, r.height / s] }
+  const lb = lienzo?.getBoundingClientRect()
+  let top = Infinity, bot = -Infinity, fuera = []
+  for (const el of lienzo ? lienzo.querySelectorAll('svg *') : []) {
+    const tag = el.tagName.toLowerCase()
+    if (['g', 'svg', 'title', 'defs', 'tspan', 'desc'].includes(tag)) continue
+    const r = el.getBoundingClientRect()
+    if (!r.width && !r.height) continue
+    if (tag === 'text' && el.textContent.trim() &&
+        (r.left < lb.left - 2 || r.right > lb.right + 2 || r.top < lb.top - 2 || r.bottom > lb.bottom + 2))
+      fuera.push(`«${el.textContent.trim().slice(0, 32)}»`)
+    if (tag === 'line') continue
+    top = Math.min(top, r.top); bot = Math.max(bot, r.bottom)
+  }
+  const central = q('.e2-banda-cifras > .tarjeta.e2-central .par-val')
+  const filaDec = q('.tarjeta-dec .kpi-lbl')
+  const geom = {
+    banda: caja(q('.fin-banda .e2-banda')), cifra: caja(q('.e2-banda-cifras > .tarjeta')), dec: caja(q('.tarjeta-dec')),
+    concl: caja(concl), lienzo: caja(lienzo), graf: caja(q('.fin-graf')),
+    conclFs: concl ? parseFloat(getComputedStyle(concl).fontSize) / u : null,
+  }
   return {
-    u, chicos, acento,
+    u, chicos, acento, geom, fuera,
+    llena: lb && bot > top ? (bot - top) / lb.height : null,
+    conclPisa: !!(concl && lb && concl.getBoundingClientRect().bottom > lb.top + 1),
+    centralAcento: !!central && getComputedStyle(central).color === ACC,
+    conclAcento: concl ? [...concl.querySelectorAll('b')].every((b) => getComputedStyle(b).color === ACC) : false,
+    filaDec: !!filaDec && filaDec.getClientRects().length > 0 && getComputedStyle(filaDec).display !== 'none',
     lienzoAria: lienzo?.getAttribute('aria-label') ?? null,
     corteTitle: q('.e2-enc-corte')?.getAttribute('title') ?? '',
     preg: q('.e2-preg')?.textContent ?? '', corte: q('.e2-enc-corte')?.textContent ?? '', titulo: document.title,
@@ -393,6 +433,7 @@ def vistas(p: Pagina, w, h, V, bloques, CF, cadenas_cf, nums, out, capturar, sin
     k = k_de(w, h)
     total = len(V)
     hay_muestra = False
+    ref = {}
     for v in V:
         p.ir(v["hid"])
         if p.estado()["hash"] != f"#{v['hid']}":
@@ -414,22 +455,54 @@ def vistas(p: Pagina, w, h, V, bloques, CF, cadenas_cf, nums, out, capturar, sin
         # encabezado y pestaña, contra CF
         if norm(c["preg"]) != norm(v["pregunta"]):
             p.mal(f"{v['hid']}: la pregunta dice «{c['preg']}», CF dice «{v['pregunta']}»")
-        corte = f"{v['n']} / {total}"
+        # (fase 7, intermedio) «n / 15 · fuente»: la referencia del documento se lee en el encabezado
+        corte = f"{v['n']} / {total}" + (f" · {v['fuente']}" if v.get("fuente") else "")
         if norm(c["corte"]) != norm(corte):
             p.mal(f"{v['hid']}: el encabezado dice «{c['corte']}», se esperaba «{corte}»")
-        if norm(c["corteTitle"]) != norm(v.get("fuente") or ""):
-            p.mal(f"{v['hid']}: el title del contador es «{c['corteTitle']}», CF dice «{v.get('fuente') or ''}»")
         for x in c["chicos"]:
             p.mal(f"{v['hid']}: texto por debajo de {PISO_U} u {x}")
         for x in c["acento"]:
-            p.mal(f"{v['hid']}: texto en el acento (--acc va solo en marcas) {x}")
+            p.mal(f"{v['hid']}: texto en el acento fuera de la cifra central y de la conclusión {x}")
         if norm(c["titulo"]) != norm(f"{v['pregunta']} · {CF['TITULO']}"):
             p.mal(f"{v['hid']}: el título de la pestaña es «{c['titulo']}»")
         revisar_estado(p, v["hid"], c)
         if r["esqueleto"]:
             continue
         contenido(p, v, c, cadenas_cf, nums)
+        familia(p, v, c, w, h, ref)
     return hay_muestra
+
+
+def familia(p: Pagina, v, c, w, h, ref):
+    """(fase 7, intermedio) Las 15 vistas, una familia: la banda, las dos tarjetas, la conclusión y el lienzo en el mismo
+    lugar y del mismo tamaño que en la primera vista; la tarjeta de cifra a 5/12 del ancho de las dos; el dibujo llena
+    entre el 70 % y el 90 % del alto del lienzo en las ventanas 16:9; ningún texto fuera del lienzo."""
+    hid, g = v["hid"], c["geom"]
+    if not ref:
+        ref.update(g)
+    else:
+        for pieza in ("banda", "cifra", "dec", "graf", "lienzo"):
+            a, b = g.get(pieza), ref.get(pieza)
+            if a is None or b is None:
+                continue
+            if pieza == "lienzo":   # el lienzo empieza donde termina la conclusión (uno o dos renglones): solo x y ancho
+                a, b = [a[0], a[2]], [b[0], b[2]]
+            if max(abs(x - y) for x, y in zip(a, b)) > TOL_U:
+                p.mal(f"{hid}: {pieza} en {[round(x, 1) for x in a]} u; en la primera vista, {[round(x, 1) for x in b]} u")
+        if g.get("concl") and ref.get("concl") and max(abs(g["concl"][i] - ref["concl"][i]) for i in (0, 1, 2)) > TOL_U:
+            p.mal(f"{hid}: la conclusión empieza en otro lugar o tiene otro ancho que en la primera vista")
+        if g.get("conclFs") and ref.get("conclFs") and abs(g["conclFs"] - ref["conclFs"]) > 0.05:
+            p.mal(f"{hid}: la conclusión mide {g['conclFs']:.1f} u y en la primera vista {ref['conclFs']:.1f} u")
+    if g.get("cifra") and g.get("dec"):
+        prop = g["cifra"][2] / (g["cifra"][2] + g["dec"][2])
+        if abs(prop - 5 / 12) > 0.01:
+            p.mal(f"{hid}: la tarjeta de cifra ocupa {prop:.3f} del ancho de la banda (5/12 = 0,417)")
+    for x in c["fuera"]:
+        p.mal(f"{hid}: texto del gráfico fuera del lienzo {x}")
+    if c["conclPisa"]:
+        p.mal(f"{hid}: la conclusión se mete en el lienzo")
+    if w / h > 1.7 and c["llena"] is not None and not LLENA[0] - 0.005 <= c["llena"] <= LLENA[1] + 0.005:
+        p.mal(f"{hid}: el dibujo ocupa el {c['llena']:.0%} del alto del lienzo (del 70 % al 90 %)")
 
 
 def negra_canon(texto):
@@ -465,12 +538,14 @@ def contenido(p: Pagina, v, c, cadenas_cf, nums):
             p.mal(f"{hid}: la frase de la decisión tiene {len(norm(c['decLlano']))} caracteres (60 o menos)")
     elif c["dec"] is not None:
         p.mal(f"{hid}: tiene tarjeta de decisión y CF no trae textos.decision")
-    # la banda (spec e.1): 0 o 1 tarjeta de cifra (2 en V04), una cifra por tarjeta, la central primera y sola al
-    # tamaño máximo
+    # la banda (fase 7, intermedio): una tarjeta de cifra, la central, con su cifra en el acento; la verde con su fila
     n_tarj = len(c["porTarjeta"])
-    tope = 2 if v["id"] in DOS_TARJETAS else 1
-    if n_tarj > tope:
-        p.mal(f"{hid}: {n_tarj} tarjetas de cifra en la banda (como mucho {tope})")
+    if n_tarj != 1:
+        p.mal(f"{hid}: {n_tarj} tarjetas de cifra en la banda (una, la central)")
+    elif not c["centralAcento"]:
+        p.mal(f"{hid}: la cifra de la tarjeta central no está en el acento")
+    if d and not c["filaDec"]:
+        p.mal(f"{hid}: la tarjeta de decisión no muestra su fila «Decisión · área · estado»")
     if c["porTarjeta"] != [1] * n_tarj:
         p.mal(f"{hid}: cifras por tarjeta de la banda {c['porTarjeta']} (una por tarjeta)")
     if n_tarj and not c["grandeCentral"]:
@@ -500,14 +575,17 @@ def contenido(p: Pagina, v, c, cadenas_cf, nums):
     # el gráfico
     if c["graficos"] != 1:
         p.mal(f"{hid}: {c['graficos']} gráficos (uno por vista)")
-    # (spec d) la conclusión, solo donde la vista la pide; qué mide, fuera de la pantalla, en el aria-label del lienzo
-    if v["id"] in CON_CONCLUSION:
-        if not norm(c["conclusion"]):
-            p.mal(f"{hid}: el gráfico no tiene su conclusión arriba (.e3-conclusion)")
-        elif t.get("conclusion") and not norm(c["conclusion"]).startswith(norm(plano(t["conclusion"]))):
+    # (fase 7, intermedio) la conclusión en las 15, con sus cifras en el acento; qué mide, fuera de la pantalla, en el
+    # aria-label del lienzo
+    if not norm(c["conclusion"]):
+        p.mal(f"{hid}: el gráfico no tiene su conclusión arriba (.e3-conclusion)")
+    else:
+        if not t.get("conclusion"):
+            p.mal(f"{hid}: CF no trae textos.conclusion y la vista muestra una")
+        elif not norm(c["conclusion"]).startswith(norm(plano(t["conclusion"]))):
             p.mal(f"{hid}: la conclusión «{c['conclusion']}» no empieza con la de CF")
-    elif c["conclusion"] is not None:
-        p.mal(f"{hid}: tiene conclusión y la especificación la deja solo en {', '.join(sorted(CON_CONCLUSION))}")
+        if c["conclusionCifras"] and not c["conclAcento"]:
+            p.mal(f"{hid}: las cifras de la conclusión no están en el acento")
     if c["mide"] is not None:
         p.mal(f"{hid}: qué mide sigue en pantalla (.fin-mide); va al aria-label de .fin-lienzo")
     if t.get("mide") and norm(c["lienzoAria"]) != norm(plano(t["mide"])):
@@ -709,6 +787,8 @@ def estatico(V, CF):
     ids = [v["id"] for v in V]
     if len(set(ids)) != len(ids):
         mal.append(f"CF: ids repetidos {ids}")
+    if len(ids) != VISTAS:
+        mal.append(f"CF: {len(ids)} vistas (se presentan {VISTAS})")
     for v in V:
         if len(v["pregunta"]) > 74:
             mal.append(f"CF: la pregunta de {v['id']} tiene {len(v['pregunta'])} caracteres (74 o menos)")

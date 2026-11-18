@@ -1,8 +1,9 @@
 // La forma común de las vistas de /final/ (17/11, F6; 18/11, spec de dataviz d y e). Arriba la banda (Banda del E2):
 // la tarjeta de cifra, o dos en V04, y la tarjeta de decisión; sin tarjetas, la decisión ocupa la banda entera (variante
 // sola). Abajo, una tarjeta con un solo gráfico, centrado en vertical en su lienzo. Qué mide no se dibuja: es el
-// aria-label del lienzo. La conclusión aparece solo si la vista la pide (conclusion), hoy solo V13. Los textos salen de
-// CF (textosDe) y las cifras, de DF. Nada de texto escrito acá.
+// aria-label del lienzo. La conclusión aparece solo si la vista la pide (conclusion). Los textos salen de CF (textosDe) y
+// las cifras, de DF. Nada de texto escrito acá. (18/11, fase 7) Las quince vistas pasan `hibrido` y se dibujan con
+// VistaHibrida en el modo de hibrido.js ('medio': una tarjeta de cifra, la verde con su fila y la conclusión siempre).
 //
 //   <Vista id="V08" items={[{ clave, valor }]} conclusion={false} cifras={[]}>{dibujo}</Vista>
 

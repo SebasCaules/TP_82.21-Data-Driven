@@ -1,9 +1,25 @@
-// Prototipo híbrido (18/11, fase 6 de la auditoría de dataviz): el marco y el gráfico del rediseño con la banda de tres
-// tarjetas, la tarjeta verde con su fila «Decisión · área · estado», el bloque de qué mide y la conclusión de la versión
-// anterior (8e633e8). Se prueba en estas vistas antes de llevarlo a las otras trece. App.jsx lo lee para el encabezado
-// (la fuente vuelve debajo de «n / 15»); cada vista de la lista pasa `hibrido` a Plantilla.jsx.
+// Modo híbrido (18/11, fases 6 y 7 de la auditoría de dataviz): el marco y el gráfico del rediseño con la banda, la tarjeta
+// verde con su fila «Decisión · área · estado» y la conclusión de la versión anterior (8e633e8). Probado en V01 y V09 y
+// llevado a las quince en la fase 7, con MODO 'medio' (el intermedio que eligió el usuario). App.jsx lo lee para el
+// encabezado (la fuente vuelve debajo de «n / 15»); cada vista de la lista pasa `hibrido` a Plantilla.jsx.
 
-export const HIBRIDAS = new Set(['V01', 'V09'])
+export const HIBRIDAS = new Set([
+  'V01',
+  'V02',
+  'V03',
+  'V04',
+  'V05',
+  'V06',
+  'V07',
+  'V08',
+  'V09',
+  'V10',
+  'V11',
+  'V12',
+  'V13',
+  'V14',
+  'V15',
+])
 
 export const esHibrida = (id) => HIBRIDAS.has(id)
 

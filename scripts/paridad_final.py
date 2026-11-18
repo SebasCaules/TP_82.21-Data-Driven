@@ -13,7 +13,8 @@ tocarlo:
    importa e2/src/Banda.jsx y src/graficos.jsx (Lienzo); estilos_final.css y las hojas de las vistas no nombran clases
    del armazón fuera de .e3-vp ni usan !important fuera de @media print; src/**, e2/** y e3/** no cambian contra main.
 2. Letra del riel contra /e2/ en la misma ventana (paridad_e3.py, solo las piezas del riel: R17).
-3. Cajas del riel y de la barra de avance contra /e2/ en la ventana lógica (paridad_e3.py, solo esas piezas).
+3. Cajas del riel contra /e2/ en la ventana lógica (paridad_e3.py, solo esas piezas; la barra de avance, desde la fase 7,
+   en el paso 4).
 4. Escala de la especificación en --vista (por defecto v08: BarrasFin y una tarjeta) y el título en todas las vistas, a
    1152×640, 1280×720, 1366×768, 1536×864 y 1920×1080: título (el token de estilos_final.css, 56, 52 o 48 u), «n / 15»
    20 u, cifra central 48 u, segunda cifra 36 u (si hay), rótulo de la tarjeta 20 u, fragmento 24 u, frase de la
@@ -21,6 +22,11 @@ tocarlo:
    gráfico 32 u; rótulo de barra 26 u y valor 28 u (34 u el foco).
 5. Reglas 11 y 12 del E2 y desbordes en cada vista (paridad_e3.py: pregunta en un renglón, un gráfico, decisión de 60
    caracteres o menos, __fit, texto que no entra en su caja, riel sobre su pie).
+
+(18/11, fase 7) El intermedio que eligió el usuario (hibrido.js, MODO 'medio') cambia la escala del paso 4: encabezado de
+96 u con «n / 15 · fuente» a 20 u; banda de 190 u con una tarjeta de cifra (la central, cifra a 60 u) y la verde con su
+fila «Decisión · área · estado» a 20 u; conclusión de 31 u en todas las vistas; relleno de la tarjeta del gráfico 28 u.
+Las medidas de la banda, la conclusión y el encabezado se comprueban en las 15 vistas, no solo en --vista.
 
 Termina con «RESULTADO: OK» o con la lista de diferencias, «RESULTADO: FALLA» y código 1.
 """
@@ -48,8 +54,10 @@ _spec.loader.exec_module(P)
 # Lo que sigue igual que /e2/ (R17): el riel y la barra de avance. El resto es desvío declarado (P-01) y se mide en
 # escala() contra la especificación.
 TEXTOS_RIEL = [t for t in P.TEXTOS if t[0].startswith("riel")]
-PIEZAS_RIEL = [p for p in P.PIEZAS if p[0].startswith("riel") or p[0] == "encabezado · avance"]
-CAJAS_RIEL = {"riel": "xywh", "riel · marca": "xw", "riel · ítem": "xw", "encabezado · avance": "wh"}
+# (fase 7) La barra de avance del intermedio mide 132 × 30 u con 3 u de relleno (estilos_final.css, .fin-enc-hib): sale de
+# la paridad con /e2/ y entra a la escala (MEDIDAS).
+PIEZAS_RIEL = [p for p in P.PIEZAS if p[0].startswith("riel")]
+CAJAS_RIEL = {"riel": "xywh", "riel · marca": "xw", "riel · ítem": "xw"}
 RES_ESCALA = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
 TOL_PX = 1.0
 
@@ -63,20 +71,25 @@ def token_titulo() -> int:
 
 
 # (nombre, selector, propiedad, u esperadas; None = opcional). Tamaños de letra y cajas, en px reales (× zoom).
+# (fase 7) Escala del intermedio. Las filas con `todas` se miden en las 15 vistas; el rótulo de barra, solo en --vista.
 MEDIDAS = [
     ("título", ".e2-enc .e2-preg", "fontSize", "titulo", False),
-    ("n / 15", ".e2-enc .e2-enc-corte", "fontSize", 20, False),
-    ("cifra central", ".fin-banda .e2-central .e2-cifra", "fontSize", 48, True),
-    ("segunda cifra", ".fin-banda .e2-cifra.sec", "fontSize", 36, True),
-    ("rótulo de la tarjeta", ".fin-banda .e2-banda-cifras .kpi-lbl > span", "fontSize", 20, True),
-    ("fragmento", ".fin-banda .e2-banda-cifras .e2-linea", "fontSize", 24, True),
+    ("n / 15 · fuente", ".e2-enc .e2-enc-corte", "fontSize", 20, False),
+    ("cifra central", ".fin-banda .e2-central .e2-cifra", "fontSize", 60, False),
+    ("rótulo de la tarjeta", ".fin-banda .e2-banda-cifras .kpi-lbl > span", "fontSize", 20, False),
+    ("fragmento", ".fin-banda .e2-banda-cifras .e2-linea", "fontSize", 24, False),
+    ("fila de la decisión", ".fin-banda .tarjeta-dec .kpi-lbl", "fontSize", 20, False),
     ("frase de la decisión", ".fin-banda .tarjeta-dec .dec-llano", "fontSize", 30, False),
-    ("conclusión", ".fin-graf .e3-conclusion", "fontSize", 30, True),
-    ("alto del encabezado", ".e2-enc", "alto", 128, False),
-    ("alto de la banda", ".fin-banda .e2-banda", "alto", 160, False),
-    ("relleno de la tarjeta del gráfico", ".tarjeta.fin-graf", "paddingTop", 32, False),
+    ("conclusión", ".fin-graf .e3-conclusion", "fontSize", 31, False),
+    ("alto del encabezado", ".e2-enc", "alto", 96, False),
+    ("ancho de la barra de avance", ".e2-enc .e3-avance-barras", "ancho", 132, False),
+    ("alto de la barra de avance", ".e2-enc .e3-avance-barras", "alto", 30, False),
+    ("relleno de la barra de avance", ".e2-enc .e3-avance", "paddingTop", 3, False),
+    ("alto de la banda", ".fin-banda .e2-banda", "alto", 190, False),
+    ("relleno de la tarjeta del gráfico", ".tarjeta.fin-graf", "paddingTop", 28, False),
     ("rótulo de barra", ".fin-lienzo svg text[text-anchor=end]", "fontSize", 26, True),
 ]
+EN_TODAS = [m for m in MEDIDAS if m[0] != "rótulo de barra"]
 
 MEDIR = r"""(medidas) => {
   const vp = document.querySelector('.e3-vp')
@@ -87,7 +100,8 @@ MEDIR = r"""(medidas) => {
     const el = document.querySelector(sel)
     if (!el || !el.getClientRects().length) { out[nombre] = null; continue }
     const cs = getComputedStyle(el)
-    out[nombre] = prop === 'alto' ? el.getBoundingClientRect().height : parseFloat(cs[prop]) * z
+    out[nombre] = prop === 'alto' ? el.getBoundingClientRect().height
+      : prop === 'ancho' ? el.getBoundingClientRect().width : parseFloat(cs[prop]) * z
   }
   return { u, z, out }
 }"""
@@ -113,22 +127,26 @@ def escala(nav, vista: str, problemas: list[str]) -> None:
                 if abs(v - esperado) > TOL_PX:
                     problemas.append(f"[{res}] {vista}: {nombre} mide {v:.2f} px, la especificación dice {n} u = {esperado:.2f} px")
             filas.append(f"   {res}: u {u:.4f} px lógicos × zoom {z:.4f} = {u * z:.4f} px reales")
-            # el título, al mismo tamaño en las 15 vistas
+            # (fase 7) el título, el encabezado, la banda y la conclusión, a la misma escala en las 15 vistas
             ids = pg.evaluate(P.IDS_E3)
             for vid in ids:
                 pg.evaluate(f"() => {{ location.hash = '#{vid}' }}")
                 pg.wait_for_timeout(120)
                 pg.wait_for_function("() => !document.querySelector(':root:active-view-transition') && "
                                      "document.getAnimations().every((a) => a.playState !== 'running')", timeout=5000)
-                fs = pg.evaluate("() => parseFloat(getComputedStyle(document.querySelector('.e2-enc .e2-preg')).fontSize)"
-                                 " * (document.querySelector('.e3-vp').currentCSSZoom ?? 1)")
-                if abs(fs - tit * u * z) > TOL_PX:
-                    problemas.append(f"[{res}] {vid}: el título mide {fs:.2f} px, {tit} u = {tit * u * z:.2f} px")
+                rv = pg.evaluate(MEDIR, [[m[0], m[1], m[2]] for m in EN_TODAS])
+                for nombre, _sel, _prop, n, _op in EN_TODAS:
+                    n = tit if n == "titulo" else n
+                    v = rv["out"][nombre]
+                    if v is None:
+                        problemas.append(f"[{res}] {vid}: falta {nombre}")
+                    elif abs(v - n * u * z) > TOL_PX:
+                        problemas.append(f"[{res}] {vid}: {nombre} mide {v:.2f} px, la especificación dice {n} u = {n * u * z:.2f} px")
         finally:
             ctx.close()
         for x in err:
             problemas.append(f"[{res}] consola /final/ #{vista}: {x}")
-    print(f"4. escala de la especificación (vista {vista}, título {tit} u en todas):")
+    print(f"4. escala del intermedio (rótulo de barra en {vista}; título {tit} u, encabezado, banda y conclusión en todas):")
     print("\n".join(filas))
 
 
