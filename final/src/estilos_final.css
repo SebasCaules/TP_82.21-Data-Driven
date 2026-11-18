@@ -205,6 +205,11 @@
 .e3-vp .fin-hib .fin-graf .e3-conclusion b { font-weight: 800; color: var(--acc); }
 .e3-vp .fin-hib .fin-cab + .fin-lienzo { margin-top: var(--fin-s3); }
 
+/* Intermedio (MODO 'medio' en hibrido.js): la banda al alto del híbrido con solo la tarjeta central a 5/12 y la verde
+   con su fila a 7/12; sin qué mide, el lienzo gana su renglón. */
+.e3-vp .fin-hib.fin-hib-medio .fin-banda .e2-banda { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+.e3-vp .fin-hib.fin-hib-medio .fin-banda .e2-banda > .e2-banda-cifras { grid-template-columns: minmax(0, 1fr); }
+
 /* Hoja impresa: la unidad de la ventana lógica mínima. */
 @media print {
   .e3-vp { --fin-u: .6px !important; }

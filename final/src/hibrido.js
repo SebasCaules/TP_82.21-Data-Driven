@@ -6,3 +6,8 @@
 export const HIBRIDAS = new Set(['V01', 'V09'])
 
 export const esHibrida = (id) => HIBRIDAS.has(id)
+
+// Qué dibuja el modo híbrido en las vistas de HIBRIDAS. 'completo': las tres tarjetas, qué mide y la conclusión (04b791f).
+// 'medio': solo la tarjeta central a 5/12 y la verde con su fila a 7/12, y solo la conclusión; qué mide queda como
+// aria-label del lienzo. Plantilla.jsx lo traduce a la clase fin-hib-medio (estilos_final.css).
+export const MODO = 'medio'

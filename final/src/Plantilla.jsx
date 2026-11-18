@@ -11,6 +11,7 @@ import Banda from '../../e2/src/Banda.jsx'
 import { textosDe, decisionDe } from './textos.js'
 import TarjetaCifra from './TarjetaCifra.jsx'
 import { NBSP } from '../../e3/src/formato.js'
+import { MODO } from './hibrido.js'
 
 /** La conclusión: textos.conclusion, después cada cifra en negrita seguida del tramo que le corresponde de
  *  textos.sigue (un tramo por cifra). Tinta; la cifra en 700, sin acento (estilos_final.css). */
@@ -41,18 +42,20 @@ export function Tarjetas({ T, items }) {
 }
 
 /** Modo híbrido (hibrido.js): banda de tres tarjetas a 3:2:2 y la verde, bloque de qué mide y conclusión arriba de la
- *  tarjeta del gráfico, y el lienzo con todo lo que sobra. Las clases fin-hib* están en estilos_final.css. */
+ *  tarjeta del gráfico, y el lienzo con todo lo que sobra. Con MODO 'medio', solo la tarjeta central y solo la
+ *  conclusión (clase fin-hib-medio). Las clases fin-hib* están en estilos_final.css. */
 function VistaHibrida({ id, T, items, cifras, children }) {
+  const medio = MODO === 'medio'
   return (
-    <section className={`pant fin-hib fin-${id.toLowerCase()}`}>
+    <section className={`pant fin-hib${medio ? ' fin-hib-medio' : ''} fin-${id.toLowerCase()}`}>
       <div className="fin-banda fin-banda-hib">
         <Banda dcs={[decisionDe(T)]}>
-          <Tarjetas T={T} items={items} />
+          <Tarjetas T={T} items={medio ? items.slice(0, 1) : items} />
         </Banda>
       </div>
       <div className="tarjeta fin-graf">
         <div className="fin-cab">
-          <p className="fin-mide">{T.mide}</p>
+          {!medio && <p className="fin-mide">{T.mide}</p>}
           <Conclusion T={T} cifras={cifras} />
         </div>
         <div className="fin-lienzo" role="img" aria-label={T.mide}>
