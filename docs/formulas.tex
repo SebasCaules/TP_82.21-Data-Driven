@@ -119,6 +119,7 @@ $h_a$, $T$ & Hora de analista y costo de un taller, en dólares. \\
 $I_e$, $R_e$, $A_e$ & Inversión, costo recurrente anual y costo del primer año de la etapa $e$ que sigue al piloto: operación mínima ($e=\min$) o producción completa ($e=\text{comp}$), en dólares. \\
 $\Delta^{*}_{e,h}$, $\mathrm{pot}(\delta)$ & Umbral de pase del piloto para la etapa $e$ con el horizonte de costo $h$, y probabilidad de que el piloto vea un efecto real $\delta$. \\
 $L_1$, $V_{\mathcal T}$ & Lunes en que empieza la semana 1 del plan, y valor de la lista de la regla sumado en una ventana $\mathcal T$ de meses seguidos. \\
+$I_{\text{merc}}(T)$, $\mathcal D(T)$ & Cruce a 90 días de la lista menos el de toda la base elegible al corte $T$, en puntos, y esa base (la población del target). \\
 $\mathcal C$, $V_{\mathcal C}$ & Cortes evaluados (3 en validación, 5 en test) y valor de la lista en esos cortes llevado a un año. \\
 $P^{c}$, $R^{c}$, $\mathrm{F1}^{c}$ & Precisión, recall y F1 de la lista de 500 contactables, sumadas sobre los cortes de $\mathcal C$. \\
 $\pi_i(T)$, $\mathrm{AUC}^{c}$ & Puntaje con que se ordena la lista, y AUC-ROC de ese puntaje sobre todas las filas contactables. \\
@@ -678,9 +679,20 @@ El monitoreo en producción de la Parte D del Entregable 3 suma una alerta de dr
 \impl{D-scripts\_etapa4.zip: drift/serie\_riesgo.py, salida \texttt{serie\_riesgo.json} (\texttt{umbral\_suba\_pp} y \texttt{serie}). Usa las funciones del pipeline del repositorio (\texttt{loader}, \texttt{features.client\_facts} y la identidad unida de \texttt{calidad}).}
 \valoren{cortes de fin de mes}{la mayor suba, de 32,67\% al 30/04/2025 a 34,76\% al 31/05/2025. La proporción es 38,5\% al 31/08/2025 y 50,4\% al 31/12/2025. Con ese umbral la alerta habría saltado en octubre (+2,64), noviembre (+3,55) y diciembre de 2025 (+3,84), meses de cobertura no confirmada (DC-09).}
 % registro de cifras: J53
-% (24/11, v4.0) lugar del indicador de seguimiento de la limitación principal de la Parte C del Entregable 3
-% (devolución del E3, OBS-37, pendiente 183): cruce de la lista menos cruce de la base elegible en el mismo mes.
-% Entra cuando la unidad C deje su fila en .workforce/presentacion-final/fase-4/cifras-C.json, con su definición.
+
+% (24/11, v4.0) indicador de la limitación principal de la Parte C del Entregable 3 (devolución del E3, OBS-37,
+% pendiente 183; fila H50), sin ecuación numerada y sin número de sección de la C
+La limitación principal de la Parte C del Entregable 3 es que la lista no separa una caída del mercado de una pérdida propia. El indicador que la sigue resta, en cada corte $T$, el cruce a 90 días de toda la base elegible al cruce de la lista:
+
+\begin{equation*}
+I_{\text{merc}}(T) = 100\left(\frac{VP_{500}(T)}{500} - \frac{1}{|\mathcal D(T)|}\sum_{i\in\mathcal D(T)} Y_i(T)\right)
+\end{equation*}
+
+con $VP_{500}(T)$ los aciertos de la lista de 500 contactables de la regla, $\mathcal D(T)$ los clientes elegibles y todavía sin cruzar al corte (la población del target) e $Y_i(T)$ el target de la ecuación~\eqref{eq:target}. Se conoce a los 90 días, cuando cierra el cruce. Si toda la base empieza a cruzar más, el indicador baja; si sube solo el cruce de la lista, no.
+
+\impl{C-scripts\_etapa3.zip: modelado/indicador\_6\_5.py, salida \texttt{indicador\_6\_5.json} (\texttt{diferencia\_validacion\_pp}, \texttt{diferencia\_min\_pp}, \texttt{diferencia\_max\_pp}).}
+\valoren{validación, cortes de julio a septiembre de 2024}{51,9 puntos: la lista cruza 75,8\% y la base 23,9\%. Por corte, 48,6 (julio), 53,0 (agosto) y 54,1 (septiembre). Si baja de 48,6 porque sube el cruce de toda la base, la caída es del mercado.}
+% registro de cifras: H50
 
 \subsection{Partición por corte y embargo}
 \label{sec:particion}
