@@ -20,8 +20,8 @@ Corre, con rutas absolutas y en este orden:
 9. (18/11, canon v1.3, tableros.notas_v1_3) Las notas salen del guion: si el vault está, notas_final.js es lo que escribe
    exportar_notas.py desde guion.py (--comprobar); sin el vault, el paso se salta con aviso.
 
-Con --textos RUTA escribe además el texto renderizado de cada vista (pantalla, rótulos del gráfico, title) y debajo su
-nota, separado por líneas «=== V01 · <bloque> ===» (para la auditoría).
+Con --textos RUTA escribe además el texto renderizado de cada vista (encabezado y cuerpo, sin el riel; rótulos del
+gráfico; title) y debajo su nota, separado por líneas «=== V01 · <bloque> ===» (para la auditoría).
 
 Imprime cada paso y cierra con «RESULTADO: OK» o «RESULTADO: FALLA».
 """
@@ -109,7 +109,8 @@ TEXTO_VISTA = r"""() => {
   const svg = [...document.querySelectorAll('.cuerpo svg text, .cuerpo svg title')].map((t) => t.textContent)
   const titulos = [...document.querySelectorAll('[title]')].map((e) => e.getAttribute('title'))
   const notas = document.querySelector('.e3-notas')?.innerText ?? ''
-  return { pantalla: vp.innerText, svg, titulos, notas }
+  const vista = [document.querySelector('.e2-enc')?.innerText ?? '', document.querySelector('.cuerpo')?.innerText ?? '']
+  return { pantalla: vp.innerText, vista: vista.join('\n'), svg, titulos, notas }
 }"""
 
 
@@ -145,7 +146,7 @@ def escribir_textos(ruta: Path, CF: dict, textos: list[dict]) -> None:
     salida = []
     for t in textos:
         salida.append(f"=== {t['id']} · {bloque.get(t['id'], '')} ===")
-        salida.append(t["pantalla"].strip())
+        salida.append(t["vista"].strip())
         if t["svg"]:
             salida.append("-- rótulos del gráfico --")
             salida.extend(x.strip() for x in t["svg"] if x.strip())
