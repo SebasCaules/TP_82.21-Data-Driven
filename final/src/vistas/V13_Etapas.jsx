@@ -8,7 +8,7 @@
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
-import { pct } from '../../../e3/src/formato.js'
+import { pct, usd } from '../../../e3/src/formato.js'
 import { BORDE, CTX, Chevron, ESTADO, INK, Renglones, SUP, TRAZO, envolver, inicial, marcaEstado, rectRedondo, tam, useU }
   from '../svg.jsx'
 
@@ -20,7 +20,12 @@ const ESTADOS = ['hecha', 'piloto', 'condicional', 'condicional']
 
 export const meta = { id: ID }
 
-function medir(w, u) {
+// (18/11, intermedio) Las cajas llenan el 80 % del alto del lienzo: lo que sobra sobre el contenido más alto se reparte
+// en el relleno de arriba (20 %), entre nombre y estado (5 %), entre estado y texto (15 %) y abajo (60 %); la letra no
+// cambia.
+const LLENA = 0.8
+
+function medir(w, h, u) {
   const n = X.etapas.length
   const paso = 64 * u                       // entre cajas, con el chevrón de 32 u en el medio
   const bw = (w - paso * (n - 1)) / n
@@ -34,7 +39,10 @@ function medir(w, u) {
     const alto = borde + pad + ln.length * fN * 1.25 + 8 * u + le.length * fE * 1.25 + 16 * u + lq.length * fQ * 1.25 + pad
     return { ...e, ln, le, lq, alto, marca: ESTADOS[i] }
   })
-  return { paso, bw, pad, borde, fN, fE, fQ, cajas, alto: Math.max(...cajas.map((c) => c.alto)) }
+  const contenido = Math.max(...cajas.map((c) => c.alto))
+  const sobra = Math.max(0, LLENA * h - contenido)
+  return { paso, bw, pad, borde, fN, fE, fQ, cajas, alto: contenido + sobra,
+    padArr: pad + 0.2 * sobra, gapNE: 8 * u + 0.05 * sobra, gapEQ: 16 * u + 0.15 * sobra }
 }
 
 function Caja({ u, x, y, w, h, estado, borde }) {
@@ -54,16 +62,16 @@ function Caja({ u, x, y, w, h, estado, borde }) {
 
 function Dibujo({ w, h }) {
   const u = useU()
-  const m = medir(w, u)
+  const m = medir(w, h, u)
   const yTop = Math.max(0, (h - m.alto) / 2)
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       {m.cajas.map((c, i) => {
         const x0 = i * (m.bw + m.paso)
         const xT = x0 + m.pad
-        const yN = yTop + m.borde + m.pad
-        const yE = yN + c.ln.length * m.fN * 1.25 + 8 * u
-        const yQ = yE + c.le.length * m.fE * 1.25 + 16 * u
+        const yN = yTop + m.borde + m.padArr
+        const yE = yN + c.ln.length * m.fN * 1.25 + m.gapNE
+        const yQ = yE + c.le.length * m.fE * 1.25 + m.gapEQ
         return (
           <g key={c.nombre}>
             <title>{`${c.nombre} (${c.estado}): ${c.que}`}</title>
@@ -81,7 +89,7 @@ function Dibujo({ w, h }) {
 
 export default function V13Etapas() {
   return (
-    <Vista id={ID} conclusion cifras={[pct(A['J03.regla'].valor)]}>
+    <Vista id={ID} hibrido items={[{ clave: 'mvp', valor: usd(A.G64.valor) }]} cifras={[pct(A['J03.regla'].valor)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

@@ -7,7 +7,7 @@
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
-import { fijo } from '../../../e3/src/formato.js'
+import { fijo, usd } from '../../../e3/src/formato.js'
 import { ACC, BORDE, CTX, INK, ancho, tam, useU } from '../svg.jsx'
 
 const ID = 'V15'
@@ -34,7 +34,7 @@ function medir(w, u) {
   const anchoCifra = (p) => (p.antes ? ancho(p.antes, fA, 600) + espacio : 0) + ancho(p.cifra, fC, 700)
   const xC = xR + Math.max(...PEDIDO.map((p) => ancho(p.rotulo, fR, 600))) + 48 * u
   const xL = xC + Math.max(...PEDIDO.map(anchoCifra)) + 48 * u
-  const filaP = 140 * u, gapP = 16 * u
+  const filaP = 128 * u, gapP = 16 * u   // (18/11, intermedio) 128 u: el bloque queda en el 86 % del lienzo
   const ySep = PEDIDO.length * filaP + (PEDIDO.length - 1) * gapP + 32 * u
   const yBal = ySep + 32 * u
   const filaB = 44 * u
@@ -84,7 +84,8 @@ function Dibujo({ w, h }) {
 
 export default function V15Pedido() {
   return (
-    <Vista id={ID} items={[{ clave: 'decide', valor: fijo(SEM_FIN) }]}>
+    <Vista id={ID} hibrido items={[{ clave: 'piloto', valor: usd(A.G64.valor) }]}
+           cifras={[usd(A.G64.valor), usd(A.G39.valor)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

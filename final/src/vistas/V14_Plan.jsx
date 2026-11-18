@@ -16,6 +16,7 @@ import { ACC, CONTORNO, CTX, FIN_GRIS, INK, SUP, TRAZO, Umbral, ancho, duro, rec
 const ID = 'V14'
 const PL = DF.tablas.plan
 const X = textosDe(ID)
+const CAL = DF.tablas.calendario
 const SEM_FIN = DF.anclas['G63.semana_decision'].valor
 const SEMANAS_HITO = [...new Set(PL.hitos.map((h) => h.semana).filter((s) => typeof s === 'number' && s <= SEM_FIN))]
   .sort((a, b) => a - b)
@@ -83,7 +84,8 @@ function Dibujo({ w, h }) {
 
 export default function V14Plan() {
   return (
-    <Vista id={ID}>
+    <Vista id={ID} hibrido items={[{ clave: 'decide', valor: fijo(SEM_FIN) }]}
+           cifras={[fijo(CAL.preliminar.semana), fijo(SEM_FIN)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

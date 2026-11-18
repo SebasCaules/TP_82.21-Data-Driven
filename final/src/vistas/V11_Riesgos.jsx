@@ -20,26 +20,33 @@ if (X.filas.length !== DF.tablas.riesgos_criticos.n) throw new Error('V11: la ta
 
 export const meta = { id: ID }
 
-function medir(w, u) {
+// (18/11, intermedio) La lista llena el 90 % del alto del lienzo (el texto visible, un 76 %): el relleno de cada fila y el aire entre filas crecen
+// juntos con lo que sobra (entre 24 y 72 u); la letra no cambia.
+const LLENA = 0.9
+
+function medir(w, h, u) {
   const f = tam('nombre', u)
-  const pad = 24 * u          // relleno de cada fila
   const gap = 48 * u          // entre columnas
-  const util = w - 2 * pad - gap
+  const pad0 = 24 * u
+  const util = w - 2 * pad0 - gap
   const anchos = [0.4 * util, 0.6 * util]
-  const xs = [pad, pad + anchos[0] + gap]
-  const filas = X.filas.map((r, i) => {
+  const xs = [pad0, pad0 + anchos[0] + gap]
+  const lineas = X.filas.map((r, i) => {
     const foco = i === FOCO
-    const ls = [envolver(r.riesgo, anchos[0], f, foco ? 700 : 400), envolver(r.respuesta, anchos[1], f)]
-    const alto = Math.max(ls[0].length, ls[1].length) * f * 1.25 + 2 * pad
-    return { ...r, ls, alto, foco }
+    return { ...r, foco, ls: [envolver(r.riesgo, anchos[0], f, foco ? 700 : 400), envolver(r.respuesta, anchos[1], f)] }
   })
-  const sep = 24 * u          // aire entre filas
+  const texto = lineas.reduce((s, r) => s + Math.max(r.ls[0].length, r.ls[1].length) * f * 1.25, 0)
+  const n = lineas.length
+  // relleno arriba y abajo de cada fila (2n) y aire entre filas (n - 1), todos del mismo tamaño
+  const pad = Math.min(72 * u, Math.max(24 * u, (LLENA * h - texto) / (3 * n - 1)))
+  const sep = pad             // aire entre filas
+  const filas = lineas.map((r) => ({ ...r, alto: Math.max(r.ls[0].length, r.ls[1].length) * f * 1.25 + 2 * pad }))
   return { f, pad, xs, filas, sep, alto: filas.reduce((s, x) => s + x.alto, 0) + sep * (filas.length - 1) }
 }
 
 function Dibujo({ w, h }) {
   const u = useU()
-  const m = medir(w, u)
+  const m = medir(w, h, u)
   let y = Math.max(0, (h - m.alto) / 2)   // la lista, centrada en el alto
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
@@ -66,7 +73,8 @@ function Dibujo({ w, h }) {
 
 export default function V11Riesgos() {
   return (
-    <Vista id={ID} items={[{ clave: 'horas', valor: fijo(A['G64.horas_por_lista'].valor) }]}>
+    <Vista id={ID} hibrido items={[{ clave: 'horas', valor: fijo(A['G64.horas_por_lista'].valor) }]}
+           cifras={[fijo(A['G64.horas_por_lista'].valor)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )
