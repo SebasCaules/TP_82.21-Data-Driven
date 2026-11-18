@@ -685,13 +685,13 @@ El monitoreo en producción de la Parte D del Entregable 3 suma una alerta de dr
 La limitación principal de la Parte C del Entregable 3 es que la lista no separa una caída del mercado de una pérdida propia. El indicador que la sigue resta, en cada corte $T$, el cruce a 90 días de toda la base elegible al cruce de la lista:
 
 \begin{equation*}
-I_{\text{merc}}(T) = 100\left(\frac{VP_{500}(T)}{500} - \frac{1}{|\mathcal D(T)|}\sum_{i\in\mathcal D(T)} Y_i(T)\right)
+I_{\text{merc}}(T) = 100\left(\frac{VP_{k(T)}(T)}{k(T)} - \frac{1}{|\mathcal D(T)|}\sum_{i\in\mathcal D(T)} Y_i(T)\right), \qquad k(T) = \mathrm{round}\bigl(f\,N^{c}(T)\bigr)
 \end{equation*}
 
-con $VP_{500}(T)$ los aciertos de la lista de 500 contactables de la regla, $\mathcal D(T)$ los clientes elegibles y todavía sin cruzar al corte (la población del target) e $Y_i(T)$ el target de la ecuación~\eqref{eq:target}. Se conoce a los 90 días, cuando cierra el cruce. Si toda la base empieza a cruzar más, el indicador baja; si sube solo el cruce de la lista, no.
+con $VP_{k(T)}(T)$ los aciertos de los $k(T)$ primeros contactables de la regla, $N^{c}(T)$ la cantidad de contactables del corte y $f$ la parte de los contactables que ocupa la lista de 500 en validación, para que el indicador no suba solo porque crece la base. $\mathcal D(T)$ los clientes elegibles y todavía sin cruzar al corte (la población del target) e $Y_i(T)$ el target de la ecuación~\eqref{eq:target}. Se conoce a los 90 días, cuando cierra el cruce. Si toda la base empieza a cruzar más, el indicador baja; si sube solo el cruce de la lista, no.
 
-\impl{C-scripts\_etapa3.zip: modelado/indicador\_6\_5.py, salida \texttt{indicador\_6\_5.json} (\texttt{diferencia\_validacion\_pp}, \texttt{diferencia\_min\_pp}, \texttt{diferencia\_max\_pp}).}
-\valoren{validación, cortes de julio a septiembre de 2024}{51,9 puntos: la lista cruza 75,8\% y la base 23,9\%. Por corte, 48,6 (julio), 53,0 (agosto) y 54,1 (septiembre). Si baja de 48,6 porque sube el cruce de toda la base, la caída es del mercado.}
+\impl{C-scripts\_etapa3.zip: modelado/indicador\_6\_5.py, salida \texttt{indicador\_6\_5.json} (\texttt{fraccion\_de\_los\_contactables}, \texttt{referencia.diferencia\_min\_pp} y \texttt{referencia.diferencia\_max\_pp}; como control, \texttt{control\_lista\_500\_validacion} da los 1.137 aciertos de la lista de 500 de validación).}
+\valoren{cortes que no son de test con 1.000 elegibles o más, octubre de 2023 a diciembre de 2024 (15 cortes)}{$f$ = 1.500 / 5.038 = 29,8\%. $I_{\text{merc}}$ va de 51,4 a 55,3 puntos. Si baja de 51,4 porque sube el cruce de toda la base, la caída es de toda la base y no de la lista; si además cae el rubro (CAME), es del mercado.}
 % registro de cifras: H50
 
 \subsection{Partición por corte y embargo}
@@ -723,16 +723,6 @@ Fuera de la evaluación & 2025-06 a 2025-09 & 11.294 & 3.031 (26,84\%) \\
 
 \impl{A-scripts\_etapa1.zip: etapa1.py, salida \texttt{etapa1.json} ($\to$ \texttt{particion}).}
 % registro de cifras: F02, F05, F17
-
-% (24/11, v4.0) compras devueltas sobre el v0.2 (devolución del E3, OBS-17; registro E3A-07), sin ecuación numerada
-\subsection{Compras devueltas}
-\label{sec:devueltas}
-
-Una compra devuelta deja en \texttt{Transacciones\_clientes.csv} una fila de monto negativo con la fecha de la compra original (consulta 6 del Entregable 2). El criterio desde la v4.0: esa fila cuenta como actividad del cliente (fecha, cantidad de compras, intervalo entre compras y días sin comprar) y no suma facturación, porque muestra que el cliente estuvo activo ese día y es la única huella de esa compra. El dataset v0.2 no la cuenta: entra a $u_i(T)$, $n_i(T)$ y $\gamma_i(T)$ solo si $\text{monto\_neto} > 0$. Las cifras del Entregable 3 quedan con el v0.2 congelado, porque rehacerlas obligaría a reabrir el test; el criterio rige desde la primera lista del piloto, en la planilla de la regla.
-
-\impl{A-scripts\_etapa1.zip: devoluciones\_v02.py, salida \texttt{devoluciones\_v02.json} ($\to$ \texttt{resumen}): arma las filas con las dos lecturas y comprueba que la que no cuenta la devolución reproduce el v0.2 fila por fila.}
-\valoren{dataset v0.2, 33 cortes}{330 filas de monto negativo con cliente, de 316 clientes. Contándolas, las filas elegibles pasan de 59.585 a 60.432 (+847, +1,4\%) y la tasa de positivos de 26,94\% a 26,88\%. La precisión de la lista de 500 de la regla en validación sin filtro pasa de 81,58\% a 82,34\% (+0,76 puntos), menos de lo que varía entre los tres cortes de validación (2,67 puntos, de 80,53\% a 83,20\%).}
-% registro de cifras: E3A-07
 
 \subsection{Evaluación en test}
 \label{sec:evaluacion-test}
@@ -802,6 +792,16 @@ La primera pide que la ventaja no sea azar: el intervalo de la ecuación~\eqref{
 \valoren{test}{el límite inferior es $-1{,}45$ puntos y la logística acierta 1,27 clientes menos por mes. Para pagar los USD 10.400 que agrega, el modelo necesitaría más aciertos por mes de los que caben en la lista de 500 ($a^* > 500$): no puede pagar su costo. No se cumple ninguna de las dos condiciones y la lista sigue con la regla del umbral.}
 % registro de cifras: J09, J10, G40, G53, G56
 
+% (24/11, v4.0) compras devueltas sobre el v0.2 (devolución del E3, OBS-17; registro E3A-07), sin ecuación numerada
+\subsection{Compras devueltas}
+\label{sec:devueltas}
+
+Una compra devuelta deja en \texttt{Transacciones\_clientes.csv} una fila de monto negativo con la fecha de la compra original (consulta 6 del Entregable 2). El criterio desde la v4.0: esa fila cuenta como actividad del cliente (fecha, cantidad de compras, intervalo entre compras y días sin comprar) y no suma facturación, porque muestra que el cliente estuvo activo ese día y es la única huella de esa compra. El dataset v0.2 no la cuenta: entra a $u_i(T)$, $n_i(T)$ y $\gamma_i(T)$ solo si $\text{monto\_neto} > 0$. Las cifras del Entregable 3 quedan con el v0.2 congelado, porque rehacerlas obligaría a reabrir el test; el criterio rige desde la primera lista del piloto, en la planilla de la regla.
+
+\impl{A-scripts\_etapa1.zip: devoluciones\_v02.py, salida \texttt{devoluciones\_v02.json} ($\to$ \texttt{resumen}): arma las filas con las dos lecturas y comprueba que la que no cuenta la devolución reproduce el v0.2 fila por fila.}
+\valoren{dataset v0.2, 33 cortes}{330 filas de monto negativo con cliente, de 316 clientes. Contándolas, las filas elegibles pasan de 59.585 a 60.432 (+847, +1,4\%) y la tasa de positivos de 26,94\% a 26,88\%. La precisión de la lista de 500 de la regla en validación sin filtro pasa de 81,58\% a 82,34\% (+0,76 puntos), menos de lo que varía entre los tres cortes de validación (2,67 puntos, de 80,53\% a 83,20\%).}
+% registro de cifras: E3A-07
+
 \section{Experimento propuesto y efecto mínimo detectable}
 \label{sec:experimento}
 
@@ -816,7 +816,7 @@ El efecto mínimo detectable (MDE) entre dos grupos de tamaños $N_1$ y $N_2$, p
 \label{eq:mde}
 \end{equation}
 
-con $p_1 = p_0+\delta$ y $\bar p = (N_1 p_0+N_2 p_1)/(N_1+N_2)$, resuelto por bisección sobre $\delta$. $N_1$ es el grupo contactado, con la tasa $p_0$, y $N_2$ el control: es la convención que da el 2,95 del Entregable 1. Con el control en $p_0$ (los argumentos invertidos) una rama da 9,68 puntos, las dos juntas 8,53 y una rama con 80 de control 10,24, 0,15 puntos o menos por encima de la convención elegida. Con $N_1 = N_2$ es la fórmula de dos ramas iguales que usa el tablero.
+con $p_1 = p_0+\delta$ y $\bar p = (N_1 p_0+N_2 p_1)/(N_1+N_2)$, resuelto por bisección sobre $\delta$. $N_1$ es el grupo contactado, con la tasa $p_0$, y $N_2$ el control: es la convención que da el 2,95 del Entregable 1. Con el control en $p_0$ (los argumentos invertidos) una rama da 9,68 puntos, las dos juntas 8,53 y una rama con 80 de control 10,24. Con $N_1 = N_2$ es la fórmula de dos ramas iguales que usa el tablero.
 
 \textbf{Qué decide.} El cruce del umbral a 90 días: la parte de cada grupo que cruza su umbral en los 90 días siguientes al corte de su lista, $Y_i(T)$ de la ecuación~\eqref{eq:target}, control menos rama. Sin contacto cruza
 
@@ -835,29 +835,6 @@ los aciertos de la regla en los lugares de la lista de contactables que no son d
 % y puntaje legal del estado actual (devolución del E3: OBS-22, OBS-26, OBS-34; canon v1.1). Sin ecuaciones numeradas
 % nuevas ni tablas con número, para no correr las que citan las partes. Reemplaza al «umbral de producción del piloto»
 % de la v3.0, a sus cifras con el costo del año 1 y a la semana 1 fija del calendario anterior.
-\subsection{Costo del piloto mínimo y de las etapas que siguen}
-\label{sec:costos-etapas}
-
-El piloto mínimo es el MVP, la planilla mensual de la regla, operado tres meses con grupo de control y dos ramas. Lo corre, con la guía de corrida, una persona del equipo de Marketing que designa Sofía R.; el equipo arma la planilla, acompaña las tres corridas, sortea, mide e informa. Su costo son las horas del equipo y un taller, con 15\% de contingencia:
-
-\begin{equation*}
-C_{\text{pil}} = 1{,}15\,\bigl[(24 + 20 + 36)\,h_a + T\bigr]
-\end{equation*}
-
-con $h_a$ la hora de analista y $T$ un taller, a las tarifas de la Parte B del Entregable 3. Las 24 horas son la planilla y la guía de corrida; las 20, la adecuación legal del equipo (L3, L4 y L5); las 36, sorteo, medición e informes (32 más 4). Las acciones de retención y las 24 horas de la persona de Marketing las pone Casa Óga y no entran en $C_{\text{pil}}$.
-
-Si el piloto pasa, sigue una de dos etapas, cada una con su inversión (con 15\% de contingencia) y su costo recurrente:
-
-\begin{equation*}
-A_e = I_e + R_e, \qquad I_e = 1{,}15 \sum \text{costos únicos}_e
-\end{equation*}
-
-La operación mínima ($e = \min$) es la misma planilla a cargo de un analista part-time, 8 horas por mes, con exportación manual y sin soporte externo (una de las dos opciones del envío 71): $I_{\min}$ es rehacer la tabla de identidad con el extracto del momento, una semana de analista, y $R_{\min} = 8 \times 12 \times h_a$. La producción completa ($e = \text{comp}$) suma exportación automática con un mismo corte, corrida con un comando, tablero del mes para el directorio, resumen por local, segundo taller, operador pago y soporte. El piloto mínimo más la producción completa es la regla de la Parte B del Entregable 3: $C_1 = C_{\text{pil}} + A_{\text{comp}}$.
-
-\impl{B-scripts\_etapa2.zip: economia.py (\texttt{etapa} y el bloque del piloto mínimo), salida \texttt{economia.json} ($\to$ \texttt{piloto\_minimo}, \texttt{operacion\_minima}, \texttt{produccion\_completa} y \texttt{comprobacion\_g39}).}
-\valoren{tarifas de la Parte B del Entregable 3}{$h_a$ = USD 37,50 y $T$ = USD 900. $C_{\text{pil}}$ = 1,15 $\times$ (900 + 750 + 1.350 + 900) = 1,15 $\times$ 3.900 = USD 4.485, con 80 horas del equipo. Operación mínima: $I_{\min}$ = 1,15 $\times$ 1.500 = USD 1.725, $R_{\min}$ = USD 3.600 por año y $A_{\min}$ = USD 5.325. Producción completa: $I_{\text{comp}}$ = 1,15 $\times$ (3.100 + 3.000 + 1.500 + 900) = 1,15 $\times$ 8.500 = USD 9.775 (data scientist, un mes menos las 24 horas de la planilla; integración; identidad; segundo taller), $R_{\text{comp}}$ = 3.600 + 2.400 = USD 6.000 por año y $A_{\text{comp}}$ = USD 15.775. $C_1$ = 4.485 + 15.775 = USD 20.260, el costo del año 1 de la regla; los costos únicos suman 3.900 + 8.500 = USD 12.400.}
-% registro de cifras: G64, G65, G66, G39, G37
-
 \subsection{Umbral de pase del piloto}
 \label{sec:umbral-piloto}
 
@@ -876,7 +853,7 @@ El umbral de pase de una rama es la diferencia con la que lo que deja la lista p
 \Delta^{*}_{e,h} = s^{*}(C_{e,h})\; c_0
 \end{equation*}
 
-con $s^*(C)$ la tasa de éxito de equilibrio de la ecuación~\eqref{eq:s-equilibrio} sobre la matriz de la lista de 500 contactables, con $C$ en lugar de $C_1$; sin descuento, $d = r = 0$. Al decidir, el piloto ya está gastado: $C_{e,h}$ es solo lo que cuesta seguir con la etapa $e$ en el horizonte $h$. Decide el de la operación mínima con el costo de su primer año, $C = A_{\min}$, inversión incluida. Los otros horizontes son referencia: solo el recurrente, $R_e$, o tres años repartidos por año, $(I_e + 3R_e)/3$. La producción completa se evalúa recién si el efecto medido la paga en su primer año. El recurrente de la producción completa, que la versión anterior usaba como umbral, queda como referencia: es lo que haría falta para pagarla una vez hecha su inversión. Cada tasa de equilibrio dice su lista: el 49,6\% de la subsección~\ref{sec:valor-lista} es de la lista sin filtro; las de esta subsección, de la lista de contactables.
+con $s^*(C)$ la tasa de éxito de equilibrio de la ecuación~\eqref{eq:s-equilibrio} sobre la matriz de la lista de 500 contactables, con $C$ en lugar de $C_1$; sin descuento, $d = r = 0$. Al decidir, el piloto ya está gastado: $C_{e,h}$ es solo lo que cuesta seguir con la etapa $e$ en el horizonte $h$. Decide el de la operación mínima con el costo de su primer año, $C = A_{\min}$ de la subsección~\ref{sec:costos-etapas}, inversión incluida. Los otros horizontes son referencia: solo el recurrente, $R_e$, o tres años repartidos por año, $(I_e + 3R_e)/3$. La producción completa se evalúa recién si el efecto medido la paga en su primer año. El recurrente de la producción completa, que la versión anterior usaba como umbral, queda como referencia: es lo que haría falta para pagarla una vez hecha su inversión. Cada tasa de equilibrio dice su lista: el 49,6\% de la subsección~\ref{sec:valor-lista} es de la lista sin filtro; las de esta subsección, de la lista de contactables.
 
 \begin{center}
 \begin{tabular}{@{}lrrr@{}}
@@ -902,6 +879,35 @@ La fila sin costo adicional supone que una persona de Marketing absorbe la opera
 \impl{B-scripts\_etapa2.zip: economia.py (\texttt{umbral\_pase} y \texttt{s\_equilibrio}), salida \texttt{economia.json} ($\to$ \texttt{umbral\_de\_pase} y \texttt{sensibilidad\_umbral\_de\_pase}).}
 \valoren{lista de 500 contactables, validación, diferencia de cruce en puntos}{con $C = A_{\min}$ = USD 5.325, $s^*$ = 14,26\% y $\Delta^*$ = 11,04 puntos con 15\% de descuento; sin descuento, 11,40\% y 8,82 puntos. Con la identidad rehecha dentro del piloto, $C_{\text{pil}}$ = 4.485 + 1.725 = USD 6.210 y el umbral pasa al de solo recurrente, 7,55 y 6,02. Con $s$ = 1,02\%, $\Delta$ = 0,79 puntos.}
 % registro de cifras: G67, G62 (referencia), G31
+
+\subsection{Costo del piloto mínimo y de las etapas que siguen}
+\label{sec:costos-etapas}
+
+El piloto mínimo es el MVP, la planilla mensual de la regla, operado tres meses con grupo de control y dos ramas. Lo corre, con la guía de corrida, una persona del equipo de Marketing que designa Sofía R.; el equipo arma la planilla, acompaña las tres corridas, sortea, mide e informa. Su costo son las horas del equipo y un taller, con 15\% de contingencia:
+
+\begin{equation*}
+C_{\text{pil}} = 1{,}15\,\bigl[(24 + 20 + 36)\,h_a + T\bigr]
+\end{equation*}
+
+con $h_a$ la hora de analista y $T$ un taller, a las tarifas de la Parte B del Entregable 3. Las 24 horas son la planilla y la guía de corrida; las 20, la adecuación legal del equipo (L3, L4 y L5); las 36, sorteo, medición e informes (32 más 4). Las acciones de retención y las 24 horas de la persona de Marketing las pone Casa Óga y no entran en $C_{\text{pil}}$. Un contactado con descuento cuesta, en pesos,
+
+\begin{equation*}
+c_{\text{cont}}(q) = c + \bigl(q\,s + (1-q)\,r\bigr)\,d\,\bar t
+\end{equation*}
+
+con $q$ la parte de su grupo que cruza sin contacto: $c_0$ de la ecuación~\eqref{eq:cruce-control} fuera del 20\% de mayor facturación y la misma cuenta en ese 20\%, que recibe el 15\%. Sin descuento cuesta $c$.
+
+Si el piloto pasa, sigue una de dos etapas, cada una con su inversión (con 15\% de contingencia) y su costo recurrente:
+
+\begin{equation*}
+A_e = I_e + R_e, \qquad I_e = 1{,}15 \sum \text{costos únicos}_e
+\end{equation*}
+
+La operación mínima ($e = \min$) es la misma planilla a cargo de un analista part-time, 8 horas por mes, con exportación manual y sin soporte externo (una de las dos opciones del envío 71): $I_{\min}$ es rehacer la tabla de identidad con el extracto del momento, una semana de analista, y $R_{\min} = 8 \times 12 \times h_a$. La producción completa ($e = \text{comp}$) suma exportación automática con un mismo corte, corrida con un comando, tablero del mes para el directorio, resumen por local, segundo taller, operador pago y soporte. El piloto mínimo más la producción completa es la regla de la Parte B del Entregable 3: $C_1 = C_{\text{pil}} + A_{\text{comp}}$.
+
+\impl{B-scripts\_etapa2.zip: economia.py (\texttt{etapa}, \texttt{costo\_con\_descuento} y el bloque del piloto mínimo), salida \texttt{economia.json} ($\to$ \texttt{piloto\_minimo}, \texttt{operacion\_minima}, \texttt{produccion\_completa}, \texttt{comprobacion\_g39} y \texttt{piloto.ramas}).}
+\valoren{tarifas de la Parte B del Entregable 3}{$h_a$ = USD 37,50 y $T$ = USD 900. $C_{\text{pil}}$ = 1,15 $\times$ (900 + 750 + 1.350 + 900) = 1,15 $\times$ 3.900 = USD 4.485, con 80 horas del equipo. Operación mínima: $I_{\min}$ = 1,15 $\times$ 1.500 = USD 1.725, $R_{\min}$ = USD 3.600 por año y $A_{\min}$ = USD 5.325. Producción completa: $I_{\text{comp}}$ = 1,15 $\times$ (3.100 + 3.000 + 1.500 + 900) = 1,15 $\times$ 8.500 = USD 9.775 (data scientist, un mes menos las 24 horas de la planilla; integración; identidad; segundo taller), $R_{\text{comp}}$ = 3.600 + 2.400 = USD 6.000 por año y $A_{\text{comp}}$ = USD 15.775. $C_1$ = 4.485 + 15.775 = USD 20.260, el costo del año 1 de la regla; los costos únicos suman 3.900 + 8.500 = USD 12.400. $c_{\text{cont}}$ = ARS 53,84 en la rama con descuento y ARS 53,38 en el 20\% de mayor facturación; $c$ = ARS 25. Acciones de los 1.200 contactados de los tres meses: 446,67 $\times$ 53,38 + 376,67 $\times$ 53,84 + 376,67 $\times$ 25 = ARS 53.538, que pone Casa Óga. Un contacto duplicado cuesta un mensaje de más, de ARS 25 a 54.}
+% registro de cifras: G64, G65, G66, G39, G37, G49
 
 \subsection{Lo que ve el piloto}
 \label{sec:potencia-piloto}
@@ -938,7 +944,7 @@ Lo primero es sortear, medir e informar. Lo segundo es armar la planilla, capaci
 
 La semana 1 del plan empieza el lunes $L_1$ siguiente a la aprobación escrita de María G., y la semana $n$, el lunes $L_1 + 7\,(n-1)$ días. La primera lista sale en la semana 6, dentro de las dos semanas posteriores a su corte de fin de mes, y la tercera en la 14. El cruce a 90 días de cada lista cierra 90 días después de su corte. El informe de la semana 20 trae la compra a 7 días de las tres listas y el cruce de la primera, y no decide; la decisión es en la semana 28, con el cruce de las tres. Después de la tercera lista la lista queda en pausa: de la semana 19 a la 28 no hay costo recurrente.
 
-\supuesto{Las fechas de referencia suponen que María G. aprueba con la entrega del 24/11/2026; si aprueba después, todas corren lo mismo. Las tres listas miden enero a marzo de 2027, después de la campaña de fin de año para la que Casa Óga quería el piloto (envío 11), y el efecto puede no repetirse en otros meses; el cruce sin contacto, $c_0$, se midió de julio a septiembre de 2024. Las semanas 4 y 5, del 21/12/2026 al 03/01/2027, caen en las fiestas.}
+\supuesto{Las fechas de referencia suponen que María G. aprueba con la entrega del 24/11/2026. Si aprueba el 07/12 o después, la semana 6 pasa del 14/01/2027: la primera lista toma el corte del mes siguiente y todo corre un mes. Las tres listas miden enero a marzo de 2027, después de la campaña de fin de año para la que Casa Óga quería el piloto (envío 11), y el efecto puede no repetirse en otros meses; el cruce sin contacto, $c_0$, se midió de julio a septiembre de 2024. Las semanas 4 y 5, del 21/12/2026 al 03/01/2027, caen en las fiestas.}
 
 \impl{B-scripts\_etapa2.zip: economia.py (fechas con \texttt{pandas} desde $L_1$, con sus controles), salida \texttt{economia.json} ($\to$ \texttt{piloto.calendario}).}
 \valoren{aprobación con la entrega del 24/11/2026}{$L_1$ = lunes 30/11/2026 (semana 1, del 30/11 al 06/12/2026). Primera lista: semana 6, entre el 04/01 y el 14/01/2027, corte 31/12/2026; su cruce cierra el 31/03/2027 (semana 18). Tercera lista: semana 14, lunes 01/03/2027, corte 28/02/2027; su cruce cierra el 29/05/2027 (semana 26). Informe preliminar: semana 20, desde el lunes 12/04/2027. Decisión: semana 28, lunes 07/06/2027. Costo recurrente de las semanas 19 a 28: USD 0.}
@@ -955,7 +961,7 @@ La factibilidad legal de la Parte C del Entregable 3 puntúa cinco dimensiones d
 
 Un promedio de 1,6 a 2,5 es ``viable con condiciones''. Desde la v4.0 se puntúa el estado actual: protección de datos personales baja de 2 a 1, porque las bases no están inscriptas y se contactó a clientes sin consentimiento. El 1 quiere decir que ninguna lista sale hasta inscribir las bases (L1) y tener el filtro de consentimiento en la planilla (L3), el criterio 1 de go-live; el plan legal es lo que la lleva a 2.
 
-\impl{generador de la Parte C del Entregable 3 (\texttt{contenido\_c.py}: \texttt{SCORES}, \texttt{PROMEDIO} y la comprobación del tramo).}
+\impl{cuenta directa sobre los cinco puntajes de la tabla de factibilidad legal de la Parte C del Entregable 3.}
 \valoren{estado actual}{protección de datos personales, 1; seguridad y control de accesos, conservación y trazabilidad fiscal, contratos con proveedores externos y explicabilidad del modelo, 2 cada una. $\bar L$ = (1 + 2 + 2 + 2 + 2) / 5 = 1,8, en el tramo de 1,6 a 2,5.}
 % registro de cifras: H40
 
@@ -1040,25 +1046,6 @@ y las horas por mes de Marketing que, reasignadas a la tarifa del analista (USD 
 \valoren{validación, lista de 500 de la regla sin filtro}{con VP 1.223,67 y FP 276,33, $V$ = USD 299,49 por año; con $C_1$ = USD 20.260, ROI $-98{,}52\%$. $s^*$ = 49,6\% con 15\% de descuento, 48,6 veces $s$, y 39,7\% sin descuento ($d = r = 0$). TC$^*$ = 21,57 ARS/USD. $m^*$ = ARS 599.274 por año, 39,2 veces $m$. $h^*$ = 44,4 horas por mes. Con la lista de 500 contactables (VP 1.137, FP 363), $V$ = USD 264,54 y ROI $-98{,}69\%$ con $C_1$, el piloto mínimo más la producción completa. $R_{\min}$ = USD 3.600 por año es 13,6 veces ese $V$: no recupera en ningún plazo. El recurrente de la operación mínima es el 209\% de su inversión.}
 % registro de cifras: G34, G39, G41, G43, G44, G54, G58 (v3.0: 13,6 veces, operación mínima; reemplaza a 20,0 con el recurrente de la producción completa), G59, G60, G66
 
-% (24/11, v4.0) rango anual por validación cruzada temporal (devolución del E3, OBS-16; registro E3A-01, E3A-04, E3A-05)
-\subsection{Rango anual por validación cruzada temporal}
-\label{sec:rango-anual}
-
-El $\times 4$ de la ecuación~\eqref{eq:valor-lista} supone que los tres cortes de validación valen por un año. Para medir cuánto puede moverse, la regla se corre en cada corte mensual $T$ de septiembre de 2023 a septiembre de 2024 (13 cortes; desde septiembre de 2023 hay un modelo entrenado con seis cortes o más para comparar). En cada corte se arma la lista proporcional, el 20,9\% de las filas del corte, la misma fracción de la búsqueda de la etapa 3 (subsección~\ref{sec:precision-lista}). Su precisión $P_T$ se lleva a una lista de 500, con el valor de cada celda de la ecuación~\eqref{eq:valor-celda}:
-
-\begin{equation*}
-V_T = \frac{500\,\bigl[P_T\,v_{VP} + (1-P_T)\,v_{FP}\bigr]}{\mathrm{TC}}, \qquad
-V_{\mathcal T} = \frac{12}{|\mathcal T|}\sum_{T \in \mathcal T} V_T
-\end{equation*}
-
-con $\mathcal T$ una ventana de 3 meses seguidos (11 ventanas, factor 4) o de 12 (2 ventanas, factor 1). El incremental del modelo sobre la regla se mide igual, con la logística reentrenada en cada pliegue con los cortes cuya ventana cierra antes del primer corte que evalúa. La lista proporcional va en el cuerpo de las partes. La lista de 500 tal cual queda solo acá: a fines de 2023 la base es chica (930 filas en septiembre de 2023), la lista de 500 ocupa más de la mitad del corte y mide el tamaño de la base, no la regla.
-
-\supuesto{El rango mezcla estacionalidad con tendencia: la tasa de positivos baja de 49,7\% en enero de 2023 a 23,9\% en septiembre de 2024, y con 21 meses no se pueden separar.}
-
-\impl{B-scripts\_etapa2.zip: cv\_temporal.py (antes de calcular reproduce 17 cifras publicadas y, si una no coincide, sale con código 1), llamado por economia.py; salida \texttt{cv\_temporal.json} ($\to$ \texttt{rangos\_regla\_usd\_anual}, \texttt{rangos\_incremental\_usd\_anual} y \texttt{roi}) y \texttt{economia.json} ($\to$ \texttt{rango\_anual}).}
-\valoren{lista proporcional llevada a 500, sin filtro, septiembre de 2023 a septiembre de 2024}{$V_{\mathcal T}$ de USD 301,45 (julio a septiembre de 2024, el trimestre de validación y el más bajo de los once) a 335,78 por año, y de 319,77 a 321,42 con doce meses seguidos: los USD 299,49 de la subsección~\ref{sec:valor-lista} no inflan el año. ROI de la regla con $C_1$ = USD 20.260, de $-98{,}51\%$ a $-98{,}34\%$ ($-98{,}52\%$ con los 500 primeros del trimestre de validación). Incremental del modelo sobre la regla, de USD $-5{,}39$ a $+6{,}82$ por año. Con la lista de 500 tal cual, de USD 219,36 (septiembre a noviembre de 2023) a 315,71 y ROI de $-98{,}92\%$ a $-98{,}44\%$.}
-% registro de cifras: E3A-01, E3A-04, E3A-05, G34, G41
-
 \subsection{Valor de un punto de precisión}
 \label{sec:valor-punto}
 
@@ -1095,6 +1082,25 @@ Es un piso, porque $s$ es un techo. Se compara con el costo por alta en el CRM, 
 \impl{B-scripts\_etapa2.zip: economia.py, salida \texttt{economia.json} ($\to$ \texttt{retener\_contra\_reemplazar}).}
 \valoren{validación y 2025}{con $|L|$ = 1.500, vuelven 49,9 clientes por año; $\kappa$ = ARS 6.519 con 15\% de descuento y ARS 3.007 sin descuento, contra ARS 11.099 por alta en 2025.}
 % registro de cifras: G45, G04, G07
+
+% (24/11, v4.0) rango anual por validación cruzada temporal (devolución del E3, OBS-16; registro E3A-01, E3A-04, E3A-05)
+\subsection{Rango anual por validación cruzada temporal}
+\label{sec:rango-anual}
+
+El $\times 4$ de la ecuación~\eqref{eq:valor-lista} supone que los tres cortes de validación valen por un año. Para medir cuánto puede moverse, la regla se corre en cada corte mensual $T$ de septiembre de 2023 a septiembre de 2024 (13 cortes; desde septiembre de 2023 hay un modelo entrenado con seis cortes o más para comparar). En cada corte se arma la lista proporcional, el 20,9\% de las filas del corte, la misma fracción de la búsqueda de la etapa 3 (subsección~\ref{sec:precision-lista}). Su precisión $P_T$ se lleva a una lista de 500, con el valor de cada celda de la ecuación~\eqref{eq:valor-celda}:
+
+\begin{equation*}
+V_T = \frac{500\,\bigl[P_T\,v_{VP} + (1-P_T)\,v_{FP}\bigr]}{\mathrm{TC}}, \qquad
+V_{\mathcal T} = \frac{12}{|\mathcal T|}\sum_{T \in \mathcal T} V_T
+\end{equation*}
+
+con $\mathcal T$ una ventana de 3 meses seguidos (11 ventanas, factor 4) o de 12 (2 ventanas, factor 1). El incremental del modelo sobre la regla se mide igual, con la logística reentrenada en cada pliegue con los cortes cuya ventana cierra antes del primer corte que evalúa. La lista proporcional va en el cuerpo de las partes. La lista de 500 tal cual queda solo acá: a fines de 2023 la base es chica (930 filas en septiembre de 2023), la lista de 500 ocupa más de la mitad del corte y mide el tamaño de la base, no la regla.
+
+\supuesto{El rango mezcla estacionalidad con tendencia: la tasa de positivos baja de 49,7\% en enero de 2023 a 23,9\% en septiembre de 2024, y con 21 meses no se pueden separar.}
+
+\impl{B-scripts\_etapa2.zip: cv\_temporal.py (antes de calcular reproduce 17 cifras publicadas y, si una no coincide, sale con código 1), llamado por economia.py; salida \texttt{cv\_temporal.json} ($\to$ \texttt{rangos\_regla\_usd\_anual}, \texttt{rangos\_incremental\_usd\_anual} y \texttt{roi}) y \texttt{economia.json} ($\to$ \texttt{rango\_anual}).}
+\valoren{lista proporcional llevada a 500, sin filtro, septiembre de 2023 a septiembre de 2024}{$V_{\mathcal T}$ de USD 301,45 (julio a septiembre de 2024, el trimestre de validación y el más bajo de los once) a 335,78 por año, y de 319,77 a 321,42 con doce meses seguidos: los USD 299,49 de la subsección~\ref{sec:valor-lista} no inflan el año. ROI de la regla con $C_1$ = USD 20.260, de $-98{,}51\%$ a $-98{,}34\%$ ($-98{,}52\%$ con los 500 primeros del trimestre de validación). Incremental del modelo sobre la regla, de USD $-5{,}39$ a $+6{,}82$ por año. Con la lista de 500 tal cual, de USD 219,36 (septiembre a noviembre de 2023) a 315,71 y ROI de $-98{,}92\%$ a $-98{,}44\%$.}
+% registro de cifras: E3A-01, E3A-04, E3A-05, G34, G41
 
 \section{Supuesto: el proxy de churn no es churn}
 \label{sec:proxy-churn}
