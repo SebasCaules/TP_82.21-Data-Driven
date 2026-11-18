@@ -12,8 +12,11 @@ JSON del vault que escriben los generadores de las partes, sin copia intermedia.
   _build/A/factibilidad/salida/condiciones.json
 - entregas/entregable-3/_build/B/modelado/salida/etapa2.json, _build/C/modelado/salida/etapa3.json,
   _build/D/modelado/salida/etapa4.json
-- entregas/entregable-3/_build/C/modelado/salida/indicador_6_5.json (H50, indicador del mercado de la C)
-- .workforce/presentacion-final/fase-4/cifras-F3.json: las cifras K de la parte de Gestión del E4
+- entregas/entregable-3/_build/C/modelado/salida/indicador_6_5.json (H50, indicador de la limitación principal de la C)
+- entregas/entregable-3/_build/C/contenido_c.py (SCORES, puntaje legal H40) y _build/A/contenido_a.py (puntajes de
+  la tabla de scoring, F16), leídos con ast sin importarlos
+- entregas/entregable-4/_build/A/registro/cifras-F3.json: las cifras K de la parte de Gestión del E4 (la copia del
+  registro que deja generar_a.py junto al generador)
 
 Escribe final/src/datos_final.js con «export const DF = {...}». Solo biblioteca estándar.
 
@@ -21,13 +24,15 @@ Anclas: cada una es una fila del registro de cifras del E4 (wiki/entregables/cif
 fila con varios valores usa «id.parte» (G67.con_descuento). Cada ancla compara el valor leído del JSON, formateado
 como lo muestra la pantalla (toFixed de JS, punto de miles, coma decimal, menos U+2212: las reglas de
 e3/src/formato.js), con el número que escribe el documento entregado, escrito acá como literal. Además, controles
-cruzados entre fuentes (G64 contra las K, G39 contra G64 + G65, calendario contra K15). Si algo no cierra, imprime
-la tabla y sale con código 1 sin escribir nada.
+cruzados entre fuentes (G64 contra las K, G39 contra G64 + G65, calendario contra K15). Si algo no cierra, o si
+falta una clave en un JSON, imprime la tabla o la clave y sale con código 1 sin escribir nada.
 
-Determinista: dos corridas seguidas dan los mismos bytes (sin fechas de corrida; las fuentes van con su sha256).
+Determinista: dos corridas seguidas dan los mismos bytes (sin fechas de corrida; cada fuente va con su nombre de
+archivo y su sha256, sin rutas).
 """
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import os
@@ -63,19 +68,21 @@ FUENTES = {
     "etapa3": E3 / "C" / "modelado" / "salida" / "etapa3.json",
     "etapa4": E3 / "D" / "modelado" / "salida" / "etapa4.json",
     "indicador_6_5": E3 / "C" / "modelado" / "salida" / "indicador_6_5.json",
-    "cifras_f3": VAULT / ".workforce" / "presentacion-final" / "fase-4" / "cifras-F3.json",
+    "cifras_f3": VAULT / "entregas" / "entregable-4" / "_build" / "A" / "registro" / "cifras-F3.json",
 }
+GENERADORES = {"contenido_c": E3 / "C" / "contenido_c.py", "contenido_a": E3 / "A" / "contenido_a.py"}
 OPCIONALES = {"devoluciones": E3 / "A" / "modelado" / "salida" / "devoluciones_v02.json"}
 
-# Constantes que no vienen en los JSON (se dicen en su fila del registro):
-# A 1.2, tabla de scoring (F16): la capacidad humana sigue en 2 con otra razón (canon plan.capacidad_humana_a_1_2).
-CONDICIONES = [("datos", "Datos suficientes", 3), ("calidad", "Calidad utilizable", 2),
-               ("infraestructura", "Infraestructura", 2), ("capacidad_humana", "Capacidad humana", 2)]
-# C 5.3 v3.0, puntaje legal del estado actual (H40, canon economia.legal): protección de datos baja de 2 a 1.
-LEGAL = [("proteccion_datos", "Protección de datos personales", 1), ("seguridad", "Seguridad y control de accesos", 2),
-         ("conservacion", "Conservación y trazabilidad fiscal", 2), ("contratos", "Contratos con proveedores externos", 2),
-         ("explicabilidad", "Explicabilidad del modelo (IA)", 2)]
+# Puntajes que no vienen en los JSON: se leen con ast del generador de la parte que los escribe.
+# A 1.2, tabla de scoring (F16): filas («nombre», «puntaje», …) de contenido_a.py del E3.
+CONDICIONES = [("datos", "Datos suficientes"), ("calidad", "Calidad utilizable"),
+               ("infraestructura", "Infraestructura"), ("capacidad_humana", "Capacidad humana")]
+# C 5.3 v3.0, puntaje legal del estado actual (H40): SCORES de contenido_c.py, en este orden.
+LEGAL = [("proteccion_datos", "Protección de datos personales"), ("seguridad", "Seguridad y control de accesos"),
+         ("conservacion", "Conservación y trazabilidad fiscal"), ("contratos", "Contratos con proveedores externos"),
+         ("explicabilidad", "Explicabilidad del modelo (IA)")]
 TRAMO_CON_CONDICIONES = (1.6, 2.5)
+PUNTAJES: dict[str, list[int]] = {}   # los llena modelado(): «condiciones» y «legal»
 
 
 # ============================================================ utilidades
@@ -84,8 +91,71 @@ def sha256(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
-def cargar(p: Path) -> dict:
-    return json.loads(p.read_text(encoding="utf-8"))
+class Falta(Exception):
+    """Una clave que no está en un JSON de entrada: sale como falla con nombre, no como traceback."""
+
+
+class Nodo(dict):
+    def __init__(self, d: dict, ruta: str):
+        super().__init__(d)
+        self.ruta = ruta
+
+    def __getitem__(self, k):
+        if k not in self:
+            raise Falta(f"{self.ruta}: falta la clave «{k}»")
+        return envolver(dict.__getitem__(self, k), f"{self.ruta}.{k}")
+
+
+class Lista(list):
+    def __init__(self, v: list, ruta: str):
+        super().__init__(v)
+        self.ruta = ruta
+
+    def __getitem__(self, i):
+        try:
+            return envolver(list.__getitem__(self, i), f"{self.ruta}[{i}]")
+        except IndexError:
+            raise Falta(f"{self.ruta}: no tiene el elemento {i}") from None
+
+    def __iter__(self):
+        for i, v in enumerate(list.__iter__(self)):
+            yield envolver(v, f"{self.ruta}[{i}]")
+
+
+def envolver(v, ruta: str):
+    if isinstance(v, dict):
+        return Nodo(v, ruta)
+    if isinstance(v, list):
+        return Lista(v, ruta)
+    return v
+
+
+def cargar(p: Path):
+    return envolver(json.loads(p.read_text(encoding="utf-8")), p.name)
+
+
+def lista_de(p: Path, nombre: str) -> list:
+    """La lista literal asignada a «nombre» en un .py, leída con ast (sin importar el módulo)."""
+    for nodo in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
+        if isinstance(nodo, ast.Assign) and any(isinstance(x, ast.Name) and x.id == nombre for x in nodo.targets):
+            return ast.literal_eval(nodo.value)
+    raise Falta(f"{p.name}: no encuentro {nombre} = [...]")
+
+
+def puntajes_de_tabla(p: Path, nombres: list[str]) -> list[int]:
+    """El puntaje de cada fila («nombre», «puntaje», …) de una tabla literal de un .py, leído con ast."""
+    vistos: dict[str, str] = {}
+    for nodo in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
+        if isinstance(nodo, ast.Tuple) and len(nodo.elts) >= 2 and all(isinstance(e, ast.Constant) for e in nodo.elts[:2]):
+            a, b = nodo.elts[0].value, nodo.elts[1].value
+            if a in nombres and isinstance(b, str) and b.isdigit():
+                if a in vistos and vistos[a] != b:
+                    raise Falta(f"{p.name}: dos puntajes para «{a}»")
+                vistos[a] = b
+    faltan = [n for n in nombres if n not in vistos]
+    if faltan:
+        raise Falta(f"{p.name}: sin puntaje para {faltan}")
+    return [int(vistos[n]) for n in nombres]
 
 
 def fijo(x, dec: int = 0, signo: bool = False) -> str:
@@ -174,6 +244,25 @@ def economia(eco: dict) -> None:
           "horas", 0, "24")
     ancla("G49.acciones", "acciones de retención del piloto, que paga Marketing", pm["acciones_marketing_ars"],
           "ARS", 0, "53.538")
+    pil = eco["piloto"]
+    ancla("G49.meses", "meses del piloto", pil["meses"], "meses", 0, "3")
+    ancla("G49.lista_mes", "lista de contactables por mes", pil["lista_mes"], "clientes", 0, "500")
+    ancla("G49.control_mes", "grupo de control por mes", pil["control_mes"], "clientes", 0, "100")
+    ancla("G49.contactados", "contactados en los tres meses", pil["tratados"], "clientes", 0, "1.200")
+    ancla("G49.por_rama", "contactados por rama en los tres meses, fuera del 20 % de mayor facturación",
+          pil["metrica_decision"]["mde"]["por_rama"], "clientes", 2, "376,67")
+    ramas = pil["ramas"]
+    ancla("G49.costo_con_descuento", "costo por contactado de la rama con descuento",
+          ramas["con_descuento"]["costo_por_contactado_ars"], "ARS", 2, "53,84")
+    ancla("G49.costo_alto_valor", "costo por contactado en el 20 % de mayor facturación",
+          ramas["alto_valor"]["costo_por_contactado_ars"], "ARS", 2, "53,38")
+    ancla("G49.costo_sin_descuento", "costo por contactado de la rama sin descuento",
+          ramas["sin_descuento"]["costo_por_contactado_ars"], "ARS", 0, "25")
+    control("G49 acciones = suma de las tres ramas", sum(r["acciones_ars"] for r in ramas.values()),
+            pm["acciones_marketing_ars"])
+    control("G49 contactados = suma de las tres ramas", sum(r["contactados"] for r in ramas.values()), pil["tratados"])
+    control("G64 duplicado con descuento = costo de la rama con descuento",
+            pm["duplicado_un_mensaje_de_mas_ars"]["con_descuento"], ramas["con_descuento"]["costo_por_contactado_ars"])
     ancla("G66.inversion", "operación mínima: inversión (identidad rehecha más 15 %)", om["inversion_usd"], "USD", 0,
           "1.725")
     ancla("G66.recurrente", "operación mínima: analista part-time, 8 h por mes", om["recurrente_usd_anual"],
@@ -200,6 +289,25 @@ def economia(eco: dict) -> None:
           "puntos", 2, "11,04")
     ancla("G67.sin_descuento", "umbral de pase del piloto, rama sin descuento", qd["sin_descuento_pp"], "puntos", 2,
           "8,82")
+    dec = pv["operacion_minima"]["primer_anio_con_la_inversion_que_queda"]
+    ancla("G67.s_con_descuento", "tasa de éxito de equilibrio con la operación mínima, con descuento",
+          dec["con_descuento"]["s_equilibrio"], "fracción", 2, "14,26", x=100)
+    ancla("G67.s_sin_descuento", "tasa de éxito de equilibrio con la operación mínima, sin descuento",
+          dec["sin_descuento"]["s_equilibrio"], "fracción", 2, "11,40", x=100)
+    for etapa, cos, cd, sd in (("operacion_minima", "4.175", "8,71", "6,95"),
+                               ("produccion_completa", "9.258,33", "19,01", "15,22")):
+        v = pv[etapa]["tres_anios_por_anio"]
+        corto = "minima" if etapa == "operacion_minima" else "completa"
+        ancla(f"G67.{corto}_tres_anios_costo", f"{etapa.replace('_', ' ')}: costo de tres años repartido por año",
+              v["con_descuento"]["costo_anual_usd"], "USD por año", 2 if "," in cos else 0, cos)
+        ancla(f"G67.{corto}_tres_anios_con_descuento", f"{etapa.replace('_', ' ')}, tres años: umbral con descuento",
+              v["con_descuento"]["diferencia_cruce_90d_pp"], "puntos", 2, cd)
+        ancla(f"G67.{corto}_tres_anios_sin_descuento", f"{etapa.replace('_', ' ')}, tres años: umbral sin descuento",
+              v["sin_descuento"]["diferencia_cruce_90d_pp"], "puntos", 2, sd)
+    control("G67 tres años de la operación mínima = (I + 3R) / 3", pv["operacion_minima"]["tres_anios_por_anio"]
+            ["con_descuento"]["costo_anual_usd"], om["tres_anios_usd"] / 3)
+    control("G67 tres años de la producción completa = (I + 3R) / 3", pv["produccion_completa"]["tres_anios_por_anio"]
+            ["con_descuento"]["costo_anual_usd"], pc["tres_anios_usd"] / 3)
     pcp = pv["produccion_completa"]["primer_anio_con_la_inversion_que_queda"]
     ancla("G67.completa_con_descuento", "efecto que paga la producción completa en su primer año, con descuento",
           pcp["con_descuento"]["diferencia_cruce_90d_pp"], "puntos", 2, "32,21")
@@ -229,6 +337,8 @@ def economia(eco: dict) -> None:
           p["potencia_rama_sin_descuento_en_su_umbral"] * 100, "de cada 100", 0, "73")
     ancla("G68.potencia_con_descuento", "veces de cada 100 que el piloto ve 11,04 puntos en la rama con descuento",
           p["potencia_rama_con_descuento_en_su_umbral"] * 100, "de cada 100", 0, "89")
+    ancla("G68.potencia_juntas", "veces de cada 100 que el primer paso ve 8,82 puntos con las dos ramas juntas",
+          p["potencia_ramas_juntas_en_el_umbral_sin_descuento"] * 100, "de cada 100", 0, "84")
     ancla("G68.clientes_por_grupo", "clientes por grupo para ver la diferencia con la tasa observada",
           p["clientes_por_grupo_para_ver_lo_esperado"], "clientes", 0, "44.661")
     ancla("G68.fuera_del_20_por_mes", "clientes por mes de la lista fuera del 20 % de mayor facturación",
@@ -340,14 +450,16 @@ def modelado(e1: dict, e2: dict, e3: dict, e4: dict, co: dict) -> None:
     ancla("J02.tasa", "tasa de positivos del test (se van en 90 días)", m["tasa_base"], "fracción", 2, "25,35", x=100)
     ancla("J02.contactables", "filas contactables del test", m["contactables"]["filas"], "filas", 0, "9.962")
 
-    puntajes = [p for _, _, p in CONDICIONES]
+    puntajes = PUNTAJES["condiciones"] = puntajes_de_tabla(GENERADORES["contenido_a"], [n for _, n in CONDICIONES])
     ancla("F16", "puntaje técnico de la A 1.2, promedio de las cuatro condiciones", sum(puntajes) / len(puntajes),
           "de 3", 2, "2,25")
     ancla("G10", "positivos para entrenar (entrenamiento con embargo)", e2["particion"]["entrenamiento"]["positivos"],
           "filas", 0, "4.636")
     ancla("C19", "ventas sin cliente identificado", co["nulos"]["ventas_sin_cliente_pct"], "%", 1, "44,8")
 
-    legal = [p for _, _, p in LEGAL]
+    legal = PUNTAJES["legal"] = lista_de(GENERADORES["contenido_c"], "SCORES")
+    if len(legal) != len(LEGAL):
+        raise Falta(f"contenido_c.py: SCORES tiene {len(legal)} puntajes y la tabla legal {len(LEGAL)} dimensiones")
     prom = sum(legal) / len(legal)
     if not TRAMO_CON_CONDICIONES[0] <= prom <= TRAMO_CON_CONDICIONES[1]:
         sys.exit(f"H40: {prom} fuera del tramo «viable con condiciones»")
@@ -365,14 +477,29 @@ def devueltas(dv: dict) -> None:
           r["variacion_precision_entre_cortes_validacion_pts"], "puntos", 2, "2,67")
 
 
-def indicador(ind: dict) -> None:
-    ancla("H50", "cruce a 90 días de la lista menos el de toda la base elegible, validación",
-          ind["diferencia_validacion_pp"], "puntos", 1, "51,9")
-    ancla("H50.min", "ídem, el corte más bajo (julio de 2024)", ind["diferencia_min_pp"], "puntos", 1, "48,6")
-    ancla("H50.max", "ídem, el corte más alto (septiembre de 2024)", ind["diferencia_max_pp"], "puntos", 1, "54,1")
-    ancla("H50.lista", "cruce de la lista en validación", ind["cruce_lista_validacion"], "fracción", 1, "75,8", x=100)
-    ancla("H50.base", "cruce de toda la base elegible en validación", ind["cruce_base_validacion"], "fracción", 1,
-          "23,9", x=100)
+def indicador(ind: dict, e3: dict) -> None:
+    ref = ind["referencia"]
+    if (ref["desde"], ref["hasta"], ref["cortes"]) != ("2023-10-31", "2024-12-31", 15):
+        raise Falta(f"indicador_6_5.json: la referencia no es octubre de 2023 a diciembre de 2024 en 15 cortes: {dict(ref)}")
+    ancla("H50.parte", "parte de los contactables que ocupa la lista en cada corte (la de 500 en validación)",
+          ind["fraccion_de_los_contactables"], "fracción", 1, "29,8", x=100)
+    ancla("H50.contactables_validacion", "contactables de validación", ind["contactables_validacion"], "clientes", 0,
+          "5.038")
+    ancla("H50.min", "cruce a 90 días de la lista menos el de toda la base elegible: mínimo de la referencia",
+          ref["diferencia_min_pp"], "puntos", 1, "51,4")
+    ancla("H50.max", "ídem, máximo de la referencia", ref["diferencia_max_pp"], "puntos", 1, "55,3")
+    ancla("H50.validacion", "ídem, en validación (no se cita en la C)", ind["validacion"]["diferencia_pp"], "puntos", 1,
+          "53,2")
+    ctl = ind["control_lista_500_validacion"]
+    h16 = [f for f in e3["umbral"]["filtradas"]["regla_umbral"] if f["umbral"].startswith("lista de 500")][0]["precision"]
+    control("H50 control: lista de 500 fija de validación = H16", ctl["cruce_lista"], h16)
+    control("H50 control: 1.137 aciertos de la lista de 500 (H16)", ctl["aciertos"], 1137.0)
+    control("H50 parte = 1.500 / contactables de validación", ind["fraccion_de_los_contactables"],
+            1500 / ind["contactables_validacion"])
+
+
+# Cifras K en USD (vienen como texto «3.450»): su línea de costos únicos de G65, que con 15 % tiene que dar la K.
+USD_K = {"K21": "sprint de integración", "K22": "data scientist"}
 
 
 def gestion(k_filas: list, eco: dict, cal: dict) -> None:
@@ -388,9 +515,14 @@ def gestion(k_filas: list, eco: dict, cal: dict) -> None:
         if isinstance(f["cifra"], int):
             unidad = "horas" if "horas" in f["definicion"] else "cantidad"
             ancla(i, f["definicion"], f["cifra"], unidad, 0, fijo(f["cifra"]))
+        elif i in USD_K:
+            usd = int(str(f["cifra"]).replace(".", ""))
+            por_id[i] = usd
+            ancla(i, f["definicion"], usd, "USD", 0, str(f["cifra"]))
         else:
             texto_fijo(i, f["definicion"], str(f["cifra"]))
-    faltan = [k for k in ("K01", "K02", "K03", "K07", "K08", "K09", "K10", "K12", "K15") if k not in por_id]
+    faltan = [k for k in ("K01", "K02", "K03", "K07", "K08", "K09", "K10", "K12", "K15", "K21", "K22")
+              if k not in por_id]
     if faltan:
         sys.exit(f"cifras-F3.json: faltan {faltan}")
     control("K07 = G64 horas del equipo", por_id["K07"], pm["horas_equipo"])
@@ -401,6 +533,11 @@ def gestion(k_filas: list, eco: dict, cal: dict) -> None:
     control("K07 = K08 + K09 + K10", por_id["K07"], por_id["K08"] + por_id["K09"] + por_id["K10"])
     control("K12 = una semana de analista (USD 1.500 / USD 37,50)", por_id["K12"],
             eco["operacion_minima"]["unicos_usd"] / 37.5)
+    for k, prefijo in USD_K.items():
+        linea = [v for c, v in eco["produccion_completa"]["unicos"].items() if c.startswith(prefijo)]
+        if len(linea) != 1:
+            raise Falta(f"economia.json: produccion_completa.unicos sin una línea «{prefijo}…»")
+        control(f"{k} = {prefijo} de G65 × 1,15", por_id[k], linea[0] * 1.15)
     d1, h1 = fecha(cal["semana_1"]), fecha(cal["semana_1_hasta"])
     control("K15 trae la semana 1 de G63", f"1: {d1[:5]} al {h1}" in por_id["K15"], True)
     control("K15 trae la semana 6 de G63", f"6: {fecha(cal['primera_lista']['lunes'])[:5]} al" in por_id["K15"], True)
@@ -420,9 +557,9 @@ def tablas(eco: dict, cal: dict) -> dict:
                       "con_descuento_pp": v["con_descuento"]["diferencia_cruce_90d_pp"],
                       "sin_descuento_pp": v["sin_descuento"]["diferencia_cruce_90d_pp"]})
     return {
-        "condiciones": [{"id": i, "nombre": n, "puntaje": p} for i, n, p in CONDICIONES],
+        "condiciones": [{"id": i, "nombre": n, "puntaje": p} for (i, n), p in zip(CONDICIONES, PUNTAJES["condiciones"])],
         "escala_tecnica": {"hasta": 3},
-        "legal": [{"id": i, "nombre": n, "puntaje": p} for i, n, p in LEGAL],
+        "legal": [{"id": i, "nombre": n, "puntaje": p} for (i, n), p in zip(LEGAL, PUNTAJES["legal"])],
         "umbral_de_pase": filas,
         "calendario": cal,
     }
@@ -431,25 +568,28 @@ def tablas(eco: dict, cal: dict) -> dict:
 # ============================================================ main
 
 def main() -> int:
-    falta = [str(p) for p in FUENTES.values() if not p.exists()]
+    falta = [str(p) for p in list(FUENTES.values()) + list(GENERADORES.values()) if not p.exists()]
     if falta:
         print("faltan fuentes:\n  " + "\n  ".join(falta))
         return 1
-    eco, cv, e1, co, e2, e3, e4, ind, kf = (cargar(FUENTES[k]) for k in
-                                              ("economia", "cv_temporal", "etapa1", "condiciones", "etapa2", "etapa3",
-                                               "etapa4", "indicador_6_5", "cifras_f3"))
-    cal = economia(eco)
-    control("E3A-01 de economia.json = cv_temporal.json", eco["rango_anual"]["trimestre_x4_usd"][0],
-            cv["roi"]["mvp_proporcional_a_500_sin_filtro"]["beneficio_min"])
-    modelado(e1, e2, e3, e4, co)
-    indicador(ind)
-    control("H50.lista = H16 (etapa3, contactables de la regla)", ind["cruce_lista_validacion"],
-            [f for f in e3["umbral"]["filtradas"]["regla_umbral"] if f["umbral"].startswith("lista de 500")][0]["precision"])
-    usadas = dict(FUENTES)
-    if OPCIONALES["devoluciones"].exists():
-        devueltas(cargar(OPCIONALES["devoluciones"]))
-        usadas["devoluciones"] = OPCIONALES["devoluciones"]
-    gestion(kf if isinstance(kf, list) else kf["filas"], eco, cal)
+    usadas = {**FUENTES, **GENERADORES}
+    try:
+        eco, cv, e1, co, e2, e3, e4, ind, kf = (cargar(FUENTES[k]) for k in
+                                                  ("economia", "cv_temporal", "etapa1", "condiciones", "etapa2",
+                                                   "etapa3", "etapa4", "indicador_6_5", "cifras_f3"))
+        cal = economia(eco)
+        control("E3A-01 de economia.json = cv_temporal.json", eco["rango_anual"]["trimestre_x4_usd"][0],
+                cv["roi"]["mvp_proporcional_a_500_sin_filtro"]["beneficio_min"])
+        modelado(e1, e2, e3, e4, co)
+        indicador(ind, e3)
+        if OPCIONALES["devoluciones"].exists():
+            devueltas(cargar(OPCIONALES["devoluciones"]))
+            usadas["devoluciones"] = OPCIONALES["devoluciones"]
+        gestion(kf if isinstance(kf, list) else kf["filas"], eco, cal)
+        tab = tablas(eco, cal)
+    except Falta as e:
+        print(f"FALLA de entrada: {e}. No se escribe {SALIDA.relative_to(APP)}.")
+        return 1
 
     print(f"{'ID':28s}{'DOCUMENTO':>14s}{'PANTALLA':>14s}  OK")
     for a in FILAS:
@@ -465,11 +605,10 @@ def main() -> int:
     df = {
         "meta": {
             "version": "final-1.0",
-            "registro": "wiki/entregables/cifras-entregable-4.md",
-            "fuentes": [{"archivo": str(p.relative_to(VAULT)), "sha256": sha256(p)} for p in usadas.values()],
+            "fuentes": [{"archivo": p.name, "sha256": sha256(p)} for p in usadas.values()],
         },
         "anclas": ANCLAS,
-        "tablas": tablas(eco, cal),
+        "tablas": tab,
     }
     texto = json.dumps(df, ensure_ascii=False, indent=1)
     js = ("// Generado por pipeline/build_final.py desde los JSON del vault (canon v1.1, tableros.final). No editar a mano.\n"

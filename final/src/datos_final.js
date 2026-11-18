@@ -4,46 +4,53 @@
 export const DF = {
  "meta": {
   "version": "final-1.0",
-  "registro": "wiki/entregables/cifras-entregable-4.md",
   "fuentes": [
    {
-    "archivo": "entregas/entregable-3/_build/B/economia/salida/economia.json",
+    "archivo": "economia.json",
     "sha256": "985b3b501b9065630d7df0f53b4bb3582d5f7730e771e8d8104ad70a299f332d"
    },
    {
-    "archivo": "entregas/entregable-3/_build/B/economia/salida/cv_temporal.json",
+    "archivo": "cv_temporal.json",
     "sha256": "926f075bf57e35efa3c883bafacfc97ddca2067b9792a9f9f24635aa31fc562d"
    },
    {
-    "archivo": "entregas/entregable-3/_build/A/modelado/salida/etapa1.json",
+    "archivo": "etapa1.json",
     "sha256": "a36746b4915cc6ab739fc4f41202ede8c81973ca41dce608952a970709f9cf4f"
    },
    {
-    "archivo": "entregas/entregable-3/_build/A/factibilidad/salida/condiciones.json",
+    "archivo": "condiciones.json",
     "sha256": "a1ba7efdc2912e6001e1aa26c1736d636d4041289e58cfceeb22ea1cbdf86256"
    },
    {
-    "archivo": "entregas/entregable-3/_build/B/modelado/salida/etapa2.json",
+    "archivo": "etapa2.json",
     "sha256": "72739f939a393ddc95e936e79f224df960a002df4b30d9d26aaf6038620cf4b6"
    },
    {
-    "archivo": "entregas/entregable-3/_build/C/modelado/salida/etapa3.json",
+    "archivo": "etapa3.json",
     "sha256": "8dc7bb84524731c46dfedf8a2cd8be5173aee71978476c26774930c509a9ded6"
    },
    {
-    "archivo": "entregas/entregable-3/_build/D/modelado/salida/etapa4.json",
+    "archivo": "etapa4.json",
     "sha256": "0368611d7d797b3bec39f19764d2e3496d9c74e539a8b6c2e8cdf03099844fbd"
    },
    {
-    "archivo": "entregas/entregable-3/_build/C/modelado/salida/indicador_6_5.json",
-    "sha256": "6ab60c087544ddee0aa20b08f00d52c111cfdb676b530c885ac28820b67f8e4f"
+    "archivo": "indicador_6_5.json",
+    "sha256": "f560dfc500b772170f45245e8ebcc20e0ffe76ac44059d12f6b5abf89131a20e"
    },
    {
-    "archivo": ".workforce/presentacion-final/fase-4/cifras-F3.json",
+    "archivo": "cifras-F3.json",
     "sha256": "ec6079b3a69eade8a7ecd0e60aebea142cbabfd5e41fb2eca0b7e154db8349d9"
    },
    {
-    "archivo": "entregas/entregable-3/_build/A/modelado/salida/devoluciones_v02.json",
+    "archivo": "contenido_c.py",
+    "sha256": "4fd742d1edf7ab3f1e3929d3ce72a1da63fbc06b887169789745965e98810afb"
+   },
+   {
+    "archivo": "contenido_a.py",
+    "sha256": "fad086cda2947a81bd9fa38464c722b2e4a8a2e70570aaf812125f3d681d1db9"
+   },
+   {
+    "archivo": "devoluciones_v02.json",
     "sha256": "5bcf053809ad4a64ebd0f5401d1db9bc927925affea7aab2d83bfbf61fd81a00"
    }
   ]
@@ -84,6 +91,54 @@ export const DF = {
    "unidad": "ARS",
    "texto": "ARS 53.538",
    "definicion": "acciones de retención del piloto, que paga Marketing"
+  },
+  "G49.meses": {
+   "valor": 3,
+   "unidad": "meses",
+   "texto": "3",
+   "definicion": "meses del piloto"
+  },
+  "G49.lista_mes": {
+   "valor": 500,
+   "unidad": "clientes",
+   "texto": "500",
+   "definicion": "lista de contactables por mes"
+  },
+  "G49.control_mes": {
+   "valor": 100,
+   "unidad": "clientes",
+   "texto": "100",
+   "definicion": "grupo de control por mes"
+  },
+  "G49.contactados": {
+   "valor": 1200,
+   "unidad": "clientes",
+   "texto": "1.200",
+   "definicion": "contactados en los tres meses"
+  },
+  "G49.por_rama": {
+   "valor": 376.66666666666663,
+   "unidad": "clientes",
+   "texto": "376,67",
+   "definicion": "contactados por rama en los tres meses, fuera del 20 % de mayor facturación"
+  },
+  "G49.costo_con_descuento": {
+   "valor": 53.83989357148354,
+   "unidad": "ARS",
+   "texto": "ARS 53,84",
+   "definicion": "costo por contactado de la rama con descuento"
+  },
+  "G49.costo_alto_valor": {
+   "valor": 53.37790309551858,
+   "unidad": "ARS",
+   "texto": "ARS 53,38",
+   "definicion": "costo por contactado en el 20 % de mayor facturación"
+  },
+  "G49.costo_sin_descuento": {
+   "valor": 25.0,
+   "unidad": "ARS",
+   "texto": "ARS 25",
+   "definicion": "costo por contactado de la rama sin descuento"
   },
   "G66.inversion": {
    "valor": 1724.9999999999998,
@@ -150,6 +205,54 @@ export const DF = {
    "unidad": "puntos",
    "texto": "8,82 puntos",
    "definicion": "umbral de pase del piloto, rama sin descuento"
+  },
+  "G67.s_con_descuento": {
+   "valor": 0.14262597531822777,
+   "unidad": "fracción",
+   "texto": "14,26 %",
+   "definicion": "tasa de éxito de equilibrio con la operación mínima, con descuento"
+  },
+  "G67.s_sin_descuento": {
+   "valor": 0.11397622867301843,
+   "unidad": "fracción",
+   "texto": "11,40 %",
+   "definicion": "tasa de éxito de equilibrio con la operación mínima, sin descuento"
+  },
+  "G67.minima_tres_anios_costo": {
+   "valor": 4175.0,
+   "unidad": "USD por año",
+   "texto": "USD 4.175 por año",
+   "definicion": "operacion minima: costo de tres años repartido por año"
+  },
+  "G67.minima_tres_anios_con_descuento": {
+   "valor": 8.710383028466683,
+   "unidad": "puntos",
+   "texto": "8,71 puntos",
+   "definicion": "operacion minima, tres años: umbral con descuento"
+  },
+  "G67.minima_tres_anios_sin_descuento": {
+   "valor": 6.953122469443356,
+   "unidad": "puntos",
+   "texto": "6,95 puntos",
+   "definicion": "operacion minima, tres años: umbral sin descuento"
+  },
+  "G67.completa_tres_anios_costo": {
+   "valor": 9258.333333333334,
+   "unidad": "USD por año",
+   "texto": "USD 9.258,33 por año",
+   "definicion": "produccion completa: costo de tres años repartido por año"
+  },
+  "G67.completa_tres_anios_con_descuento": {
+   "valor": 19.007844383399522,
+   "unidad": "puntos",
+   "texto": "19,01 puntos",
+   "definicion": "produccion completa, tres años: umbral con descuento"
+  },
+  "G67.completa_tres_anios_sin_descuento": {
+   "valor": 15.215593353885149,
+   "unidad": "puntos",
+   "texto": "15,22 puntos",
+   "definicion": "produccion completa, tres años: umbral sin descuento"
   },
   "G67.completa_con_descuento": {
    "valor": 32.20885221873965,
@@ -222,6 +325,12 @@ export const DF = {
    "unidad": "de cada 100",
    "texto": "89 de cada 100",
    "definicion": "veces de cada 100 que el piloto ve 11,04 puntos en la rama con descuento"
+  },
+  "G68.potencia_juntas": {
+   "valor": 83.63670150968409,
+   "unidad": "de cada 100",
+   "texto": "84 de cada 100",
+   "definicion": "veces de cada 100 que el primer paso ve 8,82 puntos con las dos ramas juntas"
   },
   "G68.clientes_por_grupo": {
    "valor": 44661,
@@ -535,35 +644,35 @@ export const DF = {
    "texto": "1,8",
    "definicion": "puntaje legal del estado actual, promedio de cinco dimensiones"
   },
-  "H50": {
-   "valor": 51.91877875365955,
-   "unidad": "puntos",
-   "texto": "51,9 puntos",
-   "definicion": "cruce a 90 días de la lista menos el de toda la base elegible, validación"
+  "H50.parte": {
+   "valor": 0.29773719730051607,
+   "unidad": "fracción",
+   "texto": "29,8 %",
+   "definicion": "parte de los contactables que ocupa la lista en cada corte (la de 500 en validación)"
+  },
+  "H50.contactables_validacion": {
+   "valor": 5038,
+   "unidad": "clientes",
+   "texto": "5.038",
+   "definicion": "contactables de validación"
   },
   "H50.min": {
-   "valor": 48.63001328021248,
+   "valor": 51.4030591356468,
    "unidad": "puntos",
-   "texto": "48,6 puntos",
-   "definicion": "ídem, el corte más bajo (julio de 2024)"
+   "texto": "51,4 puntos",
+   "definicion": "cruce a 90 días de la lista menos el de toda la base elegible: mínimo de la referencia"
   },
   "H50.max": {
-   "valor": 54.11464968152866,
+   "valor": 55.34926359754662,
    "unidad": "puntos",
-   "texto": "54,1 puntos",
-   "definicion": "ídem, el corte más alto (septiembre de 2024)"
+   "texto": "55,3 puntos",
+   "definicion": "ídem, máximo de la referencia"
   },
-  "H50.lista": {
-   "valor": 0.758,
-   "unidad": "fracción",
-   "texto": "75,8 %",
-   "definicion": "cruce de la lista en validación"
-  },
-  "H50.base": {
-   "valor": 0.23881221246340442,
-   "unidad": "fracción",
-   "texto": "23,9 %",
-   "definicion": "cruce de toda la base elegible en validación"
+  "H50.validacion": {
+   "valor": 53.187399673046635,
+   "unidad": "puntos",
+   "texto": "53,2 puntos",
+   "definicion": "ídem, en validación (no se cita en la C)"
   },
   "E3A-07.filas_sin": {
    "valor": 59585,
@@ -710,15 +819,15 @@ export const DF = {
    "definicion": "criterios de aceptación por historia"
   },
   "K21": {
-   "valor": null,
-   "unidad": "texto",
-   "texto": "3.450",
+   "valor": 3450,
+   "unidad": "USD",
+   "texto": "USD 3.450",
    "definicion": "estimación de HU-2-03 (exportación automática): la línea «sprint de integración / ETL» de la producción completa, USD 3.000 más 15 % de contingencia, dentro de los USD 9.775 (G65)"
   },
   "K22": {
-   "valor": null,
-   "unidad": "texto",
-   "texto": "3.565",
+   "valor": 3565,
+   "unidad": "USD",
+   "texto": "USD 3.565",
    "definicion": "estimación de HU-5-02 (tablero del mes y corrida con un comando): la línea «data scientist: tablero del directorio y corrida con un comando» de la producción completa, USD 3.100 más 15 %, dentro de los USD 9.775 (G65)"
   },
   "K23": {
