@@ -167,8 +167,9 @@ La presentación final (24/11, 30 minutos, cinco integrantes) con el esqueleto y
 riel, la misma banda de tarjetas con la tarjeta verde de decisión, la misma letra y los mismos colores, el mismo zoom
 uniforme y las mismas teclas. Un solo HTML autocontenido en `dist-final/index.html`.
 
-No tiene pipeline propio. Las cifras salen de `e3/src/datos_e3.js` (D3, la misma fuente que `/e3/`) y todo el texto
-de `final/src/contenido_final.js` (CF). Hoy CF es de muestra: los textos dicen «MUESTRA» y cuatro de las siete vistas
+Tiene payload propio: `pipeline/build_final.py` lee los JSON de los generadores de las partes en el vault y escribe
+`final/src/datos_final.js` (DF). `DF.anclas` va por id del registro de cifras (`G67.con_descuento`): valor, unidad y
+texto con las reglas de `e3/src/formato.js`. Todo el texto sale de `final/src/contenido_final.js` (CF). Hoy CF es de muestra: los textos dicen «MUESTRA» y cuatro de las siete vistas
 son esqueletos, hasta que se cargue el contenido.
 
 CF.BLOQUES es la única lista que ordena la presentación: cada bloque tiene id, título, rótulo del riel, integrante y
@@ -187,17 +188,21 @@ Las vistas importan los componentes del E2 y del E3 sin copiarlos (`Banda.jsx`, 
 `zoom.js`, `formato.js`, `texto.jsx`, `cifra.jsx`, `src/graficos.jsx`). `/final/` no toca `src/`, `e2/` ni `e3/`.
 
 Para sumar una vista: se lista en el bloque que corresponde de CF (id, título, pregunta, segundos, notas, textos) y se
-crea `final/src/vistas/Vnn_Nombre.jsx` con `meta = { id }`, que lee sus textos con `textosDe(id)` y sus cifras de D3.
+crea `final/src/vistas/Vnn_Nombre.jsx` con `meta = { id }`, que lee sus textos con `textosDe(id)` y sus cifras de
+`DF.anclas`. Para sumar una cifra: un `ancla(id, definición, valor, unidad, decimales, "número del documento")` en
+`build_final.py`, que corta con código 1 si el valor del JSON no da el número que escribe el documento.
 Para sumar o mover un bloque, se edita CF.BLOQUES: el riel, el recorrido y los tiempos lo siguen solos.
 
 ```bash
 npm run dev:final                                    # servidor de desarrollo, puerto 5180
 npm run build:final                                  # dist-final/index.html
+python3 -I pipeline/build_final.py                   # DF desde los JSON del vault (corta si una cifra no cierra)
 python3 -I scripts/verificar_final.py                # desborde, consola, red, teclado, notas, impresión y contenido
-                                                     # contra CF y D3, 5 resoluciones; con --sin-esqueletos y
+                                                     # contra CF y DF, 5 resoluciones; con --sin-esqueletos y
                                                      # --sin-muestra antes de presentar
 npm run build:e2 && python3 -I scripts/paridad_final.py   # letra, cajas y reglas del E2, 4 resoluciones
 npx vite build --config scripts/vite.final-sobre.config.js   # el HTML para mandar, en dist-final-sobre/
+python3 scripts/check_app_f4.py                      # todo lo anterior más /e3/ intacto y el anexo de fórmulas
 ```
 
 Los dos verificadores terminan con `RESULTADO: OK` o `RESULTADO: FALLA`. Las teclas son las de `/e3/`. Las notas (N o

@@ -74,9 +74,10 @@ jobs:
 
       - run: npm run build:e3
 
-      # Presentación final (17/11): cuarta página autocontenida. No tiene pipeline propio:
-      # sus cifras salen de e3/src/datos_e3.js (ya comprobado arriba) y su texto de
-      # final/src/contenido_final.js, que se versiona.
+      # Presentación final (17/11): cuarta página autocontenida. Sus cifras salen de
+      # final/src/datos_final.js, que escribe pipeline/build_final.py desde los JSON del vault;
+      # el CI no lo corre porque el vault no está en el repositorio, y la deriva se comprueba en
+      # local (scripts/check_app_f4.py). Su texto, de final/src/contenido_final.js.
       - run: npm run build:final
 
       # Arma dist-site/: landing estática en /, tablero E1 en /e1/, tablero E2 en /e2/,

@@ -51,7 +51,7 @@ export const CF = {
             barras: { logistica: 'Logística', regla: 'Regla del umbral', practica: 'Práctica actual' },
             decision: {
               area: 'Veredicto',
-              estado: 'con condiciones',
+              estado: 'muestra',
               corta: 'MUESTRA: no viable como proyecto, piloto mínimo',
               larga: 'MUESTRA. Texto completo de la decisión, para el title de la tarjeta.',
             },
