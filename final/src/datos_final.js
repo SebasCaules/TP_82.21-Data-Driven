@@ -1,4 +1,4 @@
-// Generado por pipeline/build_final.py desde los JSON del vault (canon v1.1, tableros.final). No editar a mano.
+// Generado por pipeline/build_final.py desde los JSON del vault (canon de la corrida, tableros.final). No editar a mano.
 // Cada ancla es una fila del registro de cifras del E4 por su id: valor, unidad y texto con las reglas de
 // e3/src/formato.js.
 export const DF = {
@@ -42,12 +42,28 @@ export const DF = {
     "sha256": "ec6079b3a69eade8a7ecd0e60aebea142cbabfd5e41fb2eca0b7e154db8349d9"
    },
    {
+    "archivo": "lista_de_muestra.json",
+    "sha256": "b054dd736c53eae7a58c65a6b3a2a4e0ec2ed8c671f73a49fa0c7c3000f0fed3"
+   },
+   {
+    "archivo": "canon.json",
+    "sha256": "c31476043ff5276013bb573237a5ee245957a6bb718512052ca02fba94bd1562"
+   },
+   {
     "archivo": "contenido_c.py",
-    "sha256": "4fd742d1edf7ab3f1e3929d3ce72a1da63fbc06b887169789745965e98810afb"
+    "sha256": "62ca4d101e6d51e78981f9efce8312e3beb57429384541987f6971272624e3e6"
    },
    {
     "archivo": "contenido_a.py",
     "sha256": "fad086cda2947a81bd9fa38464c722b2e4a8a2e70570aaf812125f3d681d1db9"
+   },
+   {
+    "archivo": "contenido_a.py",
+    "sha256": "03cd553f9664b792f1e0fddeae6790842018ee440cab97f344f4fd6707971088"
+   },
+   {
+    "archivo": "Transacciones_clientes.csv",
+    "sha256": "f16d5e4c60a297c9a8bd815397b664aadbea84edb01f263b8e3616d297298b83"
    },
    {
     "archivo": "devoluciones_v02.json",
@@ -841,6 +857,198 @@ export const DF = {
    "unidad": "horas",
    "texto": "44",
    "definicion": "horas del equipo de las 7 historias que bloquean la primera lista (planilla y guía 24, legal 20)"
+  },
+  "C20.crudo": {
+   "valor": 50250,
+   "unidad": "filas",
+   "texto": "50.250",
+   "definicion": "filas del extracto de ventas tal como llegó"
+  },
+  "C20.unicas": {
+   "valor": 50000,
+   "unidad": "filas",
+   "texto": "50.000",
+   "definicion": "filas sin duplicados de fila completa"
+  },
+  "C20.con_cliente": {
+   "valor": 27606,
+   "unidad": "filas",
+   "texto": "27.606",
+   "definicion": "filas con cliente identificado"
+  },
+  "C20.positivas": {
+   "valor": 27276,
+   "unidad": "filas",
+   "texto": "27.276",
+   "definicion": "filas con cliente y monto positivo"
+  },
+  "C20.repetidas": {
+   "valor": 250,
+   "unidad": "filas",
+   "texto": "250",
+   "definicion": "filas repetidas que se sacan"
+  },
+  "C20.sin_cliente": {
+   "valor": 22394,
+   "unidad": "filas",
+   "texto": "22.394",
+   "definicion": "filas sin cliente identificado: quedan fuera de la lista"
+  },
+  "C20.no_positivas": {
+   "valor": 330,
+   "unidad": "filas",
+   "texto": "330",
+   "definicion": "filas con cliente y monto no positivo (devoluciones): no suman facturación"
+  },
+  "H46.umbral_mes": {
+   "valor": 0.6,
+   "unidad": "fracción",
+   "texto": "60 %",
+   "definicion": "un mes con menos de esta parte de las operaciones del mismo mes del año anterior no se usa"
+  },
+  "D28.ops_2025-01": {
+   "valor": 1390,
+   "unidad": "operaciones",
+   "texto": "1.390",
+   "definicion": "operaciones de 2025-01"
+  },
+  "D28.ops_2025-12": {
+   "valor": 255,
+   "unidad": "operaciones",
+   "texto": "255",
+   "definicion": "operaciones de 2025-12"
+  },
+  "D28.parte_2025-08": {
+   "valor": 0.6294552790854069,
+   "unidad": "fracción",
+   "texto": "63 %",
+   "definicion": "operaciones de 2025-08 sobre las del mismo mes de 2024"
+  },
+  "D28.parte_2025-09": {
+   "valor": 0.5346467391304348,
+   "unidad": "fracción",
+   "texto": "53 %",
+   "definicion": "operaciones de 2025-09 sobre las del mismo mes de 2024"
+  },
+  "D28.parte_2025-10": {
+   "valor": 0.43928334439283345,
+   "unidad": "fracción",
+   "texto": "44 %",
+   "definicion": "operaciones de 2025-10 sobre las del mismo mes de 2024"
+  },
+  "D28.parte_2025-11": {
+   "valor": 0.3624161073825503,
+   "unidad": "fracción",
+   "texto": "36 %",
+   "definicion": "operaciones de 2025-11 sobre las del mismo mes de 2024"
+  },
+  "D28.parte_2025-12": {
+   "valor": 0.17970401691331925,
+   "unidad": "fracción",
+   "texto": "18 %",
+   "definicion": "operaciones de 2025-12 sobre las del mismo mes de 2024"
+  },
+  "D28.meses_fuera": {
+   "valor": 4,
+   "unidad": "meses",
+   "texto": "4",
+   "definicion": "meses de 2025 debajo del umbral del mes (septiembre a diciembre)"
+  },
+  "F04.menos30": {
+   "valor": 0.9170812603648425,
+   "unidad": "fracción",
+   "texto": "91,7 %",
+   "definicion": "tasa de positivos en validación a menos de 30 días de cruzar el umbral"
+  },
+  "F04.30a59": {
+   "valor": 0.7617765814266487,
+   "unidad": "fracción",
+   "texto": "76,2 %",
+   "definicion": "tasa de positivos en validación a 30 a 59 días de cruzar el umbral"
+  },
+  "F04.60a89": {
+   "valor": 0.6549062844542448,
+   "unidad": "fracción",
+   "texto": "65,5 %",
+   "definicion": "tasa de positivos en validación a 60 a 89 días de cruzar el umbral"
+  },
+  "F04.90mas": {
+   "valor": 0.0,
+   "unidad": "fracción",
+   "texto": "0,0 %",
+   "definicion": "tasa de positivos en validación a 90 o más días de cruzar el umbral"
+  },
+  "F03.lejos": {
+   "valor": 0.6651338424100025,
+   "unidad": "fracción",
+   "texto": "66,5 %",
+   "definicion": "parte de las filas a 90 días o más de cruzar su umbral, sin positivos"
+  },
+  "C03.minimo_dias": {
+   "valor": 90,
+   "unidad": "días",
+   "texto": "90",
+   "definicion": "umbral del cliente: días mínimos"
+  },
+  "C03.factor": {
+   "valor": 1.5,
+   "unidad": "veces",
+   "texto": "1,5",
+   "definicion": "umbral del cliente: veces el intervalo mediano entre compras"
+  },
+  "G64.planilla": {
+   "valor": 900.0,
+   "unidad": "USD",
+   "texto": "USD 900",
+   "definicion": "Planilla de la regla y guía de corrida"
+  },
+  "G64.legal": {
+   "valor": 750.0,
+   "unidad": "USD",
+   "texto": "USD 750",
+   "definicion": "Adecuación legal del equipo (L3, L4 y L5)"
+  },
+  "G64.medicion": {
+   "valor": 1350.0,
+   "unidad": "USD",
+   "texto": "USD 1.350",
+   "definicion": "Sorteo, medición e informes del piloto"
+  },
+  "G64.taller": {
+   "valor": 900.0,
+   "unidad": "USD",
+   "texto": "USD 900",
+   "definicion": "Un taller con el equipo de Sofía R. y quien corre la planilla (semana 5)"
+  },
+  "G64.horas_por_lista": {
+   "valor": 8.0,
+   "unidad": "horas",
+   "texto": "8",
+   "definicion": "horas de la persona de Marketing por lista"
+  },
+  "G49.descuento": {
+   "valor": 0.15,
+   "unidad": "fracción",
+   "texto": "15 %",
+   "definicion": "descuento de la rama con descuento"
+  },
+  "G49.alto_valor": {
+   "valor": 0.2,
+   "unidad": "fracción",
+   "texto": "20 %",
+   "definicion": "el grupo de mayor facturación que se contacta entero (sin control)"
+  },
+  "K18.con_descuento": {
+   "valor": 124,
+   "unidad": "clientes",
+   "texto": "124",
+   "definicion": "lista de muestra: rama con descuento"
+  },
+  "K18.sin_descuento": {
+   "valor": 123,
+   "unidad": "clientes",
+   "texto": "123",
+   "definicion": "lista de muestra: rama sin descuento"
   }
  },
  "tablas": {
@@ -966,6 +1174,413 @@ export const DF = {
    "semanas_19_a_28": 10,
    "recurrente_semanas_19_a_28_usd": 0.0,
    "recurrente_semanas_19_a_28_si_siguiera_la_completa_usd": 1153.8461538461538
+  },
+  "ventas_2025": {
+   "anio": 2025,
+   "anio_anterior": 2024,
+   "umbral": 0.6,
+   "meses": [
+    {
+     "mes": "2025-01",
+     "rotulo": "ene",
+     "operaciones": 1390,
+     "anio_anterior": 1480,
+     "parte": 0.9391891891891891,
+     "se_usa": true
+    },
+    {
+     "mes": "2025-02",
+     "rotulo": "feb",
+     "operaciones": 1265,
+     "anio_anterior": 1320,
+     "parte": 0.9583333333333334,
+     "se_usa": true
+    },
+    {
+     "mes": "2025-03",
+     "rotulo": "mar",
+     "operaciones": 1332,
+     "anio_anterior": 1441,
+     "parte": 0.9243580846634282,
+     "se_usa": true
+    },
+    {
+     "mes": "2025-04",
+     "rotulo": "abr",
+     "operaciones": 1259,
+     "anio_anterior": 1413,
+     "parte": 0.8910120311394196,
+     "se_usa": true
+    },
+    {
+     "mes": "2025-05",
+     "rotulo": "may",
+     "operaciones": 1176,
+     "anio_anterior": 1461,
+     "parte": 0.8049281314168378,
+     "se_usa": true
+    },
+    {
+     "mes": "2025-06",
+     "rotulo": "jun",
+     "operaciones": 1052,
+     "anio_anterior": 1505,
+     "parte": 0.6990033222591362,
+     "se_usa": true
+    },
+    {
+     "mes": "2025-07",
+     "rotulo": "jul",
+     "operaciones": 1035,
+     "anio_anterior": 1491,
+     "parte": 0.6941649899396378,
+     "se_usa": true
+    },
+    {
+     "mes": "2025-08",
+     "rotulo": "ago",
+     "operaciones": 936,
+     "anio_anterior": 1487,
+     "parte": 0.6294552790854069,
+     "se_usa": true
+    },
+    {
+     "mes": "2025-09",
+     "rotulo": "sep",
+     "operaciones": 787,
+     "anio_anterior": 1472,
+     "parte": 0.5346467391304348,
+     "se_usa": false
+    },
+    {
+     "mes": "2025-10",
+     "rotulo": "oct",
+     "operaciones": 662,
+     "anio_anterior": 1507,
+     "parte": 0.43928334439283345,
+     "se_usa": false
+    },
+    {
+     "mes": "2025-11",
+     "rotulo": "nov",
+     "operaciones": 486,
+     "anio_anterior": 1341,
+     "parte": 0.3624161073825503,
+     "se_usa": false
+    },
+    {
+     "mes": "2025-12",
+     "rotulo": "dic",
+     "operaciones": 255,
+     "anio_anterior": 1419,
+     "parte": 0.17970401691331925,
+     "se_usa": false
+    }
+   ]
+  },
+  "tramos_de_cruce": [
+   {
+    "tramo": "menos de 30",
+    "filas": 603,
+    "positivos": 553,
+    "tasa": 0.9170812603648425
+   },
+   {
+    "tramo": "30 a 59",
+    "filas": 743,
+    "positivos": 566,
+    "tasa": 0.7617765814266487
+   },
+   {
+    "tramo": "60 a 89",
+    "filas": 907,
+    "positivos": 594,
+    "tasa": 0.6549062844542448
+   },
+   {
+    "tramo": "90 o más",
+    "filas": 4920,
+    "positivos": 0,
+    "tasa": 0.0
+   }
+  ],
+  "lista_muestra": {
+   "corte": "2025-08-31",
+   "largo": 500,
+   "alto_valor": 153,
+   "control": 100,
+   "con_descuento": 124,
+   "sin_descuento": 123
+  },
+  "backlog": {
+   "epicas": [
+    {
+     "n": 1,
+     "nombre": "Relevamiento y definición de churn"
+    },
+    {
+     "n": 2,
+     "nombre": "Base analítica y calidad de datos"
+    },
+    {
+     "n": 3,
+     "nombre": "Modelo de scoring y validación"
+    },
+    {
+     "n": 4,
+     "nombre": "Lista mensual con la regla del umbral"
+    },
+    {
+     "n": 5,
+     "nombre": "Tablero de riesgo en pesos"
+    },
+    {
+     "n": 6,
+     "nombre": "Diseño del piloto con grupo de control"
+    },
+    {
+     "n": 7,
+     "nombre": "Consentimiento, accesos y Ley 25.326"
+    },
+    {
+     "n": 8,
+     "nombre": "Datos que faltan y handoff"
+    }
+   ],
+   "historias": [
+    {
+     "id": "HU-1-01",
+     "epica": 1,
+     "grupo": "hecha"
+    },
+    {
+     "id": "HU-1-02",
+     "epica": 1,
+     "grupo": "hecha"
+    },
+    {
+     "id": "HU-2-01",
+     "epica": 2,
+     "grupo": "hecha"
+    },
+    {
+     "id": "HU-2-02",
+     "epica": 2,
+     "grupo": "piloto"
+    },
+    {
+     "id": "HU-2-03",
+     "epica": 2,
+     "grupo": "despues"
+    },
+    {
+     "id": "HU-3-01",
+     "epica": 3,
+     "grupo": "hecha"
+    },
+    {
+     "id": "HU-3-02",
+     "epica": 3,
+     "grupo": "hecha"
+    },
+    {
+     "id": "HU-4-01",
+     "epica": 4,
+     "grupo": "hecha"
+    },
+    {
+     "id": "HU-4-02",
+     "epica": 4,
+     "grupo": "piloto"
+    },
+    {
+     "id": "HU-4-03",
+     "epica": 4,
+     "grupo": "piloto"
+    },
+    {
+     "id": "HU-5-01",
+     "epica": 5,
+     "grupo": "hecha"
+    },
+    {
+     "id": "HU-5-02",
+     "epica": 5,
+     "grupo": "despues"
+    },
+    {
+     "id": "HU-6-01",
+     "epica": 6,
+     "grupo": "hecha"
+    },
+    {
+     "id": "HU-6-02",
+     "epica": 6,
+     "grupo": "piloto"
+    },
+    {
+     "id": "HU-6-03",
+     "epica": 6,
+     "grupo": "piloto"
+    },
+    {
+     "id": "HU-7-01",
+     "epica": 7,
+     "grupo": "piloto"
+    },
+    {
+     "id": "HU-7-02",
+     "epica": 7,
+     "grupo": "piloto"
+    },
+    {
+     "id": "HU-7-03",
+     "epica": 7,
+     "grupo": "piloto"
+    },
+    {
+     "id": "HU-8-01",
+     "epica": 8,
+     "grupo": "hecha"
+    },
+    {
+     "id": "HU-8-02",
+     "epica": 8,
+     "grupo": "piloto"
+    },
+    {
+     "id": "HU-8-03",
+     "epica": 8,
+     "grupo": "despues"
+    }
+   ]
+  },
+  "plan": {
+   "semanas": 28,
+   "fases": [
+    {
+     "n": 1,
+     "fase": "Precondiciones de gobierno",
+     "desde": 1,
+     "hasta": 2,
+     "responsable": "Sebastian C."
+    },
+    {
+     "n": 2,
+     "fase": "Datos del piloto",
+     "desde": 1,
+     "hasta": 3,
+     "responsable": "Matías S."
+    },
+    {
+     "n": 3,
+     "fase": "Planilla de la regla y guía de corrida",
+     "desde": 1,
+     "hasta": 4,
+     "responsable": "Sebastian C."
+    },
+    {
+     "n": 4,
+     "fase": "Corrida de prueba y capacitación",
+     "desde": 5,
+     "hasta": 5,
+     "responsable": "Sebastian C."
+    },
+    {
+     "n": 5,
+     "fase": "Piloto: envío de las tres listas",
+     "desde": 6,
+     "hasta": 18,
+     "responsable": "Sofía R."
+    },
+    {
+     "n": 6,
+     "fase": "Medición a 90 días y decisión",
+     "desde": 19,
+     "hasta": 28,
+     "responsable": "Juan Manuel R."
+    }
+   ],
+   "hitos": [
+    {
+     "n": 1,
+     "semana": 1,
+     "responsable": "María G."
+    },
+    {
+     "n": 2,
+     "semana": 1,
+     "responsable": "María G."
+    },
+    {
+     "n": 3,
+     "semana": 2,
+     "responsable": "María G.; designa Sofía R."
+    },
+    {
+     "n": 4,
+     "semana": 4,
+     "responsable": "María G."
+    },
+    {
+     "n": 5,
+     "semana": 4,
+     "responsable": "Sofía R."
+    },
+    {
+     "n": 6,
+     "semana": 6,
+     "responsable": "Matías S."
+    },
+    {
+     "n": 7,
+     "semana": 6,
+     "responsable": "María G."
+    },
+    {
+     "n": 8,
+     "semana": 14,
+     "responsable": "Sofía R."
+    },
+    {
+     "n": 9,
+     "semana": 20,
+     "responsable": "Juan Manuel R."
+    },
+    {
+     "n": 10,
+     "semana": 28,
+     "responsable": "María G."
+    }
+   ]
+  },
+  "legal_previas": {
+   "n": 5,
+   "acciones": [
+    {
+     "codigo": "L4",
+     "semana": 1
+    },
+    {
+     "codigo": "L1",
+     "semana": 2
+    },
+    {
+     "codigo": "L5",
+     "semana": 2
+    },
+    {
+     "codigo": "L6",
+     "semana": 4
+    },
+    {
+     "codigo": "L3",
+     "semana": 4
+    }
+   ]
+  },
+  "riesgos_criticos": {
+   "n": 3
   }
  }
 };

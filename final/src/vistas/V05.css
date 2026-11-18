@@ -1,6 +1,0 @@
-/* V05 de muestra (17/11). La etiqueta del presupuesto (la Plaqueta de BarrasH, fija en 10) se agranda sobre su centro
-   hasta la letra de los valores de las barras, como en la vista 5 del E3: --fin-v05-ref lo calcula V05_SePaga.jsx con la
-   fórmula de BarrasH. */
-.fin-v05-lienzo svg > g > g:has(> rect[rx]) {
-  transform-box: fill-box; transform-origin: 50% 50%; transform: scale(var(--fin-v05-ref, 1.3));
-}

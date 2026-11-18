@@ -1,5 +1,5 @@
 """
-Build final: capa de datos de /final/, la presentación final del 24/11/2026 (canon v1.1, tableros.final).
+Build final: capa de datos de /final/, la presentación final del 24/11/2026 (canon de la corrida, tableros.final).
 
     python3 -I pipeline/build_final.py
 
@@ -17,6 +17,11 @@ JSON del vault que escriben los generadores de las partes, sin copia intermedia.
   la tabla de scoring, F16), leídos con ast sin importarlos
 - entregas/entregable-4/_build/A/registro/cifras-F3.json: las cifras K de la parte de Gestión del E4 (la copia del
   registro que deja generar_a.py junto al generador)
+- (17/11, F6) entregas/entregable-4/_build/A/contenido_a.py (épicas, historias y precondiciones de la primera lista,
+  leídas con ast), _build/A/tmp/lista_de_muestra.json (la lista de muestra al corte 2025-08) y _build/A/registro/
+  canon.json (criterios de go-live y plan); y raw/datasets/unidad-1/Transacciones_clientes.csv, contado mes a mes para
+  el control del 60 % (D28, H46) y el embudo del extracto de ventas (C20). Dan las tablas ventas_2025,
+  tramos_de_cruce, lista_muestra, backlog, plan, legal_previas y riesgos_criticos de las vistas de /final/.
 
 Escribe final/src/datos_final.js con «export const DF = {...}». Solo biblioteca estándar.
 
@@ -33,6 +38,7 @@ archivo y su sha256, sin rutas).
 from __future__ import annotations
 
 import ast
+from ast import literal_eval as literal
 import hashlib
 import json
 import os
@@ -69,8 +75,16 @@ FUENTES = {
     "etapa4": E3 / "D" / "modelado" / "salida" / "etapa4.json",
     "indicador_6_5": E3 / "C" / "modelado" / "salida" / "indicador_6_5.json",
     "cifras_f3": VAULT / "entregas" / "entregable-4" / "_build" / "A" / "registro" / "cifras-F3.json",
+    # (F6, contenido de /final/) la lista de muestra de la PoC (E4 A 3.2) y el canon que lee el generador de la A
+    # del E4 (plan, hitos y criterios de go-live de la 4.1 a 4.3), en la copia que deja junto a su registro
+    "lista_muestra": VAULT / "entregas" / "entregable-4" / "_build" / "A" / "tmp" / "lista_de_muestra.json",
+    "canon": VAULT / "entregas" / "entregable-4" / "_build" / "A" / "registro" / "canon.json",
 }
-GENERADORES = {"contenido_c": E3 / "C" / "contenido_c.py", "contenido_a": E3 / "A" / "contenido_a.py"}
+GENERADORES = {"contenido_c": E3 / "C" / "contenido_c.py", "contenido_a": E3 / "A" / "contenido_a.py",
+               "contenido_a_e4": VAULT / "entregas" / "entregable-4" / "_build" / "A" / "contenido_a.py"}
+# (F6) el extracto de ventas tal como llegó (raw/ se lee, nunca se escribe): filas, limpieza (C20) y la serie
+# mensual del control del 60 % (D28), con el mismo método que entregas/entregable-2/_build/A/serie_mensual.py
+CRUDOS = {"transacciones": VAULT / "raw" / "datasets" / "unidad-1" / "Transacciones_clientes.csv"}
 OPCIONALES = {"devoluciones": E3 / "A" / "modelado" / "salida" / "devoluciones_v02.json"}
 
 # Puntajes que no vienen en los JSON: se leen con ast del generador de la parte que los escribe.
@@ -543,6 +557,216 @@ def gestion(k_filas: list, eco: dict, cal: dict) -> None:
     control("K15 trae la semana 6 de G63", f"6: {fecha(cal['primera_lista']['lunes'])[:5]} al" in por_id["K15"], True)
 
 
+# ============================================================ F6: piezas del contenido de /final/
+
+MESES_CORTOS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
+
+
+def ventas(p: Path, co: dict, canon: dict) -> dict:
+    """C20 (limpieza del extracto de ventas) y D28 (operaciones de cada mes de 2025 contra el mismo mes de 2024, el
+    control del 60 %), leídos del CSV crudo con la base de serie_mensual.py: filas sin duplicados, monto_neto > 0."""
+    import csv
+    import re
+    with p.open(encoding="utf-8", newline="") as f:
+        filas = list(csv.reader(f))
+    cab, cuerpo = filas[0], filas[1:]
+    unicas = list(dict.fromkeys(tuple(r) for r in cuerpo))
+    i_m, i_f, i_c = cab.index("monto_neto"), cab.index("fecha"), cab.index("id_cliente")
+    con_cliente = [r for r in unicas if r[i_c].strip()]
+    positivas = [r for r in con_cliente if float(r[i_m]) > 0]
+    ancla("C20.crudo", "filas del extracto de ventas tal como llegó", len(cuerpo), "filas", 0, "50.250")
+    ancla("C20.unicas", "filas sin duplicados de fila completa", len(unicas), "filas", 0, "50.000")
+    ancla("C20.con_cliente", "filas con cliente identificado", len(con_cliente), "filas", 0, "27.606")
+    ancla("C20.positivas", "filas con cliente y monto positivo", len(positivas), "filas", 0, "27.276")
+    ancla("C20.repetidas", "filas repetidas que se sacan", len(cuerpo) - len(unicas), "filas", 0, "250")
+    ancla("C20.sin_cliente", "filas sin cliente identificado: quedan fuera de la lista", len(unicas) - len(con_cliente),
+          "filas", 0, "22.394")
+    ancla("C20.no_positivas", "filas con cliente y monto no positivo (devoluciones): no suman facturación",
+          len(con_cliente) - len(positivas), "filas", 0, "330")
+    control("C20 únicas = condiciones.json", len(unicas), co["nulos"]["ventas_unicas"])
+    control("C20 sin cliente = condiciones.json", len(unicas) - len(con_cliente), co["nulos"]["ventas_sin_cliente_filas"])
+    control("C20 crudo = inventario de condiciones.json",
+            len(cuerpo), [x["filas"] for x in co["inventario"] if x["archivo"] == "Transacciones_clientes.csv"][0])
+    control("C19 = sin cliente / únicas", round((len(unicas) - len(con_cliente)) / len(unicas) * 100, 2),
+            co["nulos"]["ventas_sin_cliente_pct"])
+
+    # el umbral del mes sale del criterio 2 de go-live del canon («debajo del 60 % de las operaciones…»)
+    m = re.search(r"debajo del (\d+) % de las operaciones", canon["plan"]["criterios_go_live"][1]["criterio"])
+    if not m:
+        raise Falta("canon.json: el criterio 2 de go-live no trae «debajo del N % de las operaciones»")
+    umbral = int(m.group(1)) / 100
+    ancla("H46.umbral_mes", "un mes con menos de esta parte de las operaciones del mismo mes del año anterior no se usa",
+          umbral, "fracción", 0, "60", x=100)
+    ops: dict[str, int] = {}
+    for r in unicas:
+        if float(r[i_m]) > 0:
+            ops[r[i_f][:7]] = ops.get(r[i_f][:7], 0) + 1
+    meses = []
+    for mes in range(1, 13):
+        k, k0 = f"2025-{mes:02d}", f"2024-{mes:02d}"
+        meses.append({"mes": k, "rotulo": MESES_CORTOS[mes - 1], "operaciones": ops[k], "anio_anterior": ops[k0],
+                      "parte": ops[k] / ops[k0], "se_usa": ops[k] / ops[k0] >= umbral})
+    for k, d in {"2025-01": "1.390", "2025-12": "255"}.items():
+        ancla(f"D28.ops_{k}", f"operaciones de {k}", ops[k], "operaciones", 0, d)
+    for k, d in {"2025-08": "63", "2025-09": "53", "2025-10": "44", "2025-11": "36", "2025-12": "18"}.items():
+        ancla(f"D28.parte_{k}", f"operaciones de {k} sobre las del mismo mes de 2024",
+              ops[k] / ops[k.replace("2025", "2024")], "fracción", 0, d, x=100)
+    fuera = [x for x in meses if not x["se_usa"]]
+    ancla("D28.meses_fuera", "meses de 2025 debajo del umbral del mes (septiembre a diciembre)", len(fuera), "meses", 0, "4")
+    control("D28: los meses que no pasan son septiembre a diciembre de 2025", [x["mes"] for x in fuera],
+            ["2025-09", "2025-10", "2025-11", "2025-12"])
+    control("D28: agosto de 2025 es el último mes que pasa", [x["mes"] for x in meses if x["se_usa"]][-1], "2025-08")
+    control("D28: ops de enero 2022 (registro: 44)", ops["2022-01"], 44)
+    control("D28: ops de diciembre 2022 (registro: 893)", ops["2022-12"], 893)
+    return {"anio": 2025, "anio_anterior": 2024, "umbral": umbral, "meses": meses}
+
+
+def objetivo_y_piloto(e1: dict, eco: dict, lm: dict, kf: list) -> dict:
+    """F03, F04 (qué es irse: la tasa de cruce por días para cruzar), C03 (umbral del cliente), el desglose de G64 y la
+    lista de muestra de la PoC (E4 A 3.2) con su control contra K16 a K19."""
+    import re
+    tr = {t["tramo"]: t for t in e1["tramos_de_cruce"]["dev"]}
+    tramos = []
+    for clave, rot, doc in (("menos de 30", "menos30", "91,7"), ("30 a 59", "30a59", "76,2"),
+                            ("60 a 89", "60a89", "65,5"), ("90 o más", "90mas", "0,0")):
+        t = tr[clave]
+        ancla(f"F04.{rot}", f"tasa de positivos en validación a {clave} días de cruzar el umbral", t["tasa"],
+              "fracción", 1, doc, x=100)
+        tramos.append({"tramo": clave, "filas": t["filas"], "positivos": t["positivos"], "tasa": t["tasa"]})
+    est = e1["ficha"]["estructura"]
+    ancla("F03.lejos", "parte de las filas a 90 días o más de cruzar su umbral, sin positivos",
+          est["pct_no_alcanzables"], "fracción", 1, "66,5", x=100)
+    control("F03: a 90 días o más no hay positivos", est["positivos_no_alcanzables"], 0)
+    clave = [k for k in eco["piloto_minimo"]["horas_planilla"] if k.startswith("regla del umbral")]
+    m = re.search(r"máx\((\d+); ([\d,]+) ×", clave[0]) if len(clave) == 1 else None
+    if not m:
+        raise Falta("economia.json: piloto_minimo.horas_planilla sin «umbral = máx(N; F × intervalo mediano)»")
+    ancla("C03.minimo_dias", "umbral del cliente: días mínimos", int(m.group(1)), "días", 0, "90")
+    ancla("C03.factor", "umbral del cliente: veces el intervalo mediano entre compras",
+          float(m.group(2).replace(",", ".")), "veces", 1, "1,5")
+
+    pm = eco["piloto_minimo"]
+    lin = pm["lineas"]
+    for i, (nombre, doc) in enumerate((("planilla", "900"), ("legal", "750"), ("medicion", "1.350"), ("taller", "900"))):
+        ancla(f"G64.{nombre}", lin[i]["componente"], lin[i]["usd"], "USD", 0, doc)
+    control("G64 = suma de las cuatro líneas", sum(x["usd"] for x in lin), pm["unicos_usd"])
+    ancla("G64.horas_por_lista", "horas de la persona de Marketing por lista",
+          pm["horas_marketing"] / eco["piloto"]["meses"], "horas", 0, "8")
+    ancla("G49.descuento", "descuento de la rama con descuento", eco["piloto"]["ramas"]["con_descuento"]["descuento"],
+          "fracción", 0, "15", x=100)
+    m = re.match(r"(\d+) % de mayor", eco["alto_valor"]["definicion"])
+    if not m:
+        raise Falta("economia.json: alto_valor.definicion no empieza con «N % de mayor»")
+    ancla("G49.alto_valor", "el grupo de mayor facturación que se contacta entero (sin control)", int(m.group(1)) / 100,
+          "fracción", 0, "20", x=100)
+
+    k = {f["id"]: f["cifra"] for f in kf}
+    ancla("K18.con_descuento", "lista de muestra: rama con descuento", lm["rama_con_descuento"], "clientes", 0, "124")
+    ancla("K18.sin_descuento", "lista de muestra: rama sin descuento", lm["rama_sin_descuento"], "clientes", 0, "123")
+    control("K16 = alto valor de la lista de muestra", lm["alto_valor"], k["K16"])
+    control("K17 = fuera del 20 % de la lista de muestra", lm["fuera_del_20"], k["K17"])
+    control("K18 = ramas de la lista de muestra", f"{lm['rama_con_descuento']} y {lm['rama_sin_descuento']}", k["K18"])
+    control("K19 = las dos ramas", lm["rama_con_descuento"] + lm["rama_sin_descuento"], k["K19"])
+    control("lista de muestra: 500 = alto valor + control + ramas",
+            lm["alto_valor"] + lm["control"] + lm["rama_con_descuento"] + lm["rama_sin_descuento"], lm["largo"])
+    control("lista de muestra: control = G49", lm["control"], eco["piloto"]["control_mes"])
+    return {"tramos_de_cruce": tramos,
+            "lista_muestra": {"corte": lm["corte"], "largo": lm["largo"], "alto_valor": lm["alto_valor"],
+                              "control": lm["control"], "con_descuento": lm["rama_con_descuento"],
+                              "sin_descuento": lm["rama_sin_descuento"]}}
+
+
+def semanas_de(txt: str) -> tuple[int, int]:
+    """«1 y 2» → (1, 2); «1 a 3» → (1, 3); «5» → (5, 5); «4 y antes de cada lista» → (4, 4)."""
+    import re
+    n = [int(x) for x in re.findall(r"\d+", txt.split(" y antes")[0])]
+    return (n[0], n[-1])
+
+
+def valor_ast(nodo, nombres: dict):
+    """El valor literal de un nodo, resolviendo además dict(...) y los nombres de cadenas del módulo (MKT)."""
+    if isinstance(nodo, ast.Call) and isinstance(nodo.func, ast.Name) and nodo.func.id == "dict":
+        return {kw.arg: valor_ast(kw.value, nombres) for kw in nodo.keywords}
+    if isinstance(nodo, ast.Name):
+        if nodo.id not in nombres:
+            raise Falta(f"contenido_a.py del E4: nombre sin valor «{nodo.id}»")
+        return nombres[nodo.id]
+    if isinstance(nodo, (ast.List, ast.Tuple)):
+        v = [valor_ast(e, nombres) for e in nodo.elts]
+        return v if isinstance(nodo, ast.List) else tuple(v)
+    return literal(nodo)
+
+
+def gestion_tablas(p: Path, canon: dict, kf: list, cal: dict, c: Path) -> dict:
+    """El backlog (E4 A 2.1 y 2.2), el plan (4.1), las acciones legales previas (4.2, criterio 1 de go-live) y los
+    riesgos críticos de la C 6.3, leídos con ast de los generadores; controles contra las K y contra G63."""
+    import re
+    arbol = ast.parse(p.read_text(encoding="utf-8"))
+    nombres, epicas, historias, previas = {}, None, None, None
+    for nodo in arbol.body:
+        if isinstance(nodo, ast.Assign) and isinstance(nodo.targets[0], ast.Name):
+            n = nodo.targets[0].id
+            if isinstance(nodo.value, ast.Constant) and isinstance(nodo.value.value, str):
+                nombres[n] = nodo.value.value
+            elif n == "EPICAS":
+                epicas = literal(nodo.value)
+            elif n == "HISTORIAS":
+                historias = valor_ast(nodo.value, nombres)
+    for nodo in ast.walk(arbol):
+        if (isinstance(nodo, ast.Call) and isinstance(nodo.func, ast.Name) and nodo.func.id == "T" and nodo.args
+                and isinstance(nodo.args[0], ast.Constant) and nodo.args[0].value == "Precondiciones de la primera lista"):
+            previas = literal(nodo.args[2])
+    if epicas is None or historias is None or previas is None:
+        raise Falta("contenido_a.py del E4: falta EPICAS, HISTORIAS o la tabla «Precondiciones de la primera lista»")
+    k = {f["id"]: f["cifra"] for f in kf}
+    grupo = {"hecha": "hecha", "planilla": "piloto", "legal": "piloto", "piloto": "piloto", "despues": "despues"}
+    hs = [{"id": h["id"], "epica": int(h["id"].split("-")[1]), "grupo": grupo[h["grupo"]]} for h in historias]
+    control("K01 = épicas del backlog", len(epicas), k["K01"])
+    control("K02 = historias", len(hs), k["K02"])
+    control("K04 = hechas", sum(h["grupo"] == "hecha" for h in hs), k["K04"])
+    control("K05 = del piloto mínimo", sum(h["grupo"] == "piloto" for h in hs), k["K05"])
+    control("K06 = después del piloto", sum(h["grupo"] == "despues" for h in hs), k["K06"])
+    control("K07 = horas de las historias del piloto",
+            sum(h["horas"] or 0 for h in historias if grupo[h["grupo"]] == "piloto"), k["K07"])
+
+    pl = canon["plan"]
+    fases = []
+    for f in pl["fases"]:
+        a, b = semanas_de(f["semanas"])
+        fases.append({"n": f["n"], "fase": f["fase"], "desde": a, "hasta": b, "responsable": f["responsable"]})
+    control("K14 = duración de cada fase", ", ".join(str(f["hasta"] - f["desde"] + 1) for f in fases), k["K14"])
+    hitos = [{"n": h["n"], "semana": h["semana"], "responsable": h["responsable"]} for h in pl["hitos"]]
+    sem = {h["n"]: h["semana"] for h in hitos}
+    control("hito 7 (go-live) = semana de la primera lista (G63)", sem[7], cal["primera_lista"]["semana"])
+    control("hito 8 = semana de la tercera lista (G63)", sem[8], cal["tercera_lista"]["semana"])
+    control("hito 9 = semana del informe preliminar (G63)", sem[9], cal["preliminar"]["semana"])
+    control("hito 10 = semana de la decisión (G63)", sem[10], cal["final"]["semana"])
+    control("la última fase termina en la semana de la decisión", fases[-1]["hasta"], cal["final"]["semana"])
+
+    acciones = []
+    for prec, resp, semana, _ in previas:
+        m = re.search(r"\((L\d)\)|filtro (L\d)", prec)
+        if m:
+            acciones.append({"codigo": m.group(1) or m.group(2), "semana": semanas_de(semana)[0]})
+    acciones.sort(key=lambda x: x["semana"])
+    criterio_1 = re.findall(r"L\d", pl["criterios_go_live"][0]["criterio"])
+    control("acciones legales previas = las del criterio 1 de go-live", sorted(a["codigo"] for a in acciones),
+            sorted(criterio_1))
+    control("L4 en la semana del hito 1", [a["semana"] for a in acciones if a["codigo"] == "L4"], [sem[1]])
+    control("acciones legales previas antes de la primera lista", max(a["semana"] for a in acciones) < sem[7], True)
+
+    top3 = None
+    for nodo in ast.parse(c.read_text(encoding="utf-8")).body:
+        if isinstance(nodo, ast.Assign) and any(isinstance(x, ast.Name) and x.id == "TOP3" for x in nodo.targets):
+            top3 = literal(nodo.value.elts[0])
+    if top3 is None:
+        raise Falta("contenido_c.py: no encuentro TOP3")
+    return {"backlog": {"epicas": [{"n": e[0], "nombre": e[1]} for e in epicas], "historias": hs},
+            "plan": {"semanas": cal["final"]["semana"], "fases": fases, "hitos": hitos},
+            "legal_previas": {"n": len(acciones), "acciones": acciones},
+            "riesgos_criticos": {"n": len(top3)}}
+
+
 def tablas(eco: dict, cal: dict) -> dict:
     u = eco["umbral_de_pase"]["por_variante"]
     filas = []
@@ -568,15 +792,17 @@ def tablas(eco: dict, cal: dict) -> dict:
 # ============================================================ main
 
 def main() -> int:
-    falta = [str(p) for p in list(FUENTES.values()) + list(GENERADORES.values()) if not p.exists()]
+    falta = [str(p) for p in list(FUENTES.values()) + list(GENERADORES.values()) + list(CRUDOS.values())
+             if not p.exists()]
     if falta:
         print("faltan fuentes:\n  " + "\n  ".join(falta))
         return 1
-    usadas = {**FUENTES, **GENERADORES}
+    usadas = {**FUENTES, **GENERADORES, **CRUDOS}
     try:
-        eco, cv, e1, co, e2, e3, e4, ind, kf = (cargar(FUENTES[k]) for k in
+        eco, cv, e1, co, e2, e3, e4, ind, kf, lm, canon = (cargar(FUENTES[k]) for k in
                                                   ("economia", "cv_temporal", "etapa1", "condiciones", "etapa2",
-                                                   "etapa3", "etapa4", "indicador_6_5", "cifras_f3"))
+                                                   "etapa3", "etapa4", "indicador_6_5", "cifras_f3", "lista_muestra",
+                                                   "canon"))
         cal = economia(eco)
         control("E3A-01 de economia.json = cv_temporal.json", eco["rango_anual"]["trimestre_x4_usd"][0],
                 cv["roi"]["mvp_proporcional_a_500_sin_filtro"]["beneficio_min"])
@@ -585,8 +811,12 @@ def main() -> int:
         if OPCIONALES["devoluciones"].exists():
             devueltas(cargar(OPCIONALES["devoluciones"]))
             usadas["devoluciones"] = OPCIONALES["devoluciones"]
-        gestion(kf if isinstance(kf, list) else kf["filas"], eco, cal)
+        kfl = kf if isinstance(kf, list) else kf["filas"]
+        gestion(kfl, eco, cal)
         tab = tablas(eco, cal)
+        tab["ventas_2025"] = ventas(CRUDOS["transacciones"], co, canon)
+        tab.update(objetivo_y_piloto(e1, eco, lm, kfl))
+        tab.update(gestion_tablas(GENERADORES["contenido_a_e4"], canon, kfl, cal, GENERADORES["contenido_c"]))
     except Falta as e:
         print(f"FALLA de entrada: {e}. No se escribe {SALIDA.relative_to(APP)}.")
         return 1
@@ -611,7 +841,7 @@ def main() -> int:
         "tablas": tab,
     }
     texto = json.dumps(df, ensure_ascii=False, indent=1)
-    js = ("// Generado por pipeline/build_final.py desde los JSON del vault (canon v1.1, tableros.final). No editar a mano.\n"
+    js = ("// Generado por pipeline/build_final.py desde los JSON del vault (canon de la corrida, tableros.final). No editar a mano.\n"
           "// Cada ancla es una fila del registro de cifras del E4 por su id: valor, unidad y texto con las reglas de\n"
           "// e3/src/formato.js.\n"
           f"export const DF = {texto};\n")
