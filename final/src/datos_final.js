@@ -39,7 +39,7 @@ export const DF = {
    },
    {
     "archivo": "cifras-F3.json",
-    "sha256": "ec6079b3a69eade8a7ecd0e60aebea142cbabfd5e41fb2eca0b7e154db8349d9"
+    "sha256": "5d51255d05564305abb4f3ade9c8a84af513964891d2dbab629fba2d0615f743"
    },
    {
     "archivo": "lista_de_muestra.json",
@@ -47,7 +47,7 @@ export const DF = {
    },
    {
     "archivo": "canon.json",
-    "sha256": "48bfed0ff0d1d00dc6a654f0f6a8aa03b74f74a24145d23dd1d8c82ab9a9001e"
+    "sha256": "1d31742316f7517edf98d76d4b644eae2d53365c7a985579393ca07e4b6adb38"
    },
    {
     "archivo": "contenido_c.py",
@@ -874,13 +874,13 @@ export const DF = {
    "valor": 7,
    "unidad": "cantidad",
    "texto": "7",
-   "definicion": "historias del piloto mínimo que bloquean la primera lista: las que terminan en la semana 5 o antes"
+   "definicion": "historias del piloto mínimo que terminan en la semana 5 o antes (se cierran antes de la primera lista)"
   },
   "K24": {
    "valor": 44,
    "unidad": "horas",
    "texto": "44",
-   "definicion": "horas del equipo de las 7 historias que bloquean la primera lista (planilla y guía 24, legal 20)"
+   "definicion": "horas del equipo de las 7 historias que se cierran antes de la primera lista (planilla y guía 24, legal 20)"
   },
   "C20.crudo": {
    "valor": 50250,
