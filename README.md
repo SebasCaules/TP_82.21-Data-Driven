@@ -169,8 +169,10 @@ uniforme y las mismas teclas. Un solo HTML autocontenido en `dist-final/index.ht
 
 Tiene payload propio: `pipeline/build_final.py` lee los JSON de los generadores de las partes en el vault y escribe
 `final/src/datos_final.js` (DF). `DF.anclas` va por id del registro de cifras (`G67.con_descuento`): valor, unidad y
-texto con las reglas de `e3/src/formato.js`. Todo el texto sale de `final/src/contenido_final.js` (CF). Hoy CF es de muestra: los textos dicen «MUESTRA» y cuatro de las siete vistas
-son esqueletos, hasta que se cargue el contenido.
+texto con las reglas de `e3/src/formato.js`. Todo el texto sale de `final/src/contenido_final.js` (CF), que importa DF
+para interpolar las cifras en preguntas, rótulos y notas: ni CF ni las vistas escriben un número. Desde el 17/11 CF trae
+el contenido real: quince vistas en los siete bloques del canon (apertura, datos, modelo, economía, legal, gestión y
+cierre), 23 minutos de exposición.
 
 CF.BLOQUES es la única lista que ordena la presentación: cada bloque tiene id, título, rótulo del riel, integrante y
 sus vistas; cada vista, id, rótulo del riel, pregunta, fuente, segundos, notas del orador y los textos que escribe. De
@@ -183,6 +185,8 @@ esa lista salen el recorrido, los grupos del riel, el número de cada vista (su 
 | `final/src/vistas/Vnn_*.jsx` | una vista por archivo, con `meta = { id }`; sin archivo, la vista es esqueleto |
 | `final/src/App.jsx`, `Notas.jsx`, `MarcaInicio.jsx` | copias adaptadas de las de `/e3/` |
 | `final/src/textos.js`, `TarjetaCifra.jsx`, `estilos_final.css` | textos de una vista, tarjeta de cifra y encabezado del gráfico, comunes a las vistas |
+| `final/src/Plantilla.jsx` | la forma común de una vista: banda con decisión, qué mide, conclusión y un gráfico |
+| `final/src/barras.jsx`, `svg.jsx` | BarrasH con el ancho de rótulo medido, y las piezas de texto de los SVG propios |
 
 Las vistas importan los componentes del E2 y del E3 sin copiarlos (`Banda.jsx`, `TarjetaDecision.jsx`, `escala.js`,
 `zoom.js`, `formato.js`, `texto.jsx`, `cifra.jsx`, `src/graficos.jsx`). `/final/` no toca `src/`, `e2/` ni `e3/`.
@@ -200,14 +204,15 @@ python3 -I pipeline/build_final.py                   # DF desde los JSON del vau
 python3 -I scripts/verificar_final.py                # desborde, consola, red, teclado, notas, impresión y contenido
                                                      # contra CF y DF, 5 resoluciones; con --sin-esqueletos y
                                                      # --sin-muestra antes de presentar
-npm run build:e2 && python3 -I scripts/paridad_final.py   # letra, cajas y reglas del E2, 4 resoluciones
+npm run build:e2 && python3 -I scripts/paridad_final.py --vista v07   # letra, cajas y reglas del E2, 4 resoluciones
 npx vite build --config scripts/vite.final-sobre.config.js   # el HTML para mandar, en dist-final-sobre/
 python3 scripts/check_app_f4.py                      # todo lo anterior más /e3/ intacto y el anexo de fórmulas
+python3 scripts/check_final_f6.py                    # contenido de /final/: lo anterior, el HTML del sobre, git y lista negra
 ```
 
 Los dos verificadores terminan con `RESULTADO: OK` o `RESULTADO: FALLA`. Las teclas son las de `/e3/`. Las notas (N o
 `?notas`) dicen además quién presenta la vista, el tiempo acumulado de su bloque contra el total del bloque y el
-acumulado de la presentación contra los 30 minutos. No hay temporizador en vivo.
+acumulado de la presentación contra los 23 minutos de exposición. No hay temporizador en vivo.
 
 ## Los datos
 
