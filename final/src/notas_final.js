@@ -40,8 +40,7 @@ export const NOTAS = {
   ],
   "V07": [
     "Carlos, el presupuesto es de **USD 30.000**.",
-    "Con lo que hoy se observa, lo que deja la lista es **USD 265 por año**. El primer año cuesta **USD 20.260**: el piloto mínimo más la producción completa.",
-    "No se paga. Con modelo es peor: su ROI es **−99,9 %**."
+    "Con lo que hoy se observa, lo que deja la lista es **USD 265 por año**. El primer año cuesta **USD 20.260**: el piloto mínimo más la producción completa. El ROI de la regla a un año da **−98,7 %**. No se paga. Con modelo es peor: su ROI es **−99,9 %**."
   ],
   "V08": [
     "No pedimos el proyecto. Pedimos el piloto mínimo: **USD 4.485** del presupuesto, por tres meses.",
