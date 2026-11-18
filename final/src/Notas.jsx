@@ -7,6 +7,8 @@
 // los tiempos son los de CF (segundos de cada vista, sumados por vistas/index.jsx).
 // (18/11, canon v1.3) El texto sale de notas_final.js, que exporta el guion (exportar_notas.py): las frases que no se
 // saltan en la versión de 15 minutos. Una sola fuente para lo que se dice; acá no se escribe guion.
+// (18/11, S-07) La fuente del documento de cada vista («E3, Parte D v3.0») sale del encabezado del tablero y va acá, en
+// la cabecera, después de «n / 15 · pregunta».
 
 import { CF } from './contenido_final.js'
 import { NOTAS } from './notas_final.js'
@@ -26,6 +28,7 @@ function Cuerpo({ vista }) {
       <p className="e3-notas-cab">
         <b>{`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}</b>
         {' · '}{vista.pregunta}
+        {vista.fuente && <span>{` · ${vista.fuente}`}</span>}
         <span>{` · ${mmss(t.vista)}`}</span>
         <span>{` · total ${mmss(t.totalHasta)} de ${mmss(objetivo ?? t.total)}`}</span>
       </p>

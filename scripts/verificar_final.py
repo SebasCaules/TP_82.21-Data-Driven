@@ -36,6 +36,18 @@ scripts/paridad_final.py. Esto cubre lo demás:
    y los ids no se repiten. Mientras CF sea de muestra (CF.MUESTRA o «MUESTRA» en pantalla) se avisa; con --sin-muestra
    es un problema (obligatorio antes de presentar).
 
+(18/11, auditoría de dataviz, decisión P-01) /final/ se aparta del contrato de letra y cajas de /e2/: este script comprueba
+la especificación nueva (.workforce/auditoria-dataviz/fase-2/spec.md) en lugar de la plantilla de la vista 5 del E3:
+- la unidad u (final/src/escala.js): --fin-u de .e3-vp es mín(ancho / 1920; alto / 1080) de la ventana lógica, y ningún
+  texto visible del encabezado ni del cuerpo mide menos de 20 u (el riel y la barra de avance no cambian: R17);
+- el zoom con piso 0,85 (S-08): k = máx(0,85; mín(1,2; ancho / 1152; alto / 640)); se mide también 1024×768;
+- el título en un renglón, sin cortarse ni pisar «n / 15»; el contador dice solo «n / 15» y la fuente va en su title;
+- la banda con 0, 1 o 2 tarjetas de cifra (dos solo en V04; con alguna, la central primera y sola al tamaño máximo);
+- qué mide no se dibuja (.fin-mide ausente): es el aria-label de .fin-lienzo; la conclusión solo en V13;
+- el acento (--acc) nunca en un texto (S-06), ni en HTML ni en SVG;
+- sin código del eje viejo en final/src (BarrasH, formatoEje, tituloEje), sin useEscalaTexto ni HECHO en las vistas;
+- la tecla P oculta y muestra el riel (S-10), que por defecto se ve.
+
 Capturas de cada vista con contenido a 1280×720 y 1920×1080 en final/capturas-verif/ (fuera del control de versiones).
 Termina con «RESULTADO: OK» o con la lista de problemas, «RESULTADO: FALLA» y código 1.
 """
@@ -66,15 +78,22 @@ try:
     NEGRA_CANON = [c for k in ("cadenas_v1_2", "cadenas_v1_3", "cadenas_v1_4") for c in _ln.get(k, [])]
 except (OSError, KeyError, ValueError):
     NEGRA_CANON = []
-RES = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
+RES = [(1024, 768), (1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
 CAPTURAR = {(1280, 720), (1920, 1080)}
 NOTAS_RES = {(1366, 768), (1536, 864)}
 NBSP = " "
 MENOS = "−"
 
 
+# (18/11, spec g y e.1) Las únicas excepciones por vista de la plantilla: dos tarjetas de cifra en V04 (los dos parámetros
+# del umbral) y la conclusión en V13 (dice qué probó la PoC y qué falta).
+DOS_TARJETAS = {"V04"}
+CON_CONCLUSION = {"V13"}
+PISO_U = 20
+
+
 def k_de(w, h):
-    return max(1.0, min(1.2, w / 1152, h / 640))
+    return max(0.85, min(1.2, w / 1152, h / 640))
 
 
 # ---------------------------------------------------------------- lectura de CF y DF
@@ -199,7 +218,19 @@ CHEQUEO = r"""() => {
   if (!esqueleto && document.querySelector('.cuerpo [role=slider], .cuerpo [role=radiogroup], .cuerpo input'))
     p.push('controles en la vista')
   if (document.querySelector('.cuerpo svg[data-desborda]')) p.push('una tabla en svg no entra (data-desborda)')
-  return { problemas: p, esqueleto, zoom: document.querySelector('.e3-vp')?.currentCSSZoom ?? 1 }
+  // (18/11, spec b.2) el título en un renglón, sin cortarse y sin pisar «n / 15»
+  const preg = document.querySelector('.e2-enc .e2-preg')
+  if (preg) {
+    const rg = document.createRange(); rg.selectNodeContents(preg)
+    const tops = new Set([...rg.getClientRects()].map((r) => Math.round(r.top)))
+    if (tops.size > 1) p.push(`el título ocupa ${tops.size} renglones`)
+    if (preg.scrollWidth > preg.clientWidth + 1) p.push('el título se corta')
+    const der = document.querySelector('.e2-enc-der')
+    if (der && rg.getBoundingClientRect().right > der.getBoundingClientRect().left + 1) p.push('el título pisa «n / 15»')
+  }
+  const vp = document.querySelector('.e3-vp')
+  return { problemas: p, esqueleto, zoom: vp?.currentCSSZoom ?? 1,
+           u: parseFloat(getComputedStyle(vp).getPropertyValue('--fin-u')), w: parseFloat(vp.style.width), h: parseFloat(vp.style.height) }
 }"""
 
 ESTADO = r"""() => ({
@@ -247,7 +278,29 @@ LEER_VISTA = r"""() => {
   const titulos = [...vp.querySelectorAll('[title]')].map((e) => e.getAttribute('title'))
     .concat([...vp.querySelectorAll('svg title')].map((e) => e.textContent))
   const concl = q('.cuerpo .pant > .tarjeta .e3-conclusion')
+  // (18/11, spec b.2 y b.3) texto visible por debajo de 20 u y texto en el acento, en el encabezado y el cuerpo
+  const u = parseFloat(getComputedStyle(vp).getPropertyValue('--fin-u'))
+  const ACC = color('--acc')
+  const chicos = [], acento = []
+  for (const raiz of [q('.e2-enc'), q('.cuerpo')]) {
+    for (const el of raiz ? raiz.querySelectorAll('*') : []) {
+      if (el.closest('svg title') || el.tagName.toLowerCase() === 'title') continue
+      if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue
+      if (!el.getClientRects().length) continue
+      const cs = getComputedStyle(el)
+      if (cs.visibility === 'hidden' || cs.opacity === '0') continue
+      const t = el.textContent.trim().slice(0, 32)
+      const fs = parseFloat(cs.fontSize)
+      if (fs < 20 * u - 0.05) chicos.push(`«${t}» a ${(fs / u).toFixed(1)} u`)
+      const c = el instanceof SVGElement ? cs.fill : cs.color
+      if (c === ACC) acento.push(`«${t}»`)
+    }
+  }
+  const lienzo = q('.cuerpo .fin-lienzo')
   return {
+    u, chicos, acento,
+    lienzoAria: lienzo?.getAttribute('aria-label') ?? null,
+    corteTitle: q('.e2-enc-corte')?.getAttribute('title') ?? '',
     preg: q('.e2-preg')?.textContent ?? '', corte: q('.e2-enc-corte')?.textContent ?? '', titulo: document.title,
     dec: q('.tarjeta-dec .kpi-lbl > b')?.textContent ?? null, decLlano: q('.tarjeta-dec .dec-llano')?.textContent ?? null,
     banda, grandes: grandes.length, grandeCentral: grandes.length === 1 && !!grandes[0].closest('.e2-central'),
@@ -349,6 +402,9 @@ def vistas(p: Pagina, w, h, V, bloques, CF, cadenas_cf, nums, out, capturar, sin
             p.mal(f"{v['hid']}: {x}")
         if abs(r.get("zoom", 1) - k) > 1e-3:
             p.mal(f"{v['hid']}: zoom {r.get('zoom')}, se esperaba {k:.4f}")
+        u_esp = min(w / k / 1920, h / k / 1080)
+        if abs((r.get("u") or 0) - u_esp) > 1e-3:
+            p.mal(f"{v['hid']}: --fin-u {r.get('u')}, se esperaba {u_esp:.4f} (mín(ancho / 1920; alto / 1080) lógicos)")
         if sin_esqueletos and r["esqueleto"]:
             p.mal(f"{v['hid']}: sigue siendo esqueleto («se arma en la etapa siguiente»)")
         if capturar and not r["esqueleto"]:
@@ -358,9 +414,15 @@ def vistas(p: Pagina, w, h, V, bloques, CF, cadenas_cf, nums, out, capturar, sin
         # encabezado y pestaña, contra CF
         if norm(c["preg"]) != norm(v["pregunta"]):
             p.mal(f"{v['hid']}: la pregunta dice «{c['preg']}», CF dice «{v['pregunta']}»")
-        corte = f"{v['n']} / {total}" + (f" · {v['fuente']}" if v.get("fuente") else "")
+        corte = f"{v['n']} / {total}"
         if norm(c["corte"]) != norm(corte):
             p.mal(f"{v['hid']}: el encabezado dice «{c['corte']}», se esperaba «{corte}»")
+        if norm(c["corteTitle"]) != norm(v.get("fuente") or ""):
+            p.mal(f"{v['hid']}: el title del contador es «{c['corteTitle']}», CF dice «{v.get('fuente') or ''}»")
+        for x in c["chicos"]:
+            p.mal(f"{v['hid']}: texto por debajo de {PISO_U} u {x}")
+        for x in c["acento"]:
+            p.mal(f"{v['hid']}: texto en el acento (--acc va solo en marcas) {x}")
         if norm(c["titulo"]) != norm(f"{v['pregunta']} · {CF['TITULO']}"):
             p.mal(f"{v['hid']}: el título de la pestaña es «{c['titulo']}»")
         revisar_estado(p, v["hid"], c)
@@ -403,14 +465,17 @@ def contenido(p: Pagina, v, c, cadenas_cf, nums):
             p.mal(f"{hid}: la frase de la decisión tiene {len(norm(c['decLlano']))} caracteres (60 o menos)")
     elif c["dec"] is not None:
         p.mal(f"{hid}: tiene tarjeta de decisión y CF no trae textos.decision")
-    # la banda: una cifra por tarjeta, la central primera y sola al tamaño máximo
-    if not c["banda"]:
-        p.mal(f"{hid}: la banda no tiene cifras")
-    if c["porTarjeta"] != [1] * len(c["porTarjeta"]):
+    # la banda (spec e.1): 0 o 1 tarjeta de cifra (2 en V04), una cifra por tarjeta, la central primera y sola al
+    # tamaño máximo
+    n_tarj = len(c["porTarjeta"])
+    tope = 2 if v["id"] in DOS_TARJETAS else 1
+    if n_tarj > tope:
+        p.mal(f"{hid}: {n_tarj} tarjetas de cifra en la banda (como mucho {tope})")
+    if c["porTarjeta"] != [1] * n_tarj:
         p.mal(f"{hid}: cifras por tarjeta de la banda {c['porTarjeta']} (una por tarjeta)")
-    if not c["grandeCentral"]:
+    if n_tarj and not c["grandeCentral"]:
         p.mal(f"{hid}: {c['grandes']} cifras al tamaño máximo; tiene que haber una, en la tarjeta central")
-    elif not c["centralPrimera"]:
+    elif n_tarj and not c["centralPrimera"]:
         p.mal(f"{hid}: la cifra central no está en la primera tarjeta de la banda")
     for rot in c["rotulos"]:
         if len(rot) > 22:
@@ -435,12 +500,18 @@ def contenido(p: Pagina, v, c, cadenas_cf, nums):
     # el gráfico
     if c["graficos"] != 1:
         p.mal(f"{hid}: {c['graficos']} gráficos (uno por vista)")
-    if not norm(c["conclusion"]):
-        p.mal(f"{hid}: el gráfico no tiene su conclusión arriba (.e3-conclusion)")
-    elif t.get("conclusion") and not norm(c["conclusion"]).startswith(norm(plano(t["conclusion"]))):
-        p.mal(f"{hid}: la conclusión «{c['conclusion']}» no empieza con la de CF")
-    if c["mide"] is not None and norm(c["mide"]) not in cadenas_cf:
-        p.mal(f"{hid}: qué mide («{c['mide']}») no sale de CF")
+    # (spec d) la conclusión, solo donde la vista la pide; qué mide, fuera de la pantalla, en el aria-label del lienzo
+    if v["id"] in CON_CONCLUSION:
+        if not norm(c["conclusion"]):
+            p.mal(f"{hid}: el gráfico no tiene su conclusión arriba (.e3-conclusion)")
+        elif t.get("conclusion") and not norm(c["conclusion"]).startswith(norm(plano(t["conclusion"]))):
+            p.mal(f"{hid}: la conclusión «{c['conclusion']}» no empieza con la de CF")
+    elif c["conclusion"] is not None:
+        p.mal(f"{hid}: tiene conclusión y la especificación la deja solo en {', '.join(sorted(CON_CONCLUSION))}")
+    if c["mide"] is not None:
+        p.mal(f"{hid}: qué mide sigue en pantalla (.fin-mide); va al aria-label de .fin-lienzo")
+    if t.get("mide") and norm(c["lienzoAria"]) != norm(plano(t["mide"])):
+        p.mal(f"{hid}: el aria-label del lienzo es «{c['lienzoAria']}», CF dice qué mide «{t['mide']}»")
     if c["terracota"] and not t.get("terracota"):
         p.mal(f"{hid}: {c['terracota']} elementos en terracota y CF no la declara (textos.terracota)")
 
@@ -480,6 +551,8 @@ def notas(p: Pagina, w, h, V, CF, NOTAS):
                     f"total {mmss(v['total_hasta'])} de {mmss(objetivo or total)}",
                     f"Presenta {v['integrante']}",
                     f"{v['bloque_titulo']}: {mmss(v['bloque_hasta'])} de {mmss(v['bloque_total'])}"]
+        if v.get("fuente"):
+            esperado.append(v["fuente"])
         esperado += [norm(plano(x))[:40] for x in NOTAS.get(v["id"]) or []]
         if not NOTAS.get(v["id"]):
             p.mal(f"notas: #{v['hid']} sin párrafos en notas_final.js")
@@ -562,6 +635,15 @@ def recorrido(p: Pagina, V):
         esperar(riel_ok, "con las notas abiertas el riel se encima con su pie")
         p.tecla("n")
         esperar(not p.estado()["notas"], "N no cierra las notas")
+    # (18/11, S-10, P-02) el riel se ve por defecto; P lo oculta y lo vuelve a mostrar sin cambiar de vista
+    riel_ve = "() => { const l = document.querySelector('.lat'); return !!l && l.getClientRects().length > 0 }"
+    esperar(p.pg.evaluate(riel_ve), "el riel no se ve por defecto")
+    p.tecla("p")
+    esperar(not p.pg.evaluate(riel_ve) and p.estado()["hash"] == f"#{medio['hid']}", "P no oculta el riel o cambia de vista")
+    fit = p.pg.evaluate("() => window.__fit().problemas")
+    esperar(not fit, f"con el riel oculto el tablero desborda: {fit}")
+    p.tecla("p")
+    esperar(p.pg.evaluate(riel_ve), "P no vuelve a mostrar el riel")
     # pantalla en negro: «.» y B; cualquier tecla vuelve sin cambiar de vista
     for k in (".", "b"):
         p.tecla(k)
@@ -630,6 +712,19 @@ def estatico(V, CF):
     for v in V:
         if len(v["pregunta"]) > 74:
             mal.append(f"CF: la pregunta de {v['id']} tiene {len(v['pregunta'])} caracteres (74 o menos)")
+    # (18/11, spec f, S-01, S-02, S-03) sin ejes con marcas ni letra vieja: nada de BarrasH ni de sus props de eje en
+    # final/src, y las vistas no usan useEscalaTexto (la letra va por la unidad u) ni HECHO (el verde es de la decisión)
+    src = APP / "final" / "src"
+    for f in sorted(src.rglob("*.jsx")):
+        txt = re.sub(r"/\*.*?\*/", "", f.read_text(encoding="utf-8"), flags=re.S)
+        txt = re.sub(r"(?m)^\s*//.*$|\s//.*$", "", txt)
+        for patron in ("BarrasH", "formatoEje", "tituloEje", "referencia:"):
+            if patron in txt:
+                mal.append(f"{f.relative_to(APP)}: usa {patron.rstrip(':')} (sin ejes con marcas, spec f)")
+        if f.parent.name == "vistas":
+            for patron in ("useEscalaTexto", "HECHO"):
+                if re.search(rf"\b{patron}\b", txt):
+                    mal.append(f"{f.relative_to(APP)}: usa {patron} (spec b.1 y b.3)")
     total = sum(v["segundos"] for v in V)
     objetivo = (CF.get("TIEMPOS") or {}).get("objetivo_s")
     if objetivo and total > objetivo:

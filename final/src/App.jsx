@@ -9,6 +9,10 @@
 // Sin temporizador en vivo: los tiempos de las notas son los de CF.
 // Los módulos sin datos del E2 y del E3 (escala.js, zoom.js) se importan tal cual; este archivo es copia porque el de /e3/
 // importa el registro y las notas del E3.
+// (18/11, spec de dataviz b.1, c y S-07, S-08, S-10) La unidad u (escala.js) se calcula acá con la ventana lógica y llega
+// a las vistas por UCtx y al CSS por --fin-u; el piso del zoom baja a 0,85 (a 1024 × 768 la vista entra entera, sin
+// aviso); el encabezado muestra solo «n / 15» (la fuente pasa a su title y a las notas); P oculta y muestra el riel
+// (modo de proyección optativo: por defecto el riel se ve, y la pantalla completa sola no lo oculta).
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -18,6 +22,7 @@ import MarcaInicio from './MarcaInicio.jsx'
 import { ImpresionCtx } from '../../e2/src/escala.js'
 import { VentanaCtx, medir } from '../../e3/src/zoom.js'
 import { PanelNotas, VentanaNotas } from './Notas.jsx'
+import { UCtx, calcularU } from './escala.js'
 
 const hashDe = (i) => `#${VISTAS[i].id.toLowerCase()}`
 function indiceDeHash() {
@@ -31,11 +36,12 @@ const SOLO_NOTAS = /(^|[?&])notas\b/.test(location.search)
 const NOTAS_ALTO = 0.35
 
 /** Ventana lógica al día con el tamaño real, descontando el panel de notas si está abierto. Con las
- *  notas, k puede bajar de 1 (zoom.js): se ensaya en una laptop, no se proyecta. */
+ *  notas, k puede bajar a 0,5 (zoom.js): se ensaya en una laptop, no se proyecta. Sin notas, el piso es 0,85
+ *  (18/11, FD-05): un proyector de 1024 × 768 da k 0,889 y ventana lógica 1152 × 864, sin aviso de pantalla chica. */
 function useVentana(notas) {
   const calc = useCallback(() => {
     const alto = notas ? Math.round(window.innerHeight * NOTAS_ALTO) : 0
-    return { ...medir(window.innerWidth, window.innerHeight - alto, notas ? 0.5 : 1), notasAlto: alto }
+    return { ...medir(window.innerWidth, window.innerHeight - alto, notas ? 0.5 : 0.85), notasAlto: alto }
   }, [notas])
   const [v, setV] = useState(calc)
   useLayoutEffect(() => {
@@ -59,7 +65,9 @@ export default function App() {
   const [imprimiendo, setImprimiendo] = useState(false)
   const [notas, setNotas] = useState(false)
   const [negro, setNegro] = useState(false)
+  const [proy, setProy] = useState(false)
   const ventana = useVentana(notas)
+  const u = calcularU(ventana.w, ventana.h)
   const vista = VISTAS[indice]
 
   // Cambio de vista con la transición del E2 (View Transitions con dirección; si no hay, WAAPI).
@@ -218,6 +226,7 @@ export default function App() {
     else if (l === 'i' && !SOLO_NOTAS) imprimirTodo()
     else if (l === 'n' && !SOLO_NOTAS) setNotas((x) => !x)
     else if ((l === 'b' || k === '.') && !SOLO_NOTAS) setNegro(true)
+    else if (l === 'p' && !SOLO_NOTAS) setProy((x) => !x)
     else return
     e.preventDefault()
   }
@@ -232,10 +241,11 @@ export default function App() {
   const Vista = vista.Componente
   return (
     <>
-      <div className="e3-vp" style={{ zoom: ventana.k, width: ventana.w, height: ventana.h }}>
+      <div className="e3-vp" style={{ zoom: ventana.k, width: ventana.w, height: ventana.h, '--fin-u': `${u}px` }}>
         <div className="e3-vp-dentro">
           <VentanaCtx.Provider value={ventana}>
-            <div className="app">
+          <UCtx.Provider value={u}>
+            <div className={`app${proy ? ' fin-proy' : ''}`}>
               <div className="chico">
                 <h1>Este tablero necesita una pantalla más grande</h1>
                 <p>
@@ -255,6 +265,7 @@ export default function App() {
                 </main>
               </div>
             </div>
+          </UCtx.Provider>
           </VentanaCtx.Provider>
         </div>
       </div>
@@ -264,24 +275,18 @@ export default function App() {
   )
 }
 
-/** El encabezado del E2 (regla 12): la pregunta, grande, es el h1. A la derecha, chico, en qué vista se
- *  está y de qué parte del documento sale. */
+/** El encabezado del E2 (regla 12): la pregunta, grande, es el h1, en un renglón. A la derecha, «n / total» y la barra de
+ *  avance. (18/11, S-07) La fuente del documento («E3, Parte D v3.0») es para la cátedra, no para el público: sale de la
+ *  pantalla y queda en el title del contador y en la cabecera de las notas. */
 function Encabezado({ vista }) {
-  // (17/11) La fuente la escribe CF (vista.fuente); sin fuente, solo «n / total».
   const fuente = vista.fuente ?? ''
-  // (F7, C5-15) La fuente va en un segundo renglón bajo «n / total», así «E3, » no le quita ancho a la
-  // pregunta; el separador queda en el texto (lo lee verificar_final.py) y no se ve.
-  const donde = (
-    <>
-      {`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}
-      {fuente && <><span style={{ display: 'none' }}> · </span><span>{fuente}</span></>}
-    </>
-  )
   return (
     <header className="e2-enc">
       <h1 className="e2-preg">{vista.pregunta}</h1>
       <div className="e2-enc-der">
-        <span className="e2-enc-corte" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>{donde}</span>
+        <span className="e2-enc-corte" title={fuente || undefined}>
+          {`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}
+        </span>
         <Avance vista={vista} />
       </div>
     </header>
@@ -340,7 +345,7 @@ function Lateral({ indice, irA }) {
         })}
       </ol>
 
-      <div className="lat-pie" title="↑ ↓ o Av Pág y Re Pág: cambiar de vista · Inicio / Fin: primera y última · N: notas del orador · B o «.»: pantalla en negro · F: pantalla completa · I: imprimir">
+      <div className="lat-pie" title="↑ ↓ o Av Pág y Re Pág: cambiar de vista · Inicio / Fin: primera y última · N: notas del orador · B o «.»: pantalla en negro · F: pantalla completa · P: ocultar el riel · I: imprimir">
         <span>↑ ↓ vista · N: notas</span>
         <span>F: pantalla · B: negro</span>
       </div>

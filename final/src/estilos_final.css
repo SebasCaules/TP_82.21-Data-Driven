@@ -1,33 +1,125 @@
-/* Estilos propios de /final/ (17/11). El tablero usa las hojas del E1, del E2 y del E3 tal cual (main.jsx). Acá va SOLO
-   el encabezado común de la tarjeta del gráfico, que en /e3/ cada vista repetía en su Vnn.css (.e3-v05-graf, -cab, -mide,
-   -lienzo, -pie): en /final/ las vistas lo comparten con el prefijo fin-. Ninguna regla nombra una clase del armazón ni
-   :root (lo controla scripts/paridad_final.py). Las medidas son las de la vista 5 del E3, que paridad_final.py compara
-   con la vista 4 del E2. */
+/* Estilos propios de /final/ (17/11; 18/11, spec de dataviz b a e). El tablero usa las hojas del E1, del E2 y del E3 tal
+   cual (main.jsx) y acá se aparta de ellas en la escala (decisión P-01): toda medida va en la unidad u, la variable
+   --fin-u que App.jsx deja en .e3-vp (1 u = 1 px de una pantalla de 1920 × 1080; escala.js). Las reglas que nombran una
+   clase del armazón van bajo .e3-vp (lo controla scripts/paridad_final.py) y ninguna usa !important fuera de
+   @media print. El esqueleto de /e2/ y /e3/ no cambia (R17): riel, banda, tarjeta verde, familias y colores. */
 
-/* Tarjeta del gráfico: encabezado arriba y el SVG llena el resto del alto. */
-.fin-graf { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+/* ---------- tokens (spec b.2, b.4) ---------- */
+.e3-vp {
+  --fin-t-titulo: calc(var(--fin-u) * 52);   /* 56 u no entra con V09 (95 % del ancho) a 1280 × 720: spec b.2, 52 */
+  --fin-t-cifra: calc(var(--fin-u) * 48);
+  --fin-t-cifra2: calc(var(--fin-u) * 36);
+  --fin-t-dec: calc(var(--fin-u) * 30);
+  --fin-t-concl: calc(var(--fin-u) * 30);
+  --fin-t-linea: calc(var(--fin-u) * 24);
+  --fin-t-rotulo: calc(var(--fin-u) * 20);
+  --fin-s1: calc(var(--fin-u) * 8);
+  --fin-s2: calc(var(--fin-u) * 16);
+  --fin-s3: calc(var(--fin-u) * 24);
+  --fin-s4: calc(var(--fin-u) * 32);
+  --fin-s6: calc(var(--fin-u) * 48);
+  --fin-banda-h: calc(var(--fin-u) * 160);
+}
+/* Marca de contexto (spec b.3): #8a94a6, 3,06:1 sobre blanco y ΔE 28 contra --acc. */
+.e3-vp .fin-graf { --fin-gris: #8a94a6; }
 
-/* Encabezado: qué mide (mono, en --e3-ctx, ×1,2 del rótulo de la banda como VIS-13 del E3) y debajo la conclusión
-   (.e3-conclusion de estilos_e3.css). */
-.fin-cab { display: flex; flex-direction: column; gap: clamp(2px, .5vh, 6px); min-width: 0; }
-.fin-mide {
-  margin: 0;
-  font: 600 calc(var(--e2-rot, 12px) * 1.2)/1.25 var(--mono); text-transform: uppercase; letter-spacing: .06em;
-  color: var(--e3-ctx, #5a6478);
+/* ---------- marco (spec c y b.4) ---------- */
+/* Encabezado: 32 u arriba, 40 u a los costados, 96 u de alto para el título. */
+.e3-vp .e2-enc {
+  box-sizing: border-box; height: calc(var(--fin-u) * 128);
+  padding: var(--fin-s4) calc(var(--fin-u) * 40) 0; gap: var(--fin-s3); align-items: center;
+}
+/* El título, en un renglón y al mismo tamaño en las 15 vistas. El más ancho es V09 («Pasa con 11 puntos; lo observado da
+   menos de 1»): a 56 u ocupa el 105 % del lugar a 1024 a 1536 de ancho con el riel visible; a 52 u entra en todas. */
+.e3-vp .e2-enc .e2-preg {
+  font: 700 var(--fin-t-titulo)/1.1 var(--fuente); letter-spacing: -.02em; color: var(--ink);
+  white-space: nowrap; overflow: visible;
+}
+.e3-vp .e2-enc-der { gap: var(--fin-s2); }
+/* «n / 15», 20 u, sans en --e3-ctx (la mono queda solo en el rótulo de la tarjeta de la banda). */
+.e3-vp .e2-enc .e2-enc-corte {
+  font: 400 var(--fin-t-rotulo)/1.2 var(--fuente); letter-spacing: 0; color: var(--e3-ctx);
+}
+/* Cuerpo: 24 u debajo del encabezado, 40 u a los costados y 32 u abajo; 24 u entre banda y gráfico. */
+.e3-vp .cuerpo { padding: var(--fin-s3) calc(var(--fin-u) * 40) var(--fin-s4); }
+.e3-vp .cuerpo > .pant { gap: var(--fin-s3); }
+
+/* Ventana chica (S-08): con el piso de zoom 0,85 la vista entra entera a 1024 × 768; el aviso no se muestra. */
+.e3-vp .chico { display: none; }
+
+/* Modo de proyección (S-10, P-02): la tecla P oculta el riel; el contenido gana el ancho sin rediseño. */
+.e3-vp .app.fin-proy { grid-template-columns: minmax(0, 1fr); }
+.e3-vp .app.fin-proy > .lat { display: none; }
+
+/* ---------- banda (spec e) ---------- */
+.fin-banda { flex: none; }
+.e3-vp .fin-banda .e2-banda { display: grid; height: var(--fin-banda-h); gap: var(--fin-s3); }
+.e3-vp .fin-banda-cifra .e2-banda { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+/* Con dos tarjetas (solo V04), mitad y mitad: a 5/12 cada tarjeta mide unos 300 u y el fragmento («piso para cualquier
+   cliente») se parte en dos renglones y no entra en 160 u. */
+.e3-vp .fin-banda-cifra .e2-banda:has(> .e2-banda-cifras > .tarjeta:nth-child(2)) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.e3-vp .fin-banda-sola .e2-banda { grid-template-columns: minmax(0, 1fr); }
+.e3-vp .fin-banda .e2-banda > .e2-banda-cifras {
+  display: grid; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+  gap: var(--fin-s3);
+}
+.e3-vp .fin-banda-sola .e2-banda > .e2-banda-cifras { display: none; }
+
+/* Tarjeta de cifra (spec e.1): rótulo, cifra y fragmento en tres filas, centradas en vertical. Relleno de 16 u arriba y
+   abajo (24 u a los costados): con 24 u, 25 + 53 + 30 u de texto, 8 u de separación y el borde de 5 u pasan de 160 u. */
+.e3-vp .fin-banda .e2-banda-cifras > .tarjeta {
+  display: grid; grid-template-rows: auto auto auto; align-content: center; gap: calc(var(--fin-u) * 4);
+  padding: var(--fin-s2) var(--fin-s3); min-height: 0; overflow: hidden;
+}
+.e3-vp .fin-banda .e2-banda-cifras > .tarjeta.e2-central { border-top: calc(var(--fin-u) * 5) solid var(--acc); }
+.e3-vp .fin-banda .e2-banda-cifras .kpi-lbl {
+  font: 600 var(--fin-t-rotulo)/1.25 var(--mono); text-transform: uppercase; letter-spacing: .06em;
+  color: var(--e3-ctx);
+}
+.e3-vp .fin-banda .e2-banda-cifras .ban-par { margin: 0; }
+.e3-vp .fin-banda .e2-banda-cifras .tarjeta .par-val.e2-cifra {
+  font: 700 var(--fin-t-cifra)/1.1 var(--fuente); letter-spacing: -.02em; color: var(--ink);
+  font-variant-numeric: normal;
+}
+.e3-vp .fin-banda .e2-banda-cifras .tarjeta .par-val.e2-cifra.sec { font-size: var(--fin-t-cifra2); color: var(--ink); }
+.e3-vp .fin-banda .e2-banda-cifras .par-val .par-unidad { font-size: .6em; font-weight: 600; letter-spacing: 0; }
+.e3-vp .fin-banda .e2-banda-cifras .e2-linea {
+  margin: 0; font: 500 var(--fin-t-linea)/1.25 var(--fuente); color: var(--e3-ctx);
 }
 
-.fin-lienzo { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; margin-top: clamp(8px, 2vh, 24px); }
+/* Tarjeta de decisión (spec e.2): sigue verde (R17); sale la fila «Decisión · área · estado» (queda en el DOM, oculta)
+   y la frase corta va a 30 u, 700, alineada a la izquierda y centrada en vertical. */
+.e3-vp .fin-banda .e2-banda > .tarjeta-dec {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--fin-s3) var(--fin-s4); border-top-width: calc(var(--fin-u) * 5);
+}
+.e3-vp .fin-banda .e2-banda > .tarjeta-dec .kpi-lbl { display: none; }
+.e3-vp .fin-banda .e2-banda > .tarjeta-dec .dec-llano {
+  margin: 0; font: 700 var(--fin-t-dec)/1.25 var(--fuente); letter-spacing: -.01em; color: var(--ink); text-align: left;
+}
 
-/* Un renglón debajo del gráfico, a la letra del texto. */
-.fin-pie { flex: none; margin: clamp(4px, 1cqh, 10px) 0 0; font: 400 var(--e2-txt)/1.3 var(--fuente); color: var(--ink); }
+/* ---------- tarjeta del gráfico (spec d) ---------- */
+/* Relleno de 32 u; el lienzo llena el resto y el dibujo se centra en vertical dentro de él. */
+.fin-graf { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.e3-vp .tarjeta.fin-graf { padding: var(--fin-s4); }
+.fin-cab { display: flex; flex-direction: column; min-width: 0; }
+.fin-lienzo { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; margin-top: 0; }
+.fin-cab + .fin-lienzo { margin-top: var(--fin-s3); }
+
+/* Conclusión (solo V13): 30 u, 500, tinta; la cifra en 700 tinta. El acento va solo en marcas (S-06). */
+.e3-vp .fin-graf .e3-conclusion {
+  font: 500 var(--fin-t-concl)/1.25 var(--fuente); letter-spacing: -.01em; color: var(--ink);
+}
+.e3-vp .fin-graf .e3-conclusion b { font-weight: 700; color: var(--ink); }
+
+/* Un renglón debajo del gráfico, a la letra del fragmento. */
+.fin-pie { flex: none; margin: var(--fin-s2) 0 0; font: 400 var(--fin-t-linea)/1.25 var(--fuente); color: var(--ink); }
 .fin-pie b { font-weight: 700; }
 
 /* Notas: el renglón de quién presenta va pegado al de arriba. */
 .fin-notas-quien { margin-top: -4px; }
 
-/* Las vistas con línea de referencia (clase fin-ref en su lienzo): la etiqueta de la línea (la Plaqueta de BarrasH, fija
-   en 10) se agranda sobre su centro hasta la letra de los valores de las barras, como en la vista 5 del E3. --fin-ref lo
-   calcula la vista con la fórmula de BarrasH; sin él, 1,3. */
-.fin-ref svg > g > g:has(> rect[rx]) {
-  transform-box: fill-box; transform-origin: 50% 50%; transform: scale(var(--fin-ref, 1.3));
+/* Hoja impresa: la unidad de la ventana lógica mínima. */
+@media print {
+  .e3-vp { --fin-u: .6px !important; }
 }

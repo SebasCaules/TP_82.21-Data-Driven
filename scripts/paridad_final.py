@@ -1,25 +1,26 @@
-"""Paridad de /final/ con /e2/ (17/11): la de scripts/paridad_e3.py, aplicada a dist-final/.
+"""Paridad y escala de /final/ (17/11; 18/11, auditoría de dataviz, decisión P-01).
 
-    npm run build:e2 && npm run build:final && python3 -I scripts/paridad_final.py [--vista v05] [--hoja RUTA]
+    npm run build:e2 && npm run build:final && python3 -I scripts/paridad_final.py [--vista v08]
 
-/final/ es /e3/ con otro contenido: el mismo zoom uniforme de factor k sobre el tablero del E2 y las mismas reglas. Este
-script carga paridad_e3.py (sin tocarlo: su comportamiento por defecto no cambia) y le cambia lo que es propio de /e3/:
+Hasta el 18/11 este script exigía que /final/ fuera /e2/ con el zoom de /e3/ en letra y cajas (paridad_e3.py contra la
+vista 4 del E2). La decisión P-01 aprueba que /final/ se aparte de ese contrato en el encabezado, la banda, las tarjetas y
+la tarjeta del gráfico: esas piezas pasan a desvío declarado y se comparan con la escala de la especificación
+(.workforce/auditoria-dataviz/fase-2/spec.md, b.2 y b.4): cada medida vale N × u × k px reales, con u = --fin-u de .e3-vp
+(final/src/escala.js) y tolerancia de 1 px. Lo que no cambia (R17) se sigue midiendo contra /e2/ con paridad_e3.py, sin
+tocarlo:
 
-- el tablero medido es dist-final/index.html y la vista de referencia es --vista (por defecto la v05 de muestra, que repite
-  la estructura de la vista 5 del E3: banda de tres cifras, decisión, qué mide, conclusión y BarrasH);
-- el encabezado del gráfico se mide en las clases comunes de /final/ (.fin-mide y .fin-graf .e3-conclusion, de
-  final/src/estilos_final.css) en vez de las de la vista 5 del E3;
-- la cifra central de /final/ va en --acc, como en /e2/: salen los desvíos declarados por la terracota de la vista 5 del
-  E3 (VIS-14), que pasan a compararse contra /e2/;
-- el riel se recorre por su data-id (en /final/ el número de cada vista sale de su posición, no del id);
-- el control estático mira final/src: main.jsx importa las hojas del E1, el E2 y el E3 y src/fit.js; alguna vista
-  importa e2/src/Banda.jsx y src/graficos.jsx; estilos_final.css y las hojas de las vistas no nombran clases del armazón
-  (la general, solo bajo .e3-vp) ni usan !important fuera de @media print; y src/**, e2/** y e3/** no cambian contra
-  main (/final/ los usa, no los toca).
-
-Lo demás (letra × k contra /e2/ en la misma ventana a 4 resoluciones, cajas del armazón contra /e2/ en la ventana
-lógica, reglas 11 y 12 del E2 y desbordes en cada vista) es paridad_e3.py tal cual: en su salida, «/e3/» es /final/.
-Sin --hoja no escribe nada (la hoja de contacto de paridad_e3.py va al vault).
+1. Estático (igual que antes): final/src/main.jsx importa las hojas del E1, el E2 y el E3 y src/fit.js; alguna vista
+   importa e2/src/Banda.jsx y src/graficos.jsx (Lienzo); estilos_final.css y las hojas de las vistas no nombran clases
+   del armazón fuera de .e3-vp ni usan !important fuera de @media print; src/**, e2/** y e3/** no cambian contra main.
+2. Letra del riel contra /e2/ en la misma ventana (paridad_e3.py, solo las piezas del riel: R17).
+3. Cajas del riel y de la barra de avance contra /e2/ en la ventana lógica (paridad_e3.py, solo esas piezas).
+4. Escala de la especificación en --vista (por defecto v08: BarrasFin y una tarjeta) y el título en todas las vistas, a
+   1152×640, 1280×720, 1366×768, 1536×864 y 1920×1080: título (el token de estilos_final.css, 56, 52 o 48 u), «n / 15»
+   20 u, cifra central 48 u, segunda cifra 36 u (si hay), rótulo de la tarjeta 20 u, fragmento 24 u, frase de la
+   decisión 30 u, conclusión 30 u (si hay); alto del encabezado 128 u y de la banda 160 u; relleno de la tarjeta del
+   gráfico 32 u; rótulo de barra 26 u y valor 28 u (34 u el foco).
+5. Reglas 11 y 12 del E2 y desbordes en cada vista (paridad_e3.py: pregunta en un renglón, un gráfico, decisión de 60
+   caracteres o menos, __fit, texto que no entra en su caja, riel sobre su pie).
 
 Termina con «RESULTADO: OK» o con la lista de diferencias, «RESULTADO: FALLA» y código 1.
 """
@@ -44,27 +45,91 @@ _spec = importlib.util.spec_from_file_location("paridad_e3", APP / "scripts" / "
 P = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(P)
 
-SELECTORES = {".e3-v05-mide": ".fin-mide", ".e3-v05-graf .e3-conclusion": ".fin-graf .e3-conclusion"}
+# Lo que sigue igual que /e2/ (R17): el riel y la barra de avance. El resto es desvío declarado (P-01) y se mide en
+# escala() contra la especificación.
+TEXTOS_RIEL = [t for t in P.TEXTOS if t[0].startswith("riel")]
+PIEZAS_RIEL = [p for p in P.PIEZAS if p[0].startswith("riel") or p[0] == "encabezado · avance"]
+CAJAS_RIEL = {"riel": "xywh", "riel · marca": "xw", "riel · ítem": "xw", "encabezado · avance": "wh"}
+RES_ESCALA = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]
+TOL_PX = 1.0
 
 
-def textos_final():
-    """TEXTOS de paridad_e3.py con los selectores de /final/ y sin el color declarado por la terracota del E3."""
-    out = []
-    for nombre, v2, s2, s3, op in P.TEXTOS:
-        op = dict(op)
-        if "est3" in op:
-            op["est3"] = {k: v for k, v in op["est3"].items() if v != P.TERRA}
-        out.append((nombre, v2, s2, SELECTORES.get(s3, s3), op))
-    return out
+def token_titulo() -> int:
+    css = (SRC / "estilos_final.css").read_text(encoding="utf-8")
+    m = re.search(r"--fin-t-titulo:\s*calc\(var\(--fin-u\)\s*\*\s*(\d+)\)", css)
+    if not m or int(m.group(1)) not in (56, 52, 48):
+        raise SystemExit("estilos_final.css: --fin-t-titulo tiene que ser calc(var(--fin-u) * 56), 52 o 48 (spec b.2)")
+    return int(m.group(1))
 
 
-def distinto_final():
-    out = {}
-    for pieza, props in P.DISTINTO.items():
-        quedan = {k: v for k, v in props.items() if v != P.TERRA}
-        if quedan:
-            out[pieza] = quedan
-    return out
+# (nombre, selector, propiedad, u esperadas; None = opcional). Tamaños de letra y cajas, en px reales (× zoom).
+MEDIDAS = [
+    ("título", ".e2-enc .e2-preg", "fontSize", "titulo", False),
+    ("n / 15", ".e2-enc .e2-enc-corte", "fontSize", 20, False),
+    ("cifra central", ".fin-banda .e2-central .e2-cifra", "fontSize", 48, True),
+    ("segunda cifra", ".fin-banda .e2-cifra.sec", "fontSize", 36, True),
+    ("rótulo de la tarjeta", ".fin-banda .e2-banda-cifras .kpi-lbl > span", "fontSize", 20, True),
+    ("fragmento", ".fin-banda .e2-banda-cifras .e2-linea", "fontSize", 24, True),
+    ("frase de la decisión", ".fin-banda .tarjeta-dec .dec-llano", "fontSize", 30, False),
+    ("conclusión", ".fin-graf .e3-conclusion", "fontSize", 30, True),
+    ("alto del encabezado", ".e2-enc", "alto", 128, False),
+    ("alto de la banda", ".fin-banda .e2-banda", "alto", 160, False),
+    ("relleno de la tarjeta del gráfico", ".tarjeta.fin-graf", "paddingTop", 32, False),
+    ("rótulo de barra", ".fin-lienzo svg text[text-anchor=end]", "fontSize", 26, True),
+]
+
+MEDIR = r"""(medidas) => {
+  const vp = document.querySelector('.e3-vp')
+  const u = parseFloat(getComputedStyle(vp).getPropertyValue('--fin-u'))
+  const z = vp.currentCSSZoom ?? 1
+  const out = {}
+  for (const [nombre, sel, prop] of medidas) {
+    const el = document.querySelector(sel)
+    if (!el || !el.getClientRects().length) { out[nombre] = null; continue }
+    const cs = getComputedStyle(el)
+    out[nombre] = prop === 'alto' ? el.getBoundingClientRect().height : parseFloat(cs[prop]) * z
+  }
+  return { u, z, out }
+}"""
+
+
+def escala(nav, vista: str, problemas: list[str]) -> None:
+    tit = token_titulo()
+    filas = []
+    for w, h in RES_ESCALA:
+        res = f"{w}x{h}"
+        ctx, pg, err = P.abrir(nav, FINAL, vista, w, h)
+        try:
+            r = pg.evaluate(MEDIR, [[m[0], m[1], m[2]] for m in MEDIDAS])
+            u, z = r["u"], r["z"]
+            for nombre, _sel, _prop, n, opcional in MEDIDAS:
+                n = tit if n == "titulo" else n
+                v = r["out"][nombre]
+                if v is None:
+                    if not opcional:
+                        problemas.append(f"[{res}] {vista}: falta {nombre}")
+                    continue
+                esperado = n * u * z
+                if abs(v - esperado) > TOL_PX:
+                    problemas.append(f"[{res}] {vista}: {nombre} mide {v:.2f} px, la especificación dice {n} u = {esperado:.2f} px")
+            filas.append(f"   {res}: u {u:.4f} px lógicos × zoom {z:.4f} = {u * z:.4f} px reales")
+            # el título, al mismo tamaño en las 15 vistas
+            ids = pg.evaluate(P.IDS_E3)
+            for vid in ids:
+                pg.evaluate(f"() => {{ location.hash = '#{vid}' }}")
+                pg.wait_for_timeout(120)
+                pg.wait_for_function("() => !document.querySelector(':root:active-view-transition') && "
+                                     "document.getAnimations().every((a) => a.playState !== 'running')", timeout=5000)
+                fs = pg.evaluate("() => parseFloat(getComputedStyle(document.querySelector('.e2-enc .e2-preg')).fontSize)"
+                                 " * (document.querySelector('.e3-vp').currentCSSZoom ?? 1)")
+                if abs(fs - tit * u * z) > TOL_PX:
+                    problemas.append(f"[{res}] {vid}: el título mide {fs:.2f} px, {tit} u = {tit * u * z:.2f} px")
+        finally:
+            ctx.close()
+        for x in err:
+            problemas.append(f"[{res}] consola /final/ #{vista}: {x}")
+    print(f"4. escala de la especificación (vista {vista}, título {tit} u en todas):")
+    print("\n".join(filas))
 
 
 def estatico(problemas):
@@ -103,8 +168,7 @@ def estatico(problemas):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--vista", default="v05", help="vista de /final/ que se compara con la vista 4 de /e2/")
-    ap.add_argument("--hoja", help="arma la hoja de contacto /e2/ y /final/ lado a lado en esta ruta")
+    ap.add_argument("--vista", default="v08", help="vista de /final/ donde se mide la escala de la banda y de BarrasFin")
     a = ap.parse_args()
     for f in (P.E2, FINAL):
         if not f.exists():
@@ -113,10 +177,13 @@ def main():
             sys.exit(1)
     P.E3 = FINAL
     P.VISTA_E3 = a.vista
-    P.TEXTOS = textos_final()
-    P.DISTINTO = distinto_final()
+    P.TEXTOS = TEXTOS_RIEL
+    P.PIEZAS = PIEZAS_RIEL
+    P.CAJAS = CAJAS_RIEL
+    P.DISTINTO = {}
     P.IDS_E3 = "() => [...document.querySelectorAll('.lat-item')].map((b) => b.dataset.id.toLowerCase())"
-    print(f"Paridad de /final/ (vista {a.vista}) con /e2/ (vista {P.VISTA_E2}): en la salida de paridad_e3.py, «/e3/» es /final/.")
+    print(f"Paridad y escala de /final/ (vista {a.vista}); en la salida de paridad_e3.py, «/e3/» es /final/ y solo se "
+          "comparan con /e2/ el riel y la barra de avance (P-01).")
     problemas: list[str] = []
     estatico(problemas)
     with sync_playwright() as pw:
@@ -124,9 +191,8 @@ def main():
         try:
             P.letra(nav, problemas)
             P.armazon(nav, problemas)
+            escala(nav, a.vista, problemas)
             P.reglas(nav, problemas)
-            if a.hoja:
-                P.hoja(nav, Path(a.hoja))
         except PWError as e:
             problemas.append(f"excepción de Playwright: {str(e).splitlines()[0][:160]}")
         nav.close()

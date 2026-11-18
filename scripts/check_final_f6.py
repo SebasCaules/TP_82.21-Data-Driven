@@ -6,8 +6,11 @@ Corre, con rutas absolutas y en este orden:
 
 1. pipeline/build_final.py dos veces: las dos dan el mismo final/src/datos_final.js, y es el versionado (git diff).
 2. npm run build:final.
-3. scripts/verificar_final.py --sin-muestra --sin-esqueletos (capturas a 1280×720 y 1920×1080 en final/capturas-verif/).
-4. npm run build:e2 y scripts/paridad_final.py --vista v07 (la vista con la estructura de la vista 5 del E3).
+3. scripts/verificar_final.py --sin-muestra --sin-esqueletos (capturas a 1280×720 y 1920×1080 en final/capturas-verif/;
+   desde el 18/11 comprueba la especificación de dataviz: unidad u, piso de 20 u, título en un renglón, una tarjeta de
+   cifra por vista salvo V04, sin ejes con marcas, acento solo en marcas, tecla P).
+4. npm run build:e2 y scripts/paridad_final.py --vista v08 (18/11, P-01: el riel contra /e2/ y la escala de la
+   especificación de dataviz en la vista con BarrasFin y una tarjeta; la v07 pasó a cuadrícula).
 5. El HTML de un solo archivo (scripts/vite.final-sobre.config.js) en dist-final-sobre/index.html: existe, no trae src
    ni href a http, y abierto con Playwright sin red (offline, file://) monta cada vista de CF con su pregunta, sin pedidos
    fuera de file: y data: (url(), @import o fetch incluidos) y sin errores de consola.
@@ -49,7 +52,7 @@ SOBRE = APP / "dist-final-sobre" / "index.html"
 MD5_E3 = "1903979ca800a3907a2ae365d30eb48e"
 MAIN = "c0db4f742066d195bc094d22580ca8a2e5ac4874"   # main al empezar la fase 6: no se toca
 RAMA = "final-tablero"
-VISTA_PARIDAD = "v07"
+VISTA_PARIDAD = "v08"
 PY = sys.executable
 
 fallas: list[str] = []
