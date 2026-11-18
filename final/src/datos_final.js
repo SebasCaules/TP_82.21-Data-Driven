@@ -47,7 +47,7 @@ export const DF = {
    },
    {
     "archivo": "canon.json",
-    "sha256": "c31476043ff5276013bb573237a5ee245957a6bb718512052ca02fba94bd1562"
+    "sha256": "60f2940b4161c7f0765815e19060cae414830939d428b55403df32249d38974e"
    },
    {
     "archivo": "contenido_c.py",
@@ -55,11 +55,11 @@ export const DF = {
    },
    {
     "archivo": "contenido_a.py",
-    "sha256": "fad086cda2947a81bd9fa38464c722b2e4a8a2e70570aaf812125f3d681d1db9"
+    "sha256": "e02fe48282b859753dfe31bc23d6c5b72e66eda5140d8525d720341850a90bad"
    },
    {
     "archivo": "contenido_a.py",
-    "sha256": "03cd553f9664b792f1e0fddeae6790842018ee440cab97f344f4fd6707971088"
+    "sha256": "67eb82e855a688a7faaf5644673dc690ee0a723298f4f5b9e562057e10ac6484"
    },
    {
     "archivo": "Transacciones_clientes.csv",
