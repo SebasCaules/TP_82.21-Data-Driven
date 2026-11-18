@@ -58,12 +58,12 @@ HTML = APP / "dist-final" / "index.html"
 CF_JS = APP / "final" / "src" / "contenido_final.js"
 DF_JS = APP / "final" / "src" / "datos_final.js"
 NOTAS_JS = APP / "final" / "src" / "notas_final.js"
-# Cadenas del canon que ya no van (lista_negra.cadenas_v1_2 y cadenas_v1_3), si la carpeta de la corrida está: en pantalla,
+# Cadenas del canon que ya no van (lista_negra.cadenas_v1_2, cadenas_v1_3 y cadenas_v1_4), si la carpeta de la corrida está: en pantalla,
 # en los title y en las notas. La lista completa la corre scripts/check_final_f6.py sobre el texto renderizado.
 CANON = Path("/Users/sebastiancaules/Desktop/ITBA/26-2C/FPDD/.workforce/presentacion-final/fase-2/canon.json")
 try:
     _ln = json.loads(CANON.read_text(encoding="utf-8"))["lista_negra"]
-    NEGRA_CANON = [c for k in ("cadenas_v1_2", "cadenas_v1_3") for c in _ln.get(k, [])]
+    NEGRA_CANON = [c for k in ("cadenas_v1_2", "cadenas_v1_3", "cadenas_v1_4") for c in _ln.get(k, [])]
 except (OSError, KeyError, ValueError):
     NEGRA_CANON = []
 RES = [(1152, 640), (1280, 720), (1366, 768), (1536, 864), (1920, 1080)]

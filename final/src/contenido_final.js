@@ -36,7 +36,6 @@ const legal = (id) => T.legal.find((x) => x.id === id).puntaje
 const cond = (id) => T.condiciones.find((x) => x.id === id).puntaje
 const sobre = (n, de) => `${fijo(n)}[[/${fijo(de)}]]`
 const unidad = (n, u) => `${n}[[${NBSP}${u}]]`
-const DE_CADA = A['G68.potencia_con_descuento'].unidad
 const TRAMOS = T.tramos_de_cruce
 const PREVIA = Object.fromEntries(T.legal_previas.acciones.map((x) => [x.codigo, x.semana]))
 const SEM_ACUERDO = T.plan.hitos.find((h) => h.n === 1).semana
@@ -65,11 +64,11 @@ export const CF = {
           id: 'V01',
           titulo: 'La recomendación',
           pregunta: 'Recomendamos un piloto, no el proyecto',
-          fuente: 'Parte D v3.0',
+          fuente: 'E3, Parte D v3.0',
           segundos: 90,
           textos: {
             piloto: { rotulo: 'Piloto mínimo', linea: 'tres listas con control' },
-            umbral: { rotulo: 'Umbral de pase', linea: 'contra menos de uno esperado', unidad: 'puntos' },
+            umbral: { rotulo: 'Umbral de pase', linea: 'lo observado da menos de uno', unidad: 'puntos' },
             semana: { rotulo: 'Se decide', linea: 'desde la aprobación', antes: 'semana' },
             mide: 'Lo que deja la lista contra lo que cuesta',
             conclusion: 'Recomendamos un piloto mínimo, tres listas mensuales con grupo de control, por',
@@ -77,7 +76,7 @@ export const CF = {
             barras: {
               deja: 'Deja la lista, por año',
               piloto: 'Piloto mínimo',
-              cuesta: 'Cuesta el primer año',
+              cuesta: 'Proyecto entero, primer año',
               eje: 'Dólares',
             },
             decision: {
@@ -104,15 +103,15 @@ export const CF = {
           id: 'V02',
           titulo: 'Qué ventas entran',
           pregunta: 'Alcanzan las ventas que tienen cliente',
-          fuente: 'Parte A v3.0',
+          fuente: 'E3, Parte A v3.0 y Anexo 1',
           segundos: 130,
           textos: {
             sin_cliente: { rotulo: 'Ventas sin cliente', linea: 'no entran a la lista' },
             datos: { rotulo: 'Datos suficientes', linea: 'condición técnica del proyecto' },
             calidad: { rotulo: 'Calidad', linea: 'utilizable, se corrige antes' },
             mide: 'Filas del extracto de ventas, paso a paso',
-            conclusion: 'La lista se arma con',
-            sigue: [' ventas con cliente y monto positivo; las demás no se pueden atribuir a nadie.'],
+            conclusion: 'La PoC usó',
+            sigue: [' ventas con cliente y monto positivo; en el piloto la devuelta cuenta como actividad.'],
             barras: {
               crudo: 'Filas del extracto',
               unicas: 'Sin repetidas',
@@ -135,7 +134,7 @@ export const CF = {
           id: 'V03',
           titulo: 'Qué meses entran',
           pregunta: 'Septiembre a diciembre llegaron incompletos',
-          fuente: 'Parte A v3.0',
+          fuente: 'E3, Parte A v3.0',
           segundos: 125,
           textos: {
             fuera: { rotulo: 'Meses que no se usan', linea: 'debajo del control mensual' },
@@ -169,13 +168,13 @@ export const CF = {
           id: 'V04',
           titulo: 'Qué es irse',
           pregunta: 'La regla ordena por cercanía al umbral',
-          fuente: 'Parte A v3.0',
+          fuente: 'E3, Parte A v3.0',
           segundos: 85,
           textos: {
             minimo: { rotulo: 'Umbral mínimo', linea: 'piso para cualquier cliente', unidad: 'días' },
             factor: { rotulo: 'O su ritmo', linea: 'su intervalo entre compras', unidad: 'veces' },
             mide: `Cruzan su umbral en ${HORIZONTE} días, en validación, por días que faltan`,
-            conclusion: 'Los más cerca de su umbral lo cruzan',
+            conclusion: 'Los más cerca de su umbral lo cruzan el',
             sigue: [' de las veces: la regla ordena por esa distancia.'],
             barras: { dias: 'días', eje: 'Cruzan su umbral' },
             decision: {
@@ -191,15 +190,15 @@ export const CF = {
           id: 'V05',
           titulo: 'Regla contra modelo',
           pregunta: 'La regla acierta lo mismo que el modelo',
-          fuente: 'Parte A v3.0',
+          fuente: 'E3, Parte D v3.0',
           segundos: 85,
           textos: {
-            regla: { rotulo: 'Acierta la regla', linea: 'de cada lista, en test' },
+            regla: { rotulo: 'Acierta la regla', linea: 'de cada lista, prueba final' },
             dif: { rotulo: 'Diferencia', linea: 'puntos, modelo menos regla' },
             hoy: { rotulo: 'Práctica actual', linea: 'lo que acierta hoy' },
             mide: 'Precisión de la lista mensual en la prueba final',
             conclusion: 'El modelo queda',
-            sigue: [' puntos debajo, con un intervalo que cruza el cero: sale la regla, sin entrenar nada.'],
+            sigue: [' puntos debajo, con un intervalo que cruza el cero: queda la regla, sin entrenar nada.'],
             barras: {
               regla: 'Regla del umbral',
               modelo: 'Modelo (logística)',
@@ -208,7 +207,7 @@ export const CF = {
             },
             decision: {
               area: 'Modelo',
-              estado: 'sale la regla',
+              estado: 'queda la regla',
               corta: 'Se usa la regla; el modelo no suma',
               larga: `Modelo menos regla en test: ${fijo(v('J09'), 2)} puntos, intervalo de ${fijo(v('J09.ic_inferior'), 2)} `
                 + `a ${fijo(v('J09.ic_superior'), 2)}.`,
@@ -219,7 +218,7 @@ export const CF = {
           id: 'V06',
           titulo: 'Cómo se mide',
           pregunta: `Cada mes, ${fijo(v('G49.control_mes'))} de control y dos ramas`,
-          fuente: 'Parte D v3.0',
+          fuente: 'E3, Parte D v3.0',
           segundos: 85,
           textos: {
             control: { rotulo: 'Control por mes', linea: 'no se contactan, al azar' },
@@ -258,7 +257,7 @@ export const CF = {
           id: 'V07',
           titulo: 'No se paga',
           pregunta: `La lista no se paga: deja ${usd(v('G54'))} por año`,
-          fuente: 'Parte B v3.0',
+          fuente: 'E3, Parte B v3.0',
           segundos: 85,
           textos: {
             roi: { rotulo: 'ROI de la regla', linea: 'piloto y producción, un año' },
@@ -285,14 +284,14 @@ export const CF = {
           id: 'V08',
           titulo: 'Qué cuesta el piloto',
           pregunta: `El piloto mínimo cuesta ${usd(v('G64'))}`,
-          fuente: 'Parte B v3.0',
+          fuente: 'E3, Parte B v3.0',
           segundos: 85,
           textos: {
             piloto: { rotulo: 'Piloto mínimo', linea: 'con contingencia, tres meses' },
             horas: { rotulo: 'Marketing pone', linea: 'de quien corre la planilla', unidad: 'horas' },
             mide: 'Costo del piloto mínimo por línea, en dólares',
             conclusion: 'Son',
-            sigue: [' horas del equipo; la medición es la línea más cara porque es lo que el piloto viene a saber.'],
+            sigue: [' horas del equipo; la línea más cara es la medición, que es para lo que se hace el piloto.'],
             barras: {
               planilla: 'Planilla y guía de corrida',
               legal: 'Adecuación legal',
@@ -304,7 +303,7 @@ export const CF = {
             decision: {
               area: 'Piloto',
               estado: 'recomendado',
-              corta: 'Tres listas con control, del presupuesto',
+              corta: 'Tres listas con control, pagadas del presupuesto',
               larga: `Piloto mínimo: ${usd(v('G64'))} del presupuesto y ${fijo(v('G64.horas_marketing'))} horas de `
                 + 'una persona de Marketing.',
             },
@@ -313,16 +312,16 @@ export const CF = {
         {
           id: 'V09',
           titulo: 'Cuándo pasa',
-          pregunta: `Hacen falta ${fijo(v('G67.con_descuento'))} puntos; se espera menos de ${fijo(MENOS_DE)}`,
-          fuente: 'Parte B v3.0',
+          pregunta: `Hacen falta ${fijo(v('G67.con_descuento'))} puntos; lo observado da menos de ${fijo(MENOS_DE)}`,
+          fuente: 'E3, Parte B v3.0',
           segundos: 85,
           textos: {
             con: { rotulo: 'Umbral de pase', linea: 'puntos, rama con descuento' },
             sin: { rotulo: 'Sin descuento', linea: 'puntos, la otra rama' },
-            hoy: { rotulo: 'Con lo observado', linea: 'puntos esperados hoy', antes: 'menos de' },
+            hoy: { rotulo: 'Con lo observado', linea: 'punto, con la tasa de hoy', antes: 'menos de' },
             mide: 'Diferencia de cruce, control menos rama, en puntos',
-            conclusion: 'Si el efecto llega al umbral, el piloto lo ve',
-            sigue: [` ${DE_CADA} veces con descuento y `, ' sin descuento.'],
+            conclusion: 'Con la tasa observada, la diferencia sería de',
+            sigue: [' puntos; el umbral pide ', ' con descuento y ', ' sin descuento.'],
             barras: {
               hoy: 'Con lo observado',
               sin: 'Umbral, rama sin descuento',
@@ -352,7 +351,7 @@ export const CF = {
           id: 'V10',
           titulo: 'Qué va antes',
           pregunta: 'Antes de la lista, el consentimiento',
-          fuente: 'Parte C v3.0',
+          fuente: 'E3, Parte C v3.0',
           segundos: 105,
           textos: {
             puntaje: { rotulo: 'Puntaje legal', linea: 'estado actual' },
@@ -383,19 +382,19 @@ export const CF = {
           id: 'V11',
           titulo: 'Qué puede fallar',
           pregunta: 'El piloto prueba si Marketing sostiene la lista',
-          fuente: 'Parte C v3.0',
+          fuente: 'E3, Parte C v3.0',
           segundos: 105,
           textos: {
             riesgos: { rotulo: 'Riesgos críticos', linea: 'con señal y respuesta' },
             horas: { rotulo: 'Horas por lista', linea: 'de la persona de Marketing', unidad: 'horas' },
             mide: 'Riesgos críticos del piloto: qué se mira y qué se hace',
-            conclusion: 'Marketing la corre en',
+            conclusion: 'Marketing corre la planilla en',
             sigue: [' horas por lista, con la guía de corrida.'],
             columnas: { riesgo: 'Riesgo', senal: 'Señal que se mira', respuesta: 'Qué se hace' },
             filas: [
               {
                 riesgo: 'Contactar no paga la lista',
-                senal: 'cruce, control menos cada rama',
+                senal: 'diferencia de cruce entre el control y cada rama',
                 respuesta: `si ninguna rama llega, se cierra en la semana ${fijo(SEM_FIN)}`,
               },
               {
@@ -480,11 +479,11 @@ export const CF = {
           id: 'V14',
           titulo: 'El plan',
           pregunta: `El plan: ${fijo(T.plan.semanas)} semanas con dueño por fase`,
-          fuente: 'Parte D v3.0',
+          fuente: 'E3, Parte D v3.0',
           segundos: 75,
           textos: {
             decide: { rotulo: 'Decide María G.', linea: 'con el cruce de las listas', antes: 'semana' },
-            lista: { rotulo: 'Primera lista', linea: 'después de las previas', antes: 'semana' },
+            lista: { rotulo: 'Primera lista', linea: 'después de las acciones previas', antes: 'semana' },
             mide: 'Fases e hitos, por semana desde la aprobación',
             conclusion: 'El informe preliminar llega en la semana',
             sigue: [' y la decisión, en la ', '.'],
@@ -510,11 +509,11 @@ export const CF = {
           id: 'V15',
           titulo: 'Lo que pedimos',
           pregunta: 'Aprobar el piloto y firmar el acuerdo',
-          fuente: 'Parte D v3.0',
+          fuente: 'E3, Parte D v3.0',
           segundos: 90,
           textos: {
             piloto: { rotulo: 'Piloto mínimo', linea: 'del presupuesto de Casa Óga' },
-            acuerdo: { rotulo: 'Confidencialidad', linea: 'antes de cualquier dato', antes: 'semana' },
+            acuerdo: { rotulo: 'Confidencialidad', linea: 'antes de más datos', antes: 'semana' },
             decide: { rotulo: 'Decisión final', linea: 'seguir o cerrar', antes: 'semana' },
             mide: 'Balance del trabajo',
             conclusion: 'Sabemos a quién contactar; el piloto dice si contactarlo paga la lista, por',
@@ -522,8 +521,8 @@ export const CF = {
             balance: [
               { que: 'Aprendimos', texto: 'una regla elige a quién contactar' },
               { que: 'Falló', texto: 'esperar que un modelo pagara el proyecto' },
-              { que: 'Supuesto', texto: `tasa de éxito ${pct(v('G31'), 2)}, sin control` },
-              { que: 'Limitación', texto: 'sin meses incompletos ni ventas sin cliente' },
+              { que: 'Supuesto', texto: `tasa de éxito ${pct(v('G31'), 2)}, sin grupo de control` },
+              { que: 'Limitación', texto: 'quedan afuera los meses incompletos y las ventas sin cliente' },
             ],
             decision: {
               area: 'Pedido',

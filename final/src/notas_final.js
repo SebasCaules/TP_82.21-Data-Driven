@@ -12,13 +12,13 @@ export const NOTAS = {
   "V02": [
     "Lucía, los extractos «se armaron exportando manualmente de cada sistema de origen» [[(envío 47)]]. Llegaron **15** archivos. El de ventas es crítico: sin él no sabemos quién se va.",
     "En las ventas, **22.394** filas no tienen cliente: son el **44,8 %** del total. Esas ventas no se pueden atribuir a nadie. No las imputamos: quedan fuera de la lista y lo decimos.",
-    "De ahí sale la base de la lista: **27.276** ventas que tienen cliente y monto mayor que cero. Con eso, la condición de datos suficientes tiene **3 de 3**.",
+    "Desde el piloto, la planilla cuenta la compra devuelta como actividad: ese día el cliente compró. De ahí sale la base de la lista: **27.276** ventas que tienen cliente y monto mayor que cero. Con eso, la condición de datos suficientes tiene **3 de 3**.",
     "La calidad queda en **2 de 3**, porque hay que corregir antes de usar."
   ],
   "V03": [
     "El segundo problema es de fechas. Cada mes lo comparamos con el mismo mes del año anterior. Si tiene menos del **60 %** de las operaciones, lo tomamos como incompleto y no se usa.",
     "En 2025 quedan debajo **4** meses, de septiembre a diciembre.",
-    "Por eso la lista de muestra sale del corte de agosto.",
+    "La lista de muestra sale del corte de agosto.",
     "En el piloto, este control es una fórmula de la planilla y corre antes de cada lista. Si un mes llega incompleto, la lista de ese mes no sale hasta corregirlo.",
     "Con estos datos, Francisco muestra cómo se elige a quién contactar."
   ],
@@ -29,7 +29,7 @@ export const NOTAS = {
   "V05": [
     "En la prueba final, un período que ningún método vio antes, la lista de la regla acierta **86,1 %**. La del modelo, **85,9 %**.",
     "El modelo queda **0,25 puntos** debajo de la regla.",
-    "Si dos listas aciertan lo mismo, conviene la que no se entrena ni se mantiene. Sale la regla, en una planilla, sin modelo."
+    "Si dos listas aciertan lo mismo, conviene la que no se entrena ni se mantiene. Queda la regla, en una planilla, sin modelo."
   ],
   "V06": [
     "Lo que no sabemos es si contactarlos paga la lista.",
@@ -41,27 +41,26 @@ export const NOTAS = {
   "V07": [
     "Carlos, el presupuesto es de **USD 30.000**.",
     "Con lo que hoy se observa, lo que deja la lista es **USD 265 por año**. El primer año cuesta **USD 20.260**: el piloto mínimo más la producción completa.",
-    "No se paga.",
-    "Con modelo es peor: su ROI es **−99,9 %**."
+    "No se paga. Con modelo es peor: su ROI es **−99,9 %**."
   ],
   "V08": [
-    "Por eso no pedimos el proyecto. Pedimos el piloto mínimo: **USD 4.485** del presupuesto, por tres meses.",
+    "No pedimos el proyecto. Pedimos el piloto mínimo: **USD 4.485** del presupuesto, por tres meses.",
     "Casa Óga pone además **24** horas de una persona de Marketing."
   ],
   "V09": [
-    "El umbral de pase cabe en un número: **11 puntos** contra menos de un punto esperado.",
-    "Con la compra observada en campañas se esperan **0,79 puntos**.",
-    "Por eso el veredicto es este. No viable como proyecto. Recomendamos un piloto mínimo, tres listas mensuales con grupo de control, por USD 4.485 del presupuesto, para medir si contactar retiene lo suficiente para pagar la lista. La decisión llega en la semana 28.",
+    "El umbral de pase cabe en un número: **11 puntos** contra menos de un punto con lo observado.",
+    "Con la compra observada en campañas, la diferencia sería de **0,79 puntos**.",
+    "Con este tamaño, el piloto ve un efecto igual al umbral **89 de cada 100** veces en la rama con descuento y **73 de cada 100** en la otra.",
+    "El veredicto es este. No viable como proyecto. Recomendamos un piloto mínimo, tres listas mensuales con grupo de control, por USD 4.485 del presupuesto, para medir si contactar retiene lo suficiente para pagar la lista. La decisión llega en la semana 28.",
     "Antes de la primera lista hay cosas que tienen que estar en regla: sigue Tomas."
   ],
   "V10": [
-    "María, la lista sale de datos personales de sus clientes. Hoy las bases no están inscriptas y el **30,1 %** de los envíos fue a clientes que no aceptaron marketing. Por eso protección de datos tiene la nota más baja: **1 de 3**.",
-    "Esa nota quiere decir algo simple: ninguna lista sale hasta tener la inscripción y el filtro de consentimiento.",
+    "María, la lista sale de datos personales de sus clientes. Hoy las bases no están inscriptas y el **30,1 %** de los envíos fue a clientes que no aceptaron marketing. Por eso protección de datos tiene la nota más baja: **1 de 3**. Esa nota quiere decir que ninguna lista sale hasta tener la inscripción y el filtro de consentimiento.",
     "En la semana **1** se firma el acuerdo de confidencialidad. Sin él, el equipo no recibe ningún dato más de Casa Óga."
   ],
   "V11": [
     "Hay tres riesgos que pueden frenar el piloto. El primero es económico: que contactar no retenga lo suficiente.",
-    "El segundo es de adopción, y es el que más nos preocupa. El proyecto anterior de Casa Óga se cortó porque «no quedó un responsable claro de mantenerlos» [[(envío 15)]]. Por eso la planilla la corre una persona de Marketing, con la guía de corrida, en **8 horas** por lista.",
+    "El segundo es de adopción. Los análisis del proyecto anterior de Casa Óga no se sostuvieron porque «no quedó un responsable claro de mantenerlos» [[(envío 15)]]. Por eso la planilla la corre una persona de Marketing, con la guía de corrida, en **8 horas** por lista.",
     "El piloto también prueba eso: si Marketing puede sostener la lista.",
     "El tercero es legal: contactar a alguien que no aceptó marketing.",
     "Sebastian muestra cómo está ordenado este trabajo y quién hace cada cosa."
@@ -75,12 +74,12 @@ export const NOTAS = {
     "El MVP es la regla en una planilla mensual, sin modelo, sin licencias y sin integración con el CRM."
   ],
   "V14": [
-    "El plan tiene **6** fases en **28** semanas, contadas desde la aprobación escrita de María.",
+    "María, el plan, que llevo yo, tiene **6** fases en **28** semanas, contadas desde su aprobación escrita.",
     "La primera lista sale en la semana **6**.",
-    "La decisión es en la semana **28**, y la toma María.",
+    "La decisión es en la semana **28**, y la toma usted.",
     "Con esto, cierro."
   ],
   "V15": [
-    "Aprendimos que una regla simple alcanza para saber a quién contactar. Falló lo que suponíamos al principio: que un modelo iba a pagar el proyecto. Por eso la recomendación cambió: ya no es el proyecto, es un piloto que mide. El supuesto más frágil es la tasa de éxito: hoy solo hay un **1,02 %** de compra en campañas sin grupo de control. Y hay límites: los meses incompletos y las ventas sin cliente quedan afuera. Además, el piloto mide de enero a marzo, después de la campaña de fin de año, y lo que mida puede no repetirse en otros meses. Si se quedan con una idea, que sea esta: ya sabemos a quién contactar; falta saber si contactarlo paga la lista. Por eso les pedimos dos cosas. Primero, que aprueben el piloto mínimo, por **USD 4.485**. Y que se firme el acuerdo de confidencialidad al arrancar, en la semana **1**. En la semana **28** van a saber si el proyecto sigue, con **USD 4.485** gastados en lugar de **USD 20.260**. Si da que no, el proyecto se cierra ahí. Gracias."
+    "Aprendimos que una regla simple alcanza para saber a quién contactar. Falló lo que suponíamos al principio: que un modelo iba a pagar el proyecto. El supuesto más frágil es la tasa de éxito: hoy solo hay un **1,02 %** de compra en campañas sin grupo de control. Y hay límites: no usamos los meses incompletos ni las ventas sin cliente. Además, el piloto mide de enero a marzo, después de la campaña de fin de año, y lo que mida puede no repetirse en otros meses. Si se quedan con una idea, que sea esta: ya sabemos a quién contactar; falta saber si contactarlo paga la lista. Les pedimos dos cosas: que aprueben el piloto mínimo, por **USD 4.485**, y que firmen el acuerdo de confidencialidad al arrancar, en la semana **1**. En la semana **28** van a saber si el proyecto sigue, con **USD 4.485** gastados en lugar de **USD 20.260**. Gracias."
   ]
 }

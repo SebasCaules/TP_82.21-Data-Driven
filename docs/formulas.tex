@@ -556,7 +556,7 @@ Feature & $D(x)$ & Lectura \\
 
 \textbf{Por qué se descartan las dos primeras.} $B_i(t)$ se calcula con $\rho_i(t)$ y $\gamma_i(t)$: que ``predigan'' el riesgo es aritmética, no señal. Entrenar un modelo con ellas como features y $B_i(t)$ como target es el \emph{leakage} que advierte Provost y Fawcett. Descontadas, la mejor señal genuina disponible con los seis datasets del Entregable 1 es \texttt{n\_tiendas\_distintas} con 1,22$\times$. Hasta el Entregable 3, el criterio de éxito 1 de la Parte C pedía un lift de $1{,}30\times$ en el decil superior contra la línea base de recency. La regla del umbral, sin modelo, ya da $2{,}30\times$ (subsección~\ref{sec:regla-umbral}), y con las señales de reclamos, consultas y devoluciones que llegaron el 08/09 ningún modelo le gana en la lista de contactables con un intervalo que excluya el cero (subsección~\ref{sec:bootstrap}). Por eso el criterio se reescribió contra la regla (subsección~\ref{sec:meta-criterio-1}). La pasada exploratoria del 05/08 reportó además una feature ``tendencia'' con 4,5$\times$; su definición no quedó registrada y no se reproduce, así que no se cita.
 
-\section{Anticipación: qué confirma la regla y qué promete el modelo}
+\section{Anticipación: qué confirma el tablero y qué anticipa la lista}
 \label{sec:anticipacion}
 
 $B_i(t)$ marca al cliente cuando su recencia \emph{ya superó} su umbral propio: $\rho_i(t) > \theta_i(t)$. Es la misma lógica que el segmento ``Inactivos 90d'' que Casa Óga usa hoy, con el umbral personalizado por el ritmo de cada cliente. Mejora la precisión de a quién se llama ``en riesgo''; no anticipa nada. Ninguna vista del tablero del Entregable 1 anticipa: todas describen el corte.
@@ -853,7 +853,7 @@ El umbral de pase de una rama es la diferencia con la que lo que deja la lista p
 \Delta^{*}_{e,h} = s^{*}(C_{e,h})\; c_0
 \end{equation*}
 
-con $s^*(C)$ la tasa de éxito de equilibrio de la ecuación~\eqref{eq:s-equilibrio} sobre la matriz de la lista de 500 contactables, con $C$ en lugar de $C_1$; sin descuento, $d = r = 0$. Al decidir, el piloto ya está gastado: $C_{e,h}$ es solo lo que cuesta seguir con la etapa $e$ en el horizonte $h$. Decide el de la operación mínima con el costo de su primer año, $C = A_{\min}$ de la subsección~\ref{sec:costos-etapas}, inversión incluida. Los otros horizontes son referencia: solo el recurrente, $R_e$, o tres años repartidos por año, $(I_e + 3R_e)/3$. La producción completa se evalúa recién si el efecto medido la paga en su primer año. El recurrente de la producción completa, que la versión anterior usaba como umbral, queda como referencia: es lo que haría falta para pagarla una vez hecha su inversión. Cada tasa de equilibrio dice su lista: el 49,6\% de la subsección~\ref{sec:valor-lista} es de la lista sin filtro; las de esta subsección, de la lista de contactables.
+con $s^*(C)$ la tasa de éxito de equilibrio de la ecuación~\eqref{eq:s-equilibrio} sobre la matriz de la lista de 500 contactables, con $C$ en lugar de $C_1$; sin descuento, $d = r = 0$. Al decidir, el piloto ya está gastado: $C_{e,h}$ es solo lo que cuesta seguir con la etapa $e$ en el horizonte $h$. Decide el de la operación mínima con el costo de su primer año, $C = A_{\min}$ de la subsección~\ref{sec:costos-etapas}, inversión incluida. Los otros horizontes son referencia: solo el recurrente, $R_e$, o tres años repartidos por año, $(I_e + 3R_e)/3$. La producción completa se evalúa solo si el efecto medido la paga en su primer año. El recurrente de la producción completa, que la versión anterior usaba como umbral, queda como referencia: es lo que haría falta para pagarla una vez hecha su inversión. Cada tasa de equilibrio dice su lista: el 49,6\% de la subsección~\ref{sec:valor-lista} es de la lista sin filtro; las de esta subsección, de la lista de contactables.
 
 \begin{center}
 \begin{tabular}{@{}lrrr@{}}
@@ -944,7 +944,7 @@ Lo primero es sortear, medir e informar. Lo segundo es armar la planilla, capaci
 
 La semana 1 del plan empieza el lunes $L_1$ siguiente a la aprobación escrita de María G., y la semana $n$, el lunes $L_1 + 7\,(n-1)$ días. La primera lista sale en la semana 6, dentro de las dos semanas posteriores a su corte de fin de mes, y la tercera en la 14. El cruce a 90 días de cada lista cierra 90 días después de su corte. El informe de la semana 20 trae la compra a 7 días de las tres listas y el cruce de la primera, y no decide; la decisión es en la semana 28, con el cruce de las tres. Después de la tercera lista la lista queda en pausa: de la semana 19 a la 28 no hay costo recurrente.
 
-\supuesto{Las fechas de referencia suponen que María G. aprueba con la entrega del 24/11/2026. Si aprueba el 07/12 o después, la semana 6 pasa del 14/01/2027: la primera lista toma el corte del mes siguiente y todo corre un mes. Las tres listas miden enero a marzo de 2027, después de la campaña de fin de año para la que Casa Óga quería el piloto (envío 11), y el efecto puede no repetirse en otros meses; el cruce sin contacto, $c_0$, se midió de julio a septiembre de 2024. Las semanas 4 y 5, del 21/12/2026 al 03/01/2027, caen en las fiestas.}
+\supuesto{Las fechas de referencia suponen que María G. aprueba con la entrega del 24/11/2026. Si aprueba el 07/12 o después, la semana 6 pasa del 14/01/2027: la primera lista toma el corte del mes siguiente y todo se atrasa un mes. Las tres listas miden enero a marzo de 2027, después de la campaña de fin de año para la que Casa Óga quería el piloto (envío 11), y el efecto puede no repetirse en otros meses; el cruce sin contacto, $c_0$, se midió de julio a septiembre de 2024. Las semanas 4 y 5, del 21/12/2026 al 03/01/2027, caen en las fiestas.}
 
 \impl{B-scripts\_etapa2.zip: economia.py (fechas con \texttt{pandas} desde $L_1$, con sus controles), salida \texttt{economia.json} ($\to$ \texttt{piloto.calendario}).}
 \valoren{aprobación con la entrega del 24/11/2026}{$L_1$ = lunes 30/11/2026 (semana 1, del 30/11 al 06/12/2026). Primera lista: semana 6, entre el 04/01 y el 14/01/2027, corte 31/12/2026; su cruce cierra el 31/03/2027 (semana 18). Tercera lista: semana 14, lunes 01/03/2027, corte 28/02/2027; su cruce cierra el 29/05/2027 (semana 26). Informe preliminar: semana 20, desde el lunes 12/04/2027. Decisión: semana 28, lunes 07/06/2027. Costo recurrente de las semanas 19 a 28: USD 0.}
@@ -962,8 +962,8 @@ La factibilidad legal de la Parte C del Entregable 3 puntúa cinco dimensiones d
 Un promedio de 1,6 a 2,5 es ``viable con condiciones''. Desde la v4.0 se puntúa el estado actual: protección de datos personales baja de 2 a 1, porque las bases no están inscriptas y se contactó a clientes sin consentimiento. El 1 quiere decir que ninguna lista sale hasta inscribir las bases (L1) y tener el filtro de consentimiento en la planilla (L3), el criterio 1 de go-live; el plan legal es lo que la lleva a 2.
 
 \impl{cuenta directa sobre los cinco puntajes de la tabla de factibilidad legal de la Parte C del Entregable 3.}
-\valoren{estado actual}{protección de datos personales, 1; seguridad y control de accesos, conservación y trazabilidad fiscal, contratos con proveedores externos y explicabilidad del modelo, 2 cada una. $\bar L$ = (1 + 2 + 2 + 2 + 2) / 5 = 1,8, en el tramo de 1,6 a 2,5.}
-% registro de cifras: H40
+\valoren{estado actual}{protección de datos personales, 1; seguridad y control de accesos, conservación y trazabilidad fiscal, contratos con proveedores externos y explicabilidad del modelo, 2 cada una. $\bar L$ = (1 + 2 + 2 + 2 + 2) / 5 = 1,8, en el tramo de 1,6 a 2,5. El puntaje técnico de la Parte A del Entregable 3 se promedia igual: (3 + 2 + 2 + 2) / 4 = 2,25.}
+% registro de cifras: H40, F16
 
 % (30/10, v2.7, crítica del acumulado) «es bajo en los dos extremos», «diciembre de 2022» y el ticket «casi no cambia» (baja 5,7 %), igual que la Parte A del E2
 % (30/10, v2.7) sin «carga parcial»: Casa Óga no sabe la causa (consulta 2), con la formulación de la condición 2 de la Parte A del E3 (pendiente 132, devolución del E2)
@@ -972,12 +972,16 @@ Un promedio de 1,6 a 2,5 es ``viable con condiciones''. Desde la v4.0 se puntúa
 
 El extracto de transacciones es bajo en los dos extremos. Sube de 44 ventas en enero de 2022 a 893 en diciembre de 2022 y baja de 1.390 en enero de 2025 a 255 en diciembre, aunque el ticket medio casi no cambia y las altas de clientes no caen. Casa Óga no sabe la causa (consulta 2 del Entregable 2). Como $\rho_i(t)$ se mide contra el corte, si el cierre de 2025 está incompleto la recencia de todos sale inflada, y con ella $B_i(t)$, $X(t)$ y el riesgo por quintil. Las tres cifras (2.452 en riesgo, ARS 94,9 M/año, 51,8\% en Q5) quedan como referencia del tablero y se informan con la sensibilidad de la decisión DC-09 del Entregable 2; la causa de la caída la revisa Casa Óga con Operaciones y el proveedor del POS. Con las decisiones de calidad del Entregable 2, sobre 5.634 clientes con la identidad unida, el riesgo pasa a 50,4\% de los elegibles y la exposición a ARS 96,4 M/año. Con la base corregida del Entregable 2 y el corte al 31/08/2025, 38,5\% y ARS 77,7 M/año. Ninguna de estas cifras se repite sin esta salvedad.
 
+\textbf{Control de mes completo.} Para cada mes $t$, $c(t)$ = operaciones de $t$ / operaciones del mismo mes del año anterior, con operaciones = filas únicas de \texttt{Transacciones\_clientes.csv} con \texttt{monto\_neto} $>$ 0, todos los canales, con o sin cliente. Un mes con $c(t) < 60\%$ no se usa; el umbral lo fija el equipo (consulta 2).
+\valoren{2025}{de enero a agosto, 94\%, 96\%, 92\%, 89\%, 80\%, 70\%, 69\% y 63\%; de septiembre a diciembre, 53\%, 44\%, 36\% y 18\%.}
+% registro de cifras: D28, H46
+
 \section{Supuesto: la exposición no es recupero}
 \label{sec:exposicion-recupero}
 
 $X(t)$ (ecuación~\eqref{eq:exposicion}) es la facturación anual proyectada de clientes que hoy están en riesgo, calculada con su propio ritmo histórico de gasto. No mide cuánto recuperaría una campaña de retención: recuperar es una afirmación causal (\emph{si contactamos a estos clientes, vuelven a comprar tanto como antes}) y $X(t)$ no compara contactados contra un grupo de control. Afirmar que Casa Óga ``recupera ARS 94,9 M'' es una lectura que el dato no sostiene.
 
-La misma distinción está en \texttt{pipeline/CONTRACT.md} sección 3 (\texttt{perdida\_esperada} se define como ``exposición, no recupero''), en la Parte D sección 2.1 (``Es exposición, no recupero'') y en la misma Parte D, sección 6.1, que deja fuera de alcance de la V1 ``la medición de efecto incremental (necesita grupo de control)''. La V2 del proyecto contempla el grupo de control del piloto (Parte D, sección 6.1, ``Plan de evolución'', y sección~\ref{sec:experimento} de este anexo), que es el diseño mínimo para poder hablar de recupero.
+La misma distinción está en \texttt{pipeline/CONTRACT.md} sección 3 (\texttt{perdida\_esperada} se define como ``exposición, no recupero''), en la Parte D sección 2.1 (``Es exposición, no recupero'') y en la misma Parte D, sección 6.1, que deja fuera de alcance de la V1 ``la medición de efecto incremental (necesita grupo de control)''. El piloto mínimo trae ese grupo de control (sección~\ref{sec:umbral-piloto} y sección~\ref{sec:experimento} de este anexo), que es el diseño mínimo para poder hablar de recupero.
 
 Mientras no exista ese grupo de control, cualquier pantalla que muestre $X(t)$ debe rotularlo como \emph{exposición} y no como \emph{ahorro} o \emph{recupero potencial}, y la nota al pie del tablero (Parte D, sección 4.1, \texttt{[NOTAS FIJAS AL PIE]}) tiene que sostener esa distinción en cada corte, no solo en el primero.
 
@@ -1013,7 +1017,7 @@ v_{VP} = s\,(m - d\,\bar t) - c, \qquad v_{FP} = -c - r\,d\,\bar t, \qquad v_{FN
 Un verdadero positivo vuelve con probabilidad $s$, compra con el descuento y deja el margen $m$; la acción se paga siempre. Un falso positivo iba a comprar igual: se paga la acción y, si usa el descuento, se le regala $d$ sobre una compra. El falso negativo va en 0 porque su margen se pierde igual sin proyecto, y cargarlo contaría dos veces el acierto. El margen $m$ es la facturación media de 2024 por registro de cliente activo identificado, multiplicada por el margen bruto de 2024 (\texttt{Costo\_Margen\_Categoria\_Mensual.csv}).
 
 \impl{B-scripts\_etapa2.zip: economia.py (\texttt{valores}), salida \texttt{economia.json} ($\to$ \texttt{parametros} y \texttt{celda\_4\_4}).}
-\valoren{2024}{$m$ = 40.664 $\times$ 37,58\% = ARS 15.282 por año (4.755 registros; por persona unificada, 4.525 y ARS 16.058). $d$ = 15\%, $\bar t$ = ARS 20.133 y $d\,\bar t$ = ARS 3.020; $c$ = ARS 25, un WhatsApp con oferta personalizada. $v_{VP}$ = ARS 99,96 (USD 0,07) y $v_{FP}$ = ARS $-47{,}21$ (USD $-0{,}03$).}
+\valoren{2024}{$m$ = 40.664 $\times$ 37,58\% = ARS 15.282 por año (4.755 registros; por persona unificada, 4.525 y ARS 16.058). $d$ = 15\%, $\bar t$ = ARS 20.133 y $d\,\bar t$ = ARS 3.020; $c$ = ARS 25, un WhatsApp con oferta personalizada. $v_{VP}$ = ARS 99,96 (USD 0,07) y $v_{FP}$ = ARS $-47{,}21$ (USD $-0{,}03$). Escenarios: conservador, $m$ = 20.133 $\times$ 37,58\% = ARS 7.566; optimista, $m$ = 45.336 $\times$ 37,58\% = ARS 17.037.}
 % registro de cifras: G08, G32, G33, G51, D07, F13
 
 \subsection{Valor anual de la lista y tasa de éxito de equilibrio}
@@ -1064,8 +1068,8 @@ p^* = \frac{-v_{FP}}{v_{VP} - v_{FP}}
 \end{equation}
 
 \impl{B-scripts\_etapa2.zip: economia.py (\texttt{valor\_punto\_usd}); C-scripts\_etapa3.zip: etapa3.py (\texttt{umbral.precision\_de\_equilibrio}).}
-\valoren{validación}{$v_{VP} - v_{FP}$ = ARS 147,16 y $v_{\text{punto}}$ = USD 6,05 por año. El modelo agrega USD 10.400 al costo de la regla: hacen falta 1.719 puntos, y entre la regla (81,6\%, validación sin filtro) y una lista perfecta hay 18,4. Con $s$ = 100\%, un punto vale USD 505,02 y harían falta 20,6. $p^*$ = 47,21 / 147,16 = 32,1\%. El 147,16 sale de los valores sin redondear, 99,9588 + 47,2055; con los redondeados de la subsección~\ref{sec:valor-celda} la suma da 147,17.}
-% registro de cifras: G40, G46, H17
+\valoren{validación}{$v_{VP} - v_{FP}$ = ARS 147,16 y $v_{\text{punto}}$ = USD 6,05 por año. El modelo agrega USD 10.400 al costo de la regla: hacen falta 1.719 puntos, y entre la regla (81,6\%, validación sin filtro) y una lista perfecta hay 18,4. Con $s$ = 100\%, un punto vale USD 505,02, harían falta 20,6 y los aciertos que el mejor modelo suma sobre la regla valen USD 448,90 por año. $p^*$ = 47,21 / 147,16 = 32,1\%. El 147,16 sale de los valores sin redondear, 99,9588 + 47,2055; con los redondeados de la subsección~\ref{sec:valor-celda} la suma da 147,17.}
+% registro de cifras: G40, G46, H17, G36
 
 \subsection{Costo por cliente que vuelve}
 \label{sec:costo-cliente}
@@ -1080,7 +1084,7 @@ Con la lista de la regla vuelven $4\,VP\,s$ clientes por año. El costo por clie
 Es un piso, porque $s$ es un techo. Se compara con el costo por alta en el CRM, que no es el de un comprador nuevo: de las 1.477 altas de 2025 con compra, 1.464 ya compraban antes.
 
 \impl{B-scripts\_etapa2.zip: economia.py, salida \texttt{economia.json} ($\to$ \texttt{retener\_contra\_reemplazar}).}
-\valoren{validación y 2025}{con $|L|$ = 1.500, vuelven 49,9 clientes por año; $\kappa$ = ARS 6.519 con 15\% de descuento y ARS 3.007 sin descuento, contra ARS 11.099 por alta en 2025.}
+\valoren{validación y 2025}{con $|L|$ = 1.500, vuelven 49,9 clientes por año; $\kappa$ = ARS 6.519 con 15\% de descuento y ARS 3.007 sin descuento, contra ARS 11.099 por alta en 2025. Las acciones cuestan ARS 0,33 M por año con descuento y 0,15 M sin descuento.}
 % registro de cifras: G45, G04, G07
 
 % (24/11, v4.0) rango anual por validación cruzada temporal (devolución del E3, OBS-16; registro E3A-01, E3A-04, E3A-05)

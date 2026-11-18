@@ -14,7 +14,7 @@ Corre, con rutas absolutas y en este orden:
 6. /e3/ intacto: npm run build:e3 y el md5 de dist-e3/index.html es el del /e3/ presentado (1903979c…).
 7. Git: la rama es final-tablero, main sigue en el commit en que se cortó esta fase, src/**, e2/** y e3/** iguales a
    main, el árbol limpio y los commits de main..HEAD de una línea y sin trailers (ni Co-Authored-By).
-8. Lista negra del canon (cadenas, cadenas_v1_2 y cadenas_v1_3) y regla del 23/10 (pendiente 238) sobre todo el texto
+8. Lista negra del canon (cadenas, cadenas_v1_2, cadenas_v1_3 y cadenas_v1_4) y regla del 23/10 (pendiente 238) sobre todo el texto
    de /final/: las cadenas de CF (preguntas, rótulos, conclusiones y decisiones), las notas de final/src/notas_final.js y
    el texto renderizado de cada vista a 1280×720 (pantalla, SVG, title y notas abiertas).
 9. (18/11, canon v1.3, tableros.notas_v1_3) Las notas salen del guion: si el vault está, notas_final.js es lo que escribe
@@ -204,6 +204,7 @@ def lista_negra(texto: str, donde: str) -> None:
         "pipeline en las semanas 1 a 3": r"pipeline",
     }
     literales = [c for c in lista["cadenas"] + lista.get("cadenas_v1_2", []) + lista.get("cadenas_v1_3", [])
+                 + lista.get("cadenas_v1_4", [])
                  if c not in descripciones]
     hits = [c for c in literales if c.lower() in plano.lower()]
     hits += [f"{d} («{re.search(rx, plano, re.I).group(0)}»)" for d, rx in descripciones.items()
