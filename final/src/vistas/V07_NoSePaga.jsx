@@ -2,7 +2,8 @@
 // primer año con la regla (G39, piloto mínimo más producción completa) y lo que deja la lista por año (G54) llena
 // 100 × G54 / G39 cuadros en --acc, desde arriba a la izquierda; el último, parcial por ancho. Como barra, el dato del
 // título medía 9 px; como parte de 100 cuadros se ve. La vista ya no repite el gráfico de V01 (sale el costo con modelo).
-// En la banda, solo el ROI del modelo (G40.roi), el que dice la voz; el de la regla queda en el title de la decisión.
+// En la banda, el ROI de la regla (G54.roi), que es lo que dibuja la cuadrícula (decisión CH-05); el del modelo (G40.roi)
+// lo dice la voz.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -80,7 +81,7 @@ function Dibujo({ w, h }) {
 
 export default function V07NoSePaga() {
   return (
-    <Vista id={ID} items={[{ clave: 'roi_modelo', valor: pctDirecto(A['G40.roi'].valor, 1) }]}>
+    <Vista id={ID} items={[{ clave: 'roi', valor: pctDirecto(A['G54.roi'].valor, 1) }]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )
