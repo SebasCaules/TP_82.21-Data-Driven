@@ -21,8 +21,8 @@ if (X.filas.length !== DF.tablas.riesgos_criticos.n) throw new Error('V11: la ta
 export const meta = { id: ID }
 
 function medir(w, u) {
-  const f = tam('fila', u)
-  const pad = 16 * u          // relleno de cada fila
+  const f = tam('nombre', u)
+  const pad = 24 * u          // relleno de cada fila
   const gap = 48 * u          // entre columnas
   const util = w - 2 * pad - gap
   const anchos = [0.4 * util, 0.6 * util]
@@ -33,7 +33,7 @@ function medir(w, u) {
     const alto = Math.max(ls[0].length, ls[1].length) * f * 1.25 + 2 * pad
     return { ...r, ls, alto, foco }
   })
-  const sep = 16 * u          // aire entre filas
+  const sep = 24 * u          // aire entre filas
   return { f, pad, xs, filas, sep, alto: filas.reduce((s, x) => s + x.alto, 0) + sep * (filas.length - 1) }
 }
 

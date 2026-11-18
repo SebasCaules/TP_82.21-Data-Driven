@@ -21,13 +21,13 @@ export const CTX = 'var(--e3-ctx, #5a6478)'
 export const FIN_GRIS = 'var(--fin-gris, #8a94a6)'
 export const CONTORNO = 'var(--e3-contorno, #4f5a6e)'
 export const EJE = 'var(--e3-eje, #6a7489)'
-export const PISTA = 'var(--bd2)'
+export const PISTA = 'var(--bd)'
 export const REALCE = 'var(--realce)'
 export const BORDE = 'var(--bd)'
 export const SUP = 'var(--sup, #fff)'
 
 /** Escala tipográfica de los SVG, en u (spec b.2). */
-export const ESCALA = { nombre: 34, valFoco: 34, val: 28, cat: 26, fila: 26, sec: 22, piso: 20 }
+export const ESCALA = { nombre: 34, valFoco: 34, val: 28, cat: 26, fila: 26, sec: 24, piso: 20 }
 /** Trazos, en u (spec b.5): línea base, umbral, contorno, guía y el punteado. */
 export const TRAZO = { base: 1.5, umbral: 3, contorno: 2, guia: 1.5, radio: 4, separacion: 2 }
 /** Punteado de 6 u y 4 u. */

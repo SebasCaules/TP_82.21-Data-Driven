@@ -22,15 +22,16 @@ export const meta = { id: ID }
 
 function Dibujo({ w, h }) {
   const u = useU()
-  const fNom = tam(24, u)
-  const fVal = tam('valFoco', u)
-  const altoPista = 44 * u
-  const sobra = 16 * u
+  const fNom = tam(28, u)
+  const fVal = tam(48, u)
+  const altoPista = 72 * u
+  const sobra = 20 * u
   const largo = 0.85 * w
   const xP = (w - largo) / 2
   const xs = (v) => xP + (v / TOPE) * largo
   // arriba: nombre, valor, 12 u, la línea que sobresale; abajo, lo mismo en espejo
-  const rotulo = fNom * 1.25 + fVal * 1.1
+  const dVal = fNom * 1.25 + 0.25 * fVal   // del nombre al valor: el renglón del nombre más el ascendente del valor
+  const rotulo = dVal + fVal * 1.1
   const alto = 2 * (rotulo + 12 * u + sobra) + altoPista
   const y0 = Math.max(0, (h - alto) / 2)
   const yP = y0 + rotulo + 12 * u + sobra
@@ -51,15 +52,15 @@ function Dibujo({ w, h }) {
       <Umbral u={u} x1={xs(CON)} x2={xs(CON)} y1={yP - sobra} y2={yP + altoPista + sobra} />
       {/* rama sin descuento, arriba de su línea */}
       <text x={xSin} y={y0} fontSize={fNom} fill={CTX} textAnchor="middle" dominantBaseline="hanging">{B.sin}</text>
-      <text x={xSin} y={y0 + fNom * 1.25} fontSize={fVal} fontWeight={700} fill={INK} textAnchor="middle"
+      <text x={xSin} y={y0 + dVal} fontSize={fVal} fontWeight={700} fill={INK} textAnchor="middle"
             dominantBaseline="hanging">{fijo(SIN, 2)}</text>
       {/* rama con descuento, abajo de la suya */}
       <text x={xCon} y={yAbajo} fontSize={fNom} fill={CTX} textAnchor="middle" dominantBaseline="hanging">{B.con}</text>
-      <text x={xCon} y={yAbajo + fNom * 1.25} fontSize={fVal} fontWeight={700} fill={INK} textAnchor="middle"
+      <text x={xCon} y={yAbajo + dVal} fontSize={fVal} fontWeight={700} fill={INK} textAnchor="middle"
             dominantBaseline="hanging">{fijo(CON, 2)}</text>
       {/* lo observado, abajo de la pista, alineado a 0 */}
       <text x={xP} y={yAbajo} fontSize={fNom} fill={CTX} dominantBaseline="hanging">{B.hoy}</text>
-      <text x={xP} y={yAbajo + fNom * 1.25} fontSize={fVal} fontWeight={700} fill={INK}
+      <text x={xP} y={yAbajo + dVal} fontSize={fVal} fontWeight={700} fill={INK}
             dominantBaseline="hanging">{fijo(HOY, 2)}</text>
     </svg>
   )

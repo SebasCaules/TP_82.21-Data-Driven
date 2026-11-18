@@ -274,7 +274,7 @@ export const CF = {
             decision: {
               area: 'Económica',
               estado: 'no viable',
-              corta: 'No viable como proyecto',
+              corta: 'No viable como proyecto.',
               larga: `ROI a un año: ${pctDirecto(v('G54.roi'), 1)} con la regla (piloto mínimo más producción completa) y `
                 + `${pctDirecto(v('G40.roi'), 1)} lo que agrega el modelo.`,
             },

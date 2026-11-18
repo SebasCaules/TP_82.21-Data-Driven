@@ -68,6 +68,8 @@ export function BarrasFin({ w, h, datos, maximo }) {
         const xVal = extremo + 12 * u
         const anchoV = ancho(d.texto, fVal, d.foco ? 700 : 600)
         const notaFuera = d.notaFantasma && fuera.has(d)
+        // con la nota del fantasma adentro, el valor va dentro de su barra (en gris, tinta a 5,1:1), no después del fantasma
+        const valDentro = d.notaFantasma && !notaFuera && !d.foco && !d.contorno && anchoV + 24 * u <= largo
         const xNota = xVal + anchoV + 16 * u
         return (
           <g key={d.etiqueta}>
@@ -86,8 +88,8 @@ export function BarrasFin({ w, h, datos, maximo }) {
               <text x={(x0 + largo + xf) / 2} y={yc} fontSize={tam('cat', u)} fontWeight={700} fill={INK}
                     textAnchor="middle" dominantBaseline="central">{d.notaFantasma}</text>
             )}
-            <text x={xVal} y={yc} fontSize={fVal} fontWeight={d.foco ? 700 : 600} fill={INK}
-                  dominantBaseline="central">{d.texto}</text>
+            <text x={valDentro ? x0 + largo - 12 * u : xVal} y={yc} fontSize={fVal} fontWeight={d.foco ? 700 : 600} fill={INK}
+                  textAnchor={valDentro ? 'end' : 'start'} dominantBaseline="central">{d.texto}</text>
             {d.nota && (
               <text x={xNota} y={yc} fontSize={tam('sec', u)} fill={CTX} dominantBaseline="central">{d.nota}</text>
             )}

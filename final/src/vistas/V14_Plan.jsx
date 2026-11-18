@@ -63,7 +63,7 @@ function Dibujo({ w, h }) {
           const foco = x.desde <= SEM_FIN && x.hasta >= SEM_FIN
           const desde = Math.max(1, x.desde), hasta = Math.min(SEM_FIN, x.hasta)
           const xa = m.xs(desde) - m.dw / 2
-          const xb = m.xs(hasta) + m.dw / 2
+          const xb = hasta === SEM_FIN ? m.xs(SEM_FIN) + u : m.xs(hasta) + m.dw / 2   // la última termina en la vertical
           return (
             <g key={x.n}>
               <title>{`${x.fase}: ${X.semana} ${x.desde} a ${x.hasta}, ${x.responsable}`}</title>

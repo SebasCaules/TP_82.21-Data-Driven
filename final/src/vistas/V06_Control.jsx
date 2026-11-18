@@ -27,10 +27,10 @@ if (TRAMOS.reduce((s, t) => s + t.valor, 0) !== LISTA) {
 
 export const meta = { id: ID }
 
-/** Los renglones del nombre de un tramo, a 24 u (baja hasta 20 u si no entra en dos renglones). */
+/** Los renglones del nombre de un tramo, a 28 u (baja hasta 20 u si no entra en dos renglones). */
 function nombre(t, w, u) {
   const peso = t.foco ? 600 : 400
-  for (let f = 24; f >= 20; f -= 1) {
+  for (let f = 28; f >= 20; f -= 1) {
     const lt = envolver(t.nombre, w, tam(f, u), peso)
     if (lt.length <= 2 || f === 20) return { lt, f: tam(f, u), peso }
   }
@@ -52,9 +52,10 @@ function Dibujo({ w, h }) {
     x += aw
     return r
   })
-  const fVal = tam('valFoco', u)
-  const altoBarra = 72 * u
-  const fNota = tam('sec', u)
+  const fVal = tam(48, u)          // cantidad del control; el resto a 36 u
+  const fCtx = tam(36, u)
+  const altoBarra = 120 * u
+  const fNota = tam(24, u)
   const altoNombres = Math.max(...tramos.map((t) => t.n.lt.length * t.n.f * 1.25 + (t.nota ? fNota * 1.25 : 0)))
   const alto = fVal + 12 * u + altoBarra + 16 * u + altoNombres
   const y0 = Math.max(0, (h - alto) / 2)
@@ -65,7 +66,7 @@ function Dibujo({ w, h }) {
       {tramos.map((t) => (
         <g key={t.clave}>
           <title>{[t.nombre, fijo(t.valor), t.nota].filter(Boolean).join(' · ')}</title>
-          <text x={t.x} y={yBarra - 12 * u} fontSize={t.foco ? fVal : tam('val', u)} fontWeight={t.foco ? 700 : 600}
+          <text x={t.x} y={yBarra - 12 * u} fontSize={t.foco ? fVal : fCtx} fontWeight={t.foco ? 700 : 600}
                 fill={INK}>{fijo(t.valor)}</text>
           <path d={rectRedondo(t.x, yBarra, t.w, altoBarra, 4 * u, 'todos')} fill={t.foco ? ACC : FIN_GRIS} />
           <Renglones lineas={t.n.lt} x={t.x} y={yNombre} f={t.n.f} peso={t.n.peso} color={t.foco ? INK : CTX} />
