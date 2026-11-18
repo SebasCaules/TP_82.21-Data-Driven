@@ -1,12 +1,13 @@
 // V13 · PoC y MVP (gestión, Sebastian C.). El camino del canon (poc_y_mvp.camino): PoC hecha, MVP en piloto mínimo,
 // operación mínima si una rama pasa y producción completa si el efecto la paga. Cuatro cajas con flechas: la PoC
 // resuelta (--sem-meta), el MVP en --acc (lo que se pide) y las dos siguientes en gris, cada una con su condición. Los
-// costos van en la banda (G64, G66, G65); el texto de cada caja, en CF.
+// costos van en la banda, los dos del primer año (G64 y G66.primer_anio; USD 15.775 de la producción completa no entra
+// en una tarjeta secundaria y va en la nota, con G65.primer_anio); el texto de cada caja, en CF.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
-import { fijo, pct, usd } from '../../../e3/src/formato.js'
+import { pct, usd } from '../../../e3/src/formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { ACC, BORDE, CTX, HECHO, INK, SUP, TINTE, Renglones, envolver, envolverMono, letra } from '../svg.jsx'
 
@@ -74,9 +75,8 @@ export default function V13Etapas() {
   return (
     <Vista id={ID}
            items={[
-             { clave: 'mvp', valor: usd(A.G64.valor) },
-             { clave: 'minima', valor: fijo(A['G66.recurrente'].valor) },
-             { clave: 'completa', valor: fijo(A['G65.primer_anio'].valor) },
+             { clave: 'mvp', span: 3, valor: usd(A.G64.valor) },
+             { clave: 'minima', span: 3, valor: usd(A['G66.primer_anio'].valor) },
            ]}
            cifras={[pct(A['J03.regla'].valor)]}>
       {({ w, h }) => <Dibujo w={w} h={h} k={k} />}

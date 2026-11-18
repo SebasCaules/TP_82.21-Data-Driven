@@ -149,7 +149,7 @@ def numeros_df(DF):
             return
         if isinstance(x, (int, float)):
             for d in range(4):
-                for v in (x, x * 100):
+                for v in (x, x * 100, abs(x), abs(x) * 100):   # sin signo: «queda 0,25 puntos debajo» (V05)
                     salida.add(fijo(v, d))
                     salida.add(fijo(v, d, True))
         elif isinstance(x, dict):

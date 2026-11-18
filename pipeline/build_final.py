@@ -341,6 +341,9 @@ def economia(eco: dict) -> None:
           ref["sin_descuento"]["diferencia_cruce_90d_pp"], "puntos", 2, "9,92")
     ancla("G62.tasa_observada", "diferencia de cruce con la tasa observada (no es un pronóstico)",
           u["esperado_con_la_tasa_observada_pp"], "puntos", 2, "0,79")
+    # V01 y V09 dicen «menos de 1» (el resumen ejecutivo de la D v3.0: «menos de 1 punto (0,79)»)
+    control("G62.tasa_observada entre 0 y 1 (V01 y V09: «menos de 1»)",
+            0 < u["esperado_con_la_tasa_observada_pp"] < 1, True)
 
     p = eco["potencia_piloto"]
     ancla("G68.mde_rama", "efecto que el piloto ve 80 de cada 100 veces, por rama", p["mde_por_rama_pp"], "puntos", 2,
@@ -633,6 +636,11 @@ def objetivo_y_piloto(e1: dict, eco: dict, lm: dict, kf: list) -> dict:
         ancla(f"F04.{rot}", f"tasa de positivos en validación a {clave} días de cruzar el umbral", t["tasa"],
               "fracción", 1, doc, x=100)
         tramos.append({"tramo": clave, "filas": t["filas"], "positivos": t["positivos"], "tasa": t["tasa"]})
+    # el horizonte del cruce: el primer tramo sin positivos empieza donde termina la ventana («90 o más»)
+    sin = [t for t in tramos if t["positivos"] == 0]
+    control("F04: un solo tramo sin positivos, el último", [t["tramo"] for t in sin], [tramos[-1]["tramo"]])
+    ancla("F04.horizonte", "días de la ventana del cruce (a partir de ahí no hay positivos)",
+          int(re.match(r"\d+", tramos[-1]["tramo"]).group(0)), "días", 0, "90")
     est = e1["ficha"]["estructura"]
     ancla("F03.lejos", "parte de las filas a 90 días o más de cruzar su umbral, sin positivos",
           est["pct_no_alcanzables"], "fracción", 1, "66,5", x=100)
@@ -767,6 +775,49 @@ def gestion_tablas(p: Path, canon: dict, kf: list, cal: dict, c: Path) -> dict:
             "riesgos_criticos": {"n": len(top3)}}
 
 
+def escala_de(p: Path) -> int:
+    """El tope de la escala de la cátedra (ESCALA_1_2 de contenido_a.py del E3: «1 = …, 2 = …, 3 = …»), el denominador
+    de los puntajes técnicos y legales; control: empieza en 1, sin saltos, y ningún puntaje la pasa."""
+    import re
+    texto = None
+    for nodo in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
+        if isinstance(nodo, ast.Assign) and any(isinstance(x, ast.Name) and x.id == "ESCALA_1_2" for x in nodo.targets):
+            texto = ast.literal_eval(nodo.value)
+    if not texto:
+        raise Falta(f"{p.name}: no encuentro ESCALA_1_2")
+    pasos = [int(x) for x in re.findall(r"(\d+) = ", texto)]
+    control("escala de la cátedra: 1, 2, 3, … sin saltos", pasos, list(range(1, len(pasos) + 1)))
+    control("ningún puntaje técnico ni legal pasa el tope de la escala",
+            max(PUNTAJES["condiciones"] + PUNTAJES["legal"]) <= max(pasos), True)
+    return max(pasos)
+
+
+def inventario(p: Path, co: dict) -> None:
+    """F14: los archivos del inventario de la A 1.4 del E3 por su rol (INVENTARIO de contenido_a.py, último campo de
+    cada fila: «Crítica…», «Útil…», «Opcional…»), con control contra la frase de apertura (INTRO_1_4) y contra el
+    inventario de condiciones.json (los dos calendarios cuentan como un archivo)."""
+    import re
+    src = p.read_text(encoding="utf-8")
+    bloque = re.search(r"^INVENTARIO = \[\n(.*?)^\]", src, re.S | re.M)
+    intro = None
+    for nodo in ast.walk(ast.parse(src)):
+        if isinstance(nodo, ast.Assign) and any(isinstance(x, ast.Name) and x.id == "INTRO_1_4" for x in nodo.targets):
+            intro = ast.literal_eval(nodo.value)
+    if not bloque or not intro:
+        raise Falta(f"{p.name}: no encuentro INVENTARIO o INTRO_1_4")
+    filas = re.findall(r"^    \('", bloque.group(1), re.M)
+    roles = re.findall(r"'(Crítica|Útil|Opcional)[^']*'", bloque.group(1))
+    n = (len(filas), roles.count("Crítica"), roles.count("Útil"), roles.count("Opcional"))
+    control("F14: filas del inventario = roles contados", n[0], sum(n[1:]))
+    control("F14: archivos y roles = INTRO_1_4 de la A 1.4", list(n), [int(x) for x in re.findall(r"\d+", intro)])
+    control("F14: archivos = inventario de condiciones.json (un solo calendario)",
+            n[0], len({x["archivo"].split(" (")[0] for x in co["inventario"]}))
+    ancla("F14.archivos", "archivos del inventario de la A 1.4", n[0], "archivos", 0, "15")
+    ancla("F14.criticos", "archivos críticos (sin ellos no hay target)", n[1], "archivos", 0, "2")
+    ancla("F14.utiles", "archivos útiles (aportan variables o arman la lista)", n[2], "archivos", 0, "8")
+    ancla("F14.opcionales", "archivos opcionales (el modelo funciona sin ellos)", n[3], "archivos", 0, "5")
+
+
 def tablas(eco: dict, cal: dict) -> dict:
     u = eco["umbral_de_pase"]["por_variante"]
     filas = []
@@ -782,7 +833,7 @@ def tablas(eco: dict, cal: dict) -> dict:
                       "sin_descuento_pp": v["sin_descuento"]["diferencia_cruce_90d_pp"]})
     return {
         "condiciones": [{"id": i, "nombre": n, "puntaje": p} for (i, n), p in zip(CONDICIONES, PUNTAJES["condiciones"])],
-        "escala_tecnica": {"hasta": 3},
+        "escala_tecnica": {"hasta": escala_de(GENERADORES["contenido_a"])},
         "legal": [{"id": i, "nombre": n, "puntaje": p} for (i, n), p in zip(LEGAL, PUNTAJES["legal"])],
         "umbral_de_pase": filas,
         "calendario": cal,
@@ -807,6 +858,7 @@ def main() -> int:
         control("E3A-01 de economia.json = cv_temporal.json", eco["rango_anual"]["trimestre_x4_usd"][0],
                 cv["roi"]["mvp_proporcional_a_500_sin_filtro"]["beneficio_min"])
         modelado(e1, e2, e3, e4, co)
+        inventario(GENERADORES["contenido_a"], co)
         indicador(ind, e3)
         if OPCIONALES["devoluciones"].exists():
             devueltas(cargar(OPCIONALES["devoluciones"]))

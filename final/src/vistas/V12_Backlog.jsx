@@ -48,7 +48,7 @@ function medir(w, f, k) {
 }
 
 function Dibujo({ w, h, k }) {
-  const f = letra((x) => medir(w, x, k).alto, h, 15 * k)
+  const f = letra((x) => medir(w, x, k).alto, h, 18 * k)
   const m = medir(w, f, k)
   // la leyenda, a la derecha, en una fila
   const items = GRUPOS.map((g) => ({ g, t: `${X.estados[g]} · ${fijo(CUANTAS[g])}` }))

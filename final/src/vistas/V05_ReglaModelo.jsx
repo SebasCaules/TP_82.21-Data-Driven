@@ -1,6 +1,6 @@
 // V05 · Regla contra modelo (modelo, Francisco C.). La precisión de la lista mensual en la prueba final (J03, J17): la
-// regla en --acc, el modelo y la práctica actual en gris. La diferencia modelo menos regla (J09) va en la banda y en la
-// conclusión.
+// regla en --acc, el modelo y la práctica actual en gris. La diferencia modelo menos regla (J09) va en la banda, con su
+// signo bajo el rótulo «Diferencia» y el fragmento «modelo menos regla», y en la conclusión sin signo («queda 0,25 puntos debajo», J-WEB-12).
 
 import Vista from '../Plantilla.jsx'
 import { barras } from '../barras.jsx'
@@ -27,7 +27,7 @@ export default function V05ReglaModelo() {
              { clave: 'dif', valor: fijo(A.J09.valor, 2) },
              { clave: 'hoy', valor: pct(A.J17.valor) },
            ]}
-           cifras={[fijo(A.J09.valor, 2)]}>
+           cifras={[fijo(Math.abs(A.J09.valor), 2)]}>
       {barras({ datos, formato: (x) => pct(x), formatoEje: (x) => pct(x, 0), tituloEje: B.eje })}
     </Vista>
   )

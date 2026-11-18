@@ -43,7 +43,7 @@ function medir(w, f, k) {
 }
 
 function Dibujo({ w, h, k }) {
-  const f = letra((x) => medir(w, x, k).alto, h, 15 * k)
+  const f = letra((x) => medir(w, x, k).alto, h, 19 * k)
   const m = medir(w, f, k)
   const r = Math.min(f * 0.55, m.dw * 0.3)
   const xL = m.xs(SEM_LISTA)

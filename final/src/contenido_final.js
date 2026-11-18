@@ -39,6 +39,12 @@ const TRAMOS = T.tramos_de_cruce
 const PREVIA = Object.fromEntries(T.legal_previas.acciones.map((x) => [x.codigo, x.semana]))
 const SEM_ACUERDO = T.plan.hitos.find((h) => h.n === 1).semana
 const FIN_PREVIAS = Math.max(...T.plan.fases.filter((f) => f.hasta < SEM_LISTA).map((f) => f.hasta))
+/** Los tramos de días que faltan donde se puede cruzar: a 90 días o más el cruce es cero por definición (A 2.1). */
+const TRAMOS_UTILES = TRAMOS.filter((t) => t.positivos > 0)
+const LEJOS = TRAMOS_UTILES[TRAMOS_UTILES.length - 1]
+const HORIZONTE = fijo(v('F04.horizonte'))
+/** «menos de 1»: build_final.py controla que G62.tasa_observada esté entre 0 y 1. */
+const MENOS_DE = Math.ceil(v('G62.tasa_observada'))
 
 export const CF = {
   MUESTRA: false,
@@ -72,8 +78,8 @@ export const CF = {
           textos: {
             piloto: { rotulo: 'Piloto mínimo', linea: 'tres listas con control' },
             umbral: { rotulo: 'Umbral de pase', linea: 'contra menos de uno esperado', unidad: 'puntos' },
-            semana: { rotulo: 'Decisión', linea: 'desde la aprobación', antes: 'semana' },
-            mide: 'Lo que deja la lista contra lo que cuesta, en dólares',
+            semana: { rotulo: 'Se decide', linea: 'desde la aprobación', antes: 'semana' },
+            mide: 'Lo que deja la lista contra lo que cuesta',
             conclusion: 'Recomendamos un piloto mínimo, tres listas mensuales con grupo de control, por',
             sigue: [' del presupuesto, para medir si contactar retiene clientes. La decisión llega en la semana ', '.'],
             barras: {
@@ -109,8 +115,11 @@ export const CF = {
           fuente: 'Parte A v3.0',
           segundos: 130,
           notas: [
-            `El extracto de ventas trae **${fijo(v('C20.crudo'))} filas**. Sacamos ${fijo(v('C20.repetidas'))} repetidas `
-              + `y ${fijo(v('C20.no_positivas'))} devoluciones, que no suman facturación.`,
+            `Casa Óga mandó **${fijo(v('F14.archivos'))} archivos**: ${fijo(v('F14.criticos'))} críticos, `
+              + `${fijo(v('F14.utiles'))} útiles y ${fijo(v('F14.opcionales'))} opcionales. El de ventas es crítico: de ahí `
+              + 'sale quién se va.',
+            `Ese extracto trae **${fijo(v('C20.crudo'))} filas**. Sacamos ${fijo(v('C20.repetidas'))} repetidas `
+              + `y ${fijo(v('C20.no_positivas'))} devoluciones, que no suman facturación, y corregimos el signo y el canal.`,
             `El corte grande es otro: **${pct(v('C19') / 100)} de las ventas no tiene cliente**. Esas ventas no se pueden `
               + 'atribuir a nadie, así que no entran a la lista. No se imputan: se dejan afuera y se declara.',
             `Con lo que queda alcanza: en datos suficientes el puntaje es ${fijo(cond('datos'))} de `
@@ -159,12 +168,10 @@ export const CF = {
           textos: {
             fuera: { rotulo: 'Meses que no se usan', linea: 'debajo del control mensual' },
             control: { rotulo: 'Control del mes', linea: 'contra el año anterior' },
-            agosto: { rotulo: 'Último mes útil', linea: 'agosto, corte de la lista' },
             mide: `Operaciones de cada mes de ${VENTAS.anio} sobre el mismo mes de ${VENTAS.anio_anterior}`,
             conclusion: 'Desde septiembre cada mes queda debajo del',
             sigue: [': la lista de muestra se arma al corte de agosto.'],
             barras: {
-              no_se_usa: 'no se usa',
               control: 'control',
               eje: `Parte de las operaciones de ${VENTAS.anio_anterior}`,
             },
@@ -189,22 +196,22 @@ export const CF = {
         {
           id: 'V04',
           titulo: 'Qué es irse',
-          pregunta: 'Se va quien pasa su umbral sin comprar',
+          pregunta: 'La regla ordena por cercanía al umbral',
           fuente: 'Parte A v3.0',
           segundos: 85,
           notas: [
             `El umbral de cada cliente es el mayor entre **${fijo(v('C03.minimo_dias'))} días** y **${fijo(v('C03.factor'), 1)} `
               + 'veces** su intervalo mediano entre compras. Quien compra seguido tiene un umbral corto; quien compra poco, '
               + 'uno largo.',
-            `La regla ordena a los clientes por los días que les faltan para cruzarlo. Los que están a ${TRAMOS[0].tramo} días `
-              + `lo cruzan el ${pct(TRAMOS[0].tasa)} de las veces; a ${TRAMOS[TRAMOS.length - 1].tramo} días, `
-              + `${pct(TRAMOS[TRAMOS.length - 1].tasa)}.`,
+            `La regla ordena a los clientes por los días que les faltan para cruzarlo. En validación, los que están a `
+              + `${TRAMOS[0].tramo} días lo cruzan en ${HORIZONTE} días el ${pct(TRAMOS[0].tasa)} de las veces; a ${LEJOS.tramo} `
+              + `días, ${pct(LEJOS.tasa)}. Quien ya está a ${HORIZONTE} días o más no puede cruzar: por eso no va en el `
+              + 'gráfico.',
           ],
           textos: {
             minimo: { rotulo: 'Umbral mínimo', linea: 'piso para cualquier cliente', unidad: 'días' },
             factor: { rotulo: 'O su ritmo', linea: 'su intervalo entre compras', unidad: 'veces' },
-            tasa: { rotulo: 'Se van en test', linea: 'de los contactables evaluados' },
-            mide: 'Clientes que cruzan su umbral, según los días que les faltan',
+            mide: `Cruzan su umbral en ${HORIZONTE} días, en validación, por días que faltan`,
             conclusion: 'Los más cerca de su umbral lo cruzan',
             sigue: [' de las veces: la regla ordena por esa distancia.'],
             barras: { dias: 'días', eje: 'Cruzan su umbral' },
@@ -226,16 +233,16 @@ export const CF = {
           notas: [
             `En la prueba final, la lista de la regla acierta **${pct(v('J03.regla'))}**; la del modelo, `
               + `${pct(v('J03.logistica'))}. La práctica actual, ${pct(v('J17'))}.`,
-            `El modelo queda **${fijo(v('J09'), 2)} puntos** debajo, con un intervalo de ${fijo(v('J09.ic_inferior'), 2)} a `
+            `El modelo queda **${fijo(Math.abs(v('J09')), 2)} puntos** debajo, con un intervalo de ${fijo(v('J09.ic_inferior'), 2)} a `
               + `${fijo(v('J09.ic_superior'), 2)}: no se distinguen. Sale la regla, que no se entrena ni se mantiene.`,
           ],
           textos: {
             regla: { rotulo: 'Acierta la regla', linea: 'de cada lista, en test' },
-            dif: { rotulo: 'Suma el modelo', linea: 'puntos, dentro del margen' },
+            dif: { rotulo: 'Diferencia', linea: 'puntos, modelo menos regla' },
             hoy: { rotulo: 'Práctica actual', linea: 'lo que acierta hoy' },
             mide: 'Precisión de la lista mensual en la prueba final',
-            conclusion: 'El modelo suma',
-            sigue: [' puntos, con un intervalo que cruza el cero: sale la regla, sin entrenar nada.'],
+            conclusion: 'El modelo queda',
+            sigue: [' puntos debajo, con un intervalo que cruza el cero: sale la regla, sin entrenar nada.'],
             barras: {
               regla: 'Regla del umbral',
               modelo: 'Modelo (logística)',
@@ -254,7 +261,7 @@ export const CF = {
         {
           id: 'V06',
           titulo: 'Cómo se mide',
-          pregunta: `Un control de ${fijo(v('G49.control_mes'))} clientes mide el efecto`,
+          pregunta: `Cada mes, ${fijo(v('G49.control_mes'))} de control y dos ramas`,
           fuente: 'Parte D v3.0',
           segundos: 85,
           notas: [
@@ -265,6 +272,8 @@ export const CF = {
             `La lista de muestra al corte de agosto lo muestra: ${fijo(LM.alto_valor)} de mayor facturación, `
               + `${fijo(LM.control)} de control, ${fijo(LM.con_descuento)} y ${fijo(LM.sin_descuento)} en las ramas. Es `
               + 'salida de la PoC, no el producto.',
+            `El ${pct(v('G49.alto_valor'), 0)} es de la base de clientes, no de la lista: en esta lista son `
+              + `${fijo(LM.alto_valor)} de ${fijo(v('G49.lista_mes'))}.`,
           ],
           textos: {
             control: { rotulo: 'Control por mes', linea: 'no se contactan, al azar' },
@@ -274,7 +283,7 @@ export const CF = {
             conclusion: 'Fuera del',
             sigue: [' de mayor facturación, cada mes se sortean el control y dos ramas: con descuento y sin descuento.'],
             barras: {
-              alto: `${pct(v('G49.alto_valor'), 0)} de mayor facturación`,
+              alto: 'Mayor facturación',
               control: 'Control, no se contacta',
               con: `Rama con ${pct(v('G49.descuento'), 0)} de descuento`,
               sin: 'Rama sin descuento',
@@ -308,29 +317,30 @@ export const CF = {
           notas: [
             `La lista de ${fijo(v('G49.lista_mes'))} contactables deja **${usd(v('G54'))} por año**. El primer año cuesta `
               + `**${usd(v('G39'))}**: el piloto mínimo más la producción completa. El ROI a un año es `
-              + `**${pctDirecto(v('G54.roi'))}**.`,
+              + `**${pctDirecto(v('G54.roi'), 1)}**.`,
             `Con modelo es peor: agrega ${usd(v('G40'))} al primer año y suma ${usd(v('G34.incremental'), 2)} por año. Su ROI `
-              + `es ${pctDirecto(v('G40.roi'))}. El presupuesto de ${usd(v('C28'))} alcanza; lo que no alcanza es lo que deja.`,
+              + `es ${pctDirecto(v('G40.roi'), 1)}.`,
+            `El presupuesto de ${usd(v('C28'))} alcanza para la regla; con modelo, ${usd(v('G38'))}, se pasa por `
+              + `${usd(v('G38') - v('C28'))}. Lo que no alcanza es lo que deja la lista.`,
           ],
           textos: {
             roi: { rotulo: 'ROI de la regla', linea: 'piloto y producción, un año' },
             roi_modelo: { rotulo: 'ROI del modelo', linea: 'lo que agrega, un año' },
             mide: 'Costo del primer año contra lo que deja la lista por año',
-            conclusion: 'El presupuesto alcanza, pero la lista deja',
+            conclusion: 'La lista deja',
             sigue: [' por año: el costo no se recupera, ni con modelo.'],
             barras: {
               costo_modelo: 'Primer año, con modelo',
               costo_regla: 'Primer año, con la regla',
               deja: 'Deja la lista, por año',
               eje: 'Dólares',
-              presupuesto: 'presupuesto',
             },
             decision: {
               area: 'Económica',
               estado: 'no viable',
               corta: 'No viable como proyecto',
-              larga: `ROI a un año: ${pctDirecto(v('G54.roi'))} con la regla (piloto mínimo más producción completa) y `
-                + `${pctDirecto(v('G40.roi'))} lo que agrega el modelo.`,
+              larga: `ROI a un año: ${pctDirecto(v('G54.roi'), 1)} con la regla (piloto mínimo más producción completa) y `
+                + `${pctDirecto(v('G40.roi'), 1)} lo que agrega el modelo.`,
             },
           },
         },
@@ -373,7 +383,7 @@ export const CF = {
         {
           id: 'V09',
           titulo: 'Cuándo pasa',
-          pregunta: `Hacen falta ${fijo(v('G67.con_descuento'))} puntos; hoy se esperan ${fijo(v('G62.tasa_observada'), 2)}`,
+          pregunta: `Hacen falta ${fijo(v('G67.con_descuento'))} puntos; se espera menos de ${fijo(MENOS_DE)}`,
           fuente: 'Parte B v3.0',
           segundos: 85,
           notas: [
@@ -382,23 +392,21 @@ export const CF = {
               + `**${fijo(v('G67.sin_descuento'), 2)}** en la rama sin descuento.`,
             `Con la compra observada en campañas, sin grupo de control, se esperan ${fijo(v('G62.tasa_observada'), 2)} puntos. `
               + 'No es un pronóstico: el piloto mide otra cosa, si el cliente contactado sigue comprando.',
-            `El piloto ve el umbral ${fijo(v('G68.potencia_con_descuento'))} de cada 100 veces con descuento y `
-              + `${fijo(v('G68.potencia_sin_descuento'))} sin descuento. Si no llega, Casa Óga cierra habiendo gastado `
-              + `${usd(v('G64'))} y no ${fijo(v('G39'))}.`,
+            `El piloto ve el umbral ${fijo(v('G68.potencia_con_descuento'))} ${DE_CADA} veces con descuento y `
+              + `${fijo(v('G68.potencia_sin_descuento'))} sin descuento. Si ninguna rama llega, Casa Óga cierra habiendo `
+              + `gastado ${usd(v('G64'))} y no ${usd(v('G39'))}.`,
           ],
           textos: {
             con: { rotulo: 'Umbral de pase', linea: 'puntos, rama con descuento' },
             sin: { rotulo: 'Sin descuento', linea: 'puntos, la otra rama' },
-            hoy: { rotulo: 'Con lo observado', linea: 'puntos esperados hoy' },
+            hoy: { rotulo: 'Con lo observado', linea: 'puntos esperados hoy', antes: 'menos de' },
             mide: 'Diferencia de cruce, control menos rama, en puntos',
-            conclusion: 'Si ninguna rama llega a su umbral, Casa Óga cierra habiendo gastado',
-            sigue: [' y no ', '.'],
+            conclusion: 'Si el efecto llega al umbral, el piloto lo ve',
+            sigue: [` ${DE_CADA} veces con descuento y `, ' sin descuento.'],
             barras: {
               hoy: 'Con lo observado',
               sin: 'Umbral, rama sin descuento',
               con: 'Umbral, rama con descuento',
-              nota_sin: `lo ve ${fijo(v('G68.potencia_sin_descuento'))} ${A['G68.potencia_sin_descuento'].unidad}`,
-              nota_con: `lo ve ${fijo(v('G68.potencia_con_descuento'))} ${A['G68.potencia_con_descuento'].unidad}`,
               eje: 'Puntos de diferencia de cruce',
             },
             decision: {
@@ -430,13 +438,13 @@ export const CF = {
             `El puntaje legal del estado actual es **${fijo(v('H40'), 1)} de ${fijo(T.escala_tecnica.hasta)}**. La dimensión `
               + `más baja es protección de datos personales, con ${fijo(legal('proteccion_datos'))}.`,
             `Antes de la primera lista, en la semana ${fijo(SEM_LISTA)}, van **${fijo(T.legal_previas.n)} acciones**: el `
-              + `acuerdo de confidencialidad en la semana ${fijo(PREVIA.L4)}, la inscripción en la AAIP y la política de borrado `
-              + `en la ${fijo(PREVIA.L1)}, la revisión del aviso de privacidad y la prueba del filtro de consentimiento en `
-              + `la ${fijo(PREVIA.L3)}.`,
+              + `acuerdo de confidencialidad (semana ${fijo(PREVIA.L4)}), la inscripción en la AAIP (${fijo(PREVIA.L1)}), la `
+              + `política de borrado (${fijo(PREVIA.L5)}), la revisión del aviso de privacidad (${fijo(PREVIA.L6)}) y la `
+              + `prueba del filtro de consentimiento (${fijo(PREVIA.L3)}).`,
             'El acuerdo de confidencialidad es lo primero: sin él, Casa Óga no entrega ningún dato más (envío 47).',
           ],
           textos: {
-            puntaje: { rotulo: 'Puntaje legal', linea: 'estado actual, cinco dimensiones' },
+            puntaje: { rotulo: 'Puntaje legal', linea: 'estado actual' },
             proteccion: { rotulo: 'Datos personales', linea: 'la dimensión más baja' },
             previas: { rotulo: 'Acciones previas', linea: 'antes de la lista' },
             mide: 'Acciones legales antes de la primera lista, por semana del plan',
@@ -463,11 +471,11 @@ export const CF = {
         {
           id: 'V11',
           titulo: 'Qué puede fallar',
-          pregunta: 'Tres riesgos, cada uno con su señal',
+          pregunta: 'El piloto prueba si Marketing sostiene la lista',
           fuente: 'Parte C v3.0',
           segundos: 105,
           notas: [
-            'El primero es económico: que contactar no retenga lo suficiente. Lo mide el piloto y, si ninguna rama llega, '
+            'El primero es económico: que contactar no retenga lo suficiente para pagar la lista. Lo mide el piloto y, si ninguna rama llega, '
               + `se cierra en la semana ${fijo(SEM_FIN)}.`,
             'El segundo es de adopción. El proyecto anterior se cortó porque «no quedó un responsable claro de '
               + 'mantenerlos» (envío 15). Por eso corre la planilla una persona de Marketing con la guía, '
@@ -477,16 +485,15 @@ export const CF = {
           textos: {
             riesgos: { rotulo: 'Riesgos críticos', linea: 'con señal y respuesta' },
             horas: { rotulo: 'Horas por lista', linea: 'de la persona de Marketing', unidad: 'horas' },
-            tasa: { rotulo: 'Tasa observada', linea: 'compra sin grupo de control' },
             mide: 'Riesgos críticos del piloto: qué se mira y qué se hace',
-            conclusion: 'El piloto también prueba si Marketing sostiene la lista:',
+            conclusion: 'Marketing la corre en',
             sigue: [' horas por lista, con la guía de corrida.'],
             columnas: { riesgo: 'Riesgo', senal: 'Señal que se mira', respuesta: 'Qué se hace' },
             filas: [
               {
-                riesgo: 'Contactar no retiene',
+                riesgo: 'Contactar no paga la lista',
                 senal: 'cruce, control menos cada rama',
-                respuesta: `sin umbral de pase, se cierra en la semana ${fijo(SEM_FIN)}`,
+                respuesta: `si ninguna rama llega, se cierra en la semana ${fijo(SEM_FIN)}`,
               },
               {
                 riesgo: 'Nadie corre la planilla',
@@ -503,8 +510,8 @@ export const CF = {
               area: 'Adopción',
               estado: 'se prueba',
               corta: 'Corre la lista una persona de Marketing',
-              larga: `Durante el piloto corre la planilla una persona de Marketing que designa Sofía R. en la semana ${fijo(SEM_ACUERDO)}, `
-                + 'con la guía de corrida; el equipo arma la planilla y acompaña las tres corridas.',
+              larga: 'Durante el piloto corre la planilla una persona de Marketing que designa Sofía R., con la guía de '
+                + 'corrida; el equipo arma la planilla y acompaña las tres corridas.',
             },
           },
         },
@@ -524,6 +531,7 @@ export const CF = {
           fuente: 'E4, Parte A',
           segundos: 75,
           notas: [
+            'Trabajamos con Scrum adaptado: cuatro sprints y una semana de cierre, con revisión los martes en clase.',
             `El backlog tiene **${fijo(v('K02'))} historias de usuario** en las ${fijo(v('K01'))} épicas del primer `
               + `entregable, cada una con sus criterios de aceptación. **${fijo(v('K04'))} están hechas** en la cursada, `
               + 'cada una con la sección entregada que la muestra.',
@@ -558,16 +566,16 @@ export const CF = {
               + 'la conducta.',
             'El **MVP** es la regla en una planilla mensual, sin modelo, sin licencias y sin integración con el CRM. Operado '
               + `tres meses con control es el piloto mínimo, ${usd(v('G64'))}.`,
-            `Si una rama pasa su umbral, sigue la operación mínima con un analista part-time (${usd(v('G66.recurrente'))} `
-              + 'por año). La producción completa, solo si el efecto medido la paga.',
+            `Si una rama pasa su umbral, sigue la operación mínima con un analista part-time: ${usd(v('G66.primer_anio'))} `
+              + `el primer año y ${usd(v('G66.recurrente'))} por año. La producción completa, `
+              + `${usd(v('G65.primer_anio'))} el primer año, solo si el efecto medido la paga.`,
           ],
           textos: {
             mvp: { rotulo: 'Se pide ahora', linea: 'el MVP en piloto mínimo' },
-            minima: { rotulo: 'Operación mínima', linea: 'dólares por año, analista part-time' },
-            completa: { rotulo: 'Producción', linea: 'completa, dólares del primer año' },
+            minima: { rotulo: 'Operación mínima', linea: 'el primer año' },
             mide: 'Etapas de la solución y qué abre cada una',
             conclusion: 'La PoC probó que la regla acierta',
-            sigue: ['; el piloto prueba si contactar retiene.'],
+            sigue: ['; falta medir si contactar paga la lista.'],
             etapas: [
               { nombre: 'PoC', estado: 'hecha', que: 'la regla sobre el extracto histórico, con validación y prueba final' },
               { nombre: 'MVP en piloto mínimo', estado: 'se pide ahora', que: 'la planilla mensual operada tres meses con control y dos ramas' },
@@ -595,21 +603,20 @@ export const CF = {
               + `**${fijo(SEM_LISTA)}**.`,
             `Las tres listas salen hasta la semana ${fijo(CAL.tercera_lista.semana)}. El informe preliminar llega en la `
               + `${fijo(SEM_PRE)} y no decide; la decisión es en la **${fijo(SEM_FIN)}** y la toma María G.`,
+            `Arriba, las semanas con hito: son ${fijo(T.plan.hitos.length)} hitos, cada uno con su dueño y su evidencia.`,
           ],
           textos: {
             decide: { rotulo: 'Decide María G.', linea: 'con el cruce de las listas', antes: 'semana' },
             lista: { rotulo: 'Primera lista', linea: 'después de las previas', antes: 'semana' },
-            hitos: { rotulo: 'Hitos con dueño', linea: 'cada uno con su evidencia' },
             mide: 'Fases e hitos, por semana desde la aprobación',
             conclusion: 'El informe preliminar llega en la semana',
             sigue: [' y la decisión, en la ', '.'],
             semana: 'semana',
-            hito: 'hitos',
-            eje: 'Semanas desde la aprobación',
+            hito: 'semanas con hito',
             decision: {
               area: 'Plan',
               estado: 'con dueños',
-              corta: 'Seis fases, cada una con responsable',
+              corta: 'Cada fase con su responsable',
               larga: `El plan dura ${fijo(T.plan.semanas)} semanas desde la aprobación escrita de María G.`,
             },
           },
@@ -629,32 +636,30 @@ export const CF = {
           fuente: 'Parte D v3.0',
           segundos: 90,
           notas: [
-            '**Aprendimos** que una regla simple alcanza para saber a quién llamar. **Falló** el supuesto del comienzo: '
-              + 'que un modelo iba a pagar el proyecto. El dato que falta es si contactar retiene.',
+            '**Aprendimos** que una regla simple alcanza para saber a quién contactar. **Falló** el supuesto del comienzo: '
+              + 'que un modelo iba a pagar el proyecto. El dato que falta es si contactar paga la lista.',
             `**Supuesto**: la tasa de éxito hoy es ${pct(v('G31'), 2)} de compra en campañas, sin control. **Limitación**: `
               + 'meses incompletos y ventas sin cliente quedan afuera.',
             `Pedimos dos cosas: aprobar el piloto mínimo, ${usd(v('G64'))}, y firmar el acuerdo de confidencialidad en `
               + `la semana ${fijo(SEM_ACUERDO)}. En la semana ${fijo(SEM_FIN)}, María G. decide si sigue.`,
           ],
           textos: {
-            piloto: { rotulo: 'Aprobar el piloto', linea: 'del presupuesto de Casa Óga' },
-            acuerdo: { rotulo: 'Firmar el acuerdo', linea: 'antes de cualquier dato', antes: 'semana' },
+            piloto: { rotulo: 'Piloto mínimo', linea: 'del presupuesto de Casa Óga' },
+            acuerdo: { rotulo: 'Confidencialidad', linea: 'antes de cualquier dato', antes: 'semana' },
             decide: { rotulo: 'Decisión final', linea: 'seguir o cerrar', antes: 'semana' },
-            mide: 'Lo que pasa en la semana de la decisión',
-            conclusion: 'Sabemos a quién llamar; el piloto mide si llamar retiene, por',
+            mide: 'Balance del trabajo',
+            conclusion: 'Sabemos a quién contactar; el piloto dice si contactarlo paga la lista, por',
             sigue: [' y no ', '.'],
-            arbol: {
-              raiz: 'Cruce medido en las tres listas',
-              si: 'Una rama llega a su umbral de pase',
-              si_luego: 'Operación mínima con un analista part-time',
-              no: 'Ninguna rama llega',
-              no_luego: 'Se cierra el proyecto',
-              semana: 'semana',
-            },
+            balance: [
+              { que: 'Aprendimos', texto: 'una regla elige a quién contactar' },
+              { que: 'Falló', texto: 'esperar que un modelo pagara el proyecto' },
+              { que: 'Supuesto', texto: `tasa de éxito ${pct(v('G31'), 2)}, sin control` },
+              { que: 'Limitación', texto: 'sin meses incompletos ni ventas sin cliente' },
+            ],
             decision: {
               area: 'Pedido',
               estado: 'a Casa Óga',
-              corta: 'Aprobar el piloto y firmar el acuerdo de confidencialidad',
+              corta: 'Decide María G.; el acuerdo va primero',
               larga: `Aprobar el piloto mínimo (${usd(v('G64'))} del presupuesto) y firmar el acuerdo de confidencialidad `
                 + `en la semana ${fijo(SEM_ACUERDO)} del plan.`,
             },

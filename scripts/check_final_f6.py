@@ -8,8 +8,9 @@ Corre, con rutas absolutas y en este orden:
 2. npm run build:final.
 3. scripts/verificar_final.py --sin-muestra --sin-esqueletos (capturas a 1280×720 y 1920×1080 en final/capturas-verif/).
 4. npm run build:e2 y scripts/paridad_final.py --vista v07 (la vista con la estructura de la vista 5 del E3).
-5. El HTML de un solo archivo (scripts/vite.final-sobre.config.js) en dist-final-sobre/index.html: existe, trae las
-   quince preguntas de CF y no pide nada a la red (sin src ni href a http).
+5. El HTML de un solo archivo (scripts/vite.final-sobre.config.js) en dist-final-sobre/index.html: existe, no trae src
+   ni href a http, y abierto con Playwright sin red (offline, file://) monta cada vista de CF con su pregunta, sin pedidos
+   fuera de file: y data: (url(), @import o fetch incluidos) y sin errores de consola.
 6. /e3/ intacto: npm run build:e3 y el md5 de dist-e3/index.html es el del /e3/ presentado (1903979c…).
 7. Git: la rama es final-tablero, main sigue en el commit en que se cortó esta fase, src/**, e2/** y e3/** iguales a
    main, el árbol limpio y los commits de main..HEAD de una línea y sin trailers (ni Co-Authored-By).
@@ -121,6 +122,39 @@ def texto_renderizado(V: list[dict]) -> str:
     return "\n".join(partes)
 
 
+def sobre_sin_red(V: list[dict]) -> tuple[list[str], list[str], list[str]]:
+    """Abre el HTML de un solo archivo sin red (offline, file://) y recorre las vistas: devuelve las vistas sin montar o
+    con otra pregunta, los pedidos fuera de file: y data: (src, url(), @import o fetch) y los errores de consola."""
+    from playwright.sync_api import sync_playwright
+
+    def norm(t: str) -> str:
+        return re.sub(r"\s+", " ", t.replace(" ", " ")).strip()
+
+    malas, pedidos, errores = [], [], []
+    with sync_playwright() as pw:
+        try:
+            nav = pw.chromium.launch()
+        except Exception:
+            nav = pw.chromium.launch(channel="chrome")
+        ctx = nav.new_context(viewport={"width": 1280, "height": 720}, device_scale_factor=1, offline=True)
+        pg = ctx.new_page()
+        pg.on("request", lambda r: pedidos.append(r.url[:120]) if not r.url.startswith(("data:", "file:")) else None)
+        pg.on("console", lambda m: errores.append(m.text[:160]) if m.type == "error" else None)
+        pg.on("pageerror", lambda e: errores.append(str(e)[:160]))
+        for v in V:
+            try:
+                pg.goto(f"{SOBRE.as_uri()}#{v['id'].lower()}")
+                pg.wait_for_selector(".cuerpo .pant", timeout=10000)
+                pg.wait_for_timeout(150)
+                preg = pg.evaluate("() => document.querySelector('.e2-preg')?.textContent ?? ''")
+                if norm(preg) != norm(v["pregunta"]):
+                    malas.append(f"{v['id']} («{norm(preg)[:40]}»)")
+            except Exception as e:   # noqa: BLE001
+                malas.append(f"{v['id']} ({str(e).splitlines()[0][:60]})")
+        nav.close()
+    return malas, pedidos, errores
+
+
 def lista_negra(texto: str, donde: str) -> None:
     lista = json.loads(CANON.read_text(encoding="utf-8"))["lista_negra"]
     plano = re.sub(r"\s+", " ", texto.replace(" ", " "))
@@ -168,11 +202,14 @@ def main() -> int:
     if SOBRE.exists():
         html = SOBRE.read_text(encoding="utf-8")
         externos = re.findall(r"""(?:src|href)\s*=\s*["']https?://[^"']+""", html)
-        # las preguntas van en el bundle como literales de plantilla o cadenas: se buscan sus tramos sin cifras
-        faltan = [v["id"] for v in V if not all(t in html for t in re.split(r"[\d.,]+|USD| ", v["pregunta"]) if len(t.strip()) > 3)]
-        paso("dist-final-sobre/index.html", not externos and not faltan,
-             f"{SOBRE.stat().st_size // 1024} KB, {len(V)} vistas, sin pedidos a la red"
-             if not externos and not faltan else f"externos {externos[:3]}, faltan {faltan}")
+        try:
+            malas, pedidos, errores = sobre_sin_red(V)
+        except Exception as e:   # noqa: BLE001
+            malas, pedidos, errores = [f"no abre: {str(e).splitlines()[0][:100]}"], [], []
+        ok = not externos and not malas and not pedidos and not errores
+        paso("dist-final-sobre/index.html, abierto sin red", ok,
+             f"{SOBRE.stat().st_size // 1024} KB, {len(V)} vistas con su pregunta, 0 pedidos, 0 errores de consola" if ok
+             else f"externos {externos[:3]}, vistas {malas[:4]}, pedidos {pedidos[:3]}, errores {errores[:3]}")
     else:
         paso("dist-final-sobre/index.html", False, "no existe")
 

@@ -1,6 +1,8 @@
-// V14 · El plan (gestión, Sebastian C.). Las seis fases del plan (tabla plan de DF, leída por build_final.py del canon
-// y controlada contra la Parte A del E4) como barras sobre las semanas desde la aprobación, cada una con su responsable,
-// y arriba un marcador por semana con hito. La semana de la decisión, en --acc. Las semanas salen de DF; los rótulos, de CF.
+// V14 · El plan (gestión, Sebastian C.). Las fases del plan (tabla plan de DF, leída por build_final.py del canon y
+// controlada contra la Parte A del E4) como barras sobre las semanas desde la aprobación, cada una con su responsable,
+// y arriba la fila «semanas con hito»: un círculo por semana con hito, con su número de semana (el eje de la vista; abajo
+// no se repite). La semana de la decisión, en --acc. Sin tarjeta que cuente hitos (J-WEB-04): el gráfico marca semanas, no
+// hitos; cuántos son y su dueño van en la nota y en el title. Las semanas salen de DF; los rótulos, de CF.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -34,7 +36,7 @@ function medir(w, f, k) {
   const yHitos = f * 1.0 + r
   const yFilas = yHitos + r + f * 0.9
   const yEje = yFilas + filas.reduce((s, x) => s + x.alto + gap, 0) - gap + f * 0.6
-  return { fQ, col, x0, dw, xs, gap, filas, r, yHitos, yFilas, yEje, alto: yEje + f * 2.6 }
+  return { fQ, col, x0, dw, xs, gap, filas, r, yHitos, yFilas, yEje, alto: yEje + f * 0.5 }
 }
 
 function Dibujo({ w, h, k }) {
@@ -76,11 +78,6 @@ function Dibujo({ w, h, k }) {
         )
       })}
       <line x1={m.x0} x2={w} y1={m.yEje} y2={m.yEje} stroke={EJE} strokeWidth={1} />
-      {[1, CAL.primera_lista.semana, CAL.tercera_lista.semana, CAL.preliminar.semana, PL.semanas].map((s) => (
-        <text key={s} x={m.xs(s)} y={m.yEje + f * 0.25} fontSize={f * 0.9} fill={CTX} textAnchor="middle"
-              dominantBaseline="hanging" className="tabular">{fijo(s)}</text>
-      ))}
-      <Titulo x={w} y={m.yEje + f * 2.1} f={f * 0.85} texto={X.eje} anchor="end" max={w - m.x0} />
     </svg>
   )
 }
@@ -90,9 +87,8 @@ export default function V14Plan() {
   return (
     <Vista id={ID}
            items={[
-             { clave: 'decide', valor: fijo(SEM_FIN) },
-             { clave: 'lista', valor: fijo(CAL.primera_lista.semana) },
-             { clave: 'hitos', valor: fijo(PL.hitos.length) },
+             { clave: 'decide', span: 3, valor: fijo(SEM_FIN) },
+             { clave: 'lista', span: 3, valor: fijo(CAL.primera_lista.semana) },
            ]}
            cifras={[fijo(CAL.preliminar.semana), fijo(SEM_FIN)]}>
       {({ w, h }) => <Dibujo w={w} h={h} k={k} />}

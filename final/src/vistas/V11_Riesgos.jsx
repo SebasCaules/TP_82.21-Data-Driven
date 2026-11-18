@@ -5,7 +5,7 @@
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
-import { fijo, pct } from '../../../e3/src/formato.js'
+import { fijo } from '../../../e3/src/formato.js'
 import { useEscalaTexto } from '../../../e2/src/escala.js'
 import { ACC, BORDE, INK, Renglones, Titulo, envolver, letra } from '../svg.jsx'
 
@@ -37,12 +37,14 @@ function medir(w, f, k) {
 }
 
 function Dibujo({ w, h, k }) {
-  const f = letra((x) => medir(w, x, k).alto, h, 15 * k)
+  const f = letra((x) => medir(w, x, k).alto, h, 20 * k)
   const m = medir(w, f, k)
   let y = m.yFilas
+  const dy = Math.max(0, (h - m.alto) / 2)   // la tabla, centrada en el alto (J-WEB-18)
   return (
     <svg width={w} height={h} role="img" style={{ display: 'block' }}
          aria-label={`${X.mide}: ${X.filas.map((r) => r.riesgo).join('; ')}`}>
+      <g transform={`translate(0,${dy})`}>
       {[C.riesgo, C.senal, C.respuesta].map((t, j) => (
         <Titulo key={t} x={m.xs[j]} y={m.yCab} f={f * 0.9} texto={t} max={m.anchos[j]} />
       ))}
@@ -62,6 +64,7 @@ function Dibujo({ w, h, k }) {
         )
       })}
       <line x1={0} x2={w} y1={y} y2={y} stroke={BORDE} strokeWidth={1} />
+      </g>
     </svg>
   )
 }
@@ -71,9 +74,8 @@ export default function V11Riesgos() {
   return (
     <Vista id={ID}
            items={[
-             { clave: 'riesgos', valor: fijo(DF.tablas.riesgos_criticos.n) },
-             { clave: 'horas', valor: fijo(A['G64.horas_por_lista'].valor) },
-             { clave: 'tasa', valor: pct(A.G31.valor, 2) },
+             { clave: 'horas', span: 3, valor: fijo(A['G64.horas_por_lista'].valor) },
+             { clave: 'riesgos', span: 3, valor: fijo(DF.tablas.riesgos_criticos.n) },
            ]}
            cifras={[fijo(A['G64.horas_por_lista'].valor)]}>
       {({ w, h }) => <Dibujo w={w} h={h} k={k} />}

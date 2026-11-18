@@ -660,6 +660,30 @@ export const DF = {
    "texto": "1,8",
    "definicion": "puntaje legal del estado actual, promedio de cinco dimensiones"
   },
+  "F14.archivos": {
+   "valor": 15,
+   "unidad": "archivos",
+   "texto": "15",
+   "definicion": "archivos del inventario de la A 1.4"
+  },
+  "F14.criticos": {
+   "valor": 2,
+   "unidad": "archivos",
+   "texto": "2",
+   "definicion": "archivos críticos (sin ellos no hay target)"
+  },
+  "F14.utiles": {
+   "valor": 8,
+   "unidad": "archivos",
+   "texto": "8",
+   "definicion": "archivos útiles (aportan variables o arman la lista)"
+  },
+  "F14.opcionales": {
+   "valor": 5,
+   "unidad": "archivos",
+   "texto": "5",
+   "definicion": "archivos opcionales (el modelo funciona sin ellos)"
+  },
   "H50.parte": {
    "valor": 0.29773719730051607,
    "unidad": "fracción",
@@ -977,6 +1001,12 @@ export const DF = {
    "unidad": "fracción",
    "texto": "0,0 %",
    "definicion": "tasa de positivos en validación a 90 o más días de cruzar el umbral"
+  },
+  "F04.horizonte": {
+   "valor": 90,
+   "unidad": "días",
+   "texto": "90",
+   "definicion": "días de la ventana del cruce (a partir de ahí no hay positivos)"
   },
   "F03.lejos": {
    "valor": 0.6651338424100025,
