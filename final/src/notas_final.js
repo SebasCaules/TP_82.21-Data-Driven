@@ -8,7 +8,7 @@
 export const NOTAS = {
   "V01": [
     [
-      "Buenas tardes, María, Carlos. No recomendamos invertir en el proyecto, sino USD 4.485 en un piloto con grupo de control. La regla ya acierta quién está por dejar de comprar, 86 de cada 100 en la prueba final, sin modelo. Lo que nadie midió es si contactarlo lo retiene. Hoy Casa Óga ya manda campañas por WhatsApp, mail y SMS. Y ustedes nos dijeron que «Hoy pesa más sostener a los que ya compran» [[(envío 1)]]. Pero esas campañas salieron sin grupo de control: nadie puede decir si el contacto cambió algo."
+      "Buenas tardes, María, Carlos. No recomendamos invertir en el proyecto, sino USD 4.485 en un piloto con grupo de control. La regla ya acierta quién va a pasar su umbral de días sin comprar, 86 de cada 100 en la prueba final, sin modelo. Lo que nadie midió es si contactarlo lo retiene. Hoy Casa Óga ya manda campañas por WhatsApp, mail y SMS. Y ustedes nos dijeron que «Hoy pesa más sostener a los que ya compran» [[(envío 1)]]. Pero esas campañas salieron sin grupo de control: nadie puede decir si el contacto cambió algo."
     ],
     [
       "Con lo que hoy se observa, la lista deja USD 265 por año y cuesta USD 20.260 el primero. El piloto, tres listas mensuales, dice en 28 semanas si contactar retiene lo suficiente para pagar la lista. Mis compañeros muestran los datos, la regla y el piloto, los números y lo legal. Yo vuelvo al final con el plan y lo que les pedimos.",

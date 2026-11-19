@@ -2,7 +2,7 @@
 // desde el PDF del consolidado acumulado (marcadores comprobados contra el texto de cada hoja). Se vuelve a correr cada
 // vez que el consolidado se rearma.
 //   PDF: entregas/Consolidado acumulado - Entregables 1-4 - GRUPO 2.pdf
-//   v5.0, 247 hojas, generado el 19/11/2026 04:32, md5 0a539b5f0cd85a4f524eb91472bf79d3
+//   v5.0, 247 hojas, generado el 19/11/2026 12:18, md5 c2aec18d80685e1165051b7f8132a5d3
 // secciones: la hoja (1-based) donde empieza cada sección; las claves son las de contenido_final.js (`informe`).
 // INFORME_QR: la matriz del QR que lleva a INFORME.url (pipeline/qr.py, modo byte, nivel M), sin el margen blanco.
 
