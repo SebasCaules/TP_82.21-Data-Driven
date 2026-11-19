@@ -7,9 +7,11 @@
 //      parcial por ancho). Arriba, a la izquierda, el rótulo de lo que deja, con una llave chica sobre lo lleno y su guía;
 //      a la derecha, la leyenda (qué vale un cuadro, qué es el gris y qué es el azul). Abajo, una llave de punta a punta
 //      con el costo del primer año.
-//   b  Dos áreas a escala: un cuadrado grande (el costo del primer año) y, en su esquina superior izquierda, uno chico
-//      con un área de G54 / G39 la del grande (lo que deja la lista). El rótulo de lo que deja, a la izquierda del chico
-//      con su guía; el costo, colgado de una llave a la derecha del grande; la leyenda, arriba.
+//   b  Dos áreas a escala: un rectángulo a todo el ancho (el costo del primer año) y, en su esquina superior izquierda,
+//      otro con la misma proporción de lados y un área de G54 / G39 la del grande (lo que deja la lista). Arriba y abajo,
+//      lo mismo que en a: el rótulo de lo que deja con su guía, la leyenda y la llave del costo.
+//      (Revisión: la b era un cuadrado en el centro, la misma composición que el intermedio objetado; ahora reparte a lo
+//      ancho como pidió el usuario.)
 // Las cifras son las de la conclusión (usd con 0 decimales). Ninguna cifra nueva: los cuadros y las áreas son proporción.
 
 import Vista from '../Plantilla.jsx'
@@ -17,7 +19,7 @@ import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { variante } from '../variantes.js'
 import { pctDirecto, usd } from '../../../e3/src/formato.js'
-import { ACC, CTX, FIN_GRIS, INK, Guia, Leyenda, Llave, LlaveH, TRAZO, anchoLeyenda, ancho, tam, useU } from '../svg.jsx'
+import { ACC, CTX, FIN_GRIS, INK, Guia, Leyenda, LlaveH, TRAZO, anchoLeyenda, ancho, tam, useU } from '../svg.jsx'
 
 const ID = 'V07'
 const A = DF.anclas
@@ -35,13 +37,13 @@ export const meta = { id: ID }
 function altoRotulo(u) {
   return tam('cat', u) * 1.3 + tam('valFoco', u) * 1.05
 }
-function Rotulo({ u, x, y, nombre, cifra, anchor = 'start', colorNombre = INK, pesoNombre = 600 }) {
+function Rotulo({ u, x, y, nombre, cifra }) {
   const fN = tam('cat', u)
   const fC = tam('valFoco', u)
   return (
     <g>
-      <text x={x} y={y + fN * 0.8} fontSize={fN} fontWeight={pesoNombre} fill={colorNombre} textAnchor={anchor}>{nombre}</text>
-      <text x={x} y={y + fN * 1.3 + fC * 0.8} fontSize={fC} fontWeight={700} fill={INK} textAnchor={anchor}>{cifra}</text>
+      <text x={x} y={y + fN * 0.8} fontSize={fN} fontWeight={600} fill={INK}>{nombre}</text>
+      <text x={x} y={y + fN * 1.3 + fC * 0.8} fontSize={fC} fontWeight={700} fill={INK}>{cifra}</text>
     </g>
   )
 }
@@ -63,6 +65,43 @@ function Leyenda2({ u, x, y, nota, items }) {
   )
 }
 
+// ---------------------------------------------------------------- lo común: arriba el rótulo y la leyenda, abajo el costo
+
+const GUIA = 42                                               // del rótulo al dibujo: la guía
+const Y_LLAVE = 18                                            // del dibujo a la llave del costo
+const altoArriba = (u) => Math.max(altoRotulo(u), altoLeyenda2(u))
+const altoAbajo = (u) => (Y_LLAVE + 8 + 16) * u + tam('valFoco', u)
+
+/** Arriba del dibujo (de x1 a x2, desde y): el rótulo de lo que deja a la izquierda y la leyenda a la derecha. La
+ *  leyenda sube 6 u para que sus dos renglones queden a la altura de los dos del rótulo. */
+function Arriba({ u, x1, x2, y, nombre, nota, items }) {
+  return (
+    <g>
+      <Rotulo u={u} x={x1} y={y} nombre={nombre} cifra={T_DEJA} />
+      <Leyenda2 u={u} x={x2 - anchoLeyenda2(u, nota, items)} y={y - 6 * u} nota={nota} items={items} />
+    </g>
+  )
+}
+
+/** Abajo del dibujo: la llave de punta a punta (x1 a x2, en y) y, centrado debajo de su pico, el costo del primer año
+ *  (nombre en CTX y cifra en tinta, en un renglón). */
+function Costo({ u, x1, x2, y, nombre }) {
+  const fCat = tam('cat', u)
+  const fVal = tam('valFoco', u)
+  const wNom = ancho(nombre, fCat, 400)
+  const wCif = ancho(T_COSTO, fVal, 700)
+  const sep = 16 * u
+  const x = (x1 + x2) / 2 - (wNom + sep + wCif) / 2
+  const yT = y + 8 * u + 16 * u + fVal * 0.8
+  return (
+    <g>
+      <LlaveH u={u} x1={x1} x2={x2} y={y} lado="abajo" />
+      <text x={x} y={yT} fontSize={fCat} fill={CTX}>{nombre}</text>
+      <text x={x + wNom + sep} y={yT} fontSize={fVal} fontWeight={700} fill={INK}>{T_COSTO}</text>
+    </g>
+  )
+}
+
 // ---------------------------------------------------------------- a: cuadrícula de 25 × 4 (o 20 × 5)
 
 /** Las dos formas de la cuadrícula de 100 cuadros. Va 25 × 4 (a todo el ancho en 16:9); 20 × 5 solo si da cuadros un
@@ -74,25 +113,21 @@ function Cuadricula({ w, h }) {
   const C = X.cuadros
   const gap = 8 * u
   const r = TRAZO.radio * u
-  const fCat = tam('cat', u)
-  const fVal = tam('valFoco', u)
   const items = [{ marca: 'contexto', texto: C.gris }, { marca: 'hecho', texto: C.azul }]
-  const wLey = anchoLeyenda2(u, C.cuadro, items)
-  const altoArriba = Math.max(altoRotulo(u), altoLeyenda2(u))
-  const guia = 42 * u                                         // del rótulo a la cuadrícula: guía y llave chica
-  const yLlave = 18 * u                                       // de la cuadrícula a la llave
-  const altoAbajo = yLlave + 8 * u + 16 * u + fVal
+  const arriba = altoArriba(u)
+  const guia = GUIA * u
+  const abajo = altoAbajo(u)
   // el lado del cuadro: a todo el ancho, salvo que el alto no alcance (el dibujo, a lo sumo el 90 % del lienzo)
-  const disp = 0.9 * h - altoArriba - guia - altoAbajo
+  const disp = 0.9 * h - arriba - guia - abajo
   const lado = ([c, f]) => Math.max(12 * u, Math.min((w - (c - 1) * gap) / c, (disp - (f - 1) * gap) / f))
   const [COLS, FILAS] = lado(FORMAS[1]) > 1.1 * lado(FORMAS[0]) ? FORMAS[1] : FORMAS[0]
   const s = lado([COLS, FILAS])
   const gw = COLS * s + (COLS - 1) * gap
   const gh = FILAS * s + (FILAS - 1) * gap
-  const total = altoArriba + guia + gh + altoAbajo
+  const total = arriba + guia + gh + abajo
   const y0 = Math.max(0, (h - total) / 2)
   const xG = (w - gw) / 2
-  const yG = y0 + altoArriba + guia
+  const yG = y0 + arriba + guia
   const cuadros = Array.from({ length: COLS * FILAS }, (_, i) => ({
     i,
     x: xG + (i % COLS) * (s + gap),
@@ -104,13 +139,6 @@ function Cuadricula({ w, h }) {
   const xFinAzul = xG + nLlenos * (s + gap) + (LLENOS - nLlenos) * s
   const xGuia = (xG + xFinAzul) / 2
   const yLlaveChica = yG - 12 * u
-  const yL = yG + gh + yLlave
-  // el costo, centrado debajo del pico de la llave: nombre en CTX y cifra en tinta, en un renglón
-  const wNom = ancho(C.costo, fCat, 400)
-  const wCif = ancho(T_COSTO, fVal, 700)
-  const sep = 16 * u
-  const xCosto = xG + gw / 2 - (wNom + sep + wCif) / 2
-  const yCosto = yL + 8 * u + 16 * u + fVal * 0.8
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       <title>{`${C.azul}: ${T_DEJA} · ${C.costo}: ${T_COSTO}`}</title>
@@ -129,64 +157,49 @@ function Cuadricula({ w, h }) {
           )}
         </g>
       ))}
-      {/* lo que deja la lista, arriba a la izquierda: llave chica sobre lo lleno y guía hasta el rótulo */}
-      <Rotulo u={u} x={xG} y={y0} nombre={C.deja} cifra={T_DEJA} />
+      <Arriba u={u} x1={xG} x2={xG + gw} y={y0} nombre={C.deja} nota={C.cuadro} items={items} />
+      {/* lo que deja la lista: llave chica sobre lo lleno y guía hasta el rótulo */}
       <LlaveH u={u} x1={xG} x2={xFinAzul} y={yLlaveChica} lado="arriba" />
       <Guia u={u} x1={xGuia} y1={y0 + altoRotulo(u) + 6 * u} x2={xGuia} y2={yLlaveChica - 8 * u} />
-      {/* la leyenda, arriba a la derecha */}
-      <Leyenda2 u={u} x={xG + gw - wLey} y={y0} nota={C.cuadro} items={items} />
       {/* el costo del primer año: los 100 cuadros, con la llave de punta a punta */}
-      <LlaveH u={u} x1={xG} x2={xG + gw} y={yL} lado="abajo" />
-      <text x={xCosto} y={yCosto} fontSize={fCat} fill={CTX}>{C.costo}</text>
-      <text x={xCosto + wNom + sep} y={yCosto} fontSize={fVal} fontWeight={700} fill={INK}>{T_COSTO}</text>
+      <Costo u={u} x1={xG} x2={xG + gw} y={yG + gh + Y_LLAVE * u} nombre={C.costo} />
     </svg>
   )
 }
 
-// ---------------------------------------------------------------- b: dos áreas a escala
+// ---------------------------------------------------------------- b: dos áreas a escala, a lo ancho
 
 function Areas({ w, h }) {
   const u = useU()
   const R = X.areas
   const r = TRAZO.radio * u
-  const fCat = tam('cat', u)
-  const fVal = tam('valFoco', u)
   const items = [{ marca: 'contexto', texto: R.gris }, { marca: 'hecho', texto: R.azul }]
-  // tres columnas: el rótulo de lo que deja (a la izquierda del rectángulo chico), el cuadrado grande, y la llave con
-  // el costo; la leyenda va arriba, sobre el cuadrado y la columna del costo
-  const colIzq = Math.max(ancho(R.deja, fCat, 600), ancho(T_DEJA, fVal, 700))
-  const hIzq = 36 * u
-  const colDer = 16 * u + 16 * u + 16 * u + Math.max(ancho(R.costo, fCat, 400), ancho(T_COSTO, fVal, 700))
-  const wLey = anchoLeyenda2(u, R.escala, items)
-  const altoArriba = altoLeyenda2(u)
-  const hArriba = 28 * u
-  const lado = Math.max(40 * u, Math.min(0.9 * h - altoArriba - hArriba, w - colIzq - hIzq - colDer))
-  const anchoTotal = colIzq + hIzq + Math.max(lado + colDer, wLey)
-  const x0 = Math.max(0, (w - anchoTotal) / 2)
-  const xR = x0 + colIzq + hIzq
-  const total = altoArriba + hArriba + lado
+  const arriba = altoArriba(u)
+  const guia = GUIA * u
+  const abajo = altoAbajo(u)
+  // el rectángulo del costo: a todo el ancho; su alto, lo que deje el resto (el dibujo, a lo sumo el 90 % del lienzo),
+  // y nunca más de la mitad del ancho, para que siga siendo un rectángulo apaisado
+  const W = w
+  const H = Math.max(60 * u, Math.min(0.9 * h - arriba - guia - abajo, W / 2))
+  const total = arriba + guia + H + abajo
   const y0 = Math.max(0, (h - total) / 2)
-  const yR = y0 + altoArriba + hArriba
-  // lo que deja: un cuadrado en la esquina, con un área de DEJA / COSTO la del grande
-  const ls = lado * Math.sqrt(DEJA / COSTO)
-  const xLlave = xR + lado + 16 * u
-  const xDer = xLlave + 32 * u
-  const yChico = yR + ls / 2
-  const yRot = Math.max(y0 + altoArriba + 6 * u, yChico - altoRotulo(u) / 2)
+  const xR = (w - W) / 2
+  const yR = y0 + arriba + guia
+  // lo que deja: la misma proporción de lados, con un área de DEJA / COSTO la del grande
+  const k = Math.sqrt(DEJA / COSTO)
+  const ws = W * k
+  const hs = H * k
+  const xGuia = xR + ws / 2
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       <title>{`${R.azul}: ${T_DEJA} · ${R.costo}: ${T_COSTO}`}</title>
-      <rect x={xR} y={yR} width={lado} height={lado} rx={r} fill={FIN_GRIS} />
-      <rect x={xR} y={yR} width={ls} height={ls} rx={r} fill={ACC} />
-      {/* la leyenda, arriba, desde el borde izquierdo del cuadrado grande */}
-      <Leyenda2 u={u} x={xR} y={y0} nota={R.escala} items={items} />
-      {/* lo que deja la lista, a la izquierda del cuadrado chico, con su guía */}
-      <Rotulo u={u} x={xR - hIzq} y={yRot} nombre={R.deja} cifra={T_DEJA} anchor="end" />
-      <Guia u={u} x1={xR - hIzq + 10 * u} y1={yChico} x2={xR - 4 * u} y2={yChico} />
-      {/* el costo del primer año: el cuadrado grande entero, con la llave a la derecha */}
-      <Llave u={u} x={xLlave} y1={yR} y2={yR + lado} lado="der" />
-      <Rotulo u={u} x={xDer} y={yR + lado / 2 - altoRotulo(u) / 2} nombre={R.costo} cifra={T_COSTO} colorNombre={CTX}
-              pesoNombre={400} />
+      <rect x={xR} y={yR} width={W} height={H} rx={r} fill={FIN_GRIS} />
+      <rect x={xR} y={yR} width={ws} height={hs} rx={r} fill={ACC} />
+      <Arriba u={u} x1={xR} x2={xR + W} y={y0} nombre={R.deja} nota={R.escala} items={items} />
+      {/* lo que deja la lista: guía del rótulo al rectángulo chico */}
+      <Guia u={u} x1={xGuia} y1={y0 + altoRotulo(u) + 6 * u} x2={xGuia} y2={yR - 6 * u} />
+      {/* el costo del primer año: el rectángulo grande entero, con la llave de punta a punta */}
+      <Costo u={u} x1={xR} x2={xR + W} y={yR + H + Y_LLAVE * u} nombre={R.costo} />
     </svg>
   )
 }

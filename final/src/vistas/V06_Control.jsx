@@ -16,7 +16,7 @@ import { textosDe } from '../textos.js'
 import { fijo, pct } from '../../../e3/src/formato.js'
 import { variante } from '../variantes.js'
 import {
-  ACC, CONTORNO, CTX, FIN_GRIS, INK, PISTA, SUP, Leyenda, Llave, LlaveH, Renglones, ancho, anchoLeyenda, envolver,
+  ACC, CONTORNO, CTX, FIN_GRIS, INK, SUP, Leyenda, Llave, LlaveH, Renglones, ancho, anchoLeyenda, envolver,
   rectRedondo, tam, useU,
 } from '../svg.jsx'
 
@@ -190,8 +190,9 @@ function Flujo({ w, h }) {
       {/* bandas, detrás de los nodos */}
       <Banda x1={xA2} a1={yA} b1={yA + ALTO * k} x2={xD} a2={gAlto.y} b2={gAlto.y + gAlto.alto}
              fill={FIN_GRIS} opacidad={0.5} />
+      {/* más clara que las que llegan a un grupo, pero visible proyectada (PISTA al 70 % se perdía) */}
       <Banda x1={xA2} a1={yA + ALTO * k} b1={yA + LISTA * k} x2={xB} a2={yB} b2={yB + RESTO * k}
-             fill={PISTA} opacidad={0.7} />
+             fill={FIN_GRIS} opacidad={0.3} />
       <Banda x1={xB2} a1={yB} b1={yB + CONTROL * k} x2={xD} a2={gCtl.y} b2={gCtl.y + gCtl.alto}
              fill={ACC} opacidad={0.75} />
       <Banda x1={xB2} a1={yB + CONTROL * k} b1={yB + (CONTROL + CON) * k} x2={xD} a2={gCon.y} b2={gCon.y + gCon.alto}
@@ -256,7 +257,8 @@ function Puntos({ w, h }) {
     let p = Math.min(40 * u, w / (sumCols + huecos))
     let lay = null
     for (let vuelta = 0; vuelta < 3; vuelta++) {
-      const nombres = GRUPOS.map((g, i) => envolver(g.nombre, Math.max(cols[i] * p, 120 * u), fNom, 600))
+      // renglones parejos: a 4:3 «En el 20 % de» / «mayor facturación», no una palabra sola abajo
+      const nombres = GRUPOS.map((g, i) => parejos(g.nombre, Math.max(cols[i] * p, 120 * u), fNom, 600))
       const altoCab = fCant * 1.15 + Math.max(...nombres.map((l) => l.length)) * fNom * 1.2 + 12 * u
       const altoLey = 26 * u + 22 * u
       const altoLista = fLlave * 1.2 + 10 * u + 10 * u + 16 * u

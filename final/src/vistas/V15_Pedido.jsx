@@ -25,7 +25,7 @@ import { textosDe } from '../textos.js'
 import { NBSP, fijo, pct, usd } from '../../../e3/src/formato.js'
 import { variante } from '../variantes.js'
 import {
-  ACC, CTX, EJE, FIN_GRIS, INK, PISTA, SUP, TRAZO, Compuerta, Leyenda, LlaveH, ancho, envolver, escalaLinda,
+  ACC, CTX, EJE, FIN_GRIS, INK, PISTA, SUP, TRAZO, Compuerta, Leyenda, LlaveH, Muestra, ancho, envolver, escalaLinda,
   escalaSemanas, punteado, rectRedondo, tam, useU,
 } from '../svg.jsx'
 
@@ -104,9 +104,11 @@ function MiniRegla({ u, x, y, w, h }) {
   const sx = (q) => xa + q * (xb - xa)
   const yNum = y + h - f
   const yEje = yNum - 9 * u
-  const gap = 6 * u
-  const y1 = y + f * 1.5
-  const tb = Math.min(30 * u, (yEje - 7 * u - y1 - gap) / 2)
+  // las dos barras con paso de al menos 1,15 renglones, para que «regla» y «modelo» no se toquen en una caja baja (b)
+  const y1 = y + f * 1.25
+  const disp = yEje - 7 * u - y1
+  const tb = Math.min(30 * u, (disp - 6 * u) / 2, disp - f * 1.15)
+  const gap = Math.max(6 * u, f * 1.15 - tb)
   const filas = [
     { t: L.regla, q: v('J03.regla'), c: ACC },
     { t: L.modelo, q: v('J03.logistica'), c: FIN_GRIS },
@@ -130,7 +132,7 @@ function MiniRegla({ u, x, y, w, h }) {
           </g>
         )
       })}
-      <line x1={xj} x2={xj} y1={y1 - 5 * u} y2={yEje} stroke={INK} strokeWidth={2.5 * u} strokeDasharray={punteado(u)} />
+      <line x1={xj} x2={xj} y1={y1 - 2 * u} y2={yEje} stroke={INK} strokeWidth={2.5 * u} strokeDasharray={punteado(u)} />
       <line x1={xa} x2={xb} y1={yEje} y2={yEje} stroke={EJE} strokeWidth={TRAZO.base * u} />
       {[0, 1].map((q) => (
         <g key={q}>
@@ -147,15 +149,19 @@ function MiniRegla({ u, x, y, w, h }) {
 }
 
 /** 3 Economía: la cuadrícula de V07. Los cien cuadros son el costo del primer año (G39); lo lleno en acento, lo que
- *  deja la lista en un año (G54), con la parte de un cuadro que le toca. */
+ *  deja la lista en un año (G54), con la parte de un cuadro que le toca. Sin rótulo arriba: «deja la lista» ya está en
+ *  el punto clave y la leyenda dice qué es el acento. Los cien van en 25 × 4 (como V07) o en 20 × 5, lo que deje el
+ *  cuadro más grande en la caja. */
 function MiniCuadros({ u, x, y, w, h }) {
   const L = P.economia.mini
   const f = tam(20, u)
-  const cols = 25, filas = 4
   const g = 2.5 * u
-  const yg = y + f * 1.5
+  const yg = y
   const yPie = y + h - f * 1.15
-  const s = Math.min((w - (cols - 1) * g) / cols, (yPie - 14 * u - yg - (filas - 1) * g) / filas)
+  const altoLibre = yPie - 14 * u - yg
+  const lado = ([c, r]) => Math.min((w - (c - 1) * g) / c, (altoLibre - (r - 1) * g) / r)
+  const [cols, filas] = [[25, 4], [20, 5]].reduce((a, b) => (lado(b) > lado(a) ? b : a))
+  const s = lado([cols, filas])
   const anchoG = cols * s + (cols - 1) * g
   const altoG = filas * s + (filas - 1) * g
   const llenos = (v('G54') / v('G39')) * cols * filas
@@ -165,7 +171,6 @@ function MiniCuadros({ u, x, y, w, h }) {
   const cy = (i) => yg + Math.floor(i / cols) * (s + g)
   return (
     <g>
-      <text x={x} y={y} fontSize={f} fontWeight={600} fill={INK} dominantBaseline="hanging">{L.deja}</text>
       {Array.from({ length: cols * filas }, (_, i) => (
         <rect key={i} x={cx(i)} y={cy(i)} width={s} height={s} rx={1.5 * u} fill={i < n ? ACC : FIN_GRIS} />
       ))}
@@ -337,8 +342,33 @@ function RotuloBloque({ u, x, y, texto, color = CTX, filete = ACC }) {
   )
 }
 
-/** La leyenda de los dibujos mínimos: acento, lo que cuenta la cifra; gris, el resto. */
+/** La leyenda de los dibujos mínimos: acento, lo que mide la cifra; gris, el resto. */
 const LEY = [{ marca: 'hecho', texto: X.ley.cifra }, { marca: 'contexto', texto: X.ley.resto }]
+
+/** La misma leyenda en columna, para un hueco angosto de ancho w (b): un ítem debajo del otro, el texto envuelto a la
+ *  derecha de su muestra. (x, y): la esquina de arriba a la izquierda. */
+function LeyendaColumna({ u, x, y, w, items, f = 22 }) {
+  const fz = tam(f, u)
+  const xt = fz + 10 * u
+  let yy = y
+  return (
+    <g>
+      {items.map((it, i) => {
+        const ls = envolver(it.texto, w - xt, fz)
+        const c = yy + fz * 0.6
+        yy += ls.length * fz * 1.2 + 14 * u
+        return (
+          <g key={i}>
+            <Muestra u={u} marca={it.marca} x={x + fz / 2} y={c} s={fz} />
+            {ls.map((l, j) => (
+              <text key={j} x={x + xt} y={c + j * fz * 1.2} fontSize={fz} fill={INK} dominantBaseline="central">{l}</text>
+            ))}
+          </g>
+        )
+      })}
+    </g>
+  )
+}
 
 // ---------------------------------------------------------------- panel del pedido (tinta llena, texto blanco)
 
@@ -535,11 +565,15 @@ function medirPasos(u, w) {
   return { alto, el }
 }
 
-/** Por qué con este equipo: tres renglones (se envuelven), cada uno con un filete blanco a la izquierda. */
+/** Por qué con este equipo: tres motivos, cada uno con un filete blanco a la izquierda; la cabeza en blanco 700 y el
+ *  resto debajo, más tenue, en renglones parejos (sin una palabra sola al final). */
 function medirPorque(u, w, f = tam(24, u)) {
   const xt = 22 * u
-  const items = X.porque.items.map((t) => envolver(t, w - xt, f))
-  const gap = 14 * u
+  const items = X.porque.items.map((it) => [
+    ...parejo(it.cabeza, w - xt, f, 700).map((t) => ({ t, peso: 700, op: 1 })),
+    ...parejo(it.resto, w - xt, f, 400).map((t) => ({ t, peso: 400, op: BLANCO_2 })),
+  ])
+  const gap = 16 * u
   const alto = items.reduce((s, l) => s + l.length * f * 1.22, 0) + gap * (items.length - 1)
   const el = (x, y) => {
     let yy = y
@@ -552,7 +586,8 @@ function medirPorque(u, w, f = tam(24, u)) {
             <g key={i}>
               <rect x={x} y={y0 + f * 0.1} width={5 * u} height={ls.length * f * 1.22 - f * 0.2} fill={SUP} fillOpacity={0.6} />
               {ls.map((l, j) => (
-                <text key={j} x={x + xt} y={y0 + j * f * 1.22} fontSize={f} fill={SUP} dominantBaseline="hanging">{l}</text>
+                <text key={j} x={x + xt} y={y0 + j * f * 1.22} fontSize={f} fontWeight={l.peso} fill={SUP}
+                      fillOpacity={l.op} dominantBaseline="hanging">{l.t}</text>
               ))}
             </g>
           )
@@ -647,7 +682,7 @@ function Tablero({ w, h, u }) {
   const fT = letraTitulo(u, w - 2 * M - mar.ancho - 48 * u, 58)
   const yTit = top + mar.alto * 0.5 + fT * 0.36
   // lo que mostramos: rótulo y leyenda, y la fila de piezas
-  const yCab = top + mar.alto + 30 * u + extra * 0.05
+  const yCab = top + mar.alto + 36 * u + extra * 0.05
   const yPiezas = yCab + 24 * u
   const n = PIEZAS.length
   const gapP = 22 * u
@@ -682,7 +717,7 @@ function Tablero({ w, h, u }) {
   const fB = tam(24, u)
   const padB = 28 * u
   const lwB = Math.max(...X.balance.map((b) => ancho(b.que, fB, 700))) + 22 * u
-  const filasB = X.balance.map((b) => ({ ...b, lineas: envolver(b.texto, wBal - 2 * padB - lwB, fB) }))
+  const filasB = X.balance.map((b) => ({ ...b, lineas: parejo(b.texto, wBal - 2 * padB - lwB, fB) }))
   const altoB = filasB.reduce((s, r) => s + r.lineas.length * fB * 1.22, 0)
   const yB0 = yAbajo + padB + 20 * u
   const gB = Math.max(16 * u, (hAb - padB - 20 * u - padB - altoB) / filasB.length)
@@ -759,7 +794,7 @@ function Camino({ w, h, u }) {
   const fB = tam(24, u)
   const gapB = 26 * u
   const colB = (wIzq - 3 * gapB) / 4
-  const filasB = X.balance.map((b) => ({ ...b, lineas: envolver(b.texto, colB, fB) }))
+  const filasB = X.balance.map((b) => ({ ...b, lineas: parejo(b.texto, colB, fB) }))
   const altoBal = 22 * u + 14 * u + 3 * u + 12 * u + fB * 1.3 + Math.max(...filasB.map((b) => b.lineas.length)) * fB * 1.22
   // alto de las estaciones: lo que queda entre el título y el balance
   const yArr = top + mar.alto + 24 * u + extra * 0.04
@@ -786,6 +821,11 @@ function Camino({ w, h, u }) {
   const ys = []
   let yy = top + padP
   for (const b of [20 * u, idea.alto, altoComp, pasos.alto, 38 * u + porq.alto]) { ys.push(yy); yy += b + gP }
+  // la leyenda de los dibujos va junto a las estaciones (no sobre el balance, que no tiene colores): en el hueco de
+  // abajo, a la derecha de la última estación de abajo, a la altura de los dibujos; si no entra, en la fila del balance
+  const iAbajo = n % 2 ? n - 2 : n - 1
+  const xLey = xNodo(iAbajo) + wE / 2 + gapE
+  const enHueco = xIzq1 - xLey >= 120 * u
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       {mar.el(M, top)}
@@ -810,8 +850,10 @@ function Camino({ w, h, u }) {
         )
       })}
       {/* lo que nos llevamos */}
+      {enHueco
+        ? <LeyendaColumna u={u} x={xLey} y={yAba + mp.yMini} w={xIzq1 - xLey} items={LEY} />
+        : <Leyenda u={u} x={xIzq1} y={yBal + 11 * u} items={LEY} anchor="end" f={22} />}
       <RotuloBloque u={u} x={M} y={yBal + 11 * u} texto={X.llevamos} />
-      <Leyenda u={u} x={xIzq1} y={yBal + 11 * u} items={LEY} anchor="end" f={22} />
       {filasB.map((b, i) => {
         const x = M + i * (colB + gapB)
         const y0 = yBal + 22 * u + 14 * u

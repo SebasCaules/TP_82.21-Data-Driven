@@ -6,6 +6,8 @@ import { DF } from '../datos_final.js'
 const VT = DF.tablas.ventas_2025
 
 export default {
+  // un solo nombre para el control: la subfila y el gráfico dicen «Control del mes»
+  fuera: { linea: 'debajo del control' },
   barras: {
     control: 'Control del mes',
     eje: `Operaciones del mes sobre el mismo mes de ${VT.anio_anterior} (%)`,

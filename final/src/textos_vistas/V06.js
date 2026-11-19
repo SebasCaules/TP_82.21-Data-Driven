@@ -8,7 +8,8 @@ const v = (id) => DF.anclas[id].valor
 export default {
   grupos: {
     lista: 'Lista del mes',
-    alto: `${pct(v('G49.alto_valor'), 0)} de mayor facturación`,
+    // «En el»: los 153 son los de la lista que están en el 20 % de mayor facturación del corte, no el 20 % de la lista
+    alto: `En el ${pct(v('G49.alto_valor'), 0)} de mayor facturación`,
     alto_accion: 'se contacta entero, sin sorteo',
     sorteo: 'Sorteo al azar',
     control: 'Control',

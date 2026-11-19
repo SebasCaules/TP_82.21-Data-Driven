@@ -16,7 +16,7 @@ export default {
   mostramos: 'Lo que mostramos',
   llevamos: 'Lo que nos llevamos',
   pedimos: 'Lo que pedimos',
-  ley: { cifra: 'lo que cuenta la cifra', resto: 'el resto' },
+  ley: { cifra: 'lo que mide la cifra', resto: 'el resto' },
   piezas: {
     datos: {
       desc: 'ventas con cliente',
@@ -32,7 +32,7 @@ export default {
       despues: 'por año',
       desc: 'deja la lista',
       clave: `el primer año cuesta ${usd(v('G39'))}`,
-      mini: { deja: 'deja la lista', costo: 'costo del primer año' },
+      mini: { costo: 'costo del primer año' },
     },
     legal: {
       desc: 'acciones legales antes de la primera lista',
@@ -62,10 +62,11 @@ export default {
   desenlace: { accion: `Semana ${fijo(v('G63.semana_decision'))}:`, dato: 'decide María G.' },
   porque: {
     titulo: 'Por qué con este equipo',
+    // cabeza en 700 y resto debajo, más tenue: los tres motivos se leen de un vistazo
     items: [
-      'No vendemos el proyecto: hoy no se paga, y lo dijimos.',
-      'Una planilla que corre Marketing: sin modelo, sin licencias, sin integrar el CRM.',
-      `La regla de pase se fija antes de empezar: ${fijo(v('G67.con_descuento'), 2)} puntos.`,
+      { cabeza: 'No vendemos el proyecto:', resto: 'hoy no se paga, y lo dijimos.' },
+      { cabeza: 'Una planilla que corre Marketing:', resto: 'sin modelo, sin licencias, sin integrar el CRM.' },
+      { cabeza: 'La regla de pase se fija antes de empezar:', resto: `${fijo(v('G67.con_descuento'), 2)} puntos.` },
     ],
   },
 }

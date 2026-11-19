@@ -6,10 +6,12 @@ export default {
   dos: {
     izq: {
       titulo: 'Contra la práctica actual',
-      hasta: 'Hasta la línea de base',
-      sobre: 'Sobre la línea de base',
+      hasta: 'Hasta la práctica actual',
+      sobre: 'Más que la práctica actual',
       base: 'Práctica actual',
-      baseNota: 'línea de base',
+      baseNota: 'lo que acierta hoy',
+      // la línea de base del proyecto es la regla (E3, decisión 6 de modelado-etapa-1); la práctica actual es referencia
+      reglaNota: 'línea de base',
     },
     der: {
       titulo: 'Modelo menos regla',
@@ -26,6 +28,7 @@ export default {
     hoy: 'Práctica actual',
     regla: 'Regla del umbral',
     modelo: 'Modelo',
+    reglaNota: 'línea de base',
     juntos: 'Regla y modelo',
     juntosNota: 'ampliado abajo',
     tramo: 'Tramo ampliado',

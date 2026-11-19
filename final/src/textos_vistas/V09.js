@@ -15,6 +15,8 @@ export default {
     zona_sin: `Pasa la rama sin${NBSP}descuento`,
     zona_dos: `Pasan las dos${NBSP}ramas`,
     llave: 'Lo que falta para pasar',
+    // versión a: la llave llega al primer umbral (8,82), no al de pase (11,04) del título; dice hasta dónde llega
+    llave_a: 'Lo que falta para que pase una rama',
     // versión b: un carril por rama
     rama_con: 'Rama con descuento',
     rama_sin: 'Rama sin descuento',
@@ -23,6 +25,8 @@ export default {
     // de cada 100 (G68)
     ve: 'el piloto lo ve',
     de_cada: DE_CADA,
+    // «89 de cada 100 veces», como en las notas y en la leyenda de los círculos
+    veces: 'veces',
     // leyendas
     ley_hoy: 'Con lo observado',
     ley_umbral: 'Umbral de pase',

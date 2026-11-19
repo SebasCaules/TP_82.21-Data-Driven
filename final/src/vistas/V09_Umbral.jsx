@@ -50,7 +50,7 @@ const PASO_P = 24
 const EJE_F = 23 // letra de los números del eje (la de EjeX), para reservar su medio ancho en los bordes
 
 const conUnidad = (v) => `${fijo(v, 2)} ${B.unidad}`
-const veces = (p) => `${B.ve} ${fijo(p)} ${B.de_cada}`
+const veces = (p) => `${B.ve} ${fijo(p)} ${B.de_cada} ${B.veces}`
 const anchoPuntos = (u) => (PUNTOS - 1) * PASO_P * u + 2 * R_P * u
 
 /** Segmento de un círculo lleno desde la izquierda hasta la fracción f de su diámetro. */
@@ -89,12 +89,12 @@ const muestraHoy = ({ x, y, s }) => <rect x={x - s / 2} y={y - s / 2} width={s} 
 
 /** Bandera de un valor: rótulo (CTX 600), valor (INK 700) y, si hay potencia, los diez círculos y «el piloto lo ve…».
  *  (x, y): el borde superior y el lado del asta; anchor 'start' (a la derecha del asta) o 'end'. */
-function Bandera({ u, x, y, rotulo, valor, potencia, anchor = 'start', m }) {
+function Bandera({ u, x, y, rotulo, valor, potencia, anchor = 'start', m, color = INK }) {
   return (
     <g>
       <text x={x} y={y} fontSize={m.fR} fontWeight={600} fill={CTX} textAnchor={anchor}
             dominantBaseline="hanging">{rotulo}</text>
-      <text x={x} y={y + m.hL1} fontSize={m.fV} fontWeight={700} fill={INK} textAnchor={anchor}
+      <text x={x} y={y + m.hL1} fontSize={m.fV} fontWeight={700} fill={color} textAnchor={anchor}
             dominantBaseline="hanging">{valor}</text>
       {potencia != null && (
         <>
@@ -176,7 +176,7 @@ function DibujoA({ w, h }) {
       <rect x={x0} y={yP} width={xHoy - x0} height={pista} fill={ACC} />
       <Umbral u={u} x1={xHoy - (TRAZO.umbral * u) / 2} x2={xHoy - (TRAZO.umbral * u) / 2} y1={yHoy} y2={yP}
               color={ACC} />
-      <Bandera u={u} x={xHoy + gap} y={yHoy} rotulo={B.hoy} valor={conUnidad(HOY)} m={m} />
+      <Bandera u={u} x={xHoy + gap} y={yHoy} rotulo={B.hoy} valor={conUnidad(HOY)} m={m} color={ACC} />
 
       {/* umbrales: línea de la bandera al eje */}
       <Umbral u={u} x1={xs(SIN)} x2={xs(SIN)} y1={yBan} y2={yE} />
@@ -187,7 +187,7 @@ function DibujoA({ w, h }) {
 
       {/* lo que falta: llave de lo observado al primer umbral */}
       <LlaveH u={u} x1={xHoy + 4 * u} x2={xs(SIN) - 4 * u} y={yLl} lado="arriba" />
-      <text x={xLl} y={yLl - 18 * u} fontSize={fR} fontWeight={600} fill={INK} textAnchor="middle">{B.llave}</text>
+      <text x={xLl} y={yLl - 18 * u} fontSize={fR} fontWeight={600} fill={INK} textAnchor="middle">{B.llave_a}</text>
 
       <EjeX u={u} x0={x0} x1={x1} y={yE} min={0} max={TOPE_A} marcas={ESC_A.marcas} formato={(v) => fijo(v)}
             titulo={B.eje} />

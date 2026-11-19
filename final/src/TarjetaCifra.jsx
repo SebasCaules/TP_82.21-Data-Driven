@@ -17,7 +17,7 @@ function CifraAntes({ antes, valor, sec }) {
 }
 
 /** Una cifra de la subfila: rótulo arriba (o al lado, si va sola) y valor con su unidad al 0,6, delante o detrás. */
-function SubCifra({ rotulo, valor, antes, title }) {
+function SubCifra({ rotulo, valor, antes, title, linea }) {
   const [moneda, n, unidad] = partirCifra(valor)
   const delante = antes ?? moneda
   return (
@@ -28,6 +28,7 @@ function SubCifra({ rotulo, valor, antes, title }) {
         {n}
         {unidad && <span className="fin-sub-u">{unidad}</span>}
       </span>
+      {linea && <span className="fin-sub-linea">{linea}</span>}
     </div>
   )
 }
@@ -45,7 +46,7 @@ export default function TarjetaCifra({ rotulo, valor, linea, title, antes, centr
       </div>
       {conSub && (
         <div className={`fin-sub fin-sub-${sub.length}`}>
-          {sub.map((s) => <SubCifra key={s.clave ?? s.rotulo} {...s} />)}
+          {sub.map((s) => <SubCifra key={s.clave ?? s.rotulo} {...s} linea={sub.length === 1 ? s.title : undefined} />)}
         </div>
       )}
     </div>

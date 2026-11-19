@@ -15,7 +15,7 @@ export default {
     },
   },
   cascada: {
-    columnas: ['Filas del extracto', 'Repetidas', 'Sin cliente', 'Devoluciones', 'Entran a la lista'],
+    columnas: ['Extracto', 'Repetidas', 'Sin cliente', 'Devoluciones', 'Entran a la lista'],
     ley: {
       total: 'Extracto',
       salen: 'Salen',

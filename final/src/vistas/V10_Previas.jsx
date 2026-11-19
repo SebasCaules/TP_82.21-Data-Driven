@@ -11,7 +11,7 @@
 //     0.8); desde el hito, la flecha gris «hecha, espera la primera lista» hasta la compuerta;
 //   - la compuerta, el foco y el único acento: la semana de la primera lista llena en ACC en la tira y una barra vertical
 //     fuerte que baja hasta la última fila, a la que llegan las cinco flechas.
-// Leyenda arriba a la izquierda (rombo, flecha, barra). Al pasar el mouse por una fila, la franja se realza; al entrar a
+// Leyenda arriba a la izquierda (rombo y flecha; la barra lleva su rótulo encima). Al pasar el mouse por una fila, la franja se realza; al entrar a
 // la vista, los hitos aparecen semana a semana y sus flechas corren a la compuerta (CSS_ENTRADA, abajo). La banda y la
 // conclusión no cambian: puntaje legal (H40), datos personales (tabla legal) y las acciones previas (legal_previas.n).
 
@@ -21,14 +21,18 @@ import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
 import { ACC, CTX, EJE, INK, PISTA, SUP, Compuerta, Flecha, FranjasFila, Leyenda, anchoLeyenda, ancho, duro,
-  escalaSemanas, tam, useU } from '../svg.jsx'
+  escalaSemanas, inicial, tam, useU } from '../svg.jsx'
 
 const ID = 'V10'
 const A = DF.anclas
 const T = DF.tablas
 const X = textosDe(ID)
 const G = X.grafico
-const ACCIONES = T.legal_previas.acciones.map((a) => ({ ...a, ...X.acciones[a.codigo] }))
+// rotuloQuien: el responsable como rótulo de fila, con mayúscula inicial («Asesor legal de Casa Óga», como «María G.»)
+const ACCIONES = T.legal_previas.acciones.map((a) => {
+  const t = { ...a, ...X.acciones[a.codigo] }
+  return { ...t, rotuloQuien: inicial(duro(t.quien)) }
+})
 const SEM_LISTA = T.calendario.primera_lista.semana
 const proteccion = T.legal.find((x) => x.id === 'proteccion_datos').puntaje
 const sobre = (n, d = 0) => `${fijo(n, d)}[[/${fijo(T.escala_tecnica.hasta)}]]`
@@ -47,7 +51,7 @@ const LLENA = 0.9
 // Entrada (solo en pantalla y sin movimiento reducido; impresión y capturas ven el estado final): la barra de la
 // compuerta baja desde la semana de la primera lista, después cada hito aparece en el orden de su semana y su flecha
 // corre hasta la compuerta. Dura menos de un segundo y medio. ANIMAR = false la apaga.
-const ANIMAR = true
+const ANIMAR = false
 const CSS_ENTRADA = `@media screen and (prefers-reduced-motion: no-preference) {
   .v10-compuerta { animation: v10-baja 420ms cubic-bezier(.33, 1, .68, 1) both; transform-box: fill-box; transform-origin: center top; }
   .v10-hito { animation: v10-entra 380ms cubic-bezier(.16, 1, .3, 1) var(--d) both; transform-box: fill-box; transform-origin: center; }
@@ -59,12 +63,12 @@ const CSS_ENTRADA = `@media screen and (prefers-reduced-motion: no-preference) {
 /** Demora de la entrada de un hito (s), por su semana; la flecha sale 0,18 s después. */
 const demora = (semana) => 0.3 + (semana - 1) * 0.16
 
-/** Muestras de la leyenda: el rombo del hito en tinta, la flecha gris y la barra de la compuerta en ACC. */
+/** Muestras de la leyenda: el rombo del hito en tinta y la flecha gris. La compuerta no va en la leyenda: lleva su rótulo
+ *  («Primera lista») encima, y repetirlo en la leyenda, en el mismo renglón, se leía dos veces. */
 const muestraRombo = ({ u, x, y, s }) => <Compuerta u={u} x={x} y={y} s={s / u} estado="curso" />
 const muestraFlecha = ({ u, x, y, s }) => (
   <Flecha u={u} x1={x - s * 0.8} x2={x + s / 2} y={y} grosor={s / u / 2} punta={s / u / 2.2} estado="contexto" />
 )
-const muestraBarra = ({ u, x, y, s }) => <rect x={x - (M.barra * u) / 2} y={y - s / 2} width={M.barra * u} height={s} fill={ACC} />
 
 /** Tira de semanas: un cuadro en forma de flecha por semana, con su número; la semana de la compuerta llena en ACC con el
  *  número en blanco. */
@@ -104,7 +108,7 @@ function Dibujo({ w, h }) {
 
   // columna de acciones: la acción más larga (o su responsable) y el hueco mínimo para la guía punteada
   const anchoAccion = (a) => ancho(a.que, fA, 600)
-  const col = pad + Math.max(...ACCIONES.map((a) => Math.max(anchoAccion(a), ancho(duro(a.quien), fQ, 400))))
+  const col = pad + Math.max(...ACCIONES.map((a) => Math.max(anchoAccion(a), ancho(a.rotuloQuien, fQ, 400))))
   const x0 = col + M.hueco * u
   // el rótulo de la compuerta, centrado en la semana de la primera lista, entra en el lienzo
   const anchoPrimera = ancho(G.primera, fP, 700)
@@ -116,7 +120,6 @@ function Dibujo({ w, h }) {
   const ley = [
     { marca: muestraRombo, texto: G.ley.vence },
     { marca: muestraFlecha, texto: G.ley.hecha },
-    { marca: muestraBarra, texto: G.ley.lista },
   ]
   const leyArriba = anchoLeyenda(u, ley) + 32 * u <= xG - anchoPrimera / 2
 
@@ -137,7 +140,7 @@ function Dibujo({ w, h }) {
 
   // títulos de la columna y del eje, en el renglón de la tira
   const yT = yTira + hTira / 2
-  const titCol = pad + ancho(G.columna, fT, 600) + 24 * u <= x0 - 14 * u - ancho(G.eje, fT, 600)
+  const titCol = pad + ancho(G.columna, fT, 600) + 24 * u <= x0 - 22 * u - ancho(G.eje, fT, 600)
 
   const filas = ACCIONES.map((a, i) => {
     const yb = yFilas + i * alto + (alto - bloque) / 2
@@ -161,7 +164,7 @@ function Dibujo({ w, h }) {
       {titCol && (
         <text x={pad} y={yT} fontSize={fT} fontWeight={600} fill={CTX} dominantBaseline="central">{G.columna}</text>
       )}
-      <text x={x0 - 14 * u} y={yT} fontSize={fT} fontWeight={600} fill={CTX} textAnchor="end"
+      <text x={x0 - 22 * u} y={yT} fontSize={fT} fontWeight={600} fill={CTX} textAnchor="end"
             dominantBaseline="central">{G.eje}</text>
       <TiraSemanas u={u} S={S} y={yTira} alto={hTira} foco={SEM_LISTA} />
 
@@ -173,7 +176,7 @@ function Dibujo({ w, h }) {
             <title>{G.ayuda(a.que, a.semana, a.quien)}</title>
             <rect x={0} y={yFilas + a.i * alto} width={xFin} height={alto} fill="transparent" />
             <text x={pad} y={a.yA} fontSize={fA} fontWeight={600} fill={INK} dominantBaseline="central">{a.que}</text>
-            <text x={pad} y={a.yQ} fontSize={fQ} fill={CTX} dominantBaseline="hanging">{duro(a.quien)}</text>
+            <text x={pad} y={a.yQ} fontSize={fQ} fill={CTX} dominantBaseline="hanging">{a.rotuloQuien}</text>
             {a.xS - r - 8 * u > xGuia && (
               <line x1={xGuia} x2={a.xS - r - 8 * u} y1={a.yA} y2={a.yA} stroke={EJE} strokeWidth={2 * u}
                     strokeDasharray={`${0.1 * u} ${7 * u}`} strokeLinecap="round" />

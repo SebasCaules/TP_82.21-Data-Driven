@@ -102,7 +102,9 @@ function Dibujo({ w, h }) {
     r ??= { p: pad, fn: f.nombre, nombre: [l.nombre], desc: [], dentro: false, conDesc: false }
     return { ...l, xi, xf, monto, ...r }
   })
-  const altoTexto = (t, desc) => pad + f.monto * lh.monto + 6 * u + t.nombre.length * t.fn * lh.nombre
+  // los nombres ocupan el alto del más largo: «qué compra» arranca en el mismo renglón en todos los tramos
+  const altoNombre = Math.max(0, ...tramos.filter((t) => t.dentro).map((t) => t.nombre.length * t.fn * lh.nombre))
+  const altoTexto = (t, desc) => pad + f.monto * lh.monto + 6 * u + altoNombre
     + (desc && t.conDesc ? 10 * u + t.desc.length * f.desc * lh.desc : 0) + pad
   const fuera = tramos.filter((t) => !t.dentro)
   const altoFuera = fuera.length ? 20 * u + f.nombre * 1.2 + f.monto * 1.15 + 8 * u : 0
@@ -118,7 +120,7 @@ function Dibujo({ w, h }) {
     hNec = necesita(false)
   }
   // la barra crece con el lienzo hasta el 88 % del alto, con un tope para que no se vuelva un bloque (en 4:3)
-  const hB = Math.max(hNec, Math.min(0.88 * h - fijoArriba - fijoAbajo, hNec + Math.max(60 * u, 0.15 * h)))
+  const hB = Math.max(hNec, Math.min(0.88 * h - fijoArriba - fijoAbajo, hNec + Math.max(60 * u, 0.25 * h)))
   const yTexto = (hB - hNec) / 2   // el bloque más alto queda centrado en la barra; los demás arrancan a su altura
   const top = Math.max(0, (h - (fijoArriba + hB + fijoAbajo)) / 2)
   const yLey = top + f.ley / 2
@@ -146,7 +148,7 @@ function Dibujo({ w, h }) {
         const xt = t.xi + t.p   // el margen de arriba es el mismo en todos: los montos quedan en un renglón
         const yMonto = yB + yTexto + pad
         const yNombre = yMonto + f.monto * lh.monto + 6 * u
-        const yDesc = yNombre + t.nombre.length * t.fn * lh.nombre + 10 * u
+        const yDesc = yNombre + altoNombre + 10 * u
         const xc = (t.xi + t.xf) / 2
         const xRot = Math.min(Math.max(xc, x0 + ancho(t.nombre.join(' '), f.nombre, 600) / 2),
           x1 - ancho(t.nombre.join(' '), f.nombre, 600) / 2)

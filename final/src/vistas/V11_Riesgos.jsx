@@ -3,7 +3,9 @@
 // (18/11): el usuario la vio «insulsa, sin contraste»; dos versiones (spec 2, ficha V11):
 //   a  tres tarjetas en columna, una por riesgo: encabezado lleno (INK con texto blanco; ACC en el de adopción, que es el
 //      que nombra el título) con número, nombre y tipo; debajo, «Señal que se mira» y «Qué se hace» con rótulo en mono.
-//      La de adopción además sobresale 24 u a cada lado y lleva el cuerpo en realce; los textos quedan alineados.
+//      La de adopción además sobresale 24 u a cada lado, lleva el cuerpo en realce y, en lugar del tipo suelto, una
+//      pastilla blanca con «Adopción · se prueba» (el área y el estado de su tarjeta de decisión): ACC e INK son dos
+//      azules oscuros y el color solo no marca el foco. La leyenda usa tarjetas en miniatura, no cuadrados, por lo mismo.
 //   b  tabla de tres filas por tres columnas (riesgo → señal → respuesta), fila de encabezado llena en INK, flechas entre
 //      columnas y la fila de adopción realzada (fondo de realce, celda del riesgo llena en ACC).
 // Las dos llevan leyenda de lo que es cada color (y en b, la flecha). El espacio vertical (rellenos y aire entre
@@ -15,14 +17,17 @@ import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
 import { variante } from '../variantes.js'
-import { ACC, BORDE, CTX, FIN_GRIS, INK, PISTA, REALCE, SUP, TRAZO, Leyenda, ancho, envolver, rectRedondo, tam,
-  useU } from '../svg.jsx'
+import { ACC, BORDE, CTX, FIN_GRIS, INK, PISTA, REALCE, SUP, TRAZO, Leyenda, ancho, envolver, inicial, rectRedondo,
+  tam, useU } from '../svg.jsx'
 
 const ID = 'V11'
 const A = DF.anclas
 const X = textosDe(ID)
 const C = X.columnas
 const N = DF.tablas.riesgos_criticos.n
+// señal y respuesta en CF empiezan en minúscula (el title las usa en medio de una frase); en la tarjeta y en la celda
+// abren el renglón, como el nombre del riesgo
+const FILAS = X.filas.map((r) => ({ ...r, senalV: inicial(r.senal), respuestaV: inicial(r.respuesta) }))
 const FOCO = 1   // la fila de adopción (quién corre la planilla): la que nombra el título
 const LLENA = 0.9
 const LLENA_A = 0.93   // las tarjetas piden un poco más de aire por dentro
@@ -93,6 +98,22 @@ function Flechita({ u, x1, x2, y, color, grosor = 4, punta = 18 }) {
   )
 }
 
+/** Muestra de la leyenda de a: una tarjeta en miniatura de lado s centrada en (x, y), con su encabezado lleno y su cuerpo
+ *  (en realce y con trazo grueso la de adopción, blanco la de los otros), así la leyenda muestra lo mismo que el dibujo. */
+function MiniTarjeta({ u, x, y, s, foco }) {
+  const c = foco ? ACC : INK
+  const sw = (foco ? 3 : 1.5) * u
+  const x0 = x - s / 2
+  const y0 = y - s / 2
+  return (
+    <g>
+      <rect x={x0 + sw / 2} y={y0 + sw / 2} width={s - sw} height={s - sw} rx={3 * u} fill={foco ? REALCE : SUP} stroke={c}
+            strokeWidth={sw} />
+      <path d={rectRedondo(x0, y0, s, 0.42 * s, 3 * u, 'arr')} fill={c} />
+    </g>
+  )
+}
+
 /** Reparte el alto libre: cada hueco va de su mínimo a su máximo (en px) con el mismo k ∈ [0, 1], el que deja el
  *  total en `meta` (o el más cercano). fijo: lo que no crece. huecos: [[min, max, veces], …]. */
 function repartir(fijoPx, huecos, metaPx) {
@@ -105,7 +126,7 @@ function repartir(fijoPx, huecos, metaPx) {
 
 function medirA(w, h, u) {
   const fNom = tam(30, u)       // número y nombre del riesgo, blanco 700
-  const fTip = tam(20, u)       // tipo del riesgo, mono
+  const fTip = tam(22, u)       // tipo del riesgo, mono
   const fLab = tam(20, u)       // rótulo del campo, mono
   const fLey = tam(24, u)
   const lsTip = 0.14 * fTip
@@ -115,13 +136,15 @@ function medirA(w, h, u) {
   const gapCol = 72 * u
   const colW = (w - 2 * salto - 2 * padX - gapCol) / 2
   // letra del cuerpo: la más grande, de 28 a 24 u, con la que cada señal y cada respuesta entra en un renglón
-  const textos = X.filas.flatMap((r) => [r.senal, r.respuesta])
+  const textos = FILAS.flatMap((r) => [r.senalV, r.respuestaV])
   let fTxt = tam(28, u)
   while (fTxt > 24 * u && textos.some((t) => ancho(t, fTxt) > colW)) fTxt = Math.max(24 * u, fTxt - 0.25 * u)
   const inter = 1.22
-  const filas = X.filas.map((r, i) => {
-    const ls = [parejo(r.senal, colW, fTxt), parejo(r.respuesta, colW, fTxt)]
-    return { ...r, i, foco: i === FOCO, tipo: X.tipos[i], ls, nl: Math.max(ls[0].length, ls[1].length) }
+  const filas = FILAS.map((r, i) => {
+    const ls = [parejo(r.senalV, colW, fTxt), parejo(r.respuestaV, colW, fTxt)]
+    // la de adopción lleva además el estado de la tarjeta de decisión («Adopción · se prueba»), en una pastilla blanca
+    const tipo = i === FOCO ? `${X.tipos[i]} · ${X.decision.estado}` : X.tipos[i]
+    return { ...r, i, foco: i === FOCO, tipo, ls, nl: Math.max(ls[0].length, ls[1].length) }
   })
   const altoLey = fLey * 1.2
   const texto = filas.reduce((s, r) => s + fNom + fLab + (r.nl - 1) * fTxt * inter + fTxt, 0)
@@ -146,8 +169,8 @@ function DibujoA({ w, h }) {
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       <g transform={`translate(0,${y0})`}>
         <Leyenda u={u} x={0} y={m.altoLey / 2} items={[
-          { marca: 'hecho', texto: X.ley.foco },
-          { marca: 'curso', texto: X.ley.otros },
+          { marca: (p) => <MiniTarjeta {...p} foco />, texto: X.ley.foco },
+          { marca: (p) => <MiniTarjeta {...p} />, texto: X.ley.otros },
         ]} />
         {m.filas.map((r) => {
           const hHead = m.fNom + 2 * m.pH
@@ -174,8 +197,15 @@ function DibujoA({ w, h }) {
                     dominantBaseline="central">{fijo(r.i + 1)}</text>
               <text x={xt + numW + 22 * u} y={yc + hHead / 2} fontSize={m.fNom} fontWeight={700} fill={SUP}
                     dominantBaseline="central">{r.riesgo}</text>
-              <Mono x={w - xt} y={yc + hHead / 2} f={m.fTip} texto={r.tipo} color={SUP} anchor="end" base="central"
-                    ls={m.lsTip} />
+              {r.foco && (() => {
+                const padC = 14 * u
+                const wC = ancho(r.tipo.toUpperCase(), m.fTip, 700, true) + m.lsTip * r.tipo.length + 2 * padC
+                const hC = m.fTip * 1.7
+                return <rect x={w - xt + padC - wC} y={yc + hHead / 2 - hC / 2} width={wC} height={hC} rx={hC / 2}
+                             fill={SUP} />
+              })()}
+              <Mono x={w - xt} y={yc + hHead / 2} f={m.fTip} texto={r.tipo} color={r.foco ? INK : SUP} peso={700}
+                    anchor="end" base="central" ls={m.lsTip} />
               <line x1={xs[1] - m.gapCol / 2} x2={xs[1] - m.gapCol / 2} y1={yLab} y2={yB + hBody - m.pB}
                     stroke={r.foco ? FIN_GRIS : PISTA} strokeWidth={TRAZO.guia * u} />
               <Mono x={xs[0]} y={yLab} f={m.fLab} texto={C.senal} ls={m.lsLab} />
@@ -206,11 +236,11 @@ function medirB(w, h, u) {
   const numW = Math.max(...X.filas.map((_, i) => ancho(fijo(i + 1), fNom, 700)))
   const gNum = 16 * u
   const inter = 1.22
-  const filas = X.filas.map((r, i) => {
+  const filas = FILAS.map((r, i) => {
     const ls = [
       parejo(r.riesgo, anchos[0] - 2 * pad - numW - gNum, fNom, 700),
-      parejo(r.senal, anchos[1] - 2 * pad, fTxt),
-      parejo(r.respuesta, anchos[2] - 2 * pad, fTxt),
+      parejo(r.senalV, anchos[1] - 2 * pad, fTxt),
+      parejo(r.respuestaV, anchos[2] - 2 * pad, fTxt),
     ]
     const nl = Math.max(...ls.map((x) => x.length))
     return { ...r, i, foco: i === FOCO, ls, nl, texto: (nl - 1) * fTxt * inter + fTxt }
@@ -299,7 +329,7 @@ export default function V11Riesgos() {
     <Vista id={ID}
            items={[
              { clave: 'horas', valor: fijo(A['G64.horas_por_lista'].valor) },
-             { clave: 'riesgos', valor: fijo(N) },
+             { clave: 'piloto', valor: fijo(A['G64.horas_marketing'].valor) },
            ]}
            cifras={[fijo(N)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}

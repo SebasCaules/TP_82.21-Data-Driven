@@ -22,7 +22,8 @@ const A = DF.anclas
 const VT = DF.tablas.ventas_2025
 const B = textosDe(ID).barras
 const UMBRAL = A['H46.umbral_mes'].valor
-const MESES = VT.meses.map((m) => ({ ...m, foco: m.parte < UMBRAL, valor: pct(m.parte, 0) }))
+// foco: los meses que no se usan (se_usa de DF, el mismo corte que H46.umbral_mes)
+const MESES = VT.meses.map((m) => ({ ...m, foco: !m.se_usa, valor: pct(m.parte, 0) }))
 const MARCAS = [0, 0.2, 0.4, 0.6, 0.8, 1]
 const fmtEje = (v) => pct(v, 0)
 
@@ -35,11 +36,13 @@ const partes = (t) => {
 }
 const anchoValor = (t, f, fu, peso) => ancho(partes(t)[0], f, peso) + ancho(partes(t)[1], fu, peso)
 
-/** El valor de una columna: el número a `f` y la unidad a `fu`. */
-function Valor({ x, y, texto, f, fu, peso, color, base = 'auto' }) {
+/** El valor de una columna: el número a `f` y la unidad a `fu`. `halo` (los que van arriba de la columna): un borde del
+ *  color de la tarjeta que tapa la grilla del 100 % donde la cruza (enero y febrero), como en barras.jsx. */
+function Valor({ x, y, texto, f, fu, peso, color, base = 'auto', halo }) {
   const [n, un] = partes(texto)
   return (
-    <text x={x} y={y} fontSize={f} fontWeight={peso} fill={color} textAnchor="middle" dominantBaseline={base}>
+    <text x={x} y={y} fontSize={f} fontWeight={peso} fill={color} textAnchor="middle" dominantBaseline={base}
+          {...halo}>
       {n}<tspan fontSize={fu}>{un}</tspan>
     </text>
   )
@@ -52,6 +55,7 @@ function Dibujo({ w, h }) {
   const fFoco = tam(30, u)
   const fUni = tam('piso', u)
   const fCtl = tam(24, u)
+  const halo = { stroke: SUP, strokeWidth: 8 * u, paintOrder: 'stroke', strokeLinejoin: 'round' }
   const ley = [
     { marca: 'contexto', texto: B.entra },
     { marca: 'hecho', texto: B.no_entra },
@@ -107,7 +111,7 @@ function Dibujo({ w, h }) {
                      color={SUP} />
             ) : (
               <Valor x={cx} y={yBase - hCol - 8 * u} texto={x.valor} f={x.foco ? fFoco : fGris} fu={fUni}
-                     peso={x.foco ? 700 : 600} color={x.foco ? INK : CTX} />
+                     peso={x.foco ? 700 : 600} color={x.foco ? INK : CTX} halo={halo} />
             )}
             <text x={cx} y={yBase + yMes} fontSize={fMes} fontWeight={x.foco ? 700 : 400} fill={x.foco ? INK : CTX}
                   textAnchor="middle" dominantBaseline="hanging">{x.rotulo}</text>

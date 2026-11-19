@@ -3,6 +3,8 @@
 // legal). ley: la leyenda de los colores (a y b) y de las flechas (b). Los rótulos de los campos y de las columnas son
 // los de `columnas`.
 export default {
+  // subfila de la banda: las horas de Marketing en las tres listas del piloto (G64.horas_marketing)
+  piloto: { rotulo: 'En las tres listas', linea: 'de la misma persona', unidad: 'horas' },
   tipos: ['Económico', 'Adopción', 'Legal'],
   ley: {
     foco: 'Riesgo de adopción: si Marketing sostiene la lista',

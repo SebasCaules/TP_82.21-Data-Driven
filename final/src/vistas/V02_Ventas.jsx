@@ -4,7 +4,8 @@
 //   a  Flujo: una banda de C20.crudo filas entra por la izquierda; en cada paso se desprende hacia abajo lo que sale
 //      (repetidas, sin cliente, devoluciones) con su cantidad, y sigue lo que queda, hasta la banda en --acc que entra a
 //      la lista (C20.positivas, la cifra de la conclusión). Las bandas van alineadas arriba y su alto es proporcional a
-//      las filas, con el eje de filas junto a la banda de entrada. Las salidas de 250 y 330 filas medirían menos de 2 u:
+//      las filas, con el eje de filas junto a la banda de entrada: baja desde 0 en el borde de arriba, así el borde de
+//      abajo de cada banda cae en su cantidad. Las salidas de 250 y 330 filas medirían menos de 2 u:
 //      llevan un grosor mínimo, pasan por debajo de la banda que sigue (la banda conserva su alto real) y la leyenda lo
 //      dice.
 //   b  Cascada: columnas sobre un eje de filas; el extracto entero, cada salida flotando desde donde quedó la anterior y
@@ -98,6 +99,7 @@ function Flujo({ w, h }) {
   const fSal = tam(30, u)
   const fSalT = tam('sec', u)
   const fLey = tam(24, u)
+  const fEje = tam(23, u)
   const g = 3 * u
   const r = 40 * u
   const min = MINIMO * u
@@ -124,7 +126,7 @@ function Flujo({ w, h }) {
   const tramo = (L - ultima) / 3
   const X = [xa, xa + tramo, xa + 2 * tramo, xa + 3 * tramo, w]
 
-  // en vertical: rótulos de etapa (en el renglón del título del eje), banda, caída de las salidas y sus rótulos. La
+  // en vertical: rótulos de etapa, banda (el título del eje va debajo, en la caída), caída de las salidas y sus rótulos. La
   // banda no pasa del alto con el que la salida más grande todavía entra en su etapa; si sobra alto, las salidas bajan más.
   const arriba = 23.5 * u + fEt * 0.82
   const rotSal = 10 * u + fSal * 1.15 + fSalT * 1.1
@@ -158,7 +160,11 @@ function Flujo({ w, h }) {
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       <Raya u={u} />
-      <EjeY u={u} x={xEje} y0={yT + H} y1={yT} min={0} max={N0} marcas={marcas} formato={filas} titulo={B.eje} />
+      {/* eje que baja: 0 en el borde de arriba, donde empiezan todas las bandas, así el borde de abajo de cada banda cae
+          en su cantidad de filas. El título va debajo del eje, en la punta de los valores altos. */}
+      <EjeY u={u} x={xEje} y0={yT} y1={yT + H} min={0} max={N0} marcas={marcas} formato={filas} />
+      <text x={0} y={yT + H + fEje / 2 + 12 * u} fontSize={fEje} fontWeight={600} fill={CTX}
+            dominantBaseline="hanging">{B.eje}</text>
 
       {/* salidas primero: pasan por debajo de la banda que sigue */}
       {salidas.map((s, i) => (
@@ -194,7 +200,7 @@ function Flujo({ w, h }) {
               textAnchor="middle" dominantBaseline="central">{filas(QUEDAN[3])}</text>
         <text x={(xF0 + w - pF) / 2} y={yT + hF / 2 + fFin * 0.55} fontSize={fFinT} fontWeight={600} fill={SUP}
               textAnchor="middle" dominantBaseline="central">{F.final}</text>
-        <text x={(xF0 + w) / 2} y={yT - 23.5 * u} fontSize={fEt} fontWeight={600} fill={INK}
+        <text x={(xF0 + w - pF) / 2} y={yT - 23.5 * u} fontSize={fEt} fontWeight={600} fill={INK}
               textAnchor="middle">{F.etapas[3]}</text>
       </g>
 

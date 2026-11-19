@@ -78,6 +78,49 @@ function enFilas(u, items, f, max) {
   return filas
 }
 
+// La escalera reparte la leyenda en tres renglones por tema (las etapas, el camino, la compuerta): con dos renglones,
+// el segundo quedaba en la misma línea que la condición de la última compuerta y se leía como un ítem más.
+// Índices de itemsLeyenda(…, 'caja'): 0 hecha, 1 se pide ahora, 2 depende, 3 compuerta, 4 camino hecho, 5 camino que falta.
+const GRUPOS_LEY = [[0, 1, 2], [4, 5], [3]]
+function filasPorTema(u, items, f, max) {
+  return GRUPOS_LEY.flatMap((g) => enFilas(u, g.map((k) => items[k]), f, max))
+}
+
+/** Como envolver, con los renglones parejos: la misma cantidad de renglones que envolver, cortados donde el sobrante de
+ *  cada uno (al cuadrado) suma menos, y evitando un renglón de una palabra sola. */
+function envolverParejo(texto, w, f, peso = 400) {
+  const base = envolver(texto, w, f, peso)
+  const n = base.length
+  if (n < 2) return base
+  const p = String(texto).split(' ')
+  const memo = new Map()
+  const sola = (palabras) => (palabras === 1 ? 4 * w * w : 0)
+  // el mejor reparto de las palabras desde i en k renglones: { costo, cortes }
+  const mejor = (i, k) => {
+    const clave = `${i},${k}`
+    if (memo.has(clave)) return memo.get(clave)
+    let r = { costo: Infinity, cortes: null }
+    if (k === 1) {
+      const a = ancho(p.slice(i).join(' '), f, peso)
+      if (a <= w) r = { costo: (w - a) ** 2 + sola(p.length - i), cortes: [p.length] }
+    } else {
+      for (let j = i + 1; j <= p.length - (k - 1); j++) {
+        const a = ancho(p.slice(i, j).join(' '), f, peso)
+        if (a > w) break
+        const resto = mejor(j, k - 1)
+        const c = (w - a) ** 2 + sola(j - i) + resto.costo
+        if (c < r.costo) r = { costo: c, cortes: [j, ...resto.cortes] }
+      }
+    }
+    memo.set(clave, r)
+    return r
+  }
+  const r = mejor(0, n)
+  if (!r.cortes) return base
+  let i = 0
+  return r.cortes.map((j) => { const l = p.slice(i, j).join(' '); i = j; return l })
+}
+
 function LeyendaFilas({ u, x, y, filas, f, alto }) {
   return (
     <g>
@@ -187,7 +230,7 @@ function medirPasos(u, bw, fN, fQ) {
   const hMarca = fM * 1.5
   return ETAPAS.map((e) => {
     const ln = envolver(e.nombre, inner, fN, 700)
-    const lq = envolver(e.que, inner, fQ)
+    const lq = envolverParejo(e.que, inner, fQ)
     const marca = e.flujo === 'hecho'
     const arriba = pad + (marca ? hMarca + 14 * u : 0) + ln.length * fN * 1.15 + 12 * u + lq.length * fQ * 1.25
     const abajo = e.costo ? 20 * u + fR * 1.3 + fV + pad : pad
@@ -214,8 +257,8 @@ function planEscalera(w, h, u) {
   const items = itemsLeyenda(u, fL, 'caja')
   for (let intento = 0; intento < 12; intento++) {
     pasos = medirPasos(u, bw, fN, fQ)
-    // la leyenda: en las filas que hagan falta antes del rótulo de la última compuerta
-    filas = enFilas(u, items, fL, gc[2] - (M.rombo * u) / 2 - 12 * u - anchosC[1] - 32 * u)
+    // la leyenda: un renglón por tema, cada uno antes del rótulo de la última compuerta
+    filas = filasPorTema(u, items, fL, gc[2] - (M.rombo * u) / 2 - 12 * u - anchosC[1] - 32 * u)
     // arriba del escalón más alto: solo el camino y su punta (los rótulos de las compuertas van a su izquierda)
     const reserva = sobre + 14 * u
     const subida = (t) => Math.min(M.subeMax * u, ...pasos.slice(0, 3).map((p, i) => (yB - t - p.need) / (3 - i)))
@@ -361,13 +404,14 @@ function planCadena(w, h, u) {
   let flechas, banda, debajo, arriba
   for (let intento = 0; intento < 10; intento++) {
     const innerN = cw - 1.4 * d - 32 * u
-    flechas = ETAPAS.map((e) => ({ ...e, ln: envolver(e.nombre, innerN, fN, 700), lq: envolver(e.que, colW, fQ) }))
+    flechas = ETAPAS.map((e) => ({ ...e, ln: envolver(e.nombre, innerN, fN, 700), lq: envolverParejo(e.que, colW, fQ) }))
     const lineasN = Math.max(...flechas.map((f) => f.ln.length))
     const lineasQ = Math.max(...flechas.map((f) => f.lq.length))
     arriba = filas.length * altoL + 24 * u + Math.max(altoAqui(u), fC * 1.3) + 12 * u
     debajo = 26 * u + lineasQ * fQ * 1.25 + 22 * u + fR * 1.3 + fV
     const minBanda = Math.max(lineasN * fN * 1.15, flechas[0].ln.length * fN * 1.15 + hMarca + 12 * u) + 2 * pad
-    banda = Math.min(MB.bandaMax * u, total - arriba - debajo)
+    // en ventanas más altas que 16:9 la flecha crece con el alto, para que el dibujo no quede chico en el lienzo
+    banda = Math.min(Math.max(MB.bandaMax * u, 0.36 * h), total - arriba - debajo)
     if (banda >= minBanda && lineasN <= 2) break
     if (fN > tam(28, u)) fN -= 2 * u
     else if (fQ > tam(22, u)) fQ -= u

@@ -2,8 +2,11 @@
 // modelo (J03.logistica) y práctica actual (J17); la diferencia modelo menos regla (J09) con su intervalo
 // (J09.ic_inferior a J09.ic_superior).
 // (18/11, fase 8, spec 2 V05) El usuario: «hay un baseline, el modelo da algo y la práctica actual otra». Dos versiones:
-//   a  Dos paneles. Izquierda, contra la práctica actual: eje de 0 a 100 %, la práctica actual como línea de base
-//      punteada y dos barras (regla, modelo) partidas en la base: hasta la línea en gris, lo que la supera en tinta.
+//   a  Dos paneles. Izquierda, contra la práctica actual: eje de 0 a 100 %, la práctica actual como referencia
+//      punteada y dos barras (regla, modelo) partidas en ella: hasta la línea en gris, lo que la supera en tinta.
+//      La regla lleva debajo «línea de base»: en el proyecto la línea de base es la regla y la práctica actual es
+//      referencia (modelado-etapa-1, decisión 6, confirmada el 06/10). Revisión del 18/11: la versión anterior
+//      rotulaba «línea de base» a la práctica actual.
 //      Derecha, modelo menos regla: eje en puntos centrado en 0, la línea del cero («sin diferencia») y el punto con su
 //      intervalo en el acento, que la cruza. El acento es solo la diferencia: el foco de la vista.
 //   b  Un eje de 0 a 100 % con las tres marcas (práctica actual, modelo, regla) y el tramo donde regla y modelo casi
@@ -97,8 +100,10 @@ function DosPaneles({ w, h }) {
   const yFil0 = yLinea + 10 * u
   const yEje = h - mY - altoEjeX(u, true)
 
-  // panel izquierdo: barras desde 0 partidas en la línea de base
-  const filas = [{ et: B.regla, v: REGLA }, { et: B.modelo, v: MODELO }]
+  // panel izquierdo: barras desde 0 partidas en la práctica actual; la regla lleva debajo «línea de base»
+  const filas = [{ et: B.regla, v: REGLA, nota: X.izq.reglaNota }, { et: B.modelo, v: MODELO }]
+  const fNotaFila = tam(22, u)
+  const halo = { stroke: SUP, strokeWidth: 8 * u, paintOrder: 'stroke', strokeLinejoin: 'round' }
   const x0 = Math.max(...filas.map((f) => ancho(f.et, fRot, 600))) + 24 * u
   const escI = escalaLinda(1)
   const fmtI = (v) => pct(v, 0)
@@ -148,8 +153,17 @@ function DosPaneles({ w, h }) {
         return (
           <g key={f.et}>
             <title>{`${f.et} · ${pct(f.v)}`}</title>
-            <text x={x0 - 24 * u} y={yf} fontSize={fRot} fontWeight={600} fill={INK} textAnchor="end"
-                  dominantBaseline="central">{f.et}</text>
+            {f.nota ? (
+              <g>
+                <text x={x0 - 24 * u} y={yf - 3 * u} fontSize={fRot} fontWeight={600} fill={INK}
+                      textAnchor="end">{f.et}</text>
+                <text x={x0 - 24 * u} y={yf + 8 * u + fNotaFila * 0.72} fontSize={fNotaFila} fill={CTX}
+                      textAnchor="end">{f.nota}</text>
+              </g>
+            ) : (
+              <text x={x0 - 24 * u} y={yf} fontSize={fRot} fontWeight={600} fill={INK} textAnchor="end"
+                    dominantBaseline="central">{f.et}</text>
+            )}
             <rect x={x0} y={yb} width={Math.max(0, xb - x0 - sep / 2)} height={t} fill={FIN_GRIS} />
             <path d={rectRedondo(xb + sep / 2, yb, Math.max(0, xi(f.v) - xb - sep / 2), t, TRAZO.radio * u)} fill={INK} />
             <text x={xi(f.v) + 16 * u} y={yf} fontSize={fVal} fontWeight={700} fill={INK}
@@ -171,10 +185,11 @@ function DosPaneles({ w, h }) {
       <RotuloReferencia u={u} x={xd(0)} yA={yRefA} yB={yRefB} nombre={X.der.cero} nota={X.der.ceroNota} />
       {/* hacia dónde gana cada uno */}
       <Punta u={u} x={xd0} y={yMejor} lado="izq" />
-      <text x={xd0 + 18 * u} y={yMejor} fontSize={fMejor} fill={CTX} dominantBaseline="central">{X.der.mejorRegla}</text>
+      <text x={xd0 + 18 * u} y={yMejor} fontSize={fMejor} fill={CTX} dominantBaseline="central"
+            {...halo}>{X.der.mejorRegla}</text>
       <Punta u={u} x={xd1} y={yMejor} lado="der" />
       <text x={xd1 - 18 * u} y={yMejor} fontSize={fMejor} fill={CTX} textAnchor="end"
-            dominantBaseline="central">{X.der.mejorModelo}</text>
+            dominantBaseline="central" {...halo}>{X.der.mejorModelo}</text>
       {/* intervalo y punto */}
       <g>
         <title>{T.decision.larga}</title>
@@ -183,12 +198,14 @@ function DosPaneles({ w, h }) {
           <line key={v} x1={xd(v)} x2={xd(v)} y1={yc - 22 * u} y2={yc + 22 * u} stroke={ACC} strokeWidth={5 * u} />
         ))}
         <circle cx={xd(DIF)} cy={yc} r={17 * u} fill={ACC} stroke={SUP} strokeWidth={4 * u} />
-        <text x={xd(DIF) + 10 * u} y={yc - 40 * u} fontSize={fNum} fontWeight={700} fill={INK} textAnchor="end">
-          {`${fijo(DIF, 2)}${NBSP}${PUNTOS}`}
+        <text x={xd(DIF) + 10 * u} y={yc - 40 * u} fontSize={fNum} fontWeight={700} fill={INK} textAnchor="end"
+              {...halo}>
+          {`${fijo(DIF, 2, true)}${NBSP}${PUNTOS}`}
         </text>
+        {/* con signo, como las marcas del eje (−1, +1) */}
         {IC.map((v) => (
           <text key={v} x={xd(v)} y={yc + 32 * u} fontSize={fCap} fontWeight={600} fill={CTX} textAnchor="middle"
-                dominantBaseline="hanging">{fijo(v, 2)}</text>
+                dominantBaseline="hanging" {...halo}>{fijo(v, 2, true)}</text>
         ))}
       </g>
     </svg>
@@ -301,6 +318,9 @@ function Lupa({ w, h }) {
             dominantBaseline="central">{nombreValor(X.modelo, pct(MODELO))}</text>
       <text x={zs(REGLA) + rGrande + 14 * u} y={yPts} fill={INK} fontSize={fNom} textAnchor="start"
             dominantBaseline="central">{nombreValor(X.regla, pct(REGLA))}</text>
+      {/* la regla es la línea de base del proyecto: se dice debajo de su nombre */}
+      <text x={zs(REGLA) + rGrande + 14 * u} y={yPts + fVal * 0.45 + 8 * u} fill={CTX} fontSize={fNota}
+            textAnchor="start" dominantBaseline="hanging">{X.reglaNota}</text>
       <LlaveH u={u} x1={zs(MODELO)} x2={zs(REGLA)} y={yLlave} lado="arriba" />
       <text x={xMedio} y={yDif} fontSize={fVal} fontWeight={700} fill={INK} textAnchor="middle">
         {`${fijo(Math.abs(DIF), 2)}${NBSP}${PUNTOS}`}

@@ -501,7 +501,7 @@ export const CF = {
           fuente: 'E3, Parte D v3.0',
           segundos: 75,
           textos: {
-            decide: { rotulo: 'Decide María G.', linea: 'con el cruce de las listas', antes: 'semana' },
+            decide: { rotulo: 'Decide María G.', linea: 'con la medición de las tres listas', antes: 'semana' },
             lista: { rotulo: 'Primera lista', linea: 'después de las acciones previas', antes: 'semana' },
             mide: 'Fases e hitos, por semana desde la aprobación',
             conclusion: 'Primera lista en la semana',

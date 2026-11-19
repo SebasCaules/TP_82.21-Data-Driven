@@ -8,14 +8,14 @@ export default {
     planilla: 'Planilla y guía de\u00a0corrida',
   },
   partida: {
-    total: 'Total del piloto mínimo',
-    eje: 'Dólares acumulados, de izquierda a derecha',
+    total: 'Total',
+    eje: 'Costo acumulado, en USD',
     desc: {
       medicion: 'control y dos ramas, sorteados cada\u00a0mes',
       planilla: 'la regla mensual que corre Marketing',
       taller: 'equipo de Sofía R. y quien corre la planilla',
       legal: 'acuerdo, borrado y consentimiento',
-      contingencia: 'sobre las otras cuatro líneas',
+      contingencia: 'se calcula sobre las otras cuatro',
     },
     ley: {
       foco: 'Medición, el motivo del piloto',

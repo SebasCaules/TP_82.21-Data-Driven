@@ -41,8 +41,6 @@ const EPICAS = BL.epicas.map((e) => {
 })
 const MAX_CELDA = Object.fromEntries(GRUPOS.map((g) => [g, Math.max(1, ...EPICAS.map((e) => e.por[g].length))]))
 const MAX_EPICA = Math.max(...EPICAS.map((e) => e.hus.length))
-// la ficha de la leyenda de la versión a: una historia real, en gris para no sumar otra marca en acento
-const MUESTRA = BL.historias.find((x) => x.grupo === 'piloto') ?? BL.historias[0]
 const TOTAL = (g) => fijo(A[ANCLA[g]].valor)
 
 export const meta = { id: ID }
@@ -79,6 +77,18 @@ function Ficha({ u, x, y, w, h, hu, f }) {
   )
 }
 
+/** La ficha de muestra de la leyenda: la misma forma, en gris claro neutro (no es ningún estado: los estados los dicen
+ *  los encabezados o la leyenda de estados) y con el prefijo «HU» en vez de una historia real, que se vería repetida. */
+function FichaMuestra({ u, x, y, w, h, f }) {
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} rx={TRAZO.radio * u} fill={PISTA} />
+      <text x={x + w / 2} y={y + h / 2} fontSize={f} fontWeight={600} fill={INK} textAnchor="middle"
+            dominantBaseline="central">{X.muestra}</text>
+    </g>
+  )
+}
+
 const tituloEpica = (e) => `${e.breve}: ${e.nombre}. ${e.hus.map((x) => `${x.id}, ${X.estados[x.grupo]}`).join('; ')}`
 
 // ------------------------------------------------------------------ a · tablero por estado
@@ -86,16 +96,18 @@ const tituloEpica = (e) => `${e.breve}: ${e.nombre}. ${e.hus.map((x) => `${x.id}
 function medirA(w, h, u) {
   const n = EPICAS.length
   const hEnc = entre(0.088 * h, 46 * u, 62 * u)        // encabezado de las columnas
-  const gEnc = 8 * u
+  const gEnc = 6 * u
   const R = entre((0.945 * h - hEnc - gEnc) / n, 46 * u, 92 * u)
   // la fila: título breve (lo que más pesa) y, debajo, el nombre completo en chico; el resto de la fila queda de aire
   let fT = entre(0.5 * R, 26 * u, 36 * u)
   let fD = entre(0.34 * R, 20 * u, 24 * u)
-  const sep = () => 0.5 * fT + 0.5 * fD + 3 * u         // de centro a centro de los dos renglones
+  // de centro a centro de los dos renglones: juntos (son una sola etiqueta) y con aire contra el borde de la franja
+  const sep = () => 0.5 * fT + 0.5 * fD + 1.5 * u
   while (0.38 * fT + sep() + 0.38 * fD > R - 12 * u && fT > 24 * u) fT -= 0.25 * u
   const lado = entre(R - 14 * u, 34 * u, 54 * u)        // círculo del número de la épica
   const xTexto = lado + 16 * u
-  const hF = entre(R - 16 * u, 30 * u, 50 * u)
+  // la ficha deja aire arriba y abajo: las filas se separan y el título de la fila sigue siendo lo que más pesa
+  const hF = entre(R - 20 * u, 30 * u, 50 * u)
   const gF = 10 * u
   const pad = 16 * u
   const fH = tam(24, u)
@@ -152,7 +164,7 @@ function DibujoA({ w, h }) {
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       <g transform={`translate(0,${y0})`}>
         {/* leyenda: qué es una ficha */}
-        <Ficha u={u} x={0} y={yLey - hLey / 2} w={m.wF} h={hLey} hu={MUESTRA} f={m.fC} />
+        <FichaMuestra u={u} x={0} y={yLey - hLey / 2} w={m.wF} h={hLey} f={m.fC} />
         {m.lineasL.map((l, i) => (
           <text key={i} x={m.wF + 12 * u} y={yLey + (i - (m.lineasL.length - 1) / 2) * m.fL * 1.2} fontSize={m.fL}
                 fill={INK} dominantBaseline="central">{l}</text>
@@ -237,14 +249,20 @@ function DibujoB({ w, h }) {
   const y0 = Math.max(0, (h - m.alto) / 2)
   const ley = GRUPOS.map((g) => ({ marca: ESTADO_DE[g], texto: `${X.columnas[g]}${X.separador}${TOTAL(g)}` }))
   const yTarjetas = m.hLey + m.gLey
-  const cabeFicha = anchoLeyenda(u, ley) + 48 * u + ancho(X.ficha, m.fL, 400) <= w
+  const anchoTexto = ancho(X.ficha, m.fL, 400)
+  const hMuestra = Math.min(m.hF, m.hLey)
+  const cabeFicha = anchoLeyenda(u, ley) + 48 * u + m.wF + 12 * u + anchoTexto <= w
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       <g transform={`translate(0,${y0})`}>
-        {/* leyenda de estados (con su total) y qué es una ficha */}
+        {/* leyenda de estados (con su total) y qué es una ficha, con su muestra */}
         <Leyenda u={u} x={0} y={m.hLey / 2} items={ley} />
         {cabeFicha && (
-          <text x={w} y={m.hLey / 2} fontSize={m.fL} fill={INK} textAnchor="end" dominantBaseline="central">{X.ficha}</text>
+          <g>
+            <FichaMuestra u={u} x={w - anchoTexto - 12 * u - m.wF} y={m.hLey / 2 - hMuestra / 2} w={m.wF} h={hMuestra}
+                          f={m.fC} />
+            <text x={w} y={m.hLey / 2} fontSize={m.fL} fill={INK} textAnchor="end" dominantBaseline="central">{X.ficha}</text>
+          </g>
         )}
         {EPICAS.map((e, i) => {
           const x = (i % m.nc) * (m.cw + m.gx)
@@ -281,7 +299,7 @@ export default function V12Backlog() {
     <Vista id={ID}
            items={[
              { clave: 'historias', valor: fijo(A.K02.valor) },
-             { clave: 'hechas', valor: fijo(A.K04.valor) },
+             { clave: 'criterios', valor: fijo(A.K03.valor) },
              { clave: 'horas', valor: fijo(A.K07.valor) },
            ]}
            cifras={[fijo(A.K04.valor), fijo(A.K05.valor), fijo(A.K06.valor)]}>

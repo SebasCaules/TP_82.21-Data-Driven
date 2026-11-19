@@ -68,7 +68,8 @@ function Escalera({ w, h }) {
   const fUm2 = tam(24, u)
   const fFl = tam(24, u)
   const fTr = tam('cat', u)
-  const fN = tam(28, u)
+  // la cuenta va debajo del porcentaje en jerarquía: más chica y sin negrita plena
+  const fN = tam(24, u)
   const fC = tam(22, u)
 
   // derecha: el rótulo del umbral; abajo: números del eje y el renglón del título con la flecha
@@ -120,7 +121,7 @@ function Escalera({ w, h }) {
                   {...halo(u)}>{pct(t.tasa, 1)}</text>
             <text x={cx} y={yc + 16 * u} fontSize={fTr} fontWeight={foco ? 700 : 600} fill={tinta} textAnchor="middle"
                   dominantBaseline="hanging">{`${t.tramo} ${DIAS}`}</text>
-            <text x={cx} y={yCuenta} fontSize={fN} fontWeight={700} fill={tinta} textAnchor="middle"
+            <text x={cx} y={yCuenta} fontSize={fN} fontWeight={600} fill={tinta} textAnchor="middle"
                   dominantBaseline="hanging">{`${fijo(t.positivos)} ${X.de} ${fijo(t.filas)}`}</text>
             <text x={cx} y={yCuenta + fN * 1.15} fontSize={fC} fill={tinta} textAnchor="middle"
                   dominantBaseline="hanging">{X.casos}</text>

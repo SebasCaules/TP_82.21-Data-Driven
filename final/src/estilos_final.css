@@ -133,6 +133,11 @@
   font: 700 var(--fin-t-sub)/1.05 var(--fuente); letter-spacing: -.01em; color: var(--ink); white-space: nowrap;
 }
 .e3-vp .fin-vista .fin-sub-u { font-size: .6em; font-weight: 600; letter-spacing: 0; }
+/* Con una sola cifra extra, su fragmento va debajo, en un renglón propio: lleva la unidad o el horizonte. */
+.e3-vp .fin-vista .fin-sub-1 .fin-sub-item { flex-wrap: wrap; row-gap: 0; }
+.e3-vp .fin-vista .fin-sub-linea {
+  flex: 0 0 100%; font: 500 calc(var(--fin-u) * 20)/1.2 var(--fuente); color: var(--e3-ctx); white-space: nowrap;
+}
 
 /* Tarjeta de decisión (spec 1.1 dec). Sigue verde. dec.a: la fila «Decisión · área · estado» (20 u, mono, verde
    oscuro) pegada al borde superior, a 16 u, la frase (30 u, 700) enseguida y el aire abajo. */

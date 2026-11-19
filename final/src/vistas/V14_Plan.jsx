@@ -62,7 +62,7 @@ export const meta = { id: ID }
 // Medidas en u.
 const M = {
   fase: 26, quien: 24, hito: 24, dec: 24, num: 22, numHito: 20, eje: 22, hoy: 22,
-  pad: 12, col: 40, rombo: 44, romboDec: 50, barra: 6, hueco: 3, punta: 18, conector: 2.5,
+  pad: 12, col: 40, rombo: 44, romboDec: 50, barra: 10, hueco: 3, punta: 18, conector: 2.5,
 }
 const LLENA = 0.9
 
@@ -142,8 +142,6 @@ function Dibujo({ w, h }) {
   const fN = tam(M.num, u), fNH = tam(M.numHito, u), fE = tam(M.eje, u)
   const pad = M.pad * u
   const g = M.hueco * u
-  const rH = (M.rombo * u) / 2
-  const rD = (M.romboDec * u) / 2
   const sep = 14 * u
 
   // a la izquierda, solo el título del eje en dos renglones (en el renglón de los números); el resto del ancho es de las
@@ -153,8 +151,13 @@ function Dibujo({ w, h }) {
   const pHoy = medidaHoy(G.hoy, fHoy, u)
   const x0 = Math.max(Math.max(...titulo.map((l) => ancho(l, fE, 600))) + M.col * u, pHoy.w + pHoy.pico + 8 * u)
   const pD = medidaPastilla(G.hitos.decision, fD, u)
-  const medio = Math.max(pD.w / 2, rD) + 2 * u
+  const medio = Math.max(pD.w / 2, (M.romboDec * u) / 2) + 2 * u
   const dw = Math.min((w - x0) / SEM, (w - x0 - medio) / (SEM_DEC - 0.5))
+  // el rombo de un hito no pasa el ancho de su semana (así no se pega a los números vecinos); el de la decisión, apenas
+  const sH = Math.min(M.rombo, dw / u)
+  const sD = Math.min(M.romboDec, dw / u + 6)
+  const rH = (sH * u) / 2
+  const rD = (sD * u) / 2
   const S = escalaSemanas({ x0, x1: x0 + dw * SEM, desde: 1, hasta: SEM })
   const xFin = S.fin(SEM)
   const xDec = S.centro(SEM_DEC)
@@ -301,7 +304,7 @@ function Dibujo({ w, h }) {
               ? <Pastilla u={u} x={x.xc} y={y} texto={x.texto} f={fD} />
               : <text x={x.xc} y={y} fontSize={fH} fontWeight={600} fill={INK} textAnchor="middle"
                       dominantBaseline="central">{x.texto}</text>}
-            <Compuerta u={u} x={xs} y={yAx} s={x.dec ? M.romboDec : M.rombo} estado={x.dec ? 'hecho' : 'curso'} />
+            <Compuerta u={u} x={xs} y={yAx} s={x.dec ? sD : sH} estado={x.dec ? 'hecho' : 'curso'} />
             <text x={xs} y={yAx} fontSize={fNH} fontWeight={700} fill={SUP} textAnchor="middle"
                   dominantBaseline="central">{fijo(x.semana)}</text>
           </g>
