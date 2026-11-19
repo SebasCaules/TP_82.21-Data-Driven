@@ -1381,107 +1381,128 @@ export const DF = {
     {
      "id": "HU-1-01",
      "epica": 1,
-     "grupo": "hecha"
+     "grupo": "hecha",
+     "dueno": "Tomas F."
     },
     {
      "id": "HU-1-02",
      "epica": 1,
-     "grupo": "hecha"
+     "grupo": "hecha",
+     "dueno": "Francisco C."
     },
     {
      "id": "HU-2-01",
      "epica": 2,
-     "grupo": "hecha"
+     "grupo": "hecha",
+     "dueno": "Matías S."
     },
     {
      "id": "HU-2-02",
      "epica": 2,
-     "grupo": "piloto"
+     "grupo": "piloto",
+     "dueno": "Matías S."
     },
     {
      "id": "HU-2-03",
      "epica": 2,
-     "grupo": "despues"
+     "grupo": "despues",
+     "dueno": "IT interno; decide María G."
     },
     {
      "id": "HU-3-01",
      "epica": 3,
-     "grupo": "hecha"
+     "grupo": "hecha",
+     "dueno": "Francisco C."
     },
     {
      "id": "HU-3-02",
      "epica": 3,
-     "grupo": "hecha"
+     "grupo": "hecha",
+     "dueno": "Francisco C."
     },
     {
      "id": "HU-4-01",
      "epica": 4,
-     "grupo": "hecha"
+     "grupo": "hecha",
+     "dueno": "Francisco C."
     },
     {
      "id": "HU-4-02",
      "epica": 4,
-     "grupo": "piloto"
+     "grupo": "piloto",
+     "dueno": "Sebastian C."
     },
     {
      "id": "HU-4-03",
      "epica": 4,
-     "grupo": "piloto"
+     "grupo": "piloto",
+     "dueno": "Sebastian C."
     },
     {
      "id": "HU-5-01",
      "epica": 5,
-     "grupo": "hecha"
+     "grupo": "hecha",
+     "dueno": "Sebastian C."
     },
     {
      "id": "HU-5-02",
      "epica": 5,
-     "grupo": "despues"
+     "grupo": "despues",
+     "dueno": "María G."
     },
     {
      "id": "HU-6-01",
      "epica": 6,
-     "grupo": "hecha"
+     "grupo": "hecha",
+     "dueno": "Francisco C."
     },
     {
      "id": "HU-6-02",
      "epica": 6,
-     "grupo": "piloto"
+     "grupo": "piloto",
+     "dueno": "Francisco C."
     },
     {
      "id": "HU-6-03",
      "epica": 6,
-     "grupo": "piloto"
+     "grupo": "piloto",
+     "dueno": "Juan Manuel R."
     },
     {
      "id": "HU-7-01",
      "epica": 7,
-     "grupo": "piloto"
+     "grupo": "piloto",
+     "dueno": "Sebastian C."
     },
     {
      "id": "HU-7-02",
      "epica": 7,
-     "grupo": "piloto"
+     "grupo": "piloto",
+     "dueno": "Matías S."
     },
     {
      "id": "HU-7-03",
      "epica": 7,
-     "grupo": "piloto"
+     "grupo": "piloto",
+     "dueno": "Sebastian C."
     },
     {
      "id": "HU-8-01",
      "epica": 8,
-     "grupo": "hecha"
+     "grupo": "hecha",
+     "dueno": "Matías S."
     },
     {
      "id": "HU-8-02",
      "epica": 8,
-     "grupo": "piloto"
+     "grupo": "piloto",
+     "dueno": "Tomas F."
     },
     {
      "id": "HU-8-03",
      "epica": 8,
-     "grupo": "despues"
+     "grupo": "despues",
+     "dueno": "Matías S.; decide María G."
     }
    ]
   },

@@ -5,8 +5,10 @@
 //
 // Cada vista es un archivo `Vnn_Nombre.jsx` que exporta `default` (el componente) y `meta = { id }`; con
 // `meta = { id, plena: true }` (18/11, spec 1.5) App.jsx la dibuja sin riel ni encabezado, con la ventana lógica entera
-// (VISTAS[i].plena). (19/11, fase 9, spec 2) `meta.pasos`, entero de 1 a 4, son los pasos de su avance (VISTAS[i].pasos;
-// sin él, 1; otro valor corta el armado con su motivo, pasosDe de pasos.js). Ningún builder toca
+// (VISTAS[i].plena). (19/11, fase 9, spec 2; fase 10, regla 4) `meta.pasos`, entero de 1 a 6 (MAX_PASOS de pasos.js),
+// son los pasos de su avance (VISTAS[i].pasos; sin él, 1; otro valor corta el armado con su motivo, pasosDe de
+// pasos.js). Una vista con lienzo y esqueleto (VistaLienzo de Plantilla.jsx) no declara nada: es una vista común para
+// App.jsx. Ningún builder toca
 // este archivo para sumar la suya: alcanza con crear el archivo y listar la vista en CF.BLOQUES. Una vista listada sin
 // archivo se muestra como esqueleto (e3/src/vistas/Esqueleto.jsx). Un `V*.jsx` sin `default` no se registra.
 //

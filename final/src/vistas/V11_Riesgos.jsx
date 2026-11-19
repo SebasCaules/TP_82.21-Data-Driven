@@ -6,8 +6,9 @@
 // al rótulo secundario del tablero (sans 600 en CTX).
 // La tarjeta de adopción, la que nombra el título, lleva el encabezado en ACC, el cuerpo en realce y un trazo de 4 u, y
 // sobresale 24 u a cada lado: ACC e INK son dos azules oscuros y el color solo no marca el foco.
-// Pasos (spec 2): un riesgo por paso, en el orden en que los dice el orador (económico, adopción, legal). En el paso 1 las
-// tres tarjetas ya están en su lugar y las dos que faltan se ven atenuadas.
+// Pasos (spec 2): un riesgo por paso, en el orden en que los dice el orador (económico, adopción, legal). (fase 10, regla
+// 2) Las tarjetas no se bocetan: cada una está oculta hasta su paso (ocupa su lugar) y entra al llegar, de a una; la
+// primera entra con el paso 1 al llegar a la vista con →.
 // El espacio vertical (rellenos y aire entre tarjetas) crece con el lienzo entre un mínimo y un máximo para que el dibujo
 // ocupe cerca del 90 % del alto; el cuerpo baja de 30 a 24 u si una señal o una respuesta no entra en un renglón (con
 // los textos de hoy, todos entran en uno; si alguno crece, envolver lo corta y la tarjeta se estira).
@@ -90,7 +91,7 @@ function Dibujo({ w, h }) {
         const x0 = r.foco ? 0 : m.salto           // borde izquierdo de la tarjeta
         const wc = w - 2 * x0
         return (
-          <Paso key={r.riesgo} n={r.i + 1}>
+          <Paso key={r.riesgo} n={r.i + 1} oculto>
             <rect x={x0 + sw / 2} y={yc + sw / 2} width={wc - sw} height={hHead + hBody - sw} rx={rx}
                   fill={r.foco ? REALCE : SUP} stroke={color} strokeWidth={sw} />
             <path d={rectRedondo(x0, yc, wc, hHead, rx, 'arr')} fill={color} />

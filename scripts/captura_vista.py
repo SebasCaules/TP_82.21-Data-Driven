@@ -1,13 +1,14 @@
 """Captura una vista de /final/ y lista lo que se ve mal (18/11, fase 8 de la auditoría de dataviz, spec 1.6; 19/11,
-fase 9, spec 2.3: pasos).
+fase 9, spec 2.3: pasos; 19/11, fase 10: hasta 6 pasos, boceto sin textos, --todas con armado propio).
 
     python3 -I scripts/captura_vista.py V05 [--paso 2 | --pasos] [--var rev.b] [--res 1920x1080 ...] [--out DIR] [--completo]
     python3 -I scripts/captura_vista.py --todas [--pasos] [--var ...] [--res ...] [--out DIR]
 
 Sin --completo arma un HTML con esa sola vista (scripts/vite.final-vista.config.js con FINAL_VISTA; las demás quedan
 como esqueleto, así un archivo roto de otro agente no rompe el armado) en una carpeta temporal propia de la corrida (se
-pueden correr varias a la vez). Con --completo usa dist-final/index.html, armado antes con npm run build:final; --todas
-recorre las quince y lo implica.
+pueden correr varias a la vez). --todas recorre las quince sobre un armado propio de las quince (la misma configuración
+sin FINAL_VISTA, en otra carpeta temporal): no toca dist-final/, que puede tener una vista previa abierta. Con
+--completo usa dist-final/index.html tal cual, armado antes con npm run build:final.
 
 Abre file://…/index.html?var=…#vNN con Playwright (device_scale_factor 1, movimiento reducido) en cada --res (por
 defecto 1920x1080 y 1280x720). Sin --paso, la vista completa (como al entrar por enlace); con --paso k, ese paso del
@@ -17,13 +18,16 @@ avance (?paso=k, que App.jsx lee al abrir; si la vista tiene menos pasos, el úl
   - window.__fit() (src/fit.js) informa desbordes;
   - dos textos (<text> de los SVG y textos HTML visibles, riel incluido) se pisan más de 2 px; se compara la caja de
     las letras (0,76 del cuerpo, centrada en el renglón), no la del renglón entero, para que dos renglones seguidos de un
-    mismo párrafo no cuenten. Lo atenuado de un paso cuenta (se ve y ocupa su lugar); lo oculto (Paso oculto, rev.b) no;
+    mismo párrafo no cuenten. Solo cuentan los textos que se ven: los de un boceto (Paso atenuado: opacidad 0 o
+    -webkit-text-fill-color transparente) y los de lo oculto (Paso oculto, rev.b) no; los de lo apagado (hasta) sí;
   - un texto se sale del lienzo (.fin-lienzo), de su SVG, de una caja que lo recorta (overflow hidden) o de la ventana;
   - un texto mide menos de 20 u (--fin-u de .e3-vp; el riel no cuenta);
-  - en una ventana 16:9, el dibujo ocupa menos del 70 % o más del 95 % del alto del lienzo (spec 0.7); lo atenuado y lo
-    oculto de un paso cuentan, porque ocupan su lugar. En las demás ventanas solo se informa;
+  - en una ventana 16:9, el dibujo ocupa menos del 70 % o más del 95 % del alto del lienzo (spec 0.7); todo lo de un
+    Paso cuenta aunque no se vea (boceto, oculto, apagado, sus textos incluidos), porque ocupa su lugar. En las demás
+    ventanas solo se informa;
   - con --paso o --pasos, la vista no quedó en el paso pedido.
-Guarda vNN[-pK][-<var con guiones>]-WxH.png en --out (por defecto la carpeta de capturas de la fase 9), imprime los
+Las capturas van con movimiento reducido: cada paso aparece terminado (sin entradas ni animaciones a medias).
+Guarda vNN[-pK][-<var con guiones>]-WxH.png en --out (por defecto la carpeta de capturas de la fase 10), imprime los
 hallazgos y termina con «RESULTADO: OK» o «RESULTADO: FALLA» (código 1).
 """
 from __future__ import annotations
@@ -44,7 +48,8 @@ from playwright.sync_api import sync_playwright
 APP = Path(__file__).resolve().parents[1]
 CONFIG = APP / "scripts" / "vite.final-vista.config.js"
 COMPLETO = APP / "dist-final" / "index.html"
-OUT = Path("/Users/sebastiancaules/Desktop/ITBA/26-2C/FPDD/.workforce/auditoria-dataviz/fase-9/capturas")
+OUT = Path("/Users/sebastiancaules/Desktop/ITBA/26-2C/FPDD/.workforce/auditoria-dataviz/fase-10/capturas")
+MAX_PASOS = 6   # final/src/pasos.js
 RES_DEF = ["1920x1080", "1280x720"]
 LLENA = (0.70, 0.95)
 VISTAS = [f"V{i:02d}" for i in range(1, 16)]
@@ -70,14 +75,17 @@ def abrir_navegador(pw):
 
 
 def armar(vista: str, carpeta: Path) -> Path:
-    """El HTML de una sola vista en `carpeta`; corta con RESULTADO: FALLA si vite no arma."""
+    """El HTML de una sola vista en `carpeta` (con vista '', las quince); corta con RESULTADO: FALLA si vite no arma."""
     vite = APP / "node_modules" / ".bin" / "vite"
     cmd = [str(vite)] if vite.exists() else ["npx", "vite"]
     cmd += ["build", "--config", str(CONFIG), "--outDir", str(carpeta)]
-    r = subprocess.run(cmd, cwd=APP, env={**os.environ, "FINAL_VISTA": vista}, capture_output=True, text=True)
+    env = {k: v for k, v in os.environ.items() if k != "FINAL_VISTA"}
+    if vista:
+        env["FINAL_VISTA"] = vista
+    r = subprocess.run(cmd, cwd=APP, env=env, capture_output=True, text=True)
     html = carpeta / "index.html"
     if r.returncode != 0 or not html.exists():
-        print(f"vite no armó {vista}:\n{(r.stderr or r.stdout).strip()[-2000:]}")
+        print(f"vite no armó {vista or 'las quince vistas'}:\n{(r.stderr or r.stdout).strip()[-2000:]}")
         print("RESULTADO: FALLA")
         sys.exit(1)
     return html
@@ -108,6 +116,9 @@ CHEQUEO = r"""(llena) => {
 
   const fuera = (el) => el.closest('.solo-lector, .chico, .e3-notas, .e3-negro, title, desc, style, script, defs, noscript')
   const ve = (el) => !el.checkVisibility || el.checkVisibility({ opacityProperty: true, visibilityProperty: true })
+  // el texto HTML de un boceto no tiene opacidad 0: se esconde con -webkit-text-fill-color transparente (fase 10)
+  const transparente = (c) => /^(transparent|rgba\(0, 0, 0, 0\))$/.test(c)
+  const veTexto = (el) => ve(el) && !transparente(getComputedStyle(el).webkitTextFillColor || '')
   const zoom = (el) => el.currentCSSZoom ?? 1
   const corto = (t) => t.replace(/\s+/g, ' ').trim().slice(0, 40)
   const nombre = (el) => {
@@ -134,7 +145,7 @@ CHEQUEO = r"""(llena) => {
     const n = w.currentNode
     if (!n.textContent.trim()) continue
     const el = n.parentElement
-    if (!el || el.closest('svg') || fuera(el) || !ve(el)) continue
+    if (!el || el.closest('svg') || fuera(el) || !veTexto(el)) continue
     const rg = document.createRange(); rg.selectNodeContents(n)
     const rs = [...rg.getClientRects()].filter((r) => r.width > 0.5 && r.height > 0.5)
     if (!rs.length) continue
@@ -186,9 +197,9 @@ CHEQUEO = r"""(llena) => {
       if (['g', 'svg', 'title', 'defs', 'tspan', 'desc', 'clippath', 'mask', 'marker', 'lineargradient',
            'radialgradient', 'stop', 'pattern', 'symbol'].includes(tag) || el.closest('defs')) continue
       const cs = getComputedStyle(el)
-      // lo oculto de un paso (visibility hidden) ocupa su lugar: cuenta para el alto
-      const oculto = el.closest('.fin-paso[data-revela="oculto"]')
-      if ((!ve(el) && !oculto) || (cs.fill === 'none' && cs.stroke === 'none' && tag !== 'text')) continue
+      // lo de un paso que no está encendido (boceto sin textos, oculto, apagado) ocupa su lugar: cuenta para el alto
+      const reservado = el.closest('.fin-paso:not([data-revela="on"])')
+      if ((!ve(el) && !reservado) || (cs.fill === 'none' && cs.stroke === 'none' && tag !== 'text')) continue
       const r = el.getBoundingClientRect()
       if (r.width < 0.5 && r.height < 0.5) continue
       top = Math.min(top, r.top); bot = Math.max(bot, r.bottom)
@@ -262,18 +273,18 @@ def main():
     ap.add_argument("vista", nargs="?", help="V01 a V15")
     ap.add_argument("--var", default="", help="cadena para ?var= (por ejemplo rev.b)")
     pasos_g = ap.add_mutually_exclusive_group()
-    pasos_g.add_argument("--paso", type=int, help="captura ese paso del avance (1 a 4) en vez de la vista completa")
+    pasos_g.add_argument("--paso", type=int, help=f"captura ese paso del avance (1 a {MAX_PASOS}) en vez de la vista completa")
     pasos_g.add_argument("--pasos", action="store_true", help="una captura por paso del avance (vNN-p1-…, vNN-p2-…)")
     ap.add_argument("--res", action="append", help="WxH, repetible (por defecto 1920x1080 y 1280x720)")
     ap.add_argument("--out", default=str(OUT), help="carpeta de las capturas")
     ap.add_argument("--completo", action="store_true", help="usa dist-final/index.html (npm run build:final) sin armar")
-    ap.add_argument("--todas", action="store_true", help="las quince vistas; implica --completo")
+    ap.add_argument("--todas", action="store_true", help="las quince vistas, sobre un armado propio de las quince")
     a = ap.parse_args()
-    if a.paso is not None and not 1 <= a.paso <= 4:
-        ap.error("--paso va de 1 a 4")
+    if a.paso is not None and not 1 <= a.paso <= MAX_PASOS:
+        ap.error(f"--paso va de 1 a {MAX_PASOS}")
 
     if a.todas:
-        vistas, a.completo = VISTAS, True
+        vistas = VISTAS
     else:
         if not a.vista or a.vista.upper() not in VISTAS:
             ap.error("falta la vista (V01 a V15) o --todas")
@@ -296,8 +307,8 @@ def main():
             sys.exit(1)
         html = COMPLETO
     else:
-        tmp = Path(tempfile.mkdtemp(prefix=f"final-{vistas[0].lower()}-"))
-        html = armar(vistas[0], tmp)
+        tmp = Path(tempfile.mkdtemp(prefix=f"final-{'todas' if a.todas else vistas[0].lower()}-"))
+        html = armar("" if a.todas else vistas[0], tmp)
 
     problemas: list[str] = []
     try:

@@ -52,6 +52,9 @@
   transition: background-color 200ms ease;
 }
 .e3-vp .fin-pasos i.fin-on { background: var(--e3-ctx); }
+@media (prefers-reduced-motion: reduce) { .e3-vp .fin-pasos i { transition: none; } }
+/* (fase 10) Hasta 6 puntos: 6 × 9 u y 5 huecos de 6 u. Medido en las quince vistas a 1920 × 1080, 1280 × 720 y
+   1024 × 768 con 6 puntos: entre la sección y «n / 15 · cita» sobran al menos 690 u (el peor caso es V05). */
 /* En la vista a pantalla completa (sin encabezado), abajo a la derecha, en el margen de la ventana. */
 .e3-vp .app.fin-app-plena .principal { position: relative; }
 .e3-vp .fin-pasos.fin-pasos-plena {

@@ -22,6 +22,9 @@ JSON del vault que escriben los generadores de las partes, sin copia intermedia.
   canon.json (criterios de go-live y plan); y raw/datasets/unidad-1/Transacciones_clientes.csv, contado mes a mes para
   el control del 60 % (D28, H46) y el embudo del extracto de ventas (C20). Dan las tablas ventas_2025,
   tramos_de_cruce, lista_muestra, backlog, plan, legal_previas y riesgos_criticos de las vistas de /final/.
+  (19/11, fase 10 de la auditoría de dataviz) Cada historia del backlog lleva su dueño (`dueno`), con el mapa DUENO de
+  ese mismo contenido_a.py (el nombre corto del canon para los integrantes, y los rótulos de María G. y de IT que usa
+  la tabla 2.2 del E4), resuelto con ast.
 
 Escribe final/src/datos_final.js con «export const DF = {...}». Solo biblioteca estándar.
 
@@ -705,9 +708,38 @@ def valor_ast(nodo, nombres: dict):
     return literal(nodo)
 
 
+def duenos_ast(arbol, canon: dict) -> dict:
+    """El mapa DUENO de contenido_a.py del E4 (slug → nombre del dueño de una historia), sin importarlo:
+    DUENO = dict(CORTO, maria='…', it='…', **{'matias-decide': '…'}), con CORTO = {i['slug']: i['corto'] for i in
+    CANON['integrantes']}, que se arma acá con el canon que ya se lee. Corta si cambia la forma de cualquiera de los dos."""
+    corto, dueno = None, None
+    for nodo in arbol.body:
+        if not (isinstance(nodo, ast.Assign) and isinstance(nodo.targets[0], ast.Name)):
+            continue
+        if nodo.targets[0].id == "CORTO":
+            if ast.unparse(nodo.value) != "{i['slug']: i['corto'] for i in CANON['integrantes']}":
+                raise Falta("contenido_a.py del E4: CORTO ya no sale de CANON['integrantes'] (slug → corto)")
+            corto = {i["slug"]: i["corto"] for i in canon["integrantes"]}
+        elif nodo.targets[0].id == "DUENO":
+            v = nodo.value
+            if not (isinstance(v, ast.Call) and isinstance(v.func, ast.Name) and v.func.id == "dict" and len(v.args) == 1
+                    and isinstance(v.args[0], ast.Name) and v.args[0].id == "CORTO" and corto is not None):
+                raise Falta("contenido_a.py del E4: DUENO ya no es dict(CORTO, …) después de CORTO")
+            dueno = dict(corto)
+            for kw in v.keywords:
+                if kw.arg is None:
+                    dueno.update(literal(kw.value))
+                else:
+                    dueno[kw.arg] = literal(kw.value)
+    if dueno is None:
+        raise Falta("contenido_a.py del E4: falta DUENO (dueño de cada historia)")
+    return dueno
+
+
 def gestion_tablas(p: Path, canon: dict, kf: list, cal: dict, c: Path) -> dict:
-    """El backlog (E4 A 2.1 y 2.2), el plan (4.1), las acciones legales previas (4.2, criterio 1 de go-live) y los
-    riesgos críticos de la C 6.3, leídos con ast de los generadores; controles contra las K y contra G63."""
+    """El backlog (E4 A 2.1 y 2.2, con el dueño de cada historia), el plan (4.1), las acciones legales previas (4.2,
+    criterio 1 de go-live) y los riesgos críticos de la C 6.3, leídos con ast de los generadores; controles contra las K
+    y contra G63."""
     import re
     arbol = ast.parse(p.read_text(encoding="utf-8"))
     nombres, epicas, historias, previas = {}, None, None, None
@@ -720,6 +752,7 @@ def gestion_tablas(p: Path, canon: dict, kf: list, cal: dict, c: Path) -> dict:
                 epicas = literal(nodo.value)
             elif n == "HISTORIAS":
                 historias = valor_ast(nodo.value, nombres)
+    duenos = duenos_ast(arbol, canon)
     for nodo in ast.walk(arbol):
         if (isinstance(nodo, ast.Call) and isinstance(nodo.func, ast.Name) and nodo.func.id == "T" and nodo.args
                 and isinstance(nodo.args[0], ast.Constant) and nodo.args[0].value == "Precondiciones de la primera lista"):
@@ -728,7 +761,11 @@ def gestion_tablas(p: Path, canon: dict, kf: list, cal: dict, c: Path) -> dict:
         raise Falta("contenido_a.py del E4: falta EPICAS, HISTORIAS o la tabla «Precondiciones de la primera lista»")
     k = {f["id"]: f["cifra"] for f in kf}
     grupo = {"hecha": "hecha", "planilla": "piloto", "legal": "piloto", "piloto": "piloto", "despues": "despues"}
-    hs = [{"id": h["id"], "epica": int(h["id"].split("-")[1]), "grupo": grupo[h["grupo"]]} for h in historias]
+    sin_dueno = [h["id"] for h in historias if h.get("dueno") not in duenos]
+    if sin_dueno:
+        raise Falta(f"contenido_a.py del E4: historias sin dueño en DUENO: {', '.join(sin_dueno)}")
+    hs = [{"id": h["id"], "epica": int(h["id"].split("-")[1]), "grupo": grupo[h["grupo"]], "dueno": duenos[h["dueno"]]}
+          for h in historias]
     control("K01 = épicas del backlog", len(epicas), k["K01"])
     control("K02 = historias", len(hs), k["K02"])
     control("K04 = hechas", sum(h["grupo"] == "hecha" for h in hs), k["K04"])

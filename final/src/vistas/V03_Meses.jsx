@@ -13,7 +13,9 @@
 // «Mes de 2025») y los márgenes del título y de los meses se ajustan.
 // Pasos (spec 2, en el orden de las notas): 1, el eje, los ocho meses que entran, la línea de control y la leyenda de los
 // meses completos; 2, los cuatro meses que quedan debajo, en el acento, con su renglón de la leyenda. Los meses del eje X
-// están desde el paso 1 (son el eje).
+// están desde el paso 1 (son el eje). (fase 10, regla 1) En el paso 1 las cuatro columnas que faltan son boceto: la forma
+// tenue y sin acento, sin su valor (Paso oculta los <text> de adentro); el renglón de la leyenda de esos meses, que no es
+// parte del gráfico, tampoco se ve (Leyenda lleva data-txt).
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'

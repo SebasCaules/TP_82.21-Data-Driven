@@ -7,12 +7,14 @@
 //
 // La API de las vistas sigue siendo barras(props), que devuelve el dibujo para Lienzo:
 //   barras({ datos, maximo?, eje, marcas?, formatoEje? })
-//   datos: [{ etiqueta, valor, texto, nota?, foco?, contorno?, fantasma?, fantasmaFoco?, notaFantasma? }]
+//   datos: [{ etiqueta, valor, texto, nota?, foco?, contorno?, fantasma?, fantasmaFoco?, notaFantasma?, paso?, oculto? }]
 // `texto` es el valor ya escrito con formato.js (con su unidad: «USD 4.485», «86,1 %»): acá no se formatea nada.
 // `eje`: el título del eje (de CF: barras.eje). `marcas`: los valores con marca (por defecto, escalaLinda hasta `maximo`
 // o hasta el mayor valor); el eje termina en la última marca. `formatoEje`: cómo se escribe cada marca (formato.js).
 // (19/11, fase 9, spec 2.2) `paso` en un dato: la fila entera (rótulo, barra, valor y nota) se enciende en ese paso del
 // avance y antes se ve atenuada (Paso de svg.jsx); sin `paso`, desde el paso 1. El eje y la línea base, siempre.
+// (fase 10) Antes de su paso la fila es boceto: la barra tenue y sin acento, sin rótulo, valor ni nota (Paso oculta los
+// textos). `oculto: true` en un dato: la fila no se ve hasta su paso y entra (regla 2).
 
 import { useU } from './escala.js'
 import { ACC, CTX, FIN_GRIS, INK, SUP, TRAZO, BarraH, EjeX, LineaBase, Paso, altoEjeX, ancho, escalaLinda, rectRedondo,
@@ -90,7 +92,7 @@ export function BarrasFin({ w, h, datos, maximo, marcas, formatoEje = (x) => fij
         const valDentro = d.notaFantasma && !notaFuera && !d.foco && !d.contorno && anchoV + 24 * u <= largoB
         const xNota = xVal + anchoV + 16 * u
         return (
-          <Paso key={d.etiqueta} n={d.paso ?? 1}>
+          <Paso key={d.etiqueta} n={d.paso ?? 1} oculto={d.oculto === true}>
             <title>{[d.etiqueta, d.texto, d.nota, d.notaFantasma].filter(Boolean).join(' · ')}</title>
             <text x={x0 - 24 * u} y={yc} fontSize={tam('cat', u)} fontWeight={d.foco ? 600 : 400}
                   fill={d.foco ? INK : CTX} textAnchor="end" dominantBaseline="central">{d.etiqueta}</text>

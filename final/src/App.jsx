@@ -25,6 +25,13 @@
 // arranca en el paso 1 de la primera vista. El cambio de paso no usa la transición de vista: solo cambian las opacidades
 // (estilos_final.css). El canal entre ventanas lleva también el paso, las notas dicen «paso k de N», el encabezado lleva
 // un punto por paso y la hoja impresa dibuja cada vista completa.
+// (19/11, fase 10, spec 2 y 3) Hasta 6 pasos por vista. Cada posición sabe cómo se llegó a ella (llegada()): avanzando
+// un paso o entrando a la vista siguiente con → ('adelante', con `llega` = el paso que llegó), retrocediendo ('atras') o
+// de otro modo ('quieto': al abrir, Inicio, Fin, el riel, el enlace, ?paso=k). .app lleva data-avance y data-llega, y
+// PasoCtx lleva llega y desdeVista: solo lo que acaba de llegar avanzando se anima (Paso, Anima, useAnima); sin avanzar,
+// los cambios son instantáneos (estilos_final.css). Al entrar a una vista con →, --fin-anima-base retrasa las animaciones
+// del paso 1 hasta que el cuerpo nuevo entra. Una vista con VistaLienzo (Plantilla.jsx) usa el riel y el encabezado
+// como cualquier otra; `plena` sigue igual.
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -56,13 +63,31 @@ const completa = (i) => ({ i, paso: pasosEn(i), completa: true })
 const enPaso = (i, paso) => ({ i, paso: Math.max(1, Math.min(pasosEn(i), paso)), completa: false })
 const igual = (a, b) => a.i === b.i && a.paso === b.paso && a.completa === b.completa
 const clave = (p) => `${p.i}:${p.paso}:${p.completa ? 1 : 0}`
+const QUIETO = { avance: 'quieto', llega: 0, desdeVista: false }
+/** Cómo se llegó de `vieja` a `nueva` (las dos { i, paso, completa }): 'adelante' si es el paso siguiente de la misma
+ *  vista o el paso 1 de la vista siguiente desde el último de esta (llega: ese paso; desdeVista: si cambió de vista);
+ *  'atras' si es un paso anterior o una vista anterior; si no, 'quieto' (la vista completa, un salto, el enlace). */
+function llegada(vieja, nueva) {
+  if (nueva.completa) return QUIETO
+  if (nueva.i === vieja.i && !vieja.completa && nueva.paso === vieja.paso + 1) {
+    return { avance: 'adelante', llega: nueva.paso, desdeVista: false }
+  }
+  if (nueva.i === vieja.i + 1 && nueva.paso === 1 && vieja.paso === pasosEn(vieja.i)) {
+    return { avance: 'adelante', llega: 1, desdeVista: true }
+  }
+  if (nueva.i < vieja.i || (nueva.i === vieja.i && nueva.paso < vieja.paso)) return { ...QUIETO, avance: 'atras' }
+  return QUIETO
+}
+// Lo que esperan las animaciones del paso 1 al entrar a una vista con →: el cuerpo nuevo entra a los 100 ms y tarda 380
+// (::view-transition-new(e2-cuerpo), estilos_e2.css; sin View Transitions, 340 ms de WAAPI).
+const BASE_DESDE_VISTA = '260ms'
 
 /** Al abrir: ?paso=k, ese paso de la vista del enlace (o de la primera); con enlace, la vista completa; sin enlace, el
  *  paso 1 de la primera (se empieza a presentar). */
 function posicionInicial() {
   const h = indiceDeHash()
-  if (PASO_URL) return enPaso(Math.max(0, h), PASO_URL)
-  return h >= 0 ? completa(h) : enPaso(0, 1)
+  if (PASO_URL) return { ...enPaso(Math.max(0, h), PASO_URL), ...QUIETO }
+  return { ...(h >= 0 ? completa(h) : enPaso(0, 1)), ...QUIETO }
 }
 
 /** Ventana lógica al día con el tamaño real, descontando el panel de notas si está abierto. Con las
@@ -108,10 +133,12 @@ export default function App() {
   // La posición vigente, al día antes de que React dibuje: las teclas y el canal calculan desde acá.
   const actual = useRef(pos)
   /** Cambio de posición. Entre vistas, con la transición del E2 (View Transitions con dirección; si no hay, WAAPI); dentro
-   *  de una vista, sin transición de vista: Paso (svg.jsx) cambia solo su opacidad. */
-  const setPos = useCallback((nueva) => {
+   *  de una vista, sin transición de vista: Paso (svg.jsx) cambia solo su opacidad. La posición nueva lleva cómo se llegó
+   *  a ella (llegada). */
+  const setPos = useCallback((destino) => {
     const vieja = actual.current
-    if (igual(nueva, vieja)) return
+    if (igual(destino, vieja)) return
+    const nueva = { ...destino, ...llegada(vieja, destino) }
     actual.current = nueva
     if (nueva.i !== vieja.i) {
       document.documentElement.dataset.dir = nueva.i > vieja.i ? 'adelante' : 'atras'
@@ -291,7 +318,9 @@ export default function App() {
     return () => window.removeEventListener('keydown', h)
   }, [])
 
-  const paso = useMemo(() => ({ paso: pos.paso, pasos, completa: pos.completa }), [pos, pasos])
+  const paso = useMemo(() => ({
+    paso: pos.paso, pasos, completa: pos.completa, llega: pos.llega ?? 0, desdeVista: pos.desdeVista === true,
+  }), [pos, pasos])
 
   if (SOLO_NOTAS) return <VentanaNotas vista={vista} paso={pos.paso} pasos={pasos} />
 
@@ -307,7 +336,9 @@ export default function App() {
           <UCtx.Provider value={u}>
             <div className={`app${proy ? ' fin-proy' : ''}${plena ? ' fin-app-plena' : ''}`}
                  data-vista={vista.id} data-paso={pos.paso} data-pasos={pasos}
-                 data-completa={pos.completa ? '' : undefined}>
+                 data-completa={pos.completa ? '' : undefined}
+                 data-avance={pos.avance ?? 'quieto'} data-llega={pos.llega || undefined}
+                 style={pos.desdeVista ? { '--fin-anima-base': BASE_DESDE_VISTA } : undefined}>
               <div className="chico">
                 <h1>Este tablero necesita una pantalla más grande</h1>
                 <p>
@@ -427,7 +458,7 @@ function Impresion() {
         {VISTAS.map((v) => (
           <div className="hoja" key={v.id}>
             <h1 className="e2-preg">{v.pregunta}</h1>
-            <PasoCtx.Provider value={{ paso: v.pasos, pasos: v.pasos, completa: true }}>
+            <PasoCtx.Provider value={{ paso: v.pasos, pasos: v.pasos, completa: true, llega: 0, desdeVista: false }}>
               <v.Componente vista={v} />
             </PasoCtx.Provider>
           </div>

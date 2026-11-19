@@ -3,7 +3,9 @@
    en la unidad u, la variable --fin-u que App.jsx deja en .e3-vp (1 u = 1 px de una pantalla de 1920 × 1080; escala.js).
    Las reglas que nombran una clase del armazón van bajo .e3-vp y ninguna usa !important fuera de @media print.
    (fase 9, spec 3) Quedan las ramas que eligió el usuario: banda de una sola cifra (180 u), decisión pegada arriba y
-   conclusión de un renglón. Las otras se borraron. (spec 2) Al final, el avance por pasos (.fin-paso). */
+   conclusión de un renglón. Las otras se borraron. (spec 2) Al final, el avance por pasos (.fin-paso).
+   (fase 10) El boceto sin textos, la entrada de lo oculto, el escalonado, los efectos de Anima (.fin-anima) y la vista
+   con lienzo y esqueleto (.fin-vista-lienzo, VistaLienzo de Plantilla.jsx). */
 
 /* ---------- tokens ---------- */
 .e3-vp {
@@ -30,7 +32,7 @@
   --fin-paso-t: 350ms;
 }
 /* Marca de contexto (spec b.3): #8a94a6, 3,06:1 sobre blanco y ΔE 28 contra --acc. */
-.e3-vp .fin-graf, .e3-vp .fin-plena { --fin-gris: #8a94a6; }
+.e3-vp .fin-graf, .e3-vp .fin-plena, .e3-vp .fin-vista-lienzo { --fin-gris: #8a94a6; }
 
 /* ---------- marco (encabezado y cuerpo; los usa App.jsx; la grilla del encabezado está en estilos_marco.css) ---------- */
 /* El título, en un renglón y al mismo tamaño en las 15 vistas. El más ancho es V09 («Pasa con 11 puntos; lo observado da
@@ -128,26 +130,119 @@
 /* ---------- vista a pantalla completa (spec 1.5) ---------- */
 .fin-plena { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
 
+/* ---------- lienzo con esqueleto (fase 10, spec 3; VistaLienzo) ---------- */
+/* Con riel y encabezado (App.jsx los dibuja como en toda vista) y sin banda ni tarjeta del gráfico: el lienzo ocupa el
+   cuerpo entero, dentro de su relleno (24 u arriba, 40 u a los costados, 32 u abajo), sobre el papel del tablero. */
+.fin-vista-lienzo { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+.fin-vista-lienzo > .fin-lienzo { flex: 1 1 0; min-height: 0; }
+
 /* Notas: el renglón de quién presenta va pegado al de arriba. */
 .fin-notas-quien { margin-top: -4px; }
 
-/* ---------- avance por pasos (spec 2 de la fase 9; Paso y PasoHtml de svg.jsx, pasos.js) ---------- */
-/* Lo que todavía no se reveló se ve atenuado: opacidad --fin-atenuado (un solo valor para todo el tablero) y sin color,
-   así una marca en el acento se ve gris (más oscura que el gris de contexto atenuado: la diferencia queda, el acento no).
-   Ocupa su lugar. Con `oculto` o ?var=rev.b, no se ve pero también ocupa su lugar. El cambio de paso solo mueve la
-   opacidad y el color, en --fin-paso-t; con movimiento reducido, sin transición. */
+/* ---------- avance por pasos (spec 2 de la fase 9; fase 10, spec 2 y 3; Paso, PasoHtml y Anima de svg.jsx, pasos.js) */
+/* Estados de .fin-paso (data-revela):
+   - atenuado: el BOCETO (regla 1 de la fase 10). Las formas con opacidad --fin-atenuado y sin color (una marca en el
+     acento se ve gris, más oscura que el gris de contexto atenuado: la diferencia queda, el acento no) y NINGÚN texto:
+     <text> (y sus <tspan>), los elementos marcados con data-txt (pastillas, fondos de rótulo, muestras de leyenda) y el
+     texto HTML (por -webkit-text-fill-color, que se hereda y casi nadie fija). Ocupa su lugar.
+   - oculto: no se ve y ocupa su lugar (Paso oculto, ?var=rev.b).
+   - apagado: lo ya dicho (después de `hasta`): tenue y sin color, con sus textos.
+   - on: encendido.
+   El cambio entre estados es una transición de --fin-paso-t, y solo cuando se avanza (.app[data-avance='adelante'],
+   App.jsx): al retroceder, al abrir completa y por enlace el cambio es instantáneo y corta lo que estuviera en curso.
+   Lo que estaba oculto ENTRA al llegar su paso (clase fin-entra, que pone Paso: animación fin-entra, con opacidad y un
+   desplazamiento de --fin-entra-dy, en --fin-entra-t). `orden` (--fin-orden) retrasa el cambio o la entrada
+   --fin-orden × --fin-escalon. Con movimiento reducido, sin transiciones ni animaciones: todo aparece terminado. */
+.e3-vp {
+  --fin-entra-t: 320ms;
+  --fin-entra-dy: calc(var(--fin-u) * 14);
+  --fin-escalon: 100ms;
+  --fin-dur: 450ms;
+  --fin-curva: cubic-bezier(0.2, 0, 0, 1);
+  --fin-curva-sale: cubic-bezier(0.16, 1, 0.3, 1);
+  /* espera antes de animar el paso 1 cuando se llega desde la vista anterior: el cuerpo nuevo entra con la transición
+     de vista (100 ms de espera y 380 ms, estilos_e2.css); App.jsx pone --fin-anima-base en .app */
+  --fin-anima-base: 0ms;
+}
 .fin-paso {
-  transition: opacity var(--fin-paso-t, 350ms) cubic-bezier(0.2, 0, 0, 1), filter var(--fin-paso-t, 350ms) cubic-bezier(0.2, 0, 0, 1),
+  transition: opacity var(--fin-paso-t, 350ms) var(--fin-curva), filter var(--fin-paso-t, 350ms) var(--fin-curva),
     visibility var(--fin-paso-t, 350ms);
 }
-.fin-paso[data-revela='atenuado'] { opacity: var(--fin-atenuado, .32); filter: grayscale(1); }
+.fin-paso :is(text, [data-txt]) { transition: opacity var(--fin-paso-t, 350ms) var(--fin-curva); }
+.fin-paso[data-revela='atenuado'], .fin-paso[data-revela='apagado'] { opacity: var(--fin-atenuado, .32); filter: grayscale(1); }
+.fin-paso[data-revela='atenuado'] { -webkit-text-fill-color: transparent; text-decoration-color: transparent; }
+.fin-paso[data-revela='atenuado'] :is(text, [data-txt]) { opacity: 0; }
 .fin-paso[data-revela='oculto'] { opacity: 0; visibility: hidden; }
+/* escalonado del encendido (boceto → on): cada lugar espera --fin-escalon; los textos de adentro, lo mismo */
+.app[data-avance='adelante'] .fin-paso[data-revela='on'],
+.app[data-avance='adelante'] .fin-paso[data-revela='on'] :is(text, [data-txt]) {
+  transition-delay: calc(var(--fin-orden, 0) * var(--fin-escalon, 100ms));
+}
+/* entrada={false}: el cambio es instantáneo siempre; el movimiento lo pone un Anima de adentro */
+.fin-paso.fin-sin-entrada, .fin-paso.fin-sin-entrada :is(text, [data-txt]) { transition: none; }
+/* sin avanzar (retroceso, vista completa, enlace, ?paso=k), los cambios son instantáneos */
+.app:not([data-avance='adelante']) .fin-paso,
+.app:not([data-avance='adelante']) .fin-paso :is(text, [data-txt]) { transition: none; }
+/* la entrada de lo oculto: desde abajo y transparente hasta su lugar; durante la espera (orden) sigue invisible */
+@keyframes fin-entra {
+  from { opacity: 0; transform: translate(0, var(--fin-entra-dy, 14px)); }
+}
+.fin-paso.fin-entra {
+  transition: none;
+  animation: fin-entra var(--fin-entra-t, 320ms) var(--fin-curva-sale) backwards;
+  animation-delay: calc(var(--fin-anima-base, 0ms) + var(--fin-orden, 0) * var(--fin-escalon, 100ms));
+}
+
+/* ---------- movimiento dentro de un paso (regla 3 de la fase 10; Anima de svg.jsx) ---------- */
+/* Anima pone .fin-anima.fin-a-<efecto> solo mientras su paso es el que acaba de llegar avanzando (pasos.js, useAnima).
+   Cada efecto va DESDE un estado inicial HASTA lo dibujado (sin keyframe final, o con uno que equivale a no tocar nada)
+   y se llena solo hacia atrás (backwards: invisible durante su espera, sin nada pegado al terminar): el estado final es
+   el dibujo, y al quitarse la clase (paso siguiente, retroceso, vista completa) queda igual. Retraso: --fin-anima-base (al entrar a la
+   vista) + --fin-i × --fin-escalon; duración --fin-dur. transform-box: fill-box hace que el origen sea la caja del
+   propio dibujo (el borde izquierdo de una barra, la base de una columna, el centro de un cuadro). */
+.fin-anima {
+  animation-duration: var(--fin-dur, 450ms);
+  animation-timing-function: var(--fin-curva);
+  animation-fill-mode: backwards;
+  animation-delay: calc(var(--fin-anima-base, 0ms) + var(--fin-i, 0) * var(--fin-escalon, 100ms));
+  transform-box: fill-box;
+}
+@keyframes fin-a-aparece { from { opacity: 0; transform: translate(0, var(--fin-entra-dy, 14px)); } }
+@keyframes fin-a-funde { from { opacity: 0; } }
+@keyframes fin-a-escala { from { transform: scale(0); } }
+@keyframes fin-a-crece-x { from { transform: scaleX(0); } }
+@keyframes fin-a-crece-y { from { transform: scaleY(0); } }
+@keyframes fin-a-revela-x { from { clip-path: inset(-20px 100% -20px -20px); } to { clip-path: inset(-20px); } }
+@keyframes fin-a-revela-y { from { clip-path: inset(100% -20px -20px -20px); } to { clip-path: inset(-20px); } }
+@keyframes fin-a-corre { from { transform: translate(var(--fin-dx, 0px), var(--fin-dy, 0px)); } }
+@keyframes fin-a-traza { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.fin-anima.fin-a-aparece { animation-name: fin-a-aparece; }
+.fin-anima.fin-a-funde { animation-name: fin-a-funde; }
+.fin-anima.fin-a-escala { animation-name: fin-a-escala; transform-origin: var(--fin-origen, center); }
+.fin-anima.fin-a-crece-x { animation-name: fin-a-crece-x; transform-origin: var(--fin-origen, left center); }
+.fin-anima.fin-a-crece-y { animation-name: fin-a-crece-y; transform-origin: var(--fin-origen, center bottom); }
+.fin-anima.fin-a-revela-x { animation-name: fin-a-revela-x; }
+.fin-anima.fin-a-revela-y { animation-name: fin-a-revela-y; }
+.fin-anima.fin-a-corre { animation-name: fin-a-corre; }
+/* traza: cada trazo de adentro con pathLength={1}; el guion de largo 1 recorre la línea y al final la cubre entera */
+.fin-anima.fin-a-traza { animation-name: none; }
+.fin-anima.fin-a-traza [pathLength] {
+  stroke-dasharray: 1 1; animation: fin-a-traza var(--fin-dur, 450ms) var(--fin-curva) backwards;
+  animation-delay: calc(var(--fin-anima-base, 0ms) + var(--fin-i, 0) * var(--fin-escalon, 100ms));
+}
+
+/* Movimiento reducido (así capturan las herramientas): nada se mueve, todo aparece terminado. useAnima ya da false; esto
+   es la red, con la especificidad de sobra para ganarle a una regla de vista. */
 @media (prefers-reduced-motion: reduce) {
-  .fin-paso { transition: none; }
+  .e3-vp .app .fin-paso, .e3-vp .app .fin-paso :is(text, [data-txt]) { transition: none; }
+  .e3-vp .app .fin-paso.fin-entra, .e3-vp .app .fin-anima, .e3-vp .app .fin-anima * { animation: none; }
 }
 
 /* Hoja impresa: la unidad de la ventana lógica mínima, y cada vista completa (App.jsx ya la arma así; esto es la red). */
 @media print {
   .e3-vp { --fin-u: .6px !important; }
-  .fin-paso { opacity: 1 !important; visibility: visible !important; filter: none !important; }
+  .fin-paso { opacity: 1 !important; visibility: visible !important; filter: none !important;
+    -webkit-text-fill-color: currentcolor !important; }
+  .fin-paso :is(text, [data-txt]) { opacity: 1 !important; }
+  .fin-paso.fin-entra, .fin-anima, .fin-anima * { animation: none !important; }
 }

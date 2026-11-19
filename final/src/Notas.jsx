@@ -10,7 +10,7 @@
 // (18/11, S-07) La fuente del documento de cada vista («E3, Parte D v3.0») sale del encabezado del tablero y va acá, en
 // la cabecera, después de «n / 15 · pregunta».
 // (19/11, fase 9, spec 2.1) Con más de un paso, la cabecera dice «paso k de N» después de «n / 15» (App.jsx pasa el paso
-// vigente; las dos ventanas están siempre en el mismo).
+// vigente; las dos ventanas están siempre en el mismo). (fase 10) N llega hasta 6; el renglón no cambia.
 
 import { CF } from './contenido_final.js'
 import { NOTAS } from './notas_final.js'

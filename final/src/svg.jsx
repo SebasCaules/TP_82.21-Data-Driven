@@ -16,11 +16,16 @@
 // (19/11, fase 9, spec 2.2) Paso (SVG) y PasoHtml (HTML): lo de adentro se enciende en su paso del avance y antes se ve
 // atenuado (o no se ve, con `oculto` o ?var=rev.b). El paso vigente sale de pasos.js (usePaso); el CSS, de
 // estilos_final.css (.fin-paso, --fin-atenuado). Están al principio de las piezas comunes.
+// (19/11, fase 10, spec 2) Antes de su paso, Paso es un boceto: formas tenues sin acento y ningún texto (<text> y lo
+// marcado con data-txt, como las muestras de Leyenda y la pastilla de Aqui). `oculto` entra al llegar (opacidad y un
+// desplazamiento chico) y `orden` escalona varias del mismo paso. Anima (y AnimaHtml) mueve lo del paso que acaba de
+// llegar avanzando (rellenar, crecer, correrse) con CSS, y lo deja terminado al abrir completa, al retroceder y con
+// movimiento reducido.
 
 import { anchoTexto as ancho } from '../../e3/src/medir.js'
 import { fijo } from '../../e3/src/formato.js'
 import { useU } from './escala.js'
-import { useEstadoPaso } from './pasos.js'
+import { REV, estadoPaso, llegaAnimado, useAnima, usePasos } from './pasos.js'
 
 export { ancho, useU }
 export const ACC = 'var(--acc)'
@@ -204,33 +209,91 @@ export function Chevron({ u, x, y, s = 32 }) {
                strokeWidth={3 * u} strokeLinecap="round" strokeLinejoin="round" />
 }
 
-// ---------------------------------------------------------------- avance por pasos (fase 9, spec 2.2)
+// ---------------------------------------------------------------- avance por pasos (fase 9, spec 2.2; fase 10, spec 2)
 
-/** Lo que se enciende en el paso `n` del avance, dentro de un SVG (un <g>). Antes de su paso se ve atenuado (opacidad
- *  --fin-atenuado y sin color: una marca en ACC se ve gris) y ocupa su lugar; con `oculto` (capas que se superponen,
- *  como la de responsables) o con ?var=rev.b, no se ve pero también ocupa su lugar. Con `hasta={k}`, después del paso k
- *  vuelve a atenuarse: lo ya dicho se apaga para enfocar lo nuevo (en la vista completa, todo encendido). El cambio es una
- *  transición de opacidad de 350 ms, sin transición si el sistema pide movimiento reducido. n = 1 está siempre encendido.
- *    <Paso n={2}><Columna … foco /></Paso>
- *    <Paso n={4} oculto><Responsables … /></Paso>
- *  Lo que cambia de lugar o de tamaño entre pasos no va en Paso: la vista lee usePaso() y lo resuelve. */
-export function Paso({ n = 1, hasta, oculto = false, children }) {
-  const e = useEstadoPaso(n, { hasta, oculto })
-  return <g className="fin-paso" data-revela={e} aria-hidden={e === 'oculto' ? true : undefined}>{children}</g>
+/** Clases y atributos comunes de Paso y PasoHtml. Entra (clase fin-entra, la animación de entrada de estilos_final.css)
+ *  lo que no se veía (`oculto`, o todo con rev b) cuando su paso acaba de llegar avanzando. */
+function usePasoAttrs({ n, hasta, oculto, orden, entrada = true, className = '', style }) {
+  const c = usePasos()
+  const e = estadoPaso(c, n, { hasta, oculto })
+  const entra = entrada && e === 'on' && (oculto || REV === 'b') && llegaAnimado(c, n)
+  const st = orden != null ? { '--fin-orden': orden, ...style } : style
+  return {
+    className: `fin-paso${entra ? ' fin-entra' : ''}${entrada ? '' : ' fin-sin-entrada'}${className ? ` ${className}` : ''}`,
+    style: st,
+    'data-revela': e,
+    'aria-hidden': e === 'oculto' ? true : undefined,
+  }
+}
+
+/** Lo que se enciende en el paso `n` del avance, dentro de un SVG (un <g>). Cuatro maneras de verse antes y después:
+ *  - por defecto, antes de su paso es BOCETO (regla 1 de la fase 10): las formas atenuadas (--fin-atenuado) y sin acento
+ *    (gris), y ningún texto: <text> y todo lo marcado con data-txt no se ven. Al llegar su paso se enciende todo junto,
+ *    con una transición de 350 ms. Para un gráfico: barras, columnas, bandas, escalones.
+ *  - `oculto`: antes de su paso no se ve (ocupa su lugar); al llegar ENTRA (regla 2): opacidad y un desplazamiento chico
+ *    de abajo hacia arriba en 320 ms. Para tarjetas, viñetas, renglones de lista y capas.
+ *  - `orden={i}`: retrasa el cambio i lugares (--fin-escalon, 100 ms por defecto): varias tarjetas del mismo paso entran
+ *    una detrás de otra. Vale para la entrada y para el encendido del boceto.
+ *  - `hasta={k}`: después del paso k queda apagado (lo ya dicho: tenue, sin acento, con sus textos).
+ *  - `entrada={false}`: cambia de estado en el acto, sin transición ni entrada: el movimiento lo pone un Anima de adentro
+ *    (un tramo que crece, cuadros que se rellenan) y no se suma el desplazamiento de la entrada.
+ *  En la vista completa y en la hoja impresa todo está encendido; al retroceder o abrir completa, nada se anima; con
+ *  movimiento reducido, sin transiciones. n = 1 está siempre encendido (y, si es `oculto`, entra al llegar a la vista con
+ *  →). Con ?var=rev.b, todo lo que no llegó está oculto y entra.
+ *    <Paso n={2}><Columna … foco /><text>…</text></Paso>         boceto: la columna tenue, el valor no se ve
+ *    <Paso n={k} oculto orden={i}><Tarjeta … /></Paso>             tarjetas de a una
+ *    <Paso n={4} oculto><Responsables … /></Paso>                   capa de calcar
+ *  Lo que cambia de lugar o de tamaño entre pasos no va en Paso: la vista lee usePaso() y lo resuelve (o usa Anima). */
+export function Paso({ n = 1, hasta, oculto = false, orden, entrada = true, children }) {
+  return <g {...usePasoAttrs({ n, hasta, oculto, orden, entrada })}>{children}</g>
 }
 
 /** Paso para HTML: el mismo comportamiento en un <div> (o la etiqueta de `como`, 'span' dentro de un renglón), con la
- *  clase y el estilo que se le pasen.
- *    <PasoHtml n={3} className="mi-tarjeta">…</PasoHtml> */
-export function PasoHtml({ n = 1, hasta, oculto = false, como: Etiqueta = 'div', className = '', style, children }) {
-  const e = useEstadoPaso(n, { hasta, oculto })
-  return (
-    <Etiqueta className={`fin-paso${className ? ` ${className}` : ''}`} style={style} data-revela={e}
-              aria-hidden={e === 'oculto' ? true : undefined}>
-      {children}
-    </Etiqueta>
-  )
+ *  clase y el estilo que se le pasen. En boceto, el texto HTML de adentro no se ve (-webkit-text-fill-color) y las cajas
+ *  marcadas con data-txt tampoco.
+ *    <PasoHtml n={3} oculto orden={1} className="mi-tarjeta">…</PasoHtml> */
+export function PasoHtml({ n = 1, hasta, oculto = false, orden, entrada = true, como: Etiqueta = 'div', className = '', style,
+  children }) {
+  return <Etiqueta {...usePasoAttrs({ n, hasta, oculto, orden, entrada, className, style })}>{children}</Etiqueta>
 }
+
+/** Movimiento dentro de un paso (regla 3 de la fase 10). Envuelve en un <g> lo que se anima cuando el paso `n` acaba de
+ *  llegar avanzando; el estado final es el dibujo tal cual (la animación va DESDE un estado inicial HASTA lo dibujado),
+ *  así la captura del paso n muestra lo mismo que ve la audiencia al terminar. Al abrir completa, al retroceder, con
+ *  ?paso=k y con movimiento reducido no se anima: se ve terminado. `efecto` (estilos_final.css):
+ *    'aparece'    opacidad 0 y 14 u más abajo → su lugar
+ *    'funde'      opacidad 0 → 1
+ *    'escala'     desde un punto en su centro → su tamaño (un cuadro que se rellena)
+ *    'crece-x'    desde ancho 0 en su borde izquierdo → su largo (una barra horizontal; --fin-origen la cambia)
+ *    'crece-y'    desde alto 0 en su base → su alto (una columna)
+ *    'revela-x'   se descubre de izquierda a derecha, sin deformar (una barra con su texto, un tramo de flujo)
+ *    'revela-y'   se descubre de abajo hacia arriba
+ *    'corre'      desde (--fin-dx, --fin-dy) → su lugar (un bloque que se corre): pasar dx y dy en px
+ *    'traza'      la línea se dibuja de punta a punta (solo trazos lisos, con pathLength={1} en cada trazo)
+ *  `i`: el lugar en la tanda (retraso i × --fin-escalon); `dur` y `escalon` en ms pisan los del grupo (escalonado() de
+ *  pasos.js arma los dos para una tanda que tiene que terminar a tiempo). El <g> no puede llevar transform propio: el
+ *  efecto usa transform; si el dibujo necesita uno, va en un <g> de adentro.
+ *    <Anima n={2} efecto="crece-x"><path d={barra} … /></Anima>
+ *    <g style={escalonado(100, { total: 1000, dur: 220 })}>{cuadros.map((c, i) => (
+ *      <Anima key={i} n={1} efecto="escala" i={i}><rect … /></Anima>))}</g> */
+export function Anima({ n = 1, efecto = 'aparece', i, dur, escalon, dx, dy, como: Etiqueta = 'g', className = '', style,
+  children, ...resto }) {
+  const anima = useAnima(n)
+  if (!EFECTOS.has(efecto)) throw new Error(`svg.jsx: Anima con efecto «${efecto}» desconocido (${[...EFECTOS].join(', ')})`)
+  const st = { ...style }
+  if (i != null) st['--fin-i'] = i
+  if (dur != null) st['--fin-dur'] = `${dur}ms`
+  if (escalon != null) st['--fin-escalon'] = `${escalon}ms`
+  if (dx != null) st['--fin-dx'] = `${dx}px`
+  if (dy != null) st['--fin-dy'] = `${dy}px`
+  const cl = `${anima ? `fin-anima fin-a-${efecto}` : ''}${className ? ` ${className}` : ''}`.trim()
+  return <Etiqueta className={cl || undefined} style={st} {...resto}>{children}</Etiqueta>
+}
+
+/** Anima para HTML: lo mismo en un <div> (o la etiqueta de `como`). */
+export const AnimaHtml = ({ como = 'div', ...props }) => <Anima como={como} {...props} />
+
+const EFECTOS = new Set(['aparece', 'funde', 'escala', 'crece-x', 'crece-y', 'revela-x', 'revela-y', 'corre', 'traza'])
 
 // ---------------------------------------------------------------- piezas comunes (fase 8, spec 1.4)
 // Medidas de los ejes, en u: marca de 8, número a 23 (CTX), título a 23 (CTX, con su unidad), grilla de 1,5 en PISTA.
@@ -384,7 +447,8 @@ export function Muestra({ u, marca, x, y, s }) {
                rx={TRAZO.radio * u} {...m.attrs} />
 }
 
-/** Leyenda en un renglón: por cada ítem, su muestra (Muestra) y su texto (24 u, INK), separados 32 u. (x, y): el punto
+/** Leyenda en un renglón: por cada ítem, su muestra (Muestra) y su texto (24 u, INK), separados 32 u. Cada ítem lleva
+ *  data-txt: dentro de un Paso en boceto no se ve ni la muestra (existe para sostener su texto). (x, y): el punto
  *  de partida a la izquierda y el centro vertical del renglón; anchor 'end' la alinea a la derecha de x y 'middle' la
  *  centra en x. Todo diagrama sin eje la lleva (spec 0.6): «1 cuadro = 1 historia de usuario».
  *    <Leyenda u={u} x={0} y={24 * u} items={[{ marca: 'hecho', texto: X.ley.hecha }, { marca: 'condicional', texto: … }]} /> */
@@ -399,7 +463,7 @@ export function Leyenda({ u, x, y, items, anchor = 'start', f = 24 }) {
         const x0 = cx
         cx += fz + 10 * u + ancho(it.texto, fz, 400)
         return (
-          <g key={i}>
+          <g key={i} data-txt="">
             <Muestra u={u} marca={it.marca} x={x0 + fz / 2} y={y} s={fz} />
             <text x={x0 + fz + 10 * u} y={y} fontSize={fz} fill={INK} dominantBaseline="central">{it.texto}</text>
           </g>
@@ -530,6 +594,7 @@ export function Hito({ u, x, y, s = 22, estado = 'hecho', texto, lado = 'arriba'
 }
 
 /** «Estamos acá»: una pastilla en INK con el texto en blanco (22 u, 600) y un pico que apunta a (x, y), del `lado`
+ *  (data-txt: en un Paso en boceto no se ve la pastilla)
  *  'arriba' (la pastilla arriba del punto, por defecto) o 'abajo'. El texto sale de CF («estamos acá · se pide ahora»).
  *  Alto total: altoAqui(u). */
 export function Aqui({ u, x, y, texto, lado = 'arriba' }) {
@@ -540,7 +605,7 @@ export function Aqui({ u, x, y, texto, lado = 'arriba' }) {
   const s = lado === 'abajo' ? 1 : -1
   const yc = y + s * (pico + h / 2)
   return (
-    <g>
+    <g data-txt="">
       <path d={`M${x - pico} ${y + s * pico} L${x} ${y} L${x + pico} ${y + s * pico} Z`} fill={INK} />
       <rect x={x - w / 2} y={yc - h / 2} width={w} height={h} rx={h / 2} fill={INK} />
       <text x={x} y={yc} fontSize={f} fontWeight={600} fill={SUP} textAnchor="middle" dominantBaseline="central">{texto}</text>
