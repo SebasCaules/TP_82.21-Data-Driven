@@ -147,12 +147,12 @@
    Óga». */
 .e3-vp .fin-riel .lat-grupo {
   position: relative; display: block; margin: 0; border: 0;
-  padding: calc(var(--fin-ru) * 18) calc(var(--fin-ru) * 20) calc(var(--fin-ru) * 6) calc(var(--fin-ru) * 66);
+  padding: calc(var(--fin-ru) * 18) calc(var(--fin-ru) * 10) calc(var(--fin-ru) * 6) calc(var(--fin-ru) * 66);
   font: 600 calc(var(--fin-ru) * 14)/1.25 var(--mono);
 }
 .e3-vp .fin-riel .lat-lista > li:first-child .lat-grupo { padding-top: 0; }
 .e3-vp .fin-riel .lat-grupo span {
-  font: inherit; letter-spacing: .12em; text-transform: uppercase; color: var(--mut);
+  font: inherit; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); white-space: nowrap;
 }
 .e3-vp .fin-riel .lat-grupo.fin-grupo-on span { color: var(--ink); }
 

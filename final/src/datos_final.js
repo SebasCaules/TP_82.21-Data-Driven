@@ -59,7 +59,7 @@ export const DF = {
    },
    {
     "archivo": "contenido_a.py",
-    "sha256": "74fa70a028ac91f52bd0fe48b0378b967403062e11dac3743d155a6bfd817482"
+    "sha256": "2578972a75c06ebc1646f3913533d725c4cfc288030c9512dc6c1138d1a204e9"
    },
    {
     "archivo": "Transacciones_clientes.csv",
