@@ -1,7 +1,7 @@
 // V02 · Qué ventas entran (datos, Matías S.). El extracto de ventas paso a paso (C20): de las filas que llegan a las que
 // usa la lista. (18/11, fase 8) Quedó la versión a, el flujo; (19/11, fase 9, spec 4 V02) sin leyenda y por pasos.
 //   Una banda de C20.crudo filas entra por la izquierda; en cada etapa se desprende hacia abajo lo que sale (repetidas,
-//   sin cliente, compras devueltas) con su cantidad, y sigue lo que queda, hasta la banda en --acc que entra a la lista
+//   sin cliente, compras devueltas) con su cantidad, y sigue lo que queda, hasta la banda en --acc, la base de la lista
 //   (C20.positivas, la cifra de la conclusión). Las bandas van alineadas arriba y su alto es proporcional a las filas, con
 //   el eje de filas junto a la banda de entrada: baja desde 0 en el borde de arriba, así el borde de abajo de cada banda
 //   cae en su cantidad. Las salidas chicas (250 y 330 filas) se dibujan a escala, como un trazo fino con su número.
@@ -163,8 +163,7 @@ function Flujo({ w, h }) {
       {/* lo que entra a la lista */}
       <Paso n={PASO_ETAPA[3]}>
         <title>{`${F.etapas[3]} · ${filas(QUEDAN[3])} ${F.final}`}</title>
-        <path d={`M${xF0} ${yT} H${w - pF} L${w} ${yT + hF / 2} L${w - pF} ${yT + hF} H${xF0} Z`} fill={ACC}
-              strokeLinejoin="round" />
+        <path d={`M${xF0} ${yT} H${w - pF} L${w} ${yT + hF / 2} L${w - pF} ${yT + hF} H${xF0} Z`} fill={ACC} />
         <text x={xFc} y={yT + hF / 2 - fFinT * 0.55} fontSize={fFin} fontWeight={700} fill={SUP}
               textAnchor="middle" dominantBaseline="central">{filas(QUEDAN[3])}</text>
         <text x={xFc} y={yT + hF / 2 + fFin * 0.55} fontSize={fFinT} fontWeight={600} fill={SUP}

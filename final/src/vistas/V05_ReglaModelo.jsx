@@ -21,7 +21,7 @@ import { textosDe } from '../textos.js'
 import { usePaso } from '../pasos.js'
 import { NBSP, fijo, pct } from '../../../e3/src/formato.js'
 import {
-  ACC, EJE, FIN_GRIS, INK, REALCE, TRAZO, EjeX, LlaveH, Paso, altoEjeX, ancho, escalaLinda, tam, useU,
+  ACC, CTX, EJE, FIN_GRIS, INK, REALCE, TRAZO, EjeX, LlaveH, Paso, altoEjeX, ancho, escalaLinda, tam, useU,
 } from '../svg.jsx'
 
 const ID = 'V05'
@@ -51,10 +51,10 @@ const ESC_Z = escalaLinda(HI, 4, LO)
 const sinMovimiento = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-/** Nombre (600) y valor (700, más grande) en un renglón. */
-function NombreValor({ x, y, anchor, nombre, valor, fN, fV, u, base = 'auto' }) {
+/** Nombre (600) y valor (700, en fV) en un renglón. */
+function NombreValor({ x, y, anchor, nombre, valor, fN, fV, u, base = 'auto', color = INK }) {
   return (
-    <text x={x} y={y} fontSize={fN} fill={INK} textAnchor={anchor} dominantBaseline={base}>
+    <text x={x} y={y} fontSize={fN} fill={color} textAnchor={anchor} dominantBaseline={base}>
       <tspan fontWeight={600}>{nombre}</tspan>
       <tspan dx={10 * u} fontWeight={700} fontSize={fV}>{valor}</tspan>
     </text>
@@ -71,10 +71,12 @@ function Recta({ u, W, r, yRot, fN, fV, trans, hv }) {
     <g>
       <EjeX u={u} x0={0} x1={W} y={0} min={0} max={ESC.tope} marcas={ESC.marcas} formato={FMT} titulo={T.barras.eje}
             anclaTitulo="start" />
+      {/* la práctica actual es contexto: gris y del tamaño del nombre; el foco es el punto de regla y modelo */}
       {marca(HOY, FIN_GRIS)}
-      <NombreValor x={xs(HOY)} y={yRot} anchor="middle" nombre={X.hoy} valor={pct(HOY)} fN={fN} fV={fV} u={u} />
+      <NombreValor x={xs(HOY)} y={yRot} anchor="middle" nombre={X.hoy} valor={pct(HOY)} fN={fN} fV={fN} u={u}
+                   color={CTX} />
       {[MODELO, REGLA].map((v) => marca(v, ACC))}
-      <text x={xs((REGLA + MODELO) / 2)} y={yRot} fontSize={fN} fontWeight={600} fill={INK}
+      <text x={xs((REGLA + MODELO) / 2)} y={yRot} fontSize={fV} fontWeight={700} fill={INK}
             textAnchor="middle">{X.juntos}</text>
       {/* la ventana del tramo ampliado (paso 2): viaja con la recta, así no se corre durante la transición */}
       <Paso n={2} oculto>

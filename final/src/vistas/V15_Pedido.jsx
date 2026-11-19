@@ -6,9 +6,9 @@
 //   - el recorrido: las cinco secciones como estaciones de una línea que avanza hacia la derecha (arriba y abajo,
 //     alternadas) y entra con su punta en el panel del pedido. Cada estación: número (en la línea), nombre (del rótulo
 //     del riel del bloque), una cifra de DF, una línea y un dibujo mínimo sin rótulos que recuerda el gráfico de la
-//     sección: el flujo de V02 (C20), la regla sobre el 100 % (J03.regla), la cuadrícula de V07 (G54 sobre G39), las
-//     acciones previas de V10 hacia la primera lista (legal_previas) y el plan de V14 hacia la decisión (plan). En todos,
-//     el acento es lo que cuenta la cifra y el gris, el resto (la leyenda, en el hueco junto a la estación 4);
+//     sección: el flujo de V02 (C20), la regla sobre el 100 % (J03.regla), la cuadrícula de V07 (G54 sobre G39), la
+//     escalera de V10 hacia la primera lista (legal_previas) y el plan de V14 hacia la decisión (plan). En todos, el
+//     acento es lo que cuenta la cifra y el gris, el resto (la leyenda, en el hueco junto a la estación 4);
 //   - lo que nos llevamos: el balance de CF en una fila de cuatro;
 //   - lo que pedimos, en el panel de tinta llena: la idea, el pedido en tres renglones y los dos montos (G64 para
 //     saberlo, G39 para apostarlo), escritos y sin eje; abajo, por qué con este equipo.
@@ -21,8 +21,8 @@ import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { NBSP, fijo, pct, usd } from '../../../e3/src/formato.js'
 import {
-  ACC, CTX, EJE, FIN_GRIS, INK, PISTA, SUP, TRAZO, Compuerta, Muestra, Paso, ancho, envolver, escalaSemanas,
-  rectRedondo, tam, useU,
+  ACC, CTX, EJE, FIN_GRIS, INK, PISTA, SUP, TRAZO, Muestra, Paso, ancho, envolver, escalaSemanas, rectRedondo, tam,
+  useU,
 } from '../svg.jsx'
 import { useEstadoPaso } from '../pasos.js'
 import './V15_cierre.css'
@@ -125,27 +125,38 @@ function MiniCuadros({ u, x, y, w, h }) {
   )
 }
 
-/** 4 Legal y adopción: las acciones de V10. Cada acción previa (legal_previas) es un rombo en acento en la semana en que
- *  vence (las de la misma semana, apiladas), sobre una línea que avanza hasta la barra de la primera lista. */
-function MiniHitos({ u, x, y, w, h }) {
+/** 4 Legal y adopción: la escalera de V10. Un escalón por semana en que vence una acción previa (legal_previas), del
+ *  vencimiento a la semana del escalón siguiente y más alto cada vez (el siguiente no se pisa sin cumplir este); al
+ *  final, la barra de la primera lista. Cada acción es un cuadro en acento dentro de su escalón, arriba, como en V10:
+ *  las de la misma semana, una al lado de la otra. La x es lineal en semanas, como el eje de V10. */
+function MiniEscalera({ u, x, y, w, h }) {
   const acc = T.legal_previas.acciones
-  const S = escalaSemanas({ x0: x, x1: x + w, desde: SEM_1, hasta: SEM_LISTA })
-  const xc = S.centro(SEM_LISTA)
-  const yBase = y + h - 4 * u
-  const porSemana = {}
-  for (const a of acc) porSemana[a.semana] = (porSemana[a.semana] ?? 0) + 1
-  const pila = Math.max(...Object.values(porSemana))
-  const s = Math.min(30, ((yBase - 6 * u - y) / pila) / u)
-  const vistos = {}
+  const semanas = [...new Set(acc.map((a) => a.semana))].sort((a, b) => a - b)
+  const wLista = 6 * u
+  const xs = (s) => x + ((s - SEM_1) / (SEM_LISTA - SEM_1)) * (w - wLista)
+  const yBase = y + h
+  const dh = h / (semanas.length + 1)
+  const g = 4 * u
+  const pad = 6 * u
+  const esc = semanas.map((s, i) => ({
+    s, x0: xs(s), x1: xs(semanas[i + 1] ?? SEM_LISTA) - g, y0: yBase - (i + 1) * dh,
+    n: acc.filter((a) => a.semana === s).length,
+  }))
+  const lado = Math.min(22 * u, dh * 0.7, ...esc.map((e) => (e.x1 - e.x0 - 2 * pad - (e.n - 1) * g) / e.n))
   return (
     <g>
-      <line x1={S.inicio(SEM_1)} x2={xc} y1={yBase} y2={yBase} stroke={EJE} strokeWidth={2 * u} />
-      {acc.map((a) => {
-        const k = vistos[a.semana] = (vistos[a.semana] ?? 0) + 1
-        const yc = yBase - 4 * u - (k - 0.5) * s * u
-        return <Compuerta key={a.codigo} u={u} x={S.centro(a.semana)} y={yc} s={s * 0.95} estado="hecho" />
-      })}
-      <line x1={xc} x2={xc} y1={y} y2={yBase + 4 * u} stroke={INK} strokeWidth={6 * u} />
+      {esc.map((e) => (
+        <g key={e.s}>
+          <rect x={e.x0} y={e.y0} width={e.x1 - e.x0} height={yBase - e.y0} fill={PISTA} />
+          <rect x={e.x0} y={e.y0} width={e.x1 - e.x0} height={3 * u} fill={FIN_GRIS} />
+          {Array.from({ length: e.n }, (_, j) => (
+            <rect key={j} x={e.x0 + pad + j * (lado + g)} y={e.y0 + (dh - lado) / 2 + 1.5 * u} width={lado} height={lado}
+                  rx={1.5 * u} fill={ACC} />
+          ))}
+        </g>
+      ))}
+      <line x1={x} x2={x + w} y1={yBase} y2={yBase} stroke={EJE} strokeWidth={2 * u} />
+      <rect x={x + w - wLista} y={y} width={wLista} height={h} fill={INK} />
     </g>
   )
 }
@@ -176,7 +187,7 @@ const PIEZAS = [
   { ...seccion('datos'), ...P.datos, ...partes(fijo(v('C20.positivas'))), Mini: MiniFlujo },
   { ...seccion('modelo'), ...P.modelo, ...partes(pct(v('J03.regla'))), Mini: MiniRegla },
   { ...seccion('economia'), ...partes(usd(v('G54'))), ...P.economia, Mini: MiniCuadros },
-  { ...seccion('legal'), ...partes(fijo(T.legal_previas.n)), ...P.legal, Mini: MiniHitos },
+  { ...seccion('legal'), ...partes(fijo(T.legal_previas.n)), ...P.legal, Mini: MiniEscalera },
   { ...seccion('gestion'), ...partes(fijo(T.plan.semanas)), ...P.gestion, Mini: MiniPlan },
 ]
 

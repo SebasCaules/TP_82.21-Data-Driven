@@ -10,6 +10,7 @@
 // tamaño y peso; solo el escalón más cercano va en el acento.
 // Pasos (spec 2): un escalón por paso, de lejos a cerca. Los ejes y el umbral están desde el paso 1.
 // Ninguna cifra nueva: las tasas son las de la tabla (las mismas que F04.menos30, F04.30a59 y F04.60a89).
+// (19/11, revisión) El título del eje X dice «les faltan», en plural como el eje Y y como lo dice el orador.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -112,7 +113,7 @@ function Escalera({ w, h }) {
 
 export default function V04Irse() {
   return (
-    <Vista id={ID} items={[{ clave: 'minimo', valor: fijo(A['C03.minimo_dias'].valor) }]} cifras={[]}>
+    <Vista id={ID} items={[{ clave: 'minimo', valor: fijo(A['C03.minimo_dias'].valor) }]}>
       {Escalera}
     </Vista>
   )

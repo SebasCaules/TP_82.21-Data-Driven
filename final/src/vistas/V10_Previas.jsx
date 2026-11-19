@@ -9,7 +9,8 @@
 //   - arriba de todo, en la semana de la primera lista, el último escalón: la primera lista, el único acento;
 //   - el eje de semanas abajo, con su título. Sin leyenda: cada escalón y la lista llevan su rótulo.
 // Pasos (spec 2): 1, el eje, la primera lista y el escalón de la semana 1; 2 y 3, un escalón cada uno; 4, la capa de
-// responsables (velo claro sobre el dibujo y el nombre debajo de cada acción, en el renglón que el escalón le guarda).
+// responsables: una lámina clara con borde sobre los tres escalones, como la de V14 (el eje y la primera lista quedan
+// nítidos), y el nombre debajo de cada acción, en el renglón que el escalón le guarda.
 // La banda lleva solo el puntaje legal (H40); la conclusión, las acciones previas (legal_previas.n) y la semana de la
 // primera lista.
 
@@ -17,7 +18,9 @@ import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
-import { ACC, FIN_GRIS, INK, PISTA, SUP, EjeX, Paso, altoEjeX, ancho, duro, envolver, inicial, tam, useU } from '../svg.jsx'
+import {
+  ACC, EJE, FIN_GRIS, INK, PISTA, SUP, TRAZO, EjeX, Paso, altoEjeX, ancho, duro, envolver, inicial, tam, useU,
+} from '../svg.jsx'
 
 const ID = 'V10'
 const A = DF.anclas
@@ -49,11 +52,13 @@ export const meta = { id: ID, pasos: PASO_CAPA }
 // Medidas en u.
 const M = {
   accion: 26, accionMin: 24, quien: 24, primera: 26,
-  margen: 14, remate: 64, hueco: 4, borde: 6,
+  margen: 14, remate: 64, hueco: 4, borde: 6, rotulo: 14,
   padL: 14, padR: 8, padT: 12, padB: 8, entre: 10, nivelMax: 175,
+  lamina: 10, radio: 8,
 }
 const LLENA = 0.9
-const VELO = 0.5
+/** Opacidad de la lámina de responsables: la misma de V14, las acciones se siguen leyendo debajo. */
+const VELO = 0.45
 const INTER_A = 1.15
 const INTER_Q = 1.2
 
@@ -107,6 +112,11 @@ function Dibujo({ w, h }) {
   const yBase = yTop + NIVELES * nivel
   const techo = (k) => yBase - k * nivel
   const xLista = xSem(SEM_LISTA)
+  // la lámina: de un poco arriba del escalón más alto hasta el eje, y del borde hasta la primera lista
+  const lam = {
+    x: TRAZO.guia * u, y: techo(ESCALONES.length) - M.lamina * u,
+    x1: xLista - (M.hueco / 2) * u,
+  }
 
   const esc = ESCALONES.map((e) => {
     const x0 = xSem(e.semana)
@@ -132,20 +142,22 @@ function Dibujo({ w, h }) {
 
       {/* la primera lista: el último escalón, en el acento, con su rótulo al lado */}
       <rect x={xLista} y={techo(NIVELES)} width={w - xLista} height={yBase - techo(NIVELES)} fill={ACC} />
-      <text x={xLista - 14 * u} y={techo(NIVELES) + nivel / 2} fontSize={fP} fontWeight={700} fill={INK} textAnchor="end"
-            dominantBaseline="central">{G.primera}</text>
+      <text x={xLista - M.rotulo * u} y={techo(NIVELES) + nivel / 2} fontSize={fP} fontWeight={700} fill={INK}
+            textAnchor="end" dominantBaseline="central">{G.primera}</text>
 
-      <EjeX u={u} x0={0} x1={w} y={yBase} min={1 - xL / col} max={1 + (w - xL) / col}
-            marcas={Array.from({ length: SEM_LISTA }, (_, i) => i + 1)} titulo={G.eje} />
-
-      {/* la capa de responsables: velo claro sobre el dibujo y el nombre debajo de cada acción */}
+      {/* la capa de responsables: lámina clara con borde sobre los escalones y el nombre debajo de cada acción */}
       <Paso n={PASO_CAPA} oculto>
-        <rect x={0} y={yTop} width={w} height={total} fill={SUP} fillOpacity={VELO} />
+        <rect x={lam.x} y={lam.y} width={lam.x1 - lam.x} height={yBase - lam.y} rx={M.radio * u}
+              fill={SUP} fillOpacity={VELO} stroke={EJE} strokeWidth={TRAZO.guia * u} />
         {esc.flatMap((e) => e.lineas.filter((l) => l.quien).map((l, i) => (
           <text key={`${e.semana}-${i}`} x={e.xT} y={l.y} fontSize={fQ} fontWeight={700} fill={INK}
                 dominantBaseline="hanging">{l.t}</text>
         )))}
       </Paso>
+
+      {/* el eje, encima de la lámina: queda nítido en el último paso */}
+      <EjeX u={u} x0={0} x1={w} y={yBase} min={1 - xL / col} max={1 + (w - xL) / col}
+            marcas={Array.from({ length: SEM_LISTA }, (_, i) => i + 1)} titulo={G.eje} />
     </svg>
   )
 }

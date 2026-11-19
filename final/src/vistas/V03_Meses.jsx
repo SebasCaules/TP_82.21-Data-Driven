@@ -1,8 +1,9 @@
 // V03 · Qué meses entran (datos, Matías S.). Las operaciones de cada mes de 2025 sobre las del mismo mes de 2024 (D28,
 // tabla ventas_2025 de DF, contada por build_final.py desde el extracto crudo) como 12 columnas de enero a diciembre, con
 // el eje Y de 0 a 100 % (línea, marcas cada 20 con su valor y título con la unidad) y la línea punteada del control del
-// mes (H46.umbral_mes), rotulada sobre su extremo derecho. Sin grilla (fase 9, spec 1): cada columna lleva su valor y la
-// única referencia horizontal que se dice en voz alta es el control.
+// mes (H46.umbral_mes), rotulada sobre su extremo derecho con el nombre del informe («Control de mes completo», A1.12).
+// Sin grilla (fase 9, spec 1): cada columna lleva su valor y la única referencia horizontal que se dice en voz alta es el
+// control. La leyenda dice solo «Mes completo» y «Mes incompleto», las palabras del título y de la decisión.
 // (19/11, fase 9, ficha V03: «me choca que no haya tanta consistencia de diseño entre las barras en azul y las grises»)
 // Las doce columnas se escriben igual: el valor arriba de la columna, mismo tamaño, peso y color (INK 700), y el mes
 // debajo en CTX; lo único que cambia entre los meses que entran y los que no es el color de la columna (FIN_GRIS o el
@@ -59,14 +60,14 @@ function Dibujo({ w, h }) {
   const fMes = tam('cat', u)
   const fUni = tam('piso', u)
   const fCtl = tam(24, u)
-  const fTit = 23 * u
+  const fTit = tam(23, u)
   const gapV = 4 * u // de la punta de la columna a la base del valor
   const cap = (f) => 0.74 * f // alto de las cifras sobre su base
   const aireCtl = 8 * u // aire mínimo entre el valor de septiembre y la línea de control
 
   const leyIt = [
-    { marca: 'contexto', texto: B.entra },
-    { marca: 'hecho', texto: B.no_entra },
+    { marca: 'contexto', texto: B.completo },
+    { marca: 'hecho', texto: B.incompleto },
   ]
   const anchoLey2 = anchoLeyenda(u, [leyIt[1]])
   const anchoLey = anchoLeyenda(u, leyIt)
@@ -139,7 +140,7 @@ function Dibujo({ w, h }) {
       <LineaBase u={u} y={yBase} x1={xEje} x2={xFin} />
 
       <Umbral u={u} x1={xEje} y1={yCtl} x2={xFin} y2={yCtl} punteada />
-      <text x={xFin} y={yCtl - 10 * u} fontSize={fCtl} fontWeight={600} fill={INK} textAnchor="end">
+      <text x={xFin} y={yCtl - 12 * u} fontSize={fCtl} fontWeight={600} fill={INK} textAnchor="end">
         {B.control}
         <tspan fontWeight={800}>{` ${pct(UMBRAL, 0)}`}</tspan>
       </text>

@@ -2,7 +2,8 @@
 // contenido_final.js.
 export default {
   barras: {
-    eje: 'Diferencia de cruce, control menos rama, en puntos',
+    // el nombre del informe (diferencia de cruce) sin la fórmula: «control menos rama» era una nota de método
+    eje: 'Diferencia de cruce con el control, en puntos',
     unidad: 'puntos',
     // zonas de la escala: cuántas ramas pasan
     zona_no: 'No pasa ninguna',

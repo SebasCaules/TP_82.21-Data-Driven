@@ -5,10 +5,12 @@
 // que deja la lista y el costo. Salen la versión b, la subfila del ROI del modelo y los renglones del gris y del azul:
 // cada color ya lleva su rótulo directo.)
 //
-// Cuadrícula de 25 × 4 a todo el ancho (20 × 5 en ventanas más altas): los 100 cuadros son el costo del primer año y lo
-// lleno en ACC, lo que deja la lista en un año (100 × G54 / G39 cuadros, desde arriba a la izquierda; el último, parcial
-// por ancho). Arriba a la izquierda, el rótulo de lo que deja, con una llave chica sobre lo lleno y su guía; a la derecha,
-// la leyenda de un renglón (qué vale un cuadro). Abajo, una llave de punta a punta con el costo del primer año.
+// Cuadrícula de 20 × 5 (25 × 4 si el lienzo queda bajo, con el panel de notas abierto): los 100 cuadros son el costo
+// del primer año y lo lleno en ACC, lo que deja la lista en un año (100 × G54 / G39 cuadros, desde arriba a la
+// izquierda; el último, parcial por ancho). Arriba a la izquierda, el rótulo de lo que deja, con una llave chica sobre lo
+// lleno y su guía; a la derecha, la leyenda de un renglón (qué vale un cuadro). Abajo, una llave de punta a punta con el
+// costo del primer año. Sin <title>: el lienzo ya lleva qué mide como aria-label, y el globo al pasar el puntero
+// mostraba las dos cifras aun en el paso 1.
 // Pasos: 1, los 100 cuadros con el costo; 2, lo que deja la lista (lo lleno, oculto antes porque se superpone a los
 // cuadros grises, y su rótulo, atenuado antes).
 // Las cifras son las de la conclusión (usd con 0 decimales). Ninguna cifra nueva: los cuadros son proporción.
@@ -69,8 +71,8 @@ function Costo({ u, x1, x2, y, nombre }) {
   )
 }
 
-/** Las dos formas de la cuadrícula de 100 cuadros. Va 25 × 4 (a todo el ancho en 16:9); 20 × 5 solo si da cuadros un
- *  10 % más grandes (ventanas más altas). */
+/** Las dos formas de la cuadrícula de 100 cuadros. Va 20 × 5 si da cuadros un 10 % más grandes (en 16:9 y en 4:3 los
+ *  da); si no, 25 × 4 (lienzo bajo, por ejemplo con el panel de notas abierto). */
 const FORMAS = [[25, 4], [20, 5]]
 
 function Cuadricula({ w, h }) {
@@ -108,7 +110,6 @@ function Cuadricula({ w, h }) {
   const yLeyenda = y0 + fNom(u) * 1.3 + fCif(u) * 0.5
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
-      <title>{`${C.deja}: ${T_DEJA} · ${C.costo}: ${T_COSTO}`}</title>
       <defs>
         {llenos.filter((c) => c.parte < 1).map((c) => (
           <clipPath key={c.i} id={`v07-c${c.i}`}>

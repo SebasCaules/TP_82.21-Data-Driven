@@ -7,8 +7,8 @@
 // tinta. Cuatro escalones del mismo ancho que suben de izquierda a derecha (el alto no es una magnitud: cada escalón sube
 // lo mismo). Un camino recorre la escalera por encima: lleno en ACC sobre la PoC hasta «estamos acá», punteado de ahí en
 // adelante, con punta de flecha al final. En las dos subidas que dependen de un resultado, la compuerta con su condición.
-// (19/11, fase 9, spec 4 V13) Sin leyenda: cada estado lleva su rótulo directo («hecha», «estamos acá · se pide ahora» y
-// la condición junto a su rombo). En cada escalón, nombre, una línea y a lo sumo un costo. Avance en cuatro pasos, una
+// (19/11, fase 9, spec 4 V13) Sin leyenda: cada estado lleva su rótulo directo («hecha», «estamos aquí» y la condición
+// junto a su rombo). En cada escalón, nombre, una línea y a lo sumo un costo. Avance en cuatro pasos, una
 // etapa por paso, en el orden en que habla el orador: la PoC; el MVP y el marcador; la primera compuerta y la operación
 // mínima; la segunda compuerta y la producción completa. Lo que falta se ve atenuado (Paso).
 

@@ -4,8 +4,9 @@
 // (19/11, fase 9, spec 4 V06; el usuario eligió el flujo, versión a: «Devuelta decluttea bastante y resalta lo que se
 // quiere resaltar») Flujo de izquierda a derecha con bandas de alto proporcional a los clientes de la lista de muestra
 // (K16, K17, K18 y G49.control_mes, que suman G49.lista_mes). En pantalla, solo las cifras que dice el orador: 500 (la
-// lista), 20 % y 15 % (en los nombres), 100 (el control) y 90 días (la comparación). Los conteos de la muestra no se
-// escriben: solo dan el alto de las bandas. Sin leyenda: cada nodo lleva su rótulo y el único color es el del control.
+// lista), 15 % (en el nombre de la rama), 100 (el control) y 90 días (la comparación); el 20 % va en la conclusión y no
+// junto a su banda, que mide un tercio de la lista. Los conteos de la muestra no se escriben: solo dan el alto de las
+// bandas. Sin leyenda: cada nodo lleva su rótulo y el único color es el del control.
 // Pasos (las notas de V06): 1 la lista y el 20 % que se aparta; 2 el sorteo, el control y las dos ramas; 3 la
 // comparación a los 90 días.
 

@@ -1,5 +1,5 @@
 // Textos de V06 (fase 9), mezclados en textosDe('V06'); puede importar DF de '../datos_final.js' y formato.js de '../../../e3/src/formato.js'.
-// Los rótulos del flujo: la lista, el 20 % de mayor facturación, el sorteo, el control y las dos ramas, y la comparación.
+// Los rótulos del flujo: la lista, el grupo de mayor facturación, el sorteo, el control y las dos ramas, y la comparación.
 // Las cifras grandes (500 y 100) las pone la vista delante de `lista` y de `control`.
 import { DF } from '../datos_final.js'
 import { NBSP, fijo, pct } from '../../../e3/src/formato.js'
@@ -10,8 +10,9 @@ export default {
   grupos: {
     lista: 'contactables',
     lista_accion: 'lista del mes',
-    // «En el»: son los de la lista que están en el 20 % de mayor facturación de la base, no el 20 % de la lista
-    alto: `En el ${pct(v('G49.alto_valor'), 0)} de mayor facturación`,
+    // sin el 20 %: ya está en la conclusión, y al lado de la banda (un tercio de la lista, porque es el 20 % de la base)
+    // invitaba a preguntar por qué no es un quinto
+    alto: 'Mayor facturación',
     alto_accion: 'se contacta entero',
     sorteo: 'Sorteo al azar',
     control: 'de control',

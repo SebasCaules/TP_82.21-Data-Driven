@@ -17,9 +17,10 @@ export default {
   pedimos: 'Lo que pedimos',
   // los dibujos de las estaciones no llevan rótulos: el acento es lo que cuenta la cifra de la estación
   ley: { cifra: 'lo que mide la cifra', resto: 'el resto' },
-  // una línea por estación, debajo de su cifra
+  // una línea por estación, debajo de su cifra. Datos: 27.276 son las ventas con cliente y monto positivo (C20.positivas;
+  // con cliente son 27.606); se nombran como en V02, «base de la lista»
   piezas: {
-    datos: { desc: 'ventas con cliente' },
+    datos: { despues: 'ventas', desc: 'base de la lista' },
     modelo: { desc: 'acierta la regla' },
     economia: { despues: 'por año', desc: 'deja la lista' },
     legal: { despues: 'acciones', desc: 'antes de la primera lista' },

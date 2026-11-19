@@ -3,7 +3,7 @@
 export default {
   escalera: {
     ejeY: 'Clientes que cruzan su umbral, %',
-    ejeX: 'Días que le faltan para cruzar su umbral',
+    ejeX: 'Días que les faltan para cruzar su umbral',
     umbral: 'Umbral',
     umbral2: 'del cliente',
   },

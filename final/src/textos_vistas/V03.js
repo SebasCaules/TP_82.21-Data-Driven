@@ -1,6 +1,7 @@
 // Textos de V03, mezclados en textosDe('V03'); puede importar DF de '../datos_final.js' y formato.js de '../../../e3/src/formato.js'.
-// Fase 8, ficha V03: eje vertical de 0 a 100 % con su título, la línea de control rotulada y la leyenda de los dos colores
-// de las columnas. Fase 9: el año del eje X («Mes de 2025») pasa al título del eje Y y ese renglón sale.
+// Eje vertical de 0 a 100 % con su título (el año del eje X va en él), la línea de control rotulada con el nombre del
+// informe (A1.12, «Control de mes completo») y la leyenda de los dos colores con las palabras del título y de la decisión
+// (completo, incompleto): lo que entra ya lo dice la tarjeta de la decisión.
 import { DF } from '../datos_final.js'
 
 const VT = DF.tablas.ventas_2025
@@ -9,9 +10,9 @@ export default {
   // un solo nombre para el control: la banda y el gráfico dicen «control»
   fuera: { linea: 'debajo del control' },
   barras: {
-    control: 'Control del mes',
+    control: 'Control de mes completo',
     eje: `Operaciones de cada mes de ${VT.anio} sobre el mismo mes de ${VT.anio_anterior} (%)`,
-    entra: 'Mes completo: entra',
-    no_entra: 'Mes incompleto: no entra',
+    completo: 'Mes completo',
+    incompleto: 'Mes incompleto',
   },
 }

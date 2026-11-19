@@ -1,6 +1,6 @@
 // V11 · Qué puede fallar (legal, riesgos y adopción, Tomas F.). Los tres riesgos críticos de la sección 26.3 del informe
 // (DF cuenta cuántos son en riesgos_criticos.n), uno por tarjeta con su número, su nombre, la señal que se mira y lo que se
-// hace (textos de CF). Fase 9 (19/11): el usuario eligió las tarjetas («Me gusta pero devuelta decluttea»). Salen la
+// hace (textos de textos_vistas/V11.js). Fase 9 (19/11): el usuario eligió las tarjetas («Me gusta pero devuelta decluttea»). Salen la
 // leyenda, el tipo de cada riesgo y la pastilla «Adopción · se prueba»: repetían el título y la tarjeta de decisión (y el
 // informe clasifica la planilla como riesgo técnico, no de adopción). Los rótulos de los campos pasan de mono en mayúsculas
 // al rótulo secundario del tablero (sans 600 en CTX).
@@ -9,13 +9,14 @@
 // Pasos (spec 2): un riesgo por paso, en el orden en que los dice el orador (económico, adopción, legal). En el paso 1 las
 // tres tarjetas ya están en su lugar y las dos que faltan se ven atenuadas.
 // El espacio vertical (rellenos y aire entre tarjetas) crece con el lienzo entre un mínimo y un máximo para que el dibujo
-// ocupe cerca del 90 % del alto; el cuerpo baja de 30 a 24 u si una señal o una respuesta no entra en un renglón.
+// ocupe cerca del 90 % del alto; el cuerpo baja de 30 a 24 u si una señal o una respuesta no entra en un renglón (con
+// los textos de hoy, todos entran en uno; si alguno crece, envolver lo corta y la tarjeta se estira).
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
-import { ACC, CTX, FIN_GRIS, INK, PISTA, REALCE, SUP, TRAZO, Paso, ancho, envolver, inicial, rectRedondo, tam, useU }
+import { ACC, CTX, FIN_GRIS, INK, PISTA, REALCE, Renglones, SUP, TRAZO, Paso, ancho, envolver, rectRedondo, tam, useU }
   from '../svg.jsx'
 
 const ID = 'V11'
@@ -23,9 +24,6 @@ const A = DF.anclas
 const X = textosDe(ID)
 const C = X.columnas
 const N = DF.tablas.riesgos_criticos.n
-// señal y respuesta en CF empiezan en minúscula (el title de la vista las usa en medio de una frase); en la tarjeta abren
-// el renglón, como el nombre del riesgo
-const FILAS = X.filas.map((r) => ({ ...r, senalV: inicial(r.senal), respuestaV: inicial(r.respuesta) }))
 const FOCO = 1   // la tarjeta de adopción (quién corre la planilla): la que nombra el título
 const LLENA = 0.9
 
@@ -33,44 +31,6 @@ export const meta = { id: ID, pasos: 3 }   // un riesgo por paso
 
 if (X.filas.length !== N) throw new Error('V11: la conclusión y el dibujo no cuentan los mismos riesgos')
 if (N !== meta.pasos) throw new Error('V11: un riesgo por paso; si cambia la cantidad de riesgos, cambian los pasos')
-
-/** Renglones desde y (borde superior del primero), con interlineado `inter`. */
-function Lineas({ ls, x, y, f, peso = 400, color = INK, inter = 1.22 }) {
-  return ls.map((l, i) => (
-    <text key={i} x={x} y={y + i * f * inter} fontSize={f} fontWeight={peso} fill={color}
-          dominantBaseline="hanging">{l}</text>
-  ))
-}
-
-/** Como envolver, pero con los renglones parejos y sin cortes feos. En dos renglones prueba cada corte que entra en `w`
- *  y elige el de menor costo: el renglón más largo sobre el del corte más parejo, más 0,35 si el primer renglón termina
- *  en una palabra de hasta tres letras («no», «la», «se», «sin») y menos 0,2 si termina en coma o punto y coma («si
- *  ninguna rama llega, / se cierra…»). En más renglones, el ancho más angosto que no agrega uno. */
-function parejo(texto, w, f, peso = 400) {
-  const base = envolver(texto, w, f, peso)
-  if (base.length < 2) return base
-  if (base.length === 2) {
-    const ps = String(texto).split(' ')
-    const cortes = []
-    for (let k = 1; k < ps.length; k++) {
-      const l = [ps.slice(0, k).join(' '), ps.slice(k).join(' ')]
-      const max = Math.max(...l.map((x) => ancho(x, f, peso)))
-      const ult = ps[k - 1]
-      if (max <= w) cortes.push({ l, max, corta: ult.replace(/[^\p{L}]/gu, '').length <= 3, signo: /[,;]$/.test(ult) })
-    }
-    const min = Math.min(...cortes.map((c) => c.max))
-    const costo = (c) => c.max / min + (c.corta ? 0.35 : 0) - (c.signo ? 0.2 : 0)
-    return cortes.sort((p, q) => costo(p) - costo(q))[0].l
-  }
-  let lo = 0
-  let hi = w
-  for (let k = 0; k < 24; k++) {
-    const mid = (lo + hi) / 2
-    if (envolver(texto, mid, f, peso).length > base.length) lo = mid
-    else hi = mid
-  }
-  return envolver(texto, hi, f, peso)
-}
 
 /** Reparte el alto libre: cada hueco va de su mínimo a su máximo (en px) con el mismo k ∈ [0, 1], el que deja el
  *  total en `meta` (o el más cercano). fijo: lo que no crece. huecos: [[min, max, veces], …]. */
@@ -88,12 +48,12 @@ function medir(w, h, u) {
   const gapCol = 72 * u
   const colW = (w - 2 * salto - 2 * padX - gapCol) / 2
   // letra del cuerpo: la más grande, de 30 a 24 u, con la que cada señal y cada respuesta entra en un renglón
-  const textos = FILAS.flatMap((r) => [r.senalV, r.respuestaV])
+  const textos = X.filas.flatMap((r) => [r.senal, r.respuesta])
   let fTxt = tam(30, u)
   while (fTxt > 24 * u && textos.some((t) => ancho(t, fTxt) > colW)) fTxt = Math.max(24 * u, fTxt - 0.25 * u)
   const inter = 1.22
-  const filas = FILAS.map((r, i) => {
-    const ls = [parejo(r.senalV, colW, fTxt), parejo(r.respuestaV, colW, fTxt)]
+  const filas = X.filas.map((r, i) => {
+    const ls = [envolver(r.senal, colW, fTxt), envolver(r.respuesta, colW, fTxt)]
     return { ...r, i, foco: i === FOCO, ls, nl: Math.max(ls[0].length, ls[1].length) }
   })
   const texto = filas.reduce((s, r) => s + fNom + fLab + (r.nl - 1) * fTxt * inter + fTxt, 0)
@@ -144,8 +104,8 @@ function Dibujo({ w, h }) {
               <text key={t} x={xs[j]} y={yLab} fontSize={m.fLab} fontWeight={600} fill={CTX}
                     dominantBaseline="hanging">{t}</text>
             ))}
-            <Lineas ls={r.ls[0]} x={xs[0]} y={yTxt} f={m.fTxt} inter={m.inter} />
-            <Lineas ls={r.ls[1]} x={xs[1]} y={yTxt} f={m.fTxt} inter={m.inter} />
+            <Renglones lineas={r.ls[0]} x={xs[0]} y={yTxt} f={m.fTxt} inter={m.inter} />
+            <Renglones lineas={r.ls[1]} x={xs[1]} y={yTxt} f={m.fTxt} inter={m.inter} />
           </Paso>
         )
       })}

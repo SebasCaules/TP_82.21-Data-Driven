@@ -8,6 +8,8 @@
 // hasta el primer umbral. Salieron los círculos «de cada 100» (G68) y su leyenda: están en la 23.6 del informe.
 // Pasos (las notas de la vista): 1, la escala con las zonas y los dos umbrales; 2, lo observado; 3, lo que falta.
 // La banda lleva solo el umbral de pase (11,04); la conclusión (0,79 puntos) no cambia.
+// (19/11, revisión) La barra de lo observado va oculta en el paso 1 (atenuada parecía una zona más); el título del eje
+// pierde la fórmula; la pista llega a 500 u para que en 4:3 el dibujo no quede en el 60 % del alto.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -70,7 +72,7 @@ function Dibujo({ w, h }) {
   // vertical: el renglón de las banderas, la escala (zonas) y el eje
   const hEje = altoEjeX(u)
   const arriba = altoBandera + 24 * u
-  const pista = Math.min(380 * u, Math.max(150 * u, LLENA * h - arriba - hEje))
+  const pista = Math.min(500 * u, Math.max(150 * u, LLENA * h - arriba - hEje))
   const total = arriba + pista + hEje
   const y0 = Math.max(0, (h - total) / 2)
   const yBan = y0
@@ -110,9 +112,12 @@ function Dibujo({ w, h }) {
       <Bandera x={xs(CON) + gap} y={yBan} rotulo={B.con} valor={conUnidad(CON)} m={m} />
       <EjeX u={u} x0={x0} x1={x1} y={yE} min={0} max={TOPE} marcas={MARCAS} formato={(v) => fijo(v)} titulo={B.eje} />
 
-      {/* paso 2: lo observado, barra en ACC de 0 a su valor y asta hasta su bandera */}
-      <Paso n={2}>
+      {/* paso 2: lo observado, barra en ACC de 0 a su valor y asta hasta su bandera. La barra va oculta antes de su
+          paso: es una capa sobre la primera zona, y atenuada se leía como otra zona, más oscura (la de «pasan las dos») */}
+      <Paso n={2} oculto>
         <rect x={x0} y={yP} width={xHoy - x0} height={pista} fill={ACC} />
+      </Paso>
+      <Paso n={2}>
         <Umbral u={u} x1={xHoy - (TRAZO.umbral * u) / 2} x2={xHoy - (TRAZO.umbral * u) / 2} y1={yBan} y2={yP}
                 color={ACC} />
         <Bandera x={xHoy + gap} y={yBan} rotulo={B.hoy} valor={conUnidad(HOY)} m={m} />
