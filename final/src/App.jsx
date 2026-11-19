@@ -4,7 +4,7 @@
 // - el registro de vistas es final/src/vistas/index.jsx, que deriva el recorrido, el riel y los tiempos de CF.BLOQUES
 //   (contenido_final.js); el número de cada vista sale de su posición y el riel lleva el id en data-id;
 // - título de la pestaña, subtítulo del riel, canal entre ventanas y nombre de la ventana de notas propios;
-// - el encabezado toma la fuente de CF (vista.fuente) en vez de armarla con las diapositivas de C3;
+// - el encabezado toma la referencia al informe de CF (vista.informe; desde la fase 11, en el botón de información);
 // - las notas (Notas.jsx) dicen además quién presenta la vista y el tiempo acumulado de su bloque.
 // Sin temporizador en vivo: los tiempos de las notas son los de CF.
 // Los módulos sin datos del E2 y del E3 (escala.js, zoom.js) se importan tal cual; este archivo es copia porque el de /e3/
@@ -32,6 +32,11 @@
 // los cambios son instantáneos (estilos_final.css). Al entrar a una vista con →, --fin-anima-base retrasa las animaciones
 // del paso 1 hasta que el cuerpo nuevo entra. Una vista con VistaLienzo (Plantilla.jsx) usa el riel y el encabezado
 // como cualquier otra; `plena` sigue igual.
+// (19/11, fase 11, spec 2.3) Sale la cita del encabezado: arriba a la derecha quedan «n / 16» con los puntos y un botón
+// chico de información. El botón (clic, Enter o la tecla R) abre un recuadro con la referencia («Informe, sección 23.6»)
+// y un enlace por sección, «Abrir en el informe», a INFORME.url#page=N en otra pestaña (VISTAS[i].referencia, de
+// vistas/index.jsx). Se cierra con Escape, con otro clic (en el botón o fuera del recuadro) y al cambiar de vista; no
+// se imprime, no cambia el paso y con el foco en el botón o en un enlace las flechas siguen pasando de paso.
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
@@ -121,14 +126,17 @@ export default function App() {
   const [notas, setNotas] = useState(false)
   const [negro, setNegro] = useState(false)
   const [proy, setProy] = useState(false)
+  // el recuadro de información está abierto en la vista `infoEn` (-1: cerrado): al cambiar de vista se cierra solo
+  const [infoEn, setInfoEn] = useState(-1)
   const ventana = useVentana(notas)
   const u = calcularU(ventana.w, ventana.h)
   // La unidad del riel: u en 16:9; si sobra alto (4:3), crece con el alto hasta 1,15 u (estilos_marco.css). Con 1,15 el
-  // título más ancho (V09) sigue entrando junto a «n / 15 · fuente» a 1024 × 768, con 34 u de margen.
+  // título más ancho (V09) sigue entrando junto a «n / 16» y el botón de información a 1024 × 768.
   const ru = u * Math.min(1.15, Math.max(1, ventana.h / 1080 / u))
   const indice = pos.i
   const vista = VISTAS[indice]
   const pasos = vista.pasos
+  const info = infoEn === indice
 
   // La posición vigente, al día antes de que React dibuje: las teclas y el canal calculan desde acá.
   const actual = useRef(pos)
@@ -143,7 +151,10 @@ export default function App() {
     if (nueva.i !== vieja.i) {
       document.documentElement.dataset.dir = nueva.i > vieja.i ? 'adelante' : 'atras'
       if (!SOLO_NOTAS && document.startViewTransition && document.visibilityState === 'visible') {
-        document.startViewTransition(() => flushSync(() => setPosCrudo(nueva)))
+        const t = document.startViewTransition(() => flushSync(() => setPosCrudo(nueva)))
+        // (19/11, fase 11) con dos cambios seguidos, el navegador saltea la primera transición y rechaza su `ready`
+        // («Transition was skipped»): no es un error, pero sin este catch queda como rechazo sin atender en la consola
+        t.ready.catch(() => {})
         return
       }
     }
@@ -262,6 +273,16 @@ export default function App() {
     } catch { /* cerrado */ }
   }, [pos])
 
+  // El recuadro de información: se abre en la vista actual y se cierra con otro clic en el botón; un clic fuera del botón
+  // y del recuadro también lo cierra (un clic en el riel lo cierra y cambia de vista).
+  const alternarInfo = useCallback(() => setInfoEn((x) => (x === actual.current.i ? -1 : actual.current.i)), [])
+  useEffect(() => {
+    if (!info) return undefined
+    const fuera = (e) => { if (!e.target.closest?.('.fin-info, .fin-info-recuadro')) setInfoEn(-1) }
+    document.addEventListener('pointerdown', fuera)
+    return () => document.removeEventListener('pointerdown', fuera)
+  }, [info])
+
   const abrirVentanaNotas = useCallback(() => {
     const url = `${location.pathname}?notas${hashDe(actual.current.i)}`
     try { window.open(url, 'casa-oga-final-notas', 'width=900,height=640') } catch { /* sin ventanas */ }
@@ -289,8 +310,17 @@ export default function App() {
       if (k === 'Escape') t.blur?.()
       return
     }
+    // (fase 11) el botón de información y los enlaces de su recuadro no se quedan con las flechas ni con las letras
+    const enInfo = Boolean(t.closest?.('.fin-info, .fin-info-recuadro'))
     const suelto = t === document.body || t === document.documentElement ||
-      (t.classList && t.classList.contains('lat-item'))
+      (t.classList && t.classList.contains('lat-item')) || enInfo
+    if (k === 'Escape' && actual.current.i === infoEn) {
+      // cierra el recuadro; si el foco estaba en uno de sus enlaces, vuelve al botón
+      e.preventDefault()
+      if (t.closest?.('.fin-info-recuadro')) document.querySelector('.fin-info')?.focus()
+      setInfoEn(-1)
+      return
+    }
     if (k === 'Escape') { if (!suelto) t.blur?.(); return }
     if (!suelto && ['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'].includes(k)) return
     if (['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft', 'Home', 'End'].includes(k)) {
@@ -309,6 +339,7 @@ export default function App() {
     else if (l === 'n' && !SOLO_NOTAS) setNotas((x) => !x)
     else if ((l === 'b' || k === '.') && !SOLO_NOTAS) setNegro(true)
     else if (l === 'p' && !SOLO_NOTAS) setProy((x) => !x)
+    else if (l === 'r' && !SOLO_NOTAS && !imprimiendo) alternarInfo()
     else return
     e.preventDefault()
   }
@@ -352,7 +383,10 @@ export default function App() {
 
               <div className="principal">
                 <p className="solo-lector" aria-live="polite">{`Vista ${etiquetaDe(vista)}: ${vista.pregunta}`}</p>
-                {!plena && <Encabezado vista={vista} paso={pos.paso} pasos={pasos} />}
+                {!plena && (
+                  <Encabezado vista={vista} paso={pos.paso} pasos={pasos} info={info && !imprimiendo}
+                              alternarInfo={alternarInfo} />
+                )}
                 <main className="cuerpo" ref={cuerpo}>
                   {imprimiendo ? <Impresion /> : (
                     <PasoCtx.Provider value={paso}>
@@ -385,11 +419,12 @@ function Puntos({ paso, pasos, clase = '' }) {
 }
 
 /** El encabezado del E2 (regla 12): arriba, la sección de la vista (el nombre del bloque en el riel, «2 · Regla y
- *  piloto»; «Apertura» y «Cierre») con su filete en el acento y, en el mismo renglón a la derecha, los puntos del avance
- *  y «n / 15 · fuente» en letra secundaria; debajo, la pregunta, grande, es el h1, en un renglón a todo el ancho. 128 u. */
-function Encabezado({ vista, paso, pasos }) {
-  const fuente = vista.fuente ?? ''
-  const donde = `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}${fuente ? ` · ${fuente}` : ''}`
+ *  piloto»; «Apertura» y «Cierre») con su filete en el acento y, en el mismo renglón a la derecha, los puntos del avance,
+ *  «n / 16» en letra secundaria y el botón de información; debajo, la pregunta, grande, es el h1, en un renglón a todo el
+ *  ancho. 128 u. (fase 11) La cita ya no se ve: la lleva el recuadro del botón. */
+function Encabezado({ vista, paso, pasos, info, alternarInfo }) {
+  const donde = `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`
+  const ref = vista.referencia
   return (
     <header className="e2-enc fin-enc">
       <p className="fin-enc-sec">{grupoDe(vista).nombre}</p>
@@ -397,8 +432,43 @@ function Encabezado({ vista, paso, pasos }) {
       <span className="e2-enc-corte fin-enc-donde">
         <Puntos paso={paso} pasos={pasos} />
         {donde}
+        {ref && (
+          <button type="button" className="fin-info" onClick={alternarInfo} aria-expanded={info}
+                  aria-controls={info ? 'fin-info-recuadro' : undefined}
+                  aria-label="Referencia en el informe (tecla R)" title="Referencia en el informe (R)">
+            <IconoInfo />
+          </button>
+        )}
       </span>
+      {ref && info && <RecuadroInfo referencia={ref} />}
     </header>
+  )
+}
+
+/** La «i» del botón, dibujada con CSS (sin letra y sin SVG: src/fit.js toma todo svg del encabezado como algo que pisa
+ *  la barra): un punto y un trazo (estilos_marco.css, .fin-info-i). Toma el color del botón. */
+const IconoInfo = () => <span className="fin-info-i" aria-hidden="true" />
+
+/** El recuadro del botón de información: la referencia y un enlace por sección a la hoja del PDF donde empieza, en otra
+ *  pestaña. Con más de una sección, cada enlace lleva el nombre de la suya. */
+function RecuadroInfo({ referencia }) {
+  const varias = referencia.enlaces.length > 1
+  return (
+    <div id="fin-info-recuadro" className="fin-info-recuadro" role="region" aria-label="Referencia en el informe">
+      <p className="fin-info-ref">{referencia.rotulo}</p>
+      <ul className="fin-info-enlaces">
+        {referencia.enlaces.map((x) => (
+          <li key={x.clave}>
+            {varias && <span className="fin-info-sec">{x.nombre}</span>}
+            <a href={x.href} target="_blank" rel="noopener"
+               aria-label={`Abrir en el informe: ${x.nombre}, página ${x.pagina} (otra pestaña)`}>
+              Abrir en el informe
+            </a>
+            <span className="fin-info-pag">{`p. ${x.pagina}`}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 

@@ -41,7 +41,7 @@
   font: 700 var(--fin-t-titulo)/1.1 var(--fuente); letter-spacing: -.02em; color: var(--ink);
   white-space: nowrap; overflow: visible;
 }
-/* «n / 15 · fuente», 20 u, sans en --e3-ctx. */
+/* «n / 16», 20 u, sans en --e3-ctx (fase 11: la cita pasó al botón de información). */
 .e3-vp .e2-enc .e2-enc-corte.fin-enc-donde {
   font: 400 var(--fin-t-rotulo)/1.25 var(--fuente); letter-spacing: 0; color: var(--e3-ctx); white-space: nowrap;
 }
@@ -138,6 +138,15 @@
 
 /* Notas: el renglón de quién presenta va pegado al de arriba. */
 .fin-notas-quien { margin-top: -4px; }
+/* (fase 11) Notas por paso: «▸ paso k» donde se aprieta la tecla; el paso vigente con un filete en el acento y los demás
+   más tenues (en px reales, como el resto de las notas). */
+.fin-notas-grupo { padding-left: 11px; border-left: 3px solid transparent; }
+.fin-notas-grupo + .fin-notas-grupo { margin-top: 6px; }
+.fin-notas-actual { border-left-color: var(--acc); }
+.fin-notas-otro { opacity: .55; }
+.fin-notas-marca {
+  margin: 0 0 2px; font: 600 12px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--acc);
+}
 
 /* ---------- avance por pasos (spec 2 de la fase 9; fase 10, spec 2 y 3; Paso, PasoHtml y Anima de svg.jsx, pasos.js) */
 /* Estados de .fin-paso (data-revela):

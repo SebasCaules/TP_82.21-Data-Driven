@@ -11,8 +11,8 @@
 // el paso 1 del avance: lo que se revela por pasos es el dibujo (Paso de svg.jsx). La prop `hibrido` de la fase 7 se
 // acepta y no hace nada. VistaPlena (spec 1.5 de la fase 8): sin banda ni tarjeta, el lienzo entero.
 // VistaLienzo (19/11, fase 10, spec 3): el lienzo con esqueleto. App.jsx dibuja el riel y el encabezado como en toda
-// vista (sección, título, «n / 15 · cita», puntos del avance) y el cuerpo entero, dentro de su relleno, es lienzo: sin
-// banda, sin tarjeta de decisión y sin la tarjeta blanca del gráfico. La usa el cierre (V15).
+// vista (sección, título, «n / 16», puntos del avance, botón de información) y el cuerpo entero, dentro de su relleno, es lienzo: sin
+// banda, sin tarjeta de decisión y sin la tarjeta blanca del gráfico. La usa el cierre (V15 y V16, fase 11).
 
 import { Lienzo } from '../../src/graficos.jsx'
 import Banda from '../../e2/src/Banda.jsx'

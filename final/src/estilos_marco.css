@@ -18,7 +18,7 @@
 }
 
 /* ---------- encabezado (App.jsx, Encabezado) ---------- */
-/* Una grilla de dos renglones, 128 u: arriba la sección (izquierda) y los puntos del avance con «n / 15 · fuente»
+/* Una grilla de dos renglones, 128 u: arriba la sección (izquierda) y los puntos del avance con «n / 16» y el botón de información
    (derecha), alineados por la línea de base; debajo, el título a todo el ancho. */
 .e3-vp .e2-enc.fin-enc {
   position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto;
@@ -39,8 +39,68 @@
   content: ''; flex: none; width: calc(var(--fin-u) * 28); height: calc(var(--fin-u) * 3); background: var(--acc);
 }
 
+/* ---------- botón de información y su recuadro (App.jsx, fase 11, spec 2.3) ---------- */
+/* «n / 16» y, a 12 u, un botón redondo de 30 u con la «i» dibujada, en el color del texto secundario; abierto, lleno en
+   tinta. El recuadro cuelga debajo, alineado a la derecha del encabezado, sobre el cuerpo: la referencia y un enlace por
+   sección. Letra de 20 u o más. No se imprime. */
+.e3-vp .fin-enc-donde { display: inline-flex; align-items: center; }
+.e3-vp .fin-info {
+  display: inline-grid; place-items: center; flex: none; box-sizing: border-box;
+  width: calc(var(--fin-u) * 30); height: calc(var(--fin-u) * 30); margin: 0 0 0 calc(var(--fin-u) * 12); padding: 0;
+  border: calc(var(--fin-u) * 1.5) solid var(--e3-ctx); border-radius: 50%; background: none; color: var(--e3-ctx);
+  cursor: pointer; transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+/* la «i»: un punto y un trazo, en currentColor */
+.e3-vp .fin-info-i { position: relative; display: block; width: calc(var(--fin-u) * 18); height: calc(var(--fin-u) * 18); }
+.e3-vp .fin-info-i::before, .e3-vp .fin-info-i::after {
+  content: ''; position: absolute; left: 50%; transform: translateX(-50%); background: currentColor;
+}
+.e3-vp .fin-info-i::before {
+  top: calc(var(--fin-u) * 1.6); width: calc(var(--fin-u) * 3.4); height: calc(var(--fin-u) * 3.4); border-radius: 50%;
+}
+.e3-vp .fin-info-i::after {
+  top: calc(var(--fin-u) * 7); width: calc(var(--fin-u) * 3); height: calc(var(--fin-u) * 9.6); border-radius: calc(var(--fin-u) * .6);
+}
+.e3-vp .fin-info:hover { border-color: var(--ink); color: var(--ink); }
+.e3-vp .fin-info[aria-expanded='true'] { border-color: var(--ink); background: var(--ink); color: var(--sup); }
+.e3-vp .fin-info:focus-visible { outline: calc(var(--fin-u) * 2.5) solid var(--acc); outline-offset: calc(var(--fin-u) * 3); }
+.e3-vp .fin-info-recuadro {
+  position: absolute; z-index: 40; top: calc(var(--fin-u) * 70); right: calc(var(--fin-u) * 40);
+  box-sizing: border-box; min-width: calc(var(--fin-u) * 380); max-width: calc(var(--fin-u) * 560);
+  padding: calc(var(--fin-u) * 18) calc(var(--fin-u) * 22) calc(var(--fin-u) * 16);
+  border: calc(var(--fin-u) * 1) solid var(--bd); border-top: calc(var(--fin-u) * 4) solid var(--ink);
+  background: var(--sup); box-shadow: 0 calc(var(--fin-u) * 8) calc(var(--fin-u) * 28) rgba(22, 35, 58, .16);
+  animation: fin-info-abre 160ms var(--fin-curva-sale, ease-out);
+}
+@keyframes fin-info-abre { from { opacity: 0; transform: translateY(calc(var(--fin-u) * -6)); } }
+.e3-vp .fin-info-ref {
+  margin: 0 0 calc(var(--fin-u) * 12); font: 600 calc(var(--fin-u) * 22)/1.3 var(--fuente); color: var(--ink);
+  white-space: nowrap;
+}
+.e3-vp .fin-info-enlaces {
+  display: grid; grid-template-columns: auto auto auto; justify-content: start; align-items: baseline;
+  gap: calc(var(--fin-u) * 8) calc(var(--fin-u) * 16); margin: 0; padding: 0; list-style: none;
+}
+.e3-vp .fin-info-enlaces > li { display: contents; }
+/* con una sola sección no hay nombre: el enlace va en la primera columna */
+.e3-vp .fin-info-enlaces:not(:has(.fin-info-sec)) { grid-template-columns: auto auto; }
+.e3-vp .fin-info-sec { font: 400 calc(var(--fin-u) * 20)/1.3 var(--fuente); color: var(--e3-ctx); white-space: nowrap; }
+.e3-vp .fin-info-enlaces a {
+  font: 600 calc(var(--fin-u) * 20)/1.3 var(--fuente); color: var(--acc); white-space: nowrap;
+  text-decoration: underline; text-decoration-thickness: calc(var(--fin-u) * 1.5); text-underline-offset: .18em;
+  border-radius: calc(var(--fin-u) * 2);
+}
+.e3-vp .fin-info-enlaces a::after { content: ' ↗'; text-decoration: none; display: inline-block; margin-left: .2em; }
+.e3-vp .fin-info-enlaces a:hover { color: var(--ink); }
+.e3-vp .fin-info-enlaces a:focus-visible { outline: calc(var(--fin-u) * 2.5) solid var(--acc); outline-offset: calc(var(--fin-u) * 3); }
+.e3-vp .fin-info-pag { font: 400 calc(var(--fin-u) * 20)/1.3 var(--mono); color: var(--e3-ctx); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) {
+  .e3-vp .fin-info { transition: none; }
+  .e3-vp .fin-info-recuadro { animation: none; }
+}
+
 /* ---------- puntos del avance por pasos (App.jsx, Puntos) ---------- */
-/* Un punto de 9 u por paso, a 14 u de «n / 15»: lleno en --e3-ctx hasta el paso vigente, aro fino el resto. Son para
+/* Un punto de 9 u por paso, a 14 u de «n / 16»: lleno en --e3-ctx hasta el paso vigente, aro fino el resto. Son para
    quien presenta: chicos y en el color del texto secundario. */
 .e3-vp .fin-pasos {
   display: inline-flex; align-items: center; gap: calc(var(--fin-u) * 6); margin-right: calc(var(--fin-u) * 14);
@@ -54,7 +114,8 @@
 .e3-vp .fin-pasos i.fin-on { background: var(--e3-ctx); }
 @media (prefers-reduced-motion: reduce) { .e3-vp .fin-pasos i { transition: none; } }
 /* (fase 10) Hasta 6 puntos: 6 × 9 u y 5 huecos de 6 u. Medido en las quince vistas a 1920 × 1080, 1280 × 720 y
-   1024 × 768 con 6 puntos: entre la sección y «n / 15 · cita» sobran al menos 690 u (el peor caso es V05). */
+   1024 × 768 con 6 puntos: entre la sección y «n / 15 · cita» sobran al menos 690 u (el peor caso es V05). Desde la fase
+   11 la cita no está: sobra más. */
 /* En la vista a pantalla completa (sin encabezado), abajo a la derecha, en el margen de la ventana. */
 .e3-vp .app.fin-app-plena .principal { position: relative; }
 .e3-vp .fin-pasos.fin-pasos-plena {
@@ -160,6 +221,6 @@
 /* El riel ya no se imprime (src/estilos.css); el encabezado y los puntos tampoco (la regla del E2 pierde contra la de
    arriba, que nombra más clases). */
 @media print {
-  .e3-vp .e2-enc.fin-enc, .e3-vp .fin-pasos { display: none; }
+  .e3-vp .e2-enc.fin-enc, .e3-vp .fin-pasos, .e3-vp .fin-info, .e3-vp .fin-info-recuadro { display: none; }
   .e3-vp .fin-riel .lat-item.on .fin-nodo { view-transition-name: none; }
 }

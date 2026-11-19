@@ -13,8 +13,15 @@
 // archivo se muestra como esqueleto (e3/src/vistas/Esqueleto.jsx). Un `V*.jsx` sin `default` no se registra.
 //
 // scripts/vite.final-sobre.config.js filtra VISTAS con las dos líneas marcadas abajo: si cambian, ese plugin corta.
+//
+// (19/11, fase 11, spec 2.3) Cada vista trae `informe`, las claves de las secciones del informe donde está su detalle
+// (contenido_final.js). Acá se resuelven contra INFORME (informe.js, que escribe pipeline/informe_paginas.py desde el
+// PDF del consolidado): VISTAS[i].referencia = { rotulo, enlaces: [{ clave, nombre, pagina, href }] }. El rótulo
+// («Informe, secciones 31.1 y 23.2») y los enlaces los usan el botón de información del encabezado (App.jsx) y las
+// notas. Una clave que no esté en INFORME.secciones corta el armado con su motivo.
 
 import { CF } from '../contenido_final.js'
+import { INFORME } from '../informe.js'
 import Esqueleto from '../../../e3/src/vistas/Esqueleto.jsx'
 import { pasosDe } from '../pasos.js'
 
@@ -34,16 +41,54 @@ function validar(bloques) {
       if (!v.id || !v.titulo || !v.pregunta) throw new Error(`contenido_final.js: la vista «${v.id ?? '?'}» necesita id, titulo y pregunta`)
       if (vistos.has(v.id)) throw new Error(`contenido_final.js: la vista «${v.id}» está dos veces`)
       if (!(Number.isFinite(v.segundos) && v.segundos >= 0)) throw new Error(`contenido_final.js: la vista «${v.id}» no tiene segundos`)
+      if (!Array.isArray(v.informe) || !v.informe.length) throw new Error(`contenido_final.js: la vista «${v.id}» no trae informe (las secciones del informe)`)
+      for (const k of v.informe) {
+        if (!Number.isInteger(INFORME.secciones[k])) {
+          throw new Error(`contenido_final.js: la vista «${v.id}» cita la sección «${k}», que no está en informe.js (corra pipeline/informe_paginas.py)`)
+        }
+      }
       vistos.add(v.id)
     }
   }
 }
 validar(CF.BLOQUES)
 
+/** «a», «a y b», «a, b y c». */
+const juntar = (xs) => (xs.length <= 1 ? (xs[0] ?? '') : `${xs.slice(0, -1).join(', ')} y ${xs[xs.length - 1]}`)
+const ANEXO = /^A(\d+)\./
+
+/** El rótulo de unas claves del informe, en su orden: «Informe, sección 23.6», «Informe, secciones 31.1 y 23.2»,
+ *  «Informe, sección 21.1 y Anexo 1, A1.2», «Informe, Anexo 1, A1.12». */
+export function rotuloInforme(claves) {
+  const secciones = claves.filter((k) => !ANEXO.test(k))
+  const anexos = new Map()
+  for (const k of claves.filter((x) => ANEXO.test(x))) {
+    const n = k.match(ANEXO)[1]
+    anexos.set(n, [...(anexos.get(n) ?? []), k])
+  }
+  const partes = []
+  if (secciones.length) partes.push(`${secciones.length > 1 ? 'secciones' : 'sección'} ${juntar(secciones)}`)
+  for (const [n, ks] of anexos) partes.push(`Anexo ${n}, ${juntar(ks)}`)
+  return `Informe, ${juntar(partes)}`
+}
+
+/** La referencia de una vista: el rótulo y un enlace por clave, a la hoja donde empieza la sección. */
+function referencia(claves) {
+  return {
+    rotulo: rotuloInforme(claves),
+    enlaces: claves.map((k) => {
+      const pagina = INFORME.secciones[k]
+      const n = k.match(ANEXO)?.[1]
+      return { clave: k, nombre: n ? `Anexo ${n}, ${k}` : `Sección ${k}`, pagina, href: `${INFORME.url}#page=${pagina}` }
+    }),
+  }
+}
+
 const HISTORIA = CF.BLOQUES.flatMap((b) => b.vistas.map((v) => ({
   ...v,
   bloque: b.id,
   integrante: v.integrante ?? b.integrante ?? '',
+  referencia: referencia(v.informe),
 })))
 
 // (sobre) las dos líneas que filtra scripts/vite.final-sobre.config.js

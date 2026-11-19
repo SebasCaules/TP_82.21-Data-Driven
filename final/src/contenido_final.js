@@ -12,9 +12,14 @@
 // Forma (la lee final/src/vistas/index.jsx, y scripts/verificar_final.py con node):
 //   BLOQUES, en el orden de la presentación: { id, titulo, riel?, integrante, vistas: [...] }
 //     - titulo: el nombre del bloque en las notas; riel: el rótulo corto del grupo en el riel (si falta, el titulo).
-//     - integrante: quien presenta las vistas del bloque (el nombre corto del canon).
-//   Cada vista: { id, titulo, pregunta, fuente?, segundos, textos: {...} }
+//     - integrante: quien presenta las vistas del bloque, «Integrante n» sin nombre (19/11, fase 11, spec 2.1: el
+//       integrante 1 tiene la apertura, la gestión y el cierre; el 5, solo legal). El canon guarda quién es cada uno.
+//   Cada vista: { id, titulo, pregunta, informe, segundos, textos: {...} }
 //     - titulo: el rótulo del riel. pregunta: el h1, la conclusión de la vista en un renglón de hasta 74 caracteres.
+//     - informe: (fase 11, spec 2.3) las secciones del informe donde está el detalle de la vista, como claves de
+//       INFORME.secciones (final/src/informe.js, que escribe pipeline/informe_paginas.py desde el PDF del consolidado
+//       acumulado): '23.6', o 'A1.11' para el Anexo 1. El rótulo («Informe, secciones 31.1 y 23.2») y los enlaces del
+//       botón de información los arma vistas/index.jsx; una clave que no esté en INFORME.secciones corta el armado.
 //     - segundos: el tiempo de la vista; suman el objetivo de cada bloque del canon.
 //     - textos: rótulo y fragmento de cada tarjeta de la banda, qué mide, la conclusión (texto y, en `sigue`, lo que va
 //       después de cada cifra en negrita), los rótulos del gráfico y la decisión.
@@ -41,6 +46,7 @@ import V12 from './textos_vistas/V12.js'
 import V13 from './textos_vistas/V13.js'
 import V14 from './textos_vistas/V14.js'
 import V15 from './textos_vistas/V15.js'
+import V16 from './textos_vistas/V16.js'
 
 const A = DF.anclas
 const T = DF.tablas
@@ -73,17 +79,17 @@ export const CF = {
   SUBTITULO: 'presentación final',
   TIEMPOS: { objetivo_s: 1380 },
   BLOQUES: [
-    // ------------------------------------------------------------------ apertura · Tomas F. · 1:30
+    // ------------------------------------------------------------------ apertura · Integrante 1 · 1:30
     {
       id: 'apertura',
       titulo: 'Apertura',
-      integrante: 'Tomas F.',
+      integrante: 'Integrante 1',
       vistas: [
         {
           id: 'V01',
           titulo: 'La recomendación',
           pregunta: 'Recomendamos un piloto, no el proyecto',
-          fuente: 'Informe, secciones 31.1 y 23.2',
+          informe: ['31.1', '23.2'],
           segundos: 90,
           textos: {
             piloto: { rotulo: 'Piloto mínimo', linea: 'tres listas con control' },
@@ -111,18 +117,18 @@ export const CF = {
         },
       ],
     },
-    // ------------------------------------------------------------------ datos · Matías S. · 4:15
+    // ------------------------------------------------------------------ datos · Integrante 2 · 4:15
     {
       id: 'datos',
       titulo: 'Datos y calidad',
       riel: '1 · Datos',
-      integrante: 'Matías S.',
+      integrante: 'Integrante 2',
       vistas: [
         {
           id: 'V02',
           titulo: 'Qué ventas entran',
           pregunta: 'Alcanzan las ventas que tienen cliente',
-          fuente: 'Informe, sección 21.1 y Anexo 1, A1.2',
+          informe: ['21.1', 'A1.2'],
           segundos: 130,
           textos: {
             sin_cliente: { rotulo: 'Ventas sin cliente', linea: 'no entran a la lista' },
@@ -153,7 +159,7 @@ export const CF = {
           id: 'V03',
           titulo: 'Qué meses entran',
           pregunta: 'Septiembre a diciembre llegaron incompletos',
-          fuente: 'Informe, Anexo 1, A1.12',
+          informe: ['A1.12'],
           segundos: 125,
           textos: {
             fuera: { rotulo: 'Meses que no se usan', linea: 'debajo del control mensual' },
@@ -176,18 +182,18 @@ export const CF = {
         },
       ],
     },
-    // ------------------------------------------------------------------ modelo · Francisco C. · 4:15
+    // ------------------------------------------------------------------ modelo · Integrante 3 · 4:15
     {
       id: 'modelo',
       titulo: 'Regla contra modelo y diseño del piloto',
       riel: '2 · Regla y piloto',
-      integrante: 'Francisco C.',
+      integrante: 'Integrante 3',
       vistas: [
         {
           id: 'V04',
           titulo: 'Qué es irse',
           pregunta: 'La regla ordena por cercanía al umbral',
-          fuente: 'Informe, sección 22.1 y Anexo 1, A1.10',
+          informe: ['22.1', 'A1.10'],
           segundos: 85,
           textos: {
             minimo: { rotulo: 'Umbral mínimo', linea: 'piso para cualquier cliente', unidad: 'días' },
@@ -209,7 +215,7 @@ export const CF = {
           id: 'V05',
           titulo: 'Regla contra modelo',
           pregunta: 'La regla acierta lo mismo que el modelo',
-          fuente: 'Informe, sección 28.1 y Anexo 1, A1.10',
+          informe: ['28.1', 'A1.10'],
           segundos: 85,
           textos: {
             regla: { rotulo: 'Acierta la regla', linea: 'de cada lista, prueba final' },
@@ -237,7 +243,7 @@ export const CF = {
           id: 'V06',
           titulo: 'Cómo se mide',
           pregunta: `Cada mes, ${fijo(v('G49.control_mes'))} de control y dos ramas`,
-          fuente: 'Informe, secciones 23.6 y 35.2',
+          informe: ['23.6', '35.2'],
           segundos: 85,
           textos: {
             control: { rotulo: 'Control por mes', linea: 'no se contactan, al azar' },
@@ -265,18 +271,18 @@ export const CF = {
         },
       ],
     },
-    // ------------------------------------------------------------------ economía · Juan Manuel R. · 4:15
+    // ------------------------------------------------------------------ economía · Integrante 4 · 4:15
     {
       id: 'economia',
       titulo: 'Economía y medición del piloto',
       riel: '3 · Economía',
-      integrante: 'Juan Manuel R.',
+      integrante: 'Integrante 4',
       vistas: [
         {
           id: 'V07',
           titulo: 'No se paga',
           pregunta: `La lista no se paga: deja ${usd(v('G54'))} por año`,
-          fuente: 'Informe, secciones 23.6 y 23.4',
+          informe: ['23.6', '23.4'],
           segundos: 85,
           textos: {
             roi: { rotulo: 'ROI de la regla', linea: 'piloto y producción, un año' },
@@ -303,7 +309,7 @@ export const CF = {
           id: 'V08',
           titulo: 'Qué cuesta el piloto',
           pregunta: `El piloto mínimo cuesta ${usd(v('G64'))}`,
-          fuente: 'Informe, sección 23.2 y Anexo 1, A1.11',
+          informe: ['23.2', 'A1.11'],
           segundos: 85,
           textos: {
             piloto: { rotulo: 'Piloto mínimo', linea: 'con contingencia, tres meses' },
@@ -332,7 +338,7 @@ export const CF = {
           id: 'V09',
           titulo: 'Cuándo pasa',
           pregunta: `Pasa con ${fijo(v('G67.con_descuento'))} puntos; lo observado da menos de ${fijo(MENOS_DE)}`,
-          fuente: 'Informe, sección 23.6 y Anexo 1, A1.11',
+          informe: ['23.6', 'A1.11'],
           segundos: 85,
           textos: {
             con: { rotulo: 'Umbral de pase', linea: 'puntos, rama con descuento' },
@@ -359,18 +365,18 @@ export const CF = {
         },
       ],
     },
-    // ------------------------------------------------------------------ legal · Tomas F. · 3:30
+    // ------------------------------------------------------------------ legal · Integrante 5 · 3:30
     {
       id: 'legal',
       titulo: 'Legal, riesgos y adopción',
       riel: '4 · Legal y adopción',
-      integrante: 'Tomas F.',
+      integrante: 'Integrante 5',
       vistas: [
         {
           id: 'V10',
           titulo: 'Qué va antes',
           pregunta: 'Antes de la lista, el consentimiento',
-          fuente: 'Informe, sección 25.4',
+          informe: ['25.4'],
           segundos: 105,
           textos: {
             puntaje: { rotulo: 'Puntaje legal', linea: 'estado actual' },
@@ -401,7 +407,7 @@ export const CF = {
           id: 'V11',
           titulo: 'Qué puede fallar',
           pregunta: 'El piloto prueba si Marketing sostiene la lista',
-          fuente: 'Informe, secciones 26.3 y 29.3',
+          informe: ['26.3', '29.3'],
           segundos: 105,
           textos: {
             riesgos: { rotulo: 'Riesgos críticos', linea: 'con señal y respuesta' },
@@ -438,18 +444,18 @@ export const CF = {
         },
       ],
     },
-    // ------------------------------------------------------------------ gestión · Sebastian C. · 3:45
+    // ------------------------------------------------------------------ gestión · Integrante 1 · 3:45
     {
       id: 'gestion',
       titulo: 'Gestión del proyecto',
       riel: '5 · Gestión',
-      integrante: 'Sebastian C.',
+      integrante: 'Integrante 1',
       vistas: [
         {
           id: 'V12',
           titulo: 'El backlog',
           pregunta: `El backlog tiene ${fijo(v('K02'))} historias; ${fijo(v('K04'))} hechas`,
-          fuente: 'Informe, sección 34.2',
+          informe: ['34.2'],
           segundos: 75,
           textos: {
             historias: { rotulo: 'Historias de usuario', linea: 'repartidas en las épicas' },
@@ -471,7 +477,7 @@ export const CF = {
           id: 'V13',
           titulo: 'PoC y MVP',
           pregunta: 'La PoC está hecha; el MVP es la planilla',
-          fuente: 'Informe, secciones 35.1 y 35.3',
+          informe: ['35.1', '35.3'],
           segundos: 75,
           textos: {
             mvp: { rotulo: 'Se pide ahora', linea: 'el MVP en piloto mínimo' },
@@ -498,7 +504,7 @@ export const CF = {
           id: 'V14',
           titulo: 'El plan',
           pregunta: `El plan: ${fijo(T.plan.semanas)} semanas con dueño por fase`,
-          fuente: 'Informe, sección 36.1',
+          informe: ['36.1'],
           segundos: 75,
           textos: {
             decide: { rotulo: 'Decide María G.', linea: 'con la medición de las tres listas', antes: 'semana' },
@@ -518,38 +524,39 @@ export const CF = {
         },
       ],
     },
-    // ------------------------------------------------------------------ cierre · Sebastian C. · 1:30
+    // ------------------------------------------------------------------ cierre · Integrante 1 · 1:30
+    // (19/11, fase 11, spec 2.2) El cierre en dos vistas, las dos con lienzo y esqueleto (VistaLienzo): V15, el paneo de
+    // la presentación (el recorrido de las cinco secciones y lo que nos llevamos), y V16, lo que pedimos, por qué con
+    // este equipo y el cierre con el contacto y el QR al informe. Los 90 s del bloque se reparten 40 y 50.
     {
       id: 'cierre',
       titulo: 'Cierre',
-      integrante: 'Sebastian C.',
+      integrante: 'Integrante 1',
       vistas: [
         {
           id: 'V15',
-          titulo: 'Lo que pedimos',
-          pregunta: 'Aprobar el piloto y firmar el acuerdo',
-          fuente: 'Informe, secciones 38.1 y 38.2',
-          segundos: 90,
+          titulo: 'El recorrido',
+          pregunta: 'Ya sabemos a quién contactar',
+          informe: ['38.1'],
+          segundos: 40,
           textos: {
-            piloto: { rotulo: 'Piloto mínimo', linea: 'del presupuesto de Casa Óga' },
-            acuerdo: { rotulo: 'Confidencialidad', linea: 'antes de más datos', antes: 'semana' },
-            decide: { rotulo: 'Decisión final', linea: 'seguir o cerrar', antes: 'semana' },
-            mide: 'Balance del trabajo',
-            conclusion: 'Sabemos a quién contactar; el piloto dice si contactarlo paga la lista, por',
-            sigue: [' y no ', '.'],
+            mide: 'El recorrido de la presentación y lo que nos llevamos',
             balance: [
               { que: 'Aprendimos', texto: 'una regla elige a quién contactar' },
               { que: 'Falló', texto: 'esperar que un modelo pagara el proyecto' },
               { que: 'Supuesto', texto: `tasa de éxito ${pct(v('G31'), 2)}, sin grupo de control` },
               { que: 'Limitación', texto: 'quedan afuera los meses incompletos y las ventas sin cliente' },
             ],
-            decision: {
-              area: 'Pedido',
-              estado: 'a Casa Óga',
-              corta: 'Decide María G.; el acuerdo va primero',
-              larga: `Aprobar el piloto mínimo (${usd(v('G64'))} del presupuesto) y firmar el acuerdo de confidencialidad `
-                + `en la semana ${fijo(SEM_ACUERDO)} del plan.`,
-            },
+          },
+        },
+        {
+          id: 'V16',
+          titulo: 'Lo que pedimos',
+          pregunta: 'Aprobar el piloto y firmar el acuerdo',
+          informe: ['38.2'],
+          segundos: 50,
+          textos: {
+            mide: 'Lo que pedimos, por qué con este equipo y el contacto',
           },
         },
       ],
@@ -558,7 +565,7 @@ export const CF = {
 }
 
 // (18/11, fase 8) Textos nuevos por vista: textos_vistas/Vnn.js sobre los de arriba.
-const TEXTOS_VISTAS = { V01, V02, V03, V04, V05, V06, V07, V08, V09, V10, V11, V12, V13, V14, V15 }
+const TEXTOS_VISTAS = { V01, V02, V03, V04, V05, V06, V07, V08, V09, V10, V11, V12, V13, V14, V15, V16 }
 const esObjeto = (x) => x != null && typeof x === 'object' && !Array.isArray(x)
 function mezclar(base, extra) {
   if (!esObjeto(extra)) return base

@@ -1,6 +1,9 @@
-/* V15 · Cierre (19/11, fase 10). En el paso 1 la línea del recorrido se traza (Anima «traza») a velocidad pareja, así
-   llega a cada número cuando entra su estación (V15_Pedido.jsx, RUTA_MS y RUTA_ESC). Solo cambia la curva: sin animar
-   (vista completa, retroceso, movimiento reducido) la regla no hace nada y la línea queda tal cual. */
+/* El cierre en dos vistas (19/11, fase 10; fase 11, spec 2.2): V15_Recorrido.jsx y V16_Pedido.jsx.
+   V15: en el paso 1 la línea del recorrido se traza (Anima «traza») a velocidad pareja, así llega a cada número cuando
+   entra su estación (RUTA_MS y RUTA_ESC). Solo cambia la curva: sin animar (vista completa, retroceso, movimiento
+   reducido) la regla no hace nada y la línea queda tal cual.
+   V16: el mail del contacto se puede seleccionar y copiar (el resto del dibujo no lo necesita). */
 .fin-v15 .v15-ruta .fin-anima.fin-a-traza [pathLength] {
   animation-timing-function: linear;
 }
+.fin-v16 .v16-seleccionable { user-select: text; -webkit-user-select: text; cursor: text; }
