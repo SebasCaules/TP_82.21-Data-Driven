@@ -22,6 +22,9 @@ const archivos = [
   { origen: path.join(raiz, 'dist-e2', 'index.html'), destino: path.join(sitio, 'e2', 'index.html'), comando: 'npm run build:e2' },
   { origen: path.join(raiz, 'dist-e3', 'index.html'), destino: path.join(sitio, 'e3', 'index.html'), comando: 'npm run build:e3' },
   { origen: path.join(raiz, 'dist-final', 'index.html'), destino: path.join(sitio, 'final', 'index.html'), comando: 'npm run build:final' },
+  // (19/11) El consolidado acumulado que abren el QR de la vista 16 y el botón de información de /final/
+  // (final/src/informe.js, INFORME.url). Es copia del PDF publicado en el vault; se versiona en final/informe/.
+  { origen: path.join(raiz, 'final', 'informe', 'consolidado-acumulado-grupo-2.pdf'), destino: path.join(sitio, 'final', 'consolidado-acumulado-grupo-2.pdf'), comando: null },
 ]
 
 for (const { origen, comando } of archivos) {
