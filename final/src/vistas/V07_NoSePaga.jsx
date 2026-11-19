@@ -88,7 +88,7 @@ export default function V07NoSePaga() {
              { clave: 'roi', valor: pctDirecto(A['G54.roi'].valor, 1) },
              { clave: 'roi_modelo', valor: pctDirecto(A['G40.roi'].valor, 1) },
            ]}
-           cifras={[usd(DEJA, 0)]}>
+           cifras={[usd(COSTO, 0), usd(DEJA, 0)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

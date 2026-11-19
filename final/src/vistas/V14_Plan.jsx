@@ -88,8 +88,12 @@ function Dibujo({ w, h }) {
 
 export default function V14Plan() {
   return (
-    <Vista id={ID} hibrido items={[{ clave: 'decide', valor: fijo(SEM_FIN) }]}
-           cifras={[fijo(CAL.preliminar.semana), fijo(SEM_FIN)]}>
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'decide', valor: fijo(SEM_FIN) },
+             { clave: 'lista', valor: fijo(CAL.primera_lista.semana) },
+           ]}
+           cifras={[fijo(CAL.primera_lista.semana), fijo(CAL.preliminar.semana), fijo(SEM_FIN)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

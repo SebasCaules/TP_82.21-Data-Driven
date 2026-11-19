@@ -89,7 +89,12 @@ function Dibujo({ w, h }) {
 
 export default function V13Etapas() {
   return (
-    <Vista id={ID} hibrido items={[{ clave: 'mvp', valor: usd(A.G64.valor) }]} cifras={[pct(A['J03.regla'].valor)]}>
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'mvp', valor: usd(A.G64.valor) },
+             { clave: 'minima', valor: usd(A['G66.primer_anio'].valor) },
+           ]}
+           cifras={[pct(A['J03.regla'].valor)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

@@ -85,7 +85,7 @@ export default function V09Umbral() {
              { clave: 'sin', valor: fijo(SIN, 2) },
              { clave: 'hoy', valor: fijo(Math.ceil(HOY)) },
            ]}
-           cifras={[fijo(HOY, 2), fijo(CON, 2), fijo(SIN, 2)]}>
+           cifras={[fijo(HOY, 2)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

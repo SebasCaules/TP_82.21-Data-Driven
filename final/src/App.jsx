@@ -11,19 +11,28 @@
 // importa el registro y las notas del E3.
 // (18/11, spec de dataviz b.1, c y S-07, S-08, S-10) La unidad u (escala.js) se calcula acá con la ventana lógica y llega
 // a las vistas por UCtx y al CSS por --fin-u; el piso del zoom baja a 0,85 (a 1024 × 768 la vista entra entera, sin
-// aviso); el encabezado muestra solo «n / 15» (la fuente pasa a su title y a las notas); P oculta y muestra el riel
-// (modo de proyección optativo: por defecto el riel se ve, y la pantalla completa sola no lo oculta).
+// aviso); P oculta y muestra el riel (modo de proyección optativo: por defecto el riel se ve, y la pantalla completa sola
+// no lo oculta).
+// (18/11, fase 8, spec 1.1 y 1.5) El marco se arma con dos claves de variantes.js: `sec` (la sección de la vista sobre el
+// título) y `nav` (cómo dice el riel dónde estamos: a línea de avance, b lista liviana con barra de avance arriba, c solo
+// los bloques). Sale el índice de teclas del riel (las teclas siguen iguales) y el gráfico de barritas del encabezado: a
+// la derecha queda «n / 15 · fuente». Una vista con `meta.plena` se dibuja sin riel ni encabezado, con la ventana lógica
+// entera. Los estilos del marco están en estilos_marco.css, en u.
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
-import { VISTAS, etiquetaDe, grupoDe, TOTAL_VISTAS } from './vistas/index.jsx'
+import { VISTAS, BLOQUES, etiquetaDe, grupoDe, indiceDe, TOTAL_VISTAS } from './vistas/index.jsx'
 import { CF } from './contenido_final.js'
 import MarcaInicio from './MarcaInicio.jsx'
 import { ImpresionCtx } from '../../e2/src/escala.js'
 import { VentanaCtx, medir } from '../../e3/src/zoom.js'
 import { PanelNotas, VentanaNotas } from './Notas.jsx'
 import { UCtx, calcularU } from './escala.js'
-import { esHibrida } from './hibrido.js'
+import { variante } from './variantes.js'
+
+// Las letras del marco no cambian sin recargar (salen de la URL o de variantes.js).
+const NAV = ['a', 'b', 'c'].includes(variante('nav')) ? variante('nav') : 'a'
+const SEC = variante('sec') === 'b' ? 'b' : 'a'
 
 const hashDe = (i) => `#${VISTAS[i].id.toLowerCase()}`
 function indiceDeHash() {
@@ -69,6 +78,9 @@ export default function App() {
   const [proy, setProy] = useState(false)
   const ventana = useVentana(notas)
   const u = calcularU(ventana.w, ventana.h)
+  // La unidad del riel: u en 16:9; si sobra alto (4:3), crece con el alto hasta 1,15 u (estilos_marco.css). Con 1,15 el
+  // título más ancho (V09) sigue entrando junto a «n / 15 · fuente» a 1024 × 768, con 34 u de margen.
+  const ru = u * Math.min(1.15, Math.max(1, ventana.h / 1080 / u))
   const vista = VISTAS[indice]
 
   // Cambio de vista con la transición del E2 (View Transitions con dirección; si no hay, WAAPI).
@@ -240,13 +252,16 @@ export default function App() {
   if (SOLO_NOTAS) return <VentanaNotas vista={vista} />
 
   const Vista = vista.Componente
+  // (spec 1.5) La vista a pantalla completa no lleva riel ni encabezado: recibe la ventana lógica entera.
+  const plena = vista.plena === true
   return (
     <>
-      <div className="e3-vp" style={{ zoom: ventana.k, width: ventana.w, height: ventana.h, '--fin-u': `${u}px` }}>
+      <div className="e3-vp"
+           style={{ zoom: ventana.k, width: ventana.w, height: ventana.h, '--fin-u': `${u}px`, '--fin-ru': `${ru}px` }}>
         <div className="e3-vp-dentro">
           <VentanaCtx.Provider value={ventana}>
           <UCtx.Provider value={u}>
-            <div className={`app${proy ? ' fin-proy' : ''}`}>
+            <div className={`app fin-nav-${NAV}${proy ? ' fin-proy' : ''}${plena ? ' fin-app-plena' : ''}`}>
               <div className="chico">
                 <h1>Este tablero necesita una pantalla más grande</h1>
                 <p>
@@ -256,11 +271,11 @@ export default function App() {
                 </p>
               </div>
 
-              <Lateral indice={indice} irA={irA} />
+              {!plena && <Lateral indice={indice} irA={irA} />}
 
               <div className="principal">
                 <p className="solo-lector" aria-live="polite">{`Vista ${etiquetaDe(vista)}: ${vista.pregunta}`}</p>
-                <Encabezado vista={vista} />
+                {!plena && <Encabezado vista={vista} />}
                 <main className="cuerpo" ref={cuerpo}>
                   {imprimiendo ? <Impresion /> : <Vista vista={vista} irAVista={irAVista} />}
                 </main>
@@ -276,52 +291,52 @@ export default function App() {
   )
 }
 
-/** El encabezado del E2 (regla 12): la pregunta, grande, es el h1, en un renglón. A la derecha, «n / total» y la barra de
- *  avance. (18/11, S-07) La fuente del documento («E3, Parte D v3.0») es para la cátedra, no para el público: sale de la
- *  pantalla y queda en el title del contador y en la cabecera de las notas. */
+/** El encabezado del E2 (regla 12): la pregunta, grande, es el h1, en un renglón. A la derecha, «n / 15 · fuente» en letra
+ *  secundaria. Tres formas (estilos_marco.css):
+ *  - sec.a: arriba, la sección de la vista (el nombre del bloque en el riel, «2 · Regla y piloto»; «Apertura» y «Cierre»)
+ *    con su filete en el acento y, en el mismo renglón a la derecha, «n / 15 · fuente»; debajo, el título a todo el ancho.
+ *    128 u de alto.
+ *  - sec.b: el título y «n / 15 · fuente» en un renglón, como estaba. 96 u.
+ *  - nav.b: la barra de avance por bloques pegada al borde superior, con el nombre del bloque en curso debajo de su tramo
+ *    (hace de sección: no se repite), y el renglón del título como en sec.b. 128 u. */
 function Encabezado({ vista }) {
   const fuente = vista.fuente ?? ''
-  // (18/11, prototipo híbrido, hibrido.js) En V01 y V09 vuelve la fuente: «n / total · fuente» en un renglón de letra
-  // secundaria, debajo de la barra de avance (en columna, así el título de V09 sigue entrando a 52 u en 1024 × 768).
-  if (esHibrida(vista.id)) {
-    return (
-      <header className="e2-enc fin-enc-hib">
-        <h1 className="e2-preg">{vista.pregunta}</h1>
-        <div className="e2-enc-der">
-          <Avance vista={vista} />
-          <span className="e2-enc-corte fin-enc-donde">
-            {`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}{fuente && ` · ${fuente}`}
-          </span>
-        </div>
-      </header>
-    )
-  }
+  const donde = `${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}${fuente ? ` · ${fuente}` : ''}`
+  const forma = NAV === 'b' ? 'barra' : SEC === 'a' ? 'seccion' : 'simple'
   return (
-    <header className="e2-enc">
+    <header className={`e2-enc fin-enc fin-enc-${forma}`}>
+      {forma === 'barra' && <BarraAvance vista={vista} />}
+      {forma === 'seccion' && <p className="fin-enc-sec">{grupoDe(vista).nombre}</p>}
       <h1 className="e2-preg">{vista.pregunta}</h1>
-      <div className="e2-enc-der">
-        <span className="e2-enc-corte" title={fuente || undefined}>
-          {`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}
-        </span>
-        <Avance vista={vista} />
-      </div>
+      <span className="e2-enc-corte fin-enc-donde">{donde}</span>
     </header>
   )
 }
 
-/** (27/10, W1) En el lugar de la miniatura del mapa de calidad del E2, el avance de la historia: una
- *  barra por vista, las ya vistas en azul claro y la actual en tinta. Mide lo mismo que la miniatura
- *  (118 × 46 con su marco), así el encabezado tiene el alto del E2. */
-function Avance({ vista }) {
-  const i = VISTAS.indexOf(vista)
+/** Estado de la vista j respecto de la actual i: vista, actual o la que falta. */
+const estadoDe = (j, i) => (j < i ? 'fin-visto' : j === i ? 'fin-actual' : 'fin-falta')
+
+/** (nav.b) La barra de avance, partida en los bloques: cada tramo mide lo que su cantidad de vistas y tiene una celda por
+ *  vista; llena hasta la vista en curso (las vistas en azul claro, la actual en tinta). Debajo del tramo en curso, el
+ *  nombre del bloque (pegado a la derecha en los dos últimos, para que no se salga). */
+function BarraAvance({ vista }) {
+  const i = indiceDe(vista.id)
+  const bloque = grupoDe(vista)
+  const j = BLOQUES.indexOf(bloque)
+  const antes = BLOQUES.slice(0, j).reduce((s, b) => s + b.ids.length, 0)
+  const derecha = antes + bloque.ids.length / 2 > TOTAL_VISTAS * 2 / 3
   return (
-    <span className="e3-avance" aria-hidden="true" title={`Vista ${i + 1} de ${VISTAS.length}`}>
-      <span className="e3-avance-barras" style={{ gridTemplateColumns: `repeat(${VISTAS.length}, minmax(0, 1fr))` }}>
-        {VISTAS.map((v, j) => (
-          <i key={v.id} className={j < i ? 'vista' : j === i ? 'actual' : ''} />
-        ))}
+    <div className="fin-avance" style={{ gridTemplateColumns: BLOQUES.map((b) => `${b.ids.length}fr`).join(' ') }}>
+      {BLOQUES.map((b, k) => (
+        <span key={b.id} className={`fin-avance-tramo${b === bloque ? ' fin-actual' : ''}`} aria-hidden="true"
+              style={{ gridColumn: k + 1, gridTemplateColumns: `repeat(${b.ids.length}, minmax(0, 1fr))` }}>
+          {b.ids.map((id) => <i key={id} className={estadoDe(indiceDe(id), i)} />)}
+        </span>
+      ))}
+      <span className="fin-avance-nombre" style={{ gridColumn: j + 1, justifySelf: derecha ? 'end' : 'start' }}>
+        {bloque.nombre}
       </span>
-    </span>
+    </div>
   )
 }
 
@@ -335,37 +350,110 @@ const Marca = () => (
   </svg>
 )
 
+/** El riel: la marca y el subtítulo arriba, y debajo una de tres formas (nav). Sin índice de teclas (las teclas siguen
+ *  iguales). En las tres, la vista actual es el `.lat-item.on` con aria-current, un clic navega y el riel no se imprime. */
 function Lateral({ indice, irA }) {
+  const Riel = NAV === 'c' ? RielBloques : NAV === 'b' ? RielLista : RielLinea
   return (
-    <nav className="lat" aria-label="Vistas del tablero">
+    <nav className={`lat fin-riel fin-riel-${NAV}`} aria-label="Vistas del tablero">
       <div className="lat-marca">
         <MarcaInicio><Marca /><span className="lat-oga">Casa Óga</span></MarcaInicio>
         <span className="lat-sub">{CF.SUBTITULO}</span>
       </div>
-
-      <ol className="lat-lista">
-        {VISTAS.map((v, i) => {
-          const grupo = grupoDe(v)
-          const abre = grupo.nombre && (i === 0 || grupoDe(VISTAS[i - 1]) !== grupo)
-          return (
-            <li key={v.id}>
-              {abre && <div className="lat-grupo"><span>{grupo.nombre}</span></div>}
-              <button type="button" onClick={() => irA(i)} data-id={v.id}
-                      className={`lat-item${i === indice ? ' on' : ''}`}
-                      aria-current={i === indice ? 'page' : undefined}>
-                <span className="lat-n tabular">{etiquetaDe(v)}</span>
-                <span className="lat-txt">{v.titulo}</span>
-              </button>
-            </li>
-          )
-        })}
-      </ol>
-
-      <div className="lat-pie" title="↑ ↓ o Av Pág y Re Pág: cambiar de vista · Inicio / Fin: primera y última · N: notas del orador · B o «.»: pantalla en negro · F: pantalla completa · P: ocultar el riel · I: imprimir">
-        <span>↑ ↓ vista · N: notas</span>
-        <span>F: pantalla · B: negro</span>
-      </div>
+      <Riel indice={indice} irA={irA} />
     </nav>
+  )
+}
+
+/** El botón de una vista en el riel. `marca` va antes del título: el nodo (a), el número (b) o nada (c); la vista actual
+ *  lleva además el filete en el acento (b y c). */
+function ItemVista({ v, i, indice, irA, marca = null }) {
+  const on = i === indice
+  return (
+    <button type="button" onClick={() => irA(i)} data-id={v.id}
+            className={`lat-item${on ? ' on' : ''}`} aria-current={on ? 'page' : undefined}>
+      {marca}
+      {on && NAV !== 'a' && <span className="fin-filete" aria-hidden="true" />}
+      <span className="lat-txt">{v.titulo}</span>
+    </button>
+  )
+}
+
+/** (nav.a) Línea de avance: una línea vertical con un nodo por vista. La línea y los nodos ya vistos van en azul claro, el
+ *  nodo actual más grande y en tinta, los que faltan vacíos; el nombre de cada bloque, como rótulo chico sobre su primer
+ *  nodo. La línea se arma por tramos (rótulo, mitad de arriba y mitad de abajo de cada fila), cada uno con su color. */
+function RielLinea({ indice, irA }) {
+  const bloqueActual = grupoDe(VISTAS[indice])
+  return (
+    <ol className="lat-lista">
+      {VISTAS.map((v, i) => {
+        const grupo = grupoDe(v)
+        const abre = i === 0 || grupoDe(VISTAS[i - 1]) !== grupo
+        return (
+          <li key={v.id} className={estadoDe(i, indice)}>
+            {abre && (
+              <div className={`lat-grupo${grupo === bloqueActual ? ' fin-grupo-on' : ''}`}><span>{grupo.nombre}</span></div>
+            )}
+            <ItemVista v={v} i={i} indice={indice} irA={irA} marca={<span className="fin-nodo" aria-hidden="true" />} />
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+/** (nav.b) Lista liviana: número y título, el rótulo de cada bloque sin separadores, la actual con filete en el acento y su
+ *  texto en 600. El avance va arriba del área principal (BarraAvance). */
+function RielLista({ indice, irA }) {
+  const bloqueActual = grupoDe(VISTAS[indice])
+  return (
+    <ol className="lat-lista">
+      {VISTAS.map((v, i) => {
+        const grupo = grupoDe(v)
+        const abre = i === 0 || grupoDe(VISTAS[i - 1]) !== grupo
+        return (
+          <li key={v.id} className={estadoDe(i, indice)}>
+            {abre && (
+              <div className={`lat-grupo${grupo === bloqueActual ? ' fin-grupo-on' : ''}`}><span>{grupo.nombre}</span></div>
+            )}
+            <ItemVista v={v} i={i} indice={indice} irA={irA}
+                       marca={<span className="lat-n tabular">{etiquetaDe(v)}</span>} />
+          </li>
+        )
+      })}
+    </ol>
+  )
+}
+
+/** (nav.c) Solo los bloques, grandes: cada uno con un punto por vista (vista, actual, falta). El bloque en curso abre sus
+ *  vistas debajo. Un clic en un bloque lleva a su primera vista. */
+function RielBloques({ indice, irA }) {
+  const bloqueActual = grupoDe(VISTAS[indice])
+  return (
+    <ol className="lat-lista">
+      {BLOQUES.map((b) => {
+        const abierto = b === bloqueActual
+        const primera = indiceDe(b.ids[0])
+        return (
+          <li key={b.id} className={`fin-bloque${abierto ? ' fin-abierto' : ''}`}>
+            <button type="button" className="lat-item fin-bloque-btn" onClick={() => irA(primera)} data-bloque={b.id}>
+              <span className="fin-bloque-nombre">{b.nombre}</span>
+              <span className="fin-puntos" aria-hidden="true">
+                {b.ids.map((id) => <i key={id} className={`fin-punto ${estadoDe(indiceDe(id), indice)}`} />)}
+              </span>
+            </button>
+            {abierto && (
+              <ol className="fin-sub">
+                {b.ids.map((id) => {
+                  const i = indiceDe(id)
+                  return <li key={id}><ItemVista v={VISTAS[i]} i={i} indice={indice} irA={irA} /></li>
+                })}
+              </ol>
+            )}
+          </li>
+        )
+      })}
+    </ol>
   )
 }
 

@@ -19,9 +19,28 @@
 //     - textos: rótulo y fragmento de cada tarjeta de la banda, qué mide, la conclusión (texto y, en `sigue`, lo que va
 //       después de cada cifra en negrita), los rótulos del gráfico y la decisión.
 //   TIEMPOS.objetivo_s: el tiempo de exposición del canon; el verificador falla si la suma de las vistas lo pasa.
+//   (18/11, fase 8) Lo que exporta textos_vistas/Vnn.js se mezcla en los textos de su vista (mezclar, abajo): los
+//   objetos se mezclan por clave, a cualquier profundidad; un valor que no es objeto (texto, número, arreglo) reemplaza
+//   al de acá. Imports estáticos: scripts de Python leen este archivo con node.
 
 import { DF } from './datos_final.js'
 import { NBSP, fijo, pct, pctDirecto, usd, ars } from '../../e3/src/formato.js'
+// (18/11, fase 8) Los textos nuevos de cada vista van en textos_vistas/Vnn.js y se mezclan al final de este archivo.
+import V01 from './textos_vistas/V01.js'
+import V02 from './textos_vistas/V02.js'
+import V03 from './textos_vistas/V03.js'
+import V04 from './textos_vistas/V04.js'
+import V05 from './textos_vistas/V05.js'
+import V06 from './textos_vistas/V06.js'
+import V07 from './textos_vistas/V07.js'
+import V08 from './textos_vistas/V08.js'
+import V09 from './textos_vistas/V09.js'
+import V10 from './textos_vistas/V10.js'
+import V11 from './textos_vistas/V11.js'
+import V12 from './textos_vistas/V12.js'
+import V13 from './textos_vistas/V13.js'
+import V14 from './textos_vistas/V14.js'
+import V15 from './textos_vistas/V15.js'
 
 const A = DF.anclas
 const T = DF.tablas
@@ -71,8 +90,8 @@ export const CF = {
             umbral: { rotulo: 'Umbral de pase', linea: 'lo observado da menos de uno', unidad: 'puntos' },
             semana: { rotulo: 'Se decide', linea: 'desde la aprobación', antes: 'semana' },
             mide: 'Lo que deja la lista contra lo que cuesta',
-            conclusion: 'Recomendamos un piloto mínimo, tres listas mensuales con grupo de control, por',
-            sigue: [' del presupuesto, para medir si contactar retiene lo suficiente para pagar la lista. La decisión llega en la semana ', '.'],
+            conclusion: 'Tres listas con grupo de control miden si contactar paga la lista.',
+            sigue: [],
             barras: {
               deja: 'Deja la lista, por año',
               piloto: 'Piloto mínimo',
@@ -110,8 +129,8 @@ export const CF = {
             datos: { rotulo: 'Datos suficientes', linea: 'condición técnica del proyecto' },
             calidad: { rotulo: 'Calidad', linea: 'utilizable, se corrige antes' },
             mide: 'Filas del extracto de ventas, paso a paso',
-            conclusion: 'La PoC usó',
-            sigue: [' ventas con cliente y monto positivo; en el piloto la devuelta cuenta como actividad.'],
+            conclusion: 'De',
+            sigue: [' filas del extracto, la lista usa ', '.'],
             barras: {
               crudo: 'Filas del extracto',
               unicas: 'Sin repetidas',
@@ -140,8 +159,8 @@ export const CF = {
             fuera: { rotulo: 'Meses que no se usan', linea: 'debajo del control mensual' },
             control: { rotulo: 'Control del mes', linea: 'contra el año anterior' },
             mide: `Operaciones de cada mes de ${VENTAS.anio} sobre el mismo mes de ${VENTAS.anio_anterior}`,
-            conclusion: 'Desde septiembre cada mes queda debajo del',
-            sigue: [': la lista de muestra se arma al corte de agosto.'],
+            conclusion: 'Desde septiembre, cada mes queda debajo del',
+            sigue: [' del año anterior.'],
             barras: {
               control: 'control',
               eje: `Parte de las operaciones de ${VENTAS.anio_anterior}`,
@@ -174,8 +193,8 @@ export const CF = {
             minimo: { rotulo: 'Umbral mínimo', linea: 'piso para cualquier cliente', unidad: 'días' },
             factor: { rotulo: 'O su ritmo', linea: 'su intervalo entre compras', unidad: 'veces' },
             mide: `Cruzan su umbral en ${HORIZONTE} días, en validación, por días que faltan`,
-            conclusion: 'Los más cerca de su umbral lo cruzan el',
-            sigue: [' de las veces: la regla ordena por esa distancia.'],
+            conclusion: 'Cuanto más cerca del umbral, más clientes lo cruzan.',
+            sigue: [],
             barras: { dias: 'días', eje: 'Cruzan su umbral' },
             decision: {
               area: 'Target',
@@ -194,11 +213,11 @@ export const CF = {
           segundos: 85,
           textos: {
             regla: { rotulo: 'Acierta la regla', linea: 'de cada lista, prueba final' },
-            dif: { rotulo: 'Diferencia', linea: 'puntos, modelo menos regla' },
+            dif: { rotulo: 'Diferencia', linea: 'puntos, modelo menos regla', unidad: 'puntos' },
             hoy: { rotulo: 'Práctica actual', linea: 'lo que acierta hoy' },
             mide: 'Precisión de la lista mensual en la prueba final',
             conclusion: 'El modelo queda',
-            sigue: [' puntos debajo, con un intervalo que cruza el cero: queda la regla, sin entrenar nada.'],
+            sigue: [' puntos debajo de la regla: no suma.'],
             barras: {
               regla: 'Regla del umbral',
               modelo: 'Modelo',
@@ -226,7 +245,7 @@ export const CF = {
             meses: { rotulo: 'Listas del piloto', linea: 'una por mes' },
             mide: 'Clientes por grupo, lista al corte de agosto',
             conclusion: 'Fuera del',
-            sigue: [' de mayor facturación, cada mes se sortean el control y dos ramas: con descuento y sin descuento.'],
+            sigue: [' de mayor facturación, se sortean el control y dos ramas.'],
             barras: {
               alto: 'Mayor facturación',
               control: 'Control, no se contacta',
@@ -263,8 +282,8 @@ export const CF = {
             roi: { rotulo: 'ROI de la regla', linea: 'piloto y producción, un año' },
             roi_modelo: { rotulo: 'ROI del modelo', linea: 'lo que agrega, un año' },
             mide: 'Costo del primer año contra lo que deja la lista por año',
-            conclusion: 'La lista deja',
-            sigue: [' por año: el costo no se recupera, ni con modelo.'],
+            conclusion: 'El primer año cuesta',
+            sigue: [' y la lista deja ', ' por año.'],
             barras: {
               costo_modelo: 'Primer año, con modelo',
               costo_regla: 'Primer año, con la regla',
@@ -290,8 +309,8 @@ export const CF = {
             piloto: { rotulo: 'Piloto mínimo', linea: 'con contingencia, tres meses' },
             horas: { rotulo: 'Marketing pone', linea: 'de quien corre la planilla', unidad: 'horas' },
             mide: 'Costo del piloto mínimo por línea, en dólares',
-            conclusion: 'Son',
-            sigue: [' horas del equipo; la línea más cara es la medición, que es para lo que se hace el piloto.'],
+            conclusion: 'La línea más cara es la medición: para eso se hace el piloto.',
+            sigue: [],
             barras: {
               planilla: 'Planilla y guía de corrida',
               legal: 'Adecuación legal',
@@ -317,11 +336,11 @@ export const CF = {
           segundos: 85,
           textos: {
             con: { rotulo: 'Umbral de pase', linea: 'puntos, rama con descuento' },
-            sin: { rotulo: 'Sin descuento', linea: 'puntos, la otra rama' },
-            hoy: { rotulo: 'Con lo observado', linea: 'punto, con la tasa de hoy', antes: 'menos de' },
+            sin: { rotulo: 'Sin descuento', linea: 'puntos, la otra rama', unidad: 'puntos' },
+            hoy: { rotulo: 'Con lo observado', linea: 'punto, con la tasa de hoy', antes: 'menos de', unidad: 'punto' },
             mide: 'Diferencia de cruce, control menos rama, en puntos',
             conclusion: 'Con la tasa observada, la diferencia sería de',
-            sigue: [' puntos; el umbral pide ', ' con descuento y ', ' sin descuento.'],
+            sigue: [' puntos.'],
             barras: {
               hoy: 'Con lo observado',
               sin: 'Umbral, rama sin descuento',
@@ -358,8 +377,8 @@ export const CF = {
             proteccion: { rotulo: 'Datos personales', linea: 'la dimensión más baja' },
             previas: { rotulo: 'Acciones previas', linea: 'antes de la lista' },
             mide: 'Acciones legales antes de la primera lista, por semana del plan',
-            conclusion: 'Ninguna lista sale sin estas acciones; la primera, en la semana',
-            sigue: ['.'],
+            conclusion: '',
+            sigue: [' acciones legales antes de la primera lista, en la semana ', '.'],
             semana: 'semana',
             primera: 'primera lista',
             acciones: {
@@ -388,8 +407,8 @@ export const CF = {
             riesgos: { rotulo: 'Riesgos críticos', linea: 'con señal y respuesta' },
             horas: { rotulo: 'Horas por lista', linea: 'de la persona de Marketing', unidad: 'horas' },
             mide: 'Riesgos críticos del piloto: qué se mira y qué se hace',
-            conclusion: 'Marketing corre la planilla en',
-            sigue: [' horas por lista, con la guía de corrida.'],
+            conclusion: '',
+            sigue: [' riesgos críticos, cada uno con su señal y su respuesta.'],
             columnas: { riesgo: 'Riesgo', senal: 'Señal que se mira', respuesta: 'Qué se hace' },
             filas: [
               {
@@ -437,8 +456,8 @@ export const CF = {
             hechas: { rotulo: 'Ya hechas', linea: 'en la cursada, con evidencia' },
             horas: { rotulo: 'Horas del piloto', linea: 'del equipo, ya estimadas', unidad: 'horas' },
             mide: 'Historias de usuario por épica, según su estado',
-            conclusion: 'Las',
-            sigue: [' historias del piloto suman las horas del presupuesto; las ', ' restantes solo van si el piloto pasa.'],
+            conclusion: '',
+            sigue: [' hechas, ', ' en el piloto y ', ' solo si el piloto pasa.'],
             estados: { hecha: 'hecha', piloto: 'en el piloto', despues: 'si el piloto pasa' },
             decision: {
               area: 'Gestión',
@@ -459,7 +478,7 @@ export const CF = {
             minima: { rotulo: 'Operación mínima', linea: 'el primer año' },
             mide: 'Etapas de la solución y qué abre cada una',
             conclusion: 'La PoC probó que la regla acierta',
-            sigue: ['; falta medir si contactar paga la lista.'],
+            sigue: ['; falta medir si contactar paga.'],
             etapas: [
               { nombre: 'PoC', estado: 'hecha', que: 'la regla sobre el extracto histórico, con validación y prueba final' },
               { nombre: 'MVP en piloto mínimo', estado: 'se pide ahora', que: 'la planilla mensual operada tres meses con control y dos ramas' },
@@ -485,8 +504,8 @@ export const CF = {
             decide: { rotulo: 'Decide María G.', linea: 'con el cruce de las listas', antes: 'semana' },
             lista: { rotulo: 'Primera lista', linea: 'después de las acciones previas', antes: 'semana' },
             mide: 'Fases e hitos, por semana desde la aprobación',
-            conclusion: 'El informe preliminar llega en la semana',
-            sigue: [' y la decisión, en la ', '.'],
+            conclusion: 'Primera lista en la semana',
+            sigue: [', informe en la ', ' y decisión en la ', '.'],
             semana: 'semana',
             hito: 'semanas con hito',
             decision: {
@@ -536,4 +555,17 @@ export const CF = {
       ],
     },
   ],
+}
+
+// (18/11, fase 8) Textos nuevos por vista: textos_vistas/Vnn.js sobre los de arriba.
+const TEXTOS_VISTAS = { V01, V02, V03, V04, V05, V06, V07, V08, V09, V10, V11, V12, V13, V14, V15 }
+const esObjeto = (x) => x != null && typeof x === 'object' && !Array.isArray(x)
+function mezclar(base, extra) {
+  if (!esObjeto(extra)) return base
+  const out = { ...base }
+  for (const [k, x] of Object.entries(extra)) out[k] = esObjeto(x) && esObjeto(base?.[k]) ? mezclar(base[k], x) : x
+  return out
+}
+for (const b of CF.BLOQUES) {
+  for (const v of b.vistas) v.textos = mezclar(v.textos ?? {}, TEXTOS_VISTAS[v.id])
 }

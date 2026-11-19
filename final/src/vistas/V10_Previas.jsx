@@ -87,7 +87,7 @@ export default function V10Previas() {
              { clave: 'proteccion', valor: sobre(proteccion) },
              { clave: 'previas', valor: fijo(T.legal_previas.n) },
            ]}
-           cifras={[fijo(SEM_LISTA)]}>
+           cifras={[fijo(T.legal_previas.n), fijo(SEM_LISTA)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

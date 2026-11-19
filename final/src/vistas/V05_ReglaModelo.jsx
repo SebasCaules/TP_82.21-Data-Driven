@@ -24,9 +24,14 @@ export default function V05ReglaModelo() {
     { etiqueta: B.hoy, valor: A.J17.valor, texto: pct(A.J17.valor) },
   ]
   return (
-    <Vista id={ID} hibrido items={[{ clave: 'regla', valor: pct(A['J03.regla'].valor) }]}
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'regla', valor: pct(A['J03.regla'].valor) },
+             { clave: 'dif', valor: fijo(A.J09.valor, 2) },
+             { clave: 'hoy', valor: pct(A.J17.valor) },
+           ]}
            cifras={[fijo(Math.abs(A.J09.valor), 2)]}>
-      {barras({ datos, maximo: 1, llenar: true })}
+      {barras({ datos, maximo: 1, eje: B.eje, formatoEje: (x) => pct(x, 0) })}
     </Vista>
   )
 }

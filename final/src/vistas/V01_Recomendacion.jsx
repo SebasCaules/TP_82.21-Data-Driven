@@ -21,7 +21,7 @@ export default function V01Recomendacion() {
   const datos = [
     { etiqueta: B.piloto, valor: A.G64.valor, texto: usd(A.G64.valor), foco: true },
     { etiqueta: B.cuesta, valor: A.G39.valor, texto: usd(A.G39.valor) },
-    { etiqueta: B.deja, valor: A.G54.valor, texto: usd(A.G54.valor), contorno: true, separado: true },
+    { etiqueta: B.deja, valor: A.G54.valor, texto: usd(A.G54.valor), contorno: true },
   ]
   return (
     <Vista id={ID} hibrido
@@ -30,8 +30,8 @@ export default function V01Recomendacion() {
              { clave: 'umbral', valor: fijo(A['G67.con_descuento'].valor) },
              { clave: 'semana', valor: fijo(A['G63.semana_decision'].valor) },
            ]}
-           cifras={[usd(A.G64.valor), fijo(A['G63.semana_decision'].valor)]}>
-      {barras({ datos, maximo: A.G39.valor, llenar: true })}
+           cifras={[]}>
+      {barras({ datos, maximo: A.G39.valor, eje: B.eje, formatoEje: (x) => fijo(x) })}
     </Vista>
   )
 }

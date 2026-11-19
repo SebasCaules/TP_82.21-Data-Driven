@@ -31,9 +31,14 @@ export default function V02Ventas() {
       fantasma: v('C20.con_cliente'), nota: B.nota_no_positivas, foco: true },
   ]
   return (
-    <Vista id={ID} hibrido items={[{ clave: 'sin_cliente', valor: pct(A.C19.valor / 100) }]}
-           cifras={[filas(v('C20.positivas'))]}>
-      {barras({ datos, llenar: true })}
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'sin_cliente', valor: pct(A.C19.valor / 100) },
+             { clave: 'datos', valor: `${fijo(DF.tablas.condiciones.find((x) => x.id === 'datos').puntaje)}[[/${fijo(DF.tablas.escala_tecnica.hasta)}]]` },
+             { clave: 'calidad', valor: `${fijo(DF.tablas.condiciones.find((x) => x.id === 'calidad').puntaje)}[[/${fijo(DF.tablas.escala_tecnica.hasta)}]]` },
+           ]}
+           cifras={[filas(v('C20.crudo')), filas(v('C20.positivas'))]}>
+      {barras({ datos, eje: B.eje, formatoEje: filas })}
     </Vista>
   )
 }

@@ -76,8 +76,12 @@ function Dibujo({ w, h }) {
 
 export default function V11Riesgos() {
   return (
-    <Vista id={ID} hibrido items={[{ clave: 'horas', valor: fijo(A['G64.horas_por_lista'].valor) }]}
-           cifras={[fijo(A['G64.horas_por_lista'].valor)]}>
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'horas', valor: fijo(A['G64.horas_por_lista'].valor) },
+             { clave: 'riesgos', valor: fijo(DF.tablas.riesgos_criticos.n) },
+           ]}
+           cifras={[fijo(DF.tablas.riesgos_criticos.n)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

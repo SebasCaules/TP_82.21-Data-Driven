@@ -30,8 +30,8 @@ export default function V04Irse() {
              { clave: 'minimo', valor: fijo(A['C03.minimo_dias'].valor) },
              { clave: 'factor', valor: fijo(A['C03.factor'].valor, 1) },
            ]}
-           cifras={[pct(TR[0].tasa, 1)]}>
-      {barras({ datos, maximo: 1, llenar: true })}
+           cifras={[]}>
+      {barras({ datos, maximo: 1, eje: B.eje, formatoEje: (x) => pct(x, 0) })}
     </Vista>
   )
 }

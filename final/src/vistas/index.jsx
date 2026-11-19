@@ -3,7 +3,9 @@
 // derivan HISTORIA (el recorrido), los grupos del riel (uno por bloque), el número de cada vista (su posición) y los
 // tiempos de las notas (de la vista, acumulado del bloque y total).
 //
-// Cada vista es un archivo `Vnn_Nombre.jsx` que exporta `default` (el componente) y `meta = { id }`. Ningún builder toca
+// Cada vista es un archivo `Vnn_Nombre.jsx` que exporta `default` (el componente) y `meta = { id }`; con
+// `meta = { id, plena: true }` (18/11, spec 1.5) App.jsx la dibuja sin riel ni encabezado, con la ventana lógica entera
+// (VISTAS[i].plena). Ningún builder toca
 // este archivo para sumar la suya: alcanza con crear el archivo y listar la vista en CF.BLOQUES. Una vista listada sin
 // archivo se muestra como esqueleto (e3/src/vistas/Esqueleto.jsx). Un `V*.jsx` sin `default` no se registra.
 //
@@ -44,6 +46,7 @@ const HISTORIA = CF.BLOQUES.flatMap((b) => b.vistas.map((v) => ({
 export const VISTAS = HISTORIA.map((v) => ({
   ...v,
   esqueleto: !porId[v.id],
+  plena: porId[v.id]?.meta?.plena === true,
   Componente: porId[v.id]?.default ?? Esqueleto,
 }))
 export const TOTAL_VISTAS = HISTORIA.length

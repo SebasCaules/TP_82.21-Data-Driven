@@ -72,7 +72,11 @@ function Dibujo({ w, h }) {
 
 export default function V03Meses() {
   return (
-    <Vista id={ID} hibrido items={[{ clave: 'fuera', valor: fijo(A['D28.meses_fuera'].valor) }]}
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'fuera', valor: fijo(A['D28.meses_fuera'].valor) },
+             { clave: 'control', valor: pct(UMBRAL, 0) },
+           ]}
            cifras={[pct(UMBRAL, 0)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>

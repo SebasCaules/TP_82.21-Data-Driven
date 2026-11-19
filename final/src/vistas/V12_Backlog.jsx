@@ -99,8 +99,13 @@ function Dibujo({ w, h }) {
 
 export default function V12Backlog() {
   return (
-    <Vista id={ID} hibrido items={[{ clave: 'historias', valor: fijo(A.K02.valor) }]}
-           cifras={[fijo(A.K05.valor), fijo(A.K06.valor)]}>
+    <Vista id={ID} hibrido
+           items={[
+             { clave: 'historias', valor: fijo(A.K02.valor) },
+             { clave: 'hechas', valor: fijo(A.K04.valor) },
+             { clave: 'horas', valor: fijo(A.K07.valor) },
+           ]}
+           cifras={[fijo(A.K04.valor), fijo(A.K05.valor), fijo(A.K06.valor)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

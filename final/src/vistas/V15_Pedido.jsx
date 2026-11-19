@@ -23,7 +23,7 @@ const PEDIDO = [
   { ...X.acuerdo, cifra: fijo(SEM_ACUERDO) },
 ]
 
-export const meta = { id: ID }
+export const meta = { id: ID, plena: true }
 
 function medir(w, u) {
   const fR = tam('fila', u), fC = tam(48, u), fA = 0.6 * fC, fL = tam(24, u)

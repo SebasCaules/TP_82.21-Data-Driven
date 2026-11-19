@@ -28,7 +28,8 @@ const Dibujo = barras({
     linea(B.legal, 'G64.legal'),
     linea(B.contingencia, 'G64.contingencia'),
   ],
-  llenar: true,
+  eje: B.eje,
+  formatoEje: (x) => fijo(x),
 })
 
 export default function V08Piloto() {
@@ -38,7 +39,7 @@ export default function V08Piloto() {
              { clave: 'piloto', valor: usd(A.G64.valor) },
              { clave: 'horas', valor: fijo(A['G64.horas_marketing'].valor) },
            ]}
-           cifras={[fijo(A['G64.horas_equipo'].valor)]}>
+           cifras={[]}>
       {Dibujo}
     </Vista>
   )
