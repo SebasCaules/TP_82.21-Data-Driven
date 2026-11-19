@@ -23,7 +23,7 @@ import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo, pct } from '../../../e3/src/formato.js'
-import { ACC, CTX, EJE, FIN_GRIS, INK, SUP, Anima, Paso, Renglones, ancho, rectRedondo, tam, useU } from '../svg.jsx'
+import { ACC, CTX, EJE, FIN_GRIS, INK, SUP, Anima, Paso, Renglones, ancho, tam, useU } from '../svg.jsx'
 import { escalonado, usePaso } from '../pasos.js'
 
 const ID = 'V06'
@@ -44,10 +44,12 @@ export const meta = { id: ID, pasos: 3 }
 
 /** Parte del alto del lienzo que ocupa el flujo (la herramienta pide entre el 70 % y el 95 %). */
 const LLENA = 0.86
-/** Opacidad de las bandas grises; la del control va del gris (GRIS_DESDE) al acento (ACC_HASTA). */
+/** Opacidad de una banda en su recorrido. Al llegar toma de a poco el cuerpo de su nodo (opacidad 1), para que banda y
+ *  nodo se lean como una sola forma (19/11, observación del usuario: la unión entre la curva y la barra tiene que ser una
+ *  transición suave). */
 const OP_BANDA = 0.34
-const GRIS_DESDE = 0.34
-const ACC_HASTA = 0.9
+/** Desde qué parte del largo de la banda empieza a tomar cuerpo. */
+const LLENA_DESDE = 0.5
 
 // ---------------------------------------------------------------- piezas propias
 
@@ -57,10 +59,24 @@ const curva = (x1, a, x2, b) => {
   return `C${xm} ${a} ${xm} ${b} ${x2} ${b}`
 }
 
-/** Banda de un flujo: de la cara derecha de un nodo (x1, de a1 a b1) a la izquierda de otro (x2, de a2 a b2). */
-function Banda({ x1, a1, b1, x2, a2, b2, fill, opacidad = 1 }) {
-  const d = `M${x1} ${a1} ${curva(x1, a1, x2, a2)} L${x2} ${b2} ${curva(x2, b2, x1, b1)} Z`
-  return <path d={d} fill={fill} fillOpacity={opacidad} />
+/** Banda de un flujo: de la cara derecha de un nodo (x1, de a1 a b1) a la izquierda de otro (x2, de a2 a b2). Entra 1 px
+ *  debajo de cada nodo, así no queda un filo de luz en la unión. */
+function Banda({ x1, a1, b1, x2, a2, b2, fill }) {
+  const xi = x1 - 1, xf = x2 + 1
+  const d = `M${xi} ${a1} H${x1} ${curva(x1, a1, x2, a2)} H${xf} V${b2} H${x2} ${curva(x2, b2, x1, b1)} H${xi} Z`
+  return <path d={d} fill={fill} />
+}
+
+/** Degradado de una banda, de la cara del nodo de salida (x1) a la del nodo de llegada (x2): clara al salir y llena al
+ *  llegar, en gris o, la del control, en acento (que va tomando color en todo su largo). */
+function Degradado({ id, x1, x2, acento = false }) {
+  return (
+    <linearGradient id={id} gradientUnits="userSpaceOnUse" x1={x1} y1={0} x2={x2} y2={0}>
+      <stop offset="0" style={{ stopColor: FIN_GRIS, stopOpacity: OP_BANDA }} />
+      {!acento && <stop offset={LLENA_DESDE} style={{ stopColor: FIN_GRIS, stopOpacity: OP_BANDA }} />}
+      <stop offset="1" style={{ stopColor: acento ? ACC : FIN_GRIS, stopOpacity: 1 }} />
+    </linearGradient>
+  )
 }
 
 /** Filo blanco sobre el borde compartido de dos bandas vecinas (de la cara de un nodo a la del otro). */
@@ -68,9 +84,16 @@ function Filo({ u, x1, a, x2, b }) {
   return <path d={`M${x1} ${a} ${curva(x1, a, x2, b)}`} fill="none" stroke={SUP} strokeWidth={2.5 * u} />
 }
 
-/** Nodo: una barra vertical angosta con las puntas redondeadas, en gris o, la del control, en acento. */
-function Nodo({ u, x, y, nw, alto, foco = false }) {
-  return <path d={rectRedondo(x, y, nw, alto, 5 * u, 'todos')} fill={foco ? ACC : FIN_GRIS} />
+/** Nodo: una barra vertical angosta, en gris o, la del control, en acento. Se redondea solo del lado libre (`redondo`:
+ *  'izq', 'der' o 'ninguno'): el lado que toca una banda va recto, para que la banda entre sin muescas. */
+function Nodo({ u, x, y, nw, alto, foco = false, redondo = 'ninguno' }) {
+  const r = Math.min(6 * u, nw / 2, alto / 2)
+  const ri = redondo === 'izq' ? r : 0
+  const rd = redondo === 'der' ? r : 0
+  const x2 = x + nw, y2 = y + alto
+  const d = `M${x + ri} ${y} H${x2 - rd} Q${x2} ${y} ${x2} ${y + rd} V${y2 - rd} Q${x2} ${y2} ${x2 - rd} ${y2}`
+    + ` H${x + ri} Q${x} ${y2} ${x} ${y2 - ri} V${y + ri} Q${x} ${y} ${x + ri} ${y} Z`
+  return <path d={d} fill={foco ? ACC : FIN_GRIS} />
 }
 
 /** Rótulo de dos renglones centrado en yc: el nombre (con una cifra grande delante, si la hay) y debajo lo que se hace. */
@@ -159,7 +182,8 @@ function parejos(texto, w, f, peso = 400, max = 5) {
 function Flujo({ w, h }) {
   const u = useU()
   const paso = usePaso()
-  const idGrad = `v06-acc-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
+  const idBase = `v06-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`
+  const grad = (c) => `url(#${idBase}-${c})`
   const fNom = tam('val', u)
   const fComp = tam(34, u)
   const fQue = tam(26, u)
@@ -227,10 +251,10 @@ function Flujo({ w, h }) {
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       <defs>
-        <linearGradient id={idGrad} gradientUnits="userSpaceOnUse" x1={xB2} y1={0} x2={xD} y2={0}>
-          <stop offset="0" style={{ stopColor: FIN_GRIS, stopOpacity: GRIS_DESDE }} />
-          <stop offset="1" style={{ stopColor: ACC, stopOpacity: ACC_HASTA }} />
-        </linearGradient>
+        <Degradado id={`${idBase}-alto`} x1={xA2} x2={xD} />
+        <Degradado id={`${idBase}-resto`} x1={xA2} x2={xB} />
+        <Degradado id={`${idBase}-rama`} x1={xB2} x2={xD} />
+        <Degradado id={`${idBase}-ctl`} x1={xB2} x2={xD} acento />
       </defs>
 
       {/* 2 · las dos bandas que salen de la lista: mayor facturación (se apaga en el paso 3) y el resto, hasta el
@@ -238,12 +262,10 @@ function Flujo({ w, h }) {
       <Paso n={2} oculto entrada={false}>
         <Anima n={2} efecto="revela-x" dur={600} style={{ '--fin-anima-base': '380ms' }}>
           <Paso n={1} hasta={2}>
-            <Banda x1={xA2} a1={yA} b1={lA} x2={xD} a2={gAlto.y} b2={gAlto.y + gAlto.alto}
-                   fill={FIN_GRIS} opacidad={OP_BANDA} />
-            <Nodo u={u} x={xD} y={gAlto.y} nw={nw} alto={gAlto.alto} />
+            <Banda x1={xA2} a1={yA} b1={lA} x2={xD} a2={gAlto.y} b2={gAlto.y + gAlto.alto} fill={grad('alto')} />
+            <Nodo u={u} x={xD} y={gAlto.y} nw={nw} alto={gAlto.alto} redondo="der" />
           </Paso>
-          <Banda x1={xA2} a1={lA} b1={yA + LISTA * k} x2={xB} a2={yB} b2={yB + RESTO * k}
-                 fill={FIN_GRIS} opacidad={OP_BANDA} />
+          <Banda x1={xA2} a1={lA} b1={yA + LISTA * k} x2={xB} a2={yB} b2={yB + RESTO * k} fill={grad('resto')} />
           <Filo u={u} x1={xA2} a={lA} x2={xB} b={yB} />
           <Nodo u={u} x={xB} y={yB} nw={nw} alto={RESTO * k} />
         </Anima>
@@ -261,18 +283,16 @@ function Flujo({ w, h }) {
                 textAnchor="middle">{G.sorteo}</text>
         </Anima>
         <Anima n={3} efecto="revela-x" dur={550} style={{ '--fin-anima-base': '120ms' }}>
-          <Banda x1={xB2} a1={yB} b1={sC} x2={xD} a2={gCtl.y} b2={gCtl.y + gCtl.alto} fill={`url(#${idGrad})`} />
-          <Banda x1={xB2} a1={sC} b1={sS} x2={xD} a2={gCon.y} b2={gCon.y + gCon.alto}
-                 fill={FIN_GRIS} opacidad={OP_BANDA} />
-          <Banda x1={xB2} a1={sS} b1={yB + RESTO * k} x2={xD} a2={gSin.y} b2={gSin.y + gSin.alto}
-                 fill={FIN_GRIS} opacidad={OP_BANDA} />
+          <Banda x1={xB2} a1={yB} b1={sC} x2={xD} a2={gCtl.y} b2={gCtl.y + gCtl.alto} fill={grad('ctl')} />
+          <Banda x1={xB2} a1={sC} b1={sS} x2={xD} a2={gCon.y} b2={gCon.y + gCon.alto} fill={grad('rama')} />
+          <Banda x1={xB2} a1={sS} b1={yB + RESTO * k} x2={xD} a2={gSin.y} b2={gSin.y + gSin.alto} fill={grad('rama')} />
           <Filo u={u} x1={xB2} a={sC} x2={xD} b={gCtl.y + gCtl.alto} />
           <Filo u={u} x1={xB2} a={sC} x2={xD} b={gCon.y} />
           <Filo u={u} x1={xB2} a={sS} x2={xD} b={gCon.y + gCon.alto} />
           <Filo u={u} x1={xB2} a={sS} x2={xD} b={gSin.y} />
-          <Nodo u={u} x={xD} y={gCtl.y} nw={nw} alto={gCtl.alto} foco />
-          <Nodo u={u} x={xD} y={gCon.y} nw={nw} alto={gCon.alto} />
-          <Nodo u={u} x={xD} y={gSin.y} nw={nw} alto={gSin.alto} />
+          <Nodo u={u} x={xD} y={gCtl.y} nw={nw} alto={gCtl.alto} foco redondo="der" />
+          <Nodo u={u} x={xD} y={gCon.y} nw={nw} alto={gCon.alto} redondo="der" />
+          <Nodo u={u} x={xD} y={gSin.y} nw={nw} alto={gSin.alto} redondo="der" />
         </Anima>
         <g style={{ ...escalonado(3, { total: 520, dur: 300 }), '--fin-anima-base': '480ms' }}>
           {[['control', gCtl], ['con', gCon], ['sin', gSin]].map(([c, g], i) => (
@@ -295,7 +315,7 @@ function Flujo({ w, h }) {
         <Anima n={2} efecto="corre" dx={dxCentro} dur={520}>
           <g transform={corrido}>
             <RotuloLista x={xA - gap} yc={yA + (LISTA * k) / 2} u={u} />
-            <Nodo u={u} x={xA} y={yA} nw={nwL} alto={LISTA * k} />
+            <Nodo u={u} x={xA} y={yA} nw={nwL} alto={LISTA * k} redondo="izq" />
           </g>
         </Anima>
       </Anima>
