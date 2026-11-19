@@ -1,15 +1,15 @@
-/* El marco de /final/ (18/11, fase 8 de la auditoría de dataviz, spec 1.1 y 1.5): el riel, el encabezado, la barra de
-   avance de nav.b y la vista a pantalla completa. Se importa después de estilos_final.css (main.jsx). Toda medida va en u
-   (--fin-u, App.jsx), así el marco mide lo mismo a 1920 × 1080, 1280 × 720 y 1024 × 768 (en u la ventana lógica tiene
-   1920 de ancho en las tres) y el título entra en un renglón en las tres. El riel usa --fin-ru (App.jsx): igual a u en
-   16:9 y hasta 1,15 u cuando sobra alto (1024 × 768), para que su letra no baje de 11 px reales en un proyector 4:3.
-   Todas las reglas van bajo .e3-vp; ninguna usa !important. Las formas salen de las clases que pone App.jsx:
-   fin-riel-a/b/c (clave nav) y fin-enc-seccion, fin-enc-simple o fin-enc-barra (claves sec y nav). */
+/* El marco de /final/ (18/11, fase 8 de la auditoría de dataviz, spec 1.1 y 1.5; 19/11, fase 9, spec 2 y 3): el riel con
+   la línea de avance, el encabezado con la sección sobre el título, los puntos del avance por pasos y la vista a pantalla
+   completa. Se importa después de estilos_final.css (main.jsx). Toda medida va en u (--fin-u, App.jsx), así el marco mide
+   lo mismo a 1920 × 1080, 1280 × 720 y 1024 × 768 (en u la ventana lógica tiene 1920 de ancho en las tres) y el título
+   entra en un renglón en las tres. El riel usa --fin-ru (App.jsx): igual a u en 16:9 y hasta 1,15 u cuando sobra alto
+   (1024 × 768), para que su letra no baje de 11 px reales en un proyector 4:3. Todas las reglas van bajo .e3-vp; ninguna
+   usa !important. */
 
 /* ---------- tokens del marco ---------- */
 .e3-vp {
   /* El riel, en u (antes en px y vw: a 1280 × 720 quedaba 20 u más ancho que a 1920 × 1080). 300 u deja entrar el título
-     más largo de la vista actual en 600 (nav.a) y el bloque más largo a 22 u (nav.c). */
+     más largo de la vista actual en 600. */
   --fin-ru: var(--fin-u);
   --lat-w: calc(var(--fin-ru) * 300);
   --fin-riel-visto: var(--azul3);        /* lo ya visto: el azul claro del avance del E3 */
@@ -18,18 +18,17 @@
 }
 
 /* ---------- encabezado (App.jsx, Encabezado) ---------- */
-/* Una grilla: el título (preg) a la izquierda y «n / 15 · fuente» (donde) a la derecha, alineados por la línea de base. */
+/* Una grilla de dos renglones, 128 u: arriba la sección (izquierda) y los puntos del avance con «n / 15 · fuente»
+   (derecha), alineados por la línea de base; debajo, el título a todo el ancho. */
 .e3-vp .e2-enc.fin-enc {
   position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: calc(var(--fin-u) * 24); align-content: start; align-items: baseline;
+  grid-template-areas: "sec donde" "preg preg";
+  column-gap: calc(var(--fin-u) * 24); row-gap: calc(var(--fin-u) * 10); align-content: start; align-items: baseline;
   box-sizing: border-box; height: calc(var(--fin-u) * 128);
   padding: calc(var(--fin-u) * 28) calc(var(--fin-u) * 40) 0;
 }
 .e3-vp .e2-enc.fin-enc .e2-preg { grid-area: preg; min-width: 0; }
 .e3-vp .e2-enc.fin-enc .fin-enc-donde { grid-area: donde; justify-self: end; }
-
-/* sec.a: la sección y «n / 15 · fuente» en el primer renglón; el título debajo, a todo el ancho. 128 u. */
-.e3-vp .e2-enc.fin-enc-seccion { grid-template-areas: "sec donde" "preg preg"; row-gap: calc(var(--fin-u) * 10); }
 .e3-vp .fin-enc-sec {
   grid-area: sec; display: flex; align-items: center; gap: calc(var(--fin-u) * 12); min-width: 0; margin: 0;
   font: 600 calc(var(--fin-u) * 20)/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase;
@@ -40,35 +39,32 @@
   content: ''; flex: none; width: calc(var(--fin-u) * 28); height: calc(var(--fin-u) * 3); background: var(--acc);
 }
 
-/* sec.b: el título y «n / 15 · fuente» en un renglón, como estaba (96 u). */
-.e3-vp .e2-enc.fin-enc-simple {
-  grid-template-areas: "preg donde"; height: calc(var(--fin-u) * 96); padding-top: calc(var(--fin-u) * 24);
+/* ---------- puntos del avance por pasos (App.jsx, Puntos) ---------- */
+/* Un punto de 9 u por paso, a 14 u de «n / 15»: lleno en --e3-ctx hasta el paso vigente, aro fino el resto. Son para
+   quien presenta: chicos y en el color del texto secundario. */
+.e3-vp .fin-pasos {
+  display: inline-flex; align-items: center; gap: calc(var(--fin-u) * 6); margin-right: calc(var(--fin-u) * 14);
+  vertical-align: calc(var(--fin-u) * 1);
+}
+.e3-vp .fin-pasos i {
+  display: block; flex: none; box-sizing: border-box; width: calc(var(--fin-u) * 9); height: calc(var(--fin-u) * 9);
+  border-radius: 50%; border: calc(var(--fin-u) * 1.5) solid var(--e3-ctx);
+  transition: background-color 200ms ease;
+}
+.e3-vp .fin-pasos i.fin-on { background: var(--e3-ctx); }
+/* En la vista a pantalla completa (sin encabezado), abajo a la derecha, en el margen de la ventana. */
+.e3-vp .app.fin-app-plena .principal { position: relative; }
+.e3-vp .fin-pasos.fin-pasos-plena {
+  position: absolute; right: calc(var(--fin-u) * 48); bottom: calc(var(--fin-u) * 16); margin: 0;
 }
 
-/* nav.b: la barra de avance arriba (0 a 10 u), el nombre del bloque debajo de su tramo (16 a 40 u) y el renglón del
-   título desde 60 u. 128 u. */
-.e3-vp .e2-enc.fin-enc-barra { grid-template-areas: "preg donde"; padding-top: calc(var(--fin-u) * 60); }
-.e3-vp .fin-avance {
-  position: absolute; top: 0; left: calc(var(--fin-u) * 40); right: calc(var(--fin-u) * 40);
-  display: grid; grid-template-rows: calc(var(--fin-u) * 10) auto;
-  column-gap: calc(var(--fin-u) * 18); row-gap: calc(var(--fin-u) * 6);
-}
-/* entre bloques 18 u y entre vistas 2 u: la barra se lee en siete tramos, no en quince celdas */
-.e3-vp .fin-avance-tramo { grid-row: 1; display: grid; column-gap: calc(var(--fin-u) * 2); min-width: 0; }
-.e3-vp .fin-avance-tramo i { display: block; background: var(--fin-riel-linea); }
-.e3-vp .fin-avance-tramo i.fin-visto { background: var(--fin-riel-visto); }
-.e3-vp .fin-avance-tramo i.fin-actual { background: var(--ink); }
-.e3-vp .fin-avance-nombre {
-  grid-row: 2; font: 600 calc(var(--fin-u) * 20)/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase;
-  color: var(--e3-ctx); white-space: nowrap;
-}
-
-/* ---------- riel (App.jsx, Lateral): común a las tres formas ---------- */
+/* ---------- riel (App.jsx, Lateral) ---------- */
 /* Menos tinta y más aire: sin pastilla oscura, sin separadores punteados, sin índice de teclas y sin la raya debajo de
    la marca. Queda la raya del borde derecho, que separa el riel del área principal. */
 .e3-vp .lat.fin-riel {
   padding: calc(var(--fin-ru) * 36) 0 calc(var(--fin-ru) * 24); border-right: calc(var(--fin-ru) * 1) solid var(--bd);
   overflow: hidden;
+  --x-linea: calc(var(--fin-ru) * 44);
 }
 .e3-vp .fin-riel .lat-marca {
   gap: calc(var(--fin-ru) * 6); margin: 0 0 calc(var(--fin-ru) * 32); padding: 0 calc(var(--fin-ru) * 32); border-bottom: 0;
@@ -83,10 +79,11 @@
 .e3-vp .fin-riel .lat-lista { flex: 1 1 auto; min-height: 0; gap: 0; margin: 0; padding: 0; }
 
 /* El rótulo de cada bloque: chico, mono, sin raya; el del bloque en curso en tinta. La letra va también en el div: si no,
-   su renglón toma el alto del cuerpo de la página (15 px × 1,5) y el riel no entra. */
+   su renglón toma el alto del cuerpo de la página (15 px × 1,5) y el riel no entra. El texto arranca a 66 u, bajo «Casa
+   Óga». */
 .e3-vp .fin-riel .lat-grupo {
   position: relative; display: block; margin: 0; border: 0;
-  padding: calc(var(--fin-ru) * 18) calc(var(--fin-ru) * 20) calc(var(--fin-ru) * 6) calc(var(--fin-ru) * 32);
+  padding: calc(var(--fin-ru) * 18) calc(var(--fin-ru) * 20) calc(var(--fin-ru) * 6) calc(var(--fin-ru) * 66);
   font: 600 calc(var(--fin-ru) * 14)/1.25 var(--mono);
 }
 .e3-vp .fin-riel .lat-lista > li:first-child .lat-grupo { padding-top: 0; }
@@ -98,7 +95,7 @@
 /* La fila de una vista: título a 18 u; la actual en tinta y 600, sin fondo. */
 .e3-vp .fin-riel .lat-item {
   position: relative; display: flex; align-items: center; gap: calc(var(--fin-ru) * 14); width: 100%;
-  padding: calc(var(--fin-ru) * 10) calc(var(--fin-ru) * 20) calc(var(--fin-ru) * 10) calc(var(--fin-ru) * 32);
+  padding: calc(var(--fin-ru) * 10) calc(var(--fin-ru) * 20) calc(var(--fin-ru) * 10) calc(var(--fin-ru) * 66);
   border: 0; border-radius: 0; background: none; color: var(--mut2);
   font: 400 calc(var(--fin-ru) * 18)/1.25 var(--fuente); text-align: left;
 }
@@ -107,100 +104,59 @@
 .e3-vp .fin-riel .lat-item.on { background: none; color: var(--ink); font-weight: 600; view-transition-name: none; }
 .e3-vp .fin-riel .lat-item.on:focus-visible { outline-color: var(--acc); outline-offset: calc(var(--fin-ru) * -2); }
 .e3-vp .fin-riel .lat-txt { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.e3-vp .fin-riel .lat-n { flex: none; font: 500 calc(var(--fin-ru) * 14)/1 var(--mono); color: var(--mut); }
-.e3-vp .fin-riel .lat-item.on .lat-n { color: var(--ink); }
-/* El filete de la vista actual (nav.b y nav.c): se desliza de una fila a la otra al cambiar de vista. */
-.e3-vp .fin-riel .fin-filete {
-  position: absolute; left: 0; top: calc(var(--fin-ru) * 6); bottom: calc(var(--fin-ru) * 6);
-  width: calc(var(--fin-ru) * 5); background: var(--acc); view-transition-name: fin-filete;
-}
 
-/* ---------- nav.a: línea de avance ---------- */
-/* La línea pasa a 44 u del borde, bajo el centro del ícono de la marca; el texto arranca a 66 u, bajo «Casa Óga». Cada
-   tramo de la línea es un seudoelemento: el del rótulo y las dos mitades de cada fila. Lo ya recorrido (hasta el nodo
-   actual) va en azul claro. */
-.e3-vp .fin-riel-a { --x-linea: calc(var(--fin-ru) * 44); }
-.e3-vp .fin-riel-a .lat-item { padding-left: calc(var(--fin-ru) * 66); }
-.e3-vp .fin-riel-a .lat-grupo { padding-left: calc(var(--fin-ru) * 66); }
-.e3-vp .fin-riel-a .lat-grupo::before,
-.e3-vp .fin-riel-a .lat-item::before,
-.e3-vp .fin-riel-a .lat-item::after {
+/* La línea de avance pasa a 44 u del borde, bajo el centro del ícono de la marca. Cada tramo de la línea es un
+   seudoelemento: el del rótulo y las dos mitades de cada fila. Lo ya recorrido (hasta el nodo actual) va en azul claro. */
+.e3-vp .fin-riel .lat-grupo::before,
+.e3-vp .fin-riel .lat-item::before,
+.e3-vp .fin-riel .lat-item::after {
   content: ''; position: absolute; z-index: 0; left: calc(var(--x-linea) - var(--fin-ru) * 1);
   width: calc(var(--fin-ru) * 2); background: var(--fin-riel-linea);
 }
-.e3-vp .fin-riel-a .lat-grupo::before { top: 0; bottom: 0; }
-.e3-vp .fin-riel-a .lat-item::before { top: 0; height: 50%; }
-.e3-vp .fin-riel-a .lat-item::after { top: 50%; bottom: 0; }
-.e3-vp .fin-riel-a .lat-lista > li:first-child .lat-grupo::before,
-.e3-vp .fin-riel-a .lat-lista > li:first-child .lat-item::before,
-.e3-vp .fin-riel-a .lat-lista > li:last-child .lat-item::after { display: none; }
-.e3-vp .fin-riel-a li.fin-visto .lat-grupo::before,
-.e3-vp .fin-riel-a li.fin-actual .lat-grupo::before,
-.e3-vp .fin-riel-a li.fin-visto .lat-item::before,
-.e3-vp .fin-riel-a li.fin-actual .lat-item::before,
-.e3-vp .fin-riel-a li.fin-visto .lat-item::after { background: var(--fin-riel-visto); }
+.e3-vp .fin-riel .lat-grupo::before { top: 0; bottom: 0; }
+.e3-vp .fin-riel .lat-item::before { top: 0; height: 50%; }
+.e3-vp .fin-riel .lat-item::after { top: 50%; bottom: 0; }
+.e3-vp .fin-riel .lat-lista > li:first-child .lat-grupo::before,
+.e3-vp .fin-riel .lat-lista > li:first-child .lat-item::before,
+.e3-vp .fin-riel .lat-lista > li:last-child .lat-item::after { display: none; }
+.e3-vp .fin-riel li.fin-visto .lat-grupo::before,
+.e3-vp .fin-riel li.fin-actual .lat-grupo::before,
+.e3-vp .fin-riel li.fin-visto .lat-item::before,
+.e3-vp .fin-riel li.fin-actual .lat-item::before,
+.e3-vp .fin-riel li.fin-visto .lat-item::after { background: var(--fin-riel-visto); }
 /* El nodo: vacío (falta), lleno en azul claro (visto) o más grande en tinta, con un aro del color del riel que lo separa
    de la línea (actual). El actual se desliza por la línea al cambiar de vista. */
-.e3-vp .fin-riel-a .fin-nodo {
+.e3-vp .fin-riel .fin-nodo {
   position: absolute; z-index: 1; left: var(--x-linea); top: 50%; transform: translate(-50%, -50%);
   box-sizing: border-box; width: calc(var(--fin-ru) * 12); height: calc(var(--fin-ru) * 12); border-radius: 50%;
   border: calc(var(--fin-ru) * 2) solid var(--fin-riel-falta); background: var(--lat);
 }
-.e3-vp .fin-riel-a li.fin-visto .fin-nodo { border-color: var(--fin-riel-visto); background: var(--fin-riel-visto); }
-.e3-vp .fin-riel-a .lat-item.on .fin-nodo {
+.e3-vp .fin-riel li.fin-visto .fin-nodo { border-color: var(--fin-riel-visto); background: var(--fin-riel-visto); }
+.e3-vp .fin-riel .lat-item.on .fin-nodo {
   width: calc(var(--fin-ru) * 22); height: calc(var(--fin-ru) * 22); border: 0; background: var(--ink);
   box-shadow: 0 0 0 calc(var(--fin-ru) * 4) var(--lat); view-transition-name: fin-nodo;
 }
 
-/* ---------- nav.b: lista liviana ---------- */
-/* Número y título; la actual con el filete en el borde izquierdo. La barra de avance va en el encabezado. */
-.e3-vp .fin-riel-b .lat-n { width: calc(var(--fin-ru) * 22); }
-
-/* ---------- nav.c: solo los bloques ---------- */
-/* Cada bloque: el nombre a 22 u y una fila de puntos, uno por vista. El bloque en curso, en tinta, abre sus vistas. */
-.e3-vp .fin-riel-c .lat-lista { gap: calc(var(--fin-ru) * 12); }
-.e3-vp .fin-riel-c .fin-bloque-btn {
-  flex-direction: column; align-items: flex-start; gap: calc(var(--fin-ru) * 10);
-  padding-top: calc(var(--fin-ru) * 12); padding-bottom: calc(var(--fin-ru) * 12);
-}
-.e3-vp .fin-riel-c .fin-bloque-nombre {
-  font: 600 calc(var(--fin-ru) * 22)/1.2 var(--fuente); letter-spacing: -.005em; color: var(--mut2); white-space: nowrap;
-}
-.e3-vp .fin-riel-c .fin-abierto .fin-bloque-nombre { font-weight: 700; color: var(--ink); }
-.e3-vp .fin-riel-c .fin-bloque-btn:hover .fin-bloque-nombre { color: var(--ink); }
-.e3-vp .fin-riel-c .fin-puntos { display: flex; align-items: center; gap: calc(var(--fin-ru) * 8); height: calc(var(--fin-ru) * 16); }
-.e3-vp .fin-riel-c .fin-punto {
-  display: block; flex: none; box-sizing: border-box; width: calc(var(--fin-ru) * 12); height: calc(var(--fin-ru) * 12);
-  border-radius: 50%; border: calc(var(--fin-ru) * 2) solid var(--fin-riel-falta);
-}
-.e3-vp .fin-riel-c .fin-punto.fin-visto { border-color: var(--fin-riel-visto); background: var(--fin-riel-visto); }
-.e3-vp .fin-riel-c .fin-punto.fin-actual {
-  width: calc(var(--fin-ru) * 16); height: calc(var(--fin-ru) * 16); border-color: var(--ink); background: var(--ink);
-}
-.e3-vp .fin-riel-c .fin-sub { list-style: none; margin: 0; padding: calc(var(--fin-ru) * 2) 0 calc(var(--fin-ru) * 6); }
-.e3-vp .fin-riel-c .fin-sub .lat-item { padding-left: calc(var(--fin-ru) * 52); }
-.e3-vp .fin-riel-c .fin-sub .fin-filete { left: calc(var(--fin-ru) * 32); }
-
-/* ---------- vista a pantalla completa (spec 1.5, App.jsx con meta.plena) ---------- */
+/* ---------- vista a pantalla completa (spec 1.5 de la fase 8, App.jsx con meta.plena) ---------- */
 /* Sin riel ni encabezado: la vista recibe la ventana lógica entera, sin el relleno del cuerpo. */
 .e3-vp .app.fin-app-plena { grid-template-columns: minmax(0, 1fr); }
 .e3-vp .app.fin-app-plena .cuerpo { padding: 0; }
 
 /* ---------- movimiento ---------- */
-/* El nodo (nav.a) y el filete (nav.b y nav.c) se deslizan de la vista anterior a la nueva con el tiempo que tenía la
-   pastilla del riel del E2 (e2-riel); con movimiento reducido, saltan. Los seudoelementos de View Transitions cuelgan de
-   la raíz del documento: no pueden ir bajo .e3-vp, y sus nombres (fin-*) solo existen en /final/. */
-::view-transition-group(fin-nodo), ::view-transition-group(fin-filete) {
+/* El nodo se desliza de la vista anterior a la nueva con el tiempo que tenía la pastilla del riel del E2 (e2-riel); con
+   movimiento reducido, salta. Los seudoelementos de View Transitions cuelgan de la raíz del documento: no pueden ir bajo
+   .e3-vp, y su nombre (fin-nodo) solo existe en /final/. */
+::view-transition-group(fin-nodo) {
   animation-duration: 320ms; animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(fin-nodo), ::view-transition-group(fin-filete) { animation-duration: 0s; }
+  ::view-transition-group(fin-nodo) { animation-duration: 0s; }
 }
 
 /* ---------- impresión ---------- */
-/* El riel ya no se imprime (src/estilos.css); el encabezado y la barra de avance tampoco (la regla del E2 pierde contra
-   la de arriba, que nombra más clases). */
+/* El riel ya no se imprime (src/estilos.css); el encabezado y los puntos tampoco (la regla del E2 pierde contra la de
+   arriba, que nombra más clases). */
 @media print {
-  .e3-vp .e2-enc.fin-enc, .e3-vp .fin-avance { display: none; }
-  .e3-vp .fin-riel .fin-filete, .e3-vp .fin-riel-a .lat-item.on .fin-nodo { view-transition-name: none; }
+  .e3-vp .e2-enc.fin-enc, .e3-vp .fin-pasos { display: none; }
+  .e3-vp .fin-riel .lat-item.on .fin-nodo { view-transition-name: none; }
 }

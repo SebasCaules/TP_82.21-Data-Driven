@@ -7,6 +7,8 @@
 // columna: así ningún valor toca la línea (el de septiembre, arriba, quedaría pegado a ella). Valores con la unidad chica,
 // como en la banda. El título del eje Y va 32 u arriba del 100 %, con la leyenda de los dos colores en su renglón; debajo
 // de los meses, el título del eje X («Mes de 2025»).
+// (19/11, fase 9, spec 2) Ejemplo mínimo del avance por pasos, para probar el mecanismo (la vista la rehace otro agente):
+// paso 1, los ocho meses que entran y la línea de control; paso 2, los cuatro que quedan debajo, en el acento.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -14,7 +16,7 @@ import { textosDe } from '../textos.js'
 import { NBSP, fijo, pct } from '../../../e3/src/formato.js'
 import { useU } from '../escala.js'
 import {
-  CTX, INK, SUP, Columna, EjeY, LineaBase, Leyenda, Umbral, ancho, anchoLeyenda, margenEjeY, tam,
+  CTX, INK, SUP, Columna, EjeY, LineaBase, Leyenda, Paso, Umbral, ancho, anchoLeyenda, margenEjeY, tam,
 } from '../svg.jsx'
 
 const ID = 'V03'
@@ -27,7 +29,7 @@ const MESES = VT.meses.map((m) => ({ ...m, foco: !m.se_usa, valor: pct(m.parte, 
 const MARCAS = [0, 0.2, 0.4, 0.6, 0.8, 1]
 const fmtEje = (v) => pct(v, 0)
 
-export const meta = { id: ID }
+export const meta = { id: ID, pasos: 2 }
 
 /** «53 %» con la unidad chica: [número, unidad], los dos de pct() de formato.js. */
 const partes = (t) => {
@@ -103,7 +105,7 @@ function Dibujo({ w, h }) {
         const hCol = x.parte * alto
         const adentro = x.foco && hCol >= fFoco + 20 * u
         return (
-          <g key={x.mes}>
+          <Paso key={x.mes} n={x.foco ? 2 : 1}>
             <title>{`${x.rotulo} · ${x.valor}`}</title>
             <Columna u={u} x={x0} yBase={yBase} w={anchoBarra} h={hCol} foco={x.foco} />
             {adentro ? (
@@ -115,7 +117,7 @@ function Dibujo({ w, h }) {
             )}
             <text x={cx} y={yBase + yMes} fontSize={fMes} fontWeight={x.foco ? 700 : 400} fill={x.foco ? INK : CTX}
                   textAnchor="middle" dominantBaseline="hanging">{x.rotulo}</text>
-          </g>
+          </Paso>
         )
       })}
 

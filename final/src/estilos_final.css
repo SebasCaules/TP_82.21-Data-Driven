@@ -1,13 +1,14 @@
-/* Estilos propios de /final/ (17/11; 18/11, spec de dataviz b a e; 18/11, fase 8). El tablero usa las hojas del E1, del
-   E2 y del E3 tal cual (main.jsx) y acá se aparta de ellas en la escala (decisión P-01): toda medida va en la unidad u, la
-   variable --fin-u que App.jsx deja en .e3-vp (1 u = 1 px de una pantalla de 1920 × 1080; escala.js). Las reglas que
-   nombran una clase del armazón van bajo .e3-vp y ninguna usa !important fuera de @media print. */
+/* Estilos propios de /final/ (17/11; 18/11, spec de dataviz b a e; 18/11, fase 8; 19/11, fase 9). El tablero usa las
+   hojas del E1, del E2 y del E3 tal cual (main.jsx) y acá se aparta de ellas en la escala (decisión P-01): toda medida va
+   en la unidad u, la variable --fin-u que App.jsx deja en .e3-vp (1 u = 1 px de una pantalla de 1920 × 1080; escala.js).
+   Las reglas que nombran una clase del armazón van bajo .e3-vp y ninguna usa !important fuera de @media print.
+   (fase 9, spec 3) Quedan las ramas que eligió el usuario: banda de una sola cifra (180 u), decisión pegada arriba y
+   conclusión de un renglón. Las otras se borraron. (spec 2) Al final, el avance por pasos (.fin-paso). */
 
 /* ---------- tokens ---------- */
 .e3-vp {
   --fin-t-titulo: calc(var(--fin-u) * 52);   /* 56 u no entra con V09 (95 % del ancho) a 1280 × 720: spec b.2, 52 */
   --fin-t-cifra: calc(var(--fin-u) * 60);    /* la cifra central de la banda */
-  --fin-t-sub: calc(var(--fin-u) * 34);      /* las cifras de la subfila: su unidad al 0,6 da 20,4 u */
   --fin-t-dec: calc(var(--fin-u) * 30);
   --fin-t-concl: calc(var(--fin-u) * 30);
   --fin-t-linea: calc(var(--fin-u) * 24);
@@ -17,44 +18,28 @@
   --fin-s3: calc(var(--fin-u) * 24);
   --fin-s4: calc(var(--fin-u) * 32);
   --fin-s6: calc(var(--fin-u) * 48);
-  /* Presupuesto vertical a 1920 × 1080 (spec 1.2), en u: encabezado 128, 24 de aire, banda 220 (con subfila; 180 sin
-     ella), 24, tarjeta del gráfico con relleno 28 arriba y abajo, renglón de cabecera 38, 24 y el lienzo con el resto
-     (534 u con la subfila), y 32 abajo. */
-  --fin-banda-h: calc(var(--fin-u) * 220);
+  /* Presupuesto vertical a 1920 × 1080 (spec 1.2 de la fase 8 con la banda sin subfila), en u: encabezado 128, 24 de
+     aire, banda 180, 24, tarjeta del gráfico con relleno 28 arriba y abajo, renglón de cabecera 38, 24 y el lienzo con el
+     resto (574 u), y 32 abajo. */
+  --fin-banda-h: calc(var(--fin-u) * 180);
   --fin-cab-h: calc(var(--fin-u) * 38);
+  /* Avance por pasos (spec 2 de la fase 9): la opacidad de lo que todavía no se reveló y lo que dura el cambio. Probado a
+     1280 × 720 con un proyector simulado (negro levantado, claros quemados): con 0,22 y 0,28 el gris de contexto atenuado
+     desaparece; con 0,32 se ve la forma y el texto no compite con lo encendido. */
+  --fin-atenuado: .32;
+  --fin-paso-t: 350ms;
 }
-.e3-vp .fin-vista.fin-kpi-b { --fin-banda-h: calc(var(--fin-u) * 180); }
 /* Marca de contexto (spec b.3): #8a94a6, 3,06:1 sobre blanco y ΔE 28 contra --acc. */
 .e3-vp .fin-graf, .e3-vp .fin-plena { --fin-gris: #8a94a6; }
 
-/* ---------- marco (encabezado y cuerpo; los usa App.jsx) ---------- */
-/* Encabezado: 32 u arriba, 40 u a los costados, 128 u de alto. */
-.e3-vp .e2-enc {
-  box-sizing: border-box; height: calc(var(--fin-u) * 128);
-  padding: var(--fin-s4) calc(var(--fin-u) * 40) 0; gap: var(--fin-s3); align-items: center;
-}
+/* ---------- marco (encabezado y cuerpo; los usa App.jsx; la grilla del encabezado está en estilos_marco.css) ---------- */
 /* El título, en un renglón y al mismo tamaño en las 15 vistas. El más ancho es V09 («Pasa con 11 puntos; lo observado da
    menos de 1»): a 56 u ocupa el 105 % del lugar a 1024 a 1536 de ancho con el riel visible; a 52 u entra en todas. */
 .e3-vp .e2-enc .e2-preg {
   font: 700 var(--fin-t-titulo)/1.1 var(--fuente); letter-spacing: -.02em; color: var(--ink);
   white-space: nowrap; overflow: visible;
 }
-.e3-vp .e2-enc-der { gap: var(--fin-s2); }
-/* «n / 15», 20 u, sans en --e3-ctx. */
-.e3-vp .e2-enc .e2-enc-corte {
-  font: 400 var(--fin-t-rotulo)/1.2 var(--fuente); letter-spacing: 0; color: var(--e3-ctx);
-}
-/* Encabezado de las vistas híbridas (App.jsx, hibrido.js): 96 u; a la derecha, en columna, la barra de avance (132 × 30 u
-   por dentro) y debajo «n / 15 · fuente» en letra secundaria de 20 u. */
-.e3-vp .e2-enc.fin-enc-hib { height: calc(var(--fin-u) * 96); padding: var(--fin-s3) calc(var(--fin-u) * 40) 0; }
-.e3-vp .e2-enc.fin-enc-hib .e2-enc-der {
-  display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: calc(var(--fin-u) * 6);
-  flex-shrink: 0;
-}
-.e3-vp .e2-enc.fin-enc-hib .e3-avance { padding: calc(var(--fin-u) * 3); }
-.e3-vp .e2-enc.fin-enc-hib .e3-avance-barras {
-  width: calc(var(--fin-u) * 132); height: calc(var(--fin-u) * 30); gap: calc(var(--fin-u) * 2);
-}
+/* «n / 15 · fuente», 20 u, sans en --e3-ctx. */
 .e3-vp .e2-enc .e2-enc-corte.fin-enc-donde {
   font: 400 var(--fin-t-rotulo)/1.25 var(--fuente); letter-spacing: 0; color: var(--e3-ctx); white-space: nowrap;
 }
@@ -83,7 +68,8 @@
 }
 .e3-vp .fin-vista .fin-banda .e2-banda > .e2-banda-cifras:empty { display: none; }
 
-/* Tarjeta de cifra: rótulo arriba, a la altura de la fila de la verde (16 u del borde); la cifra central en el acento. */
+/* Tarjeta de cifra (una sola, sin subfila): rótulo arriba, a la altura de la fila de la verde (16 u del borde); la cifra
+   central en el acento y su fragmento debajo. */
 .e3-vp .fin-vista .fin-banda .e2-banda-cifras > .tarjeta {
   display: flex; flex-direction: column; justify-content: flex-start; min-width: 0; min-height: 0; overflow: hidden;
   padding: var(--fin-s2) var(--fin-s3) calc(var(--fin-u) * 12);
@@ -107,40 +93,8 @@
 .e3-vp .fin-vista .fin-banda .e2-banda-cifras .e2-linea {
   margin: 0; font: 500 var(--fin-t-linea)/1.2 var(--fuente); color: var(--ink); text-wrap: balance;
 }
-/* Con subfila (kpi.a): el fragmento al lado de la cifra, con su último renglón en la línea de base del número. */
-.e3-vp .fin-vista .fin-banda .e2-banda-cifras .fin-con-sub .ban-par.fin-fila {
-  flex-direction: row; align-items: last baseline; gap: calc(var(--fin-u) * 20);
-}
-.e3-vp .fin-vista .fin-banda .e2-banda-cifras .fin-con-sub .par-item { flex: none; }
-.e3-vp .fin-vista .fin-banda .e2-banda-cifras .fin-con-sub .e2-linea { flex: 1 1 0; min-width: 0; }
-/* La subfila: debajo de un filete, las otras cifras lado a lado, separadas por un filete vertical. */
-.e3-vp .fin-vista .fin-sub {
-  display: flex; align-items: flex-start; margin-top: calc(var(--fin-u) * 14); padding-top: calc(var(--fin-u) * 12);
-  border-top: calc(var(--fin-u) * 1.5) solid var(--bd); min-width: 0;
-}
-.e3-vp .fin-vista .fin-sub-item {
-  display: flex; flex-direction: column; gap: calc(var(--fin-u) * 2); min-width: 0;
-  padding: 0 var(--fin-s3); border-left: calc(var(--fin-u) * 1.5) solid var(--bd);
-}
-.e3-vp .fin-vista .fin-sub-item:first-child { padding-left: 0; border-left: 0; }
-/* Una sola cifra extra: rótulo y valor en un renglón. */
-.e3-vp .fin-vista .fin-sub-1 .fin-sub-item { flex-direction: row; align-items: baseline; gap: var(--fin-s2); }
-.e3-vp .fin-vista .fin-sub-lbl {
-  font: 600 var(--fin-t-rotulo)/1.25 var(--mono); text-transform: uppercase; letter-spacing: .06em;
-  color: var(--e3-ctx); white-space: nowrap;
-}
-.e3-vp .fin-vista .fin-sub-val {
-  font: 700 var(--fin-t-sub)/1.05 var(--fuente); letter-spacing: -.01em; color: var(--ink); white-space: nowrap;
-}
-.e3-vp .fin-vista .fin-sub-u { font-size: .6em; font-weight: 600; letter-spacing: 0; }
-/* Con una sola cifra extra, su fragmento va debajo, en un renglón propio: lleva la unidad o el horizonte. */
-.e3-vp .fin-vista .fin-sub-1 .fin-sub-item { flex-wrap: wrap; row-gap: 0; }
-.e3-vp .fin-vista .fin-sub-linea {
-  flex: 0 0 100%; font: 500 calc(var(--fin-u) * 20)/1.2 var(--fuente); color: var(--e3-ctx); white-space: nowrap;
-}
-
-/* Tarjeta de decisión (spec 1.1 dec). Sigue verde. dec.a: la fila «Decisión · área · estado» (20 u, mono, verde
-   oscuro) pegada al borde superior, a 16 u, la frase (30 u, 700) enseguida y el aire abajo. */
+/* Tarjeta de decisión. Sigue verde. La fila «Decisión · área · estado» (20 u, mono, verde oscuro) pegada al borde
+   superior, a 16 u, la frase (30 u, 700) enseguida y el aire abajo. */
 .e3-vp .fin-vista .fin-banda .e2-banda > .tarjeta-dec {
   display: flex; flex-direction: column; justify-content: flex-start; min-height: 0;
   padding: var(--fin-s2) var(--fin-s4) var(--fin-s2); border-top-width: calc(var(--fin-u) * 5);
@@ -155,16 +109,8 @@
   margin: calc(var(--fin-u) * 12) 0 0; font: 700 var(--fin-t-dec)/1.25 var(--fuente); letter-spacing: -.01em;
   color: var(--ink); text-align: left; text-wrap: pretty;
 }
-/* dec.b: la fila como franja llena en verde oscuro con letra blanca, a todo el ancho y al ras del borde superior. */
-.e3-vp .fin-vista.fin-dec-b .fin-banda .e2-banda > .tarjeta-dec { padding-top: 0; border-top-width: 0; }
-.e3-vp .fin-vista.fin-dec-b .fin-banda .e2-banda > .tarjeta-dec .kpi-lbl {
-  margin: 0 calc(var(--fin-s4) * -1); padding: calc(var(--fin-u) * 12) var(--fin-s4);
-  background: var(--dec-osc); color: var(--sup, #fff);
-}
-.e3-vp .fin-vista.fin-dec-b .fin-banda .e2-banda > .tarjeta-dec .kpi-lbl b { color: var(--sup, #fff); }
-.e3-vp .fin-vista.fin-dec-b .fin-banda .e2-banda > .tarjeta-dec .dec-llano { margin-top: var(--fin-s2); }
 
-/* ---------- tarjeta del gráfico (spec 1.2 y 1.3) ---------- */
+/* ---------- tarjeta del gráfico (spec 1.2 y 1.3 de la fase 8) ---------- */
 /* Relleno de 28 u arriba y abajo y 32 u a los costados; un renglón de cabecera de 38 u y el lienzo con el resto. */
 .fin-graf { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
 .e3-vp .fin-vista .tarjeta.fin-graf { padding: calc(var(--fin-u) * 28) var(--fin-s4); }
@@ -172,14 +118,12 @@
 .e3-vp .fin-vista .fin-cab { min-height: var(--fin-cab-h); }
 .fin-lienzo { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; margin-top: 0; }
 .e3-vp .fin-vista .fin-cab + .fin-lienzo { margin-top: var(--fin-s3); }
-/* cab.a: la conclusión corta, 30 u, 500, tinta; la cifra en 800 y en el acento. */
+/* La conclusión corta, un renglón: 30 u, 500, tinta; la cifra en 800 y en el acento. */
 .e3-vp .fin-vista .fin-graf .e3-conclusion {
   margin: 0; font: 500 var(--fin-t-concl)/1.25 var(--fuente); letter-spacing: -.01em; color: var(--ink);
   text-wrap: pretty;
 }
 .e3-vp .fin-vista .fin-graf .e3-conclusion b { font-weight: 800; color: var(--acc); }
-/* cab.b: qué mide en su lugar, 24 u, secundario. */
-.e3-vp .fin-vista .fin-mide { margin: 0; font: 500 var(--fin-t-linea)/1.25 var(--fuente); color: var(--e3-ctx); }
 
 /* ---------- vista a pantalla completa (spec 1.5) ---------- */
 .fin-plena { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
@@ -187,7 +131,23 @@
 /* Notas: el renglón de quién presenta va pegado al de arriba. */
 .fin-notas-quien { margin-top: -4px; }
 
-/* Hoja impresa: la unidad de la ventana lógica mínima. */
+/* ---------- avance por pasos (spec 2 de la fase 9; Paso y PasoHtml de svg.jsx, pasos.js) ---------- */
+/* Lo que todavía no se reveló se ve atenuado: opacidad --fin-atenuado (un solo valor para todo el tablero) y sin color,
+   así una marca en el acento se ve gris (más oscura que el gris de contexto atenuado: la diferencia queda, el acento no).
+   Ocupa su lugar. Con `oculto` o ?var=rev.b, no se ve pero también ocupa su lugar. El cambio de paso solo mueve la
+   opacidad y el color, en --fin-paso-t; con movimiento reducido, sin transición. */
+.fin-paso {
+  transition: opacity var(--fin-paso-t, 350ms) cubic-bezier(0.2, 0, 0, 1), filter var(--fin-paso-t, 350ms) cubic-bezier(0.2, 0, 0, 1),
+    visibility var(--fin-paso-t, 350ms);
+}
+.fin-paso[data-revela='atenuado'] { opacity: var(--fin-atenuado, .32); filter: grayscale(1); }
+.fin-paso[data-revela='oculto'] { opacity: 0; visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .fin-paso { transition: none; }
+}
+
+/* Hoja impresa: la unidad de la ventana lógica mínima, y cada vista completa (App.jsx ya la arma así; esto es la red). */
 @media print {
   .e3-vp { --fin-u: .6px !important; }
+  .fin-paso { opacity: 1 !important; visibility: visible !important; filter: none !important; }
 }

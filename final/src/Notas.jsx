@@ -9,6 +9,8 @@
 // saltan en la versión de 15 minutos. Una sola fuente para lo que se dice; acá no se escribe guion.
 // (18/11, S-07) La fuente del documento de cada vista («E3, Parte D v3.0») sale del encabezado del tablero y va acá, en
 // la cabecera, después de «n / 15 · pregunta».
+// (19/11, fase 9, spec 2.1) Con más de un paso, la cabecera dice «paso k de N» después de «n / 15» (App.jsx pasa el paso
+// vigente; las dos ventanas están siempre en el mismo).
 
 import { CF } from './contenido_final.js'
 import { NOTAS } from './notas_final.js'
@@ -16,7 +18,7 @@ import { VISTAS, TOTAL_VISTAS, etiquetaDe, grupoDe, tiemposDe } from './vistas/i
 import { mmss } from '../../e3/src/formato.js'
 import { Rico } from '../../e3/src/texto.jsx'
 
-function Cuerpo({ vista }) {
+function Cuerpo({ vista, paso = 1, pasos = 1 }) {
   const t = tiemposDe(vista)
   const bloque = grupoDe(vista)
   const objetivo = CF.TIEMPOS?.objetivo_s
@@ -27,6 +29,7 @@ function Cuerpo({ vista }) {
     <>
       <p className="e3-notas-cab">
         <b>{`${etiquetaDe(vista).replace(/^0/, '')} / ${TOTAL_VISTAS}`}</b>
+        {pasos > 1 && <b className="fin-notas-paso">{` · paso ${paso} de ${pasos}`}</b>}
         {' · '}{vista.pregunta}
         {vista.fuente && <span>{` · ${vista.fuente}`}</span>}
         <span>{` · ${mmss(t.vista)}`}</span>
@@ -52,21 +55,21 @@ function Cuerpo({ vista }) {
 }
 
 /** Panel de notas, debajo del tablero (N). */
-export function PanelNotas({ vista, alto, onVentana }) {
+export function PanelNotas({ vista, paso, pasos, alto, onVentana }) {
   return (
     <aside className="e3-notas" style={{ height: alto }} aria-label="Notas del orador">
       <button type="button" className="e3-notas-abrir" onClick={onVentana}>Abrir en otra ventana</button>
-      <Cuerpo vista={vista} />
+      <Cuerpo vista={vista} paso={paso} pasos={pasos} />
     </aside>
   )
 }
 
 /** Ventana aparte con solo las notas. */
-export function VentanaNotas({ vista }) {
+export function VentanaNotas({ vista, paso, pasos }) {
   return (
     <div className="e3-notas e3-notas-ventana" aria-label="Notas del orador">
-      <Cuerpo vista={vista} />
-      <p className="e3-notas-ayuda">Av Pág y Re Pág, o las flechas, pasan de vista en las dos ventanas.</p>
+      <Cuerpo vista={vista} paso={paso} pasos={pasos} />
+      <p className="e3-notas-ayuda">Av Pág y Re Pág, o las flechas, avanzan y retroceden paso a paso en las dos ventanas.</p>
     </div>
   )
 }

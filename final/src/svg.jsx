@@ -13,10 +13,14 @@
 // (fase 8) Al final del archivo, las piezas comunes de spec 1.4: EjeX, EjeY, Leyenda, GrillaSemanas, FranjasFila, Flecha,
 // Compuerta, Hito, Aqui y LlaveH, con sus funciones de medida (altoEjeX, margenEjeY, anchoLeyenda, escalaSemanas,
 // escalaLinda). Cada una dice arriba cómo se usa; las firmas no cambian sin avisar a las vistas.
+// (19/11, fase 9, spec 2.2) Paso (SVG) y PasoHtml (HTML): lo de adentro se enciende en su paso del avance y antes se ve
+// atenuado (o no se ve, con `oculto` o ?var=rev.b). El paso vigente sale de pasos.js (usePaso); el CSS, de
+// estilos_final.css (.fin-paso, --fin-atenuado). Están al principio de las piezas comunes.
 
 import { anchoTexto as ancho } from '../../e3/src/medir.js'
 import { fijo } from '../../e3/src/formato.js'
 import { useU } from './escala.js'
+import { useEstadoPaso } from './pasos.js'
 
 export { ancho, useU }
 export const ACC = 'var(--acc)'
@@ -198,6 +202,34 @@ export function Chevron({ u, x, y, s = 32 }) {
   const a = (s * u) / 2
   return <path d={`M${x - a / 2} ${y - a} L${x + a / 2} ${y} L${x - a / 2} ${y + a}`} fill="none" stroke={CTX}
                strokeWidth={3 * u} strokeLinecap="round" strokeLinejoin="round" />
+}
+
+// ---------------------------------------------------------------- avance por pasos (fase 9, spec 2.2)
+
+/** Lo que se enciende en el paso `n` del avance, dentro de un SVG (un <g>). Antes de su paso se ve atenuado (opacidad
+ *  --fin-atenuado y sin color: una marca en ACC se ve gris) y ocupa su lugar; con `oculto` (capas que se superponen,
+ *  como la de responsables) o con ?var=rev.b, no se ve pero también ocupa su lugar. Con `hasta={k}`, después del paso k
+ *  vuelve a atenuarse: lo ya dicho se apaga para enfocar lo nuevo (en la vista completa, todo encendido). El cambio es una
+ *  transición de opacidad de 350 ms, sin transición si el sistema pide movimiento reducido. n = 1 está siempre encendido.
+ *    <Paso n={2}><Columna … foco /></Paso>
+ *    <Paso n={4} oculto><Responsables … /></Paso>
+ *  Lo que cambia de lugar o de tamaño entre pasos no va en Paso: la vista lee usePaso() y lo resuelve. */
+export function Paso({ n = 1, hasta, oculto = false, children }) {
+  const e = useEstadoPaso(n, { hasta, oculto })
+  return <g className="fin-paso" data-revela={e} aria-hidden={e === 'oculto' ? true : undefined}>{children}</g>
+}
+
+/** Paso para HTML: el mismo comportamiento en un <div> (o la etiqueta de `como`, 'span' dentro de un renglón), con la
+ *  clase y el estilo que se le pasen.
+ *    <PasoHtml n={3} className="mi-tarjeta">…</PasoHtml> */
+export function PasoHtml({ n = 1, hasta, oculto = false, como: Etiqueta = 'div', className = '', style, children }) {
+  const e = useEstadoPaso(n, { hasta, oculto })
+  return (
+    <Etiqueta className={`fin-paso${className ? ` ${className}` : ''}`} style={style} data-revela={e}
+              aria-hidden={e === 'oculto' ? true : undefined}>
+      {children}
+    </Etiqueta>
+  )
 }
 
 // ---------------------------------------------------------------- piezas comunes (fase 8, spec 1.4)

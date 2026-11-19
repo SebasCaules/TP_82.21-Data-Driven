@@ -11,10 +11,12 @@
 // `texto` es el valor ya escrito con formato.js (con su unidad: «USD 4.485», «86,1 %»): acá no se formatea nada.
 // `eje`: el título del eje (de CF: barras.eje). `marcas`: los valores con marca (por defecto, escalaLinda hasta `maximo`
 // o hasta el mayor valor); el eje termina en la última marca. `formatoEje`: cómo se escribe cada marca (formato.js).
+// (19/11, fase 9, spec 2.2) `paso` en un dato: la fila entera (rótulo, barra, valor y nota) se enciende en ese paso del
+// avance y antes se ve atenuada (Paso de svg.jsx); sin `paso`, desde el paso 1. El eje y la línea base, siempre.
 
 import { useU } from './escala.js'
-import { ACC, CTX, FIN_GRIS, INK, SUP, TRAZO, BarraH, EjeX, LineaBase, altoEjeX, ancho, escalaLinda, rectRedondo, tam }
-  from './svg.jsx'
+import { ACC, CTX, FIN_GRIS, INK, SUP, TRAZO, BarraH, EjeX, LineaBase, Paso, altoEjeX, ancho, escalaLinda, rectRedondo,
+  tam } from './svg.jsx'
 import { fijo } from '../../e3/src/formato.js'
 
 /** Ancho de la columna de rótulos: el más largo a 26 u y 600, más 24 u. */
@@ -88,7 +90,7 @@ export function BarrasFin({ w, h, datos, maximo, marcas, formatoEje = (x) => fij
         const valDentro = d.notaFantasma && !notaFuera && !d.foco && !d.contorno && anchoV + 24 * u <= largoB
         const xNota = xVal + anchoV + 16 * u
         return (
-          <g key={d.etiqueta}>
+          <Paso key={d.etiqueta} n={d.paso ?? 1}>
             <title>{[d.etiqueta, d.texto, d.nota, d.notaFantasma].filter(Boolean).join(' · ')}</title>
             <text x={x0 - 24 * u} y={yc} fontSize={tam('cat', u)} fontWeight={d.foco ? 600 : 400}
                   fill={d.foco ? INK : CTX} textAnchor="end" dominantBaseline="central">{d.etiqueta}</text>
@@ -113,7 +115,7 @@ export function BarrasFin({ w, h, datos, maximo, marcas, formatoEje = (x) => fij
               <text x={d.nota ? xNota + ancho(d.nota, tam('sec', u), 400) + 16 * u : xNota} y={yc}
                     fontSize={tam('cat', u)} fontWeight={700} fill={INK} dominantBaseline="central" {...halo}>{d.notaFantasma}</text>
             )}
-          </g>
+          </Paso>
         )
       })}
       <LineaBase u={u} x={x0} y1={y0} y2={yEje} />

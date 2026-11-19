@@ -83,7 +83,7 @@ export const CF = {
           id: 'V01',
           titulo: 'La recomendación',
           pregunta: 'Recomendamos un piloto, no el proyecto',
-          fuente: 'E3, Parte D v3.0',
+          fuente: 'Informe, secciones 31.1 y 23.2',
           segundos: 90,
           textos: {
             piloto: { rotulo: 'Piloto mínimo', linea: 'tres listas con control' },
@@ -122,7 +122,7 @@ export const CF = {
           id: 'V02',
           titulo: 'Qué ventas entran',
           pregunta: 'Alcanzan las ventas que tienen cliente',
-          fuente: 'E3, Parte A v3.0 y Anexo 1',
+          fuente: 'Informe, sección 21.1 y Anexo 1, A1.2',
           segundos: 130,
           textos: {
             sin_cliente: { rotulo: 'Ventas sin cliente', linea: 'no entran a la lista' },
@@ -153,7 +153,7 @@ export const CF = {
           id: 'V03',
           titulo: 'Qué meses entran',
           pregunta: 'Septiembre a diciembre llegaron incompletos',
-          fuente: 'E3, Parte A v3.0',
+          fuente: 'Informe, Anexo 1, A1.12',
           segundos: 125,
           textos: {
             fuera: { rotulo: 'Meses que no se usan', linea: 'debajo del control mensual' },
@@ -187,7 +187,7 @@ export const CF = {
           id: 'V04',
           titulo: 'Qué es irse',
           pregunta: 'La regla ordena por cercanía al umbral',
-          fuente: 'E3, Parte A v3.0',
+          fuente: 'Informe, sección 22.1 y Anexo 1, A1.10',
           segundos: 85,
           textos: {
             minimo: { rotulo: 'Umbral mínimo', linea: 'piso para cualquier cliente', unidad: 'días' },
@@ -209,7 +209,7 @@ export const CF = {
           id: 'V05',
           titulo: 'Regla contra modelo',
           pregunta: 'La regla acierta lo mismo que el modelo',
-          fuente: 'E3, Parte D v3.0',
+          fuente: 'Informe, sección 28.1 y Anexo 1, A1.10',
           segundos: 85,
           textos: {
             regla: { rotulo: 'Acierta la regla', linea: 'de cada lista, prueba final' },
@@ -237,7 +237,7 @@ export const CF = {
           id: 'V06',
           titulo: 'Cómo se mide',
           pregunta: `Cada mes, ${fijo(v('G49.control_mes'))} de control y dos ramas`,
-          fuente: 'E3, Parte D v3.0',
+          fuente: 'Informe, secciones 23.6 y 35.2',
           segundos: 85,
           textos: {
             control: { rotulo: 'Control por mes', linea: 'no se contactan, al azar' },
@@ -276,7 +276,7 @@ export const CF = {
           id: 'V07',
           titulo: 'No se paga',
           pregunta: `La lista no se paga: deja ${usd(v('G54'))} por año`,
-          fuente: 'E3, Parte B v3.0',
+          fuente: 'Informe, secciones 23.6 y 23.4',
           segundos: 85,
           textos: {
             roi: { rotulo: 'ROI de la regla', linea: 'piloto y producción, un año' },
@@ -303,7 +303,7 @@ export const CF = {
           id: 'V08',
           titulo: 'Qué cuesta el piloto',
           pregunta: `El piloto mínimo cuesta ${usd(v('G64'))}`,
-          fuente: 'E3, Parte B v3.0',
+          fuente: 'Informe, sección 23.2 y Anexo 1, A1.11',
           segundos: 85,
           textos: {
             piloto: { rotulo: 'Piloto mínimo', linea: 'con contingencia, tres meses' },
@@ -332,7 +332,7 @@ export const CF = {
           id: 'V09',
           titulo: 'Cuándo pasa',
           pregunta: `Pasa con ${fijo(v('G67.con_descuento'))} puntos; lo observado da menos de ${fijo(MENOS_DE)}`,
-          fuente: 'E3, Parte B v3.0',
+          fuente: 'Informe, sección 23.6 y Anexo 1, A1.11',
           segundos: 85,
           textos: {
             con: { rotulo: 'Umbral de pase', linea: 'puntos, rama con descuento' },
@@ -370,7 +370,7 @@ export const CF = {
           id: 'V10',
           titulo: 'Qué va antes',
           pregunta: 'Antes de la lista, el consentimiento',
-          fuente: 'E3, Parte C v3.0',
+          fuente: 'Informe, sección 25.4',
           segundos: 105,
           textos: {
             puntaje: { rotulo: 'Puntaje legal', linea: 'estado actual' },
@@ -401,7 +401,7 @@ export const CF = {
           id: 'V11',
           titulo: 'Qué puede fallar',
           pregunta: 'El piloto prueba si Marketing sostiene la lista',
-          fuente: 'E3, Parte C v3.0',
+          fuente: 'Informe, secciones 26.3 y 29.3',
           segundos: 105,
           textos: {
             riesgos: { rotulo: 'Riesgos críticos', linea: 'con señal y respuesta' },
@@ -449,7 +449,7 @@ export const CF = {
           id: 'V12',
           titulo: 'El backlog',
           pregunta: `El backlog tiene ${fijo(v('K02'))} historias; ${fijo(v('K04'))} hechas`,
-          fuente: 'E4, Parte A',
+          fuente: 'Informe, sección 34.2',
           segundos: 75,
           textos: {
             historias: { rotulo: 'Historias de usuario', linea: 'repartidas en las épicas' },
@@ -471,7 +471,7 @@ export const CF = {
           id: 'V13',
           titulo: 'PoC y MVP',
           pregunta: 'La PoC está hecha; el MVP es la planilla',
-          fuente: 'E4, Parte A',
+          fuente: 'Informe, secciones 35.1 y 35.3',
           segundos: 75,
           textos: {
             mvp: { rotulo: 'Se pide ahora', linea: 'el MVP en piloto mínimo' },
@@ -498,7 +498,7 @@ export const CF = {
           id: 'V14',
           titulo: 'El plan',
           pregunta: `El plan: ${fijo(T.plan.semanas)} semanas con dueño por fase`,
-          fuente: 'E3, Parte D v3.0',
+          fuente: 'Informe, sección 36.1',
           segundos: 75,
           textos: {
             decide: { rotulo: 'Decide María G.', linea: 'con la medición de las tres listas', antes: 'semana' },
@@ -528,7 +528,7 @@ export const CF = {
           id: 'V15',
           titulo: 'Lo que pedimos',
           pregunta: 'Aprobar el piloto y firmar el acuerdo',
-          fuente: 'E3, Parte D v3.0',
+          fuente: 'Informe, secciones 38.1 y 38.2',
           segundos: 90,
           textos: {
             piloto: { rotulo: 'Piloto mínimo', linea: 'del presupuesto de Casa Óga' },

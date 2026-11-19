@@ -1,7 +1,8 @@
-"""Captura una vista de /final/ y lista lo que se ve mal (18/11, fase 8 de la auditoría de dataviz, spec 1.6).
+"""Captura una vista de /final/ y lista lo que se ve mal (18/11, fase 8 de la auditoría de dataviz, spec 1.6; 19/11,
+fase 9, spec 2.3: pasos).
 
-    python3 -I scripts/captura_vista.py V05 [--var dec.b,kpi.b] [--res 1920x1080 ...] [--out DIR] [--completo]
-    python3 -I scripts/captura_vista.py --todas [--var ...] [--res ...] [--out DIR]
+    python3 -I scripts/captura_vista.py V05 [--paso 2 | --pasos] [--var rev.b] [--res 1920x1080 ...] [--out DIR] [--completo]
+    python3 -I scripts/captura_vista.py --todas [--pasos] [--var ...] [--res ...] [--out DIR]
 
 Sin --completo arma un HTML con esa sola vista (scripts/vite.final-vista.config.js con FINAL_VISTA; las demás quedan
 como esqueleto, así un archivo roto de otro agente no rompe el armado) en una carpeta temporal propia de la corrida (se
@@ -9,17 +10,20 @@ pueden correr varias a la vez). Con --completo usa dist-final/index.html, armado
 recorre las quince y lo implica.
 
 Abre file://…/index.html?var=…#vNN con Playwright (device_scale_factor 1, movimiento reducido) en cada --res (por
-defecto 1920x1080 y 1280x720) y falla si:
+defecto 1920x1080 y 1280x720). Sin --paso, la vista completa (como al entrar por enlace); con --paso k, ese paso del
+avance (?paso=k, que App.jsx lee al abrir; si la vista tiene menos pasos, el último); con --pasos, una captura por paso
+(la cantidad la dice la vista: data-pasos de .app). Los chequeos corren en cada captura. Falla si:
   - hay errores de consola o de página, la vista no monta o queda como esqueleto;
   - window.__fit() (src/fit.js) informa desbordes;
   - dos textos (<text> de los SVG y textos HTML visibles, riel incluido) se pisan más de 2 px; se compara la caja de
     las letras (0,76 del cuerpo, centrada en el renglón), no la del renglón entero, para que dos renglones seguidos de un
-    mismo párrafo no cuenten;
+    mismo párrafo no cuenten. Lo atenuado de un paso cuenta (se ve y ocupa su lugar); lo oculto (Paso oculto, rev.b) no;
   - un texto se sale del lienzo (.fin-lienzo), de su SVG, de una caja que lo recorta (overflow hidden) o de la ventana;
   - un texto mide menos de 20 u (--fin-u de .e3-vp; el riel no cuenta);
-  - en una ventana 16:9, el dibujo ocupa menos del 70 % o más del 95 % del alto del lienzo (spec 0.7). En las demás
-    ventanas solo se informa.
-Guarda vNN[-<var con guiones>]-WxH.png en --out (por defecto la carpeta de capturas de la fase 8), imprime los
+  - en una ventana 16:9, el dibujo ocupa menos del 70 % o más del 95 % del alto del lienzo (spec 0.7); lo atenuado y lo
+    oculto de un paso cuentan, porque ocupan su lugar. En las demás ventanas solo se informa;
+  - con --paso o --pasos, la vista no quedó en el paso pedido.
+Guarda vNN[-pK][-<var con guiones>]-WxH.png en --out (por defecto la carpeta de capturas de la fase 9), imprime los
 hallazgos y termina con «RESULTADO: OK» o «RESULTADO: FALLA» (código 1).
 """
 from __future__ import annotations
@@ -40,7 +44,7 @@ from playwright.sync_api import sync_playwright
 APP = Path(__file__).resolve().parents[1]
 CONFIG = APP / "scripts" / "vite.final-vista.config.js"
 COMPLETO = APP / "dist-final" / "index.html"
-OUT = Path("/Users/sebastiancaules/Desktop/ITBA/26-2C/FPDD/.workforce/auditoria-dataviz/fase-8/capturas")
+OUT = Path("/Users/sebastiancaules/Desktop/ITBA/26-2C/FPDD/.workforce/auditoria-dataviz/fase-9/capturas")
 RES_DEF = ["1920x1080", "1280x720"]
 LLENA = (0.70, 0.95)
 VISTAS = [f"V{i:02d}" for i in range(1, 16)]
@@ -91,6 +95,10 @@ LISTO = r"""() => {
 
 CHEQUEO = r"""(llena) => {
   const out = { pisan: [], fuera: [], chicos: [], info: [], fit: [], vista: null }
+  const app = document.querySelector('#root .app')
+  out.paso = app ? Number(app.dataset.paso) : null
+  out.pasos = app ? Number(app.dataset.pasos) : null
+  out.completa = app ? app.hasAttribute('data-completa') : null
   const vp = document.querySelector('.e3-vp')
   const u = vp ? parseFloat(getComputedStyle(vp).getPropertyValue('--fin-u')) || 1 : 1
   const vw = innerWidth, vh = innerHeight
@@ -178,7 +186,9 @@ CHEQUEO = r"""(llena) => {
       if (['g', 'svg', 'title', 'defs', 'tspan', 'desc', 'clippath', 'mask', 'marker', 'lineargradient',
            'radialgradient', 'stop', 'pattern', 'symbol'].includes(tag) || el.closest('defs')) continue
       const cs = getComputedStyle(el)
-      if (!ve(el) || (cs.fill === 'none' && cs.stroke === 'none' && tag !== 'text')) continue
+      // lo oculto de un paso (visibility hidden) ocupa su lugar: cuenta para el alto
+      const oculto = el.closest('.fin-paso[data-revela="oculto"]')
+      if ((!ve(el) && !oculto) || (cs.fill === 'none' && cs.stroke === 'none' && tag !== 'text')) continue
       const r = el.getBoundingClientRect()
       if (r.width < 0.5 && r.height < 0.5) continue
       top = Math.min(top, r.top); bot = Math.max(bot, r.bottom)
@@ -190,13 +200,16 @@ CHEQUEO = r"""(llena) => {
 }"""
 
 
-def capturar(nav, html: Path, vista: str, var: str, w: int, h: int, out: Path) -> list[str]:
+def capturar(nav, html: Path, vista: str, var: str, w: int, h: int, out: Path,
+             paso: int | None = None) -> tuple[list[str], int | None]:
+    """Una captura (la vista completa, o el paso `paso`) con sus chequeos: (problemas, pasos de la vista)."""
     malos: list[str] = []
     ctx = nav.new_context(viewport={"width": w, "height": h}, device_scale_factor=1, reduced_motion="reduce")
     pg = ctx.new_page()
     pg.on("console", lambda m: m.type == "error" and malos.append(f"consola: {m.text[:200]}"))
     pg.on("pageerror", lambda e: malos.append(f"error de página: {str(e)[:200]}"))
-    url = html.resolve().as_uri() + (f"?var={var}" if var else "") + f"#{vista.lower()}"
+    query = "&".join(x for x in (f"var={var}" if var else "", f"paso={paso}" if paso else "") if x)
+    url = html.resolve().as_uri() + (f"?{query}" if query else "") + f"#{vista.lower()}"
     try:
         pg.goto(url, wait_until="load")
         pg.wait_for_function(LISTO, timeout=15000)
@@ -204,7 +217,7 @@ def capturar(nav, html: Path, vista: str, var: str, w: int, h: int, out: Path) -
         pg.evaluate("() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))")
     except PWError as e:
         malos.append(f"la vista no montó: {str(e).splitlines()[0][:200]}")
-    sufijo = f"-{re.sub(r'[^A-Za-z0-9]+', '-', var).strip('-')}" if var else ""
+    sufijo = (f"-p{paso}" if paso else "") + (f"-{re.sub(r'[^A-Za-z0-9]+', '-', var).strip('-')}" if var else "")
     png = out / f"{vista.lower()}{sufijo}-{w}x{h}.png"
     pg.screenshot(path=str(png))
     info = []
@@ -213,7 +226,13 @@ def capturar(nav, html: Path, vista: str, var: str, w: int, h: int, out: Path) -
     except PWError as e:
         c = None
         malos.append(f"el chequeo falló: {str(e).splitlines()[0][:200]}")
+    pasos = None
     if c:
+        pasos = c.get("pasos")
+        if paso and c.get("paso") != min(paso, pasos or paso):
+            malos.append(f"se pidió el paso {paso} y la vista quedó en el {c.get('paso')} de {pasos}")
+        if not paso and pasos and (c.get("paso") != pasos or not c.get("completa")):
+            malos.append(f"sin --paso la vista tenía que abrir completa y quedó en el paso {c.get('paso')} de {pasos}")
         if c["vista"] == "esqueleto":
             malos.append("la vista quedó como esqueleto (sin default o no está en el armado)")
         malos += [f"__fit: {x}" for x in c["fit"]]
@@ -228,23 +247,30 @@ def capturar(nav, html: Path, vista: str, var: str, w: int, h: int, out: Path) -
             else:
                 info.append(txt)
     ctx.close()
-    print(f"\n{vista} {w}x{h}{' · var=' + var if var else ''} → {png}")
+    donde = f" · paso {paso} de {pasos}" if paso else (f" · completa ({pasos} pasos)" if pasos and pasos > 1 else "")
+    print(f"\n{vista} {w}x{h}{donde}{' · var=' + var if var else ''} → {png}")
     for x in info:
         print(f"  · {x}")
     for x in malos:
         print(f"  ✗ {x}")
-    return [f"{vista} {w}x{h}: {x}" for x in malos]
+    etiqueta = f"{vista}{f' p{paso}' if paso else ''} {w}x{h}"
+    return [f"{etiqueta}: {x}" for x in malos], pasos
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("vista", nargs="?", help="V01 a V15")
-    ap.add_argument("--var", default="", help="cadena para ?var= (por ejemplo dec.b,kpi.b)")
+    ap.add_argument("--var", default="", help="cadena para ?var= (por ejemplo rev.b)")
+    pasos_g = ap.add_mutually_exclusive_group()
+    pasos_g.add_argument("--paso", type=int, help="captura ese paso del avance (1 a 4) en vez de la vista completa")
+    pasos_g.add_argument("--pasos", action="store_true", help="una captura por paso del avance (vNN-p1-…, vNN-p2-…)")
     ap.add_argument("--res", action="append", help="WxH, repetible (por defecto 1920x1080 y 1280x720)")
     ap.add_argument("--out", default=str(OUT), help="carpeta de las capturas")
     ap.add_argument("--completo", action="store_true", help="usa dist-final/index.html (npm run build:final) sin armar")
     ap.add_argument("--todas", action="store_true", help="las quince vistas; implica --completo")
     a = ap.parse_args()
+    if a.paso is not None and not 1 <= a.paso <= 4:
+        ap.error("--paso va de 1 a 4")
 
     if a.todas:
         vistas, a.completo = VISTAS, True
@@ -279,7 +305,13 @@ def main():
             nav = abrir_navegador(pw)
             for v in vistas:
                 for w, h in res:
-                    problemas += capturar(nav, html, v, var, w, h, out)
+                    if a.pasos:
+                        malos, n = capturar(nav, html, v, var, w, h, out, paso=1)
+                        problemas += malos
+                        for k in range(2, (n or 1) + 1):
+                            problemas += capturar(nav, html, v, var, w, h, out, paso=k)[0]
+                    else:
+                        problemas += capturar(nav, html, v, var, w, h, out, paso=a.paso)[0]
             nav.close()
     finally:
         if tmp:

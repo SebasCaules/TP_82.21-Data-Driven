@@ -1,21 +1,21 @@
-// La forma común de las vistas de /final/ (17/11, F6; 18/11, fase 8: spec 1.1 a 1.3). Una sola forma para las quince:
-// arriba la banda (Banda del E2) con la tarjeta de cifra (items[0]; con kpi.a, items[1..] en la subfila) y la tarjeta
-// verde con su fila «Decisión · área · estado» pegada al borde superior (dec.a) o como franja llena (dec.b). Abajo, la
-// tarjeta del gráfico: un renglón con la conclusión corta (cab.a) o con qué mide (cab.b), y el lienzo con todo lo que
-// sobra. Las letras de las variantes salen de variante() (variantes.js) y llegan al CSS como clases de la sección
-// (fin-dec-a, fin-kpi-a, fin-cab-a, …). Los textos salen de CF (textosDe) y las cifras, de DF. Nada de texto acá.
+// La forma común de las vistas de /final/ (17/11, F6; 18/11, fase 8; 19/11, fase 9: spec 3). Una sola forma para las
+// quince, con las ramas que eligió el usuario fijas: arriba la banda (Banda del E2) con la tarjeta de una sola cifra
+// (items[0]; banda de 180 u, sin subfila) y la tarjeta verde con su fila «Decisión · área · estado» pegada al borde
+// superior. Abajo, la tarjeta del gráfico: un renglón con la conclusión corta y el lienzo con todo lo que sobra. Los
+// textos salen de CF (textosDe) y las cifras, de DF. Nada de texto acá.
 //
-//   <Vista id="V08" items={[{ clave, valor }, …]} cifras={[…]}>{({ w, h }) => dibujo}</Vista>
+//   <Vista id="V08" items={[{ clave, valor }]} cifras={[…]}>{({ w, h }) => dibujo}</Vista>
 //
-// `valor` es la cifra ya escrita con formato.js; el rótulo, el fragmento y la unidad salen de textos[clave]. La prop
-// `hibrido` de la fase 7 se acepta y no hace nada. VistaPlena (spec 1.5): sin banda ni tarjeta, el lienzo entero.
+// `valor` es la cifra ya escrita con formato.js; el rótulo, el fragmento y la unidad salen de textos[clave]. Si la vista
+// pasa más de un ítem, se usa el primero (las demás cifras ya no van en la banda). La banda y la conclusión están desde
+// el paso 1 del avance: lo que se revela por pasos es el dibujo (Paso de svg.jsx). La prop `hibrido` de la fase 7 se
+// acepta y no hace nada. VistaPlena (spec 1.5 de la fase 8): sin banda ni tarjeta, el lienzo entero.
 
 import { Lienzo } from '../../src/graficos.jsx'
 import Banda from '../../e2/src/Banda.jsx'
 import { textosDe, decisionDe } from './textos.js'
 import TarjetaCifra from './TarjetaCifra.jsx'
 import { NBSP } from '../../e3/src/formato.js'
-import { variante } from './variantes.js'
 
 /** La conclusión: textos.conclusion (puede ser '': el renglón empieza con la cifra), después cada cifra en negrita
  *  seguida de su tramo de textos.sigue (un tramo por cifra). Sin cifras, la conclusión sola. */
@@ -32,50 +32,29 @@ export function Conclusion({ T, cifras = [] }) {
   )
 }
 
-/** Los textos de una cifra de la banda (textos[clave]), con un error que dice qué falta. */
-function textosCifra(id, T, clave) {
-  const t = T[clave]
-  if (!t?.rotulo) throw new Error(`contenido_final.js: la vista «${id}» no trae textos.${clave} (rótulo y fragmento de su cifra)`)
-  return t
-}
-
-/** La cifra con su unidad detrás (textos.unidad, al 0,6 entre [[…]]) o tal cual. */
-const conUnidad = (t, valor) => (t.unidad ? `${valor}[[${NBSP}${t.unidad}]]` : valor)
-
-/** La tarjeta de la banda: items[0] grande; con `sub`, items[1..] en la subfila (rótulo y valor; el fragmento de cada
- *  una va a su title). */
-export function Tarjetas({ id = '', T, items, sub = false }) {
+/** La tarjeta de la banda: la cifra central (items[0]) con su rótulo, su fragmento y su unidad (textos[clave]). */
+export function Tarjetas({ id = '', T, items }) {
   if (!items.length) return null
-  const [x, ...resto] = items
-  const t = textosCifra(id, T, x.clave)
-  const subs = sub
-    ? resto.map((y) => {
-      const s = textosCifra(id, T, y.clave)
-      return { clave: y.clave, rotulo: s.rotulo, valor: conUnidad(s, y.valor), antes: s.antes, title: s.linea }
-    })
-    : []
-  return (
-    <TarjetaCifra central rotulo={t.rotulo} linea={t.linea} valor={conUnidad(t, x.valor)} antes={t.antes} title={t.title}
-                  sub={subs} />
-  )
+  const x = items[0]
+  const t = T[x.clave]
+  if (!t?.rotulo) throw new Error(`contenido_final.js: la vista «${id}» no trae textos.${x.clave} (rótulo y fragmento de su cifra)`)
+  // la unidad detrás de la cifra, al 0,6 entre [[…]] (Cifra de e3/src/cifra.jsx)
+  const valor = t.unidad ? `${x.valor}[[${NBSP}${t.unidad}]]` : x.valor
+  return <TarjetaCifra central rotulo={t.rotulo} linea={t.linea} valor={valor} antes={t.antes} title={t.title} />
 }
 
 export default function Vista({ id, items = [], cifras = [], children }) {
   const T = textosDe(id)
-  const dec = variante('dec')
-  const kpi = variante('kpi')
-  const cab = variante('cab')
-  const sub = kpi === 'a' && items.length > 1
   return (
-    <section className={`pant fin-vista fin-dec-${dec} fin-kpi-${kpi} fin-cab-${cab} fin-${id.toLowerCase()}`}>
+    <section className={`pant fin-vista fin-${id.toLowerCase()}`}>
       <div className="fin-banda">
         <Banda dcs={[decisionDe(T)]}>
-          <Tarjetas id={id} T={T} items={items} sub={sub} />
+          <Tarjetas id={id} T={T} items={items} />
         </Banda>
       </div>
       <div className="tarjeta fin-graf">
         <div className="fin-cab">
-          {cab === 'b' ? <p className="fin-mide">{T.mide}</p> : <Conclusion T={T} cifras={cifras} />}
+          <Conclusion T={T} cifras={cifras} />
         </div>
         <div className="fin-lienzo" role="img" aria-label={T.mide}>
           <Lienzo className="lienzo">{children}</Lienzo>
@@ -85,8 +64,8 @@ export default function Vista({ id, items = [], cifras = [], children }) {
   )
 }
 
-/** Vista a pantalla completa (spec 1.5, `meta.plena`): sin banda ni tarjeta del gráfico; el dibujo recibe todo el lugar
- *  que App.jsx le da a la vista (w × h). Qué mide queda como aria-label. */
+/** Vista a pantalla completa (spec 1.5 de la fase 8, `meta.plena`): sin banda ni tarjeta del gráfico; el dibujo recibe
+ *  todo el lugar que App.jsx le da a la vista (w × h). Qué mide queda como aria-label. */
 export function VistaPlena({ id, children }) {
   const T = textosDe(id)
   return (

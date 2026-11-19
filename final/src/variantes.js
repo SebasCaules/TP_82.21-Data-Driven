@@ -1,19 +1,15 @@
-// Variantes en prueba de /final/ (18/11, observaciones del usuario sobre el intermedio). Cada clave es una decisión de
-// diseño: 'a' es la versión elegida por defecto y las otras letras, las alternativas que el usuario compara antes de
-// cerrar. La URL cambia cualquier clave sin tocar el código, antes del #vista:
+// Variantes de /final/ (19/11, segunda vuelta de las observaciones del usuario). El usuario ya eligió en la fase 8: riel con
+// línea de avance, sección sobre el título, decisión pegada arriba, banda sin subfila y conclusión de un renglón; V05 y V15
+// en su versión b y el resto en la a. Esas ramas quedan fijas en el código y las que no se eligieron se borran.
 //
-//   index.html?var=nav.b,V05.b#v05        (con las notas: ?notas&var=nav.b)
-//
-// Claves del marco: nav (riel y avance), sec (sección sobre el título), dec (tarjeta de decisión), cab (texto sobre el
-// gráfico), kpi (subfila de cifras). Claves de vista: el id («V05»), solo en las vistas que traen alternativa.
-// Cuando el usuario elija, cada clave queda fija en su letra y se borran este archivo y las ramas que no se usan.
+// Queda una sola clave en prueba, por URL (index.html?var=rev.b#v05):
+//   rev: cómo se ve lo que todavía no se reveló en el avance por pasos. 'a', atenuado (lo elegido); 'b', oculto.
+// V05 y V15 siguen acá hasta que su vista deje de leerlas.
 
 export const VARIANTES = {
-  nav: 'a',
-  sec: 'a',
-  dec: 'a',
-  cab: 'a',
-  kpi: 'a',
+  rev: 'a',
+  V05: 'b',
+  V15: 'b',
 }
 
 function deURL() {
