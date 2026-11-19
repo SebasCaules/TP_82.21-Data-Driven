@@ -1,346 +1,207 @@
 // V05 · Regla contra modelo (modelo, Francisco C.). Precisión de la lista mensual en la prueba final: regla (J03.regla),
-// modelo (J03.logistica) y práctica actual (J17); la diferencia modelo menos regla (J09) con su intervalo
-// (J09.ic_inferior a J09.ic_superior).
-// (18/11, fase 8, spec 2 V05) El usuario: «hay un baseline, el modelo da algo y la práctica actual otra». Dos versiones:
-//   a  Dos paneles. Izquierda, contra la práctica actual: eje de 0 a 100 %, la práctica actual como referencia
-//      punteada y dos barras (regla, modelo) partidas en ella: hasta la línea en gris, lo que la supera en tinta.
-//      La regla lleva debajo «línea de base»: en el proyecto la línea de base es la regla y la práctica actual es
-//      referencia (modelado-etapa-1, decisión 6, confirmada el 06/10). Revisión del 18/11: la versión anterior
-//      rotulaba «línea de base» a la práctica actual.
-//      Derecha, modelo menos regla: eje en puntos centrado en 0, la línea del cero («sin diferencia») y el punto con su
-//      intervalo en el acento, que la cruza. El acento es solo la diferencia: el foco de la vista.
-//   b  Un eje de 0 a 100 % con las tres marcas (práctica actual, modelo, regla) y el tramo donde regla y modelo casi
-//      coinciden ampliado abajo, unido por la lupa (recuadro, tallo y abanico). En el ampliado, la llave entre las dos
-//      marcas lleva la diferencia (J09, sin signo, como en la conclusión).
-// Banda y conclusión sin cambios: tarjeta J03.regla, subfila J09 y J17, conclusión con |J09|.
+// modelo (J03.logistica) y práctica actual (J17); la diferencia modelo menos regla (J09).
+// (18/11, fase 8) El usuario eligió la versión b, un eje de 0 a 100 % con lupa. (19/11, fase 9, spec 4 V05) «que primero
+// sea la barra de 0 a 100 principalmente y al pasar se corre arriba y se abre este tramo ampliado con un mejor diseño».
+// Dos pasos, con cambio de composición:
+//   1  la recta de 0 a 100 % sola, grande (K1 veces el tamaño del paso 2) y centrada en el alto: la práctica actual en
+//      gris y el punto donde coinciden regla y modelo en el acento, cada uno con su rótulo directo; eje con su título.
+//   2  la recta sube y se achica (transición propia sobre transform, sin movimiento si el sistema lo pide) y se abre el
+//      tramo ampliado: una ventana exacta sobre la recta (de LO a HI, viaja con ella), dos guías finas (tallo y abanico)
+//      hasta el panel, y en el panel la misma recta ampliada con regla y modelo separados, cada uno con su valor (las dos
+//      marcas en el acento: la idea es que empatan; la práctica actual, en gris); la llave entre los dos lleva la
+//      diferencia (J09, sin signo, como en la conclusión) y la palabra del empate (31.1 del informe: «la logística
+//      empata»). En el ampliado los valores van con dos decimales (el texto de J03 en DF): 86,13 − 85,88 da los 0,25
+//      puntos de la llave, que con un decimal (86,1 − 85,9) no cerrarían.
+// Salieron (fase 9, menos información): la leyenda, «ampliado abajo», «Tramo ampliado», «línea de base» y «dentro del
+// margen de error». Banda: solo J03.regla; conclusión con |J09|.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
-import { variante } from '../variantes.js'
+import { usePaso } from '../pasos.js'
 import { NBSP, fijo, pct } from '../../../e3/src/formato.js'
-import { ACC, CTX, EJE, FIN_GRIS, INK, PISTA, REALCE, SUP, TRAZO, EjeX, Leyenda, LlaveH, altoEjeX, ancho, escalaLinda,
-  punteado, rectRedondo, tam, useU } from '../svg.jsx'
+import {
+  ACC, EJE, FIN_GRIS, INK, REALCE, TRAZO, EjeX, LlaveH, Paso, altoEjeX, ancho, escalaLinda, tam, useU,
+} from '../svg.jsx'
 
 const ID = 'V05'
 const A = DF.anclas
 const T = textosDe(ID)
-const B = T.barras
+const X = T.lupa
 
 const REGLA = A['J03.regla'].valor
 const MODELO = A['J03.logistica'].valor
 const HOY = A.J17.valor
 const DIF = A.J09.valor
-const IC = [A['J09.ic_inferior'].valor, A['J09.ic_superior'].valor]
 const PUNTOS = T.dif.unidad
 
-export const meta = { id: ID }
+export const meta = { id: ID, pasos: 2 }
 
+/** Cuánto más grande es la recta en el paso 1 que en el 2 (como mucho: baja si la ventana no entraría). */
+const K1 = 1.3
 const LETRA_EJE = 23
+const FMT = (v) => pct(v, 0)
+const FMT_Z = (v) => pct(v, 1)
+const ESC = escalaLinda(1)
+/** Tramo ampliado: medio punto de cada lado de regla y modelo, redondeado al punto. */
+const LO = Math.floor(Math.min(REGLA, MODELO) * 100 - 0.5) / 100
+const HI = Math.ceil(Math.max(REGLA, MODELO) * 100 + 0.5) / 100
+const ESC_Z = escalaLinda(HI, 4, LO)
 
-/** Línea de referencia punteada de 3 u en tinta (línea de base, cero). */
-function Referencia({ u, x, y1, y2 }) {
-  return <line x1={x} x2={x} y1={y1} y2={y2} stroke={INK} strokeWidth={TRAZO.umbral * u} strokeDasharray={punteado(u)} />
+const sinMovimiento = () =>
+  typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+/** Nombre (600) y valor (700, más grande) en un renglón. */
+function NombreValor({ x, y, anchor, nombre, valor, fN, fV, u, base = 'auto' }) {
+  return (
+    <text x={x} y={y} fontSize={fN} fill={INK} textAnchor={anchor} dominantBaseline={base}>
+      <tspan fontWeight={600}>{nombre}</tspan>
+      <tspan dx={10 * u} fontWeight={700} fontSize={fV}>{valor}</tspan>
+    </text>
+  )
 }
 
-/** Rótulo de una línea de referencia: nombre (26 u, 600, tinta) con su valor opcional (700) y, debajo, la nota (22 u,
- *  CTX), centrados en x. yA e yB son las líneas de base de los dos renglones. */
-function RotuloReferencia({ u, x, yA, yB, nombre, valor, nota }) {
-  const f = tam(26, u)
+/** La recta de 0 a 100 % en coordenadas propias: la línea del eje en y = 0, de x = 0 a x = W; rótulos arriba (en yRot),
+ *  números y título abajo. La vista la ubica y la escala; el radio de las marcas cambia con el paso (`r`, con su
+ *  transición en `trans`). */
+function Recta({ u, W, r, yRot, fN, fV, trans, hv }) {
+  const xs = (v) => v * W
+  const marca = (v, fill) => <circle key={v} cx={xs(v)} cy={0} r={r} fill={fill} style={{ r: `${r}px`, transition: trans }} />
   return (
     <g>
-      <text x={x} y={yA} fontSize={f} fill={INK} textAnchor="middle">
-        <tspan fontWeight={600}>{nombre}</tspan>
-        {valor && <tspan dx={10 * u} fontWeight={700}>{valor}</tspan>}
-      </text>
-      <text x={x} y={yB} fontSize={tam(22, u)} fill={CTX} textAnchor="middle">{nota}</text>
+      <EjeX u={u} x0={0} x1={W} y={0} min={0} max={ESC.tope} marcas={ESC.marcas} formato={FMT} titulo={T.barras.eje}
+            anclaTitulo="start" />
+      {marca(HOY, FIN_GRIS)}
+      <NombreValor x={xs(HOY)} y={yRot} anchor="middle" nombre={X.hoy} valor={pct(HOY)} fN={fN} fV={fV} u={u} />
+      {[MODELO, REGLA].map((v) => marca(v, ACC))}
+      <text x={xs((REGLA + MODELO) / 2)} y={yRot} fontSize={fN} fontWeight={600} fill={INK}
+            textAnchor="middle">{X.juntos}</text>
+      {/* la ventana del tramo ampliado (paso 2): viaja con la recta, así no se corre durante la transición */}
+      <Paso n={2} oculto>
+        <rect x={xs(LO)} y={-hv} width={xs(HI) - xs(LO)} height={2 * hv} rx={3 * u} fill="none" stroke={INK}
+              strokeWidth={2 * u} />
+      </Paso>
     </g>
   )
 }
 
-/** Muestra de leyenda del intervalo: una barra horizontal en el acento con sus topes. */
-const muestraIntervalo = ({ u, x, y, s }) => (
-  <g>
-    <line x1={x - s / 2} x2={x + s / 2} y1={y} y2={y} stroke={ACC} strokeWidth={5 * u} />
-    <line x1={x - s / 2} x2={x - s / 2} y1={y - s / 2.4} y2={y + s / 2.4} stroke={ACC} strokeWidth={3 * u} />
-    <line x1={x + s / 2} x2={x + s / 2} y1={y - s / 2.4} y2={y + s / 2.4} stroke={ACC} strokeWidth={3 * u} />
-  </g>
-)
-const muestraPunto = (fill, stroke) => ({ u, x, y, s }) => (
-  <circle cx={x} cy={y} r={s / 2.6} fill={fill} stroke={stroke ?? 'none'} strokeWidth={stroke ? 3 * u : 0} />
-)
-
-/** Punta de flecha chica (triángulo de 12 u en CTX) con la punta en (x, y), hacia 'izq' o 'der'. */
-function Punta({ u, x, y, lado }) {
-  const s = (lado === 'izq' ? 1 : -1) * 12 * u
-  return <path d={`M${x} ${y} L${x + s} ${y - 7 * u} L${x + s} ${y + 7 * u} Z`} fill={CTX} />
-}
-
-// ---------------------------------------------------------------- versión a: dos paneles
-
-function DosPaneles({ w, h }) {
-  const u = useU()
-  const X = T.dos
-  const mY = 0.04 * h
-  const gap = 88 * u
-  const wIzq = (w - gap) * 0.6
-  const xDer = wIzq + gap
-  const fTit = tam(28, u)
-  const fLey = tam(24, u)
-  const fRot = tam('cat', u)
-  const fVal = tam('valFoco', u)
-  const fEje = tam(LETRA_EJE, u)
-
-  // renglones de arriba abajo: título, leyenda, rótulo de las referencias (dos renglones), filas, eje
-  const yTit = mY + fTit * 0.8
-  const yLey = yTit + 22 * u + fLey / 2
-  const yRefA = yLey + fLey / 2 + 30 * u + tam(26, u) * 0.8
-  const yRefB = yRefA + 10 * u + tam(22, u) * 0.85
-  const yLinea = yRefB + 12 * u
-  const yFil0 = yLinea + 10 * u
-  const yEje = h - mY - altoEjeX(u, true)
-
-  // panel izquierdo: barras desde 0 partidas en la práctica actual; la regla lleva debajo «línea de base»
-  const filas = [{ et: B.regla, v: REGLA, nota: X.izq.reglaNota }, { et: B.modelo, v: MODELO }]
-  const fNotaFila = tam(22, u)
-  const halo = { stroke: SUP, strokeWidth: 8 * u, paintOrder: 'stroke', strokeLinejoin: 'round' }
-  const x0 = Math.max(...filas.map((f) => ancho(f.et, fRot, 600))) + 24 * u
-  const escI = escalaLinda(1)
-  const fmtI = (v) => pct(v, 0)
-  const medioI = ancho(fmtI(escI.tope), fEje, 400) / 2
-  const valW = Math.max(...filas.map((f) => ancho(pct(f.v), fVal, 700)))
-  const vMax = Math.max(...filas.map((f) => f.v))
-  const L = Math.min(wIzq - x0 - medioI, (wIzq - x0 - valW - 16 * u) / (vMax / escI.tope))
-  const xi = (v) => x0 + (v / escI.tope) * L
-  const paso = (yEje - yFil0) / filas.length
-  const t = Math.min(92 * u, 0.56 * paso)
-  const sep = TRAZO.separacion * u
-
-  // panel derecho: modelo menos regla, eje en puntos centrado en 0
-  const ext = escalaLinda(Math.max(...IC.map(Math.abs)), 2)
-  const marcasD = [...ext.marcas.slice(1).reverse().map((v) => -v), ...ext.marcas]
-  const fmtD = (v) => fijo(v, 0, true)
-  const padD = Math.max(...marcasD.map((v) => ancho(fmtD(v), fEje, 400))) / 2 + 6 * u
-  const xd0 = xDer + padD
-  const xd1 = w - padD
-  const xd = (v) => xd0 + ((v + ext.tope) / (2 * ext.tope)) * (xd1 - xd0)
-  const yc = (yFil0 + yEje) / 2
-  const fNum = tam(30, u)
-  const fCap = tam(24, u)
-  const fMejor = tam(22, u)
-  const yMejor = yEje - 22 * u
-
-  return (
-    <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
-      {/* separador entre paneles */}
-      <line x1={wIzq + gap / 2} x2={wIzq + gap / 2} y1={mY} y2={h - mY} stroke={PISTA} strokeWidth={TRAZO.guia * u} />
-
-      {/* ---- izquierda: contra la práctica actual */}
-      <text x={0} y={yTit} fontSize={fTit} fontWeight={700} fill={INK}>{X.izq.titulo}</text>
-      <Leyenda u={u} x={0} y={yLey} items={[
-        { marca: 'contexto', texto: X.izq.hasta },
-        { marca: 'curso', texto: X.izq.sobre },
-      ]} />
-      <EjeX u={u} x0={x0} x1={x0 + L} y={yEje} min={0} max={escI.tope} marcas={escI.marcas} formato={fmtI}
-            titulo={B.eje} grilla yGrilla={yFil0} />
-      <Referencia u={u} x={xi(HOY)} y1={yLinea} y2={yEje} />
-      <RotuloReferencia u={u} x={xi(HOY)} yA={yRefA} yB={yRefB} nombre={X.izq.base} valor={pct(HOY)}
-                        nota={X.izq.baseNota} />
-      {filas.map((f, i) => {
-        const yf = yFil0 + (i + 0.5) * paso
-        const yb = yf - t / 2
-        const xb = xi(HOY)
-        return (
-          <g key={f.et}>
-            <title>{`${f.et} · ${pct(f.v)}`}</title>
-            {f.nota ? (
-              <g>
-                <text x={x0 - 24 * u} y={yf - 3 * u} fontSize={fRot} fontWeight={600} fill={INK}
-                      textAnchor="end">{f.et}</text>
-                <text x={x0 - 24 * u} y={yf + 8 * u + fNotaFila * 0.72} fontSize={fNotaFila} fill={CTX}
-                      textAnchor="end">{f.nota}</text>
-              </g>
-            ) : (
-              <text x={x0 - 24 * u} y={yf} fontSize={fRot} fontWeight={600} fill={INK} textAnchor="end"
-                    dominantBaseline="central">{f.et}</text>
-            )}
-            <rect x={x0} y={yb} width={Math.max(0, xb - x0 - sep / 2)} height={t} fill={FIN_GRIS} />
-            <path d={rectRedondo(xb + sep / 2, yb, Math.max(0, xi(f.v) - xb - sep / 2), t, TRAZO.radio * u)} fill={INK} />
-            <text x={xi(f.v) + 16 * u} y={yf} fontSize={fVal} fontWeight={700} fill={INK}
-                  dominantBaseline="central">{pct(f.v)}</text>
-          </g>
-        )
-      })}
-      <line x1={x0} x2={x0} y1={yFil0} y2={yEje} stroke={EJE} strokeWidth={TRAZO.base * u} />
-
-      {/* ---- derecha: modelo menos regla */}
-      <text x={xDer} y={yTit} fontSize={fTit} fontWeight={700} fill={INK}>{X.der.titulo}</text>
-      <Leyenda u={u} x={xDer} y={yLey} items={[
-        { marca: muestraPunto(ACC), texto: X.der.punto },
-        { marca: muestraIntervalo, texto: X.der.intervalo },
-      ]} />
-      <EjeX u={u} x0={xd0} x1={xd1} y={yEje} min={-ext.tope} max={ext.tope} marcas={marcasD} formato={fmtD}
-            titulo={X.der.eje} grilla yGrilla={yFil0} />
-      <Referencia u={u} x={xd(0)} y1={yLinea} y2={yEje} />
-      <RotuloReferencia u={u} x={xd(0)} yA={yRefA} yB={yRefB} nombre={X.der.cero} nota={X.der.ceroNota} />
-      {/* hacia dónde gana cada uno */}
-      <Punta u={u} x={xd0} y={yMejor} lado="izq" />
-      <text x={xd0 + 18 * u} y={yMejor} fontSize={fMejor} fill={CTX} dominantBaseline="central"
-            {...halo}>{X.der.mejorRegla}</text>
-      <Punta u={u} x={xd1} y={yMejor} lado="der" />
-      <text x={xd1 - 18 * u} y={yMejor} fontSize={fMejor} fill={CTX} textAnchor="end"
-            dominantBaseline="central" {...halo}>{X.der.mejorModelo}</text>
-      {/* intervalo y punto */}
-      <g>
-        <title>{T.decision.larga}</title>
-        <line x1={xd(IC[0])} x2={xd(IC[1])} y1={yc} y2={yc} stroke={ACC} strokeWidth={10 * u} />
-        {IC.map((v) => (
-          <line key={v} x1={xd(v)} x2={xd(v)} y1={yc - 22 * u} y2={yc + 22 * u} stroke={ACC} strokeWidth={5 * u} />
-        ))}
-        <circle cx={xd(DIF)} cy={yc} r={17 * u} fill={ACC} stroke={SUP} strokeWidth={4 * u} />
-        <text x={xd(DIF) + 10 * u} y={yc - 40 * u} fontSize={fNum} fontWeight={700} fill={INK} textAnchor="end"
-              {...halo}>
-          {`${fijo(DIF, 2, true)}${NBSP}${PUNTOS}`}
-        </text>
-        {/* con signo, como las marcas del eje (−1, +1) */}
-        {IC.map((v) => (
-          <text key={v} x={xd(v)} y={yc + 32 * u} fontSize={fCap} fontWeight={600} fill={CTX} textAnchor="middle"
-                dominantBaseline="hanging" {...halo}>{fijo(v, 2, true)}</text>
-        ))}
-      </g>
-    </svg>
-  )
-}
-
-// ---------------------------------------------------------------- versión b: un eje y la lupa
-
 function Lupa({ w, h }) {
   const u = useU()
-  const X = T.lupa
-  const mY = 0.04 * h
-  const fLey = tam(24, u)
-  const fNom = tam(26, u)
-  const fVal = tam(30, u)
-  const fNota = tam(22, u)
+  const abre = usePaso() >= 2
   const fEje = tam(LETRA_EJE, u)
+  const fN = tam(26, u)
+  const fV = tam(30, u)
+  // radio de las marcas de la recta: grande en el paso 1 (la recta sola), chico en el 2 (entra en la ventana, de medio
+  // alto hv)
+  const r1 = 10 * u
+  const r2 = 5 * u
+  const hv = r2 + 8 * u
+  const mY = 0.035 * h
   const abajo = altoEjeX(u, true)
-  const rChico = 10 * u
-  const rGrande = 17 * u
+  const yRot = -(r1 + 20 * u)
+  const arriba = -yRot + fV * 0.74
+  const curva = 'var(--fin-paso-t, 350ms) cubic-bezier(0.2, 0, 0, 1)'
+  const quieto = sinMovimiento()
 
-  // eje principal, de 0 a 100 %
-  const esc = escalaLinda(1)
-  const fmt = (v) => pct(v, 0)
-  const x0 = ancho(fmt(esc.min), fEje, 400) / 2 + 4 * u
-  const x1 = w - ancho(fmt(esc.tope), fEje, 400) / 2 - 4 * u
-  const xs = (v) => x0 + ((v - esc.min) / (esc.tope - esc.min)) * (x1 - x0)
-  // renglones de arriba: el nombre y el valor de cada marca, el recuadro de la lupa y el eje
-  const yNomB = mY + fNom * 0.8
-  const yValB = yNomB + fVal * 0.95 + 4 * u
-  const fy0 = yValB + 14 * u
-  const yEje1 = fy0 + 26 * u
-  const fy1 = yEje1 + 26 * u
-  // la leyenda, arriba a la izquierda: las dos marcas que en el eje quedan juntas (la práctica actual y el recuadro
-  // llevan su rótulo al lado)
-  const yLey = yNomB - fNom * 0.3
+  // la recta mide W en el paso 2; en el paso 1, k veces más, a todo el ancho y centrada en el alto. La ventana del
+  // tramo ampliado (exacta: de LO a HI) tiene que abrazar las dos marcas con aire, y eso fija un W mínimo.
+  const m0 = ancho(FMT(ESC.min), fEje, 400) / 2 + 4 * u
+  const m1 = ancho(FMT(ESC.tope), fEje, 400) / 2 + 4 * u
+  const holgura = 4 * u
+  const wMin = (2 * r2 + 2 * holgura) / ((HI - LO) - Math.abs(REGLA - MODELO))
+  const k = Math.max(1, Math.min(K1, w / (wMin + m0 + m1)))
+  const W = w / k - m0 - m1
+  const p1 = { x: k * m0, y: h / 2 - (k * (abajo - arriba)) / 2, k }
 
-  // tramo ampliado: medio punto de precisión de cada lado, redondeado al punto
-  const lo = Math.floor(Math.min(REGLA, MODELO) * 100 - 0.5) / 100
-  const hi = Math.ceil(Math.max(REGLA, MODELO) * 100 + 0.5) / 100
-  const escZ = escalaLinda(hi, 4, lo)
-  const fmtZ = (v) => pct(v, 1)
-  const fx0 = xs(lo)
-  const fx1 = xs(hi)
+  // el paso 2 de arriba abajo: la recta (rótulos, eje y título), el abanico y el panel. El panel lleva «Empate», la
+  // diferencia, la llave, regla y modelo (con su tallo hasta la recta ampliada) y su eje. El abanico toma lo que sobra,
+  // entre 48 u y 120 u; si todavía sobra (ventanas altas), el conjunto se centra en el alto.
+  const fZN = tam(28, u)
+  const fZV = tam('valFoco', u)
+  const fDif = tam(30, u)
+  const fEmp = tam(26, u)
+  const rZ = 15 * u
+  const tallo = 52 * u
+  const bloque = fEmp + 8 * u + fDif * 0.74 + 22 * u + 18 * u + rZ + tallo + abajo
+  const padP = 30 * u
+  const altoRecta = arriba + abajo + 6 * u
+  const altoPanel = bloque + 2 * padP
+  const libre = h - 2 * mY
+  const abanico = Math.min(120 * u, Math.max(48 * u, libre - altoRecta - altoPanel))
+  const corre = Math.max(0, (libre - altoRecta - abanico - altoPanel) / 2)
 
-  // panel ampliado, unido al recuadro por un tallo y un abanico
-  const yTallo = yEje1 + abajo + 8 * u
-  const py0 = yTallo + 30 * u
-  const py1 = h - mY
-  const padZ = Math.max(...escZ.marcas.map((v) => ancho(fmtZ(v), fEje, 400))) / 2 + 40 * u
+  const p2 = { x: (w - (m0 + W + m1)) / 2 + m0, y: mY + corre + arriba, k: 1 }
+  const p = abre ? p2 : p1
+  const mover = {
+    transform: `translate(${p.x}px, ${p.y}px) scale(${p.k})`,
+    transition: quieto ? 'none' : `transform ${curva}`,
+  }
+
+  // la lupa: ventana sobre la recta (exacta, de LO a HI), dos guías finas (tallo hasta debajo del eje y abanico) y el
+  // panel
+  const fx0 = p2.x + LO * W
+  const fx1 = p2.x + HI * W
+  const fy1 = p2.y + hv
+  const yTallo = p2.y + abajo + 6 * u
+  const py0 = yTallo + abanico
+  const py1 = Math.max(py0 + altoPanel, h - mY - corre)
+  const top = py0 + padP + Math.max(0, (py1 - py0 - altoPanel) / 2)
+
+  const padZ = Math.max(...ESC_Z.marcas.map((v) => ancho(FMT_Z(v), fEje, 400))) / 2 + 48 * u
   const zx0 = padZ
   const zx1 = w - padZ
-  const zs = (v) => zx0 + ((v - lo) / (hi - lo)) * (zx1 - zx0)
-  const zy = py1 - 20 * u - abajo
-  // de las marcas a la nota de arriba hay 54 u de guía y 145 u de rótulos; si el panel tiene más alto (ventanas 4:3),
-  // la guía crece para que el grupo quede centrado entre el rótulo del panel y el eje
-  const yTitZ = py0 + 20 * u + fLey * 0.8
-  const natural = 54 * u + rGrande + 18 * u + 20 * u + fVal * 0.95 + 4 * u + fNota
-  const sobra = Math.max(0, zy - yTitZ - 24 * u - natural)
-  const yPts = zy - 54 * u - sobra / 2
-  const yLlave = yPts - rGrande - 18 * u
-  const yDif = yLlave - 8 * u - 12 * u
-  const yEmpate = yDif - fVal * 0.95 - 4 * u
-  const xMedio = (zs(MODELO) + zs(REGLA)) / 2
-  const lupa = `M${fx0} ${fy0} H${fx1} V${yTallo} L${w} ${py0} V${py1} H0 V${py0} L${fx0} ${yTallo} Z`
-  const nombreValor = (nombre, valor) => [
-    <tspan key="n" fontWeight={600} fontSize={fNom}>{nombre}</tspan>,
-    <tspan key="v" dx={10 * u} fontWeight={700} fontSize={fVal}>{valor}</tspan>,
-  ]
-  const itemsLey = [
-    { marca: muestraPunto(ACC), texto: X.regla },
-    { marca: muestraPunto(SUP, ACC), texto: X.modelo },
-  ]
+  const zs = (v) => zx0 + ((v - LO) / (HI - LO)) * (zx1 - zx0)
+  const yEmp = top + fEmp * 0.74
+  const yDif = yEmp + fEmp * 0.26 + 8 * u + fDif * 0.74
+  const yLlave = yDif + 22 * u
+  const yPts = yLlave + 18 * u + rZ
+  const zy = yPts + tallo
+  const xm = zs(MODELO)
+  const xr = zs(REGLA)
+  const rp = 10 * u
+  const panel = `M0 ${py0} H${w} V${py1 - rp} Q${w} ${py1} ${w - rp} ${py1} H${rp} Q0 ${py1} 0 ${py1 - rp} Z`
+  const guias = `M${fx0} ${fy1} V${yTallo} L0 ${py0} M${fx1} ${fy1} V${yTallo} L${w} ${py0}`
 
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
-      {/* la lupa: recuadro, tallo, abanico y panel en un solo trazado */}
-      <path d={lupa} fill={REALCE} stroke={EJE} strokeWidth={TRAZO.guia * u} strokeLinejoin="round" />
+      <Paso n={2} oculto>
+        <path d={panel} fill={REALCE} />
+        <path d={guias} fill="none" stroke={EJE} strokeWidth={TRAZO.guia * u} />
+      </Paso>
 
-      {/* eje principal con las tres marcas */}
-      <EjeX u={u} x0={x0} x1={x1} y={yEje1} min={esc.min} max={esc.tope} marcas={esc.marcas} formato={fmt}
-            titulo={B.eje} anclaTitulo="start" />
-      <Leyenda u={u} x={0} y={yLey} items={itemsLey} />
-      <rect x={fx0} y={fy0} width={fx1 - fx0} height={fy1 - fy0} rx={4 * u} fill="none" stroke={INK}
-            strokeWidth={2.5 * u} />
-      <g>
-        <title>{`${X.hoy} · ${pct(HOY)}`}</title>
-        <circle cx={xs(HOY)} cy={yEje1} r={rChico} fill={FIN_GRIS} />
-        <text x={xs(HOY)} y={yNomB} fontSize={fNom} fontWeight={600} fill={INK} textAnchor="middle">{X.hoy}</text>
-        <text x={xs(HOY)} y={yValB} fontSize={fVal} fontWeight={700} fill={INK} textAnchor="middle">{pct(HOY)}</text>
-      </g>
-      <g>
-        <title>{`${X.juntos} · ${pct(REGLA)} · ${pct(MODELO)}`}</title>
-        <circle cx={xs(MODELO)} cy={yEje1} r={rChico - 1.5 * u} fill={SUP} stroke={ACC} strokeWidth={3 * u} />
-        <circle cx={xs(REGLA)} cy={yEje1} r={rChico - 1.5 * u} fill={ACC} />
-        <text x={(fx0 + fx1) / 2} y={yNomB} fontSize={fNom} fontWeight={600} fill={INK} textAnchor="middle">{X.juntos}</text>
-        <text x={(fx0 + fx1) / 2} y={yValB} fontSize={fNota} fill={CTX} textAnchor="middle">{X.juntosNota}</text>
+      <g style={mover}>
+        <Recta u={u} W={W} r={abre ? r2 : r1} yRot={yRot} fN={fN} fV={fV} trans={quieto ? 'none' : `r ${curva}`}
+               hv={hv} />
       </g>
 
-      {/* panel ampliado: las dos marcas sobre el eje, con su guía, y la llave de la diferencia */}
-      <text x={24 * u} y={yTitZ} fontSize={fLey} fontWeight={600} fill={CTX}>{X.tramo}</text>
-      <EjeX u={u} x0={zx0} x1={zx1} y={zy} min={lo} max={escZ.tope} marcas={escZ.marcas} formato={fmtZ}
-            titulo={X.ejeZoom} grilla yGrilla={yPts} />
-      {[MODELO, REGLA].map((v) => (
-        <line key={v} x1={zs(v)} x2={zs(v)} y1={yPts} y2={zy} stroke={ACC} strokeWidth={3 * u} />
-      ))}
-      <circle cx={zs(MODELO)} cy={yPts} r={rGrande - 2 * u} fill={SUP} stroke={ACC} strokeWidth={4 * u} />
-      <circle cx={zs(REGLA)} cy={yPts} r={rGrande} fill={ACC} />
-      <text x={zs(MODELO) - rGrande - 14 * u} y={yPts} fill={INK} fontSize={fNom} textAnchor="end"
-            dominantBaseline="central">{nombreValor(X.modelo, pct(MODELO))}</text>
-      <text x={zs(REGLA) + rGrande + 14 * u} y={yPts} fill={INK} fontSize={fNom} textAnchor="start"
-            dominantBaseline="central">{nombreValor(X.regla, pct(REGLA))}</text>
-      {/* la regla es la línea de base del proyecto: se dice debajo de su nombre */}
-      <text x={zs(REGLA) + rGrande + 14 * u} y={yPts + fVal * 0.45 + 8 * u} fill={CTX} fontSize={fNota}
-            textAnchor="start" dominantBaseline="hanging">{X.reglaNota}</text>
-      <LlaveH u={u} x1={zs(MODELO)} x2={zs(REGLA)} y={yLlave} lado="arriba" />
-      <text x={xMedio} y={yDif} fontSize={fVal} fontWeight={700} fill={INK} textAnchor="middle">
-        {`${fijo(Math.abs(DIF), 2)}${NBSP}${PUNTOS}`}
-      </text>
-      <text x={xMedio} y={yEmpate} fontSize={fNota} fill={CTX} textAnchor="middle">{X.empate}</text>
+      <Paso n={2} oculto>
+        <EjeX u={u} x0={zx0} x1={zx1} y={zy} min={LO} max={ESC_Z.tope} marcas={ESC_Z.marcas} formato={FMT_Z}
+              titulo={X.ejeZoom} />
+        {[MODELO, REGLA].map((v) => (
+          <g key={v}>
+            <line x1={zs(v)} x2={zs(v)} y1={yPts} y2={zy} stroke={ACC} strokeWidth={3 * u} />
+            <circle cx={zs(v)} cy={yPts} r={rZ} fill={ACC} />
+          </g>
+        ))}
+        <NombreValor x={xm - rZ - 14 * u} y={yPts} base="central" anchor="end" nombre={X.modelo}
+                     valor={pct(MODELO, 2)} fN={fZN} fV={fZV} u={u} />
+        <NombreValor x={xr + rZ + 14 * u} y={yPts} base="central" anchor="start" nombre={X.regla}
+                     valor={pct(REGLA, 2)} fN={fZN} fV={fZV} u={u} />
+        <LlaveH u={u} x1={xm} x2={xr} y={yLlave} lado="arriba" />
+        <text x={(xm + xr) / 2} y={yDif} fontSize={fDif} fontWeight={700} fill={INK} textAnchor="middle">
+          {`${fijo(Math.abs(DIF), 2)}${NBSP}${PUNTOS}`}
+        </text>
+        <text x={(xm + xr) / 2} y={yEmp} fontSize={fEmp} fontWeight={600} fill={INK}
+              textAnchor="middle">{X.empate}</text>
+      </Paso>
     </svg>
   )
 }
 
 export default function V05ReglaModelo() {
-  const b = variante(ID) === 'b'
   return (
-    <Vista id={ID}
-           items={[
-             { clave: 'regla', valor: pct(REGLA) },
-             { clave: 'dif', valor: fijo(DIF, 2) },
-             { clave: 'hoy', valor: pct(HOY) },
-           ]}
-           cifras={[fijo(Math.abs(DIF), 2)]}>
-      {({ w, h }) => (b ? <Lupa w={w} h={h} /> : <DosPaneles w={w} h={h} />)}
+    <Vista id={ID} items={[{ clave: 'regla', valor: pct(REGLA) }]} cifras={[fijo(Math.abs(DIF), 2)]}>
+      {({ w, h }) => <Lupa w={w} h={h} />}
     </Vista>
   )
 }

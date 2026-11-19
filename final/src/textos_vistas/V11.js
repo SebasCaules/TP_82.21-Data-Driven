@@ -1,14 +1,8 @@
-// Textos nuevos de V11 (fase 8), mezclados en textosDe('V11'); puede importar DF de '../datos_final.js' y formato.js de '../../../e3/src/formato.js'.
-// tipos: la clase de cada riesgo de `filas`, en el mismo orden (las notas de V11 los dicen así: económico, adopción,
-// legal). ley: la leyenda de los colores (a y b) y de las flechas (b). Los rótulos de los campos y de las columnas son
-// los de `columnas`.
+// Textos nuevos de V11, mezclados en textosDe('V11'); puede importar DF de '../datos_final.js' y formato.js de '../../../e3/src/formato.js'.
+// (19/11, fase 9) La tarjeta de cada riesgo lleva el nombre, la señal y la respuesta de CF (`filas`). Los rótulos de los
+// campos se acortan a las dos palabras de la conclusión («cada uno con su señal y su respuesta»), que son también las de
+// la ficha de la sección 26.3 del informe. Salieron la subfila de la banda (las 24 horas de las tres listas), el tipo de
+// cada riesgo y la leyenda.
 export default {
-  // subfila de la banda: las horas de Marketing en las tres listas del piloto (G64.horas_marketing)
-  piloto: { rotulo: 'En las tres listas', linea: 'de la misma persona', unidad: 'horas' },
-  tipos: ['Económico', 'Adopción', 'Legal'],
-  ley: {
-    foco: 'Riesgo de adopción: si Marketing sostiene la lista',
-    otros: 'Riesgos económico y legal',
-    flecha: 'Cada fila se lee de izquierda a derecha',
-  },
+  columnas: { senal: 'Señal', respuesta: 'Respuesta' },
 }

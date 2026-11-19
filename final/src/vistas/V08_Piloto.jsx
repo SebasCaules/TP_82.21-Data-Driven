@@ -1,19 +1,22 @@
 // V08 · Qué cuesta el piloto (economía, Juan Manuel R.). El piloto mínimo (G64) como una sola barra partida en sus
-// cinco líneas (G64.medicion, .planilla, .taller, .legal, .contingencia), de mayor a menor, que suma el total: la
-// medición en --acc, que es para lo que se hace el piloto; planilla, taller y legal en gris; la contingencia, que es una
-// reserva sobre las otras cuatro, con contorno punteado. Cada tramo lleva adentro su monto, su nombre y qué compra (si no
-// entra, el nombre y el monto van debajo con una guía). Arriba, la llave del total; debajo, el eje en dólares de 0 al
-// total, y la leyenda de los tres rellenos. En la banda, el piloto (G64) y las horas de Marketing (G64.horas_marketing).
+// cinco líneas (G64.medicion, .planilla, .taller, .legal, .contingencia), de mayor a menor, que suma el total.
 // (18/11, fase 8, spec 2 V08) Reemplaza las barras sueltas (BarrasFin) del intermedio: «hay un total y cada parte ocupa
 // una porción».
+// (19/11, fase 9, spec 4 V08: «Así pero mucho más sobrio, sin tanto texto, lo mínimo indispensable») Cada tramo lleva
+// solo su monto y su nombre corto; salen «qué compra», la leyenda (la medición se nombra sola) y el punteado de la
+// contingencia, que es un tramo gris más. Arriba, la llave del total; debajo, el eje en dólares sin repetir el total. En la
+// banda, solo el piloto (G64): las horas de Marketing salen de la pantalla (las dice el orador; informe, 23.2 y 23.6).
+// Pasos: 1, el total partido en sus cinco tramos, todos en gris; 2, la medición en ACC (una capa encima del tramo gris,
+// oculta antes, y su texto pasa a blanco).
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo, usd } from '../../../e3/src/formato.js'
 import {
-  CTX, INK, SUP, EjeX, Guia, Leyenda, LlaveH, altoEjeX, ancho, duro, envolver, escalaLinda, marcaFlujo, tam, useU,
+  ACC, FIN_GRIS, INK, SUP, CTX, EjeX, Guia, LlaveH, Paso, TRAZO, altoEjeX, ancho, envolver, escalaLinda, tam, useU,
 } from '../svg.jsx'
+import { useEstadoPaso } from '../pasos.js'
 
 const ID = 'V08'
 const A = DF.anclas
@@ -22,15 +25,15 @@ const B = T.barras
 const P = T.partida
 const TOTAL = A.G64.valor
 
-// Las cinco líneas del costo, de mayor a menor (a igual monto, en este orden). tipo: el estado de FLUJO que da el relleno.
+// Las cinco líneas del costo, de mayor a menor (a igual monto, en este orden). foco: la que se resalta en el paso 2.
 const LINEAS = [
-  { clave: 'medicion', ancla: 'G64.medicion', tipo: 'hecho' },
-  { clave: 'planilla', ancla: 'G64.planilla', tipo: 'contexto' },
-  { clave: 'taller', ancla: 'G64.taller', tipo: 'contexto' },
-  { clave: 'legal', ancla: 'G64.legal', tipo: 'contexto' },
-  { clave: 'contingencia', ancla: 'G64.contingencia', tipo: 'condicional' },
+  { clave: 'medicion', ancla: 'G64.medicion', foco: true },
+  { clave: 'planilla', ancla: 'G64.planilla' },
+  { clave: 'taller', ancla: 'G64.taller' },
+  { clave: 'legal', ancla: 'G64.legal' },
+  { clave: 'contingencia', ancla: 'G64.contingencia' },
 ]
-  .map((l, i) => ({ ...l, i, valor: A[l.ancla].valor, nombre: B[l.clave], desc: duro(P.desc[l.clave]) }))
+  .map((l, i) => ({ ...l, i, valor: A[l.ancla].valor, nombre: B[l.clave] }))
   .sort((a, b) => b.valor - a.valor || a.i - b.i)
 
 const SUMA = LINEAS.reduce((s, l) => s + l.valor, 0)
@@ -38,102 +41,78 @@ if (Math.abs(SUMA - TOTAL) > 0.5) {
   throw new Error(`V08: las líneas del piloto suman ${SUMA} y G64 dice ${TOTAL}; la barra no puede sumar el total`)
 }
 
-export const meta = { id: ID }
+export const meta = { id: ID, pasos: 2 }
 
-const LEYENDA = [
-  { marca: 'hecho', texto: P.ley.foco },
-  { marca: 'contexto', texto: P.ley.resto },
-  { marca: 'condicional', texto: P.ley.reserva },
-]
-
-/** Marcas del eje: las redondas por debajo del total que no pisan su número, y el total al final. */
-function marcasEje(u, largo) {
-  const f = tam(23, u)
-  const xDe = (v) => (v / TOTAL) * largo
-  const anchoNum = (v) => ancho(fijo(v), f, 400)
-  const redondas = escalaLinda(TOTAL).marcas.filter((v) => v < TOTAL)
-  const libres = redondas.filter((v) => xDe(TOTAL) - xDe(v) >= (anchoNum(v) + anchoNum(TOTAL)) / 2 + 16 * u)
-  return [...libres, TOTAL]
-}
+/** Marcas del eje: las redondas hasta el total, sin el total (ya está arriba, en la llave). */
+const MARCAS = escalaLinda(TOTAL).marcas.filter((v) => v < TOTAL)
 
 function Dibujo({ w, h }) {
   const u = useU()
-  const f = {
-    ley: tam(24, u),
-    monto: tam('valFoco', u),
-    nombre: tam(24, u),
-    desc: tam(22, u),
-    totRot: tam('cat', u),
-    totVal: tam('valFoco', u),
-    eje: tam(23, u),
-  }
-  const lh = { monto: 1.15, nombre: 1.2, desc: 1.25 }
-  const pad = 16 * u
+  const resaltada = useEstadoPaso(2, { oculto: true }) === 'on'
+  const f = { monto: tam('valFoco', u), totRot: tam('cat', u), totVal: tam('valFoco', u), eje: tam(23, u) }
+  const lh = { monto: 1.15, nombre: 1.2 }
   const hueco = 4 * u
-  // a lo ancho: el 0 y el total del eje van centrados en las puntas de la barra
+  // a lo ancho: el 0 del eje va centrado en la punta izquierda de la barra
   const x0 = ancho(fijo(0), f.eje, 400) / 2 + 2 * u
-  const x1 = w - ancho(fijo(TOTAL), f.eje, 400) / 2 - 2 * u
+  const x1 = w - 2 * u
   const largo = Math.max(0, x1 - x0)
   const xDe = (v) => x0 + (v / TOTAL) * largo
 
-  // cada tramo: su lugar y qué texto entra adentro (monto, nombre en hasta 2 renglones y qué compra en hasta 3). Un
-  // tramo angosto prueba primero con menos margen a los lados y después con el nombre más chico (nunca menos de 20 u); si no
-  // entra igual, el nombre y el monto van debajo de la barra con una guía.
-  const PRUEBAS = [[pad, f.nombre], [10 * u, f.nombre], [10 * u, tam(22, u)], [10 * u, tam(20, u)]]
   let acum = 0
-  const tramos = LINEAS.map((l, k) => {
+  const base = LINEAS.map((l, k) => {
     const xa = xDe(acum)
     acum += l.valor
     const xb = xDe(acum)
-    const xi = xa + (k ? hueco / 2 : 0)
-    const xf = xb - (k < LINEAS.length - 1 ? hueco / 2 : 0)
-    const monto = usd(l.valor, 0)
-    let r = null
-    for (const [p, fn] of PRUEBAS) {
-      const util = xf - xi - 2 * p
-      const nombre = envolver(l.nombre, util, fn, 600)
-      const cabe = (ls, fz, peso) => ls.every((t) => ancho(t, fz, peso) <= util + 0.5)
-      if (util > 0 && ancho(monto, f.monto, 700) <= util && nombre.length <= 2 && cabe(nombre, fn, 600)) {
-        const desc = envolver(l.desc, util, f.desc, 400)
-        r = { p, fn, nombre, desc, dentro: true, conDesc: desc.length <= 3 && cabe(desc, f.desc, 400) }
-        break
-      }
+    return {
+      ...l,
+      xi: xa + (k ? hueco / 2 : 0),
+      xf: xb - (k < LINEAS.length - 1 ? hueco / 2 : 0),
+      monto: usd(l.valor, 0),
     }
-    r ??= { p: pad, fn: f.nombre, nombre: [l.nombre], desc: [], dentro: false, conDesc: false }
-    return { ...l, xi, xf, monto, ...r }
   })
-  // los nombres ocupan el alto del más largo: «qué compra» arranca en el mismo renglón en todos los tramos
-  const altoNombre = Math.max(0, ...tramos.filter((t) => t.dentro).map((t) => t.nombre.length * t.fn * lh.nombre))
-  const altoTexto = (t, desc) => pad + f.monto * lh.monto + 6 * u + altoNombre
-    + (desc && t.conDesc ? 10 * u + t.desc.length * f.desc * lh.desc : 0) + pad
-  const fuera = tramos.filter((t) => !t.dentro)
-  const altoFuera = fuera.length ? 20 * u + f.nombre * 1.2 + f.monto * 1.15 + 8 * u : 0
 
-  // a lo alto: leyenda, rótulo del total, llave, barra, (nombres que no entran), eje
-  const fijoArriba = f.ley + 36 * u + f.totVal * 0.8 + 22 * u + 18 * u
-  const fijoAbajo = altoFuera + 14 * u + altoEjeX(u, true)
-  const necesita = (desc) => Math.max(...tramos.filter((t) => t.dentro).map((t) => altoTexto(t, desc)), 120 * u)
-  let conDesc = true
-  let hNec = necesita(true)
-  if (fijoArriba + hNec + fijoAbajo > 0.95 * h) {
-    conDesc = false
-    hNec = necesita(false)
+  // un solo tamaño de nombre y un solo margen para los cinco tramos: el más grande con el que todos entran (monto en un
+  // renglón, nombre en hasta dos). Si ni con 20 u entra alguno, ese va debajo de la barra con una guía.
+  const PRUEBAS = [[26, 16], [26, 12], [24, 16], [24, 12], [22, 12], [20, 10]]
+  const ajuste = (t, fn, p) => {
+    const util = t.xf - t.xi - 2 * p
+    const nombre = envolver(t.nombre, util, fn, 600)
+    const cabe = util > 0 && ancho(t.monto, f.monto, 700) <= util && nombre.length <= 2
+      && nombre.every((r) => ancho(r, fn, 600) <= util + 0.5)
+    return { nombre, cabe }
   }
-  // la barra crece con el lienzo hasta el 88 % del alto, con un tope para que no se vuelva un bloque (en 4:3)
-  const hB = Math.max(hNec, Math.min(0.88 * h - fijoArriba - fijoAbajo, hNec + Math.max(60 * u, 0.25 * h)))
-  const yTexto = (hB - hNec) / 2   // el bloque más alto queda centrado en la barra; los demás arrancan a su altura
+  const elegida = PRUEBAS.find(([n, p]) => base.every((t) => ajuste(t, tam(n, u), p * u).cabe)) ?? PRUEBAS.at(-1)
+  const fn = tam(elegida[0], u)
+  const pad = elegida[1] * u
+  const tramos = base.map((t) => {
+    const a = ajuste(t, fn, pad)
+    return { ...t, nombre: a.cabe ? a.nombre : [t.nombre], dentro: a.cabe }
+  })
+
+  // el bloque de texto (monto y nombre) tiene el alto del nombre más largo: los montos quedan en un renglón
+  const renglones = Math.max(1, ...tramos.filter((t) => t.dentro).map((t) => t.nombre.length))
+  const altoBloque = f.monto * lh.monto + 6 * u + renglones * fn * lh.nombre
+  const fuera = tramos.filter((t) => !t.dentro)
+  const altoFuera = fuera.length ? 20 * u + fn * 1.2 + f.monto * 1.15 + 8 * u : 0
+
+  // a lo alto: rótulo del total, llave, barra, (nombres que no entran), eje
+  const fijoArriba = f.totVal * 0.8 + 22 * u + 18 * u
+  const fijoAbajo = altoFuera + 14 * u + altoEjeX(u, true)
+  const hNec = Math.max(altoBloque + 2 * 24 * u, 120 * u)
+  // la barra crece con el lienzo hasta que el dibujo ocupa el 75 % del alto, con un tope para que no sea un bloque
+  const hB = Math.max(hNec, Math.min(0.75 * h - fijoArriba - fijoAbajo, hNec + Math.max(80 * u, 0.3 * h)))
   const top = Math.max(0, (h - (fijoArriba + hB + fijoAbajo)) / 2)
-  const yLey = top + f.ley / 2
-  const yTot = top + f.ley + 36 * u + f.totVal * 0.8
+  const yTot = top + f.totVal * 0.8
   const yLlave = yTot + 22 * u
   const yB = yLlave + 18 * u
+  const yMonto = yB + (hB - altoBloque) / 2
+  const yNombre = yMonto + f.monto * lh.monto + 6 * u
   const yFuera = yB + hB + 20 * u
   const yEje = yB + hB + altoFuera + 14 * u
+  const r = TRAZO.radio * u
 
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
-      <Leyenda u={u} x={x0} y={yLey} items={LEYENDA} />
-
       {/* el total, con la llave que abarca la barra entera */}
       <text x={(x0 + x1) / 2} y={yTot} fontSize={f.totVal} textAnchor="middle">
         <tspan fontSize={f.totRot} fontWeight={600} fill={CTX}>{P.total}</tspan>
@@ -142,41 +121,32 @@ function Dibujo({ w, h }) {
       <LlaveH u={u} x1={x0} x2={x1} y={yLlave} lado="arriba" />
 
       {tramos.map((t) => {
-        const m = marcaFlujo(t.tipo, u)
-        const color = m.texto
-        const colorDesc = t.tipo === 'condicional' ? CTX : color
-        const xt = t.xi + t.p   // el margen de arriba es el mismo en todos: los montos quedan en un renglón
-        const yMonto = yB + yTexto + pad
-        const yNombre = yMonto + f.monto * lh.monto + 6 * u
-        const yDesc = yNombre + altoNombre + 10 * u
+        const color = t.foco && resaltada ? SUP : INK
         const xc = (t.xi + t.xf) / 2
-        const xRot = Math.min(Math.max(xc, x0 + ancho(t.nombre.join(' '), f.nombre, 600) / 2),
-          x1 - ancho(t.nombre.join(' '), f.nombre, 600) / 2)
+        const anchoRot = ancho(t.nombre.join(' '), fn, 600)
+        const xRot = Math.min(Math.max(xc, x0 + anchoRot / 2), x1 - anchoRot / 2)
+        const caja = { x: t.xi, y: yB, width: Math.max(0, t.xf - t.xi), height: hB, rx: r }
         return (
           <g key={t.clave}>
             <title>{`${t.nombre.join(' ')}: ${t.monto}`}</title>
-            <rect x={t.xi + m.trazo / 2} y={yB + m.trazo / 2} width={Math.max(0, t.xf - t.xi - m.trazo)}
-                  height={Math.max(0, hB - m.trazo)} rx={4 * u} {...m.attrs} />
+            <rect {...caja} fill={FIN_GRIS} />
+            {t.foco && <Paso n={2} oculto><rect {...caja} fill={ACC} /></Paso>}
             {t.dentro && (
               <g>
-                <text x={xt} y={yMonto} fontSize={f.monto} fontWeight={700} fill={color}
+                <text x={t.xi + pad} y={yMonto} fontSize={f.monto} fontWeight={700} fill={color}
                       dominantBaseline="hanging">{t.monto}</text>
-                {t.nombre.map((r, i) => (
-                  <text key={i} x={xt} y={yNombre + i * t.fn * lh.nombre} fontSize={t.fn} fontWeight={600}
-                        fill={color} dominantBaseline="hanging">{r}</text>
-                ))}
-                {conDesc && t.conDesc && t.desc.map((r, i) => (
-                  <text key={`d${i}`} x={xt} y={yDesc + i * f.desc * lh.desc} fontSize={f.desc} fontWeight={400}
-                        fill={colorDesc} dominantBaseline="hanging">{r}</text>
+                {t.nombre.map((renglon, i) => (
+                  <text key={i} x={t.xi + pad} y={yNombre + i * fn * lh.nombre} fontSize={fn} fontWeight={600}
+                        fill={color} dominantBaseline="hanging">{renglon}</text>
                 ))}
               </g>
             )}
             {!t.dentro && (
               <g>
                 <Guia u={u} x1={xc} y1={yB + hB} x2={xc} y2={yFuera - 6 * u} />
-                <text x={xRot} y={yFuera} fontSize={f.nombre} fontWeight={600} fill={INK} textAnchor="middle"
+                <text x={xRot} y={yFuera} fontSize={fn} fontWeight={600} fill={INK} textAnchor="middle"
                       dominantBaseline="hanging">{t.nombre.join(' ')}</text>
-                <text x={xRot} y={yFuera + f.nombre * 1.2} fontSize={f.monto} fontWeight={700} fill={INK}
+                <text x={xRot} y={yFuera + fn * 1.2} fontSize={f.monto} fontWeight={700} fill={INK}
                       textAnchor="middle" dominantBaseline="hanging">{t.monto}</text>
               </g>
             )}
@@ -184,20 +154,15 @@ function Dibujo({ w, h }) {
         )
       })}
 
-      <EjeX u={u} x0={x0} x1={x1} y={yEje} min={0} max={TOTAL} marcas={marcasEje(u, largo)} formato={(v) => fijo(v)}
-            titulo={P.eje} />
+      <EjeX u={u} x0={x0} x1={x1} y={yEje} min={0} max={TOTAL} marcas={MARCAS} formato={(v) => fijo(v)}
+            titulo={B.eje} />
     </svg>
   )
 }
 
 export default function V08Piloto() {
   return (
-    <Vista id={ID}
-           items={[
-             { clave: 'piloto', valor: usd(A.G64.valor) },
-             { clave: 'horas', valor: fijo(A['G64.horas_marketing'].valor) },
-           ]}
-           cifras={[]}>
+    <Vista id={ID} items={[{ clave: 'piloto', valor: usd(A.G64.valor) }]} cifras={[]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
   )

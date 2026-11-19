@@ -4,12 +4,9 @@
 //
 // Queda una sola clave en prueba, por URL (index.html?var=rev.b#v05):
 //   rev: cómo se ve lo que todavía no se reveló en el avance por pasos. 'a', atenuado (lo elegido); 'b', oculto.
-// V05 y V15 siguen acá hasta que su vista deje de leerlas.
 
 export const VARIANTES = {
   rev: 'a',
-  V05: 'b',
-  V15: 'b',
 }
 
 function deURL() {

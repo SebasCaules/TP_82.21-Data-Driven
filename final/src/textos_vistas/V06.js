@@ -1,39 +1,28 @@
-// Textos nuevos de V06 (fase 8), mezclados en textosDe('V06'); puede importar DF de '../datos_final.js' y formato.js de '../../../e3/src/formato.js'.
-// Los grupos de la lista del mes (spec 2, V06): los comparten la versión a (flujo) y la b (cuadrícula de puntos).
+// Textos de V06 (fase 9), mezclados en textosDe('V06'); puede importar DF de '../datos_final.js' y formato.js de '../../../e3/src/formato.js'.
+// Los rótulos del flujo: la lista, el 20 % de mayor facturación, el sorteo, el control y las dos ramas, y la comparación.
+// Las cifras grandes (500 y 100) las pone la vista delante de `lista` y de `control`.
 import { DF } from '../datos_final.js'
-import { NBSP, fijo, pct, mesAnio } from '../../../e3/src/formato.js'
+import { NBSP, fijo, pct } from '../../../e3/src/formato.js'
 
 const v = (id) => DF.anclas[id].valor
 
 export default {
   grupos: {
-    lista: 'Lista del mes',
-    // «En el»: los 153 son los de la lista que están en el 20 % de mayor facturación del corte, no el 20 % de la lista
+    lista: 'contactables',
+    lista_accion: 'lista del mes',
+    // «En el»: son los de la lista que están en el 20 % de mayor facturación de la base, no el 20 % de la lista
     alto: `En el ${pct(v('G49.alto_valor'), 0)} de mayor facturación`,
-    alto_accion: 'se contacta entero, sin sorteo',
+    alto_accion: 'se contacta entero',
     sorteo: 'Sorteo al azar',
-    control: 'Control',
-    control_accion: 'no se contacta',
+    control: 'de control',
+    control_accion: 'no se contactan',
     con: `Con ${pct(v('G49.descuento'), 0)} de descuento`,
     sin: 'Sin descuento',
     rama_accion: 'se contacta',
   },
   compara: {
     cuando: `A los ${fijo(v('F04.horizonte'))} días`,
-    // los espacios duros arman los renglones de la versión a: «cada rama» / «se compara» / «con el control»
+    // los espacios duros arman los renglones: «cada rama se compara» / «con el control»
     que: `cada${NBSP}rama se${NBSP}compara con${NBSP}el${NBSP}control`,
-  },
-  muestra: `Lista de muestra, ${mesAnio(DF.tablas.lista_muestra.corte)}`,
-  ley: {
-    reparte: 'Se reparte',
-    contacta: 'Se contacta',
-    control: 'No se contacta',
-    banda: 'Alto de la banda: clientes',
-    punto: 'Cada punto: un cliente',
-  },
-  puntos: {
-    lista: `Lista del mes: ${fijo(v('G49.lista_mes'))} clientes`,
-    sorteo: `Sorteo al azar entre los ${fijo(v('K17'))} restantes`,
-    compara: `A los ${fijo(v('F04.horizonte'))} días, cada rama se compara con el control`,
   },
 }

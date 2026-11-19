@@ -1,22 +1,20 @@
 // V12 · El backlog (gestión, Sebastian C.). Las épicas del backlog (tabla backlog de DF, leída por build_final.py de
-// EPICAS e HISTORIAS de la Parte A del E4) y sus historias de usuario, una ficha por historia con su código (HU-n-nn).
-// (18/11, fase 8, spec V12) El usuario no entendía qué eran los cuadros ni a qué épica atacaba cada uno, y los nombres
-// de fila eran largos: cada épica lleva ahora un título breve (textos_vistas/V12.js) que es lo que más pesa, y debajo,
-// en chico, su nombre completo. Dos versiones (variante('V12')):
-//   a  tablero por estado: una fila por épica y tres columnas (hecha, en el piloto, si el piloto pasa) con encabezado
-//      lleno y su total (K04, K05, K06); cada ficha va en la celda de su épica y su estado. Leyenda en la esquina.
-//   b  ocho tarjetas en 4 × 2, una por épica, con sus fichas del color del estado y la leyenda de estados arriba.
-// El estado usa FLUJO de svg.jsx (el mismo código que V13): hecha en acento (el título habla de las hechas), en el piloto
-// en gris y si el piloto pasa en contorno punteado. Los totales salen de K04 a K06 y se controlan contra la tabla.
+// EPICAS e HISTORIAS de la Parte A del E4) y sus historias de usuario, una ficha por historia.
+// (18/11, fase 8) Tablero por estado: una fila por épica con su título breve (textos_vistas/V12.js) y tres columnas
+// (hechas, en el piloto, si el piloto pasa) con encabezado lleno; cada ficha va en la celda de su épica y su estado.
+// (19/11, fase 9, spec V12) Lo que pidió el usuario: sin el subtítulo de cada fila (el nombre completo de la épica) ni el
+// código de cada ficha (HU-n-nn), que daban pie a preguntas. Las fichas van lisas, del color de su estado; sale también el
+// número de la épica, y el total de cada columna, que ya dice la conclusión. Queda la leyenda «1 ficha = 1 historia de
+// usuario» en la esquina. Los encabezados nombran el color de cada estado (FLUJO de svg.jsx, el mismo código que V13):
+// hechas en acento (el título habla de las hechas), en el piloto en gris y si el piloto pasa en contorno punteado.
+// Pasos (spec 2, en el orden de las notas): 1, las épicas y las hechas; 2, las del piloto; 3, las que van si el piloto
+// pasa. Lo que no se reveló se ve atenuado (Paso). Los totales se controlan contra K02, K04, K05 y K06.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
-import { variante } from '../variantes.js'
-import {
-  CTX, INK, PISTA, SUP, TRAZO, FranjasFila, Leyenda, anchoLeyenda, ancho, envolver, marcaFlujo, rectRedondo, tam, useU,
-} from '../svg.jsx'
+import { CONTORNO, INK, PISTA, Paso, TRAZO, FranjasFila, ancho, envolver, marcaFlujo, rectRedondo, tam, useU } from '../svg.jsx'
 
 const ID = 'V12'
 const A = DF.anclas
@@ -37,105 +35,44 @@ const EPICAS = BL.epicas.map((e) => {
   const breve = X.breves?.[e.n]
   if (!breve) throw new Error(`V12: falta el título breve de la épica ${e.n} en textos_vistas/V12.js`)
   const hus = BL.historias.filter((x) => x.epica === e.n)
-  return { ...e, breve, hus, por: Object.fromEntries(GRUPOS.map((g) => [g, hus.filter((x) => x.grupo === g)])) }
+  return { ...e, breve, por: Object.fromEntries(GRUPOS.map((g) => [g, hus.filter((x) => x.grupo === g)])) }
 })
 const MAX_CELDA = Object.fromEntries(GRUPOS.map((g) => [g, Math.max(1, ...EPICAS.map((e) => e.por[g].length))]))
-const MAX_EPICA = Math.max(...EPICAS.map((e) => e.hus.length))
-const TOTAL = (g) => fijo(A[ANCLA[g]].valor)
 
-export const meta = { id: ID }
+export const meta = { id: ID, pasos: 3 }
 
 const entre = (v, a, b) => Math.min(b, Math.max(a, v))
-const anchoFicha = (f) => Math.max(...BL.historias.map((x) => ancho(x.id, f, 600)))
 
-/** Renglones de hasta `w` px, parejos: si el texto va en dos renglones, corta donde el más largo de los dos es más
- *  corto (no deja una palabra sola abajo). Con más de dos, como envolver. */
-function parejo(texto, w, f) {
-  const base = envolver(texto, w, f, 400)
-  if (base.length !== 2) return base
-  const p = String(texto).split(' ')
-  let mejor = base
-  let largo = Math.max(...base.map((l) => ancho(l, f, 400)))
-  for (let i = 1; i < p.length; i++) {
-    const par = [p.slice(0, i).join(' '), p.slice(i).join(' ')]
-    const m = Math.max(...par.map((l) => ancho(l, f, 400)))
-    if (m <= w && m < largo) { mejor = par; largo = m }
-  }
-  return mejor
-}
-
-/** Una ficha: un rectángulo con el estado de la historia (marcaFlujo) y su código centrado. */
-function Ficha({ u, x, y, w, h, hu, f }) {
-  const m = marcaFlujo(ESTADO_DE[hu.grupo], u)
+/** Una ficha: un rectángulo liso con el estado de la historia (marcaFlujo). */
+function Ficha({ u, x, y, w, h, estado }) {
+  const m = marcaFlujo(estado, u)
   const a = m.trazo / 2
-  return (
-    <g>
-      <rect x={x + a} y={y + a} width={w - 2 * a} height={h - 2 * a} rx={TRAZO.radio * u} {...m.attrs} />
-      <text x={x + w / 2} y={y + h / 2} fontSize={f} fontWeight={600} fill={m.texto} textAnchor="middle"
-            dominantBaseline="central">{hu.id}</text>
-    </g>
-  )
+  return <rect x={x + a} y={y + a} width={w - 2 * a} height={h - 2 * a} rx={TRAZO.radio * u} {...m.attrs} />
 }
 
-/** La ficha de muestra de la leyenda: la misma forma, en gris claro neutro (no es ningún estado: los estados los dicen
- *  los encabezados o la leyenda de estados) y con el prefijo «HU» en vez de una historia real, que se vería repetida. */
-function FichaMuestra({ u, x, y, w, h, f }) {
-  return (
-    <g>
-      <rect x={x} y={y} width={w} height={h} rx={TRAZO.radio * u} fill={PISTA} />
-      <text x={x + w / 2} y={y + h / 2} fontSize={f} fontWeight={600} fill={INK} textAnchor="middle"
-            dominantBaseline="central">{X.muestra}</text>
-    </g>
-  )
-}
-
-const tituloEpica = (e) => `${e.breve}: ${e.nombre}. ${e.hus.map((x) => `${x.id}, ${X.estados[x.grupo]}`).join('; ')}`
-
-// ------------------------------------------------------------------ a · tablero por estado
-
-function medirA(w, h, u) {
+function medir(w, h, u) {
   const n = EPICAS.length
-  const hEnc = entre(0.088 * h, 46 * u, 62 * u)        // encabezado de las columnas
-  const gEnc = 6 * u
-  const R = entre((0.945 * h - hEnc - gEnc) / n, 46 * u, 92 * u)
-  // la fila: título breve (lo que más pesa) y, debajo, el nombre completo en chico; el resto de la fila queda de aire
-  let fT = entre(0.5 * R, 26 * u, 36 * u)
-  let fD = entre(0.34 * R, 20 * u, 24 * u)
-  // de centro a centro de los dos renglones: juntos (son una sola etiqueta) y con aire contra el borde de la franja
-  const sep = () => 0.5 * fT + 0.5 * fD + 1.5 * u
-  while (0.38 * fT + sep() + 0.38 * fD > R - 12 * u && fT > 24 * u) fT -= 0.25 * u
-  const lado = entre(R - 14 * u, 34 * u, 54 * u)        // círculo del número de la épica
-  const xTexto = lado + 16 * u
-  // la ficha deja aire arriba y abajo: las filas se separan y el título de la fila sigue siendo lo que más pesa
-  const hF = entre(R - 20 * u, 30 * u, 50 * u)
-  const gF = 10 * u
-  const pad = 16 * u
+  const hEnc = entre(0.085 * h, 44 * u, 56 * u)       // encabezado de las columnas
+  const gEnc = 8 * u
+  const R = entre((0.9 * h - hEnc - gEnc) / n, 44 * u, 84 * u)
   const fH = tam(24, u)
-  const fN = tam(32, u)
+  const fL = tam(24, u)
+  const pad = 16 * u                                    // sangría del título de la fila y de las fichas en su celda
+  const gF = 12 * u
   const gCol = 12 * u
-  const holgura = GRUPOS.length * 16 * u
-  // fichas y columnas; si no entra todo a lo ancho (4:3), bajan primero el código, después la descripción y el título
-  let fC = tam(R >= 66 * u ? 22 : 20, u)
-  let wF, necesita, T0, suma
-  for (;;) {
-    wF = anchoFicha(fC) + 26 * u
-    necesita = GRUPOS.map((g) => Math.max(
-      MAX_CELDA[g] * wF + (MAX_CELDA[g] - 1) * gF + 2 * pad,
-      ancho(X.columnas[g], fH, 700) + 36 * u + ancho(TOTAL(g), fN, 700) + 2 * pad,
-    ))
-    suma = necesita.reduce((s, y) => s + y, 0) + (GRUPOS.length - 1) * gCol
-    T0 = xTexto + Math.max(...EPICAS.map((e) => Math.max(ancho(e.breve, fT, 700), ancho(e.nombre, fD, 400)))) + 32 * u
-    if (T0 + suma + holgura <= w) break
-    if (fC > 20 * u) fC = 20 * u
-    else if (fD > 20 * u) fD = Math.max(20 * u, fD - 0.5 * u)
-    else if (fT > 26 * u) fT = Math.max(26 * u, fT - 0.5 * u)
-    else break
-  }
+  const hF = entre(R - 18 * u, 26 * u, 42 * u)
+  const minF = 1.2 * hF
+  const maxF = 2.2 * hF
+  // lo mínimo que pide cada columna: sus fichas más angostas y su encabezado
+  const necesita = GRUPOS.map((g) => Math.max(MAX_CELDA[g] * minF + (MAX_CELDA[g] - 1) * gF, ancho(X.columnas[g], fH, 700)) + 2 * pad)
+  const suma = necesita.reduce((s, y) => s + y, 0) + (GRUPOS.length - 1) * gCol
+  // el título de la fila: lo que más pesa; baja hasta 26 u si no entra todo a lo ancho
+  let fT = entre(0.54 * R, 26 * u, 34 * u)
+  const anchoT = (f) => pad + Math.max(...EPICAS.map((e) => ancho(e.breve, f, 700))) + 32 * u
+  while (anchoT(fT) + suma > w && fT > 26 * u) fT = Math.max(26 * u, fT - 0.5 * u)
   // la columna de las épicas se ensancha, si sobra lugar, para que la leyenda de la esquina entre en un renglón
-  const fL = tam(22, u)
-  const conLeyenda = wF + 12 * u + ancho(X.ficha, fL, 400) + 24 * u
-  const tope = w - suma - holgura
-  const T = Math.max(T0, Math.min(conLeyenda, tope))
+  const conLeyenda = pad + maxF + 12 * u + ancho(X.ficha, fL, 400) + 24 * u
+  const T = Math.max(anchoT(fT), Math.min(conLeyenda, w - suma))
   const libre = w - T - (GRUPOS.length - 1) * gCol
   const igual = libre / GRUPOS.length
   const anchos = necesita.every((x) => x <= igual)
@@ -143,149 +80,62 @@ function medirA(w, h, u) {
     : necesita.map((x) => x + (libre - necesita.reduce((s, y) => s + y, 0)) / GRUPOS.length)
   const xs = []
   anchos.reduce((x, a) => { xs.push(x); return x + a + gCol }, T)
-  // la leyenda, en la esquina de arriba a la izquierda: en un renglón si entra, si no en dos
-  const anchoL = T - wF - 12 * u - 24 * u + 1
+  // la ficha: tan ancha como deja la celda más llena, entre 1,2 y 2,2 veces su alto
+  const wF = entre(Math.min(...GRUPOS.map((g, k) => (anchos[k] - 2 * pad - (MAX_CELDA[g] - 1) * gF) / MAX_CELDA[g])),
+    minF, maxF)
+  // la leyenda, en la esquina de arriba a la izquierda: en un renglón si entra; si no, corta después del «=»
+  const anchoL = T - pad - wF - 12 * u - 24 * u + 1
   const igualdad = X.ficha.indexOf(' = ')
   const lineasL = ancho(X.ficha, fL, 400) <= anchoL ? [X.ficha]
-    : igualdad > 0 ? [X.ficha.slice(0, igualdad + 2), X.ficha.slice(igualdad + 3)] // corta después del «=»
-      : parejo(X.ficha, anchoL, fL)
+    : igualdad > 0 ? [X.ficha.slice(0, igualdad + 2), X.ficha.slice(igualdad + 3)]
+      : envolver(X.ficha, anchoL, fL)
   const alto = hEnc + gEnc + n * R
-  return { n, hEnc, gEnc, R, fT, fD, sep: sep(), lado, xTexto, fC, hF, wF, gF, pad, fH, fN, T, anchos, xs, fL, lineasL, alto }
+  return { n, hEnc, gEnc, R, fT, fH, fL, pad, gF, gCol, hF, wF, T, anchos, xs, lineasL, alto }
 }
 
-function DibujoA({ w, h }) {
+function Dibujo({ w, h }) {
   const u = useU()
-  const m = medirA(w, h, u)
+  const m = medir(w, h, u)
   const y0 = Math.max(0, (h - m.alto) / 2)
   const yCuerpo = m.hEnc + m.gEnc
+  const yFila = (i) => yCuerpo + (i + 0.5) * m.R
   const yLey = m.hEnc / 2
-  const hLey = Math.min(m.hF, m.hEnc - 4 * u)
+  const hLey = Math.min(m.hF, m.hEnc - 8 * u)
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
       <g transform={`translate(0,${y0})`}>
-        {/* leyenda: qué es una ficha */}
-        <FichaMuestra u={u} x={0} y={yLey - hLey / 2} w={m.wF} h={hLey} f={m.fC} />
+        {/* leyenda: qué es una ficha. La muestra va en contorno liso, que no es ningún estado (los estados los nombran
+            los encabezados) y no se confunde con las fichas atenuadas de un paso */}
+        <rect x={m.pad + u} y={yLey - hLey / 2 + u} width={m.wF - 2 * u} height={hLey - 2 * u} rx={TRAZO.radio * u}
+              fill="none" stroke={CONTORNO} strokeWidth={TRAZO.contorno * u} />
         {m.lineasL.map((l, i) => (
-          <text key={i} x={m.wF + 12 * u} y={yLey + (i - (m.lineasL.length - 1) / 2) * m.fL * 1.2} fontSize={m.fL}
-                fill={INK} dominantBaseline="central">{l}</text>
+          <text key={i} x={m.pad + m.wF + 12 * u} y={yLey + (i - (m.lineasL.length - 1) / 2) * m.fL * 1.2}
+                fontSize={m.fL} fill={INK} dominantBaseline="central">{l}</text>
         ))}
-        {/* encabezados llenos: el estado y su total */}
-        {GRUPOS.map((g, i) => {
+        {/* filas: franja alterna para leer a qué épica va cada ficha, y la separación de las columnas */}
+        <FranjasFila u={u} x0={m.T - m.gCol} x1={w} y0={yCuerpo} filas={m.n} alto={m.R} desdeX={0} guia={false} />
+        {m.xs.slice(1).map((x, i) => (
+          <line key={i} x1={x - m.gCol / 2} x2={x - m.gCol / 2} y1={yCuerpo} y2={yCuerpo + m.n * m.R} stroke={PISTA}
+                strokeWidth={TRAZO.guia * u} />
+        ))}
+        {EPICAS.map((e, i) => (
+          <text key={e.n} x={m.pad} y={yFila(i)} fontSize={m.fT} fontWeight={700} fill={INK}
+                dominantBaseline="central">{e.breve}</text>
+        ))}
+        {/* una columna por paso: su encabezado lleno (el nombre del estado) y sus fichas */}
+        {GRUPOS.map((g, k) => {
           const f = marcaFlujo(ESTADO_DE[g], u)
           const a = f.trazo / 2
           return (
-            <g key={g}>
-              <path d={rectRedondo(m.xs[i] + a, a, m.anchos[i] - 2 * a, m.hEnc - 2 * a, 6 * u, 'todos')} {...f.attrs} />
-              <text x={m.xs[i] + m.pad} y={m.hEnc / 2} fontSize={m.fH} fontWeight={700} fill={f.texto}
+            <Paso key={g} n={k + 1}>
+              <path d={rectRedondo(m.xs[k] + a, a, m.anchos[k] - 2 * a, m.hEnc - 2 * a, 6 * u, 'todos')} {...f.attrs} />
+              <text x={m.xs[k] + m.pad} y={m.hEnc / 2} fontSize={m.fH} fontWeight={700} fill={f.texto}
                     dominantBaseline="central">{X.columnas[g]}</text>
-              <text x={m.xs[i] + m.anchos[i] - m.pad} y={m.hEnc / 2} fontSize={m.fN} fontWeight={700} fill={f.texto}
-                    textAnchor="end" dominantBaseline="central">{TOTAL(g)}</text>
-            </g>
-          )
-        })}
-        {/* filas: franja alterna y guía de punta a punta, para leer a qué épica va cada ficha */}
-        <FranjasFila u={u} x0={m.T - 12 * u} x1={w} y0={yCuerpo} filas={m.n} alto={m.R} desdeX={0} />
-        {m.xs.slice(1).map((x, i) => (
-          <line key={i} x1={x - 6 * u} x2={x - 6 * u} y1={yCuerpo} y2={yCuerpo + m.n * m.R} stroke={PISTA}
-                strokeWidth={TRAZO.guia * u} />
-        ))}
-        {EPICAS.map((e, i) => {
-          const yc = yCuerpo + (i + 0.5) * m.R
-          return (
-            <g key={e.n}>
-              <title>{tituloEpica(e)}</title>
-              {/* el número de la épica, en contorno: no se confunde con una ficha (que va llena y con código) */}
-              <circle cx={m.lado / 2} cy={yc} r={m.lado / 2 - 1.5 * u} fill={SUP} stroke={INK} strokeWidth={3 * u} />
-              <text x={m.lado / 2} y={yc} fontSize={entre(0.52 * m.lado, 20 * u, 28 * u)} fontWeight={700} fill={INK}
-                    textAnchor="middle" dominantBaseline="central">{fijo(e.n)}</text>
-              <text x={m.xTexto} y={yc - m.sep / 2} fontSize={m.fT} fontWeight={700} fill={INK}
-                    dominantBaseline="central">{e.breve}</text>
-              <text x={m.xTexto} y={yc + m.sep / 2} fontSize={m.fD} fill={CTX} dominantBaseline="central">{e.nombre}</text>
-              {GRUPOS.map((g, k) => e.por[g].map((hu, j) => (
-                <Ficha key={hu.id} u={u} x={m.xs[k] + m.pad + j * (m.wF + m.gF)} y={yc - m.hF / 2} w={m.wF} h={m.hF}
-                       hu={hu} f={m.fC} />
+              {EPICAS.map((e, i) => e.por[g].map((hu, j) => (
+                <Ficha key={hu.id} u={u} x={m.xs[k] + m.pad + j * (m.wF + m.gF)} y={yFila(i) - m.hF / 2} w={m.wF}
+                       h={m.hF} estado={ESTADO_DE[g]} />
               )))}
-            </g>
-          )
-        })}
-      </g>
-    </svg>
-  )
-}
-
-// ------------------------------------------------------------------ b · ocho tarjetas
-
-function medirB(w, h, u) {
-  const nc = 4
-  const nf = Math.ceil(EPICAS.length / nc)
-  const fL = tam(24, u)
-  const hLey = 36 * u
-  const gLey = 24 * u
-  const gx = 14 * u
-  const gy = 22 * u
-  const cw = (w - (nc - 1) * gx) / nc
-  const ch = entre((0.93 * h - hLey - gLey - (nf - 1) * gy) / nf, 170 * u, 290 * u)
-  const hb = entre(0.26 * ch, 52 * u, 70 * u)          // franja del título
-  const fT = entre(0.54 * hb, 26 * u, 36 * u)
-  const pad = 12 * u
-  const gF = 6 * u
-  const lugar = (cw - 2 * pad - (MAX_EPICA - 1) * gF) / MAX_EPICA
-  const fC = tam(ch >= 260 * u && anchoFicha(tam(22, u)) + 20 * u <= lugar ? 22 : 20, u)
-  const wF = Math.min(anchoFicha(fC) + 26 * u, lugar)
-  let fD = entre(0.11 * ch, 20 * u, 24 * u)
-  let hF = entre(0.22 * ch, 36 * u, 60 * u)
-  const lineas = (f) => EPICAS.map((e) => parejo(e.nombre, cw - 2 * pad, f))
-  const cabe = (f, hf) => hb + pad + Math.max(...lineas(f).map((l) => l.length)) * f * 1.25 + pad + hf + pad <= ch
-  while (!cabe(fD, hF) && fD > 20 * u) fD = Math.max(20 * u, fD - 0.5 * u)
-  while (!cabe(fD, hF) && hF > 34 * u) hF = Math.max(34 * u, hF - 1 * u)
-  const r = entre(0.3 * hb, 16 * u, 21 * u)            // disco del número
-  const alto = hLey + gLey + nf * ch + (nf - 1) * gy
-  return { nc, nf, fL, hLey, gLey, gx, gy, cw, ch, hb, fT, pad, fC, gF, wF, fD, hF, r, lineas: lineas(fD), alto }
-}
-
-function DibujoB({ w, h }) {
-  const u = useU()
-  const m = medirB(w, h, u)
-  const y0 = Math.max(0, (h - m.alto) / 2)
-  const ley = GRUPOS.map((g) => ({ marca: ESTADO_DE[g], texto: `${X.columnas[g]}${X.separador}${TOTAL(g)}` }))
-  const yTarjetas = m.hLey + m.gLey
-  const anchoTexto = ancho(X.ficha, m.fL, 400)
-  const hMuestra = Math.min(m.hF, m.hLey)
-  const cabeFicha = anchoLeyenda(u, ley) + 48 * u + m.wF + 12 * u + anchoTexto <= w
-  return (
-    <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
-      <g transform={`translate(0,${y0})`}>
-        {/* leyenda de estados (con su total) y qué es una ficha, con su muestra */}
-        <Leyenda u={u} x={0} y={m.hLey / 2} items={ley} />
-        {cabeFicha && (
-          <g>
-            <FichaMuestra u={u} x={w - anchoTexto - 12 * u - m.wF} y={m.hLey / 2 - hMuestra / 2} w={m.wF} h={hMuestra}
-                          f={m.fC} />
-            <text x={w} y={m.hLey / 2} fontSize={m.fL} fill={INK} textAnchor="end" dominantBaseline="central">{X.ficha}</text>
-          </g>
-        )}
-        {EPICAS.map((e, i) => {
-          const x = (i % m.nc) * (m.cw + m.gx)
-          const y = yTarjetas + Math.floor(i / m.nc) * (m.ch + m.gy)
-          const yF = y + m.ch - m.pad - m.hF
-          return (
-            <g key={e.n}>
-              <title>{tituloEpica(e)}</title>
-              <rect x={x} y={y} width={m.cw} height={m.ch} rx={8 * u} fill={PISTA} fillOpacity={0.4} />
-              <path d={rectRedondo(x, y, m.cw, m.hb, 8 * u, 'arr')} fill={INK} />
-              <circle cx={x + m.pad + m.r} cy={y + m.hb / 2} r={m.r} fill={SUP} />
-              <text x={x + m.pad + m.r} y={y + m.hb / 2} fontSize={entre(1.15 * m.r, 20 * u, 26 * u)} fontWeight={700}
-                    fill={INK} textAnchor="middle" dominantBaseline="central">{fijo(e.n)}</text>
-              <text x={x + m.pad + 2 * m.r + 14 * u} y={y + m.hb / 2} fontSize={m.fT} fontWeight={700} fill={SUP}
-                    dominantBaseline="central">{e.breve}</text>
-              {m.lineas[i].map((l, j) => (
-                <text key={j} x={x + m.pad} y={y + m.hb + m.pad + (j + 0.5) * m.fD * 1.25} fontSize={m.fD} fill={CTX}
-                      dominantBaseline="central">{l}</text>
-              ))}
-              {e.hus.map((hu, j) => (
-                <Ficha key={hu.id} u={u} x={x + m.pad + j * (m.wF + m.gF)} y={yF} w={m.wF} h={m.hF} hu={hu} f={m.fC} />
-              ))}
-            </g>
+            </Paso>
           )
         })}
       </g>
@@ -294,14 +144,9 @@ function DibujoB({ w, h }) {
 }
 
 export default function V12Backlog() {
-  const Dibujo = variante(ID) === 'b' ? DibujoB : DibujoA
   return (
     <Vista id={ID}
-           items={[
-             { clave: 'historias', valor: fijo(A.K02.valor) },
-             { clave: 'criterios', valor: fijo(A.K03.valor) },
-             { clave: 'horas', valor: fijo(A.K07.valor) },
-           ]}
+           items={[{ clave: 'historias', valor: fijo(A.K02.valor) }]}
            cifras={[fijo(A.K04.valor), fijo(A.K05.valor), fijo(A.K06.valor)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>

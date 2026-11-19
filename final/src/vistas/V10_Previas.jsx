@@ -1,204 +1,151 @@
-// V10 · Qué va antes (legal, Tomas F.). Las acciones legales que se hacen antes de la primera lista, una por fila, con la
-// semana del plan en que vence cada una (tabla legal_previas de DF, leída por build_final.py de la tabla «Precondiciones
-// de la primera lista» de la Parte A del E4) y la semana de la primera lista (calendario).
-// (18/11, fase 8, spec 2 V10) El usuario: «la falta de guías visuales como líneas dificulta asignarle al punto una
-// categoría; debe mostrarle el dinamismo de las semanas». Gramática de tiempo de spec 1.4, la misma de V13 y V14:
-//   - eje de semanas arriba, de 1 a la semana de la primera lista, como una tira de cuadros en forma de flecha (el tiempo
-//     avanza a la derecha) con su número y su título; líneas guía verticales en el borde de cada semana;
-//   - una franja por acción (FranjasFila, alternadas) con la acción y su responsable a la izquierda y una guía punteada
-//     de la acción a su hito;
-//   - el hito (rombo en tinta) en la semana en que vence: no hay fecha de comienzo, así que nada se dibuja antes (spec
-//     0.8); desde el hito, la flecha gris «hecha, espera la primera lista» hasta la compuerta;
-//   - la compuerta, el foco y el único acento: la semana de la primera lista llena en ACC en la tira y una barra vertical
-//     fuerte que baja hasta la última fila, a la que llegan las cinco flechas.
-// Leyenda arriba a la izquierda (rombo y flecha; la barra lleva su rótulo encima). Al pasar el mouse por una fila, la franja se realza; al entrar a
-// la vista, los hitos aparecen semana a semana y sus flechas corren a la compuerta (CSS_ENTRADA, abajo). La banda y la
-// conclusión no cambian: puntaje legal (H40), datos personales (tabla legal) y las acciones previas (legal_previas.n).
+// V10 · Qué va antes (legal, Tomas F.). Las acciones legales que se hacen antes de la primera lista, con la semana del
+// plan en que vence cada una (tabla legal_previas de DF, leída por build_final.py de la tabla «Precondiciones de la
+// primera lista» de la Parte A del E4) y la semana de la primera lista (calendario).
+// (19/11, fase 9, spec 4 V10) El usuario: «cada acción espera a la lista como si fueran personas en un equipo cuando en
+// realidad son decisiones escalonadas que para pasar a la siguiente hay que cumplir la anterior». Una escalera:
+//   - un escalón por semana en que vence algo (1, 2 y 4), con sus acciones escritas encima en nombre corto; el escalón
+//     sube desde la semana en que vence (no hay fecha de comienzo: el borde izquierdo es el vencimiento, spec 0.8 de la
+//     fase 8) y llega hasta la semana del escalón siguiente, que no se pisa sin cumplir este;
+//   - arriba de todo, en la semana de la primera lista, el último escalón: la primera lista, el único acento;
+//   - el eje de semanas abajo, con su título. Sin leyenda: cada escalón y la lista llevan su rótulo.
+// Pasos (spec 2): 1, el eje, la primera lista y el escalón de la semana 1; 2 y 3, un escalón cada uno; 4, la capa de
+// responsables (velo claro sobre el dibujo y el nombre debajo de cada acción, en el renglón que el escalón le guarda).
+// La banda lleva solo el puntaje legal (H40); la conclusión, las acciones previas (legal_previas.n) y la semana de la
+// primera lista.
 
-import { useState } from 'react'
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo } from '../../../e3/src/formato.js'
-import { ACC, CTX, EJE, INK, PISTA, SUP, Compuerta, Flecha, FranjasFila, Leyenda, anchoLeyenda, ancho, duro,
-  escalaSemanas, inicial, tam, useU } from '../svg.jsx'
+import { ACC, FIN_GRIS, INK, PISTA, SUP, EjeX, Paso, altoEjeX, ancho, duro, envolver, inicial, tam, useU } from '../svg.jsx'
 
 const ID = 'V10'
 const A = DF.anclas
 const T = DF.tablas
-const X = textosDe(ID)
-const G = X.grafico
-// rotuloQuien: el responsable como rótulo de fila, con mayúscula inicial («Asesor legal de Casa Óga», como «María G.»)
+const TX = textosDe(ID)
+const G = TX.grafico
 const ACCIONES = T.legal_previas.acciones.map((a) => {
-  const t = { ...a, ...X.acciones[a.codigo] }
-  return { ...t, rotuloQuien: inicial(duro(t.quien)) }
+  const t = { ...a, ...TX.acciones[a.codigo] }
+  if (!t.corta || !t.quien) throw new Error(`V10: la acción ${a.codigo} no trae nombre corto o responsable`)
+  return { ...t, quien: inicial(duro(t.quien)) }
 })
 const SEM_LISTA = T.calendario.primera_lista.semana
-const proteccion = T.legal.find((x) => x.id === 'proteccion_datos').puntaje
 const sobre = (n, d = 0) => `${fijo(n, d)}[[/${fijo(T.escala_tecnica.hasta)}]]`
 
-if (ACCIONES.length !== T.legal_previas.n) throw new Error('V10: la tarjeta y el gráfico no cuentan las mismas acciones')
+// Un escalón por semana de vencimiento, en orden; cada uno con sus acciones en el orden de la tabla. El escalón i se
+// enciende en el paso i; la capa de responsables, en el paso siguiente al último escalón.
+const SEMANAS = [...new Set(ACCIONES.map((a) => a.semana))].sort((a, b) => a - b)
+const ESCALONES = SEMANAS.map((s, i) => ({
+  semana: s, hasta: SEMANAS[i + 1] ?? SEM_LISTA, nivel: i + 1, acciones: ACCIONES.filter((a) => a.semana === s),
+}))
+const NIVELES = ESCALONES.length + 1
+const PASO_CAPA = ESCALONES.length + 1
 
-export const meta = { id: ID }
+if (ACCIONES.length !== T.legal_previas.n) throw new Error('V10: la conclusión y el gráfico no cuentan las mismas acciones')
+if (SEMANAS[SEMANAS.length - 1] >= SEM_LISTA) throw new Error('V10: una acción previa vence después de la primera lista')
+
+export const meta = { id: ID, pasos: PASO_CAPA }
 
 // Medidas en u.
 const M = {
-  accion: 26, quien: 24, numero: 24, titulo: 22, primera: 26,
-  pad: 16, hueco: 64, tira: 40, pico: 14, barra: 12, rombo: 36, flecha: 18, punta: 22,
+  accion: 26, accionMin: 24, quien: 24, primera: 26,
+  margen: 14, remate: 64, hueco: 4, borde: 6,
+  padL: 14, padR: 8, padT: 12, padB: 8, entre: 10, nivelMax: 175,
 }
 const LLENA = 0.9
+const VELO = 0.5
+const INTER_A = 1.15
+const INTER_Q = 1.2
 
-// Entrada (solo en pantalla y sin movimiento reducido; impresión y capturas ven el estado final): la barra de la
-// compuerta baja desde la semana de la primera lista, después cada hito aparece en el orden de su semana y su flecha
-// corre hasta la compuerta. Dura menos de un segundo y medio. ANIMAR = false la apaga.
-const ANIMAR = false
-const CSS_ENTRADA = `@media screen and (prefers-reduced-motion: no-preference) {
-  .v10-compuerta { animation: v10-baja 420ms cubic-bezier(.33, 1, .68, 1) both; transform-box: fill-box; transform-origin: center top; }
-  .v10-hito { animation: v10-entra 380ms cubic-bezier(.16, 1, .3, 1) var(--d) both; transform-box: fill-box; transform-origin: center; }
-  .v10-flecha { animation: v10-crece 560ms cubic-bezier(.33, 1, .68, 1) var(--d) both; transform-box: fill-box; transform-origin: left center; }
-}
-@keyframes v10-baja { from { transform: scaleY(0); } to { transform: none; } }
-@keyframes v10-entra { from { opacity: 0; transform: scale(.2); } to { opacity: 1; transform: none; } }
-@keyframes v10-crece { from { transform: scaleX(0); } to { transform: none; } }`
-/** Demora de la entrada de un hito (s), por su semana; la flecha sale 0,18 s después. */
-const demora = (semana) => 0.3 + (semana - 1) * 0.16
-
-/** Muestras de la leyenda: el rombo del hito en tinta y la flecha gris. La compuerta no va en la leyenda: lleva su rótulo
- *  («Primera lista») encima, y repetirlo en la leyenda, en el mismo renglón, se leía dos veces. */
-const muestraRombo = ({ u, x, y, s }) => <Compuerta u={u} x={x} y={y} s={s / u} estado="curso" />
-const muestraFlecha = ({ u, x, y, s }) => (
-  <Flecha u={u} x1={x - s * 0.8} x2={x + s / 2} y={y} grosor={s / u / 2} punta={s / u / 2.2} estado="contexto" />
-)
-
-/** Tira de semanas: un cuadro en forma de flecha por semana, con su número; la semana de la compuerta llena en ACC con el
- *  número en blanco. */
-function TiraSemanas({ u, S, y, alto, foco }) {
-  const k = M.pico * u
-  const sep = 4 * u
-  const f = tam(M.numero, u)
-  return (
-    <g aria-hidden="true">
-      {Array.from({ length: S.n }, (_, i) => i + 1).map((s) => {
-        const xa = S.inicio(s) + sep / 2
-        const xb = S.fin(s) - sep / 2
-        const ym = y + alto / 2
-        const muesca = s === 1 ? 0 : k
-        const d = `M${xa} ${y} H${xb - k} L${xb} ${ym} L${xb - k} ${y + alto} H${xa} L${xa + muesca} ${ym} Z`
-        const es = s === foco
-        return (
-          <g key={s}>
-            <path d={d} fill={es ? ACC : PISTA} />
-            <text x={(xa + muesca + xb - k) / 2 + k / 2} y={ym} fontSize={f} fontWeight={es ? 700 : 400}
-                  fill={es ? SUP : INK} textAnchor="middle" dominantBaseline="central">{fijo(s)}</text>
-          </g>
-        )
-      })}
-    </g>
-  )
+/** Los renglones de un escalón con la letra f: por acción, su nombre (hasta dos renglones) y debajo el renglón del
+ *  responsable. alto: lo que ocupan; entra: si cada renglón cabe en el ancho. */
+function renglones(e, f, fQ, wi, u) {
+  const out = []
+  let y = 0
+  let entra = true
+  e.acciones.forEach((a, j) => {
+    if (j) y += M.entre * u
+    const lineas = envolver(a.corta, wi, f, 600)
+    if (lineas.length > 2 || lineas.some((l) => ancho(l, f, 600) > wi)) entra = false
+    for (const l of lineas) {
+      out.push({ t: l, y, quien: false })
+      y += f * INTER_A
+    }
+    out.push({ t: a.quien, y, quien: true })
+    y += fQ * INTER_Q
+  })
+  return { lineas: out, alto: y, entra }
 }
 
 function Dibujo({ w, h }) {
   const u = useU()
-  const [sobreFila, setSobreFila] = useState(-1)
-  const fA = tam(M.accion, u)
   const fQ = tam(M.quien, u)
-  const fT = tam(M.titulo, u)
   const fP = tam(M.primera, u)
-  const pad = M.pad * u
+  const hEje = altoEjeX(u)
 
-  // columna de acciones: la acción más larga (o su responsable) y el hueco mínimo para la guía punteada
-  const anchoAccion = (a) => ancho(a.que, fA, 600)
-  const col = pad + Math.max(...ACCIONES.map((a) => Math.max(anchoAccion(a), ancho(a.rotuloQuien, fQ, 400))))
-  const x0 = col + M.hueco * u
-  // el rótulo de la compuerta, centrado en la semana de la primera lista, entra en el lienzo
-  const anchoPrimera = ancho(G.primera, fP, 700)
-  const colW = Math.min((w - x0) / SEM_LISTA, (w - x0 - anchoPrimera / 2) / (SEM_LISTA - 0.5))
-  const S = escalaSemanas({ x0, x1: x0 + colW * SEM_LISTA, desde: 1, hasta: SEM_LISTA })
-  const xG = S.centro(SEM_LISTA)
+  // semanas: la 1 a M.margen del borde y la de la primera lista dejando el ancho del último escalón
+  const xL = M.margen * u
+  const col = (w - xL - M.remate * u) / (SEM_LISTA - 1)
+  const xSem = (s) => xL + (s - 1) * col
 
-  // leyenda arriba a la izquierda; si no entra antes del rótulo de la compuerta, va debajo de las filas
-  const ley = [
-    { marca: muestraRombo, texto: G.ley.vence },
-    { marca: muestraFlecha, texto: G.ley.hecha },
-  ]
-  const leyArriba = anchoLeyenda(u, ley) + 32 * u <= xG - anchoPrimera / 2
+  // alto de un nivel: los niveles y el eje llenan LLENA del lienzo (con un tope, para las ventanas altas)
+  const nivel = Math.min(M.nivelMax * u, (LLENA * h - hEje) / NIVELES)
+  const ancho1 = (e) => xSem(e.hasta) - xSem(e.semana) - M.hueco * u - (M.padL + M.padR) * u
+  const altoLibre = (e) => e.nivel * nivel - (M.borde + M.padT + M.padB) * u
 
-  // alto: renglón de leyenda y rótulo, tira de semanas y las filas, que reparten LLENA del lienzo
-  const hCab = fP * 1.3
-  const hTira = M.tira * u
-  const hLeyAbajo = leyArriba ? 0 : 24 * u + fT * 1.3
-  const bloque = fA * 1.2 + 6 * u + fQ
-  const cab = hCab + 10 * u + hTira + 10 * u
-  const n = ACCIONES.length
-  const alto = Math.max(bloque + 14 * u, Math.min(140 * u, (LLENA * h - cab - hLeyAbajo) / n))
-  const total = cab + alto * n + hLeyAbajo
+  // la letra de las acciones: la más grande, de 26 u a 24 u, con la que todos los escalones entran
+  let fA = tam(M.accionMin, u)
+  for (let f = M.accion * u; f >= M.accionMin * u; f -= 0.25 * u) {
+    if (ESCALONES.every((e) => { const r = renglones(e, f, fQ, ancho1(e), u); return r.entra && r.alto <= altoLibre(e) })) {
+      fA = f
+      break
+    }
+  }
+
+  const total = NIVELES * nivel + hEje
   const yTop = Math.max(0, (h - total) / 2)
-  const yTira = yTop + hCab + 10 * u
-  const yFilas = yTira + hTira + 10 * u
-  const yFin = yFilas + alto * n
-  const xFin = S.fin(SEM_LISTA)
+  const yBase = yTop + NIVELES * nivel
+  const techo = (k) => yBase - k * nivel
+  const xLista = xSem(SEM_LISTA)
 
-  // títulos de la columna y del eje, en el renglón de la tira
-  const yT = yTira + hTira / 2
-  const titCol = pad + ancho(G.columna, fT, 600) + 24 * u <= x0 - 22 * u - ancho(G.eje, fT, 600)
-
-  const filas = ACCIONES.map((a, i) => {
-    const yb = yFilas + i * alto + (alto - bloque) / 2
-    return { ...a, i, yA: yb + fA * 0.6, yQ: yb + fA * 1.2 + 6 * u, xS: S.centro(a.semana) }
+  const esc = ESCALONES.map((e) => {
+    const x0 = xSem(e.semana)
+    const x1 = xSem(e.hasta) - M.hueco * u
+    const y0 = techo(e.nivel)
+    const r = renglones(e, fA, fQ, ancho1(e), u)
+    const yT = y0 + (M.borde + M.padT) * u
+    return { ...e, x0, x1, y0, xT: x0 + M.padL * u, lineas: r.lineas.map((l) => ({ ...l, y: yT + l.y })) }
   })
-  const r = (M.rombo * u) / 2
 
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
-      {ANIMAR && <style>{CSS_ENTRADA}</style>}
-      <FranjasFila u={u} x0={0} x1={xFin} y0={yFilas} filas={n} alto={alto} desdeX={0} guia={false} foco={sobreFila} />
-      {/* guías verticales en el borde de cada semana */}
-      {Array.from({ length: SEM_LISTA + 1 }, (_, i) => i + 1).map((s) => (
-        <line key={s} x1={S.inicio(s)} x2={S.inicio(s)} y1={yTira + hTira} y2={yFin} stroke={PISTA} strokeWidth={1.5 * u} />
+      {/* los escalones: el bloque, el borde de arriba y las acciones */}
+      {esc.map((e) => (
+        <Paso key={e.semana} n={e.nivel}>
+          <rect x={e.x0} y={e.y0} width={e.x1 - e.x0} height={yBase - e.y0} fill={PISTA} />
+          <rect x={e.x0} y={e.y0} width={e.x1 - e.x0} height={M.borde * u} fill={FIN_GRIS} />
+          {e.lineas.filter((l) => !l.quien).map((l, i) => (
+            <text key={i} x={e.xT} y={l.y} fontSize={fA} fontWeight={600} fill={INK} dominantBaseline="hanging">{l.t}</text>
+          ))}
+        </Paso>
       ))}
 
-      {/* cabecera: leyenda, rótulo de la compuerta, títulos y tira de semanas */}
-      {leyArriba && <Leyenda u={u} x={0} y={yTop + hCab / 2} items={ley} />}
-      <text x={xG} y={yTop + hCab / 2} fontSize={fP} fontWeight={700} fill={INK} textAnchor="middle"
+      {/* la primera lista: el último escalón, en el acento, con su rótulo al lado */}
+      <rect x={xLista} y={techo(NIVELES)} width={w - xLista} height={yBase - techo(NIVELES)} fill={ACC} />
+      <text x={xLista - 14 * u} y={techo(NIVELES) + nivel / 2} fontSize={fP} fontWeight={700} fill={INK} textAnchor="end"
             dominantBaseline="central">{G.primera}</text>
-      {titCol && (
-        <text x={pad} y={yT} fontSize={fT} fontWeight={600} fill={CTX} dominantBaseline="central">{G.columna}</text>
-      )}
-      <text x={x0 - 22 * u} y={yT} fontSize={fT} fontWeight={600} fill={CTX} textAnchor="end"
-            dominantBaseline="central">{G.eje}</text>
-      <TiraSemanas u={u} S={S} y={yTira} alto={hTira} foco={SEM_LISTA} />
 
-      {/* filas: acción, responsable, guía punteada, hito y flecha hasta la compuerta */}
-      {filas.map((a) => {
-        const xGuia = pad + anchoAccion(a) + 14 * u
-        return (
-          <g key={a.codigo} onMouseEnter={() => setSobreFila(a.i)} onMouseLeave={() => setSobreFila(-1)}>
-            <title>{G.ayuda(a.que, a.semana, a.quien)}</title>
-            <rect x={0} y={yFilas + a.i * alto} width={xFin} height={alto} fill="transparent" />
-            <text x={pad} y={a.yA} fontSize={fA} fontWeight={600} fill={INK} dominantBaseline="central">{a.que}</text>
-            <text x={pad} y={a.yQ} fontSize={fQ} fill={CTX} dominantBaseline="hanging">{a.rotuloQuien}</text>
-            {a.xS - r - 8 * u > xGuia && (
-              <line x1={xGuia} x2={a.xS - r - 8 * u} y1={a.yA} y2={a.yA} stroke={EJE} strokeWidth={2 * u}
-                    strokeDasharray={`${0.1 * u} ${7 * u}`} strokeLinecap="round" />
-            )}
-            {xG - a.xS > r && (
-              <g className="v10-flecha" style={{ '--d': `${demora(a.semana) + 0.18}s` }}>
-                <Flecha u={u} x1={a.xS} x2={xG - (M.barra * u) / 2} y={a.yA} grosor={M.flecha} punta={M.punta}
-                        estado="contexto" />
-              </g>
-            )}
-            <g className="v10-hito" style={{ '--d': `${demora(a.semana)}s` }}>
-              <Compuerta u={u} x={a.xS} y={a.yA} s={M.rombo} estado="curso" />
-            </g>
-          </g>
-        )
-      })}
+      <EjeX u={u} x0={0} x1={w} y={yBase} min={1 - xL / col} max={1 + (w - xL) / col}
+            marcas={Array.from({ length: SEM_LISTA }, (_, i) => i + 1)} titulo={G.eje} />
 
-      {/* la compuerta: barra vertical en ACC desde la semana de la primera lista hasta la última fila */}
-      <rect className="v10-compuerta" x={xG - (M.barra * u) / 2} y={yTira + hTira} width={M.barra * u}
-            height={yFin - yTira - hTira} fill={ACC} />
-
-      {!leyArriba && <Leyenda u={u} x={0} y={yFin + 24 * u + (fT * 1.3) / 2} items={ley} />}
+      {/* la capa de responsables: velo claro sobre el dibujo y el nombre debajo de cada acción */}
+      <Paso n={PASO_CAPA} oculto>
+        <rect x={0} y={yTop} width={w} height={total} fill={SUP} fillOpacity={VELO} />
+        {esc.flatMap((e) => e.lineas.filter((l) => l.quien).map((l, i) => (
+          <text key={`${e.semana}-${i}`} x={e.xT} y={l.y} fontSize={fQ} fontWeight={700} fill={INK}
+                dominantBaseline="hanging">{l.t}</text>
+        )))}
+      </Paso>
     </svg>
   )
 }
@@ -206,11 +153,7 @@ function Dibujo({ w, h }) {
 export default function V10Previas() {
   return (
     <Vista id={ID}
-           items={[
-             { clave: 'puntaje', valor: sobre(A.H40.valor, 1) },
-             { clave: 'proteccion', valor: sobre(proteccion) },
-             { clave: 'previas', valor: fijo(T.legal_previas.n) },
-           ]}
+           items={[{ clave: 'puntaje', valor: sobre(A.H40.valor, 1) }]}
            cifras={[fijo(T.legal_previas.n), fijo(SEM_LISTA)]}>
       {({ w, h }) => <Dibujo w={w} h={h} />}
     </Vista>
