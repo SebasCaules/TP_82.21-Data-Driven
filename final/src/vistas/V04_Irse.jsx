@@ -11,6 +11,11 @@
 // Pasos (spec 2): un escalón por paso, de lejos a cerca. Los ejes y el umbral están desde el paso 1.
 // Ninguna cifra nueva: las tasas son las de la tabla (las mismas que F04.menos30, F04.30a59 y F04.60a89).
 // (19/11, revisión) El título del eje X dice «les faltan», en plural como el eje Y y como lo dice el orador.
+// (19/11, fase 10, regla 1) Los escalones que faltan son boceto: solo la forma, tenue, sin su porcentaje (el <text> del
+// Paso no se ve hasta su paso). Lo que se ve siempre queda fuera de todo Paso: los dos ejes con sus marcas y títulos (los
+// días del eje X son los límites de los tramos) y la línea del umbral con su rótulo. El escalón más cercano pasa al acento
+// solo encendido: en boceto el acento se vería como un gris más oscuro y adelantaría el foco. Sin pastillas ni fondos de
+// rótulo (nada que marcar con data-txt) y sin movimiento propio: cada paso enciende su escalón con la transición de Paso.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -50,8 +55,8 @@ const partes = (t) => {
   return i < 0 ? [t, ''] : [t.slice(0, i), t.slice(i)]
 }
 
-/** Un escalón: la columna y su porcentaje arriba, encendidos en el paso `n`. El foco va en el acento solo encendido:
- *  atenuado, se ve como los otros escalones que todavía no se dijeron. */
+/** Un escalón: la columna y su porcentaje arriba, encendidos en el paso `n`. Antes, boceto: la columna tenue y el
+ *  porcentaje sin verse. El foco va en el acento solo encendido: en boceto se ve como los otros escalones que faltan. */
 function Escalon({ u, n, x, w, yBase, alto, foco, texto, f, fu, halo }) {
   const encendido = useEstadoPaso(n) === 'on'
   const [num, uni] = partes(texto)

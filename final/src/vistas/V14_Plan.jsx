@@ -18,6 +18,10 @@
 // Pasos (las notas: «6 fases en 28 semanas», «la primera lista sale en la semana 6», «la decisión es en la semana 28»):
 //   1. la preparación (las fases que terminan antes de la primera lista), con el eje; 2. el piloto y la primera lista;
 //   3. la medición, el informe preliminar y la decisión; 4. la capa de responsables.
+// (19/11, fase 10, spec 2 y fila V14: «Boceto: las fases que faltan, sin nombre; los hitos, en su paso») Las fases que
+// faltan son boceto de Paso (la flecha tenue, sin nombre; el fondo del nombre lleva data-txt). Los hitos (rombo, rótulo,
+// pastilla y la barra de la decisión) no se bocetan: están ocultos y entran en su paso, después de su flecha (orden). La
+// capa de responsables entra en el paso 4: primero el velo y después los nombres, de a uno (orden), en menos de 1 s.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -48,6 +52,9 @@ const HITOS = [
   { clave: 'preliminar', semana: CAL.preliminar.semana },
   { clave: 'decision', semana: SEM_DEC, dec: true },
 ].map((x) => ({ ...x, texto: G.hitos[x.clave], paso: pasoDe(x.semana) }))
+  // orden de entrada dentro de su paso: 200 ms después de que se enciende la flecha, y 200 ms entre hito e hito (el último
+  // del paso 3, la decisión, termina a los 720 ms)
+  .map((x, i, todos) => ({ ...x, orden: 2 + 2 * todos.slice(0, i).filter((o) => o.paso === x.paso).length }))
 
 for (const x of HITOS) {
   if (!Number.isInteger(x.semana) || x.semana < 1 || x.semana > SEM) throw new Error(`V14: el hito «${x.clave}» no cae en una semana del plan`)
@@ -84,12 +91,13 @@ const LLENA = 0.9
 /** Opacidad del velo de la capa de responsables: las flechas se siguen leyendo debajo y los nombres quedan encima. */
 const VELO = 0.45
 
-/** Pastilla llena en ACC con el texto en blanco, centrada en (x, y): el rótulo de la decisión. */
+/** Pastilla llena en ACC con el texto en blanco, centrada en (x, y): el rótulo de la decisión (data-txt: existe para
+ *  sostener su texto). */
 const medidaPastilla = (texto, f, u) => ({ w: ancho(texto, f, 700) + 32 * u, h: f * 1.55 })
 function Pastilla({ u, x, y, texto, f }) {
   const p = medidaPastilla(texto, f, u)
   return (
-    <g>
+    <g data-txt="">
       <rect x={x - p.w / 2} y={y - p.h / 2} width={p.w} height={p.h} rx={p.h / 2} fill={ACC} />
       <text x={x} y={y} fontSize={f} fontWeight={700} fill={SUP} textAnchor="middle" dominantBaseline="central">{texto}</text>
     </g>
@@ -186,8 +194,9 @@ function Dibujo({ w, h }) {
         <Paso key={f.n} n={f.paso}>
           <Flecha u={u} x1={f.x1} x2={f.x2} y={yc(f.i)} grosor={t / u} punta={M.punta} estado="curso" />
           {!f.dentro && (
-            // fondo del nombre con el color de su franja: las guías no le pasan por detrás a la letra
-            <g>
+            // fondo del nombre con el color de su franja: las guías no le pasan por detrás a la letra (data-txt: en el
+            // boceto no queda una caja vacía)
+            <g data-txt="">
               <rect x={f.xt - 6 * u} y={yc(f.i) - fF * 0.62} width={f.wN + 12 * u} height={fF * 1.24} fill={SUP} />
               {f.i % 2 === 0 && (
                 <rect x={f.xt - 6 * u} y={yc(f.i) - fF * 0.62} width={f.wN + 12 * u} height={fF * 1.24} fill={PISTA}
@@ -199,9 +208,10 @@ function Dibujo({ w, h }) {
         </Paso>
       ))}
 
-      {/* hitos: rombo encima del número de su semana y el rótulo arriba; la decisión, en ACC con su barra */}
+      {/* hitos: rombo encima del número de su semana y el rótulo arriba; la decisión, en ACC con su barra. Ocultos hasta
+          su paso; entran después de la flecha que se enciende con ellos, la decisión al final */}
       {rot.map((x) => (
-        <Paso key={x.clave} n={x.paso}>
+        <Paso key={x.clave} n={x.paso} oculto orden={x.orden}>
           {x.dec && <rect x={xDec - mBarra} y={y0} width={M.barra * u} height={yFin - y0} fill={ACC} />}
           {x.dec
             ? <Pastilla u={u} x={x.xc} y={yLab} texto={x.texto} f={fH} />
@@ -212,15 +222,18 @@ function Dibujo({ w, h }) {
       ))}
 
       {/* capa de responsables (último paso): un velo claro sobre las filas, con borde, como papel de calcar (el eje y los
-          hitos quedan nítidos), y el nombre de cada responsable a la izquierda de su fila */}
+          hitos quedan nítidos), y el nombre de cada responsable a la izquierda de su fila. Entra el velo y después los
+          nombres, de a uno */}
       <Paso n={CAPA} oculto>
         <rect x={TRAZO.guia * u} y={y0 - 10 * u} width={w - 2 * TRAZO.guia * u} height={yFin - y0 + 20 * u} rx={8 * u}
               fill={SUP} fillOpacity={VELO} stroke={EJE} strokeWidth={TRAZO.guia * u} />
-        {filas.map((f) => (
-          <text key={f.n} x={xTit} y={yc(f.i)} fontSize={fQ} fontWeight={700} fill={INK} textAnchor="end"
-                dominantBaseline="central">{duro(f.responsable)}</text>
-        ))}
       </Paso>
+      {filas.map((f) => (
+        <Paso key={`q${f.n}`} n={CAPA} oculto orden={f.i + 1}>
+          <text x={xTit} y={yc(f.i)} fontSize={fQ} fontWeight={700} fill={INK} textAnchor="end"
+                dominantBaseline="central">{duro(f.responsable)}</text>
+        </Paso>
+      ))}
     </svg>
   )
 }

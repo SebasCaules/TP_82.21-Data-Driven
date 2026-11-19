@@ -11,6 +11,9 @@
 // junto a su rombo). En cada escalón, nombre, una línea y a lo sumo un costo. Avance en cuatro pasos, una
 // etapa por paso, en el orden en que habla el orador: la PoC; el MVP y el marcador; la primera compuerta y la operación
 // mínima; la segunda compuerta y la producción completa. Lo que falta se ve atenuado (Paso).
+// (19/11, fase 10, spec 4 V13) Lo que falta es boceto: el contorno de cada escalón, los tramos punteados, los rombos y la
+// punta, sin ningún texto (nombre, línea, costo y condición aparecen en su paso, lo resuelve Paso). Las dos pastillas
+// («hecha» y «estamos aquí») llevan data-txt: en boceto no quedan como cápsulas vacías. La forma no cambia.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
@@ -92,7 +95,7 @@ function AquiIzq({ u, x, y, texto, f }) {
   const pico = 10 * u
   const xr = x - pico
   return (
-    <g>
+    <g data-txt="">
       <path d={`M${xr} ${y - pico} L${x} ${y} L${xr} ${y + pico} Z`} fill={INK} />
       <rect x={xr - w} y={y - h / 2} width={w + 1} height={h} rx={h / 2} fill={INK} />
       <text x={xr - w / 2} y={y} fontSize={f} fontWeight={600} fill={SUP} textAnchor="middle"
@@ -186,7 +189,7 @@ function Escalera({ w, h }) {
           <Paso key={p.nombre} n={i + 1}>
             <CajaFlujo u={u} x={x0} y={tops[i]} w={P.bw} h={yB - tops[i]} estado={p.flujo} />
             {p.marca && (
-              <g>
+              <g data-txt="">
                 <rect x={xt} y={yMarca} width={ancho(G.hecha, fM, 700) + 28 * u} height={hMarca} rx={hMarca / 2} fill={SUP} />
                 <text x={xt + 14 * u} y={yMarca + hMarca / 2} fontSize={fM} fontWeight={700} fill={INK}
                       dominantBaseline="central">{G.hecha}</text>

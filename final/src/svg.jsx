@@ -123,7 +123,7 @@ export function letra(alto, h, desde, u) {
 }
 
 /** El dueño con un espacio duro antes de cada inicial («Sebastian C.»): el renglón no deja la inicial sola. */
-export const duro = (t) => String(t).replace(/ (\p{Lu}\.)/gu, ' $1')
+export const duro = (t) => String(t).replace(/ (\p{Lu}\.)/gu, '\u00a0$1')
 
 // ---------------------------------------------------------------- marcas (spec b.5 y f)
 

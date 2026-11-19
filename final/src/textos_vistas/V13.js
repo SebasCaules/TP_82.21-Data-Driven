@@ -4,6 +4,7 @@
 // (en el orden de etapas de CF; reemplaza al `que` de CF en pantalla) y el rótulo de cada costo (la cifra sale de DF).
 // Los nombres de las etapas y las condiciones de las compuertas son los `nombre` y `estado` de las etapas de CF («si una
 // rama pasa», «si el efecto la paga»). Sin leyenda: cada estado tiene su rótulo directo.
+// (19/11, fase 10) Sin textos nuevos: en el boceto ninguno de estos se ve; cada uno aparece en el paso de su etapa.
 
 export default {
   grafico: {

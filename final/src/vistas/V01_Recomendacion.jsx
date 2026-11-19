@@ -6,8 +6,12 @@
 // sin leyenda. Las tres a escala real: la del beneficio es un trazo fino con su número.
 // Pasos (las notas: «USD 4.485 en un piloto…», después «la lista deja USD 265 por año y cuesta USD 20.260 el primero»):
 //   1. los dos costos, con el eje; 2. lo que deja la lista.
+// (19/11, fase 10, regla 1) En el paso 1 la tercera barra es boceto: solo su forma (el contorno a escala, tenue), sin
+// rótulo ni cifra; los dos aparecen en el paso 2. El eje queda fuera de todo Paso. El globo (<title>) de cada barra existe
+// recién cuando su paso llega: si no, el puntero mostraría la cifra del boceto.
 
 import Vista from '../Plantilla.jsx'
+import { usePaso } from '../pasos.js'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo, usd } from '../../../e3/src/formato.js'
@@ -39,6 +43,7 @@ function Contorno({ u, x, y, w, h }) {
 
 function Dibujo({ w, h }) {
   const u = useU()
+  const paso = usePaso()
   const fRot = tam(28, u)
   const fVal = tam('val', u)
   const fFoco = tam('valFoco', u)
@@ -76,7 +81,7 @@ function Dibujo({ w, h }) {
         const largoB = esc(f.valor)
         return (
           <Paso key={f.clave} n={f.paso}>
-            <title>{`${f.etiqueta} · ${f.texto}`}</title>
+            {paso >= f.paso && <title>{`${f.etiqueta} · ${f.texto}`}</title>}
             <text x={x0 - 28 * u} y={yc} fontSize={fRot} fontWeight={f.foco ? 700 : 400} fill={f.foco ? INK : CTX}
                   textAnchor="end" dominantBaseline="central">{f.etiqueta}</text>
             {f.contorno

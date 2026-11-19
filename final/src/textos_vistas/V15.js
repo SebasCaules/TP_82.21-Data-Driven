@@ -1,4 +1,5 @@
-// Textos de V15 (fase 8; 19/11, fase 9: menos información), mezclados en textosDe('V15'). El cierre a pantalla completa:
+// Textos de V15 (fase 8; 19/11, fase 9: menos información; fase 10: vuelve el esqueleto, el título y la cita los pone el
+// encabezado de App.jsx), mezclados en textosDe('V15'). El cierre:
 // el recorrido (una estación por sección, con su cifra y una línea; el número y el nombre los pone la vista desde el
 // rótulo del riel de su bloque, «1 · Datos»), lo que nos llevamos (el balance de contenido_final.js), lo que pedimos y
 // por qué con este equipo. Las cifras salen de DF con formato.js.
@@ -12,11 +13,11 @@ const SEM_ACUERDO = T.plan.hitos.find((h) => h.n === 1).semana
 
 export default {
   mide: 'Cierre: el recorrido, lo que nos llevamos y lo que pedimos',
-  marca: 'Casa Óga',
   llevamos: 'Lo que nos llevamos',
   pedimos: 'Lo que pedimos',
-  // los dibujos de las estaciones no llevan rótulos: el acento es lo que cuenta la cifra de la estación
-  ley: { cifra: 'lo que mide la cifra', resto: 'el resto' },
+  // los dibujos de las estaciones no llevan rótulos: el acento es lo que cuenta la cifra de la estación. Corto: la
+  // leyenda va en el hueco angosto junto a la estación 4
+  ley: { cifra: 'la cifra', resto: 'el resto' },
   // una línea por estación, debajo de su cifra. Datos: 27.276 son las ventas con cliente y monto positivo (C20.positivas;
   // con cliente son 27.606); se nombran como en V02, «base de la lista»
   piezas: {

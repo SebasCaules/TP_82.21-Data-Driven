@@ -9,12 +9,17 @@
 // Pasos, en el orden de las notas: 1 el extracto; 2 lo que sale sin ser venta de un cliente (repetidas y sin cliente);
 // 3 las compras devueltas y lo que entra a la lista. La banda (C19) y la conclusión están desde el inicio. Los textos, en
 // textos_vistas/V02.js.
+// (19/11, fase 10, spec 4 V02) Boceto: antes de su paso, las bandas y las salidas que faltan son solo su forma (lo
+//   resuelve Paso: tenues, sin acento y sin texto); 250, 22.394, 330 y 27.276 y los nombres de etapa aparecen en su paso.
+//   El eje y su título van fuera de todo Paso. El <title> de cada forma (el globo al pasar el mouse) existe solo desde su
+//   paso, para que ninguna cifra se adelante.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo, pct } from '../../../e3/src/formato.js'
 import { useU } from '../escala.js'
+import { usePasos } from '../pasos.js'
 import { ACC, CTX, FIN_GRIS, INK, SUP, EjeY, Paso, escalaLinda, margenEjeY, tam } from '../svg.jsx'
 
 const ID = 'V02'
@@ -77,6 +82,8 @@ function Salida({ u, s, r, yE }) {
 
 function Flujo({ w, h }) {
   const u = useU()
+  const { paso, completa } = usePasos()
+  const ya = (k) => completa || paso >= k
   const fEt = tam('cat', u)
   const fNum = tam(40, u)
   const fFin = tam(52, u)
@@ -133,7 +140,7 @@ function Flujo({ w, h }) {
       {/* salidas primero, con su cantidad debajo */}
       {salidas.map((s, i) => (
         <Paso key={`s${i}`} n={PASO_SALIDA[i]}>
-          <title>{`${filas(s.n)} ${F.salidas[i]}`}</title>
+          {ya(PASO_SALIDA[i]) && <title>{`${filas(s.n)} ${F.salidas[i]}`}</title>}
           <Salida u={u} s={s} r={r} yE={yE} />
           <text x={s.xc} y={yE + 10 * u} fontSize={fSal} fontWeight={700} fill={INK} textAnchor="middle"
                 dominantBaseline="hanging">{filas(s.n)}</text>
@@ -149,7 +156,7 @@ function Flujo({ w, h }) {
         const hh = alto(QUEDAN[i])
         return (
           <Paso key={`e${i}`} n={PASO_ETAPA[i]}>
-            <title>{`${F.etapas[i]} · ${filas(QUEDAN[i])}`}</title>
+            {ya(PASO_ETAPA[i]) && <title>{`${F.etapas[i]} · ${filas(QUEDAN[i])}`}</title>}
             <rect x={x0} y={yT} width={x1 - x0} height={hh} fill={FIN_GRIS} />
             {i === 0 && (
               <text x={(x0 + x1) / 2} y={yT + hh / 2} fontSize={fNum} fontWeight={700} fill={INK} textAnchor="middle"
@@ -162,7 +169,7 @@ function Flujo({ w, h }) {
 
       {/* lo que entra a la lista */}
       <Paso n={PASO_ETAPA[3]}>
-        <title>{`${F.etapas[3]} · ${filas(QUEDAN[3])} ${F.final}`}</title>
+        {ya(PASO_ETAPA[3]) && <title>{`${F.etapas[3]} · ${filas(QUEDAN[3])} ${F.final}`}</title>}
         <path d={`M${xF0} ${yT} H${w - pF} L${w} ${yT + hF / 2} L${w - pF} ${yT + hF} H${xF0} Z`} fill={ACC} />
         <text x={xFc} y={yT + hF / 2 - fFinT * 0.55} fontSize={fFin} fontWeight={700} fill={SUP}
               textAnchor="middle" dominantBaseline="central">{filas(QUEDAN[3])}</text>

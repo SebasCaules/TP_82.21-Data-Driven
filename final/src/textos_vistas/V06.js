@@ -1,6 +1,7 @@
-// Textos de V06 (fase 9), mezclados en textosDe('V06'); puede importar DF de '../datos_final.js' y formato.js de '../../../e3/src/formato.js'.
+// Textos de V06 (fase 9; fase 10 sin cambios de texto), mezclados en textosDe('V06'); puede importar DF de '../datos_final.js' y formato.js de '../../../e3/src/formato.js'.
 // Los rótulos del flujo: la lista, el grupo de mayor facturación, el sorteo, el control y las dos ramas, y la comparación.
-// Las cifras grandes (500 y 100) las pone la vista delante de `lista` y de `control`.
+// Las cifras grandes las pone la vista: 500 encima de `lista` (paso 1, el bloque solo en el centro) y 100 delante de
+// `control` (paso 3).
 import { DF } from '../datos_final.js'
 import { NBSP, fijo, pct } from '../../../e3/src/formato.js'
 

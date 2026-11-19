@@ -1,20 +1,6 @@
-/* V15 · Cierre (19/11, fase 9). El panel del pedido cambia de tono en su paso: antes es tinta atenuada sobre el fondo
-   (como el resto de lo que falta) y en su paso, blanco sobre la tinta llena, que entra con la transición de Paso. El
-   color del texto, los círculos y los filetes acompaña esa entrada con el mismo tiempo; sin transición si el sistema
-   pide movimiento reducido. */
-.fin-v15 .v15-panel text,
-.fin-v15 .v15-panel tspan,
-.fin-v15 .v15-panel circle,
-.fin-v15 .v15-panel path,
-.fin-v15 .v15-panel rect,
-.fin-v15 .v15-panel line {
-  transition: fill var(--fin-paso-t, 350ms) cubic-bezier(0.2, 0, 0, 1), stroke var(--fin-paso-t, 350ms) cubic-bezier(0.2, 0, 0, 1);
-}
-@media (prefers-reduced-motion: reduce) {
-  .fin-v15 .v15-panel text,
-  .fin-v15 .v15-panel tspan,
-  .fin-v15 .v15-panel circle,
-  .fin-v15 .v15-panel path,
-  .fin-v15 .v15-panel rect,
-  .fin-v15 .v15-panel line { transition: none; }
+/* V15 · Cierre (19/11, fase 10). En el paso 1 la línea del recorrido se traza (Anima «traza») a velocidad pareja, así
+   llega a cada número cuando entra su estación (V15_Pedido.jsx, RUTA_MS y RUTA_ESC). Solo cambia la curva: sin animar
+   (vista completa, retroceso, movimiento reducido) la regla no hace nada y la línea queda tal cual. */
+.fin-v15 .v15-ruta .fin-anima.fin-a-traza [pathLength] {
+  animation-timing-function: linear;
 }

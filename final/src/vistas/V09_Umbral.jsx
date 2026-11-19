@@ -10,12 +10,15 @@
 // La banda lleva solo el umbral de pase (11,04); la conclusión (0,79 puntos) no cambia.
 // (19/11, revisión) La barra de lo observado va oculta en el paso 1 (atenuada parecía una zona más); el título del eje
 // pierde la fórmula; la pista llega a 500 u para que en 4:3 el dibujo no quede en el 60 % del alto.
+// (19/11, fase 10, spec V09: «boceto: lo observado y la llave, sin rótulo hasta su paso») Lo observado deja de ir oculto:
+// su boceto es el contorno de la barra y el asta, sin bandera; en el paso 2 la barra llena crece desde el 0 dentro del
+// contorno (Anima crece-x, 600 ms). La llave sigue en boceto hasta el paso 3, sin su rótulo (lo resuelve Paso).
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import {
-  ACC, CTX, INK, PISTA, REALCE, TRAZO, EjeX, LlaveH, Paso, Umbral, altoEjeX, ancho, envolver, tam, useU,
+  ACC, CTX, INK, PISTA, REALCE, TRAZO, Anima, EjeX, LlaveH, Paso, Umbral, altoEjeX, ancho, envolver, tam, useU,
 } from '../svg.jsx'
 import { fijo } from '../../../e3/src/formato.js'
 
@@ -55,6 +58,7 @@ function Dibujo({ w, h }) {
   const fR = tam(24, u)
   const fV = tam('valFoco', u)
   const gap = 14 * u
+  const sC = TRAZO.contorno * u // trazo del contorno de la barra de lo observado (su boceto)
   const m = { fR, fV, hL1: fR * 1.3 }
   const altoBandera = m.hL1 + fV * 1.15
   const anchoBandera = (rot, val) => Math.max(ancho(rot, fR, 600), ancho(val, fV, 700))
@@ -112,15 +116,20 @@ function Dibujo({ w, h }) {
       <Bandera x={xs(CON) + gap} y={yBan} rotulo={B.con} valor={conUnidad(CON)} m={m} />
       <EjeX u={u} x0={x0} x1={x1} y={yE} min={0} max={TOPE} marcas={MARCAS} formato={(v) => fijo(v)} titulo={B.eje} />
 
-      {/* paso 2: lo observado, barra en ACC de 0 a su valor y asta hasta su bandera. La barra va oculta antes de su
-          paso: es una capa sobre la primera zona, y atenuada se leía como otra zona, más oscura (la de «pasan las dos») */}
-      <Paso n={2} oculto>
-        <rect x={x0} y={yP} width={xHoy - x0} height={pista} fill={ACC} />
-      </Paso>
+      {/* paso 2: lo observado, barra en ACC de 0 a su valor y asta hasta su bandera. Boceto antes de su paso: el
+          contorno de la barra y el asta, sin bandera (la barra llena, atenuada, se leía como otra zona). El contorno va
+          hacia adentro, así la barra llena lo tapa entero; al llegar el paso, la barra crece desde el 0 dentro de él */}
       <Paso n={2}>
+        <rect x={x0 + sC / 2} y={yP + sC / 2} width={Math.max(0, xHoy - x0 - sC)} height={pista - sC} fill="none"
+              stroke={ACC} strokeWidth={sC} />
         <Umbral u={u} x1={xHoy - (TRAZO.umbral * u) / 2} x2={xHoy - (TRAZO.umbral * u) / 2} y1={yBan} y2={yP}
                 color={ACC} />
         <Bandera x={xHoy + gap} y={yBan} rotulo={B.hoy} valor={conUnidad(HOY)} m={m} />
+      </Paso>
+      <Paso n={2} oculto entrada={false}>
+        <Anima n={2} efecto="crece-x" dur={600}>
+          <rect x={x0} y={yP} width={xHoy - x0} height={pista} fill={ACC} />
+        </Anima>
       </Paso>
 
       {/* paso 3: lo que falta, llave de lo observado al primer umbral */}

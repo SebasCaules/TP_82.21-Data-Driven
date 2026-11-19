@@ -6,17 +6,20 @@
 // solo su monto y su nombre corto; salen «qué compra», la leyenda (la medición se nombra sola) y el punteado de la
 // contingencia, que es un tramo gris más. Arriba, la llave del total; debajo, el eje en dólares sin repetir el total. En la
 // banda, solo el piloto (G64): las horas de Marketing salen de la pantalla (las dice el orador; informe, 23.2 y 23.6).
-// Pasos: 1, el total partido en sus cinco tramos, todos en gris; 2, la medición en ACC (una capa encima del tramo gris,
-// oculta antes, y su texto pasa a blanco).
+// (19/11, fase 10, spec 4 V08: «que se vaya llenando la barra de total paso a paso») Cinco pasos, uno por tramo. La barra
+// del total arranca como boceto: su pista (relleno claro y contorno) con el eje en dólares, los dos fuera de todo Paso.
+// Cada paso suma un tramo, de mayor a menor, que se descubre de izquierda a derecha con su monto y su nombre (Paso oculto
+// sin entrada y Anima 'revela-x', así el texto no se deforma). La medición, el primero, en acento desde el paso 1. En el
+// último, con la contingencia, la barra queda llena y entran la llave y el rótulo del total, cuando el tramo terminó.
 
 import Vista from '../Plantilla.jsx'
 import { DF } from '../datos_final.js'
 import { textosDe } from '../textos.js'
 import { fijo, usd } from '../../../e3/src/formato.js'
 import {
-  ACC, FIN_GRIS, INK, SUP, CTX, EjeX, Guia, LlaveH, Paso, TRAZO, altoEjeX, ancho, envolver, escalaLinda, tam, useU,
+  ACC, FIN_GRIS, INK, SUP, CTX, PISTA, REALCE, Anima, EjeX, Guia, LlaveH, Paso, TRAZO, altoEjeX, ancho, envolver,
+  escalaLinda, tam, useU,
 } from '../svg.jsx'
-import { useEstadoPaso } from '../pasos.js'
 
 const ID = 'V08'
 const A = DF.anclas
@@ -25,7 +28,7 @@ const B = T.barras
 const P = T.partida
 const TOTAL = A.G64.valor
 
-// Las cinco líneas del costo, de mayor a menor (a igual monto, en este orden). foco: la que se resalta en el paso 2.
+// Las cinco líneas del costo, de mayor a menor (a igual monto, en este orden). foco: la que va en acento.
 const LINEAS = [
   { clave: 'medicion', ancla: 'G64.medicion', foco: true },
   { clave: 'planilla', ancla: 'G64.planilla' },
@@ -41,14 +44,20 @@ if (Math.abs(SUMA - TOTAL) > 0.5) {
   throw new Error(`V08: las líneas del piloto suman ${SUMA} y G64 dice ${TOTAL}; la barra no puede sumar el total`)
 }
 
-export const meta = { id: ID, pasos: 2 }
+// un paso por tramo: el último completa la barra
+export const meta = { id: ID, pasos: 5 }
+if (meta.pasos !== LINEAS.length) {
+  throw new Error(`V08: meta.pasos (${meta.pasos}) tiene que ser uno por tramo (${LINEAS.length})`)
+}
 
-/** Marcas del eje: las redondas hasta el total, sin el total (ya está arriba, en la llave). */
+/** Marcas del eje: las redondas hasta el total, sin el total (lo dice el rótulo de arriba, en el último paso). */
 const MARCAS = escalaLinda(TOTAL).marcas.filter((v) => v < TOTAL)
+
+/** Lo que tarda en descubrirse cada tramo (ms): algo más el más largo, para que la barra se llene a un ritmo parejo. */
+const durDe = (valor) => Math.round(300 + (350 * valor) / LINEAS[0].valor)
 
 function Dibujo({ w, h }) {
   const u = useU()
-  const resaltada = useEstadoPaso(2, { oculto: true }) === 'on'
   const f = { monto: tam('valFoco', u), totRot: tam('cat', u), totVal: tam('valFoco', u), eje: tam(23, u) }
   const lh = { monto: 1.15, nombre: 1.2 }
   const hueco = 4 * u
@@ -95,7 +104,8 @@ function Dibujo({ w, h }) {
   const fuera = tramos.filter((t) => !t.dentro)
   const altoFuera = fuera.length ? 20 * u + fn * 1.2 + f.monto * 1.15 + 8 * u : 0
 
-  // a lo alto: rótulo del total, llave, barra, (nombres que no entran), eje
+  // a lo alto: rótulo del total, llave, barra, (nombres que no entran), eje. Todo tiene su lugar desde el paso 1: nada
+  // se corre al avanzar.
   const fijoArriba = f.totVal * 0.8 + 22 * u + 18 * u
   const fijoAbajo = altoFuera + 14 * u + altoEjeX(u, true)
   const hNec = Math.max(altoBloque + 2 * 24 * u, 120 * u)
@@ -110,49 +120,70 @@ function Dibujo({ w, h }) {
   const yFuera = yB + hB + 20 * u
   const yEje = yB + hB + altoFuera + 14 * u
   const r = TRAZO.radio * u
+  const sw = TRAZO.contorno * u
+  // la pista va un píxel por dentro de la barra: al llenarse, los tramos la tapan sin dejar filo
+  const ins = sw / 2 + Math.max(1, u)
+  const ultimo = LINEAS.length
+  const durUltimo = durDe(tramos[ultimo - 1].valor)
 
   return (
     <svg width={w} height={h} style={{ display: 'block' }} aria-hidden="true">
-      {/* el total, con la llave que abarca la barra entera */}
-      <text x={(x0 + x1) / 2} y={yTot} fontSize={f.totVal} textAnchor="middle">
-        <tspan fontSize={f.totRot} fontWeight={600} fill={CTX}>{P.total}</tspan>
-        <tspan dx={14 * u} fontSize={f.totVal} fontWeight={700} fill={INK}>{usd(TOTAL, 0)}</tspan>
-      </text>
-      <LlaveH u={u} x1={x0} x2={x1} y={yLlave} lado="arriba" />
+      {/* boceto fijo: la pista del total, por dentro de su borde (los tramos la tapan entera al llenarse) */}
+      <rect x={x0 + ins} y={yB + ins} width={Math.max(0, largo - 2 * ins)} height={Math.max(0, hB - 2 * ins)} rx={r}
+            fill={REALCE} stroke={PISTA} strokeWidth={sw} />
 
-      {tramos.map((t) => {
-        const color = t.foco && resaltada ? SUP : INK
+      {/* un tramo por paso, de mayor a menor: se descubre de izquierda a derecha con su monto y su nombre */}
+      {tramos.map((t, k) => {
+        const color = t.foco ? SUP : INK
         const xc = (t.xi + t.xf) / 2
         const anchoRot = ancho(t.nombre.join(' '), fn, 600)
         const xRot = Math.min(Math.max(xc, x0 + anchoRot / 2), x1 - anchoRot / 2)
-        const caja = { x: t.xi, y: yB, width: Math.max(0, t.xf - t.xi), height: hB, rx: r }
+        const xAntes = k ? tramos[k - 1].xf : t.xi
         return (
-          <g key={t.clave}>
+          <Paso key={t.clave} n={k + 1} oculto entrada={false}>
             <title>{`${t.nombre.join(' ')}: ${t.monto}`}</title>
-            <rect {...caja} fill={FIN_GRIS} />
-            {t.foco && <Paso n={2} oculto><rect {...caja} fill={ACC} /></Paso>}
-            {t.dentro && (
-              <g>
-                <text x={t.xi + pad} y={yMonto} fontSize={f.monto} fontWeight={700} fill={color}
-                      dominantBaseline="hanging">{t.monto}</text>
-                {t.nombre.map((renglon, i) => (
-                  <text key={i} x={t.xi + pad} y={yNombre + i * fn * lh.nombre} fontSize={fn} fontWeight={600}
-                        fill={color} dominantBaseline="hanging">{renglon}</text>
-                ))}
-              </g>
-            )}
-            {!t.dentro && (
-              <g>
-                <Guia u={u} x1={xc} y1={yB + hB} x2={xc} y2={yFuera - 6 * u} />
-                <text x={xRot} y={yFuera} fontSize={fn} fontWeight={600} fill={INK} textAnchor="middle"
-                      dominantBaseline="hanging">{t.nombre.join(' ')}</text>
-                <text x={xRot} y={yFuera + fn * 1.2} fontSize={f.monto} fontWeight={700} fill={INK}
-                      textAnchor="middle" dominantBaseline="hanging">{t.monto}</text>
-              </g>
-            )}
-          </g>
+            <Anima n={k + 1} efecto="revela-x" dur={durDe(t.valor)}>
+              {/* el hueco con el tramo anterior, del color de la tarjeta: tapa la pista */}
+              {k > 0 && <rect x={xAntes} y={yB} width={Math.max(0, t.xi - xAntes)} height={hB} fill={SUP} />}
+              <rect x={t.xi} y={yB} width={Math.max(0, t.xf - t.xi)} height={hB} rx={r} fill={t.foco ? ACC : FIN_GRIS} />
+              {t.dentro && (
+                <g>
+                  <text x={t.xi + pad} y={yMonto} fontSize={f.monto} fontWeight={700} fill={color}
+                        dominantBaseline="hanging">{t.monto}</text>
+                  {t.nombre.map((renglon, i) => (
+                    <text key={i} x={t.xi + pad} y={yNombre + i * fn * lh.nombre} fontSize={fn} fontWeight={600}
+                          fill={color} dominantBaseline="hanging">{renglon}</text>
+                  ))}
+                </g>
+              )}
+              {!t.dentro && (
+                <g>
+                  <Guia u={u} x1={xc} y1={yB + hB} x2={xc} y2={yFuera - 6 * u} />
+                  <text x={xRot} y={yFuera} fontSize={fn} fontWeight={600} fill={INK} textAnchor="middle"
+                        dominantBaseline="hanging">{t.nombre.join(' ')}</text>
+                  <text x={xRot} y={yFuera + fn * 1.2} fontSize={f.monto} fontWeight={700} fill={INK}
+                        textAnchor="middle" dominantBaseline="hanging">{t.monto}</text>
+                </g>
+              )}
+            </Anima>
+          </Paso>
         )
       })}
+
+      {/* el total: la llave que abarca la barra es boceto hasta el último paso y se enciende mientras el último tramo
+          termina de llenarse (orden: 4 × 100 ms); el rótulo entra cuando la barra ya está llena. Van en dos Paso: el
+          escalonado del encendido (orden) y la espera del rótulo (--fin-anima-base) no se mezclan. */}
+      <Paso n={ultimo} orden={4}>
+        <LlaveH u={u} x1={x0} x2={x1} y={yLlave} lado="arriba" />
+      </Paso>
+      <Paso n={ultimo} oculto entrada={false}>
+        <Anima n={ultimo} efecto="aparece" dur={350} style={{ '--fin-anima-base': `${durUltimo}ms` }}>
+          <text x={(x0 + x1) / 2} y={yTot} fontSize={f.totVal} textAnchor="middle">
+            <tspan fontSize={f.totRot} fontWeight={600} fill={CTX}>{P.total}</tspan>
+            <tspan dx={14 * u} fontSize={f.totVal} fontWeight={700} fill={INK}>{usd(TOTAL, 0)}</tspan>
+          </text>
+        </Anima>
+      </Paso>
 
       <EjeX u={u} x0={x0} x1={x1} y={yEje} min={0} max={TOTAL} marcas={MARCAS} formato={(v) => fijo(v)}
             titulo={B.eje} />
