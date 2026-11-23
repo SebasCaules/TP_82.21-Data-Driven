@@ -166,10 +166,7 @@ export const NOTAS = {
       "El MVP es la regla en una planilla mensual: operada tres meses con control, es el piloto mínimo, y ahí estamos."
     ],
     [
-      "En la semana **28** hay tres salidas. Si ninguna rama llega al umbral, el proyecto cierra con **USD 4.485** gastados. Si una llega, sigue la operación mínima, **USD 5.325** el primer año."
-    ],
-    [
-      "En esa misma semana, la producción completa, **USD 15.775**, reemplaza a la operación mínima si el efecto la paga."
+      "Si el piloto funciona, en la semana **28** hay dos caminos. Si contactar paga la lista, sigue la operación mínima: la misma planilla cada mes, **USD 5.325** el primer año. Si el efecto paga también la automatización, va la producción completa, **USD 15.775**."
     ]
   ],
   "V14": [
