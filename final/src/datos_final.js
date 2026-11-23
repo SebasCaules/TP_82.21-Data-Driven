@@ -47,7 +47,7 @@ export const DF = {
    },
    {
     "archivo": "canon.json",
-    "sha256": "45502163ab9925f02f6b29806808184857f6ae6db789d94d340048cd1ab02d2d"
+    "sha256": "dedbed8ce1e50576126d5c25b3904a2b07a5b271160e630eeb4f0f14f77b304c"
    },
    {
     "archivo": "contenido_c.py",
