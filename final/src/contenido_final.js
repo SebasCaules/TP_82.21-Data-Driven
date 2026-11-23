@@ -499,7 +499,7 @@ export const CF = {
             decision: {
               area: 'Solución',
               estado: 'si funciona',
-              corta: 'Si funciona: operación mínima o producción completa',
+              corta: 'Operación mínima o producción completa',
               larga: `PoC hecha; MVP en piloto mínimo. Si una rama llega a su umbral de pase, en la semana ${fijo(SEM_FIN)} `
                 + 'sigue la operación mínima, o la producción completa si el efecto medido la paga.',
             },

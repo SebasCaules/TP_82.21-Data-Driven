@@ -14,8 +14,8 @@
 //     abajo, con línea, costo del primer año y la condición en palabras (los umbrales en puntos están en V09).
 // El cierre no se dibuja: queda implícito en «si funciona». Ninguna flecha une las dos salidas.
 // Movimiento (como una cámara que sigue a la pieza nueva): en cada paso la pieza nueva aparece escalando desde su centro
-// en su lugar final y lo anterior se corre a la izquierda (Anima «corre», 560 ms, ease-out cúbica) hasta que la composición queda
-// centrada en el lienzo. Lo que todavía no llegó no se dibuja (Paso oculto, sin boceto). Cada pieza se dibuja corrida
+// en su lugar final y lo anterior se corre a la izquierda (Anima «corre», 560 ms, ease-out cúbica). La PoC entra centrada;
+// el MVP entra en el centro del lienzo (la PoC a su izquierda); en el 3 la tira entera queda centrada. Lo que todavía no llegó no se dibuja (Paso oculto, sin boceto). Cada pieza se dibuja corrida
 // hasta donde va a estar cuando aparezca (dx del paso máx(paso, el suyo)), así lo oculto nunca queda fuera del lienzo.
 // Con ?paso=k, al abrir completa, al retroceder y con movimiento reducido se ve terminado (regla de Anima).
 
@@ -123,7 +123,9 @@ function medir(w, h, u, s) {
   const xR = xM + bwM + gF + rr
   const xE = xR + M.rama * u
   const ext = [bwP, xM + bwM, xE + We]
-  const dx = [0, ...ext.map((e) => (w - e) / 2)]          // dx[k]: la composición del paso k, centrada
+  // dx[k]: el corrimiento de la tira en el paso k. En el 1 y el 3 la composición queda centrada; en el 2 el MVP entra en
+  // el centro del lienzo (la PoC queda a su izquierda, sin pasar del margen)
+  const dx = [0, (w - ext[0]) / 2, Math.max(M.margen * u, w / 2 - (xM + bwM / 2)), (w - ext[2]) / 2]
   // alto: dos salidas con el rótulo del nodo en el hueco entre ellas; la PoC y el MVP centrados en la misma línea
   const H = LLENA * h
   const yR = h / 2
@@ -150,10 +152,11 @@ function Pieza({ j, dx, paso, children }) {
   let el = children
   for (let n = j + 1; n < dx.length; n++) {
     el = (
-      <Anima n={n} efecto="corre" dx={dx[n - 1] - dx[n]} dur={CORRE} style={{ '--fin-curva': CURVA_CORRE }}>{el}</Anima>
+      <Anima n={n} efecto="corre" dx={dx[n - 1] - dx[n]} dur={CORRE}
+             style={{ animationTimingFunction: CURVA_CORRE }}>{el}</Anima>
     )
   }
-  return <g transform={`translate(${dx[Math.max(paso, j)]} 0)`}>{el}</g>
+  return <g transform={`translate(${dx[Math.min(dx.length - 1, Math.max(paso, j))]} 0)`}>{el}</g>
 }
 
 function Dibujo({ w, h }) {
