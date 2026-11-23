@@ -482,27 +482,26 @@ export const CF = {
           textos: {
             mvp: { rotulo: 'Se pide ahora', linea: 'el MVP en piloto mínimo' },
             minima: { rotulo: 'Operación mínima', linea: 'el primer año' },
-            mide: `Etapas de la solución y las tres salidas de la semana ${fijo(SEM_FIN)}`,
+            mide: 'Etapas de la solución y qué sigue si el piloto funciona',
             conclusion: 'La PoC probó que la regla acierta',
             sigue: ['; falta medir si contactar paga.'],
-            // (23/11) las dos etapas que van en orden; las tres salidas son alternativas de la misma decisión (E4 A 3.2),
-            // en el orden en que V13 las apila: producción completa, operación mínima y cierre
+            // (23/11) las dos etapas que van en orden; las dos salidas, si el piloto funciona, son alternativas de la
+            // misma decisión (E4 A 3.2), en el orden en que V13 las apila: operación mínima arriba, producción completa
+            // abajo. El cierre queda implícito: no se dibuja.
             etapas: [
               { nombre: 'PoC', estado: 'hecha', que: 'la regla sobre el extracto histórico, con validación y prueba final' },
               { nombre: 'MVP en piloto mínimo', estado: 'se pide ahora', que: 'la planilla mensual operada tres meses con control y dos ramas' },
             ],
             salidas: [
-              { nombre: 'Producción completa', estado: 'si el efecto medido la paga', que: 'exportación automática, soporte y tablero del directorio' },
               { nombre: 'Operación mínima', estado: 'si una rama llega a su umbral de pase', que: 'la misma planilla con un analista part-time' },
-              { nombre: 'Cierra', estado: 'si ninguna rama llega a su umbral de pase', que: 'el proyecto termina con el piloto' },
+              { nombre: 'Producción completa', estado: 'si el efecto medido la paga', que: 'exportación automática, soporte y tablero del directorio' },
             ],
             decision: {
               area: 'Solución',
-              estado: 'por etapas',
-              corta: `Semana ${fijo(SEM_FIN)}: cerrar, operación mínima o producción completa`,
-              larga: `PoC hecha; MVP en piloto mínimo. En la semana ${fijo(SEM_FIN)}, el proyecto cierra si ninguna rama `
-                + 'llega a su umbral de pase, sigue con la operación mínima si una llega y pasa a la producción completa si '
-                + 'el efecto medido la paga.',
+              estado: 'si funciona',
+              corta: 'Si funciona: operación mínima o producción completa',
+              larga: `PoC hecha; MVP en piloto mínimo. Si una rama llega a su umbral de pase, en la semana ${fijo(SEM_FIN)} `
+                + 'sigue la operación mínima, o la producción completa si el efecto medido la paga.',
             },
           },
         },
