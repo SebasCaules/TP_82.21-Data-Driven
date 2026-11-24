@@ -1,0 +1,237 @@
+{
+ "control_v02": "la lectura A reproduce el dataset v0.2 fila por fila (59.585 filas; target, días para cruzar, acepta_marketing, pidio_baja, partición, recency)",
+ "filas_negativas_con_cliente": 330,
+ "clientes_con_devolucion": 316,
+ "A": {
+  "conjuntos": {
+   "todos_los_cortes": {
+    "filas": 59585,
+    "clientes": 4627,
+    "positivos": 16052,
+    "tasa_pct": 26.93966602332802
+   },
+   "train": {
+    "filas": 18882,
+    "clientes": 2921,
+    "positivos": 5698,
+    "tasa_pct": 30.17688804152103
+   },
+   "train_con_embargo": {
+    "filas": 14753,
+    "clientes": 2547,
+    "positivos": 4636,
+    "tasa_pct": 31.42411712871958
+   },
+   "validacion": {
+    "filas": 7173,
+    "clientes": 2829,
+    "positivos": 1713,
+    "tasa_pct": 23.88122124634044
+   },
+   "gap": {
+    "filas": 8025,
+    "clientes": 3095,
+    "positivos": 2008,
+    "tasa_pct": 25.021806853582557
+   },
+   "test": {
+    "filas": 14211,
+    "clientes": 3636,
+    "positivos": 3602,
+    "tasa_pct": 25.346562521990005
+   },
+   "test_flag": {
+    "filas": 11294,
+    "clientes": 3414,
+    "positivos": 3031,
+    "tasa_pct": 26.837258721445018
+   }
+  },
+  "lista_500_sin_filtro": {
+   "largo": 1500,
+   "vp": 1223.6666666666665,
+   "fp": 276.3333333333333,
+   "precision_pct": 81.57777777777777,
+   "recall_pct": 71.43413115392099,
+   "precision_por_corte_pct": [
+    80.53333333333333,
+    83.2,
+    81.0
+   ],
+   "valor_validacion_usd": 74.87364571729924,
+   "valor_anual_usd": 299.49458286919696
+  },
+  "lista_500_contactables": {
+   "largo": 1500,
+   "vp": 1137.0,
+   "fp": 363.0,
+   "precision_pct": 75.8,
+   "recall_pct": 96.76595744680851,
+   "precision_por_corte_pct": [
+    72.8,
+    76.6,
+    78.0
+   ],
+   "valor_validacion_usd": 66.13437280897537,
+   "valor_anual_usd": 264.5374912359015
+  },
+  "contactables_validacion": 5038
+ },
+ "B": {
+  "conjuntos": {
+   "todos_los_cortes": {
+    "filas": 60432,
+    "clientes": 4665,
+    "positivos": 16245,
+    "tasa_pct": 26.88145353455123
+   },
+   "train": {
+    "filas": 19242,
+    "clientes": 2963,
+    "positivos": 5766,
+    "tasa_pct": 29.96570003118179
+   },
+   "train_con_embargo": {
+    "filas": 15045,
+    "clientes": 2586,
+    "positivos": 4689,
+    "tasa_pct": 31.166500498504483
+   },
+   "validacion": {
+    "filas": 7282,
+    "clientes": 2871,
+    "positivos": 1766,
+    "tasa_pct": 24.251579236473496
+   },
+   "gap": {
+    "filas": 8112,
+    "clientes": 3129,
+    "positivos": 2022,
+    "tasa_pct": 24.92603550295858
+   },
+   "test": {
+    "filas": 14375,
+    "clientes": 3674,
+    "positivos": 3628,
+    "tasa_pct": 25.238260869565217
+   },
+   "test_flag": {
+    "filas": 11421,
+    "clientes": 3452,
+    "positivos": 3063,
+    "tasa_pct": 26.819017599159444
+   }
+  },
+  "lista_500_sin_filtro": {
+   "largo": 1500,
+   "vp": 1235.0333333333333,
+   "fp": 264.9666666666667,
+   "precision_pct": 82.33555555555556,
+   "recall_pct": 69.93393733484334,
+   "precision_por_corte_pct": [
+    81.44,
+    83.76666666666667,
+    81.8
+   ],
+   "valor_validacion_usd": 76.01983497181403,
+   "valor_anual_usd": 304.07933988725614
+  },
+  "lista_500_contactables": {
+   "largo": 1500,
+   "vp": 1155.3333333333333,
+   "fp": 344.66666666666663,
+   "precision_pct": 77.02222222222223,
+   "recall_pct": 95.56106975461813,
+   "precision_por_corte_pct": [
+    75.0,
+    77.4,
+    78.66666666666666
+   ],
+   "valor_validacion_usd": 67.98306515496695,
+   "valor_anual_usd": 271.9322606198678
+  },
+  "contactables_validacion": 5119
+ },
+ "cambios": {
+  "todos_los_cortes": {
+   "solo_en_A": 228,
+   "solo_en_B": 1075,
+   "en_las_dos": 59357,
+   "target_cambia": 438,
+   "target_0_a_1": 257,
+   "target_1_a_0": 181,
+   "filas_de_clientes_con_devolucion": 4477
+  },
+  "validacion": {
+   "solo_en_A": 12,
+   "solo_en_B": 121,
+   "en_las_dos": 7161,
+   "target_cambia": 61,
+   "target_0_a_1": 46,
+   "target_1_a_0": 15,
+   "filas_de_clientes_con_devolucion": 519
+  },
+  "train": {
+   "solo_en_A": 40,
+   "solo_en_B": 400,
+   "en_las_dos": 18842,
+   "target_cambia": 94,
+   "target_0_a_1": 50,
+   "target_1_a_0": 44,
+   "filas_de_clientes_con_devolucion": 1594
+  }
+ },
+ "resumen": {
+  "elegibles_filas_validacion": {
+   "A": 7173,
+   "B": 7282,
+   "B_menos_A": 109
+  },
+  "elegibles_filas_train_con_embargo": {
+   "A": 14753,
+   "B": 15045,
+   "B_menos_A": 292
+  },
+  "elegibles_filas_todos": {
+   "A": 59585,
+   "B": 60432,
+   "B_menos_A": 847
+  },
+  "tasa_pct_train_con_embargo": {
+   "A": 31.42411712871958,
+   "B": 31.166500498504483,
+   "B_menos_A": -0.2576166302150966
+  },
+  "tasa_pct_validacion": {
+   "A": 23.88122124634044,
+   "B": 24.251579236473496,
+   "B_menos_A": 0.3703579901330549
+  },
+  "tasa_pct_todos": {
+   "A": 26.93966602332802,
+   "B": 26.88145353455123,
+   "B_menos_A": -0.05821248877678897
+  },
+  "precision_500_sin_filtro_pct": {
+   "A": 81.57777777777777,
+   "B": 82.33555555555556,
+   "B_menos_A": 0.7577777777777897
+  },
+  "precision_500_contactables_pct": {
+   "A": 75.8,
+   "B": 77.02222222222223,
+   "B_menos_A": 1.2222222222222285
+  },
+  "valor_anual_500_sin_filtro_usd": {
+   "A": 299.49458286919696,
+   "B": 304.07933988725614,
+   "B_menos_A": 4.584757018059179
+  },
+  "valor_anual_500_contactables_usd": {
+   "A": 264.5374912359015,
+   "B": 271.9322606198678,
+   "B_menos_A": 7.39476938396632
+  },
+  "variacion_precision_entre_cortes_validacion_pts": 2.6666666666666714
+ }
+}

@@ -1,0 +1,388 @@
+{
+  "aviso": "lectura fuera del preregistro (devolución de la cátedra del 29/10); no elige nada: la decisión es la de la apertura del 27/10/2026 (etapa4.json, decision)",
+  "registro": "2026-10-30T00:04:48-03:00\trelectura del test, lista de 800 contactables por corte (devolución de la cátedra del 29/10, fila B 2.1); fuera del preregistro, no elige nada: la decisión es la de la apertura del 27/10\tpreregistro.json sha256 c10f6ba35a958a6697d9b48a5b1a00fa8397acf93f734e2838d482400e82ba0f\tetapa4.py sha256 7a7387ca474cec5bcf5e2f4fb027451e693d94276d1e1c987e3e4a14f3fce98c\trelectura_800.py sha256 1fd1e619fa0ca4ca09988a64d0f54ce0e5634f9d2bafce18ef71d0d91b9f7371",
+  "reproduce_lista_500": {
+    "campos": [
+      "vp",
+      "fp",
+      "fn",
+      "vn",
+      "precision",
+      "recall",
+      "f1",
+      "auc_roc_contactables",
+      "precision_por_corte"
+    ],
+    "tolerancia": 1e-09,
+    "resultado": "igual a etapa4.json para el modelo y la regla"
+  },
+  "test": {
+    "logistica_ajustada": {
+      "lista_500": {
+        "vp": 2147.0,
+        "fp": 353.0,
+        "fn": 374.0,
+        "vn": 7088.0,
+        "precision": 0.8588,
+        "recall": 0.8516461721539071,
+        "f1": 0.8552081258713403,
+        "auc_roc_contactables": 0.9744690494217609,
+        "aciertos_por_mes": 429.4,
+        "lugares": 2500.0,
+        "precision_por_corte": [
+          {
+            "corte": "2025-01-31",
+            "largo": 500,
+            "vp": 423.0,
+            "precision": 0.846
+          },
+          {
+            "corte": "2025-02-28",
+            "largo": 500,
+            "vp": 436.0,
+            "precision": 0.872
+          },
+          {
+            "corte": "2025-03-31",
+            "largo": 500,
+            "vp": 433.0,
+            "precision": 0.866
+          },
+          {
+            "corte": "2025-04-30",
+            "largo": 500,
+            "vp": 435.0,
+            "precision": 0.87
+          },
+          {
+            "corte": "2025-05-31",
+            "largo": 500,
+            "vp": 420.0,
+            "precision": 0.84
+          }
+        ]
+      },
+      "lista_800": {
+        "vp": 2502.0,
+        "fp": 1498.0,
+        "fn": 19.0,
+        "vn": 5943.0,
+        "precision": 0.6255,
+        "recall": 0.9924633082110274,
+        "f1": 0.7673669682564024,
+        "auc_roc_contactables": 0.9744690494217609,
+        "aciertos_por_mes": 500.4,
+        "lugares": 4000.0,
+        "precision_por_corte": [
+          {
+            "corte": "2025-01-31",
+            "largo": 800,
+            "vp": 491.0,
+            "precision": 0.61375
+          },
+          {
+            "corte": "2025-02-28",
+            "largo": 800,
+            "vp": 528.0,
+            "precision": 0.66
+          },
+          {
+            "corte": "2025-03-31",
+            "largo": 800,
+            "vp": 506.0,
+            "precision": 0.6325
+          },
+          {
+            "corte": "2025-04-30",
+            "largo": 800,
+            "vp": 506.0,
+            "precision": 0.6325
+          },
+          {
+            "corte": "2025-05-31",
+            "largo": 800,
+            "vp": 471.0,
+            "precision": 0.58875
+          }
+        ]
+      },
+      "de_500_a_800": {
+        "lugares_de_mas": 1500.0,
+        "aciertos_de_mas": 355.0,
+        "llamadas_de_mas": 1145.0
+      }
+    },
+    "regla_umbral": {
+      "lista_500": {
+        "vp": 2153.35,
+        "fp": 346.65,
+        "fn": 367.65,
+        "vn": 7094.35,
+        "precision": 0.86134,
+        "recall": 0.8541650138833796,
+        "f1": 0.8577375024895441,
+        "auc_roc_contactables": 0.9787815144081211,
+        "aciertos_por_mes": 430.66999999999996,
+        "lugares": 2500.0,
+        "precision_por_corte": [
+          {
+            "corte": "2025-01-31",
+            "largo": 500,
+            "vp": 418.0,
+            "precision": 0.836
+          },
+          {
+            "corte": "2025-02-28",
+            "largo": 500,
+            "vp": 433.6,
+            "precision": 0.8672000000000001
+          },
+          {
+            "corte": "2025-03-31",
+            "largo": 500,
+            "vp": 435.0,
+            "precision": 0.87
+          },
+          {
+            "corte": "2025-04-30",
+            "largo": 500,
+            "vp": 441.0,
+            "precision": 0.882
+          },
+          {
+            "corte": "2025-05-31",
+            "largo": 500,
+            "vp": 425.75,
+            "precision": 0.8515
+          }
+        ]
+      },
+      "lista_800": {
+        "vp": 2521.0,
+        "fp": 1479.0,
+        "fn": 0.0,
+        "vn": 5962.0,
+        "precision": 0.63025,
+        "recall": 1.0,
+        "f1": 0.7731942953534734,
+        "auc_roc_contactables": 0.9787815144081211,
+        "aciertos_por_mes": 504.2,
+        "lugares": 4000.0,
+        "precision_por_corte": [
+          {
+            "corte": "2025-01-31",
+            "largo": 800,
+            "vp": 496.0,
+            "precision": 0.62
+          },
+          {
+            "corte": "2025-02-28",
+            "largo": 800,
+            "vp": 530.0,
+            "precision": 0.6625
+          },
+          {
+            "corte": "2025-03-31",
+            "largo": 800,
+            "vp": 510.0,
+            "precision": 0.6375
+          },
+          {
+            "corte": "2025-04-30",
+            "largo": 800,
+            "vp": 507.0,
+            "precision": 0.63375
+          },
+          {
+            "corte": "2025-05-31",
+            "largo": 800,
+            "vp": 478.0,
+            "precision": 0.5975
+          }
+        ]
+      },
+      "de_500_a_800": {
+        "lugares_de_mas": 1500.0,
+        "aciertos_de_mas": 367.6500000000001,
+        "llamadas_de_mas": 1132.35
+      }
+    },
+    "modelo_menos_regla_800": {
+      "aciertos": -19.0,
+      "precision_pp": -0.4750000000000032
+    },
+    "techo_800": {
+      "positivos_contactables": 2521,
+      "positivos_por_corte": [
+        496,
+        530,
+        510,
+        507,
+        478
+      ],
+      "positivos_por_corte_promedio": 504.2,
+      "lugares": 4000,
+      "precision_maxima": 0.63025
+    }
+  },
+  "validacion": {
+    "logistica_ajustada": {
+      "lista_500": {
+        "vp": 1108.0,
+        "fp": 392.0,
+        "fn": 67.0,
+        "vn": 3471.0,
+        "precision": 0.7386666666666667,
+        "recall": 0.9429787234042554,
+        "f1": 0.8284112149532711,
+        "auc_roc_contactables": 0.9660145075208882,
+        "aciertos_por_mes": 369.3333333333333,
+        "lugares": 1500.0,
+        "precision_por_corte": [
+          {
+            "corte": "2024-07-31",
+            "largo": 500,
+            "vp": 351.0,
+            "precision": 0.702
+          },
+          {
+            "corte": "2024-08-31",
+            "largo": 500,
+            "vp": 372.0,
+            "precision": 0.744
+          },
+          {
+            "corte": "2024-09-30",
+            "largo": 500,
+            "vp": 385.0,
+            "precision": 0.77
+          }
+        ]
+      },
+      "lista_800": {
+        "vp": 1175.0,
+        "fp": 1225.0,
+        "fn": 0.0,
+        "vn": 2638.0,
+        "precision": 0.4895833333333333,
+        "recall": 1.0,
+        "f1": 0.6573426573426573,
+        "auc_roc_contactables": 0.9660145075208882,
+        "aciertos_por_mes": 391.6666666666667,
+        "lugares": 2400.0,
+        "precision_por_corte": [
+          {
+            "corte": "2024-07-31",
+            "largo": 800,
+            "vp": 364.0,
+            "precision": 0.455
+          },
+          {
+            "corte": "2024-08-31",
+            "largo": 800,
+            "vp": 391.0,
+            "precision": 0.48875
+          },
+          {
+            "corte": "2024-09-30",
+            "largo": 800,
+            "vp": 420.0,
+            "precision": 0.525
+          }
+        ]
+      },
+      "de_500_a_800": {
+        "lugares_de_mas": 900.0,
+        "aciertos_de_mas": 67.0,
+        "llamadas_de_mas": 833.0
+      }
+    },
+    "regla_umbral": {
+      "lista_500": {
+        "vp": 1137.0,
+        "fp": 363.0,
+        "fn": 38.0,
+        "vn": 3500.0,
+        "precision": 0.758,
+        "recall": 0.9676595744680851,
+        "f1": 0.8500934579439252,
+        "auc_roc_contactables": 0.9697447138978086,
+        "aciertos_por_mes": 379.0,
+        "lugares": 1500.0,
+        "precision_por_corte": [
+          {
+            "corte": "2024-07-31",
+            "largo": 500,
+            "vp": 364.0,
+            "precision": 0.728
+          },
+          {
+            "corte": "2024-08-31",
+            "largo": 500,
+            "vp": 383.0,
+            "precision": 0.766
+          },
+          {
+            "corte": "2024-09-30",
+            "largo": 500,
+            "vp": 390.0,
+            "precision": 0.78
+          }
+        ]
+      },
+      "lista_800": {
+        "vp": 1175.0,
+        "fp": 1225.0,
+        "fn": 0.0,
+        "vn": 2638.0,
+        "precision": 0.4895833333333333,
+        "recall": 1.0,
+        "f1": 0.6573426573426573,
+        "auc_roc_contactables": 0.9697447138978086,
+        "aciertos_por_mes": 391.6666666666667,
+        "lugares": 2400.0,
+        "precision_por_corte": [
+          {
+            "corte": "2024-07-31",
+            "largo": 800,
+            "vp": 364.0,
+            "precision": 0.455
+          },
+          {
+            "corte": "2024-08-31",
+            "largo": 800,
+            "vp": 391.0,
+            "precision": 0.48875
+          },
+          {
+            "corte": "2024-09-30",
+            "largo": 800,
+            "vp": 420.0,
+            "precision": 0.525
+          }
+        ]
+      },
+      "de_500_a_800": {
+        "lugares_de_mas": 900.0,
+        "aciertos_de_mas": 38.0,
+        "llamadas_de_mas": 862.0
+      }
+    },
+    "modelo_menos_regla_800": {
+      "aciertos": 0.0,
+      "precision_pp": 0.0
+    },
+    "techo_800": {
+      "positivos_contactables": 1175,
+      "positivos_por_corte": [
+        364,
+        391,
+        420
+      ],
+      "positivos_por_corte_promedio": 391.6666666666667,
+      "lugares": 2400,
+      "precision_maxima": 0.4895833333333333
+    }
+  },
+  "decision_27_10": "la lista sigue con la regla del umbral"
+}

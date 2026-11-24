@@ -1,0 +1,192 @@
+{
+  "entrada": "churn_cliente_corte_v0.1.csv.gz",
+  "filas_entrenamiento": 18882,
+  "mediana_edad": 42.0,
+  "p99": {
+    "ticket_medio": 49139.88333333333,
+    "ticket_90d": 82079.91,
+    "monetary": 209258.0799999988
+  },
+  "log1p": [
+    "monetary",
+    "ticket_medio",
+    "envios_acum",
+    "reclamos_acum"
+  ],
+  "estandarizacion": {
+    "recency_dias": {
+      "media": 67.30494650990362,
+      "desvio": 56.64273617470969
+    },
+    "gap_mediano": {
+      "media": 141.13989513822688,
+      "desvio": 75.82819819144729
+    },
+    "recency_sobre_umbral": {
+      "media": 0.35279069342474173,
+      "desvio": 0.2724327117630822
+    },
+    "frequency": {
+      "media": 3.85266391272111,
+      "desvio": 1.2389463816067605
+    },
+    "compras_90d": {
+      "media": 0.9898845461285881,
+      "desvio": 0.7951933066310269
+    },
+    "compras_90d_prev": {
+      "media": 0.7244465628641034,
+      "desvio": 0.7355513047867666
+    },
+    "monetary": {
+      "media": 11.134922823198021,
+      "desvio": 0.49535197562895916
+    },
+    "ticket_medio": {
+      "media": 9.826385255626843,
+      "desvio": 0.41031365775524037
+    },
+    "ticket_90d": {
+      "media": 20214.440103022345,
+      "desvio": 15013.769892687562
+    },
+    "n_tiendas_distintas": {
+      "media": 2.309818875119161,
+      "desvio": 1.1705738248036042
+    },
+    "n_categorias_distintas": {
+      "media": 3.031087808494863,
+      "desvio": 0.8674919684731197
+    },
+    "pct_online": {
+      "media": 0.37958534825987955,
+      "desvio": 0.25775712256370337
+    },
+    "meses_desde_alta": {
+      "media": 15.848850757335027,
+      "desvio": 5.875789232790267
+    },
+    "edad": {
+      "media": 41.679589026586164,
+      "desvio": 12.744908174290849
+    },
+    "puntos_canjeados": {
+      "media": 1584.4731965585704,
+      "desvio": 1966.5969734719868
+    },
+    "meses_sin_movimiento": {
+      "media": 6.937459283387622,
+      "desvio": 5.970046707235586
+    },
+    "envios_90d": {
+      "media": 0.19198178159093315,
+      "desvio": 0.43647734771305235
+    },
+    "envios_acum": {
+      "media": 0.8587900727679907,
+      "desvio": 0.5216447747516861
+    },
+    "aperturas_90d": {
+      "media": 0.06858383645800233,
+      "desvio": 0.2628191016378686
+    },
+    "clics_90d": {
+      "media": 0.016152949899375067,
+      "desvio": 0.12606694175449362
+    },
+    "reclamos_90d": {
+      "media": 0.09416375383963563,
+      "desvio": 0.4702120276752321
+    },
+    "reclamos_acum": {
+      "media": 0.20709510506663192,
+      "desvio": 0.4284151348344569
+    },
+    "consultas_90d": {
+      "media": 0.1176252515623345,
+      "desvio": 0.4603760420737193
+    },
+    "nps_ultimo": {
+      "media": 37.17562437562437,
+      "desvio": 30.20876339397452
+    },
+    "n_devoluciones": {
+      "media": 0.023408537231225504,
+      "desvio": 0.15190010392758482
+    },
+    "mes_corte": {
+      "media": 5.748278784027116,
+      "desvio": 3.3106275392583537
+    },
+    "dias_a_proximo_evento": {
+      "media": 83.28503336510963,
+      "desvio": 52.272662305780194
+    }
+  },
+  "categorias": {
+    "categoria_dominante": [
+      "Baño",
+      "Cocina y mesa",
+      "Decoracion",
+      "Iluminacion",
+      "Muebles",
+      "Organizacion",
+      "Textil hogar"
+    ],
+    "region_dominante": [
+      "AMBA",
+      "Centro",
+      "Cuyo",
+      "NOA",
+      "Patagonia",
+      "Solo online"
+    ],
+    "formato_tienda": [
+      "Chico",
+      "Grande",
+      "Mediano"
+    ],
+    "canal_alta": [
+      "fisico",
+      "online"
+    ],
+    "ultimo_canal_campania": [
+      "Email",
+      "SMS",
+      "WhatsApp"
+    ],
+    "motivo_ultima_devolucion": [
+      "Cambio de talle/color",
+      "Error de compra",
+      "No cumplio expectativas",
+      "Producto dañado en envio",
+      "Producto defectuoso"
+    ],
+    "temporada": [
+      "Invierno",
+      "Otoño",
+      "Primavera",
+      "Verano"
+    ],
+    "genero": [
+      "F",
+      "M",
+      "X"
+    ],
+    "provincia": [
+      "Buenos Aires",
+      "CABA",
+      "Cordoba",
+      "Entre Rios",
+      "Mendoza",
+      "Neuquen",
+      "Salta",
+      "Santa Fe",
+      "Tucuman"
+    ]
+  },
+  "salida": "churn_cliente_corte_v0.1_modelo.csv.gz",
+  "filas": 59585,
+  "columnas": 82,
+  "features": 77
+}

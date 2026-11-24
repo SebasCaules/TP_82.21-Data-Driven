@@ -1,0 +1,1742 @@
+{
+  "modo": "validación (sin --abrir-test): no se leyó ninguna fila de test ni de test_flag",
+  "preregistro_sha256": "c10f6ba35a958a6697d9b48a5b1a00fa8397acf93f734e2838d482400e82ba0f",
+  "huellas_verificadas": [
+    "comun_py",
+    "dataset",
+    "economia_json",
+    "etapa2_py",
+    "etapa3_json",
+    "etapa3_py"
+  ],
+  "medicion": {
+    "cortes": [
+      "2024-07-31",
+      "2024-08-31",
+      "2024-09-30"
+    ],
+    "filas": 7173,
+    "positivos": 1713,
+    "tasa_base": 0.23881221246340442,
+    "entrenamiento": {
+      "filas": 14753,
+      "cortes": 16,
+      "desde": "2023-01-31",
+      "hasta": "2024-04-30",
+      "clientes": 2547,
+      "positivos": 4636
+    },
+    "anualizar": 4.0,
+    "contactables": {
+      "filas": 5038,
+      "positivos": 1175,
+      "por_corte": [
+        1585,
+        1688,
+        1765
+      ]
+    },
+    "modelo": {
+      "variables": 39,
+      "terminos_con_intercepto": 73,
+      "iteraciones": 30,
+      "intercepto": -1.9518862755045128,
+      "coeficientes": [
+        {
+          "termino": "gap_mediano",
+          "variable": "gap_mediano",
+          "valor": null,
+          "coeficiente": -2.247185852280461,
+          "odds_ratio": 0.10569625129183025,
+          "filas": 14753,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "recency_sobre_umbral",
+          "variable": "recency_sobre_umbral",
+          "valor": null,
+          "coeficiente": 1.279076722771225,
+          "odds_ratio": 3.5933205625001783,
+          "filas": 14753,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "recency_dias",
+          "variable": "recency_dias",
+          "valor": null,
+          "coeficiente": 0.600442559025099,
+          "odds_ratio": 1.8229253739754696,
+          "filas": 14753,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "compras_90d",
+          "variable": "compras_90d",
+          "valor": null,
+          "coeficiente": 0.24573876474138345,
+          "odds_ratio": 1.2785655235156217,
+          "filas": 14753,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "missingindicator_ticket_90d",
+          "variable": "ticket_90d",
+          "valor": "vacío",
+          "coeficiente": 0.19776358521810145,
+          "odds_ratio": 1.2186742471555725,
+          "filas": 3798,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "envios_acum",
+          "variable": "envios_acum",
+          "valor": null,
+          "coeficiente": -0.19248013520348373,
+          "odds_ratio": 0.8249107047241389,
+          "filas": 14753,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "meses_desde_alta",
+          "variable": "meses_desde_alta",
+          "valor": null,
+          "coeficiente": -0.1384381326635251,
+          "odds_ratio": 0.8707171185517344,
+          "filas": 14753,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "categoria_dominante_Decoracion",
+          "variable": "categoria_dominante",
+          "valor": "Decoracion",
+          "coeficiente": -0.11805348743399058,
+          "odds_ratio": 0.8886485198143805,
+          "filas": 3485,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "reclamos_90d",
+          "variable": "reclamos_90d",
+          "valor": null,
+          "coeficiente": -0.09923985587243075,
+          "odds_ratio": 0.9055254863681039,
+          "filas": 14753,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "reclamos_acum",
+          "variable": "reclamos_acum",
+          "valor": null,
+          "coeficiente": 0.09654922139802478,
+          "odds_ratio": 1.1013637904751548,
+          "filas": 14753,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "formato_tienda_Chico",
+          "variable": "formato_tienda",
+          "valor": "Chico",
+          "coeficiente": -0.08813649221574116,
+          "odds_ratio": 0.9156358910221543,
+          "filas": 2492,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "region_dominante_Centro",
+          "variable": "region_dominante",
+          "valor": "Centro",
+          "coeficiente": 0.08334837770250683,
+          "odds_ratio": 1.0869204014300078,
+          "filas": 2933,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "ultimo_canal_campania_(vacío)",
+          "variable": "ultimo_canal_campania",
+          "valor": "(vacío)",
+          "coeficiente": -0.07772991565158352,
+          "odds_ratio": 0.92521427869705,
+          "filas": 3012,
+          "sentido": "baja el riesgo"
+        },
+        {
+          "termino": "formato_tienda_Mediano",
+          "variable": "formato_tienda",
+          "valor": "Mediano",
+          "coeficiente": 0.06602301871939782,
+          "odds_ratio": 1.0682513066600572,
+          "filas": 6264,
+          "sentido": "sube el riesgo"
+        },
+        {
+          "termino": "region_dominante_Cuyo",
+          "variable": "region_dominante",
+          "valor": "Cuyo",
+          "coeficiente": -0.06549515862889042,
+          "odds_ratio": 0.9366035811941705,
+          "filas": 2707,
+          "sentido": "baja el riesgo"
+        }
+      ],
+      "agrupadas_min_frecuencia": {
+        "motivo_ultima_devolucion": [
+          "Cambio de talle/color",
+          "Error de compra",
+          "No cumplio expectativas",
+          "Producto dañado en envio",
+          "Producto defectuoso"
+        ]
+      }
+    },
+    "principal": {
+      "metrica": "precisión de la lista de 500 contactables por corte",
+      "logistica_ajustada": {
+        "umbral": "lista de 500 por corte, solo contactables",
+        "tipo": "lista filtrada",
+        "casos_marcados": 1500,
+        "por_corte": [
+          500,
+          500,
+          500
+        ],
+        "vp": 1108.0,
+        "fp": 392.0,
+        "fn": 67.0,
+        "vn": 3471.0,
+        "precision": 0.7386666666666667,
+        "recall": 0.9429787234042554,
+        "valor_neto_ars": 92249.84292121726,
+        "valor_neto_usd": 63.21007764349775,
+        "valor_neto_anual_usd": 252.840310573991,
+        "operable": true,
+        "contactables": null,
+        "f1": 0.8284112149532711,
+        "aciertos_por_mes": 369.3333333333333,
+        "precision_por_corte": [
+          {
+            "corte": "2024-07-31",
+            "largo": 500,
+            "vp": 351.0,
+            "precision": 0.702
+          },
+          {
+            "corte": "2024-08-31",
+            "largo": 500,
+            "vp": 372.0,
+            "precision": 0.744
+          },
+          {
+            "corte": "2024-09-30",
+            "largo": 500,
+            "vp": 385.0,
+            "precision": 0.77
+          }
+        ],
+        "auc_roc_contactables": 0.9660145075208882,
+        "probabilidad_del_ultimo_puesto": [
+          0.2341903999122087,
+          0.2696687619560642,
+          0.32821737696499886
+        ]
+      },
+      "regla_umbral": {
+        "umbral": "lista de 500 por corte, solo contactables",
+        "tipo": "lista filtrada",
+        "casos_marcados": 1500,
+        "por_corte": [
+          500,
+          500,
+          500
+        ],
+        "vp": 1137.0,
+        "fp": 363.0,
+        "fn": 38.0,
+        "vn": 3500.0,
+        "precision": 0.758,
+        "recall": 0.9676595744680851,
+        "valor_neto_ars": 96517.60812144456,
+        "valor_neto_usd": 66.13437280897537,
+        "valor_neto_anual_usd": 264.5374912359015,
+        "operable": true,
+        "contactables": null,
+        "f1": 0.8500934579439252,
+        "aciertos_por_mes": 379.0,
+        "precision_por_corte": [
+          {
+            "corte": "2024-07-31",
+            "largo": 500,
+            "vp": 364.0,
+            "precision": 0.728
+          },
+          {
+            "corte": "2024-08-31",
+            "largo": 500,
+            "vp": 383.0,
+            "precision": 0.766
+          },
+          {
+            "corte": "2024-09-30",
+            "largo": 500,
+            "vp": 390.0,
+            "precision": 0.78
+          }
+        ],
+        "auc_roc_contactables": 0.9697447138978086
+      },
+      "diferencia_logistica_menos_regla": {
+        "replicas": 1000,
+        "semilla": 42,
+        "unidad": "cliente",
+        "ic95": [
+          -0.032534444444444414,
+          -0.010709999999999895
+        ],
+        "replicas_con_a_mejor": 0.0
+      }
+    },
+    "secundarias": {
+      "practica_actual_contactables": {
+        "umbral": "lista de 500 por corte, solo contactables",
+        "tipo": "lista filtrada",
+        "casos_marcados": 1500,
+        "por_corte": [
+          500,
+          500,
+          500
+        ],
+        "vp": 491.42857142857144,
+        "fp": 1008.5714285714286,
+        "fn": 683.5714285714286,
+        "vn": 2854.4285714285716,
+        "precision": 0.32761904761904764,
+        "recall": 0.4182370820668693,
+        "valor_neto_ars": 1512.5296001287497,
+        "valor_neto_usd": 1.0363932385649348,
+        "valor_neto_anual_usd": 4.145572954259739,
+        "operable": true,
+        "contactables": null,
+        "f1": 0.36742323097463286,
+        "aciertos_por_mes": 163.80952380952382,
+        "precision_por_corte": [
+          {
+            "corte": "2024-07-31",
+            "largo": 500,
+            "vp": 162.125,
+            "precision": 0.32425
+          },
+          {
+            "corte": "2024-08-31",
+            "largo": 500,
+            "vp": 167.875,
+            "precision": 0.33575
+          },
+          {
+            "corte": "2024-09-30",
+            "largo": 500,
+            "vp": 161.42857142857142,
+            "precision": 0.32285714285714284
+          }
+        ],
+        "auc_roc_contactables": 0.6449346500625135
+      },
+      "sin_filtro": {
+        "logistica_ajustada": {
+          "lista_500": {
+            "largo": 1500,
+            "aciertos": 1239.0,
+            "positivos": 1713,
+            "precision": 0.826,
+            "recall": 0.723292469352014,
+            "f1": 0.7712418300653595,
+            "valor_neto_usd": 76.4198247703104,
+            "valor_neto_anual_usd": 305.6792990812416
+          },
+          "lista_500_por_corte": [
+            {
+              "corte": "2024-07-31",
+              "precision": 0.828
+            },
+            {
+              "corte": "2024-08-31",
+              "precision": 0.838
+            },
+            {
+              "corte": "2024-09-30",
+              "precision": 0.812
+            }
+          ],
+          "decil_superior": 0.8842398884239888,
+          "auc_roc": 0.9638667034463884,
+          "auc_pr": 0.8581672151937472,
+          "umbral_05": {
+            "precision": 0.8235690235690236,
+            "recall": 0.7139521307647402,
+            "f1": 0.7648530331457161,
+            "avisados": 1485
+          },
+          "lift_decil_superior": 3.7026577464479113
+        },
+        "regla_umbral": {
+          "lista_500": {
+            "largo": 1500,
+            "aciertos": 1223.6666666666667,
+            "positivos": 1713,
+            "precision": 0.8157777777777778,
+            "recall": 0.71434131153921,
+            "f1": 0.7616972715011932,
+            "valor_neto_usd": 74.87364571729924,
+            "valor_neto_anual_usd": 299.49458286919696
+          },
+          "lista_500_por_corte": [
+            {
+              "corte": "2024-07-31",
+              "precision": 0.8053333333333332
+            },
+            {
+              "corte": "2024-08-31",
+              "precision": 0.832
+            },
+            {
+              "corte": "2024-09-30",
+              "precision": 0.81
+            }
+          ],
+          "decil_superior": 0.9065550906555091,
+          "auc_roc": 0.9681792327151346,
+          "auc_pr": 0.8737142882625789,
+          "lift_decil_superior": 3.7961002132352406
+        }
+      },
+      "diferencia_sin_filtro_logistica_menos_regla": {
+        "replicas": 1000,
+        "semilla": 42,
+        "unidad": "cliente",
+        "ic95": [
+          -0.005049206349206273,
+          0.01806976190476191
+        ],
+        "replicas_con_a_mejor": 0.865
+      },
+      "calibracion": {
+        "brier": 0.069464690745474,
+        "brier_tasa_base": 0.18178093964173822,
+        "probabilidad_media": 0.23153473661869958,
+        "tasa_observada": 0.23881221246340442,
+        "probabilidad_media_entrenamiento": 0.31421874353713447,
+        "tasa_entrenamiento": 0.3142411712871958,
+        "positivos_esperados": 1660.7986657659321,
+        "positivos_observados": 1713,
+        "ece_deciles": 0.04934890541073107,
+        "por_decil": [
+          {
+            "decil": 1,
+            "filas": 718,
+            "probabilidad_media": 7.864523772974387e-05,
+            "tasa_observada": 0.0
+          },
+          {
+            "decil": 2,
+            "filas": 717,
+            "probabilidad_media": 0.000936403744695018,
+            "tasa_observada": 0.0
+          },
+          {
+            "decil": 3,
+            "filas": 717,
+            "probabilidad_media": 0.004354732392661715,
+            "tasa_observada": 0.0
+          },
+          {
+            "decil": 4,
+            "filas": 717,
+            "probabilidad_media": 0.01502047418529929,
+            "tasa_observada": 0.0
+          },
+          {
+            "decil": 5,
+            "filas": 718,
+            "probabilidad_media": 0.04059581550125855,
+            "tasa_observada": 0.0
+          },
+          {
+            "decil": 6,
+            "filas": 717,
+            "probabilidad_media": 0.09431293589836895,
+            "tasa_observada": 0.009762900976290097
+          },
+          {
+            "decil": 7,
+            "filas": 717,
+            "probabilidad_media": 0.20279578478305674,
+            "tasa_observada": 0.15202231520223153
+          },
+          {
+            "decil": 8,
+            "filas": 717,
+            "probabilidad_media": 0.39668600904939105,
+            "tasa_observada": 0.5718270571827058
+          },
+          {
+            "decil": 9,
+            "filas": 717,
+            "probabilidad_media": 0.6603704534713608,
+            "tasa_observada": 0.7684797768479776
+          },
+          {
+            "decil": 10,
+            "filas": 718,
+            "probabilidad_media": 0.8998531225599343,
+            "tasa_observada": 0.8857938718662952
+          }
+        ],
+        "lista_500": {
+          "probabilidad_media": 0.7676923666356615,
+          "precision_observada": 0.826
+        }
+      },
+      "segmentos": {
+        "global": {
+          "filas": 7173,
+          "positivos": 1713,
+          "en_lista": 1500.0,
+          "vp": 1239.0,
+          "fp": 261.0,
+          "precision": 0.826,
+          "precision_regla": 0.8157777777777777
+        },
+        "filas": [
+          {
+            "segmento": "formato de tienda principal",
+            "valor": "(sin tienda)",
+            "filas": 229,
+            "positivos": 27,
+            "tasa_base": 0.11790393013100436,
+            "en_lista": 27.0,
+            "vp": 23.0,
+            "fp": 4.0,
+            "precision": 0.8518518518518519,
+            "ic95": [
+              0.6752093665317052,
+              0.9408416814035512
+            ],
+            "diferencia_pp": 2.5851851851851904,
+            "recall": 0.8518518518518519,
+            "parte_de_la_lista": 0.018,
+            "parte_de_las_falsas_alarmas": 0.01532567049808429,
+            "precision_regla": 0.7666666666666667,
+            "diferencia_regla_pp": -4.911111111111099
+          },
+          {
+            "segmento": "formato de tienda principal",
+            "valor": "Chico",
+            "filas": 1191,
+            "positivos": 302,
+            "tasa_base": 0.25356842989084805,
+            "en_lista": 260.0,
+            "vp": 219.0,
+            "fp": 41.0,
+            "precision": 0.8423076923076923,
+            "ic95": [
+              0.7930651273870444,
+              0.8815820851829219
+            ],
+            "diferencia_pp": 1.6307692307692356,
+            "recall": 0.7251655629139073,
+            "parte_de_la_lista": 0.17333333333333334,
+            "parte_de_las_falsas_alarmas": 0.15708812260536398,
+            "precision_regla": 0.8478802992518704,
+            "diferencia_regla_pp": 3.210252147409265
+          },
+          {
+            "segmento": "formato de tienda principal",
+            "valor": "Grande",
+            "filas": 2682,
+            "positivos": 649,
+            "tasa_base": 0.24198359433258762,
+            "en_lista": 554.0,
+            "vp": 460.0,
+            "fp": 94.0,
+            "precision": 0.8303249097472925,
+            "ic95": [
+              0.7968189044836574,
+              0.8592813218171419
+            ],
+            "diferencia_pp": 0.43249097472924936,
+            "recall": 0.7087827426810478,
+            "parte_de_la_lista": 0.36933333333333335,
+            "parte_de_las_falsas_alarmas": 0.36015325670498083,
+            "precision_regla": 0.8147492625368731,
+            "diferencia_regla_pp": -0.10285152409046372
+          },
+          {
+            "segmento": "formato de tienda principal",
+            "valor": "Mediano",
+            "filas": 3071,
+            "positivos": 735,
+            "tasa_base": 0.2393357212634321,
+            "en_lista": 659.0,
+            "vp": 537.0,
+            "fp": 122.0,
+            "precision": 0.8148710166919575,
+            "ic95": [
+              0.7834211329698899,
+              0.8426711340211981
+            ],
+            "diferencia_pp": -1.1128983308042462,
+            "recall": 0.7306122448979592,
+            "parte_de_la_lista": 0.43933333333333335,
+            "parte_de_las_falsas_alarmas": 0.4674329501915709,
+            "precision_regla": 0.8055410350235233,
+            "diferencia_regla_pp": -1.0236742754254458
+          },
+          {
+            "segmento": "canal de alta",
+            "valor": "fisico",
+            "filas": 4248,
+            "positivos": 1015,
+            "tasa_base": 0.23893596986817325,
+            "en_lista": 873.0,
+            "vp": 733.0,
+            "fp": 140.0,
+            "precision": 0.8396334478808706,
+            "ic95": [
+              0.8138116075951077,
+              0.8624792983108164
+            ],
+            "diferencia_pp": 1.363344788087062,
+            "recall": 0.722167487684729,
+            "parte_de_la_lista": 0.582,
+            "parte_de_las_falsas_alarmas": 0.5363984674329502,
+            "precision_regla": 0.8341669873028089,
+            "diferencia_regla_pp": 1.8389209525031203
+          },
+          {
+            "segmento": "canal de alta",
+            "valor": "online",
+            "filas": 2925,
+            "positivos": 698,
+            "tasa_base": 0.23863247863247863,
+            "en_lista": 627.0,
+            "vp": 506.0,
+            "fp": 121.0,
+            "precision": 0.8070175438596491,
+            "ic95": [
+              0.7742950746695503,
+              0.8360007587060545
+            ],
+            "diferencia_pp": -1.8982456140350878,
+            "recall": 0.7249283667621776,
+            "parte_de_la_lista": 0.418,
+            "parte_de_las_falsas_alarmas": 0.46360153256704983,
+            "precision_regla": 0.7906365071015256,
+            "diferencia_regla_pp": -2.514127067625216
+          },
+          {
+            "segmento": "antigüedad",
+            "valor": "12 a 23 meses",
+            "filas": 3693,
+            "positivos": 930,
+            "tasa_base": 0.2518277822908205,
+            "en_lista": 833.0,
+            "vp": 697.0,
+            "fp": 136.0,
+            "precision": 0.8367346938775511,
+            "ic95": [
+              0.8100988554971719,
+              0.8602789077497796
+            ],
+            "diferencia_pp": 1.0734693877551105,
+            "recall": 0.7494623655913979,
+            "parte_de_la_lista": 0.5553333333333333,
+            "parte_de_las_falsas_alarmas": 0.5210727969348659,
+            "precision_regla": 0.8270583367811336,
+            "diferencia_regla_pp": 1.1280559003355894
+          },
+          {
+            "segmento": "antigüedad",
+            "valor": "24 meses o más",
+            "filas": 3104,
+            "positivos": 637,
+            "tasa_base": 0.20521907216494845,
+            "en_lista": 522.0,
+            "vp": 428.0,
+            "fp": 94.0,
+            "precision": 0.8199233716475096,
+            "ic95": [
+              0.7846599916351488,
+              0.8505122731685489
+            ],
+            "diferencia_pp": -0.6076628352490343,
+            "recall": 0.6718995290423861,
+            "parte_de_la_lista": 0.348,
+            "parte_de_las_falsas_alarmas": 0.36015325670498083,
+            "precision_regla": 0.7973209085614444,
+            "diferencia_regla_pp": -1.8456869216333271
+          },
+          {
+            "segmento": "antigüedad",
+            "valor": "menos de 12 meses",
+            "filas": 376,
+            "positivos": 146,
+            "tasa_base": 0.3882978723404255,
+            "en_lista": 145.0,
+            "vp": 114.0,
+            "fp": 31.0,
+            "precision": 0.7862068965517242,
+            "ic95": [
+              0.7125412798762675,
+              0.8450985197496436
+            ],
+            "diferencia_pp": -3.97931034482758,
+            "recall": 0.7808219178082192,
+            "parte_de_la_lista": 0.09666666666666666,
+            "parte_de_las_falsas_alarmas": 0.11877394636015326,
+            "precision_regla": 0.8278688524590164,
+            "diferencia_regla_pp": 1.2091074681238712
+          },
+          {
+            "segmento": "alto valor",
+            "valor": "20 % de mayor facturación",
+            "filas": 1436,
+            "positivos": 492,
+            "tasa_base": 0.3426183844011142,
+            "en_lista": 442.0,
+            "vp": 352.0,
+            "fp": 90.0,
+            "precision": 0.7963800904977375,
+            "ic95": [
+              0.7563594689225064,
+              0.831293186190879
+            ],
+            "diferencia_pp": -2.9619909502262454,
+            "recall": 0.7154471544715447,
+            "parte_de_la_lista": 0.2946666666666667,
+            "parte_de_las_falsas_alarmas": 0.3448275862068966,
+            "precision_regla": 0.7878787878787878,
+            "diferencia_regla_pp": -2.7898989898989868
+          },
+          {
+            "segmento": "alto valor",
+            "valor": "resto",
+            "filas": 5737,
+            "positivos": 1221,
+            "tasa_base": 0.21282900470629249,
+            "en_lista": 1058.0,
+            "vp": 887.0,
+            "fp": 171.0,
+            "precision": 0.8383742911153119,
+            "ic95": [
+              0.814975119715494,
+              0.859325077225368
+            ],
+            "diferencia_pp": 1.2374291115311964,
+            "recall": 0.7264537264537264,
+            "parte_de_la_lista": 0.7053333333333334,
+            "parte_de_las_falsas_alarmas": 0.6551724137931034,
+            "precision_regla": 0.8269530034235916,
+            "diferencia_regla_pp": 1.1175225645813858
+          },
+          {
+            "segmento": "genero",
+            "valor": "(vacío)",
+            "filas": 333,
+            "positivos": 80,
+            "tasa_base": 0.24024024024024024,
+            "en_lista": 76.0,
+            "vp": 62.0,
+            "fp": 14.0,
+            "precision": 0.8157894736842105,
+            "ic95": [
+              0.7142152897559246,
+              0.8869750671507506
+            ],
+            "diferencia_pp": -1.0210526315789448,
+            "recall": 0.775,
+            "parte_de_la_lista": 0.050666666666666665,
+            "parte_de_las_falsas_alarmas": 0.05363984674329502,
+            "precision_regla": 0.7838983050847458,
+            "diferencia_regla_pp": -3.187947269303193
+          },
+          {
+            "segmento": "genero",
+            "valor": "F",
+            "filas": 3308,
+            "positivos": 769,
+            "tasa_base": 0.23246674727932284,
+            "en_lista": 685.0,
+            "vp": 546.0,
+            "fp": 139.0,
+            "precision": 0.7970802919708029,
+            "ic95": [
+              0.7653440939028311,
+              0.8255029164983989
+            ],
+            "diferencia_pp": -2.8919708029197078,
+            "recall": 0.7100130039011704,
+            "parte_de_la_lista": 0.45666666666666667,
+            "parte_de_las_falsas_alarmas": 0.5325670498084292,
+            "precision_regla": 0.7870905587668593,
+            "diferencia_regla_pp": -2.868721901091842
+          },
+          {
+            "segmento": "genero",
+            "valor": "M",
+            "filas": 3339,
+            "positivos": 815,
+            "tasa_base": 0.24408505540581013,
+            "en_lista": 702.0,
+            "vp": 602.0,
+            "fp": 100.0,
+            "precision": 0.8575498575498576,
+            "ic95": [
+              0.8297457462493676,
+              0.8814619808100748
+            ],
+            "diferencia_pp": 3.154985754985762,
+            "recall": 0.7386503067484662,
+            "parte_de_la_lista": 0.468,
+            "parte_de_las_falsas_alarmas": 0.3831417624521073,
+            "precision_regla": 0.8505802707930368,
+            "diferencia_regla_pp": 3.480249301525906
+          },
+          {
+            "segmento": "genero",
+            "valor": "X",
+            "filas": 193,
+            "positivos": 49,
+            "tasa_base": 0.2538860103626943,
+            "en_lista": 37.0,
+            "vp": 29.0,
+            "fp": 8.0,
+            "precision": 0.7837837837837838,
+            "ic95": [
+              0.628045387261231,
+              0.8861362314804442
+            ],
+            "diferencia_pp": -4.221621621621619,
+            "recall": 0.5918367346938775,
+            "parte_de_la_lista": 0.024666666666666667,
+            "parte_de_las_falsas_alarmas": 0.03065134099616858,
+            "precision_regla": 0.775,
+            "diferencia_regla_pp": -4.077777777777769
+          }
+        ]
+      },
+      "meta_criterio_1": {
+        "regla_aciertos_por_mes": 379.0,
+        "meta": 379
+      },
+      "alerta_fila_10": {
+        "regla_precision_por_corte": [
+          0.728,
+          0.766,
+          0.78
+        ],
+        "umbral": 0.72
+      }
+    },
+    "criterio": {
+      "ic95_limite_inferior": -0.032534444444444414,
+      "condicion_1_intervalo_excluye_el_cero": false,
+      "aciertos_extra_por_mes": -9.666666666666666,
+      "aciertos_extra_por_mes_para_pagar": 8594.663640675424,
+      "condicion_2_paga_lo_que_agrega": false,
+      "valor_extra_anual_usd": -11.697180661910439,
+      "costo_incremental_usd": 10400.0
+    }
+  },
+  "columna_8_1_validacion": {
+    "logistica_ajustada": {
+      "metrica_principal": 0.7386666666666667,
+      "precision": 0.7386666666666667,
+      "recall": 0.9429787234042554,
+      "f1": 0.8284112149532711,
+      "auc_roc": 0.9660145075208882,
+      "valor_neto_anual_usd": 252.840310573991
+    },
+    "regla_umbral": {
+      "metrica_principal": 0.758,
+      "precision": 0.758,
+      "recall": 0.9676595744680851,
+      "f1": 0.8500934579439252,
+      "auc_roc": 0.9697447138978086,
+      "valor_neto_anual_usd": 264.5374912359015
+    }
+  },
+  "matriz_8_1_validacion": {
+    "vp": 1108.0,
+    "fn": 67.0,
+    "fp": 392.0,
+    "vn": 3471.0,
+    "filas": 5038.0,
+    "en_la_lista": 1500.0,
+    "positivos": 1175.0
+  },
+  "contra_roi_b_3_4_validacion": [
+    {
+      "fila": "modelo_sobre_la_regla",
+      "id": "G40",
+      "que": "modelo sobre la regla, contra el costo incremental",
+      "costo_usd": 10400.0,
+      "b_3_4": {
+        "beneficio_usd": 5.378014097430056,
+        "roi_pct": -99.94828832598624,
+        "recupera_en_el_anio": false
+      },
+      "contactables": {
+        "beneficio_usd": -11.697180661910494,
+        "roi_pct": -100.11247289097992,
+        "recupera_en_el_anio": false,
+        "contra_b_3_4_usd": -17.07519475934055
+      },
+      "sin_filtro": {
+        "beneficio_usd": 6.184716212044634,
+        "roi_pct": -99.94053157488419,
+        "recupera_en_el_anio": false,
+        "contra_b_3_4_usd": 0.8067021146145779
+      },
+      "cambia_el_veredicto": false
+    },
+    {
+      "fila": "proyecto_completo",
+      "id": "G40 (beneficio de G34)",
+      "que": "proyecto con modelo frente a no contactar, contra el costo total del año 1",
+      "costo_usd": 30660.0,
+      "b_3_4": {
+        "beneficio_usd": 304.87259696662704,
+        "roi_pct": -99.00563406077421,
+        "recupera_en_el_anio": false
+      },
+      "contactables": {
+        "beneficio_usd": 252.840310573991,
+        "roi_pct": -99.17534145279193,
+        "recupera_en_el_anio": false,
+        "contra_b_3_4_usd": -52.03228639263605
+      },
+      "sin_filtro": {
+        "beneficio_usd": 305.6792990812416,
+        "roi_pct": -99.00300293841734,
+        "recupera_en_el_anio": false,
+        "contra_b_3_4_usd": 0.8067021146145521
+      },
+      "cambia_el_veredicto": false
+    },
+    {
+      "fila": "regla_sin_modelo",
+      "id": "G41",
+      "que": "regla sin modelo con 15 % de descuento, contra el costo del año 1 de la regla",
+      "costo_usd": 20260.0,
+      "b_3_4": {
+        "beneficio_usd": 299.49458286919696,
+        "roi_pct": -98.52174440834553,
+        "recupera_en_el_anio": false
+      },
+      "contactables": {
+        "beneficio_usd": 264.5374912359015,
+        "roi_pct": -98.69428681522261,
+        "recupera_en_el_anio": false,
+        "contra_b_3_4_usd": -34.95709163329548
+      },
+      "sin_filtro": {
+        "beneficio_usd": 299.49458286919696,
+        "roi_pct": -98.52174440834553,
+        "recupera_en_el_anio": false,
+        "contra_b_3_4_usd": 0.0
+      },
+      "cambia_el_veredicto": false
+    }
+  ],
+  "ensayo_del_criterio": {
+    "aviso": "el criterio de la C 6.2, fila 13, aplicado a validación para probar el código; la decisión vale solo en test",
+    "resultado": "la lista sigue con la regla del umbral"
+  },
+  "control": {
+    "cifras": 125,
+    "reproducen": 125,
+    "tolerancia": 1e-09,
+    "detalle": [
+      {
+        "clave_etapa3": "umbral.filtradas.modelo[lista de 500 por corte, solo contactables].precision",
+        "etapa3": 0.7386666666666667,
+        "etapa4": 0.7386666666666667,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.modelo[lista de 500 por corte, solo contactables].recall",
+        "etapa3": 0.9429787234042554,
+        "etapa4": 0.9429787234042554,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.modelo[lista de 500 por corte, solo contactables].vp",
+        "etapa3": 1108.0,
+        "etapa4": 1108.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.modelo[lista de 500 por corte, solo contactables].fp",
+        "etapa3": 392.0,
+        "etapa4": 392.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.modelo[lista de 500 por corte, solo contactables].valor_neto_anual_usd",
+        "etapa3": 252.840310573991,
+        "etapa4": 252.840310573991,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.regla_umbral[lista de 500 por corte, solo contactables].precision",
+        "etapa3": 0.758,
+        "etapa4": 0.758,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.regla_umbral[lista de 500 por corte, solo contactables].recall",
+        "etapa3": 0.9676595744680851,
+        "etapa4": 0.9676595744680851,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.regla_umbral[lista de 500 por corte, solo contactables].vp",
+        "etapa3": 1137.0,
+        "etapa4": 1137.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.regla_umbral[lista de 500 por corte, solo contactables].fp",
+        "etapa3": 363.0,
+        "etapa4": 363.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.regla_umbral[lista de 500 por corte, solo contactables].valor_neto_anual_usd",
+        "etapa3": 264.5374912359015,
+        "etapa4": 264.5374912359015,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.practica_actual[lista de 500 por corte, solo contactables].precision",
+        "etapa3": 0.32761904761904764,
+        "etapa4": 0.32761904761904764,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.practica_actual[lista de 500 por corte, solo contactables].recall",
+        "etapa3": 0.4182370820668693,
+        "etapa4": 0.4182370820668693,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.practica_actual[lista de 500 por corte, solo contactables].vp",
+        "etapa3": 491.42857142857144,
+        "etapa4": 491.42857142857144,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.practica_actual[lista de 500 por corte, solo contactables].fp",
+        "etapa3": 1008.5714285714286,
+        "etapa4": 1008.5714285714286,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.practica_actual[lista de 500 por corte, solo contactables].valor_neto_anual_usd",
+        "etapa3": 4.145572954259739,
+        "etapa4": 4.145572954259739,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "contra.filtrada_logistica_ajustada_menos_regla.ic95.inferior",
+        "etapa3": -0.032534444444444414,
+        "etapa4": -0.032534444444444414,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "contra.filtrada_logistica_ajustada_menos_regla.ic95.superior",
+        "etapa3": -0.010709999999999895,
+        "etapa4": -0.010709999999999895,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "contra.filtrada_logistica_ajustada_menos_regla.replicas_con_a_mejor",
+        "etapa3": 0.0,
+        "etapa4": 0.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "contra.logistica_ajustada_menos_regla.ic95.inferior",
+        "etapa3": -0.005049206349206273,
+        "etapa4": -0.005049206349206273,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "contra.logistica_ajustada_menos_regla.ic95.superior",
+        "etapa3": 0.01806976190476191,
+        "etapa4": 0.01806976190476191,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "contra.logistica_ajustada_menos_regla.replicas_con_a_mejor",
+        "etapa3": 0.865,
+        "etapa4": 0.865,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.lista_500.precision",
+        "etapa3": 0.826,
+        "etapa4": 0.826,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.lista_500.recall",
+        "etapa3": 0.723292469352014,
+        "etapa4": 0.723292469352014,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.lista_500.aciertos",
+        "etapa3": 1239.0,
+        "etapa4": 1239.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.lista_500.f1",
+        "etapa3": 0.7712418300653595,
+        "etapa4": 0.7712418300653595,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.decil_superior",
+        "etapa3": 0.8842398884239888,
+        "etapa4": 0.8842398884239888,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.auc_roc",
+        "etapa3": 0.9638667034463884,
+        "etapa4": 0.9638667034463884,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.auc_pr",
+        "etapa3": 0.8581672151937472,
+        "etapa4": 0.8581672151937472,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.regla_umbral.validacion.lista_500.precision",
+        "etapa3": 0.8157777777777778,
+        "etapa4": 0.8157777777777778,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.regla_umbral.validacion.lista_500.recall",
+        "etapa3": 0.71434131153921,
+        "etapa4": 0.71434131153921,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.regla_umbral.validacion.lista_500.aciertos",
+        "etapa3": 1223.6666666666667,
+        "etapa4": 1223.6666666666667,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.regla_umbral.validacion.lista_500.f1",
+        "etapa3": 0.7616972715011932,
+        "etapa4": 0.7616972715011932,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.regla_umbral.validacion.decil_superior",
+        "etapa3": 0.9065550906555091,
+        "etapa4": 0.9065550906555091,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.regla_umbral.validacion.auc_roc",
+        "etapa3": 0.9681792327151346,
+        "etapa4": 0.9681792327151346,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.regla_umbral.validacion.auc_pr",
+        "etapa3": 0.8737142882625789,
+        "etapa4": 0.8737142882625789,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.umbral_05.precision",
+        "etapa3": 0.8235690235690236,
+        "etapa4": 0.8235690235690236,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.umbral_05.recall",
+        "etapa3": 0.7139521307647402,
+        "etapa4": 0.7139521307647402,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.umbral_05.f1",
+        "etapa3": 0.7648530331457161,
+        "etapa4": 0.7648530331457161,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.validacion.umbral_05.avisados",
+        "etapa3": 1485,
+        "etapa4": 1485,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "calibracion.logistica_ajustada.brier",
+        "etapa3": 0.069464690745474,
+        "etapa4": 0.069464690745474,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "calibracion.logistica_ajustada.probabilidad_media",
+        "etapa3": 0.23153473661869958,
+        "etapa4": 0.23153473661869958,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "calibracion.logistica_ajustada.ece_deciles",
+        "etapa3": 0.04934890541073107,
+        "etapa4": 0.04934890541073107,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "calibracion.logistica_ajustada.lista_500.probabilidad_media",
+        "etapa3": 0.7676923666356615,
+        "etapa4": 0.7676923666356615,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = (sin tienda)].en_lista",
+        "etapa3": 27.0,
+        "etapa4": 27.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = (sin tienda)].precision",
+        "etapa3": 0.8518518518518519,
+        "etapa4": 0.8518518518518519,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = (sin tienda)].precision_regla",
+        "etapa3": 0.7666666666666667,
+        "etapa4": 0.7666666666666667,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = Chico].en_lista",
+        "etapa3": 260.0,
+        "etapa4": 260.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = Chico].precision",
+        "etapa3": 0.8423076923076923,
+        "etapa4": 0.8423076923076923,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = Chico].precision_regla",
+        "etapa3": 0.8478802992518704,
+        "etapa4": 0.8478802992518704,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = Grande].en_lista",
+        "etapa3": 554.0,
+        "etapa4": 554.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = Grande].precision",
+        "etapa3": 0.8303249097472925,
+        "etapa4": 0.8303249097472925,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = Grande].precision_regla",
+        "etapa3": 0.8147492625368731,
+        "etapa4": 0.8147492625368731,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = Mediano].en_lista",
+        "etapa3": 659.0,
+        "etapa4": 659.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = Mediano].precision",
+        "etapa3": 0.8148710166919575,
+        "etapa4": 0.8148710166919575,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[formato de tienda principal = Mediano].precision_regla",
+        "etapa3": 0.8055410350235233,
+        "etapa4": 0.8055410350235233,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[canal de alta = fisico].en_lista",
+        "etapa3": 873.0,
+        "etapa4": 873.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[canal de alta = fisico].precision",
+        "etapa3": 0.8396334478808706,
+        "etapa4": 0.8396334478808706,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[canal de alta = fisico].precision_regla",
+        "etapa3": 0.8341669873028089,
+        "etapa4": 0.8341669873028089,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[canal de alta = online].en_lista",
+        "etapa3": 627.0,
+        "etapa4": 627.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[canal de alta = online].precision",
+        "etapa3": 0.8070175438596491,
+        "etapa4": 0.8070175438596491,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[canal de alta = online].precision_regla",
+        "etapa3": 0.7906365071015256,
+        "etapa4": 0.7906365071015256,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[antigüedad = 12 a 23 meses].en_lista",
+        "etapa3": 833.0,
+        "etapa4": 833.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[antigüedad = 12 a 23 meses].precision",
+        "etapa3": 0.8367346938775511,
+        "etapa4": 0.8367346938775511,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[antigüedad = 12 a 23 meses].precision_regla",
+        "etapa3": 0.8270583367811336,
+        "etapa4": 0.8270583367811336,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[antigüedad = 24 meses o más].en_lista",
+        "etapa3": 522.0,
+        "etapa4": 522.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[antigüedad = 24 meses o más].precision",
+        "etapa3": 0.8199233716475096,
+        "etapa4": 0.8199233716475096,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[antigüedad = 24 meses o más].precision_regla",
+        "etapa3": 0.7973209085614444,
+        "etapa4": 0.7973209085614444,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[antigüedad = menos de 12 meses].en_lista",
+        "etapa3": 145.0,
+        "etapa4": 145.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[antigüedad = menos de 12 meses].precision",
+        "etapa3": 0.7862068965517242,
+        "etapa4": 0.7862068965517242,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[antigüedad = menos de 12 meses].precision_regla",
+        "etapa3": 0.8278688524590164,
+        "etapa4": 0.8278688524590164,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[alto valor = 20 % de mayor facturación].en_lista",
+        "etapa3": 442.0,
+        "etapa4": 442.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[alto valor = 20 % de mayor facturación].precision",
+        "etapa3": 0.7963800904977375,
+        "etapa4": 0.7963800904977375,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[alto valor = 20 % de mayor facturación].precision_regla",
+        "etapa3": 0.7878787878787878,
+        "etapa4": 0.7878787878787878,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[alto valor = resto].en_lista",
+        "etapa3": 1058.0,
+        "etapa4": 1058.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[alto valor = resto].precision",
+        "etapa3": 0.8383742911153119,
+        "etapa4": 0.8383742911153119,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[alto valor = resto].precision_regla",
+        "etapa3": 0.8269530034235916,
+        "etapa4": 0.8269530034235916,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = (vacío)].en_lista",
+        "etapa3": 76.0,
+        "etapa4": 76.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = (vacío)].precision",
+        "etapa3": 0.8157894736842105,
+        "etapa4": 0.8157894736842105,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = (vacío)].precision_regla",
+        "etapa3": 0.7838983050847458,
+        "etapa4": 0.7838983050847458,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = F].en_lista",
+        "etapa3": 685.0,
+        "etapa4": 685.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = F].precision",
+        "etapa3": 0.7970802919708029,
+        "etapa4": 0.7970802919708029,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = F].precision_regla",
+        "etapa3": 0.7870905587668593,
+        "etapa4": 0.7870905587668593,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = M].en_lista",
+        "etapa3": 702.0,
+        "etapa4": 702.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = M].precision",
+        "etapa3": 0.8575498575498576,
+        "etapa4": 0.8575498575498576,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = M].precision_regla",
+        "etapa3": 0.8505802707930368,
+        "etapa4": 0.8505802707930368,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = X].en_lista",
+        "etapa3": 37.0,
+        "etapa4": 37.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = X].precision",
+        "etapa3": 0.7837837837837838,
+        "etapa4": 0.7837837837837838,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "segmentos[genero = X].precision_regla",
+        "etapa3": 0.775,
+        "etapa4": 0.775,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.contactables_por_corte",
+        "etapa3": [
+          1585,
+          1688,
+          1765
+        ],
+        "etapa4": [
+          1585,
+          1688,
+          1765
+        ],
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "anualizar",
+        "etapa3": 4.0,
+        "etapa4": 4.0,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filas.modelo[lista de 500 por corte].valor_neto_anual_usd",
+        "etapa3": 305.6792990812416,
+        "etapa4": 305.6792990812416,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filas.regla_umbral[lista de 500 por corte].valor_neto_anual_usd",
+        "etapa3": 299.49458286919696,
+        "etapa4": 299.49458286919696,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "umbral.filtradas.modelo[lista de 500 por corte, solo contactables].probabilidad_del_ultimo_puesto",
+        "etapa3": [
+          0.2341903999122087,
+          0.2696687619560642,
+          0.32821737696499886
+        ],
+        "etapa4": [
+          0.2341903999122087,
+          0.2696687619560642,
+          0.32821737696499886
+        ],
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "medidos.logistica_ajustada.complejidad.coeficientes",
+        "etapa3": 73,
+        "etapa4": 73,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[0].termino",
+        "etapa3": "gap_mediano",
+        "etapa4": "gap_mediano",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[0].coeficiente (gap_mediano)",
+        "etapa3": -2.247185852280461,
+        "etapa4": -2.247185852280461,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[1].termino",
+        "etapa3": "recency_sobre_umbral",
+        "etapa4": "recency_sobre_umbral",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[1].coeficiente (recency_sobre_umbral)",
+        "etapa3": 1.279076722771225,
+        "etapa4": 1.279076722771225,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[2].termino",
+        "etapa3": "recency_dias",
+        "etapa4": "recency_dias",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[2].coeficiente (recency_dias)",
+        "etapa3": 0.600442559025099,
+        "etapa4": 0.600442559025099,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[3].termino",
+        "etapa3": "compras_90d",
+        "etapa4": "compras_90d",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[3].coeficiente (compras_90d)",
+        "etapa3": 0.24573876474138345,
+        "etapa4": 0.24573876474138345,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[4].termino",
+        "etapa3": "missingindicator_ticket_90d",
+        "etapa4": "missingindicator_ticket_90d",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[4].coeficiente (missingindicator_ticket_90d)",
+        "etapa3": 0.19776358521810145,
+        "etapa4": 0.19776358521810145,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[5].termino",
+        "etapa3": "envios_acum",
+        "etapa4": "envios_acum",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[5].coeficiente (envios_acum)",
+        "etapa3": -0.19248013520348373,
+        "etapa4": -0.19248013520348373,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[6].termino",
+        "etapa3": "meses_desde_alta",
+        "etapa4": "meses_desde_alta",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[6].coeficiente (meses_desde_alta)",
+        "etapa3": -0.1384381326635251,
+        "etapa4": -0.1384381326635251,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[7].termino",
+        "etapa3": "categoria_dominante_Decoracion",
+        "etapa4": "categoria_dominante_Decoracion",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[7].coeficiente (categoria_dominante_Decoracion)",
+        "etapa3": -0.11805348743399058,
+        "etapa4": -0.11805348743399058,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[8].termino",
+        "etapa3": "reclamos_90d",
+        "etapa4": "reclamos_90d",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[8].coeficiente (reclamos_90d)",
+        "etapa3": -0.09923985587243075,
+        "etapa4": -0.09923985587243075,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[9].termino",
+        "etapa3": "reclamos_acum",
+        "etapa4": "reclamos_acum",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[9].coeficiente (reclamos_acum)",
+        "etapa3": 0.09654922139802478,
+        "etapa4": 0.09654922139802478,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[10].termino",
+        "etapa3": "formato_tienda_Chico",
+        "etapa4": "formato_tienda_Chico",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[10].coeficiente (formato_tienda_Chico)",
+        "etapa3": -0.08813649221574116,
+        "etapa4": -0.08813649221574116,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[11].termino",
+        "etapa3": "region_dominante_Centro",
+        "etapa4": "region_dominante_Centro",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[11].coeficiente (region_dominante_Centro)",
+        "etapa3": 0.08334837770250683,
+        "etapa4": 0.08334837770250683,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[12].termino",
+        "etapa3": "ultimo_canal_campania_(vacío)",
+        "etapa4": "ultimo_canal_campania_(vacío)",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[12].coeficiente (ultimo_canal_campania_(vacío))",
+        "etapa3": -0.07772991565158352,
+        "etapa4": -0.07772991565158352,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[13].termino",
+        "etapa3": "formato_tienda_Mediano",
+        "etapa4": "formato_tienda_Mediano",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[13].coeficiente (formato_tienda_Mediano)",
+        "etapa3": 0.06602301871939782,
+        "etapa4": 0.06602301871939782,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[14].termino",
+        "etapa3": "region_dominante_Cuyo",
+        "etapa4": "region_dominante_Cuyo",
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "coeficientes[14].coeficiente (region_dominante_Cuyo)",
+        "etapa3": -0.06549515862889042,
+        "etapa4": -0.06549515862889042,
+        "reproduce": true
+      },
+      {
+        "clave_etapa3": "agrupadas_min_frecuencia",
+        "etapa3": {
+          "motivo_ultima_devolucion": [
+            "Cambio de talle/color",
+            "Error de compra",
+            "No cumplio expectativas",
+            "Producto dañado en envio",
+            "Producto defectuoso"
+          ]
+        },
+        "etapa4": {
+          "motivo_ultima_devolucion": [
+            "Cambio de talle/color",
+            "Error de compra",
+            "No cumplio expectativas",
+            "Producto dañado en envio",
+            "Producto defectuoso"
+          ]
+        },
+        "reproduce": true
+      }
+    ]
+  }
+}

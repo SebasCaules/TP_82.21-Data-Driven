@@ -1,0 +1,404 @@
+{
+  "dataset": "churn_cliente_corte_v0.2.csv.gz",
+  "dataset_control_de_fugas": "B-churn_cliente_corte_v0.1.csv",
+  "capacidad": 500,
+  "decil": 0.1,
+  "ficha": {
+    "filas": 59585,
+    "columnas_tablon": 45,
+    "clientes": 4627,
+    "cortes": 33,
+    "positivos": 16052,
+    "tasa": 0.2693966602332802,
+    "por_particion": [
+      {
+        "particion": "train",
+        "filas": 18882,
+        "cortes": 18,
+        "desde": "2023-01-31",
+        "hasta": "2024-06-30",
+        "clientes": 2921,
+        "clientes_con_positivo": 1681,
+        "positivos": 5698,
+        "tasa": 0.30176888041521027
+      },
+      {
+        "particion": "dev",
+        "filas": 7173,
+        "cortes": 3,
+        "desde": "2024-07-31",
+        "hasta": "2024-09-30",
+        "clientes": 2829,
+        "clientes_con_positivo": 960,
+        "positivos": 1713,
+        "tasa": 0.23881221246340442
+      },
+      {
+        "particion": "gap",
+        "filas": 8025,
+        "cortes": 3,
+        "desde": "2024-10-31",
+        "hasta": "2024-12-31",
+        "clientes": 3095,
+        "clientes_con_positivo": 1111,
+        "positivos": 2008,
+        "tasa": 0.25021806853582557
+      },
+      {
+        "particion": "test",
+        "filas": 14211,
+        "cortes": 5,
+        "desde": "2025-01-31",
+        "hasta": "2025-05-31",
+        "clientes": 3636,
+        "clientes_con_positivo": 1647,
+        "positivos": 3602,
+        "tasa": 0.25346562521990007
+      },
+      {
+        "particion": "test_flag",
+        "filas": 11294,
+        "cortes": 4,
+        "desde": "2025-06-30",
+        "hasta": "2025-09-30",
+        "clientes": 3414,
+        "clientes_con_positivo": 1501,
+        "positivos": 3031,
+        "tasa": 0.2683725872144502
+      }
+    ],
+    "estructura": {
+      "filas_no_alcanzables": 39632,
+      "pct_no_alcanzables": 0.6651338424100025,
+      "positivos_no_alcanzables": 0,
+      "filas_alcanzables": 19953,
+      "tasa_alcanzables": 0.8044905527990779
+    }
+  },
+  "particion": {
+    "tramos": {
+      "train": {
+        "primer_corte": "2023-01-31",
+        "ultimo_corte": "2024-06-30",
+        "target_mira_hasta": "2024-09-28"
+      },
+      "dev": {
+        "primer_corte": "2024-07-31",
+        "ultimo_corte": "2024-09-30",
+        "target_mira_hasta": "2024-12-29"
+      },
+      "gap": {
+        "primer_corte": "2024-10-31",
+        "ultimo_corte": "2024-12-31",
+        "target_mira_hasta": "2025-03-31"
+      }
+    },
+    "primer_corte_test": "2025-01-31",
+    "embargo": {
+      "cortes_purgados": [
+        "2024-05-31",
+        "2024-06-30"
+      ],
+      "filas_purgadas": 4129,
+      "entrenamiento_filas": 14753,
+      "entrenamiento_cortes": 16,
+      "entrenamiento_clientes": 2547,
+      "entrenamiento_clientes_con_positivo": 1431,
+      "entrenamiento_positivos": 4636,
+      "entrenamiento_tasa": 0.3142411712871958,
+      "target_mira_hasta": "2024-07-29"
+    },
+    "validacion": {
+      "filas": 7173,
+      "positivos": 1713,
+      "tasa": 0.23881221246340442,
+      "clientes": 2829,
+      "clientes_con_positivo": 960
+    },
+    "clientes_en_entrenamiento_y_validacion": 1927,
+    "pct_clientes_validacion_vistos": 0.6811594202898551
+  },
+  "tramos_de_cruce": {
+    "train": [
+      {
+        "tramo": "menos de 30",
+        "filas": 1873,
+        "positivos": 1735,
+        "tasa": 0.9263214095034704
+      },
+      {
+        "tramo": "30 a 59",
+        "filas": 2392,
+        "positivos": 1899,
+        "tasa": 0.7938963210702341
+      },
+      {
+        "tramo": "60 a 89",
+        "filas": 3030,
+        "positivos": 2064,
+        "tasa": 0.6811881188118812
+      },
+      {
+        "tramo": "90 o más",
+        "filas": 11587,
+        "positivos": 0,
+        "tasa": 0.0
+      }
+    ],
+    "dev": [
+      {
+        "tramo": "menos de 30",
+        "filas": 603,
+        "positivos": 553,
+        "tasa": 0.9170812603648425
+      },
+      {
+        "tramo": "30 a 59",
+        "filas": 743,
+        "positivos": 566,
+        "tasa": 0.7617765814266487
+      },
+      {
+        "tramo": "60 a 89",
+        "filas": 907,
+        "positivos": 594,
+        "tasa": 0.6549062844542448
+      },
+      {
+        "tramo": "90 o más",
+        "filas": 4920,
+        "positivos": 0,
+        "tasa": 0.0
+      }
+    ]
+  },
+  "fugas": {
+    "sospechosas": [
+      "recency_sobre_umbral",
+      "gap_mediano"
+    ],
+    "decisiones": {
+      "mantener": 37,
+      "excluir": 3,
+      "recalcular": 3
+    },
+    "excluir": [
+      "puntos_canjeados",
+      "meses_sin_movimiento",
+      "nivel"
+    ],
+    "recalcular": [
+      "clics_90d",
+      "aperturas_90d",
+      "compro_7d_alguna"
+    ]
+  },
+  "lineas_base_validacion": {
+    "filas": 7173,
+    "positivos": 1713,
+    "tasa": 0.23881221246340442,
+    "clase_mayoritaria": {
+      "auc_roc": 0.5,
+      "auc_pr": 0.23881221246340442,
+      "lista_capacidad": {
+        "largo": 1500,
+        "aciertos": 358.30332965424185,
+        "positivos": 1713,
+        "precision": 0.23886888643616122,
+        "recall": 0.20916715099488725,
+        "lift_vs_practica_actual": 0.6606022671080971
+      },
+      "decil_superior": {
+        "largo": 717,
+        "aciertos": 171.22918862829766,
+        "positivos": 1713,
+        "precision": 0.23881337326122407,
+        "recall": 0.09995866236327942,
+        "lift_vs_practica_actual": 0.6054066775308109
+      },
+      "accuracy": 0.7611877875365956,
+      "recall": 0.0,
+      "precision": null,
+      "f1": 0.0
+    },
+    "practica_actual": {
+      "auc_roc": 0.6542296679774788,
+      "auc_pr": 0.35775618646889484,
+      "lista_capacidad": {
+        "largo": 1500,
+        "aciertos": 542.3888888888889,
+        "positivos": 1713,
+        "precision": 0.36159259259259263,
+        "recall": 0.3166309917623403,
+        "lift_vs_practica_actual": 1.0
+      },
+      "decil_superior": {
+        "largo": 717,
+        "aciertos": 282.8333333333333,
+        "positivos": 1713,
+        "precision": 0.3944676894467689,
+        "recall": 0.1651099435687877,
+        "lift_vs_practica_actual": 1.0
+      }
+    },
+    "regla_umbral": {
+      "auc_roc": 0.9681792327151346,
+      "auc_pr": 0.8737142882625789,
+      "lista_capacidad": {
+        "largo": 1500,
+        "aciertos": 1223.6666666666667,
+        "positivos": 1713,
+        "precision": 0.8157777777777778,
+        "recall": 0.71434131153921,
+        "confusion": {
+          "tp": 1223.6666666666667,
+          "fp": 276.33333333333326,
+          "fn": 489.33333333333326,
+          "tn": 5183.666666666667
+        },
+        "lift_vs_practica_actual": 2.256068831301854
+      },
+      "decil_superior": {
+        "largo": 717,
+        "aciertos": 650.0,
+        "positivos": 1713,
+        "precision": 0.9065550906555091,
+        "recall": 0.37945125510799765,
+        "lift_vs_practica_actual": 2.2981732469063054
+      },
+      "como_clasificador": {
+        "tp": 1713,
+        "fp": 540,
+        "fn": 0,
+        "tn": 4920,
+        "precision": 0.7603195739014648,
+        "recall": 1.0,
+        "f1": 0.8638426626323752,
+        "accuracy": 0.9247176913425345
+      },
+      "dentro_de_alcanzables": {
+        "filas": 2253,
+        "positivos": 1713,
+        "tasa": 0.7603195739014648,
+        "auc_roc": 0.678256686341917
+      }
+    },
+    "por_corte": [
+      {
+        "corte": "2024-07-31",
+        "filas": 2259,
+        "positivos": 546,
+        "alcanzables": 709,
+        "precision_capacidad_regla_umbral": 0.8053333333333333,
+        "precision_capacidad_practica_actual": 0.3693333333333333
+      },
+      {
+        "corte": "2024-08-31",
+        "filas": 2402,
+        "positivos": 567,
+        "alcanzables": 747,
+        "precision_capacidad_regla_umbral": 0.832,
+        "precision_capacidad_practica_actual": 0.37977777777777777
+      },
+      {
+        "corte": "2024-09-30",
+        "filas": 2512,
+        "positivos": 600,
+        "alcanzables": 797,
+        "precision_capacidad_regla_umbral": 0.81,
+        "precision_capacidad_practica_actual": 0.33566666666666667
+      }
+    ]
+  },
+  "lineas_base_entrenamiento": {
+    "filas": 18882,
+    "positivos": 5698,
+    "tasa": 0.30176888041521027,
+    "clase_mayoritaria": {
+      "auc_roc": 0.5,
+      "auc_pr": 0.30176888041521027,
+      "lista_capacidad": {
+        "largo": 7920,
+        "aciertos": 2546.10238668239,
+        "positivos": 5698,
+        "precision": 0.3214775740760593,
+        "recall": 0.4468414157041751,
+        "lift_vs_practica_actual": 0.7828008846856905
+      },
+      "decil_superior": {
+        "largo": 1889,
+        "aciertos": 570.1736307509856,
+        "positivos": 5698,
+        "precision": 0.3018388728168267,
+        "recall": 0.10006557226237023,
+        "lift_vs_practica_actual": 0.5849934652027895
+      },
+      "accuracy": 0.6982311195847897,
+      "recall": 0.0,
+      "precision": null,
+      "f1": 0.0
+    },
+    "practica_actual": {
+      "auc_roc": 0.6605359435115199,
+      "auc_pr": 0.43176522749918433,
+      "lista_capacidad": {
+        "largo": 7920,
+        "aciertos": 3252.554304029304,
+        "positivos": 5698,
+        "precision": 0.4106760484885485,
+        "recall": 0.5708238511809941,
+        "lift_vs_practica_actual": 1.0
+      },
+      "decil_superior": {
+        "largo": 1889,
+        "aciertos": 974.6666666666667,
+        "positivos": 5698,
+        "precision": 0.5159696488441857,
+        "recall": 0.17105417105417106,
+        "lift_vs_practica_actual": 1.0
+      }
+    },
+    "regla_umbral": {
+      "auc_roc": 0.9599968755005163,
+      "auc_pr": 0.881855182983466,
+      "lista_capacidad": {
+        "largo": 7920,
+        "aciertos": 5161.571428571428,
+        "positivos": 5698,
+        "precision": 0.6517135642135642,
+        "recall": 0.9058566915709773,
+        "confusion": {
+          "tp": 5161.571428571428,
+          "fp": 2758.4285714285716,
+          "fn": 536.4285714285716,
+          "tn": 10425.571428571428
+        },
+        "lift_vs_practica_actual": 1.5869285939906401
+      },
+      "decil_superior": {
+        "largo": 1889,
+        "aciertos": 1742.125,
+        "positivos": 5698,
+        "precision": 0.9222472207517205,
+        "recall": 0.30574324324324326,
+        "lift_vs_practica_actual": 1.7874059507523936
+      },
+      "como_clasificador": {
+        "tp": 5698,
+        "fp": 1597,
+        "fn": 0,
+        "tn": 11587,
+        "precision": 0.7810829335161069,
+        "recall": 1.0,
+        "f1": 0.8770876625875471,
+        "accuracy": 0.9154220951170426
+      },
+      "dentro_de_alcanzables": {
+        "filas": 7295,
+        "positivos": 5698,
+        "tasa": 0.7810829335161069,
+        "auc_roc": 0.6697550448333166
+      }
+    }
+  }
+}

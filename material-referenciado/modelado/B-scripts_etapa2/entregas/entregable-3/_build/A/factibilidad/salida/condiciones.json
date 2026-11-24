@@ -1,0 +1,229 @@
+{
+  "inventario": [
+    {
+      "archivo": "Transacciones_clientes.csv",
+      "filas": 50250,
+      "periodo": [
+        "2022-01-03",
+        "2025-12-29"
+      ]
+    },
+    {
+      "archivo": "Clientes.csv",
+      "filas": 6050,
+      "periodo": [
+        "2022-01-01",
+        "2026-10-01"
+      ]
+    },
+    {
+      "archivo": "Identidad_resuelta.csv",
+      "filas": 665,
+      "periodo": null
+    },
+    {
+      "archivo": "Campanias_marketing.csv",
+      "filas": 23729,
+      "periodo": [
+        "2022-02-14",
+        "2025-11-23"
+      ]
+    },
+    {
+      "archivo": "Interacciones_soporte_mensual.csv",
+      "filas": 14976,
+      "periodo": [
+        "2022-02-01",
+        "2025-12-01"
+      ]
+    },
+    {
+      "archivo": "Fidelizacion.csv",
+      "filas": 4043,
+      "periodo": [
+        "2022-01-09",
+        "2025-12-31"
+      ],
+      "periodo_ultimo_movimiento": [
+        "2022-03-10",
+        "2025-12-31"
+      ]
+    },
+    {
+      "archivo": "Devoluciones.csv",
+      "filas": 613,
+      "periodo": [
+        "2022-01-31",
+        "2025-12-24"
+      ]
+    },
+    {
+      "archivo": "Historial_Bajas_No_Contacto.csv",
+      "filas": 1211,
+      "periodo": [
+        "2022-03-18",
+        "2026-08-30"
+      ]
+    },
+    {
+      "archivo": "Calendario.csv (unidad 2)",
+      "filas": 1704,
+      "periodo": [
+        "2022-01-01",
+        "2026-08-31"
+      ]
+    },
+    {
+      "archivo": "Calendario.csv (unidad 1)",
+      "filas": 1461,
+      "periodo": [
+        "2022-01-01",
+        "2025-12-31"
+      ]
+    },
+    {
+      "archivo": "Tiendas.csv",
+      "filas": 28,
+      "periodo": [
+        "2014-08-29",
+        "2025-02-11"
+      ]
+    },
+    {
+      "archivo": "Contenido_Campanias.csv",
+      "filas": 42,
+      "periodo": [
+        "2022-02-14",
+        "2025-11-23"
+      ]
+    },
+    {
+      "archivo": "Catalogo_Acciones_Retencion.csv",
+      "filas": 5,
+      "periodo": null,
+      "costo_min_ars": 8.0,
+      "costo_max_ars": 900.0,
+      "costo_mediana_ars": 45.0
+    },
+    {
+      "archivo": "Casos_Cualitativos_Clientes.csv",
+      "filas": 20,
+      "periodo": [
+        "2022-03-31",
+        "2025-11-15"
+      ]
+    },
+    {
+      "archivo": "Costo_Margen_Categoria_Mensual.csv",
+      "filas": 336,
+      "periodo": [
+        "2022-01-01",
+        "2025-12-01"
+      ]
+    },
+    {
+      "archivo": "Inversion_Marketing_Anual.csv",
+      "filas": 4,
+      "periodo": [
+        "2022-01-01",
+        "2025-12-31"
+      ]
+    }
+  ],
+  "cruces": [
+    {
+      "cruce": "ventas -> clientes",
+      "descripcion": "id_cliente de las ventas únicas con cliente contra Clientes.csv",
+      "filas": 27606,
+      "sin_par": 0,
+      "sin_par_pct": 0.0
+    },
+    {
+      "cruce": "ventas -> tiendas",
+      "descripcion": "id_tienda de las ventas de tienda contra Tiendas.csv",
+      "filas": 30962,
+      "sin_par": 0,
+      "sin_par_pct": 0.0
+    },
+    {
+      "cruce": "campañas -> clientes",
+      "descripcion": "id_cliente de los envíos únicos contra Clientes.csv",
+      "filas": 23529,
+      "sin_par": 46,
+      "sin_par_pct": 0.2
+    },
+    {
+      "cruce": "campañas -> contenido",
+      "descripcion": "id_campania de los envíos únicos contra Contenido_Campanias.csv",
+      "filas": 23529,
+      "sin_par": 0,
+      "sin_par_pct": 0.0
+    },
+    {
+      "cruce": "fidelización -> clientes",
+      "descripcion": "socios contra Clientes.csv",
+      "filas": 4043,
+      "sin_par": 0,
+      "sin_par_pct": 0.0
+    },
+    {
+      "cruce": "soporte -> clientes",
+      "descripcion": "filas cliente-mes de soporte contra Clientes.csv",
+      "filas": 14976,
+      "sin_par": 0,
+      "sin_par_pct": 0.0
+    },
+    {
+      "cruce": "devoluciones -> ventas",
+      "descripcion": "id_transaccion de cada devolución contra Transacciones",
+      "filas": 613,
+      "sin_par": 0,
+      "sin_par_pct": 0.0
+    },
+    {
+      "cruce": "bajas -> clientes",
+      "descripcion": "pedidos de no contacto contra Clientes.csv",
+      "filas": 1211,
+      "sin_par": 0,
+      "sin_par_pct": 0.0
+    },
+    {
+      "cruce": "alta en tienda -> tiendas",
+      "descripcion": "tienda_alta de los clientes dados de alta en tienda contra Tiendas.csv",
+      "filas": 3567,
+      "sin_par": 132,
+      "sin_par_pct": 3.7
+    }
+  ],
+  "join_roto": {
+    "campanias_duplicadas": [
+      "CAMP004",
+      "CAMP034"
+    ],
+    "envios_afectados": 915,
+    "envios_unicos": 23529,
+    "pct": 3.89
+  },
+  "identidad": {
+    "registros": 665,
+    "personas": 312,
+    "alias": 353,
+    "alias_pct_clientes": 5.83
+  },
+  "nulos": {
+    "ventas_sin_cliente_pct": 44.79,
+    "ventas_sin_cliente_filas": 22394,
+    "ventas_unicas": 50000,
+    "clientes_edad_nula": 524,
+    "clientes_edad_nula_pct": 8.66,
+    "clientes_genero_nulo_pct": 4.96,
+    "fidelizacion_sin_ultimo_movimiento": 475,
+    "devoluciones_sin_cliente": 280
+  },
+  "margen_bruto_anual": {
+    "2022": 0.4044,
+    "2023": 0.395,
+    "2024": 0.3758,
+    "2025": 0.3606
+  }
+}

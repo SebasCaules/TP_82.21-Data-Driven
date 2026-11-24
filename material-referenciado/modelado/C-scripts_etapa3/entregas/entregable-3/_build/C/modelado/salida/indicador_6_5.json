@@ -1,0 +1,288 @@
+{
+ "que": "cruce a 90 días de la lista de la regla (solo contactables, llevada a la parte de los contactables que ocupa la de 500 en validación) menos cruce de toda la base elegible del mismo corte",
+ "fraccion_de_los_contactables": 0.29773719730051607,
+ "contactables_validacion": 5038,
+ "referencia": {
+  "desde": "2023-10-31",
+  "hasta": "2024-12-31",
+  "cortes": 15,
+  "min_filas_base": 1000,
+  "diferencia_min_pp": 51.4030591356468,
+  "diferencia_max_pp": 55.34926359754662
+ },
+ "validacion": {
+  "cruce_lista": 0.7706862091938708,
+  "cruce_base": 0.23881221246340442,
+  "diferencia_pp": 53.187399673046635
+ },
+ "control_lista_500_validacion": {
+  "aciertos": 1137.0,
+  "cruce_lista": 0.758
+ },
+ "por_corte": [
+  {
+   "corte": "2023-01-31",
+   "particion": "train",
+   "filas_base": 155,
+   "contactables": 115,
+   "lista": 34,
+   "aciertos_lista": 32.0,
+   "cruce_lista": 0.9411764705882353,
+   "cruce_base": 0.4967741935483871,
+   "diferencia_pp": 44.44022770398482
+  },
+  {
+   "corte": "2023-02-28",
+   "particion": "train",
+   "filas_base": 196,
+   "contactables": 142,
+   "lista": 42,
+   "aciertos_lista": 39.0,
+   "cruce_lista": 0.9285714285714286,
+   "cruce_base": 0.4744897959183674,
+   "diferencia_pp": 45.40816326530612
+  },
+  {
+   "corte": "2023-03-31",
+   "particion": "train",
+   "filas_base": 261,
+   "contactables": 186,
+   "lista": 55,
+   "aciertos_lista": 44.0,
+   "cruce_lista": 0.8,
+   "cruce_base": 0.39846743295019155,
+   "diferencia_pp": 40.15325670498085
+  },
+  {
+   "corte": "2023-04-30",
+   "particion": "train",
+   "filas_base": 345,
+   "contactables": 251,
+   "lista": 75,
+   "aciertos_lista": 61.0,
+   "cruce_lista": 0.8133333333333334,
+   "cruce_base": 0.3739130434782609,
+   "diferencia_pp": 43.94202898550725
+  },
+  {
+   "corte": "2023-05-31",
+   "particion": "train",
+   "filas_base": 463,
+   "contactables": 326,
+   "lista": 97,
+   "aciertos_lista": 76.0,
+   "cruce_lista": 0.7835051546391752,
+   "cruce_base": 0.3693304535637149,
+   "diferencia_pp": 41.41747010754603
+  },
+  {
+   "corte": "2023-06-30",
+   "particion": "train",
+   "filas_base": 557,
+   "contactables": 387,
+   "lista": 115,
+   "aciertos_lista": 94.0,
+   "cruce_lista": 0.8173913043478261,
+   "cruce_base": 0.3608617594254937,
+   "diferencia_pp": 45.65295449223324
+  },
+  {
+   "corte": "2023-07-31",
+   "particion": "train",
+   "filas_base": 675,
+   "contactables": 468,
+   "lista": 139,
+   "aciertos_lista": 110.0,
+   "cruce_lista": 0.7913669064748201,
+   "cruce_base": 0.33037037037037037,
+   "diferencia_pp": 46.099653610444975
+  },
+  {
+   "corte": "2023-08-31",
+   "particion": "train",
+   "filas_base": 802,
+   "contactables": 562,
+   "lista": 167,
+   "aciertos_lista": 132.0,
+   "cruce_lista": 0.7904191616766467,
+   "cruce_base": 0.32169576059850374,
+   "diferencia_pp": 46.872340107814296
+  },
+  {
+   "corte": "2023-09-30",
+   "particion": "train",
+   "filas_base": 930,
+   "contactables": 655,
+   "lista": 195,
+   "aciertos_lista": 156.0,
+   "cruce_lista": 0.8,
+   "cruce_base": 0.3225806451612903,
+   "diferencia_pp": 47.741935483870975
+  },
+  {
+   "corte": "2023-10-31",
+   "particion": "train",
+   "filas_base": 1076,
+   "contactables": 762,
+   "lista": 227,
+   "aciertos_lista": 192.0,
+   "cruce_lista": 0.8458149779735683,
+   "cruce_base": 0.33178438661710036,
+   "diferencia_pp": 51.4030591356468
+  },
+  {
+   "corte": "2023-11-30",
+   "particion": "train",
+   "filas_base": 1208,
+   "contactables": 847,
+   "lista": 252,
+   "aciertos_lista": 211.0,
+   "cruce_lista": 0.8373015873015873,
+   "cruce_base": 0.304635761589404,
+   "diferencia_pp": 53.266582571218336
+  },
+  {
+   "corte": "2023-12-31",
+   "particion": "train",
+   "filas_base": 1365,
+   "contactables": 958,
+   "lista": 285,
+   "aciertos_lista": 234.0,
+   "cruce_lista": 0.8210526315789474,
+   "cruce_base": 0.29304029304029305,
+   "diferencia_pp": 52.80123385386544
+  },
+  {
+   "corte": "2024-01-31",
+   "particion": "train",
+   "filas_base": 1487,
+   "contactables": 1043,
+   "lista": 311,
+   "aciertos_lista": 256.0,
+   "cruce_lista": 0.8231511254019293,
+   "cruce_base": 0.2871553463349025,
+   "diferencia_pp": 53.59957790670268
+  },
+  {
+   "corte": "2024-02-29",
+   "particion": "train",
+   "filas_base": 1605,
+   "contactables": 1127,
+   "lista": 336,
+   "aciertos_lista": 280.0,
+   "cruce_lista": 0.8333333333333334,
+   "cruce_base": 0.3003115264797508,
+   "diferencia_pp": 53.30218068535826
+  },
+  {
+   "corte": "2024-03-31",
+   "particion": "train",
+   "filas_base": 1752,
+   "contactables": 1224,
+   "lista": 364,
+   "aciertos_lista": 305.3333333333333,
+   "cruce_lista": 0.8388278388278387,
+   "cruce_base": 0.2950913242009132,
+   "diferencia_pp": 54.37365146269255
+  },
+  {
+   "corte": "2024-04-30",
+   "particion": "train",
+   "filas_base": 1876,
+   "contactables": 1308,
+   "lista": 389,
+   "aciertos_lista": 325.0,
+   "cruce_lista": 0.8354755784061697,
+   "cruce_base": 0.2819829424307036,
+   "diferencia_pp": 55.34926359754662
+  },
+  {
+   "corte": "2024-05-31",
+   "particion": "train",
+   "filas_base": 1998,
+   "contactables": 1405,
+   "lista": 418,
+   "aciertos_lista": 331.0,
+   "cruce_lista": 0.7918660287081339,
+   "cruce_base": 0.26176176176176175,
+   "diferencia_pp": 53.010426694637225
+  },
+  {
+   "corte": "2024-06-30",
+   "particion": "train",
+   "filas_base": 2131,
+   "contactables": 1488,
+   "lista": 443,
+   "aciertos_lista": 345.66666666666663,
+   "cruce_lista": 0.7802859292701279,
+   "cruce_base": 0.25293289535429375,
+   "diferencia_pp": 52.73530339158341
+  },
+  {
+   "corte": "2024-07-31",
+   "particion": "dev",
+   "filas_base": 2259,
+   "contactables": 1585,
+   "lista": 472,
+   "aciertos_lista": 364.0,
+   "cruce_lista": 0.7711864406779662,
+   "cruce_base": 0.24169986719787517,
+   "diferencia_pp": 52.9486573480091
+  },
+  {
+   "corte": "2024-08-31",
+   "particion": "dev",
+   "filas_base": 2402,
+   "contactables": 1688,
+   "lista": 503,
+   "aciertos_lista": 384.79999999999995,
+   "cruce_lista": 0.7650099403578527,
+   "cruce_base": 0.23605328892589508,
+   "diferencia_pp": 52.89566514319577
+  },
+  {
+   "corte": "2024-09-30",
+   "particion": "dev",
+   "filas_base": 2512,
+   "contactables": 1765,
+   "lista": 526,
+   "aciertos_lista": 408.0,
+   "cruce_lista": 0.7756653992395437,
+   "cruce_base": 0.23885350318471338,
+   "diferencia_pp": 53.68118960548303
+  },
+  {
+   "corte": "2024-10-31",
+   "particion": "gap",
+   "filas_base": 2617,
+   "contactables": 1848,
+   "lista": 550,
+   "aciertos_lista": 430.0,
+   "cruce_lista": 0.7818181818181819,
+   "cruce_base": 0.24149789835689722,
+   "diferencia_pp": 54.032028346128456
+  },
+  {
+   "corte": "2024-11-30",
+   "particion": "gap",
+   "filas_base": 2680,
+   "contactables": 1890,
+   "lista": 563,
+   "aciertos_lista": 442.5,
+   "cruce_lista": 0.7859680284191829,
+   "cruce_base": 0.2526119402985075,
+   "diferencia_pp": 53.335608812067534
+  },
+  {
+   "corte": "2024-12-31",
+   "particion": "gap",
+   "filas_base": 2728,
+   "contactables": 1924,
+   "lista": 573,
+   "aciertos_lista": 456.0,
+   "cruce_lista": 0.7958115183246073,
+   "cruce_base": 0.2562316715542522,
+   "diferencia_pp": 53.95798467703551
+  }
+ ]
+}

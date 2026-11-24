@@ -1,0 +1,44 @@
+variable,tipo,pct_vacio,tasa_con_dato,tasa_sin_dato,auc,separacion,sospechosa,disponible,disponible_en_T,usa_periodo_a_predecir,decision,motivo
+recency_sobre_umbral,float64,0.0,0.28265014299332697,,0.8448678728833506,0.8448678728833506,True,Sí,sí,no,mantener,"entra en la definición del target: lo explica por construcción, no por datos posteriores a T; la regla del umbral es la línea base que el modelo tiene que superar"
+gap_mediano,float64,0.0,0.28265014299332697,,0.17011831497628327,0.8298816850237167,True,Sí,sí,no,mantener,"entra en la definición del target: lo explica por construcción, no por datos posteriores a T; la regla del umbral es la línea base que el modelo tiene que superar"
+recency_dias,int64,0.0,0.28265014299332697,,0.6550487680362054,0.6550487680362054,False,Sí,sí,no,mantener,"entra en la definición del target: lo explica por construcción, no por datos posteriores a T; la regla del umbral es la línea base que el modelo tiene que superar"
+compras_90d_prev,int64,0.0,0.28265014299332697,,0.6302432788974746,0.6302432788974746,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+meses_desde_alta,int64,0.0,0.28265014299332697,,0.38671407593326096,0.613285924066739,False,Sí,sí,no,mantener,"la menor entre fecha de alta y primera compra, ambas ≤ T"
+frequency,int64,0.0,0.28265014299332697,,0.5979495685863256,0.5979495685863256,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+n_categorias_distintas,int64,0.0,0.28265014299332697,,0.5695918289287965,0.5695918289287965,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+n_tiendas_distintas,int64,0.0,0.28265014299332697,,0.5609374106243264,0.5609374106243264,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+monetary,float64,0.0,0.28265014299332697,,0.5604658356073444,0.5604658356073444,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+puntos_canjeados,float64,0.9199766973837518,0.28325612177365983,0.2825974325024466,0.5452878383859304,0.5452878383859304,False,No,no: Fidelizacion.csv es una foto del extracto,sí,excluir,"el valor en T no se puede reconstruir: el archivo trae el último movimiento, y el vacío en T depende de si hubo movimiento después de T"
+compras_90d,int64,0.0,0.28265014299332697,,0.4621295312407382,0.5378704687592618,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+tiene_panel,bool,0.0,0.28265014299332697,,0.47018924489413527,0.5298107551058647,False,Sí,sí,no,mantener,panel de soporte con mes ≤ T (E15; tiene_panel corregido en el E2)
+envios_acum,int64,0.0,0.28265014299332697,,0.476235365041462,0.523764634958538,False,Sí,sí,no,mantener,envíos con fecha ≤ T
+ultimo_canal_campania,object,0.1896515199661053,0.2778903339651003,0.30298799218095507,0.5232149436575754,0.5232149436575754,False,Sí,sí,no,mantener,canal del último envío con fecha ≤ T
+categoria_dominante,object,0.0,0.28265014299332697,,0.5191423974644231,0.5191423974644231,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+meses_sin_movimiento,float64,0.9187056455883911,0.28338762214983715,0.28258488499452356,0.48087878787878785,0.5191212121212121,False,No,no: Fidelizacion.csv es una foto del extracto,sí,excluir,"el valor en T no se puede reconstruir: el archivo trae el último movimiento, y el vacío en T depende de si hubo movimiento después de T"
+formato_tienda,object,0.04162694629806164,0.28470380194518125,0.23536895674300254,0.5165040051022509,0.5165040051022509,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+genero,object,0.047611481834551425,0.2799866540621698,0.3359288097886541,0.5164007054120392,0.5164007054120392,False,Sí,"sí, foto sin fecha",no,mantener,atributo del alta en Clientes.csv; no depende de lo que el cliente haga después de T
+region_dominante,object,0.0,0.28265014299332697,,0.5161270425032403,0.5161270425032403,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+provincia,object,0.0,0.28265014299332697,,0.5139609306530886,0.5139609306530886,False,Sí,"sí, foto sin fecha",no,mantener,atributo del alta en Clientes.csv; no depende de lo que el cliente haga después de T
+reclamos_acum,int64,0.0,0.28265014299332697,,0.48618792880005735,0.5138120711999427,False,Sí,sí,no,mantener,panel de soporte con mes ≤ T (E15; tiene_panel corregido en el E2)
+temporada,object,0.0,0.28265014299332697,,0.5120976629231855,0.5120976629231855,False,Sí,"sí, se conoce de antemano",no,mantener,calendario
+canal_alta,object,0.0,0.28265014299332697,,0.5106906775678101,0.5106906775678101,False,Sí,"sí, foto sin fecha",no,mantener,atributo del alta en Clientes.csv; no depende de lo que el cliente haga después de T
+nps_ultimo,float64,0.41685202838682345,0.2619198982835346,0.31165036208867997,0.5097040873497991,0.5097040873497991,False,Sí,sí,no,mantener,panel de soporte con mes ≤ T (E15; tiene_panel corregido en el E2)
+reclamos_90d,int64,0.0,0.28265014299332697,,0.49124033843565323,0.5087596615643468,False,Sí,sí,no,mantener,panel de soporte con mes ≤ T (E15; tiene_panel corregido en el E2)
+ticket_medio,float64,0.0,0.28265014299332697,,0.507973615592215,0.507973615592215,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+pct_online,float64,0.0,0.28265014299332697,,0.4927233443397475,0.5072766556602525,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+consultas_90d,int64,0.0,0.28265014299332697,,0.49514452722944563,0.5048554727705543,False,Sí,sí,no,mantener,panel de soporte con mes ≤ T (E15; tiene_panel corregido en el E2)
+nivel,object,0.0,0.28265014299332697,,0.5048207859311563,0.5048207859311563,False,No,no: Fidelizacion.csv es una foto del extracto,no se sabe,excluir,"es el nivel de hoy, no el de T, y sin historial no se puede reconstruir"
+nps_sin_interaccion_flag,bool,0.0,0.28265014299332697,,0.49527525822674645,0.5047247417732535,False,Sí,sí,no,mantener,panel de soporte con mes ≤ T (E15; tiene_panel corregido en el E2)
+es_socio,bool,0.0,0.28265014299332697,,0.495517409023821,0.504482590976179,False,Sí,sí,no,mantener,socio si fecha_inscripcion ≤ T
+envios_90d,int64,0.0,0.28265014299332697,,0.4960818949707403,0.5039181050292597,False,Sí,sí,no,mantener,envíos con fecha ≤ T
+edad_flag,bool,0.0,0.28265014299332697,,0.4962874983581678,0.5037125016418322,False,Sí,"sí, foto del extracto",no,mantener,marca de edad nula o fuera de rango (DC-07)
+clics_90d,int64,0.0,0.28265014299332697,,0.4964466082392276,0.5035533917607724,False,Dudoso,en parte,sí,recalcular,"la respuesta a un envío de los 7 días previos a T (apertura, clic, compra a 7 días) puede ocurrir después de T: se cuentan solo envíos con fecha ≤ T − 7"
+motivo_ultima_devolucion,object,0.9766973837517212,0.28863636363636364,0.28250732024726166,0.5029568196228327,0.5029568196228327,False,Sí,sí,no,mantener,fecha_devolucion ≤ T
+aperturas_90d,int64,0.0,0.28265014299332697,,0.49734650866067787,0.5026534913393221,False,Dudoso,en parte,sí,recalcular,"la respuesta a un envío de los 7 días previos a T (apertura, clic, compra a 7 días) puede ocurrir después de T: se cuentan solo envíos con fecha ≤ T − 7"
+ticket_90d,float64,0.2739646223916958,0.2405718870814793,0.394161994973903,0.49750645673259597,0.502493543267404,False,Sí,sí,no,mantener,transacciones con fecha ≤ T (test de fugas E15)
+pidio_baja,bool,0.0,0.28265014299332697,,0.49785905080622517,0.5021409491937748,False,Sí,sí,no,mantener,fecha_solicitud ≤ T; las 399 bajas de 2026 quedan fuera (D03)
+edad,float64,0.1054443385234615,0.2814516606476822,0.292817679558011,0.498759698948157,0.5012403010518429,False,Sí,"sí, foto del extracto",no,mantener,la edad del extracto difiere en hasta 3 años de la edad en T; no depende del comportamiento
+compro_7d_alguna,bool,0.0,0.28265014299332697,,0.4989162973711387,0.5010837026288613,False,Dudoso,en parte,sí,recalcular,"la respuesta a un envío de los 7 días previos a T (apertura, clic, compra a 7 días) puede ocurrir después de T: se cuentan solo envíos con fecha ≤ T − 7"
+dias_a_proximo_evento,int64,0.0,0.28265014299332697,,0.4989697144121501,0.5010302855878499,False,Sí,"sí, se conoce de antemano",no,mantener,calendario
+mes_corte,int64,0.0,0.28265014299332697,,0.4990820956218292,0.5009179043781709,False,Sí,"sí, se conoce de antemano",no,mantener,calendario
+n_devoluciones,int64,0.0,0.28265014299332697,,0.5003422342599042,0.5003422342599042,False,Sí,sí,no,mantener,fecha_devolucion ≤ T

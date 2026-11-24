@@ -1,0 +1,69 @@
+{
+  "nombre": "churn_cliente_corte_v0.2",
+  "base": "B-churn_cliente_corte_v0.1.csv",
+  "filas": 59585,
+  "columnas": 45,
+  "n_features": 40,
+  "clientes_distintos": 4627,
+  "positivos_v01": 15167,
+  "positivos": 16052,
+  "tasa_global_pct": 26.94,
+  "positivos_nuevos_por_evaluacion_diaria": 885,
+  "excluidas": [
+    "nivel",
+    "puntos_canjeados",
+    "meses_sin_movimiento"
+  ],
+  "recalculadas": [
+    "aperturas_90d",
+    "clics_90d",
+    "compro_7d_alguna"
+  ],
+  "filas_que_cambian": {
+    "aperturas_90d": 609,
+    "clics_90d": 145,
+    "compro_7d_alguna": 25
+  },
+  "por_particion": [
+    {
+      "particion": "train",
+      "filas": 18882,
+      "positivos_v01": 5337,
+      "positivos": 5698,
+      "tasa_pct": 30.18
+    },
+    {
+      "particion": "dev",
+      "filas": 7173,
+      "positivos_v01": 1601,
+      "positivos": 1713,
+      "tasa_pct": 23.88
+    },
+    {
+      "particion": "gap",
+      "filas": 8025,
+      "positivos_v01": 1884,
+      "positivos": 2008,
+      "tasa_pct": 25.02
+    },
+    {
+      "particion": "test",
+      "filas": 14211,
+      "positivos_v01": 3416,
+      "positivos": 3602,
+      "tasa_pct": 25.35
+    },
+    {
+      "particion": "test_flag",
+      "filas": 11294,
+      "positivos_v01": 2929,
+      "positivos": 3031,
+      "tasa_pct": 26.84
+    }
+  ],
+  "notas": [
+    "y_churn_90 evaluado cada día de (T, T+90] (anexo, ecuación del target); el v0.1 lo evaluaba en T+30, T+60 y T+90. Ningún positivo del v0.1 pasa a 0.",
+    "aperturas_90d y clics_90d cuentan envíos con fecha en (T − 90, T − 7]; compro_7d_alguna, envíos con fecha ≤ T − 7. envios_90d y envios_acum siguen contando hasta T: el envío se conoce en T.",
+    "Antes de cambiar nada se reproducen el target y las tres variables de campaña del v0.1 fila por fila."
+  ]
+}

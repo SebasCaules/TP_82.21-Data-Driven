@@ -1,0 +1,206 @@
+seccion,concepto,valor,unidad,calculo,fila_registro
+supuesto,tipo de cambio de referencia,1459.42,ARS/USD,"BCRA Com. A 3500, 30/12/2025",G30
+supuesto,tipo de cambio 30/12/2024 (sensibilidad),1032.5,ARS/USD,BCRA Com. A 3500,G30
+supuesto,tipo de cambio 30/12/2022 (sensibilidad),177.13,ARS/USD,BCRA Com. A 3500,G30
+supuesto,tasa de éxito: compra a 7 días cerca del umbral,1.02,%,16 / 1570 envíos,G31
+supuesto,"tasa de éxito, límite inferior del IC95",0.63,%,Wilson,G31
+supuesto,"tasa de éxito, límite superior del IC95",1.65,%,Wilson,G31
+supuesto,falsos positivos que usan el descuento: compra a 7 días de los que no cruzan,0.74,%,3 / 408 envíos; oferta válida 7 días (G32),G31
+supuesto,falsos positivos que usan el descuento si la oferta vale hasta la próxima compra (apertura),34.8,%,142 / 408 envíos (sensibilidad),G31
+supuesto,costo de la acción (WhatsApp con oferta personalizada),25.0,ARS,"catálogo, ACC03",G32
+supuesto,descuento sobre una compra,3019.95,ARS,"0,15 × ticket medio (G06, D07)",G32
+supuesto,"margen que vuelve, esperado",15281.53,ARS,"40.664 × 0,3758 (G08)",G32
+supuesto,"margen que vuelve, conservador (una compra)",7565.97,ARS,"ticket medio × 0,3758",G32
+supuesto,"margen que vuelve, optimista (tres compras o más)",17037.16,ARS,"45.336 × 0,3758",G32
+4.4,valor unitario VP,99.96,ARS,VP: s(m − dt) − c; FP: −c − r·d·t; FN y VN: 0,G33
+4.4,valor unitario FP,-47.21,ARS,VP: s(m − dt) − c; FP: −c − r·d·t; FN y VN: 0,G33
+4.4,valor unitario FN,0.0,ARS,VP: s(m − dt) − c; FP: −c − r·d·t; FN y VN: 0,G33
+4.4,valor unitario VN,0.0,ARS,VP: s(m − dt) − c; FP: −c − r·d·t; FN y VN: 0,G33
+4.4,"valor neto del modelo, validación",111234.04,ARS,Σ cantidad × valor (G19),G34
+4.4,"valor neto de la regla, validación",109271.85,ARS,Σ cantidad × valor (G20),G34
+4.4,"valor incremental, validación",1962.19,ARS,modelo − regla,G34
+4.4,valor incremental anual,5.38,USD,× 4 ÷ tipo de cambio,G34
+4.4,margen perdido por los FN del modelo (aparte),7274008.85,ARS,476 × G08,G35
+4.4,techo del incremental anual con éxito de 100 %,448.9,USD,s = 1,G36
+4.4,"valor neto de la lista por pérdida esperada, validación",102551.35,ARS,Σ cantidad × valor (G27),G47
+4.4,"pérdida esperada menos modelo, anual",-23.8,USD,(G47 − G34 modelo) × 4 ÷ tipo de cambio,G47
+4.4,"valor neto con el margen de cada cliente, perdida esperada, validación",251542.86,ARS,"s (0,3758 × Σ F̂ de los VP − VP d t) − VP c − FP (c + r d t)",G47
+4.4,"valor neto con el margen de cada cliente, modelo, validación",213794.8,ARS,"s (0,3758 × Σ F̂ de los VP − VP d t) − VP c − FP (c + r d t)",G47
+4.4,"valor neto con el margen de cada cliente, regla, validación",204880.25,ARS,"s (0,3758 × Σ F̂ de los VP − VP d t) − VP c − FP (c + r d t)",G47
+4.4,"pérdida esperada menos modelo con el margen de cada cliente, anual",103.46,USD,× 4 ÷ tipo de cambio,G47
+3.2 proyecto,Consultor / Data Scientist senior,12000.0,USD,3 meses × USD 4.000,G38
+3.2 proyecto,Sprint de integración / ETL,3000.0,USD,2 semanas × USD 1.500,G38
+3.2 proyecto,Limpieza de datos maestros,1500.0,USD,1 semana × USD 1.500,G38
+3.2 proyecto,Capacitación usuarios clave,1800.0,USD,2 talleres × USD 900,G38
+3.2 proyecto,Adecuación legal del equipo (L3 a L5),750.0,USD,"20 h × USD 37,50",G38
+3.2 proyecto,"Adecuación legal de Casa Óga (L1, L2, L6)",0.0,USD,"Casa Óga y su asesor legal, fuera de los USD 30.000",G38
+3.2 proyecto,Piloto con grupo de control (3 meses),1350.0,USD,"32 h + 4 h del equipo × USD 37,50",G38
+3.2 proyecto,contingencia 15 %,3060.0,USD,15 % de los únicos,G38
+3.2 proyecto,inversión inicial,23460.0,USD,únicos + contingencia,G38
+3.2 proyecto,Operador de la lista mensual (envío 71),3600.0,USD/año,"8 h/mes × 12 × USD 37,50",G38
+3.2 proyecto,Soporte y reentrenamiento,2400.0,USD/año,USD 200/mes,G38
+3.2 proyecto,Infraestructura cloud / BD,1200.0,USD/año,USD 100/mes,G38
+3.2 proyecto,Licencias BI (Power BI Pro x5),0.0,USD/año,sin licencias (A 1.6; envío 12),G38
+3.2 proyecto,recurrente anual,7200.0,USD/año,suma,G38
+3.2 proyecto,total año 1,30660.0,USD,inicial + recurrente,G38
+3.2 MVP,inversión inicial,14260.0,USD,1 mes de data scientist; resto igual,G39
+3.2 MVP,recurrente anual,6000.0,USD/año,sin nube,G39
+3.2 MVP,total año 1,20260.0,USD,inicial + recurrente,G39
+3.2,"costo incremental del modelo sobre la regla, año 1",10400.0,USD,total año 1 del proyecto − total año 1 del MVP,G40
+3.4 modelo sobre la regla,conservador: beneficio anual,-0.44,USD,valor anual de la 4.4,G40
+3.4 modelo sobre la regla,conservador: ROI,-100.0,%,(B − C) / C × 100,G40
+3.4 modelo sobre la regla,conservador: payback,no recupera,meses,C / B × 12,G40
+3.4 proyecto completo frente a no contactar,conservador: beneficio anual,-24.24,USD,valor anual de la 4.4,G40
+3.4 proyecto completo frente a no contactar,conservador: ROI,-100.08,%,(B − C) / C × 100,G40
+3.4 proyecto completo frente a no contactar,conservador: payback,no recupera,meses,C / B × 12,G40
+3.4 MVP con descuento,conservador: beneficio anual,-23.81,USD,valor anual de la 4.4,G41
+3.4 MVP con descuento,conservador: ROI,-100.12,%,(B − C) / C × 100,G41
+3.4 MVP con descuento,conservador: payback,no recupera,meses,C / B × 12,G41
+3.4 MVP sin descuento,conservador: beneficio anual,56.64,USD,valor anual de la 4.4,G41
+3.4 MVP sin descuento,conservador: ROI,-99.72,%,(B − C) / C × 100,G41
+3.4 MVP sin descuento,conservador: payback,no recupera,meses,C / B × 12,G41
+3.4 modelo sobre la regla,esperado: beneficio anual,5.38,USD,valor anual de la 4.4,G40
+3.4 modelo sobre la regla,esperado: ROI,-99.95,%,(B − C) / C × 100,G40
+3.4 modelo sobre la regla,esperado: payback,no recupera,meses,C / B × 12,G40
+3.4 proyecto completo frente a no contactar,esperado: beneficio anual,304.87,USD,valor anual de la 4.4,G40
+3.4 proyecto completo frente a no contactar,esperado: ROI,-99.01,%,(B − C) / C × 100,G40
+3.4 proyecto completo frente a no contactar,esperado: payback,no recupera,meses,C / B × 12,G40
+3.4 MVP con descuento,esperado: beneficio anual,299.49,USD,valor anual de la 4.4,G41
+3.4 MVP con descuento,esperado: ROI,-98.52,%,(B − C) / C × 100,G41
+3.4 MVP con descuento,esperado: payback,no recupera,meses,C / B × 12,G41
+3.4 MVP sin descuento,esperado: beneficio anual,419.53,USD,valor anual de la 4.4,G41
+3.4 MVP sin descuento,esperado: ROI,-97.93,%,(B − C) / C × 100,G41
+3.4 MVP sin descuento,esperado: payback,no recupera,meses,C / B × 12,G41
+3.4 modelo sobre la regla,optimista: beneficio anual,19.91,USD,valor anual de la 4.4,G40
+3.4 modelo sobre la regla,optimista: ROI,-99.81,%,(B − C) / C × 100,G40
+3.4 modelo sobre la regla,optimista: payback,no recupera,meses,C / B × 12,G40
+3.4 proyecto completo frente a no contactar,optimista: beneficio anual,675.56,USD,valor anual de la 4.4,G40
+3.4 proyecto completo frente a no contactar,optimista: ROI,-97.8,%,(B − C) / C × 100,G40
+3.4 proyecto completo frente a no contactar,optimista: payback,no recupera,meses,C / B × 12,G40
+3.4 MVP con descuento,optimista: beneficio anual,655.65,USD,valor anual de la 4.4,G41
+3.4 MVP con descuento,optimista: ROI,-96.76,%,(B − C) / C × 100,G41
+3.4 MVP con descuento,optimista: payback,no recupera,meses,C / B × 12,G41
+3.4 MVP sin descuento,optimista: beneficio anual,839.49,USD,valor anual de la 4.4,G41
+3.4 MVP sin descuento,optimista: ROI,-95.86,%,(B − C) / C × 100,G41
+3.4 MVP sin descuento,optimista: payback,no recupera,meses,C / B × 12,G41
+3.5 modelo sobre la regla,% de adopción del modelo por parte de los usuarios → 50 %,-99.97,%,una variable por vez,G42
+3.5 MVP,% de adopción del modelo por parte de los usuarios → 50 %,-99.26,%,una variable por vez,G42
+3.5 modelo sobre la regla,Beneficio por caso corregido → el margen de una compra,-99.98,%,una variable por vez,G42
+3.5 MVP,Beneficio por caso corregido → el margen de una compra,-99.82,%,una variable por vez,G42
+3.5 modelo sobre la regla,"Desempeño del modelo (casos detectados / precisión) → −0,21 puntos (límite inferior)",-100.01,%,una variable por vez,G42
+3.5 modelo sobre la regla,Costo de integración técnica → el doble,-99.95,%,una variable por vez,G42
+3.5 MVP,Costo de integración técnica → el doble,-98.74,%,una variable por vez,G42
+3.5 modelo sobre la regla,Tasa de éxito de la acción → límite inferior del intervalo,-99.97,%,una variable por vez,G42
+3.5 MVP,Tasa de éxito de la acción → límite inferior del intervalo,-99.32,%,una variable por vez,G42
+3.5 modelo sobre la regla,Falsos positivos que usan el descuento → apertura: la oferta vale hasta la próxima compra,-99.59,%,una variable por vez,G42
+3.5 MVP,Falsos positivos que usan el descuento → apertura: la oferta vale hasta la próxima compra,-102.37,%,una variable por vez,G42
+3.5 modelo sobre la regla,Margen bruto → 2025,-99.95,%,una variable por vez,G42
+3.5 MVP,Margen bruto → 2025,-98.63,%,una variable por vez,G42
+3.5 modelo sobre la regla,Descuento de la oferta → sin descuento (a favor),-99.95,%,una variable por vez,G42
+3.5 MVP,Descuento de la oferta → sin descuento (a favor),-97.93,%,una variable por vez,G42
+3.5 modelo sobre la regla,"Descuento de la oferta → 20 % a los clientes de alto valor de la lista (el 20 % de mayor facturación, G50), 15 % al resto",-99.95,%,una variable por vez,G42
+3.5 MVP,"Descuento de la oferta → 20 % a los clientes de alto valor de la lista (el 20 % de mayor facturación, G50), 15 % al resto",-98.58,%,una variable por vez,G42
+3.5 modelo sobre la regla,"Margen que vuelve con un cliente → por persona unificada, id_cliente_canonico (G51; a favor)",-99.95,%,una variable por vez,G42
+3.5 MVP,"Margen que vuelve con un cliente → por persona unificada, id_cliente_canonico (G51; a favor)",-98.39,%,una variable por vez,G42
+3.5 modelo sobre la regla,Tasa de éxito de la acción → compra a 7 días de los que cruzan el umbral (G52; a favor),-99.94,%,una variable por vez,G42
+3.5 MVP,Tasa de éxito de la acción → compra a 7 días de los que cruzan el umbral (G52; a favor),-98.32,%,una variable por vez,G42
+3.5 modelo sobre la regla,"Tipo de cambio → 30/12/2024, el año de los montos (a favor)",-99.93,%,una variable por vez,G42
+3.5 MVP,"Tipo de cambio → 30/12/2024, el año de los montos (a favor)",-97.91,%,una variable por vez,G42
+3.5 modelo sobre la regla,Tipo de cambio → 30/12/2022 (a favor),-99.57,%,una variable por vez,G42
+3.5 MVP,Tipo de cambio → 30/12/2022 (a favor),-87.82,%,una variable por vez,G42
+3.5 modelo sobre la regla,Horizonte de evaluación → 3 años (a favor),-99.87,%,una variable por vez,G42
+3.5 MVP,Horizonte de evaluación → 3 años (a favor),-97.21,%,una variable por vez,G42
+3.6,"tasa de éxito de equilibrio, MVP con descuento",49.56,%,ROI del MVP = 0,G43
+3.6,"tasa de éxito de equilibrio, MVP sin descuento",39.73,%,ROI del MVP = 0,G43
+3.6,"tipo de cambio de equilibrio, proyecto",0.75,ARS/USD,B en ARS / C en USD,G44
+3.6,"tipo de cambio de equilibrio, proyecto completo",14.51,ARS/USD,B en ARS / C en USD,G44
+3.6,"tipo de cambio de equilibrio, mvp con descuento",21.57,ARS/USD,B en ARS / C en USD,G44
+3.6,"tipo de cambio de equilibrio, mvp sin descuento",30.22,ARS/USD,B en ARS / C en USD,G44
+3.5 y 3.6,"valor de un punto de precisión sobre la regla, anual",6.05,USD,15 aciertos × 4 × (v_VP − v_FP) ÷ tipo de cambio,G46
+3.5 y 3.6,puntos de precisión para pagar el costo incremental,1718.93,puntos,costo incremental / valor de un punto,G46
+3.5 y 3.6,máximo posible sobre la regla,18.42,puntos,(1 − precisión de la regla) × 100,G46
+3.5 y 3.6,"valor del máximo posible, anual",111.46,USD,máximo × valor de un punto,G46
+3.5 y 3.6,puntos para pagar el costo incremental con éxito de 100 %,20.59,puntos,s = 1,G46
+3.1,"costo por cliente retenido, con descuento",6519.1,ARS,costo anual de las acciones / clientes que vuelven,G45
+3.1,"costo por cliente retenido, sin descuento",3007.1,ARS,costo anual de las acciones / clientes que vuelven,G45
+3.1,costo de adquisición 2025 por alta,11099.0,ARS,G04,G45
+3.2,adecuación legal del equipo (L3 a L5),750.0,USD,"20 h × USD 37,50",G48
+3.2,"adecuación legal de Casa Óga (L1, L2, L6)",0.0,USD,fuera de los USD 30.000,G48
+3.2 y 3.6,"piloto: horas del equipo (sorteo, medición e informes)",1350.0,USD,"32 h + 4 h × USD 37,50",G49
+3.2 y 3.6,piloto: acciones sobre los contactados (paga Marketing),53538.49,ARS,"446,67 de alto valor × ARS 53,38 + 376,67 con descuento × ARS 53,84 + 376,67 sin descuento × ARS 25,00",G49
+3.6,"piloto: señal temprana, diferencia mínima detectable en la compra a 7 días, dos ramas contra el control",2.91,puntos,"753,33 contactados fuera del 20 % contra 300 de control, p0 1,21 %",G49
+3.6,"piloto: compra a 7 días, una rama contra el control",3.66,puntos,"376,67 contra 300",G49
+3.6,piloto: cruce a 90 días del control (fuera del 20 % de mayor facturación),77.41,%,"815,33 / 1.053,33 de la lista de contactables en validación",G61
+3.6,"piloto: diferencia mínima detectable a 90 días, una rama contra el control",9.63,puntos,"376,67 contra 300",G61
+3.6,"piloto: diferencia mínima detectable a 90 días, entre ramas",9.06,puntos,"376,67 contra 376,67",G61
+3.6,"referencia: diferencia de cruce a 90 días que paga el recurrente de la producción completa, con descuento",12.41,puntos,"s de equilibrio con USD 6.000 × 77,4 %",G62
+3.6,"referencia: diferencia de cruce a 90 días que paga el recurrente de la producción completa, sin descuento",9.92,puntos,"s de equilibrio con USD 6.000, d = r = 0, × 77,4 %",G62
+3.6,diferencia esperada con la tasa de éxito observada,0.79,puntos,"1,02 % × 77,4 %",G62
+3.6,costo recurrente de las semanas 19 a 28,0.0,USD,pausa entre el fin del piloto y la decisión: no corre ningún costo recurrente,G63
+3.3,horas por mes de Marketing reasignadas que dejan la regla en ROI 0,44.36,h/mes,"(USD 20.260 − USD 299,49) / USD 37,50 / 12",G60
+3.4,veces que el recurrente de la operación mínima supera lo que deja la lista por año,13.61,veces,"USD 3.600 / USD 264,54 (lista de 500 contactables)",G58
+3.5,beneficio por caso con el que la regla da ROI 0,599274.2,ARS por año,despeja m en ROI de la regla = 0,G59
+3.5,"parte de la lista de la regla de alto valor, entre los VP",27.62,%,20 % de mayor facturación acumulada del corte,G50
+3.5,"parte de la lista de la regla de alto valor, entre los FP",32.93,%,20 % de mayor facturación acumulada del corte,G50
+3.5,margen que vuelve por persona unificada,16058.31,ARS,"42.731 × 0,3758",G51
+3.5,tasa de éxito sobre los que cruzan el umbral,1.12,%,13 / 1162 envíos,G52
+4.5,"aciertos por mes de la regla en la lista de 500 sin filtro (la meta del criterio de éxito 1 usa la de contactables, Parte C 7.2)",407.89,aciertos/mes,VP de la regla en validación / 3,G53
+3.2 piloto mínimo,Planilla de la regla y guía de corrida,900.0,USD,"24 h × USD 37,50; Consultor / Data Scientist senior (1 mes): solo la planilla y la guía",G64
+3.2 piloto mínimo,"Adecuación legal del equipo (L3, L4 y L5)",750.0,USD,"20 h × USD 37,50; Adecuación legal del equipo, entera (G48)",G64
+3.2 piloto mínimo,"Sorteo, medición e informes del piloto",1350.0,USD,"36 h × USD 37,50; Piloto con grupo de control, entera (G49)",G64
+3.2 piloto mínimo,Un taller con el equipo de Sofía R. y quien corre la planilla (semana 5),900.0,USD,1 taller × USD 900; Capacitación: 1 de los 2 talleres,G64
+3.2 piloto mínimo,contingencia 15 %,585.0,USD,15 % de los únicos,G64
+3.2 piloto mínimo,total,4485.0,USD,USD 3.900 + 15 %; 80 h del equipo,G64
+3.2 piloto mínimo,horas de Marketing (fuera del presupuesto),24.0,h,8 h por lista × 3 listas,G64
+3.2 producción completa,data scientist: tablero del mes y corrida con un comando (1 mes menos la planilla),3100.0,USD,único,G65
+3.2 producción completa,sprint de integración / ETL: exportación automática con un mismo corte,3000.0,USD,único,G65
+3.2 producción completa,limpieza de datos maestros: identidad rehecha con el extracto del momento,1500.0,USD,único,G65
+3.2 producción completa,segundo taller,900.0,USD,único,G65
+3.2 producción completa,inversión con 15 % de contingencia,9775.0,USD,"únicos × 1,15",G65
+3.2 producción completa,"operador de la lista, 8 h por mes",3600.0,USD/año,recurrente en caja,G65
+3.2 producción completa,soporte,2400.0,USD/año,recurrente en caja,G65
+3.2 producción completa,primer año,15775.0,USD,inversión + recurrente,G65
+3.2 operación mínima,limpieza de datos maestros: identidad rehecha con el extracto del momento,1500.0,USD,único,G66
+3.2 operación mínima,inversión con 15 % de contingencia,1725.0,USD,"únicos × 1,15",G66
+3.2 operación mínima,"analista part-time, 8 h por mes (envío 71)",3600.0,USD/año,recurrente en caja,G66
+3.2 operación mínima,primer año,5325.0,USD,inversión + recurrente,G66
+3.2,piloto mínimo más producción completa,20260.0,USD,USD 4.485 + USD 15.775 = total año 1 de la regla (G39),G39
+3.6,"umbral de pase del piloto, con descuento",11.04,puntos,"s de equilibrio con USD 5.325 (primer año de la operación mínima) × 77,4 %",G67
+3.6,"lo que paga el primer año de la producción completa, con descuento",32.21,puntos,"s de equilibrio con USD 15.775 × 77,4 %",G67
+3.5,"umbral de pase si la operación mínima no tiene costo adicional, con descuento",3.75,puntos,"s de equilibrio con USD 1.725 × 77,4 %",G67
+3.5,"umbral de pase con la limpieza dentro del piloto (USD 6.210), con descuento",7.55,puntos,"s de equilibrio con USD 3.600 × 77,4 %",G67
+3.6,"umbral de pase del piloto, sin descuento",8.82,puntos,"s de equilibrio con USD 5.325 (primer año de la operación mínima) × 77,4 %",G67
+3.6,"lo que paga el primer año de la producción completa, sin descuento",25.81,puntos,"s de equilibrio con USD 15.775 × 77,4 %",G67
+3.5,"umbral de pase si la operación mínima no tiene costo adicional, sin descuento",2.97,puntos,"s de equilibrio con USD 1.725 × 77,4 %",G67
+3.5,"umbral de pase con la limpieza dentro del piloto (USD 6.210), sin descuento",6.02,puntos,"s de equilibrio con USD 3.600 × 77,4 %",G67
+3.6,"potencia de una rama si el efecto es su umbral, sin descuento",73.2,%,"376,67 contra 300, dos colas, 5 %",G68
+3.6,"potencia de una rama si el efecto es su umbral, con descuento",89.03,%,"376,67 contra 300, dos colas, 5 %",G68
+3.6,"diferencia mínima detectable a 90 días, las dos ramas juntas contra el control",8.38,puntos,"753,33 contra 300",G68
+3.6,clientes por grupo para ver lo esperado,44661.0,clientes,"diferencia mínima detectable = 0,79 puntos, grupos iguales",G68
+3.6,clientes por mes fuera del 20 % en el piloto,351.11,clientes,"1.053,33 / 3",G68
+3.6,medición sola del piloto,1552.5,USD,"36 h × USD 37,50 × 1,15",G69
+3.6,"resto del piloto (planilla, taller y legal)",2932.5,USD,USD 4.485 − medición,G69
+3.3,lo que deja por año la lista de 500 contactables,264.54,USD,4 × (VP × v_VP + FP × v_FP) ÷ tipo de cambio (H16),G54
+3.4,ROI de un año del piloto mínimo más la producción completa,-98.69,%,"(USD 264,54 − USD 20.260) / USD 20.260 × 100",G54
+3.4,recurrente sobre inversión de la regla (v2.0),42.08,%,USD 6.000 / USD 14.260,G58
+3.4,recurrente sobre inversión de la operación mínima,208.7,%,USD 3.600 / USD 1.725,G58
+3.3 rango anual,"trimestre × 4, mínimo",301.45,USD/año,"cv_temporal.py, septiembre de 2023 a septiembre de 2024",E3A-01
+3.3 rango anual,"trimestre × 4, máximo",335.78,USD/año,"cv_temporal.py, septiembre de 2023 a septiembre de 2024",E3A-01
+3.3 rango anual,"doce meses, mínimo",319.77,USD/año,"cv_temporal.py, septiembre de 2023 a septiembre de 2024",E3A-01
+3.3 rango anual,"doce meses, máximo",321.42,USD/año,"cv_temporal.py, septiembre de 2023 a septiembre de 2024",E3A-01
+3.3 rango anual,"ROI de la regla, mínimo",-98.51,%,"cv_temporal.py, septiembre de 2023 a septiembre de 2024",E3A-05
+3.3 rango anual,"ROI de la regla, máximo",-98.34,%,"cv_temporal.py, septiembre de 2023 a septiembre de 2024",E3A-05
+3.3 rango anual,"incremental del modelo, trimestre × 4, mínimo",-5.39,USD/año,"cv_temporal.py, septiembre de 2023 a septiembre de 2024",E3A-04
+3.3 rango anual,"incremental del modelo, trimestre × 4, máximo",6.82,USD/año,"cv_temporal.py, septiembre de 2023 a septiembre de 2024",E3A-04
+8.2 test (Parte D),"modelo sobre la regla, lista de 500 contactables: beneficio anual",-1.54,USD,"valor neto de test en 5 cortes × 12 / 5, con los valores por celda de la 4.4",J12
+8.2 test (Parte D),"modelo sobre la regla, lista de 500 contactables: ROI",-100.01,%,"(B − C) / C × 100, C = USD 10.400",J12
+8.2 test (Parte D),"modelo sobre la regla, lista de 500 sin filtro: beneficio anual",6.44,USD,"valor neto de test en 5 cortes × 12 / 5, con los valores por celda de la 4.4",J12
+8.2 test (Parte D),"modelo sobre la regla, lista de 500 sin filtro: ROI",-99.94,%,"(B − C) / C × 100, C = USD 10.400",J12
+8.2 test (Parte D),"proyecto completo frente a no contactar, lista de 500 contactables: beneficio anual",325.52,USD,"valor neto de test en 5 cortes × 12 / 5, con los valores por celda de la 4.4",J12
+8.2 test (Parte D),"proyecto completo frente a no contactar, lista de 500 contactables: ROI",-98.94,%,"(B − C) / C × 100, C = USD 30.660",J12
+8.2 test (Parte D),"proyecto completo frente a no contactar, lista de 500 sin filtro: beneficio anual",352.39,USD,"valor neto de test en 5 cortes × 12 / 5, con los valores por celda de la 4.4",J12
+8.2 test (Parte D),"proyecto completo frente a no contactar, lista de 500 sin filtro: ROI",-98.85,%,"(B − C) / C × 100, C = USD 30.660",J12
+8.2 test (Parte D),"MVP con descuento, lista de 500 contactables: beneficio anual",327.06,USD,"valor neto de test en 5 cortes × 12 / 5, con los valores por celda de la 4.4",J12
+8.2 test (Parte D),"MVP con descuento, lista de 500 contactables: ROI",-98.39,%,"(B − C) / C × 100, C = USD 20.260",J12
+8.2 test (Parte D),"MVP con descuento, lista de 500 sin filtro: beneficio anual",345.95,USD,"valor neto de test en 5 cortes × 12 / 5, con los valores por celda de la 4.4",J12
+8.2 test (Parte D),"MVP con descuento, lista de 500 sin filtro: ROI",-98.29,%,"(B − C) / C × 100, C = USD 20.260",J12

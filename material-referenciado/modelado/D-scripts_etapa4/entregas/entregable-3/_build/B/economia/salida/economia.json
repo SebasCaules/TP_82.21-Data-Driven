@@ -1,0 +1,751 @@
+{
+ "tipo_de_cambio": {
+  "base_30_12_2025": 1459.4167,
+  "30_12_2024": 1032.5,
+  "30_12_2022": 177.1283,
+  "fuente": "BCRA, Com. A 3500, tipo de cambio mayorista de referencia; API de estadísticas monetarias v4.0, variable 5, consultada el 13/10/2026"
+ },
+ "tasa_exito": {
+  "envios_cerca_del_umbral": 1570,
+  "compras_7d": 16,
+  "tasa": 0.01019108280254777,
+  "ic95_wilson": [
+   0.0062826603938233305,
+   0.01649057300846136
+  ],
+  "aperturas": 548,
+  "tasa_apertura": 0.3490445859872611,
+  "falsos_positivos": {
+   "envios_a_los_que_no_cruzan": 408,
+   "compras_7d": 3,
+   "aperturas": 142,
+   "r_oferta_7_dias": 0.007352941176470588,
+   "r_apertura": 0.3480392156862745
+  },
+  "por_canal": {
+   "Email": {
+    "envios": 662,
+    "compras_7d": 6
+   },
+   "SMS": {
+    "envios": 316,
+    "compras_7d": 5
+   },
+   "WhatsApp": {
+    "envios": 592,
+    "compras_7d": 5
+   }
+  },
+  "por_canal_todos_los_envios": {
+   "Email": {
+    "envios": 9432,
+    "compras_7d": 114,
+    "tasa": 0.012086513994910942,
+    "ic95_wilson": [
+     0.01007142770611664,
+     0.014498872663129166
+    ]
+   },
+   "SMS": {
+    "envios": 7987,
+    "compras_7d": 97,
+    "tasa": 0.012144735194691373,
+    "ic95_wilson": [
+     0.009966283821422377,
+     0.014792242536450508
+    ]
+   },
+   "WhatsApp": {
+    "envios": 6110,
+    "compras_7d": 73,
+    "tasa": 0.011947626841243862,
+    "ic95_wilson": [
+     0.00951360582806225,
+     0.014994955587711497
+    ]
+   }
+  },
+  "particiones_usadas": [
+   "gap",
+   "train"
+  ],
+  "envios_cruzados_con_el_dataset": 4247
+ },
+ "parametros": {
+  "accion": "ACC03",
+  "costo_accion_ars": 25.0,
+  "descuento": 0.15,
+  "ticket_medio_ars": 20132.968890508586,
+  "facturacion_media_2024_ars": 40664,
+  "margen_2024": 0.3758,
+  "margen_2025": 0.3606,
+  "m_base_ars": 15281.531200000001,
+  "m_conservador_ars": 7565.969709053127,
+  "facturacion_2024_elegibles_ars": 45335.71435215947,
+  "clientes_elegibles_activos_2024": 3612,
+  "m_optimista_ars": 17037.16145354153,
+  "anualizar": 4.0,
+  "horizonte_anios": 1
+ },
+ "celda_4_4": {
+  "unitario_ars": {
+   "vp": 99.9588368552735,
+   "fp": -47.20548039394329,
+   "fn": 0.0,
+   "vn": 0.0
+  },
+  "unitario_usd": {
+   "vp": 0.06849232083973926,
+   "fp": -0.03234544348707486,
+   "fn": 0.0,
+   "vn": 0.0
+  },
+  "modelo": {
+   "matriz": {
+    "filas": 7173,
+    "largo": 1500,
+    "vp": 1237.0,
+    "fp": 263.0,
+    "fn": 476.0,
+    "vn": 5197.0
+   },
+   "neto_ars": 111234.03984636624,
+   "neto_usd": 76.21814924165677,
+   "por_celda_ars": {
+    "vp": 123649.08118997332,
+    "fp": -12415.041343607085,
+    "fn": 0.0,
+    "vn": 0.0
+   }
+  },
+  "regla": {
+   "matriz": {
+    "filas": 7173,
+    "largo": 1500,
+    "vp": 1223.6666666666665,
+    "fp": 276.3333333333333,
+    "fn": 489.33333333333337,
+    "vn": 5183.666666666666
+   },
+   "neto_ars": 109271.84894971,
+   "neto_usd": 74.87364571729924,
+   "por_celda_ars": {
+    "vp": 122316.29669856965,
+    "fp": -13044.447748859662,
+    "fn": 0.0,
+    "vn": 0.0
+   }
+  },
+  "regla_como_clasificador_2_5": {
+   "matriz": {
+    "filas": 7173,
+    "avisados": 2253,
+    "vp": 1713,
+    "fp": 540,
+    "fn": 0,
+    "vn": 4920
+   },
+   "neto_ars": 145738.52812035414,
+   "neto_usd": 99.86080611545293
+  },
+  "incremental_ars": 1962.1908966562478,
+  "incremental_usd": 1.344503524357538,
+  "incremental_anual_ars": 7848.763586624991,
+  "incremental_anual_usd": 5.378014097430152,
+  "regla_anual_usd": 299.49458286919696,
+  "modelo_anual_usd": 304.8725969666271,
+  "margen_perdido_fn_ars": {
+   "modelo": 7274008.8512,
+   "regla": 7477762.600533335
+  },
+  "margen_perdido_fn_usd": {
+   "modelo": 4984.189129259656,
+   "regla": 5123.8022701352775
+  },
+  "perdida_esperada": {
+   "matriz": {
+    "filas": 7173,
+    "largo": 1500,
+    "vp": 1178.0,
+    "fp": 322.0,
+    "fn": 535.0,
+    "vn": 5138.0
+   },
+   "neto_ars": 102551.34512866245,
+   "neto_usd": 70.26872114637474,
+   "contra_modelo_ars": -8682.694717703795,
+   "contra_modelo_anual_usd": -23.797712381128143,
+   "margen_propio": {
+    "facturacion_anualizada_vp_ars": {
+     "perdida_esperada": 86805311.17487714,
+     "logistica": 77080969.78059182,
+     "regla_umbral": 74723456.51395008
+    },
+    "margen": 0.3758,
+    "neto_ars": {
+     "perdida_esperada": 251542.85785140208,
+     "modelo": 213794.79754467352,
+     "regla": 204880.2526478071
+    },
+    "neto_usd": {
+     "perdida_esperada": 172.35848942348136,
+     "modelo": 146.49331993026632,
+     "regla": 140.38502687259032
+    },
+    "pe_contra_modelo_ars": 37748.060306728556,
+    "pe_contra_modelo_anual_usd": 103.46067797286013,
+    "modelo_contra_regla_anual_usd": 24.433172230704027
+   }
+  }
+ },
+ "costos_proyecto": {
+  "unicos": [
+   {
+    "componente": "Consultor / Data Scientist senior",
+    "tipo": "Desarrollo",
+    "origen": "Modelo",
+    "usd": 12000.0,
+    "calculo": "3 meses × USD 4.000"
+   },
+   {
+    "componente": "Sprint de integración / ETL",
+    "tipo": "Desarrollo",
+    "origen": "Brecha técnica",
+    "usd": 3000.0,
+    "calculo": "2 semanas × USD 1.500"
+   },
+   {
+    "componente": "Limpieza de datos maestros",
+    "tipo": "Desarrollo",
+    "origen": "Brecha técnica",
+    "usd": 1500.0,
+    "calculo": "1 semana × USD 1.500"
+   },
+   {
+    "componente": "Capacitación usuarios clave",
+    "tipo": "Change Mgmt",
+    "origen": "Adopción",
+    "usd": 1800.0,
+    "calculo": "2 talleres × USD 900"
+   },
+   {
+    "componente": "Adecuación legal del equipo (L3 a L5)",
+    "tipo": "Legal",
+    "origen": "Brecha legal",
+    "usd": 750.0,
+    "calculo": "20 h × USD 37,50"
+   },
+   {
+    "componente": "Adecuación legal de Casa Óga (L1, L2, L6)",
+    "tipo": "Legal",
+    "origen": "Brecha legal",
+    "usd": 0.0,
+    "calculo": "Casa Óga y su asesor legal, fuera de los USD 30.000"
+   },
+   {
+    "componente": "Piloto con grupo de control (3 meses)",
+    "tipo": "Desarrollo",
+    "origen": "Piloto",
+    "usd": 1350.0,
+    "calculo": "32 h del equipo + 4 h del operador × USD 37,50"
+   }
+  ],
+  "recurrentes": [
+   {
+    "componente": "Operador de la lista mensual (envío 71)",
+    "tipo": "Desarrollo",
+    "origen": "Brecha técnica",
+    "usd_anual": 3600.0,
+    "calculo": "8 h/mes × 12 × USD 37,50"
+   },
+   {
+    "componente": "Soporte y reentrenamiento",
+    "tipo": "Desarrollo",
+    "origen": "Modelo",
+    "usd_anual": 2400.0,
+    "calculo": "USD 200/mes"
+   },
+   {
+    "componente": "Infraestructura cloud / BD",
+    "tipo": "Infra",
+    "origen": "Modelo",
+    "usd_anual": 1200.0,
+    "calculo": "USD 100/mes"
+   },
+   {
+    "componente": "Licencias BI (Power BI Pro x5)",
+    "tipo": "Licencia",
+    "origen": "Modelo",
+    "usd_anual": 0.0,
+    "calculo": "sin licencias (A 1.6; envío 12)"
+   }
+  ],
+  "suma_unicos": 20400.0,
+  "contingencia": 3060.0,
+  "inversion_inicial": 23460.0,
+  "recurrente_anual": 7200.0,
+  "total_anio_1": 30660.0,
+  "recurrente_sobre_inicial": 0.3069053708439898,
+  "presupuesto_C28": 30000.0,
+  "margen_contra_presupuesto": -660.0
+ },
+ "costos_mvp": {
+  "unicos": [
+   {
+    "componente": "Consultor / Data Scientist senior",
+    "tipo": "Desarrollo",
+    "origen": "Modelo",
+    "usd": 4000.0,
+    "calculo": "1 mes × USD 4.000"
+   },
+   {
+    "componente": "Sprint de integración / ETL",
+    "tipo": "Desarrollo",
+    "origen": "Brecha técnica",
+    "usd": 3000.0,
+    "calculo": "2 semanas × USD 1.500"
+   },
+   {
+    "componente": "Limpieza de datos maestros",
+    "tipo": "Desarrollo",
+    "origen": "Brecha técnica",
+    "usd": 1500.0,
+    "calculo": "1 semana × USD 1.500"
+   },
+   {
+    "componente": "Capacitación usuarios clave",
+    "tipo": "Change Mgmt",
+    "origen": "Adopción",
+    "usd": 1800.0,
+    "calculo": "2 talleres × USD 900"
+   },
+   {
+    "componente": "Adecuación legal del equipo (L3 a L5)",
+    "tipo": "Legal",
+    "origen": "Brecha legal",
+    "usd": 750.0,
+    "calculo": "20 h × USD 37,50"
+   },
+   {
+    "componente": "Adecuación legal de Casa Óga (L1, L2, L6)",
+    "tipo": "Legal",
+    "origen": "Brecha legal",
+    "usd": 0.0,
+    "calculo": "Casa Óga y su asesor legal, fuera de los USD 30.000"
+   },
+   {
+    "componente": "Piloto con grupo de control (3 meses)",
+    "tipo": "Desarrollo",
+    "origen": "Piloto",
+    "usd": 1350.0,
+    "calculo": "32 h del equipo + 4 h del operador × USD 37,50"
+   }
+  ],
+  "recurrentes": [
+   {
+    "componente": "Operador de la lista mensual (envío 71)",
+    "tipo": "Desarrollo",
+    "origen": "Brecha técnica",
+    "usd_anual": 3600.0,
+    "calculo": "8 h/mes × 12 × USD 37,50"
+   },
+   {
+    "componente": "Soporte y reentrenamiento",
+    "tipo": "Desarrollo",
+    "origen": "Modelo",
+    "usd_anual": 2400.0,
+    "calculo": "USD 200/mes"
+   },
+   {
+    "componente": "Infraestructura cloud / BD",
+    "tipo": "Infra",
+    "origen": "Modelo",
+    "usd_anual": 0.0,
+    "calculo": "computadora de Casa Óga (A 1.6)"
+   },
+   {
+    "componente": "Licencias BI (Power BI Pro x5)",
+    "tipo": "Licencia",
+    "origen": "Modelo",
+    "usd_anual": 0.0,
+    "calculo": "sin licencias (A 1.6; envío 12)"
+   }
+  ],
+  "suma_unicos": 12400.0,
+  "contingencia": 1860.0,
+  "inversion_inicial": 14260.0,
+  "recurrente_anual": 6000.0,
+  "total_anio_1": 20260.0,
+  "recurrente_sobre_inicial": 0.42075736325385693,
+  "presupuesto_C28": 30000.0,
+  "margen_contra_presupuesto": 9740.0
+ },
+ "costo_total_anio_1": {
+  "proyecto": 30660.0,
+  "mvp": 20260.0,
+  "incremental": 10400.0
+ },
+ "escenarios": {
+  "conservador": {
+   "s": 0.0062826603938233305,
+   "m_ars": 7565.969709053127,
+   "dif_pp": -0.20868055555555484,
+   "diferencial": "tasa de éxito en el límite inferior del intervalo; el margen de una compra; la logística en el límite inferior de su diferencia con la regla",
+   "proyecto": {
+    "beneficio_usd": -0.435544031906024,
+    "costo_usd": 10400.0,
+    "roi_pct": -100.00418792338372,
+    "payback_meses": "no recupera"
+   },
+   "proyecto_completo": {
+    "beneficio_usd": -24.24454932685228,
+    "costo_usd": 30660.0,
+    "roi_pct": -100.07907550334916,
+    "payback_meses": "no recupera"
+   },
+   "mvp_con_descuento": {
+    "beneficio_usd": -23.809005294946257,
+    "costo_usd": 20260.0,
+    "roi_pct": -100.11751730155451,
+    "payback_meses": "no recupera"
+   },
+   "mvp_sin_descuento": {
+    "beneficio_usd": 56.64258360154781,
+    "costo_usd": 20260.0,
+    "roi_pct": -99.72042160117695,
+    "payback_meses": "no recupera"
+   }
+  },
+  "esperado": {
+   "s": 0.01019108280254777,
+   "m_ars": 15281.531200000001,
+   "dif_pp": 0.8888888888888838,
+   "diferencial": "tasa de compra a 7 días cerca del umbral; margen anual medio (G08); +0,89 puntos sobre la regla (G17)",
+   "proyecto": {
+    "beneficio_usd": 5.378014097430056,
+    "costo_usd": 10400.0,
+    "roi_pct": -99.94828832598624,
+    "payback_meses": "no recupera"
+   },
+   "proyecto_completo": {
+    "beneficio_usd": 304.87259696662704,
+    "costo_usd": 30660.0,
+    "roi_pct": -99.00563406077421,
+    "payback_meses": "no recupera"
+   },
+   "mvp_con_descuento": {
+    "beneficio_usd": 299.49458286919696,
+    "costo_usd": 20260.0,
+    "roi_pct": -98.52174440834553,
+    "payback_meses": "no recupera"
+   },
+   "mvp_sin_descuento": {
+    "beneficio_usd": 419.5324238316445,
+    "costo_usd": 20260.0,
+    "roi_pct": -97.9292575329139,
+    "payback_meses": "no recupera"
+   }
+  },
+  "optimista": {
+   "s": 0.01649057300846136,
+   "m_ars": 17037.16145354153,
+   "dif_pp": 1.9112500000000074,
+   "diferencial": "tasa de éxito en el límite superior; margen anual de los clientes con tres compras o más; la logística en el límite superior",
+   "proyecto": {
+    "beneficio_usd": 19.907789567901936,
+    "costo_usd": 10400.0,
+    "roi_pct": -99.80857894646248,
+    "payback_meses": "no recupera"
+   },
+   "proyecto_completo": {
+    "beneficio_usd": 675.5582069539212,
+    "costo_usd": 30660.0,
+    "roi_pct": -97.79661380641252,
+    "payback_meses": "no recupera"
+   },
+   "mvp_con_descuento": {
+    "beneficio_usd": 655.6504173860193,
+    "costo_usd": 20260.0,
+    "roi_pct": -96.76381827548856,
+    "payback_meses": "no recupera"
+   },
+   "mvp_sin_descuento": {
+    "beneficio_usd": 839.4923156125041,
+    "costo_usd": 20260.0,
+    "roi_pct": -95.85640515492348,
+    "payback_meses": "no recupera"
+   }
+  }
+ },
+ "esperado": {
+  "beneficio_ars": 7848.763586624851,
+  "beneficio_usd": 5.378014097430056,
+  "costo_usd": 10400.0,
+  "roi_pct": -99.94828832598624,
+  "payback": "no recupera",
+  "proyecto_completo": {
+   "beneficio_ars": 444936.15938546485,
+   "beneficio_usd": 304.87259696662704,
+   "costo_usd": 30660.0,
+   "roi_pct": -99.00563406077421,
+   "payback": "no recupera"
+  }
+ },
+ "sensibilidad": [
+  {
+   "variable": "% de adopción del modelo por parte de los usuarios",
+   "base": "100 % de la lista contactada",
+   "probado": "50 %",
+   "roi_proyecto_pct": -99.97414416299313,
+   "roi_mvp_pct": -99.26087220417276,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Beneficio por caso corregido",
+   "base": "margen anual medio (G08)",
+   "probado": "el margen de una compra",
+   "roi_proyecto_pct": -99.97591788441589,
+   "roi_mvp_pct": -99.82338845270647,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Desempeño del modelo (casos detectados / precisión)",
+   "base": "+0,89 puntos sobre la regla",
+   "probado": "−0,21 puntos (límite inferior)",
+   "roi_proyecto_pct": -100.01214012346964,
+   "roi_mvp_pct": null,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": null
+  },
+  {
+   "variable": "Costo de integración técnica",
+   "base": "ETL de 2 semanas",
+   "probado": "el doble",
+   "roi_proyecto_pct": -99.94828832598624,
+   "roi_mvp_pct": -98.73684275466387,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Tasa de éxito de la acción",
+   "base": "compra a 7 días cerca del umbral",
+   "probado": "límite inferior del intervalo",
+   "roi_proyecto_pct": -99.96512802076147,
+   "roi_mvp_pct": -99.31507190465145,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Falsos positivos que usan el descuento",
+   "base": "compra a 7 días de los que no cruzan (oferta de 7 días)",
+   "probado": "apertura: la oferta vale hasta la próxima compra",
+   "roi_proyecto_pct": -99.58676210979691,
+   "roi_mvp_pct": -102.36791225817043,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Margen bruto",
+   "base": "2024",
+   "probado": "2025",
+   "roi_proyecto_pct": -99.95050172693608,
+   "roi_mvp_pct": -98.62601897253978,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Descuento de la oferta",
+   "base": "15 %",
+   "probado": "sin descuento (a favor)",
+   "roi_proyecto_pct": -99.94527657388511,
+   "roi_mvp_pct": -97.9292575329139,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Descuento de la oferta",
+   "base": "15 %",
+   "probado": "20 % a los clientes de alto valor de la lista (el 20 % de mayor facturación, G50), 15 % al resto",
+   "roi_proyecto_pct": -99.94842753597314,
+   "roi_mvp_pct": -98.57776556430275,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Margen que vuelve con un cliente",
+   "base": "por registro de cliente (G08)",
+   "probado": "por persona unificada, id_cliente_canonico (G51; a favor)",
+   "roi_proyecto_pct": -99.94550666845676,
+   "roi_mvp_pct": -98.39069895693368,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Tasa de éxito de la acción",
+   "base": "compra a 7 días cerca del umbral (G31)",
+   "probado": "compra a 7 días de los que cruzan el umbral (G52; a favor)",
+   "roi_proyecto_pct": -99.94399473352924,
+   "roi_mvp_pct": -98.31947085175558,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Tipo de cambio",
+   "base": "30/12/2025",
+   "probado": "30/12/2024, el año de los montos (a favor)",
+   "roi_proyecto_pct": -99.92690665313256,
+   "roi_mvp_pct": -97.9105172907226,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Tipo de cambio",
+   "base": "30/12/2025",
+   "probado": "30/12/2022 (a favor)",
+   "roi_proyecto_pct": -99.5739309831313,
+   "roi_mvp_pct": -87.82017951208856,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  },
+  {
+   "variable": "Horizonte de evaluación",
+   "base": "1 año",
+   "probado": "3 años (a favor)",
+   "roi_proyecto_pct": -99.87395279459149,
+   "roi_mvp_pct": -97.21486748726723,
+   "roi_base_proyecto_pct": -99.94828832598624,
+   "roi_base_mvp_pct": -98.52174440834553,
+   "viable_proyecto": false,
+   "viable_mvp": false
+  }
+ ],
+ "umbral": {
+  "proyecto_techo_incremental_usd": 448.9023172730285,
+  "proyecto_roi_con_exito_100_pct": -95.68363156468241,
+  "mvp_s_equilibrio_con_descuento": 0.49557019216813325,
+  "mvp_s_equilibrio_sin_descuento": 0.397307171229313,
+  "mvp_s_equilibrio_sin_descuento_tc_2022": 0.04998287773751036,
+  "mvp_s_equilibrio_sin_descuento_3_anios": 0.21181841700269302,
+  "veces_la_tasa_base": 38.985766176876346,
+  "veces_la_tasa_base_con_descuento": 48.62782510649808
+ },
+ "tc_equilibrio": {
+  "proyecto": 0.7546888064062357,
+  "proyecto_completo": 14.511942576173022,
+  "mvp_con_descuento": 21.57390897328924,
+  "mvp_sin_descuento": 30.220761378646593
+ },
+ "mejora_minima": {
+  "aciertos_por_punto": 15.0,
+  "valor_por_punto_usd_anual": 6.050265859608848,
+  "puntos_para_pagar_costo_incremental": 1718.9327281350847,
+  "maximo_posible_pp": 18.422222222222228,
+  "valor_del_maximo_usd_anual": 111.45934216923858,
+  "mejora_observada_pp": 0.8888888888888835,
+  "con_exito_100": {
+   "valor_por_punto_usd_anual": 505.0151069321458,
+   "puntos_para_pagar_costo_incremental": 20.59344335890798,
+   "valor_del_maximo_usd_anual": 9303.50052548331
+  }
+ },
+ "retener_contra_reemplazar": {
+  "clientes_que_vuelven_por_anio": 49.88195329087048,
+  "costo_acciones_anual_ars": {
+   "con_descuento": 325185.22973253997,
+   "sin_descuento": 150000.0
+  },
+  "costo_por_cliente_retenido_ars": {
+   "con_descuento": 6519.0957506480845,
+   "sin_descuento": 3007.0995641514583
+  },
+  "cac_2025_ars": 11099,
+  "acciones_sobre_retencion_2025_pct": {
+   "con_descuento": 12.24803125169642,
+   "sin_descuento": 5.649717514124294
+  }
+ },
+ "adecuacion_legal": {
+  "horas": {
+   "L3": 8,
+   "L4": 4,
+   "L5": 8
+  },
+  "que": {
+   "L3": "filtro obligatorio de acepta_marketing y pidio_baja en la planilla mensual, con su prueba",
+   "L4": "acuerdo de confidencialidad entre el equipo y Casa Óga",
+   "L5": "política de retención y borrado de los extractos y las listas del proyecto"
+  },
+  "costo_usd": 750.0,
+  "casa_oga_usd": 0.0
+ },
+ "piloto": {
+  "meses": 3,
+  "lista_mes": 500,
+  "control_mes": 80,
+  "tratados": 1260,
+  "control": 240,
+  "horas_equipo": {
+   "diseño del sorteo y del registro de resultados": 8,
+   "medición de la compra a 7 días de tratados y control, 4 h por mes": 12,
+   "informe del piloto": 12
+  },
+  "horas_operador": 4,
+  "costo_horas_usd": 1350.0,
+  "costo_por_tratado_ars": 54.19753828875666,
+  "acciones_marketing_ars": 68288.89824383339,
+  "acciones_marketing_usd": 46.79191230567211,
+  "p0_compra_7d": 0.012070211228696502,
+  "mde_pp": 2.872566723190802
+ },
+ "alto_valor": {
+  "definicion": "20 % de mayor monetary de cada corte",
+  "en_vp": 0.27621901389267234,
+  "en_fp": 0.3293124246079614,
+  "en_la_lista": 0.28600000000000003
+ },
+ "margen_persona_unificada": {
+  "personas_2024": 4525,
+  "facturacion_media_ars": 42731,
+  "m_ars": 16058.3098,
+  "registros_2024": 4755
+ },
+ "tasa_exito_cruzan": {
+  "envios": 1162,
+  "compras_7d": 13,
+  "tasa": 0.011187607573149742
+ },
+ "meta_criterio_1": {
+  "regla_aciertos_por_mes": 407.88888888888886,
+  "logistica_aciertos_extra_por_mes": 4.444444444444419,
+  "aciertos_por_mes_por_punto": 5.0,
+  "aciertos_extra_por_mes_para_pagar": 8594.663640675424
+ }
+}

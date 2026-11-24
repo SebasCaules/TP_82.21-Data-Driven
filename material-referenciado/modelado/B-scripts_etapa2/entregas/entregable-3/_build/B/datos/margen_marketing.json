@@ -1,0 +1,452 @@
+{
+  "fuentes": {
+    "costo_margen": "raw/datasets/unidad-3/Costo_Margen_Categoria_Mensual.csv",
+    "inversion_marketing": "raw/datasets/unidad-3/Inversion_Marketing_Anual.csv",
+    "transacciones": "raw/datasets/unidad-1/Transacciones_clientes.csv (filas únicas, DC-01)",
+    "clientes": "raw/datasets/unidad-1/Clientes.csv",
+    "identidad": "raw/datasets/unidad-2/Identidad_resuelta.csv",
+    "respuesta": "raw/Respuestas_Consultas_Entregable_3.md"
+  },
+  "perfil_costo_margen": {
+    "filas": 336,
+    "columnas": [
+      "periodo",
+      "categoria",
+      "ventas_netas_ars",
+      "cmv_ars",
+      "margen_bruto_ars",
+      "margen_bruto_pct"
+    ],
+    "periodo_min": "2022-01",
+    "periodo_max": "2025-12",
+    "meses": 48,
+    "categorias": [
+      "Baño",
+      "Cocina y mesa",
+      "Decoracion",
+      "Iluminacion",
+      "Muebles",
+      "Organizacion",
+      "Textil hogar"
+    ],
+    "filas_por_categoria": {
+      "Baño": 48,
+      "Cocina y mesa": 48,
+      "Decoracion": 48,
+      "Iluminacion": 48,
+      "Muebles": 48,
+      "Organizacion": 48,
+      "Textil hogar": 48
+    },
+    "nulos": {
+      "periodo": 0,
+      "categoria": 0,
+      "ventas_netas_ars": 0,
+      "cmv_ars": 0,
+      "margen_bruto_ars": 0,
+      "margen_bruto_pct": 0
+    },
+    "pares_periodo_categoria_repetidos": 0,
+    "filas_ventas_menos_cmv_distinto_de_margen": 0,
+    "filas_pct_distinto_de_margen_sobre_ventas": 0,
+    "filas_con_monto_no_positivo": 0,
+    "margen_pct_fila_min": 33.4,
+    "margen_pct_fila_max": 42.9,
+    "categorias_transacciones": [
+      "Baño",
+      "Cocina y mesa",
+      "Decoracion",
+      "Iluminacion",
+      "Muebles",
+      "Organizacion",
+      "Textil hogar"
+    ],
+    "categorias_identicas_a_transacciones": true
+  },
+  "perfil_inversion_marketing": {
+    "filas": 4,
+    "columnas": [
+      "anio",
+      "gasto_adquisicion_ars",
+      "clientes_nuevos",
+      "costo_adquisicion_por_cliente_ars",
+      "inversion_retencion_ars",
+      "retencion_pct_del_gasto_mkt"
+    ],
+    "anios": [
+      "2022",
+      "2023",
+      "2024",
+      "2025"
+    ],
+    "nulos": {
+      "anio": 0,
+      "gasto_adquisicion_ars": 0,
+      "clientes_nuevos": 0,
+      "costo_adquisicion_por_cliente_ars": 0,
+      "inversion_retencion_ars": 0,
+      "retencion_pct_del_gasto_mkt": 0
+    }
+  },
+  "G01": {
+    "margen_bruto_pct": {
+      "2022": 40.4,
+      "2023": 39.5,
+      "2024": 37.6,
+      "2025": 36.1
+    },
+    "margen_bruto_pct_2dec": {
+      "2022": 40.44,
+      "2023": 39.5,
+      "2024": 37.58,
+      "2025": 36.06
+    },
+    "ventas_netas_M": {
+      "2022": 122.5,
+      "2023": 292.1,
+      "2024": 345.9,
+      "2025": 221.2
+    },
+    "cmv_M": {
+      "2022": 72.9,
+      "2023": 176.7,
+      "2024": 215.9,
+      "2025": 141.4
+    },
+    "margen_bruto_M": {
+      "2022": 49.5,
+      "2023": 115.4,
+      "2024": 130.0,
+      "2025": 79.8
+    },
+    "caida_2022_2025_pp": 4.3,
+    "margen_mensual_pct": {
+      "2022-01": 40.4,
+      "2022-02": 40.4,
+      "2022-03": 40.9,
+      "2022-04": 40.7,
+      "2022-05": 41.0,
+      "2022-06": 40.7,
+      "2022-07": 40.7,
+      "2022-08": 40.8,
+      "2022-09": 40.1,
+      "2022-10": 40.5,
+      "2022-11": 40.5,
+      "2022-12": 39.9,
+      "2023-01": 39.9,
+      "2023-02": 39.4,
+      "2023-03": 39.9,
+      "2023-04": 39.6,
+      "2023-05": 39.5,
+      "2023-06": 39.6,
+      "2023-07": 39.5,
+      "2023-08": 39.3,
+      "2023-09": 39.6,
+      "2023-10": 39.3,
+      "2023-11": 39.6,
+      "2023-12": 39.1,
+      "2024-01": 37.7,
+      "2024-02": 37.5,
+      "2024-03": 37.5,
+      "2024-04": 37.5,
+      "2024-05": 37.6,
+      "2024-06": 37.4,
+      "2024-07": 37.6,
+      "2024-08": 37.9,
+      "2024-09": 37.4,
+      "2024-10": 37.4,
+      "2024-11": 37.5,
+      "2024-12": 37.8,
+      "2025-01": 36.0,
+      "2025-02": 36.1,
+      "2025-03": 36.4,
+      "2025-04": 35.7,
+      "2025-05": 36.1,
+      "2025-06": 36.1,
+      "2025-07": 36.3,
+      "2025-08": 36.0,
+      "2025-09": 35.7,
+      "2025-10": 36.3,
+      "2025-11": 35.8,
+      "2025-12": 36.1
+    },
+    "margen_mensual_pct_rango_por_anio": {
+      "2022": [
+        39.9,
+        41.0
+      ],
+      "2023": [
+        39.1,
+        39.9
+      ],
+      "2024": [
+        37.4,
+        37.9
+      ],
+      "2025": [
+        35.7,
+        36.4
+      ]
+    },
+    "definicion": "suma de margen_bruto_ars / suma de ventas_netas_ars del año, las 7 categorías"
+  },
+  "G02": {
+    "margen_2025_pct": {
+      "Baño": 36.9,
+      "Cocina y mesa": 36.0,
+      "Decoracion": 36.9,
+      "Iluminacion": 35.5,
+      "Muebles": 36.3,
+      "Organizacion": 36.4,
+      "Textil hogar": 34.5
+    },
+    "margen_2022_pct": {
+      "Baño": 41.7,
+      "Cocina y mesa": 40.3,
+      "Decoracion": 41.5,
+      "Iluminacion": 39.6,
+      "Muebles": 40.8,
+      "Organizacion": 40.7,
+      "Textil hogar": 38.8
+    },
+    "ventas_2025_M": {
+      "Baño": 11.1,
+      "Cocina y mesa": 23.0,
+      "Decoracion": 44.6,
+      "Iluminacion": 31.2,
+      "Muebles": 66.0,
+      "Organizacion": 13.2,
+      "Textil hogar": 32.1
+    },
+    "rango_2025_pp": 2.4
+  },
+  "G03": {
+    "ventas_netas_contables_M": {
+      "2022": 122.5,
+      "2023": 292.1,
+      "2024": 345.9,
+      "2025": 221.2
+    },
+    "total_M": 981.7,
+    "transacciones_neto_M": {
+      "2022": 122.4,
+      "2023": 292.3,
+      "2024": 345.9,
+      "2025": 221.3
+    },
+    "transacciones_neto_total_M": 981.9,
+    "diferencia_M": {
+      "2022": 0.05,
+      "2023": -0.15,
+      "2024": 0.04,
+      "2025": -0.06
+    },
+    "diferencia_pct": {
+      "2022": 0.04,
+      "2023": -0.05,
+      "2024": 0.01,
+      "2025": -0.03
+    },
+    "diferencia_mensual_pct_min": -0.48,
+    "diferencia_mensual_pct_max": 0.31,
+    "diferencia_categoria_mes_pct_min": -1.08,
+    "diferencia_categoria_mes_pct_max": 1.17,
+    "contra_solo_positivas_C14": {
+      "transacciones_positivas_M": {
+        "2022": 123.8,
+        "2023": 295.8,
+        "2024": 349.7,
+        "2025": 225.0
+      },
+      "diferencia_pct": {
+        "2022": -1.09,
+        "2023": -1.25,
+        "2024": -1.08,
+        "2025": -1.69
+      }
+    },
+    "variacion_2025_2024_pct": -36.0,
+    "meses_M": {
+      "2024-12": 40.6,
+      "2025-01": 24.8,
+      "2025-06": 23.1,
+      "2025-08": 17.2,
+      "2025-09": 14.3,
+      "2025-10": 11.3,
+      "2025-11": 11.5,
+      "2025-12": 6.9
+    },
+    "mes_2025_sobre_mismo_mes_2024": {
+      "2025-01": {
+        "ventas_contables_pct": 89.7,
+        "operaciones_transacciones_pct": 93.9
+      },
+      "2025-02": {
+        "ventas_contables_pct": 97.9,
+        "operaciones_transacciones_pct": 95.8
+      },
+      "2025-03": {
+        "ventas_contables_pct": 94.4,
+        "operaciones_transacciones_pct": 92.4
+      },
+      "2025-04": {
+        "ventas_contables_pct": 86.4,
+        "operaciones_transacciones_pct": 89.1
+      },
+      "2025-05": {
+        "ventas_contables_pct": 82.7,
+        "operaciones_transacciones_pct": 80.5
+      },
+      "2025-06": {
+        "ventas_contables_pct": 69.7,
+        "operaciones_transacciones_pct": 69.9
+      },
+      "2025-07": {
+        "ventas_contables_pct": 65.7,
+        "operaciones_transacciones_pct": 69.4
+      },
+      "2025-08": {
+        "ventas_contables_pct": 65.5,
+        "operaciones_transacciones_pct": 62.9
+      },
+      "2025-09": {
+        "ventas_contables_pct": 53.5,
+        "operaciones_transacciones_pct": 53.5
+      },
+      "2025-10": {
+        "ventas_contables_pct": 41.3,
+        "operaciones_transacciones_pct": 43.9
+      },
+      "2025-11": {
+        "ventas_contables_pct": 36.1,
+        "operaciones_transacciones_pct": 36.2
+      },
+      "2025-12": {
+        "ventas_contables_pct": 17.1,
+        "operaciones_transacciones_pct": 18.0
+      }
+    },
+    "meses_2025_bajo_60pct_ventas_contables": [
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12"
+    ],
+    "meses_2025_bajo_60pct_operaciones": [
+      "2025-09",
+      "2025-10",
+      "2025-11",
+      "2025-12"
+    ],
+    "definicion": "ventas_netas_ars sumadas por año contra la suma de monto_neto de las 50.000 filas únicas de Transacciones (DC-01), devoluciones incluidas"
+  },
+  "G04": {
+    "costo_adquisicion_por_cliente_ars": {
+      "2022": 3337,
+      "2023": 8501,
+      "2024": 11003,
+      "2025": 11099
+    },
+    "recalculado_ars": {
+      "2022": 3337,
+      "2023": 8501,
+      "2024": 11003,
+      "2025": 11099
+    },
+    "gasto_adquisicion_M": {
+      "2022": 4.9,
+      "2023": 12.9,
+      "2024": 17.3,
+      "2025": 16.6
+    },
+    "cac_2025_sobre_2022_veces": 3.3,
+    "definicion": "gasto_adquisicion_ars / clientes_nuevos (la columna del archivo, recalculada)"
+  },
+  "G05": {
+    "inversion_retencion_M": {
+      "2022": 1.47,
+      "2023": 3.51,
+      "2024": 4.15,
+      "2025": 2.66
+    },
+    "retencion_pct_del_gasto_mkt": {
+      "2022": 23.1,
+      "2023": 21.4,
+      "2024": 19.4,
+      "2025": 13.8
+    },
+    "recalculado_pct": {
+      "2022": 23.1,
+      "2023": 21.4,
+      "2024": 19.4,
+      "2025": 13.8
+    },
+    "gasto_mkt_total_M": {
+      "2022": 6.4,
+      "2023": 16.4,
+      "2024": 21.4,
+      "2025": 19.2
+    },
+    "variacion_retencion_2025_2024_pct": -36.0,
+    "definicion": "inversion_retencion_ars; peso = retención / (adquisición + retención), la columna del archivo, recalculada"
+  },
+  "G06": {
+    "tope_general_pct": 15,
+    "tope_alto_valor_pct": 20,
+    "condiciones": [
+      "15% como tope general en acciones de retención.",
+      "Hasta 20% solo para clientes de alto valor, en una única compra.",
+      "Nunca acumulable con otras promociones vigentes ni con canje de puntos.",
+      "En campañas co-financiadas por proveedores, vale lo que se acuerde con cada proveedor."
+    ],
+    "confirmado_por": "Carlos F. (mail de Casa Óga del 13/10/2026)",
+    "lineas_encontradas_en_raw": 4
+  },
+  "G07": {
+    "clientes_nuevos_marketing": {
+      "2022": 1468,
+      "2023": 1512,
+      "2024": 1572,
+      "2025": 1495
+    },
+    "altas_clientes_csv": {
+      "2022": 1468,
+      "2023": 1512,
+      "2024": 1572,
+      "2025": 1495
+    },
+    "altas_2026": 3,
+    "diferencia": {
+      "2022": 0,
+      "2023": 0,
+      "2024": 0,
+      "2025": 0
+    },
+    "altas_duplicadas_identidad": {
+      "2022": 29,
+      "2023": 57,
+      "2024": 126,
+      "2025": 138
+    },
+    "primeras_compras_identificadas": {
+      "2022": 2472,
+      "2023": 2647,
+      "2024": 748,
+      "2025": 111
+    },
+    "altas_con_compra_identificada": {
+      "2022": 1448,
+      "2023": 1496,
+      "2024": 1554,
+      "2025": 1477
+    },
+    "altas_con_primera_compra_antes_del_alta": {
+      "2022": 234,
+      "2023": 1011,
+      "2024": 1445,
+      "2025": 1464
+    },
+    "definicion": "clientes_nuevos del archivo de marketing contra fecha_alta de Clientes.csv por año; duplicadas = registros con es_canonico False en Identidad_resuelta; primera compra = primera fila única con id_cliente y monto positivo"
+  },
+  "fallas": []
+}

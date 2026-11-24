@@ -1,0 +1,230 @@
+{
+  "aviso": "ensayo del camino de test con datos que no son de test; sus cifras no se citan",
+  "a_validacion_como_test": {
+    "diferencias_cero": true,
+    "decision": "la lista sigue con la regla del umbral",
+    "tabla_8_1": [
+      {
+        "fila": "metrica_principal",
+        "baseline_test": 0.758,
+        "modelo_validacion": 0.7386666666666667,
+        "modelo_test": 0.7386666666666667,
+        "diferencia_test_menos_validacion": 0.0,
+        "baseline_validacion": 0.758,
+        "modelo_menos_baseline_test": -0.019333333333333313
+      },
+      {
+        "fila": "precision",
+        "baseline_test": 0.758,
+        "modelo_validacion": 0.7386666666666667,
+        "modelo_test": 0.7386666666666667,
+        "diferencia_test_menos_validacion": 0.0,
+        "baseline_validacion": 0.758,
+        "modelo_menos_baseline_test": -0.019333333333333313
+      },
+      {
+        "fila": "recall",
+        "baseline_test": 0.9676595744680851,
+        "modelo_validacion": 0.9429787234042554,
+        "modelo_test": 0.9429787234042554,
+        "diferencia_test_menos_validacion": 0.0,
+        "baseline_validacion": 0.9676595744680851,
+        "modelo_menos_baseline_test": -0.02468085106382978
+      },
+      {
+        "fila": "f1",
+        "baseline_test": 0.8500934579439252,
+        "modelo_validacion": 0.8284112149532711,
+        "modelo_test": 0.8284112149532711,
+        "diferencia_test_menos_validacion": 0.0,
+        "baseline_validacion": 0.8500934579439252,
+        "modelo_menos_baseline_test": -0.021682242990654133
+      },
+      {
+        "fila": "auc_roc",
+        "baseline_test": 0.9697447138978086,
+        "modelo_validacion": 0.9660145075208882,
+        "modelo_test": 0.9660145075208882,
+        "diferencia_test_menos_validacion": 0.0,
+        "baseline_validacion": 0.9697447138978086,
+        "modelo_menos_baseline_test": -0.003730206376920342
+      },
+      {
+        "fila": "valor_neto_anual_usd",
+        "baseline_test": 264.5374912359015,
+        "modelo_validacion": 252.840310573991,
+        "modelo_test": 252.840310573991,
+        "diferencia_test_menos_validacion": 0.0,
+        "baseline_validacion": 264.5374912359015,
+        "modelo_menos_baseline_test": -11.697180661910494
+      }
+    ]
+  },
+  "b_cinco_cortes_de_entrenamiento": {
+    "cortes": [
+      "2024-02-29",
+      "2024-03-31",
+      "2024-04-30",
+      "2024-05-31",
+      "2024-06-30"
+    ],
+    "entrenamiento": {
+      "filas": 6668,
+      "cortes": 11,
+      "desde": "2023-01-31",
+      "hasta": "2023-11-30",
+      "clientes": 1548,
+      "positivos": 2281
+    },
+    "anualizar": 2.4,
+    "tabla_8_1": [
+      {
+        "fila": "metrica_principal",
+        "baseline_test": 0.7144,
+        "modelo_validacion": 0.7386666666666667,
+        "modelo_test": 0.6996,
+        "diferencia_test_menos_validacion": -0.039066666666666694,
+        "baseline_validacion": 0.758,
+        "modelo_menos_baseline_test": -0.014800000000000035
+      },
+      {
+        "fila": "precision",
+        "baseline_test": 0.7144,
+        "modelo_validacion": 0.7386666666666667,
+        "modelo_test": 0.6996,
+        "diferencia_test_menos_validacion": -0.039066666666666694,
+        "baseline_validacion": 0.758,
+        "modelo_menos_baseline_test": -0.014800000000000035
+      },
+      {
+        "fila": "recall",
+        "baseline_test": 1.0,
+        "modelo_validacion": 0.9429787234042554,
+        "modelo_test": 0.9792833146696529,
+        "diferencia_test_menos_validacion": 0.036304591265397534,
+        "baseline_validacion": 0.9676595744680851,
+        "modelo_menos_baseline_test": -0.020716685330347095
+      },
+      {
+        "fila": "f1",
+        "baseline_test": 0.8334111059262715,
+        "modelo_validacion": 0.8284112149532711,
+        "modelo_test": 0.8161455902939804,
+        "diferencia_test_menos_validacion": -0.012265624659290708,
+        "baseline_validacion": 0.8500934579439252,
+        "modelo_menos_baseline_test": -0.017265515632291173
+      },
+      {
+        "fila": "auc_roc",
+        "baseline_test": 0.969763427864131,
+        "modelo_validacion": 0.9660145075208882,
+        "modelo_test": 0.9634279581150355,
+        "diferencia_test_menos_validacion": -0.0025865494058527894,
+        "baseline_validacion": 0.9697447138978086,
+        "modelo_menos_baseline_test": -0.00633546974909549
+      },
+      {
+        "fila": "valor_neto_anual_usd",
+        "baseline_test": 238.15833208800683,
+        "modelo_validacion": 252.840310573991,
+        "modelo_test": 229.20393861578577,
+        "diferencia_test_menos_validacion": -23.636371958205217,
+        "baseline_validacion": 264.5374912359015,
+        "modelo_menos_baseline_test": -8.954393472221057
+      }
+    ],
+    "matriz_8_1": {
+      "vp": 1749.0,
+      "fn": 37.0,
+      "fp": 751.0,
+      "vn": 4015.0,
+      "filas": 6552.0,
+      "en_la_lista": 2500.0,
+      "positivos": 1786.0
+    },
+    "contra_roi_b_3_4": [
+      {
+        "fila": "modelo_sobre_la_regla",
+        "id": "G40",
+        "que": "modelo sobre la regla, contra el costo incremental",
+        "costo_usd": 10400.0,
+        "b_3_4": {
+          "beneficio_usd": 5.378014097430056,
+          "roi_pct": -99.94828832598624,
+          "recupera_en_el_anio": false
+        },
+        "contactables": {
+          "beneficio_usd": -8.954393472221057,
+          "roi_pct": -100.0860999372329,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": -14.332407569651114
+        },
+        "sin_filtro": {
+          "beneficio_usd": -6.430568285069967,
+          "roi_pct": -100.06183238735645,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": -11.808582382500024
+        },
+        "cambia_el_veredicto": false
+      },
+      {
+        "fila": "proyecto_completo",
+        "id": "G40 (beneficio de G34)",
+        "que": "proyecto con modelo frente a no contactar, contra el costo total del año 1",
+        "costo_usd": 30660.0,
+        "b_3_4": {
+          "beneficio_usd": 304.87259696662704,
+          "roi_pct": -99.00563406077421,
+          "recupera_en_el_anio": false
+        },
+        "contactables": {
+          "beneficio_usd": 229.20393861578577,
+          "roi_pct": -99.25243333784806,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": -75.66865835084127
+        },
+        "sin_filtro": {
+          "beneficio_usd": 303.7432140061668,
+          "roi_pct": -99.00931763207382,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": -1.1293829604602479
+        },
+        "cambia_el_veredicto": false
+      },
+      {
+        "fila": "regla_sin_modelo",
+        "id": "G41",
+        "que": "regla sin modelo con 15 % de descuento, contra el costo del año 1 de la regla",
+        "costo_usd": 20260.0,
+        "b_3_4": {
+          "beneficio_usd": 299.49458286919696,
+          "roi_pct": -98.52174440834553,
+          "recupera_en_el_anio": false
+        },
+        "contactables": {
+          "beneficio_usd": 238.15833208800683,
+          "roi_pct": -98.82448996995062,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": -61.33625078119013
+        },
+        "sin_filtro": {
+          "beneficio_usd": 310.17378229123676,
+          "roi_pct": -98.46903365107978,
+          "recupera_en_el_anio": false,
+          "contra_b_3_4_usd": 10.679199422039801
+        },
+        "cambia_el_veredicto": false
+      }
+    ],
+    "criterio": {
+      "ic95_limite_inferior": -0.02464066666666666,
+      "condicion_1_intervalo_excluye_el_cero": false,
+      "aciertos_extra_por_mes": -7.4,
+      "aciertos_extra_por_mes_para_pagar": 8594.663640675424,
+      "condicion_2_paga_lo_que_agrega": false,
+      "valor_extra_anual_usd": -8.954393472221096,
+      "costo_incremental_usd": 10400.0
+    },
+    "decision": "la lista sigue con la regla del umbral"
+  }
+}
